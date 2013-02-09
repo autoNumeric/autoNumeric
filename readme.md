@@ -18,7 +18,7 @@ The following is a list of the methods and settings/options the control autoNume
 
 ###  Methods that are supported:
     
-**init** - $(selector).autoNumeric('init', {options}); - *initializes autoNumeric*
+**'init'** - $(selector).autoNumeric('init', {options}); - *initializes autoNumeric*
 
 **destroy** - $(selector).autoNumeric('destroy'); - *stops autoNumeric*
 

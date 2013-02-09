@@ -1,6 +1,6 @@
 # autoNumeric-1.8.2
 
-[visit my home page for extensive demos and documentation ](http://www.decorplanit.com/plugin/)
+visit my home page for extensive demos and documentation [http://www.decorplanit.com/plugin/ ](http://www.decorplanit.com/plugin/)
 
 Is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. It supports most International numeric formats and currency signs including those used in Europe, North and South America, Asia and India lakhs (Lakhs values supported below 1 billion). 
 

@@ -18,21 +18,21 @@ The following is a list of the methods and settings/options the control autoNume
 
 ###  Methods that are supported:
     
-$(selector).autoNumeric(**'init'**, {options}); - *initializes autoNumeric*
+**init** - $(selector).autoNumeric('init', {options}); - *initializes autoNumeric*
 
-$(selector).autoNumeric('**destroy**'); - *stops autoNumeric*
+**destroy** - $(selector).autoNumeric('destroy'); - *stops autoNumeric*
 
-$(selector).autoNumeric('**update**', {options}); - *updates autoNumeric's settings*
+**update** - $(selector).autoNumeric('update', {options}); - *updates autoNumeric's settings*
 
-$(selector).autoNumeric('**set**', value); - *returns a formatted string via jQuery's ".val()" or ".text' methods to the selected tag(s)*
+**set** - $(selector).autoNumeric('set', value); - *returns a formatted string via jQuery's ".val()" or ".text' methods to the selected tag(s)*
 
-$(selector).autoNumeric('**get**'); - *allows you to easily remove the formatting from a string on a autoNumeric controlled element and returns a value*
+**get** - $(selector).autoNumeric('get'); - *allows you to easily remove the formatting from a string on a autoNumeric controlled element and returns a value*
 
-$(selector).autoNumeric('**getString**'); - *this basically uses jQuery's .serialize() method which creates a text string (URL-encoded notation) from a set of form elements that is ready for submission. The extra step taken here is the string is split and iterated through and the formatted values are replaced with unformatted values. The string is then joined back together and returned*
+**getString** - $(selector).autoNumeric('getString'); - *this basically uses jQuery's .serialize() method which creates a text string (URL-encoded notation) from a set of form elements that is ready for submission. The extra step taken here is the string is split and iterated through and the formatted values are replaced with unformatted values. The string is then joined back together and returned*
 
-$(selector).autoNumeric('**getArray**'); - *this basically uses jQuery's .serializeArray() method which returns a Javascript array of objects, ready to be encoded as a JSON string*
+**getArray** - $(selector).autoNumeric('getArray'); - *this basically uses jQuery's .serializeArray() method which returns a Javascript array of objects, ready to be encoded as a JSON string*
 
-$(selector).autoNumeric('**getSettings**'); - *this returns an object that shows the autoNumeric settings for the field. You may find this helpful when developing a page*
+**getSettings** - $(selector).autoNumeric('getSettings'); - *this returns an object that shows the autoNumeric settings for the field. You may find this helpful when developing a page*
 
 ****
 

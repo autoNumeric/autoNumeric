@@ -1,6 +1,6 @@
 {
     "name": "autoNumeric",
-    "title": "jQuery autoNumeric",
+    "title": "autoNumeric",
     "description": "jQuery plugin that automatically formats currency and numbers as you type on form inputs. It supports most International numeric formats and currency signs including those used in Europe, North and South America, Asia and India (lakhs**)..",
     "keywords": [
         "currency",

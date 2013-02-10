@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.8.2 - 2013-02-04 GMT 10:00 PM
+* @version: 1.8.3 - 2013-02-10 GMT 3:00 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bug at http://www.decorplanit.com/plugin/
 * Created by Sokolov Yura on 2010-11-07. http://github.com/funny_falcon
@@ -870,7 +870,7 @@
                 }
                 var holder = getHolder($this, settings);
                 if (settings.runOnce === undefined && settings.aForm && ($this[0].value || $this.text() !== '' || settings.wEmpty !== 'empty')) {
-                    if ($this.is('input[type=text], input:not([type])')) {
+                    if ($this.is('input[type=text], input[type=hidden], input:not([type])')) {
                         if (settings.nBracket !== null && ($this[0].value || settings.wEmpty !== 'empty')) { /** routine to handle page refresh */
                             settings.oEvent = "pageLoad";
                             $this[0].value = negativeBracket($this[0].value, settings.nBracket, settings.oEvent);
@@ -883,7 +883,7 @@
                     }
                 }
                 settings.runOnce = true;
-                if ($this.is('input[type=text], input:not([type])') && !$this.is('[readonly]')) {
+                if ($this.is('input[type=text], input[type=hidden], input:not([type])') && !$this.is('[readonly]')) {
                     $this.bind('keydown.autoNumeric', function (e) {
                         holder = getHolder($this);
                         if (holder.settings.aDec === holder.settings.aSep) {
@@ -993,7 +993,7 @@
                             $this.val(negativeBracket($this.val(), settingsClone.nBracket, settingsClone.oEvent));
                         }
                     });
-                } else if ($this.is('input[type=text], input:not([type])') && $this.is('[readonly]')) {
+                } else if ($this.is('input[type=text], input[type=hidden], input:not([type])') && $this.is('[readonly]')) {
                     this.blur();
                 }
             });
@@ -1053,7 +1053,7 @@
                     value = autoRound('', settings);
                 }
                 value = autoGroup(value, settings);
-                if ($this.is('input[type=text], input:not([type])')) {
+                if ($this.is('input[type=text], input[type=hidden], input:not([type])')) {
                     return $this.val(value);
                 }
                 if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
@@ -1074,7 +1074,7 @@
             /** code here, use .eq(0) to grab first element in selector
             we'll just grab the HTML of that element for our value */
             var getValue = '';
-            if ($this.is('input[type=text], input:not([type])')) {
+            if ($this.is('input[type=text], input[type=hidden], input:not([type])')) {
                 getValue = $this.eq(0).val();
             } else if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
                 getValue = $this.eq(0).text();

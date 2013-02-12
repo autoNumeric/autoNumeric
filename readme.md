@@ -8,7 +8,9 @@ Any number of currency formats can reside on the same page and are configured by
 
 Seven built in methods gives you the flexibility needed to use autoNumeric to its maximum potential. You can now easily start and stop autoNumeric, update the settings and remove the formatting from multiple inputs, preparing the values for manipulation or form submission.
 
-There are fifteen settings/options which controls the behavior and format of the form input field. These options are easy to implement with the data/argument code generator located below.
+There are fifteen settings/options which controls the behavior and format of the form input field. These setting are easy to implement with the HTML5 data or options passed as argument.
+
+The settings can also be modified via callback function allows the returned value to be taken as parameter to the default/options settings. You can pass the callback function via options or HTML5 data and can be used on any of the 15 options.
 
 If you are developing sites that span across International lines that use different currency symbols and formats you will find autoNumeric the ideal tool to shorten your development time.
 

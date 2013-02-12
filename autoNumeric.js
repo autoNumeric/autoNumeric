@@ -1098,7 +1098,7 @@
             if (settings.lZero === 'keep') {
                 return getValue;
             }
-            return +getValue;
+            return getValue;
         },
         /** method to get the unformated value from multiple fields */
         getString: function () {

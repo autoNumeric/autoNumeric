@@ -890,6 +890,10 @@
                             $.error("autoNumeric will not function properly when the decimal character aDec: '" + holder.settings.aDec + "' and thousand seperater aSep: '" + holder.settings.aSep + "' are the same character");
                             return this;
                         }
+                        if (holder.that.readOnly) {
+                            holder.processed = true
+                            return true;
+                        }
                         /* The below streamed code / comment allows the "enter" keydown to throw a change() event */
                         /* if (e.keyCode === 13 && holder.inVal !== $this.val()){
                             $this.change();

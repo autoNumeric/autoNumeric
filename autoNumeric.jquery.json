@@ -26,6 +26,7 @@
     ],
     "bugs": "https://github.com/BobKnothe/autoNumeric/issues",
     "homepage": "https://github.com/BobKnothe/autoNumeric",
+	"demo": "http://www.decorplanit.com/plugin/",
     "docs": "https://github.com/BobKnothe/autoNumeric/blob/master/readme.md",
     "dependencies": {
         "jquery": ">=1.7"

@@ -1148,12 +1148,6 @@
             return $this.eq(0).data('autoNumeric');
         }
     };
-        /** returns the settings object for those who need to look under the hood */
-        getSettings: function () {
-            var $this = autoGet($(this));
-            return $this.eq(0).data('autoNumeric');
-        }
-    };
     $.fn.autoNumeric = function (method) {
         if (methods[method]) {
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));

@@ -1,4 +1,4 @@
-# autoNumeric-1.8.5 
+# autoNumeric-1.8.6 
 
 visit my home page for extensive demos and documentation [http://www.decorplanit.com/plugin/ ](http://www.decorplanit.com/plugin/)
 
@@ -123,6 +123,75 @@ The following is a list of the methods and settings/options the control autoNume
 **"nBracket"** - controls if negative values are display with brackets when the input does not have focus
 
 +	nBracket:null	 no brackets use for negative values (default)
+	+Allowed options
+	+nBracket: '(,)'
+	+nBracket: '[,]'
+	+nBracket: '{,}'
+	+nBracket: '<,>'
+
+#### Version 1.8.6
+
++ Removed the error message when calling the 'init' methods multiple times. This was done when using the class selector for the 'init' method and then dynamically adding input(s) it allows you to use the same selector to init autoNumeric. **Please note:** if the input is already been initialized no changes to the option will occur you still need to use the update method to change exisiting options.
++ Added support for brackets '[,]', parentheses '(,)', braces '{,}' and '<,>' to the nBracket setting. **Please note:** the following format nBracket: '(,)' that the left and right symbol used to represent negative numbers must be enclosed in quote marks and separated by a comma to function properly. 
+
+#### Version 1.8.5
+
++ Fixed readonly - this occured when you toggle the readonly attribute
+
+
+#### Version 1.8.4
+
++ Fixed the getString and getArray methods under jQuery-1.9.1
+
+
+#### version on 1.8.3
+
++ Added input[type=hidden] support - this was done mainly for backward compatibility.
+
++ The "get" method now returns a numeric string - this also was done for backward compatibility.
+
+
+#### Version 1.8.2
+
++ Allowed dGroup settings to be passed as a numeric value or text representing a numeric value
+
++ Allows input fields without type that defaults to type text - Thanks Mathieu DEMONT
+
+
+#### Version 1.8.1
+
++ Modified the 'get' method so when a field is blank and the setting wEmpty:'empty' a empty string('') is returned.
+
+
+#### Version 1.8.0
+
++ autoNumeric() 1.8.0 is not compatible with earlier versions but I believe you will find version 1.8.0's new functionality and ease of use worth the effort to convert.
+
++ Changed autoNumeric structure to conform to jQuery's recommended plugin development. 
+
++ Created a single namespace and added multiple methods.
+
++ Added HTML 5 data support and eliminated the metadata plugin dependency. 
+
++ Added support for the following elements: 'DD', 'DT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'input', 'LABEL', 'P', 'SPAN', 'TD', 'TH'.
+
++ Changed the settings loading order to defaults, HTML5 data then options. Now the defaults settings are overridden by HTML5 data and options overrides both defaults & HTML5 data.
+
++ Added "lZero" to the settings to control leading zero behavior.
+
++ Added "nBracket" to the settings which controls if negative values are display with brackets.
+
++ Changed the callback feature to accept functions only.
+
++ Improved the 'aForm' behavior that allows values to be automatically formatted on page ready.
+
++ Fixed the issue for numbers that are less than 1 and greater than -1 and have six or more decimal places.
+
++ Fixed 'crtl' + 'a' (select all) and 'ctrl' + 'c' (copy) combined key events.
+
++ Fixed a IE & FF bug on readonly attribute.
+
++ General code clean up
 
 **"wEmpty"** - controls input display behavior
 

@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon 
-* @version: 1.8.5 - 2013-02-16 GMT 10:30 PM  
+* @version: 1.8.6 - 2013-02-27 GMT 10:30 PM  
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bug at http://www.decorplanit.com/plugin/
 * Created by Sokolov Yura on 2010-11-07. http://github.com/funny_falcon
@@ -187,7 +187,7 @@
     * places or removes brackets on negative values
     */
     function negativeBracket(s, nBracket, oEvent) {/** oEvent = settings.oEvent */
-        nBracket = nBracket.split('');
+        nBracket = nBracket.split(',');
         if (oEvent === 'set' || oEvent === 'focusout') {
             s = s.replace('-', '');
             s = nBracket[0] + s + nBracket[1];
@@ -865,7 +865,6 @@
                     }
                     $this.data('autoNumeric', settings);/** Save our new settings */
                 } else {
-                    $.error("autoNumeric has already been initialized. If you are trying to pass options please use the 'update' method");
                     return this;
                 }
                 var holder = getHolder($this, settings);
@@ -891,7 +890,7 @@
                             return this;
                         }
                         if (holder.that.readOnly) {
-                            holder.processed = true
+                            holder.processed = true;
                             return true;
                         }
                         /* The below streamed code / comment allows the "enter" keydown to throw a change() event */

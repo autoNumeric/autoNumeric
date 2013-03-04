@@ -749,6 +749,110 @@
         }
         return holder;
     }
+	
+	var globalDefaults = {
+		/**  allowed  numeric values
+		* please do not modify
+		*/
+		aNum: '0123456789',
+		/** allowed thousand separator characters
+		* comma = ','
+		* period "full stop" = '.'
+		* apostrophe is escaped = '\''
+		* space = ' '
+		* none = ''
+		* NOTE: do not use numeric characters
+		*/
+		aSep: ',',
+		/** digital grouping for the thousand separator used in Format
+		* dGroup: '2', results in 99,99,99,999 common in India
+		* dGroup: '3', results in 999,999,999 default
+		* dGroup: '4', results in 9999,9999,9999 used in some Asian countries
+		*/
+		dGroup: '3',
+		/** allowed decimal separator characters
+		* period "full stop" = '.'
+		* comma = ','
+		*/
+		aDec: '.',
+		/** allow to declare alternative decimal separator which is automatically replaced by aDec
+		* developed for countries the use a comma ',' as the decimal character
+		* and have keyboards\numeric pads that have a period 'full stop' as the decimal characters (Spain is an example)
+		*/
+		altDec: null,
+		/** allowed currency symbol
+		* Must be in quotes aSign: '$',
+		*/
+		aSign: '',
+		/** placement of currency sign
+		* for prefix  pSign: 'p',
+		* for suffix pSign: 's',
+		*/
+		pSign: 'p',
+		/** maximum possible value
+		* value must be enclosed in quotes and use the period for the decimal point
+		* value must be larger than vMin
+		*/
+		vMax: '999999999.99',
+		/** minimum possible value
+		* value must be enclosed in quotes and use the period for the decimal point
+		* value must be smaller than vMax
+		*/
+		vMin: '0.00',
+		/** max number of decimal places = used to overide deciaml places set by the vMin & vMax values
+		* value must be enclosed in quotes example mDec: '3',
+		* This can also set the value via a call back function mDec: 'css:#
+		*/
+		mDec: null,
+		/** method used for rounding
+		* mRound: 'S', Round-Half-Up Symmetric (default)
+		* mRound: 'A', Round-Half-Up Asymmetric
+		* mRound: 's', Round-Half-Down Symmetric (lower case s)
+		* mRound: 'a', Round-Half-Down Asymmetric (lower case a)
+		* mRound: 'B', Round-Half-Even "Bankers Rounding"
+		* mRound: 'U', Round Up "Round-Away-From-Zero"
+		* mRound: 'D', Round Down "Round-Toward-Zero" - same as trancate
+		* mRound: 'C', Round to Ceiling "Toward Positive Infinity"
+		* mRound: 'F', Round to Floor "Toward Negative Infinity"
+		*/
+		mRound: 'S',
+		/** controls decimal padding
+		* aPad: true - always Pad decimals with zeros
+		* aPad: false - does not pad with zeros.
+		* aPad: `some number` - pad decimals with zero to number different from mDec
+		* thanks to Jonas Johansson for the suggestion
+		*/
+		aPad: true,
+		/** places brackets on negative value -$ 999.99 to (999.99) 
+		* visible only when the field does NOT have focus
+		* nBracket: '()', or nBracket: '[]' or nBracket: null (no brackets)
+		*/
+		nBracket: null,
+		/** Displayed on empty string
+		* wEmpty: 'empty', - input can be blank
+		* wEmpty: 'zero', - displays zero
+		* wEmpty: 'sign', - displays the currency sign
+		*/
+		wEmpty: 'empty',
+		/** controls leading zero behavior
+		* lZero: 'allow', - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
+		* lZero: 'deny', - allows only one leading zero on values less than one
+		* lZero: 'keep', - allows leading zeros to be entered. on fousout zeros will be retained.
+		*/
+		lZero: 'allow',
+		/** determine if the default value will be formatted on page ready.
+		* true = atomatically formats the default value on page ready  
+		* false = will not format the default value
+		*/
+		aForm: true,
+		/**
+		*Multiplie value with vMul
+		*/
+		vMul: 1,
+		/** future use */
+		onSomeEvent: function () {}
+	};
+	
     var methods = {
         init: function (options) {
             return this.each(function () {
@@ -756,104 +860,7 @@
                 var settings = $this.data('autoNumeric');/** attempt to grab 'autoNumeric' settings, if they don't exist returns "undefined". */
                 var tagData = $this.data();/** attempt to grab HTML5 data, if they don't exist we'll get "undefined".*/
                 if (typeof settings !== 'object') {/** If we could't grab settings, create them from defaults and passed options. */
-                    var defaults = {
-                        /**  allowed  numeric values
-                        * please do not modify
-                        */
-                        aNum: '0123456789',
-                        /** allowed thousand separator characters
-                        * comma = ','
-                        * period "full stop" = '.'
-                        * apostrophe is escaped = '\''
-                        * space = ' '
-                        * none = ''
-                        * NOTE: do not use numeric characters
-                        */
-                        aSep: ',',
-                        /** digital grouping for the thousand separator used in Format
-                        * dGroup: '2', results in 99,99,99,999 common in India
-                        * dGroup: '3', results in 999,999,999 default
-                        * dGroup: '4', results in 9999,9999,9999 used in some Asian countries
-                        */
-                        dGroup: '3',
-                        /** allowed decimal separator characters
-                        * period "full stop" = '.'
-                        * comma = ','
-                        */
-                        aDec: '.',
-                        /** allow to declare alternative decimal separator which is automatically replaced by aDec
-                        * developed for countries the use a comma ',' as the decimal character
-                        * and have keyboards\numeric pads that have a period 'full stop' as the decimal characters (Spain is an example)
-                        */
-                        altDec: null,
-                        /** allowed currency symbol
-                        * Must be in quotes aSign: '$',
-                        */
-                        aSign: '',
-                        /** placement of currency sign
-                        * for prefix  pSign: 'p',
-                        * for suffix pSign: 's',
-                        */
-                        pSign: 'p',
-                        /** maximum possible value
-                        * value must be enclosed in quotes and use the period for the decimal point
-                        * value must be larger than vMin
-                        */
-                        vMax: '999999999.99',
-                        /** minimum possible value
-                        * value must be enclosed in quotes and use the period for the decimal point
-                        * value must be smaller than vMax
-                        */
-                        vMin: '0.00',
-                        /** max number of decimal places = used to overide deciaml places set by the vMin & vMax values
-                        * value must be enclosed in quotes example mDec: '3',
-                        * This can also set the value via a call back function mDec: 'css:#
-                        */
-                        mDec: null,
-                        /** method used for rounding
-                        * mRound: 'S', Round-Half-Up Symmetric (default)
-                        * mRound: 'A', Round-Half-Up Asymmetric
-                        * mRound: 's', Round-Half-Down Symmetric (lower case s)
-                        * mRound: 'a', Round-Half-Down Asymmetric (lower case a)
-                        * mRound: 'B', Round-Half-Even "Bankers Rounding"
-                        * mRound: 'U', Round Up "Round-Away-From-Zero"
-                        * mRound: 'D', Round Down "Round-Toward-Zero" - same as trancate
-                        * mRound: 'C', Round to Ceiling "Toward Positive Infinity"
-                        * mRound: 'F', Round to Floor "Toward Negative Infinity"
-                        */
-                        mRound: 'S',
-                        /** controls decimal padding
-                        * aPad: true - always Pad decimals with zeros
-                        * aPad: false - does not pad with zeros.
-                        * aPad: `some number` - pad decimals with zero to number different from mDec
-                        * thanks to Jonas Johansson for the suggestion
-                        */
-                        aPad: true,
-                        /** places brackets on negative value -$ 999.99 to (999.99) 
-                        * visible only when the field does NOT have focus
-                        * nBracket: '()', or nBracket: '[]' or nBracket: null (no brackets)
-                        */
-                        nBracket: null,
-                        /** Displayed on empty string
-                        * wEmpty: 'empty', - input can be blank
-                        * wEmpty: 'zero', - displays zero
-                        * wEmpty: 'sign', - displays the currency sign
-                        */
-                        wEmpty: 'empty',
-                        /** controls leading zero behavior
-                        * lZero: 'allow', - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
-                        * lZero: 'deny', - allows only one leading zero on values less than one
-                        * lZero: 'keep', - allows leading zeros to be entered. on fousout zeros will be retained.
-                        */
-                        lZero: 'allow',
-                        /** determine if the default value will be formatted on page ready.
-                        * true = atomatically formats the default value on page ready  
-                        * false = will not format the default value
-                        */
-                        aForm: true,
-                        /** future use */
-                        onSomeEvent: function () {}
-                    };
+                    var defaults = globalDefaults; /** Get global defaults */
                     settings = $.extend({}, defaults, tagData, options);/** Merge defaults, tagData and options */
                     if (settings.aDec === settings.aSep) {
                         $.error("autoNumeric will not function properly when the decimal character aDec: '" + settings.aDec + "' and thousand seperater aSep: '" + settings.aSep + "' are the same character");
@@ -1035,6 +1042,7 @@
         set: function (valueIn) {
             return $(this).each(function () {
                 var $this = autoGet($(this)), settings = $this.data('autoNumeric'), value = valueIn;
+				value /= settings.vMul;
                 /** added the following routine to handle numbers less than 0 that are stored in Exponential notaion ex: .0000001 stored as 1e-7 */
                 if (value < 0.000001 && value > 0) {
                     value = (value + 1).toString();
@@ -1101,7 +1109,7 @@
             if (settings.lZero === 'keep') {
                 return getValue;
             }
-            return getValue; /** returned Numeric String */
+            return (parseInt(getValue)*settings.vMul).toString(); /** returned Numeric String */
         },
         /** method to get the unformated value from multiple fields */
         getString: function () {
@@ -1156,4 +1164,11 @@
         }
         $.error('Method "' +  method + '" is not supported by autoNumeric()');
     };
+	
+	$.autoNumeric = {
+		defaults: function(options){
+			var ret = $.extend(globalDefaults, options);
+			return ret;
+		}
+	};
 }(jQuery));

@@ -1,5 +1,14 @@
 ### Change log:
 
+#### Version 1.8.7
+
++ Fixed the "getSting" method - it use to returned an error when no values were entered 
++ Modified the "init" method to better handle default and pre-existing values
++ Modified the "set" method - removed the routine that checked for values less than .000001 and greater than -1 and placed it in a separate function named checkValue()
++ Modified the "get" method:
+	+ Added a call to the checkValue() function - this corrects returned values example - when the input value was "12." the returned value was "12." - it now returns "12" 
+	+ When no numeric character is entered the returned value is an empty string "". 
+
 #### Version 1.8.6
 
 + Removed the error message when calling the 'init' methods multiple times. This was done when using the class selector for the 'init' method and then dynamically adding input(s) it allows you to use the same selector to init autoNumeric. **Please note:** if the input is already been initialized no changes to the option will occur you still need to use the update method to change exisiting options.

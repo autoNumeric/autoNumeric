@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon 
-* @version: 1.8.6 - 2013-02-27 GMT 10:30 PM  
+* @version: 1.8.7 - 2013-03-6 GMT 3:00 PM  
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bug at http://www.decorplanit.com/plugin/
 * Created by Sokolov Yura on 2010-11-07. http://github.com/funny_falcon
@@ -230,6 +230,25 @@
             s += '0';
         }
         return s;
+    }
+    /**
+    * function to handle numbers less than 0 that are stored in Exponential notaion ex: .0000001 stored as 1e-7
+    */
+    function checkValue(value) {
+        var valueIn = value;
+        value = +value;
+        if (value < 0.000001 && value > 0) {
+            value = (value + 1).toString();
+            value = value.substring(1);
+        }
+        if (value < 0 && value > -1) {
+            value = (value - 1).toString();
+            value = '-' + value.substring(2);
+        }
+        if (valueIn === "") {
+            return '';
+        }
+        return value.toString();
     }
     /**
     * prepare real number to be converted to our format
@@ -555,7 +574,8 @@
                 return false;
             }
             /** codes are taken from http://www.cambiaresearch.com/c4/702b8cd1-e5b0-42e6-83ac-25f0306e3e25/Javascript-Char-Codes-Key-Codes.aspx
-            * skip Fx keys, windows keys, other special keys */
+            * skip Fx keys, windows keys, other special keys 
+            */
             if ((kdCode >= 112 && kdCode <= 123) || (kdCode >= 91 && kdCode <= 93) || (kdCode >= 9 && kdCode <= 31) || (kdCode < 8 && (which === 0 || which === kdCode)) || kdCode === 144 || kdCode === 145 || kdCode === 45) {
                 return true;
             }
@@ -771,7 +791,7 @@
                         */
                         aSep: ',',
                         /** digital grouping for the thousand separator used in Format
-                        * dGroup: '2', results in 99,99,99,999 common in India
+                        * dGroup: '2', results in 99,99,99,999 common in India for values less than 1 billion and greater than -1 billion
                         * dGroup: '3', results in 999,999,999 default
                         * dGroup: '4', results in 9999,9999,9999 used in some Asian countries
                         */
@@ -787,7 +807,7 @@
                         */
                         altDec: null,
                         /** allowed currency symbol
-                        * Must be in quotes aSign: '$',
+                        * Must be in quotes aSign: '$', a space is allowed aSign: '$ ' 
                         */
                         aSign: '',
                         /** placement of currency sign
@@ -830,8 +850,8 @@
                         */
                         aPad: true,
                         /** places brackets on negative value -$ 999.99 to (999.99) 
-                        * visible only when the field does NOT have focus
-                        * nBracket: '()', or nBracket: '[]' or nBracket: null (no brackets)
+                        * visible only when the field does NOT have focus the left and right symbols should be enclosed in quotes and seperated by a comma
+                        * nBracket: null, nBracket: '(,)', nBracket: '[,]', nBracket: '<,>' or  nBracket: '{,}'
                         */
                         nBracket: null,
                         /** Displayed on empty string
@@ -875,7 +895,7 @@
                             $this[0].value = negativeBracket($this[0].value, settings.nBracket, settings.oEvent);
                             $this[0].value = autoStrip($this[0].value, settings);
                         }
-                        $this.autoNumeric('set', $this.val());
+                        $this.autoNumeric('set', autoStrip($this.val(), settings));
                     }
                     if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
                         $this.autoNumeric('set', $this.text());
@@ -895,9 +915,9 @@
                         }
                         /* The below streamed code / comment allows the "enter" keydown to throw a change() event */
                         /* if (e.keyCode === 13 && holder.inVal !== $this.val()){
-                            $this.change();
-                            holder.inVal = $this.val();
-                        } */
+                         *  $this.change();
+                         *   holder.inVal = $this.val();
+                        }*/
                         holder.init(e);
                         holder.settings.oEvent = 'keydown';
                         if (holder.skipAllways(e)) {
@@ -1009,8 +1029,7 @@
                 $this.removeData('autoNumeric');
             });
         },
-        /** method to update settings
-        * can call as many times */
+        /** method to update settings - can call as many times */
         update: function (options) {
             return $(this).each(function () {
                 var $this = autoGet($(this)), settings = $this.data('autoNumeric');
@@ -1035,22 +1054,16 @@
         set: function (valueIn) {
             return $(this).each(function () {
                 var $this = autoGet($(this)), settings = $this.data('autoNumeric'), value = valueIn;
-                /** added the following routine to handle numbers less than 0 that are stored in Exponential notaion ex: .0000001 stored as 1e-7 */
-                if (value < 0.000001 && value > 0) {
-                    value = (value + 1).toString();
-                    value = value.substring(1);
-                }
-                if (value < 0 && value > -1) {
-                    value = (value - 1).toString();
-                    value = '-' + value.substring(2);
-                }
+                value = checkValue(value);
                 settings.oEvent = 'set';
                 if (typeof settings !== 'object') {
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'set' method");
                     return this;
                 }
                 value.toString();
-                value = autoRound(value, settings);
+                if (value !== '') {
+                    value = autoRound(value, settings);
+                }
                 value = presentNumber(value, settings.aDec, settings.aNeg);
                 if (!autoCheck(value, settings)) {
                     value = autoRound('', settings);
@@ -1074,9 +1087,8 @@
                 $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'get' method");
                 return this;
             }
-            /** code here, use .eq(0) to grab first element in selector
-            we'll just grab the HTML of that element for our value */
             var getValue = '';
+            /** determine the element type then use .eq(0) selector to grab the value of the first element in selector */
             if ($this.is('input[type=text], input[type=hidden], input:not([type])')) { /**added hidden type */
                 getValue = $this.eq(0).val();
             } else if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
@@ -1085,8 +1097,8 @@
                 $.error("The <" + $this.prop('tagName') + "> is not supported by autoNumeric()");
                 return false;
             }
-            if (getValue === '' && settings.wEmpty === 'empty') {
-                return getValue;
+            if ((getValue === '' && settings.wEmpty === 'empty') || (getValue === settings.aSign && settings.wEmpty === 'sign')) {
+                return '';
             }
             if (settings.nBracket !== null && getValue !== '') {
                 getValue = negativeBracket(getValue, settings.nBracket, settings.oEvent);
@@ -1101,6 +1113,7 @@
             if (settings.lZero === 'keep') {
                 return getValue;
             }
+            getValue = checkValue(getValue);
             return getValue; /** returned Numeric String */
         },
         /** method to get the unformated value from multiple fields */
@@ -1110,7 +1123,7 @@
                 var miniParts = parts[i].split('=');
                 var settings = $('*[name=' + miniParts[0] + ']').data('autoNumeric');
                 if (typeof settings === 'object') {
-                    if (miniParts[1] !== '' && $('*[name=' + miniParts[0] + ']').data('autoNumeric') !== undefined) {
+                    if (miniParts[1] !== null && $('*[name=' + miniParts[0] + ']').data('autoNumeric') !== undefined) {
                         miniParts[1] = $('input[name=' + miniParts[0] + ']').autoNumeric('get');
                         parts[i] = miniParts.join('=');
                         isAutoNumeric = true;

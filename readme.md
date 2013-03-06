@@ -1,4 +1,4 @@
-# autoNumeric-1.8.7 
+# autoNumeric-1.8.8 
 
 visit my home page for extensive demos and documentation [http://www.decorplanit.com/plugin/ ](http://www.decorplanit.com/plugin/)
 

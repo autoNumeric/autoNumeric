@@ -1,5 +1,9 @@
 ### Change log:
 
+####Change notes on 1.8.8
+
++ Fixed the "init" when there is a default and value aForm=true and the aSep and aDec are not the defaults
+
 #### Version 1.8.7
 
 + Fixed the "getSting" method - it use to returned an error when no values were entered 

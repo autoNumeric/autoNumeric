@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon 
-* @version: 1.8.7 - 2013-03-6 GMT 3:00 PM  
+* @version: 1.8.8 - 2013-03-6 GMT 4:30 PM  
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bug at http://www.decorplanit.com/plugin/
 * Created by Sokolov Yura on 2010-11-07. http://github.com/funny_falcon
@@ -888,14 +888,18 @@
                     return this;
                 }
                 var holder = getHolder($this, settings);
-                if (settings.runOnce === undefined && settings.aForm && ($this[0].value || $this.text() !== '' || settings.wEmpty !== 'empty')) {
+                if (settings.runOnce === undefined && settings.aForm && ($this[0].value || $this.text() !== '')) {
                     if ($this.is('input[type=text], input[type=hidden], input:not([type])')) { /**added hidden type */
                         if (settings.nBracket !== null && ($this[0].value || settings.wEmpty !== 'empty')) { /** routine to handle page refresh */
                             settings.oEvent = "pageLoad";
                             $this[0].value = negativeBracket($this[0].value, settings.nBracket, settings.oEvent);
                             $this[0].value = autoStrip($this[0].value, settings);
                         }
-                        $this.autoNumeric('set', autoStrip($this.val(), settings));
+                        if ($this[0].value !== $($this[0]).attr("value")) {
+                            $this.autoNumeric('set', autoStrip($this.val(), settings));
+                        } else {
+                            $this.autoNumeric('set', $this.val());
+                        }
                     }
                     if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
                         $this.autoNumeric('set', $this.text());

@@ -1,8 +1,8 @@
 /**
 * autoNumeric.js
 * @author: Bob Knothe
-* @author: Sokolov Yura aka funny_falcon 
-* @version: 1.8.8 - 2013-03-6 GMT 4:30 PM  
+* @author: Sokolov Yura aka funny_falcon
+* @version: 1.8.9 - 2013-03-7 GMT 2:00 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bug at http://www.decorplanit.com/plugin/
 * Created by Sokolov Yura on 2010-11-07. http://github.com/funny_falcon
@@ -574,7 +574,7 @@
                 return false;
             }
             /** codes are taken from http://www.cambiaresearch.com/c4/702b8cd1-e5b0-42e6-83ac-25f0306e3e25/Javascript-Char-Codes-Key-Codes.aspx
-            * skip Fx keys, windows keys, other special keys 
+            * skip Fx keys, windows keys, other special keys
             */
             if ((kdCode >= 112 && kdCode <= 123) || (kdCode >= 91 && kdCode <= 93) || (kdCode >= 9 && kdCode <= 31) || (kdCode < 8 && (which === 0 || which === kdCode)) || kdCode === 144 || kdCode === 145 || kdCode === 45) {
                 return true;
@@ -807,7 +807,7 @@
                         */
                         altDec: null,
                         /** allowed currency symbol
-                        * Must be in quotes aSign: '$', a space is allowed aSign: '$ ' 
+                        * Must be in quotes aSign: '$', a space is allowed aSign: '$ '
                         */
                         aSign: '',
                         /** placement of currency sign
@@ -849,7 +849,7 @@
                         * thanks to Jonas Johansson for the suggestion
                         */
                         aPad: true,
-                        /** places brackets on negative value -$ 999.99 to (999.99) 
+                        /** places brackets on negative value -$ 999.99 to (999.99)
                         * visible only when the field does NOT have focus the left and right symbols should be enclosed in quotes and seperated by a comma
                         * nBracket: null, nBracket: '(,)', nBracket: '[,]', nBracket: '<,>' or  nBracket: '{,}'
                         */
@@ -867,7 +867,7 @@
                         */
                         lZero: 'allow',
                         /** determine if the default value will be formatted on page ready.
-                        * true = atomatically formats the default value on page ready  
+                        * true = atomatically formats the default value on page ready
                         * false = will not format the default value
                         */
                         aForm: true,
@@ -1058,12 +1058,12 @@
         set: function (valueIn) {
             return $(this).each(function () {
                 var $this = autoGet($(this)), settings = $this.data('autoNumeric'), value = valueIn;
-                value = checkValue(value);
-                settings.oEvent = 'set';
                 if (typeof settings !== 'object') {
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'set' method");
                     return this;
                 }
+                value = checkValue(value);
+                settings.oEvent = 'set';
                 value.toString();
                 if (value !== '') {
                     value = autoRound(value, settings);
@@ -1086,11 +1086,11 @@
         /** method to get the unformated value from a specific input field, returns a numeric value */
         get: function () {
             var $this = autoGet($(this)), settings = $this.data('autoNumeric');
-            settings.oEvent = 'get';
             if (typeof settings !== 'object') {
                 $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'get' method");
                 return this;
             }
+            settings.oEvent = 'get';
             var getValue = '';
             /** determine the element type then use .eq(0) selector to grab the value of the first element in selector */
             if ($this.is('input[type=text], input[type=hidden], input:not([type])')) { /**added hidden type */

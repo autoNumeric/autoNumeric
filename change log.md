@@ -1,6 +1,10 @@
 ### Change log:
 
-####Change notes on 1.8.8
+#### version 1.8.9
+
++ Fixed the "get" and "set" methods by moving the settings.oEvent property to ensure the error message would be thrown if the element had not been inialized prior to calling the "get" and "set" methods
+
+#### Version 1.8.8
 
 + Fixed the "init" when there is a default and value aForm=true and the aSep and aDec are not the defaults
 

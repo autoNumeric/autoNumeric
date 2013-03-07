@@ -24,44 +24,44 @@ The following is a list of the methods and settings/options the control autoNume
     
 **'init'** - *initializes autoNumeric*
 
-+	$(selector).autoNumeric('init', {options});
++	$('someSelector').autoNumeric('init', {options});
 
 **'destroy'** - *stops autoNumeric*
 
-+	$(selector).autoNumeric('destroy');
++	$('someSelector').autoNumeric('destroy');
 
 **'update'** - *updates autoNumeric's settings*
 
-+	$(selector).autoNumeric('update', {options});
++	$('someSelector').autoNumeric('update', {options});
 	+ Can be run multiple times
 	+ Overides the default settings and HTML5 data
 
 **'set'** - *returns a formatted string via jQuery's ".val()" or ".text' methods to the selected tag(s)*
 
-+	$(selector).autoNumeric('set', value);
++	$('someSelector').autoNumeric('set', value);
 
 **'get'** - *allows you to easily remove the formatting from a string on a autoNumeric controlled element and returns a string*
 
-+	$(selector).autoNumeric('get');
++	$('someSelector').autoNumeric('get');
 
 **'getString'** - *this basically uses jQuery's .serialize() method which creates a text string (URL-encoded notation) from a set of form elements that is ready for submission. The extra step taken here is the string is split and iterated through and the formatted values are replaced with unformatted values. The string is then joined back together and returned*
 
-+	$(selector).autoNumeric('getString');
++	$('someSelector').autoNumeric('getString');
 
 **'getArray'** - *this basically uses jQuery's .serializeArray() method which returns a Javascript array of objects, ready to be encoded as a JSON string*
 
-+	$(selector).autoNumeric('getArray');
++	$('someSelector').autoNumeric('getArray');
 
 **'getSettings'** - *this returns an object that shows the autoNumeric settings for the field. You may find this helpful when developing a page*
 
-+	$(selector).autoNumeric('getSettings');
++	$('someSelector').autoNumeric('getSettings');
 
 ****
 
-###  Settings / options that are supported: 
+###  Default settings & options that are supported: 
 [visit my home page for an easy to use settings and option code generator ](http://www.decorplanit.com/plugin/)
 
-**"aSep"** - controls the thousand character
+**"aSep"** - controls the thousand separator character
 
 +	aSep: ','	comma (default)
 +	aSep: '\''	apostrophe (note: the apostrophe is escaped)
@@ -87,14 +87,17 @@ The following is a list of the methods and settings/options the control autoNume
 **"aSign"** - displays the desired currency symbol (examples: € or EUR). Note: other symbols can be used, such as %, °C, °F, km/h & MPH the possibilities are endless
 
 +	aSign: '' none   (default)
+	+ example - aSign: 'U$D' 
 
 **"pSign"** - controls the placement of the currency symbol (prefix or suffix)
 
 +	pSign: 'p' prefix to the left   (default)
++	pSign: 's' suufix to the right
 
 **"vMin"** - controls the minimum value allowed
 
 +	vMin: '0.00'   (default)
+	+ example - vMin: '-999999999.99'
 
 **"vMax"** - controls the maximum value allowed
 
@@ -104,7 +107,8 @@ The following is a list of the methods and settings/options the control autoNume
 
 **"mDec"** - overrides the decimal places that that are set via the vMin/vMax values
 
-+ 	mDec: null   (default method)
++ 	mDec: null   (default method) 
+	* example - mDec: '4'
 
 **"mRound"** - sets the rounding method used (9 different available)
 
@@ -120,16 +124,17 @@ The following is a list of the methods and settings/options the control autoNume
 
 **"aPad"** - controls padding of the decimal places
 
-+ aPad: true	always pads the decimal with zeros (default)
++ 	aPad: true		always pads the decimal with zeros (default)
++ 	aPad: false  	no padding
 
 **"nBracket"** - controls if negative values are display with brackets when the input does not have focus
 
 +	nBracket:null	 no brackets use for negative values (default)
-	+Allowed options
-	+nBracket: '(,)'
-	+nBracket: '[,]'
-	+nBracket: '{,}'
-	+nBracket: '<,>'
++	Allowed options
++	nBracket: '(,)'
++	nBracket: '[,]'
++	nBracket: '{,}'
++	nBracket: '<,>'
 
 **"wEmpty"** - controls input display behavior
 
@@ -156,7 +161,7 @@ You can change the defaults with options via the "init" method or the "update" m
 
 &lt;input type="text" id="someID" class="someClass"&gt;
 
-$('#someId').autoNumeric('**init**', {aSign: '€ ', vMax: '-999999999.99', nBracket: '()'});
+$('someSelector').autoNumeric('init', {aSign: '€ ', vMax: '-999999999.99', nBracket: '(,)'});
 
 + Initializes autoNumeric 
 + Adds the Euro sign
@@ -168,9 +173,9 @@ $('#someId').autoNumeric('**init**', {aSign: '€ ', vMax: '-999999999.99', nBrack
 You can also change the defaults with HTML5 data attributes - example:
 
 
-&lt;input type="text" id="someID" class="someClass  data-a-sign="€ " data-v-max="-999999999.99" data-n-bracket"()"&gt;
+&lt;input type="text" id="someID" class="someClass  data-a-sign="€ " data-v-max="-999999999.99" data-n-bracket"(,)"&gt;
 
-$('#someId').autoNumeric('**init**');
+$('someSelector').autoNumeric('init');
 
 + Initializes autoNumeric 
 + Adds the Euro sign

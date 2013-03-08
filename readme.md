@@ -1,4 +1,5 @@
-# autoNumeric-1.8.9
+[autoNumeric-1.8.9](http://www.decorplanit.com/plugin/) - currency formatting made easy
+================================
 
 visit my home page for extensive demos and documentation [http://www.decorplanit.com/plugin/ ](http://www.decorplanit.com/plugin/)
 

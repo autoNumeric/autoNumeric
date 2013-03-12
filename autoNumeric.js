@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.8.9 - 2013-03-7 GMT 2:00 PM
+* @version: 1.9.0 - 2013-03-12 GMT 1030 AM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bug at http://www.decorplanit.com/plugin/
 * Created by Sokolov Yura on 2010-11-07. http://github.com/funny_falcon
@@ -34,7 +34,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 (function ($) {
-    /* "use strict"; */
+    "use strict";
     /*jslint browser: true*/
     /*global jQuery*/
     /**
@@ -236,7 +236,7 @@
     */
     function checkValue(value) {
         var valueIn = value;
-        value = +value;
+        value = value.valueOf();
         if (value < 0.000001 && value > 0) {
             value = (value + 1).toString();
             value = value.substring(1);

@@ -1,5 +1,9 @@
 ### Change log:
 
+#### Version 1.9.0
++ Fixed a rounding error when the integers were 15 or more digits in length
++ Added "use strict";
+
 #### version 1.8.9
 
 + Fixed the "get" and "set" methods by moving the settings.oEvent property to ensure the error message would be thrown if the element had not been inialized prior to calling the "get" and "set" methods

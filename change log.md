@@ -1,5 +1,8 @@
 ### Change log:
 
+#### Version 1.9.1
++ Modified the checkValue function to handle the values as text with the exception of values less than "0.000001 and greater than -1"
+
 #### Version 1.9.0
 + Fixed a rounding error when the integers were 15 or more digits in length
 + Added "use strict";

@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.9.0 - 2013-03-12 GMT 1030 AM
+* @version: 1.9.1 - 2013-03-17 GMT 10:30 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bug at http://www.decorplanit.com/plugin/
 * Created by Sokolov Yura on 2010-11-07. http://github.com/funny_falcon
@@ -232,23 +232,39 @@
         return s;
     }
     /**
-    * function to handle numbers less than 0 that are stored in Exponential notaion ex: .0000001 stored as 1e-7
-    */
+     * function to handle numbers less than 0 that are stored in Exponential notaion ex: .0000001 stored as 1e-7
+     */
     function checkValue(value) {
-        var valueIn = value;
-        value = value.valueOf();
-        if (value < 0.000001 && value > 0) {
-            value = (value + 1).toString();
-            value = value.substring(1);
-        }
-        if (value < 0 && value > -1) {
-            value = (value - 1).toString();
-            value = '-' + value.substring(2);
-        }
-        if (valueIn === "") {
-            return '';
-        }
-        return value.toString();
+		value = value.toString();
+        var decimal = value.indexOf('.');
+		if (decimal === value.length -1) {
+			value = value.substring(0, value.length - 1);
+		}
+		if (decimal !== -1) {	
+			if (decimal === 1 && value.charAt(0) === "0") {
+				value = +value;
+				if (value < 0.000001 && value > 0) {
+					value = (value + 1).toString();
+					value = value.substring(1);
+				} 
+				if (value < 0 && value > -1) {
+					value = (value - 1).toString();
+					value = '-' + value.substring(2);
+				}
+				value = value.toString();
+			} else {
+				var parts = value.split('.');
+				if (parts[1] !== undefined) {
+					if (+parts[1] === 0) {
+						value = parts[0];
+					} else {
+						parts[1] = parts[1].replace(/0*$/, '');
+						value = parts.join('.'); 
+					}
+				}	
+			}
+		}
+		return value.replace(/^0*(\d)/, '$1');
     }
     /**
     * prepare real number to be converted to our format

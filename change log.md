@@ -1,6 +1,12 @@
 ### Change log:
 
 #### Version 1.9.1
++ Modified the "checkValue" function - eliminated redundant code
++ Modified the "update" method include calling the "getHolder" function which updates the regular expressions
++ Modified the "getHolder function so the regular expressions are updated
++ Modified the "set" method to convert value from number to string
+
+#### Version 1.9.1
 + Modified the checkValue function to handle the values as text with the exception of values less than "0.000001 and greater than -1"
 
 #### Version 1.9.0

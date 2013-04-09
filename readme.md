@@ -1,4 +1,4 @@
-[autoNumeric-1.9.2](http://www.decorplanit.com/plugin/) - currency formatting made easy
+[autoNumeric-1.9.3](http://www.decorplanit.com/plugin/) - currency formatting made easy
 ================================
 
 Visit my home page for extensive demos and documentation [http://www.decorplanit.com/plugin/ ](http://www.decorplanit.com/plugin/)
@@ -131,7 +131,6 @@ The following is a list of the methods and settings/options the control autoNume
 **"nBracket"** - controls if negative values are display with brackets when the input does not have focus
 
 +	nBracket:null	 no brackets use for negative values (default)
-+	Allowed options
 +	nBracket: '(,)'
 +	nBracket: '[,]'
 +	nBracket: '{,}'

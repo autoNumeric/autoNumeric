@@ -1170,10 +1170,10 @@
                 i = 0;
             for (i; i < parts.length; i += 1) {
                 var miniParts = parts[i].split('=');
-                var settings = $('*[name=' + miniParts[0] + ']').data('autoNumeric');
+                var settings = $('*[name="' + unescape(miniParts[0]) + '"]').data('autoNumeric');
                 if (typeof settings === 'object') {
-                    if (miniParts[1] !== null && $('*[name=' + miniParts[0] + ']').data('autoNumeric') !== undefined) {
-                        miniParts[1] = $('input[name=' + miniParts[0] + ']').autoNumeric('get');
+                    if (miniParts[1] !== null && $('*[name="' + unescape(miniParts[0]) + '"]').data('autoNumeric') !== undefined) {
+                        miniParts[1] = $('input[name="' + unescape(miniParts[0]) + '"]').autoNumeric('get');
                         parts[i] = miniParts.join('=');
                         isAutoNumeric = true;
                     }
@@ -1191,10 +1191,10 @@
                 $this = autoGet($(this)),
                 formFields = $this.serializeArray();
             $.each(formFields, function(i, field) {
-                var settings = $('*[name=' + field.name + ']').data('autoNumeric');
+                var settings = $('*[name="' + unescape(field.name) + '"]').data('autoNumeric');
                 if (typeof settings === 'object') {
-                    if (field.value !== '' && $('*[name=' + field.name + ']').data('autoNumeric') !== undefined) {
-                        field.value = $('input[name=' + field.name + ']').autoNumeric('get').toString();
+                    if (field.value !== '' && $('*[name="' + unescape(field.name) + '"]').data('autoNumeric') !== undefined) {
+                        field.value = $('input[name="' + unescape(field.name) + '"]').autoNumeric('get').toString();
                     }
                     isAutoNumeric = true;
                 }

@@ -937,7 +937,7 @@
                     }
                 }
                 settings.runOnce = true;
-                if ($this.is('input[type=text], input[type=hidden], input:not([type])') && !$this.is('[readonly]')) { /**added hidden type */
+                if ($this.is('input[type=text], input[type=hidden], input:not([type])')) { /**added hidden type */
                     $this.bind('keydown.autoNumeric', function(e) {
                         holder = getHolder($this);
                         if (holder.settings.aDec === holder.settings.aSep) {
@@ -1054,8 +1054,6 @@
                             $this.val(negativeBracket($this.val(), settingsClone.nBracket, settingsClone.oEvent));
                         }
                     });
-                } else if ($this.is('input[type=text], input[type=hidden], input:not([type])') && $this.is('[readonly]')) { /**added hidden type */
-                    this.blur();
                 }
             });
         },

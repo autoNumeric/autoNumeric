@@ -1,5 +1,9 @@
 ### Change log:
 
+#### Version 1.9.4
++ Merged issue #11 - Both getString and getArray were using escaped versions of the name from jQuery's serialization. So this change wraps the name finder with quotes and unescapes the name.Fixed a bug in autoCode that corrects the pasted values and page re-load - Thanks Cory.
++ Merged issue #12 - If a input is readonly during "init", autocomplete won't work if the input is enabled later. This commit should fix the Problem - Thanks Sven.
+
 #### Version 1.9.3
 
 + Fixed a bug in autoCode function that corrects pasted values and page re-load

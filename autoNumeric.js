@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.9.4 - 2013-04-13 GMT 12:00 PM
+* @version: 1.9.5 - 2013-04-16 GMT 9:00 AM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bug at http://www.decorplanit.com/plugin/
 * Created by Sokolov Yura on 2010-11-07. http://github.com/funny_falcon
@@ -109,10 +109,8 @@
         runCallbacks($this, settings);
         settings.oEvent = null;
         settings.tagList = ['DD', 'DT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LABEL', 'P', 'SPAN', 'TD', 'TH'];
-        var vmax = settings.vMax.toString()
-            .split('.'),
-            vmin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString()
-                .split('.');
+        var vmax = settings.vMax.toString().split('.'),
+            vmin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
         convertKeyToNumber(settings, 'vMax');
         convertKeyToNumber(settings, 'vMin');
         convertKeyToNumber(settings, 'mDec'); /** set mDec if not defained by user */
@@ -243,13 +241,11 @@
             if (decimal === 1 && value.charAt(0) === '0') {
                 value = +value;
                 if (value < 0.000001 && value > 0) {
-                    value = (value + 1)
-                        .toString();
+                    value = (value + 1).toString();
                     value = value.substring(1);
                 }
                 if (value < 0 && value > -1) {
-                    value = (value - 1)
-                        .toString();
+                    value = (value - 1).toString();
                     value = '-' + value.substring(2);
                 }
                 value = value.toString();
@@ -415,8 +411,7 @@
         } /** rounded length of the string after rounding */
         var rLength = dPos + settings.mDec; /** test round */
         var tRound = +iv.charAt(rLength + 1);
-        var ivArray = iv.substring(0, rLength + 1)
-            .split('');
+        var ivArray = iv.substring(0, rLength + 1).split('');
         var odd = (iv.charAt(rLength) === '.') ? (iv.charAt(rLength - 1) % 2) : (iv.charAt(rLength) % 2);
         if ((tRound > 4 && settings.mRound === 'S') || (tRound > 4 && settings.mRound === 'A' && nSign === '') || (tRound > 5 && settings.mRound === 'A' && nSign === '-') || (tRound > 5 && settings.mRound === 's') || (tRound > 5 && settings.mRound === 'a' && nSign === '') || (tRound > 4 && settings.mRound === 'a' && nSign === '-') || (tRound > 5 && settings.mRound === 'B') || (tRound === 5 && settings.mRound === 'B' && odd === 1) || (tRound > 0 && settings.mRound === 'C' && nSign === '') || (tRound > 0 && settings.mRound === 'F' && nSign === '-') || (tRound > 0 && settings.mRound === 'U')) {
             /** Round up the last digit if required, and continue until no more 9's are found */
@@ -717,6 +712,10 @@
                     left = settingsClone.aNeg;
                     right = right.substring(1, right.length);
                 }
+                if (settingsClone.vMax <= 0 && settingsClone.vMin < 0 && settingsClone.aNeg && left === '' && right.indexOf(settingsClone.aNeg) === -1) {
+                    left = settingsClone.aNeg;
+                    right = right.substring(1, right.length);
+                }
                 this.setValueParts(left + cCode, right);
                 return true;
             } /** prevent any other character */
@@ -778,8 +777,7 @@
     /** thanks to Anthony & Evan C */
     function autoGet(obj) {
         if (typeof obj === 'string') {
-            obj = obj.replace(/\[/g, "\\[")
-                .replace(/\]/g, "\\]");
+            obj = obj.replace(/\[/g, "\\[").replace(/\]/g, "\\]");
             obj = '#' + obj.replace(/(:|\.)/g, '\\$1');
             /** obj = '#' + obj.replace(/([;&,\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|])/g, '\\$1'); */
             /** possible modification to replace the above 2 lines */
@@ -1168,10 +1166,10 @@
                 i = 0;
             for (i; i < parts.length; i += 1) {
                 var miniParts = parts[i].split('=');
-                var settings = $('*[name="' + unescape(miniParts[0]) + '"]').data('autoNumeric');
+                var settings = $('*[name="' + decodeURIComponent(miniParts[0]) + '"]').data('autoNumeric');
                 if (typeof settings === 'object') {
-                    if (miniParts[1] !== null && $('*[name="' + unescape(miniParts[0]) + '"]').data('autoNumeric') !== undefined) {
-                        miniParts[1] = $('input[name="' + unescape(miniParts[0]) + '"]').autoNumeric('get');
+                    if (miniParts[1] !== null && $('*[name="' + decodeURIComponent(miniParts[0]) + '"]').data('autoNumeric') !== undefined) {
+                        miniParts[1] = $('input[name="' + decodeURIComponent(miniParts[0]) + '"]').autoNumeric('get');
                         parts[i] = miniParts.join('=');
                         isAutoNumeric = true;
                     }
@@ -1189,10 +1187,10 @@
                 $this = autoGet($(this)),
                 formFields = $this.serializeArray();
             $.each(formFields, function(i, field) {
-                var settings = $('*[name="' + unescape(field.name) + '"]').data('autoNumeric');
+                var settings = $('*[name="' + decodeURIComponent(field.name) + '"]').data('autoNumeric');
                 if (typeof settings === 'object') {
-                    if (field.value !== '' && $('*[name="' + unescape(field.name) + '"]').data('autoNumeric') !== undefined) {
-                        field.value = $('input[name="' + unescape(field.name) + '"]').autoNumeric('get').toString();
+                    if (field.value !== '' && $('*[name="' + decodeURIComponent(field.name) + '"]').data('autoNumeric') !== undefined) {
+                        field.value = $('input[name="' + decodeURIComponent(field.name) + '"]').autoNumeric('get').toString();
                     }
                     isAutoNumeric = true;
                 }

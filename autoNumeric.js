@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.9.5 - 2013-04-16 GMT 9:00 AM
+* @version: 1.9.6 - 2013-04-20 GMT 3:00 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bug at http://www.decorplanit.com/plugin/
 * Created by Sokolov Yura on 2010-11-07. http://github.com/funny_falcon
@@ -616,7 +616,7 @@
                 }
                 return e.type === 'keydown' || e.type === 'keypress' || kdCode === 67;
             }
-            if (ctrlKey || cmdKey || shiftKey) {
+            if (ctrlKey || cmdKey) {
                 return true;
             }
             if (kdCode === 37 || kdCode === 39) { /** jump over thousand separator */
@@ -712,9 +712,8 @@
                     left = settingsClone.aNeg;
                     right = right.substring(1, right.length);
                 }
-                if (settingsClone.vMax <= 0 && settingsClone.vMin < 0 && settingsClone.aNeg && left === '' && right.indexOf(settingsClone.aNeg) === -1) {
-                    left = settingsClone.aNeg;
-                    right = right.substring(1, right.length);
+                if (settingsClone.vMax <= 0 && settingsClone.vMin < settingsClone.vMax && this.value.indexOf(settingsClone.aNeg) === -1 && cCode !== '0') {
+                    left = settingsClone.aNeg + left;
                 }
                 this.setValueParts(left + cCode, right);
                 return true;

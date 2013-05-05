@@ -1,0 +1,488 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>autoNumeric</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
+<script type="text/javascript" src="autoNumeric.js"></script>
+<script type="text/javascript">
+jQuery(function($) {
+    $('.auto').autoNumeric('init');
+});
+</script>
+<style>
+input[type="text"] {
+	text-align:right;
+}
+.method {
+	margin-top: 25px;
+	margin-bottom:25px;
+}
+.method td {
+	height:25px;
+}
+</style>
+</head>
+
+<body>
+<div id="main" style="width:900px; border:#000000; border-width: 1px; border-style: solid; background-color:#FFFFFF">
+  <div id="banner">
+    <h1 style="font-family:'Comic Sans MS', cursive; background-color:#000; color:#CCCCCC; height:100px; margin-top:0px; padding-top:25px; padding-left:10px; margin-bottom: 0px;">$(selector).<span style="color:#00F">autoNumeric</span>('init', {options});</h1>
+  </div>
+  <div id="content" style="padding: 5px 10px 10px 10px; margin-top:0px">
+    <p>Author: Robert  Knothe</p>
+    <p>Contact:	bob{@}decorplanit.com (remove brackets)</p>
+    <p>Web site: <a href="http://www.decorplanit.com/plugin/">http://www.decorplanit.com/plugin/</a> complete with detailed examples and option/html 5 data code generator/</p>
+    <p>github: <a href="https://github.com/BobKnothe/autoNumeric">https://github.com/BobKnothe/autoNumeric</a></p>
+    <p>jQuery: <a href="http://plugins.jquery.com/autoNumeric/">http://plugins.jquery.com/autoNumeric/</a></p>
+    <p><strong>autoNumeric</strong> is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. It supports most International numeric formats and currency signs including those used in Europe, North and South America, Asia and India (lakhs**).</p>
+    <p>Any number of currency formats can reside on the same page and are configured by options that can be placed as HTML5 data attribute or passed as an argument. These settings can easily be changed at any time using the new &lsquo;update&rsquo; method or via the callback feature. </p>
+    <p>Seven built in methods and fifteen options gives you the flexibility needed to use autoNumeric to its maximum potential (details below).</p>
+    <p><strong>Examples of autoNumeric's flexibilty:</strong></p>
+    <form name="form1" method="post" action="">
+      <table width="880" border="0">
+        <tr>
+          <td colspan="3"><strong>Demonstrates some of the available decimal  &amp; thousand  seperarators</strong></td>
+        </tr>
+        <tr>
+          <td>decimal '.' &amp; thousand ',' seperarators</td>
+          <td>decimal ',' &amp; thousand '.' seperarators</td>
+          <td>decimal '.' &amp; thousand ' ' seperarators</td>
+        </tr>
+        <tr>
+          <td width="33%"><input type="text" class="auto"></td>
+          <td width="33%"><input type="text" class="auto" data-a-sep="." data-a-dec=","></td>
+          <td width="33%"><input type="text" class="auto" data-a-sep=" " data-a-dec=","></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td colspan="3"><strong>Demonstrates use of currency signs and the placement</strong></td>
+        </tr>
+        <tr>
+          <td>Dollar as a prefix</td>
+          <td>Euro as prefix</td>
+          <td>Swiss Franc as a suffix</td>
+        </tr>
+        <tr>
+          <td width="33%"><input type="text" class="auto" data-a-sign="$ "></td>
+          <td width="33%"><input type="text" class="auto" data-a-sep="." data-a-dec="," data-a-sign="€ "></td>
+          <td width="33%"><input type="text" class="auto" data-a-sep=" " data-a-dec="," data-a-sign=" CHF" data-p-sign="s"></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td colspan="3"><strong>Demonstrates min/max values including negative values  with brackets on focus out.</strong></td>
+        </tr>
+        <tr>
+          <td>0 to 9999 no decimal place</td>
+          <td>-99.99 to 1000.00 two decimal places</td>
+          <td>-9999.99 to 0.00 negative only w/brackets</td>
+        </tr>
+        <tr>
+          <td width="33%"><input type="text" class="auto" data-v-max="9999" data-v-min="0"></td>
+          <td width="33%"><input type="text" class="auto" data-a-sep="." data-a-dec="," data-v-min="-99.99" data-v-max="1000.00"></td>
+          <td width="33%"><input type="text" class="auto" data-a-sep="." data-a-dec="," data-v-min="-9999.99" data-v-max="0.00" data-n-bracket="(,)"></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td colspan="3"><strong>Demonstrates digital grouping &quot;hint - for none set the thousand seperator (aSep: &quot;&quot; or data-a-sep=&quot;&quot;) to and empty string</strong></td>
+        </tr>
+        <tr>
+          <td width="33%">none</td>
+          <td width="33%">2 India's lakhs ( on values below 1 billion)</td>
+          <td width="33%">4 used in some Asian countries</td>
+        </tr>
+        
+          <td width="33%"><input type="text" class="auto" data-a-sep=""></td>
+          <td width="33%"><input type="text" class="auto" data-d-group="2" data-a-sign="Rs. "></td>
+          <td width="33%"><input type="text" class="auto" data-d-group="4" data-a-sign="¥ "></td>
+        </tr>
+        <tr>
+          <td width="33%">&nbsp;</td>
+          <td width="33%">&nbsp;</td>
+          <td width="33%">&nbsp;</td>
+        </tr>
+        <tr>
+          <td colspan="3"><strong>Demonstrates non-input elements - default values are formatted on page ready - can changed via the &quot;set&quot; method</strong></td>
+        </tr>
+        <tr>
+          <td width="33%">&lt;span class=&quot;auto&quot;&gt;1234.56&lt;/span&gt;</td>
+          <td width="33%">&lt;td  class=&quot;auto&quot;&gt;1234.56&lt;/td&gt;</td>
+          <td width="33%">&lt;label class=&quot;auto&quot;&gt;1234.56&lt;/label&gt;</td>
+        </tr>
+        <tr>
+          <td width="33%"><span class="auto">1234.56</span></td>
+          <td width="33%" class="auto">1234.56</td>
+          <td width="33%"><label class="auto">1234.56</label></td>
+        </tr>
+      </table>
+    </form>
+    <hr>
+    <p><strong>Key features and general notes:</strong></p>
+    <p><strong>Elements supported:</strong></p>
+    <ul>
+      <li>The input types supported:
+        <ul>
+          <li>&lt;input type="text"&gt;, &lt;input type="hidden"&gt; &amp; &lt;input&gt;  no type attribute. </li>
+          <li>Other input types are NOT supported including HTML 5 number type. </li>
+        </ul>
+      </li>
+      <li>Non-input tags supported:
+        <ul>
+          <li>'dd', 'dt', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'', 'label', 'p', 'span', 'td', 'th'</li>
+        </ul>
+      </li>
+    </ul>
+    <p><strong>Default settings, options and HTML 5 data:</strong></p>
+    <ul>
+      <li>The default settings can be changed via options or HTML 5 data attribute
+        <ul>
+          <li>$(selector).autoNumeric('init', {aSep: '.', aDec: ',', aSign: '€ '}); - example using options</li>
+          <li>Options can be sent as a variable:
+            <ul>
+              <li>var myOptions = {aSep: '.', aDec: ',', aSign: '€ '};</li>
+              <li>$(selector).autoNumeric('init', {aSep: '.', aDec: ',', aSign: '€ '});</li>
+            </ul>
+          </li>
+          <li>&lt;input type="text" id="someID" class="someClass" data-a-sign="€ " data-a-dec="," data-a-sep="."&gt; - example of HTML 5 data</li>
+          <li>Order of precedence:  defaults, HTML 5 (overides defaults), options (overides defaults and HTML5 data).</li>
+          <li>FYI - my web site has a easy to use code genterator</li>
+        </ul>
+      </li>
+    </ul>
+    <p><strong>Callback function:</strong></p>
+    <ul>
+      <li>Callback function is supported and can be done via options or HTML5 data.</li>
+    </ul>
+    <p><strong>Defaults values on autoNumeric controlled elements:</strong></p>
+    <ul>
+      <li>The option "aForm" controls how default values are handled on page ready. </li>
+      <li>When &quot;aForm&quot; is set to "aForm: true"  the defaults values will be  formatted on page ready.
+        <ul>
+          <li>Default values format: '99999.99'</li>
+          <li>The decimal seperator must be a full stop / period &quot;.&quot; </li>
+          <li>Other non numeric values will be striped.</li>
+          <li>If the default value falls outside the min/max range an empty string will be returned </li>
+        </ul>
+      </li>
+      <li>When &quot;aForm&quot; is set to "aForm: false" the values will  not formatted on page ready
+        <ul>
+          <li>The input field values  will be formatted  on  the first keypress event is fired for that element </li>
+        </ul>
+      </li>
+    </ul>
+    <p><strong>Precision control of minimum &amp; maximum values:</strong></p>
+    <ul>
+      <li>Controlled by &quot;vMin&quot; &amp; &quot;vMax&quot; settings / options</li>
+    </ul>
+    <p><strong>Currency signs:</strong></p>
+    <ul>
+      <li>Most currency symbols are supported and can be placed as a prefix or suffix.</li>
+    </ul>
+    <hr>
+    <p><strong>Default settings &amp; options - for a detailed info please see </strong><a href="http://www.decorplanit.com/plugin/">http://www.decorplanit.com/plugin/</a></p>
+    <ul>
+      <li style="line-height:25px"><strong>aSep: ','</strong> - controls the thousand separator  (note - the thousand &amp; decimal separators can not be the same)
+        <ul>
+          <li>aSep: '\''	 apostrophe (note: the apostrophe is escaped) </li>
+          <li>aSep: '.'	 period </li>
+          <li>aSep: ' '	 space </li>
+          <li>aSep: '' none</li>
+        </ul>
+      </li>
+      <li style="line-height:25px"><strong>dGroup: '3'</strong> - controls the digital grouping  - the placement of the thousand separator
+        <ul>
+          <li>dGroup: '2'	 produces 22,22,22,333 (India's lakhs format on values below 1 billion) </li>
+          <li>dGroup: '4'	 produces 4,4444,4444 used in some Asian country's</li>
+        </ul>
+      </li>
+      <li style="line-height:25px"><strong>aDec: '.'</strong> - controls the decimal (note - the  thousand &amp; decimal separators can not be the same)
+        <ul>
+          <li>aDec: ','	 comma</li>
+        </ul>
+      </li>
+      <li style="line-height:25px"><strong>altDec: null </strong>- altDec allows you to declare  an alternative key to enter the decimal separator assigned in aDec.
+        <ul>
+          <li>developer sellectable - example: {aSep: '.', aDec: ',',  altDec: '.'}  would allow the period on the numeric pad to enter the decimal &quot;,&quot;</li>
+        </ul>
+      </li>
+      <li style="line-height:25px"><strong>aSign: ''</strong> - desired currency symbol  (examples: € or EUR). Note: other symbols can be used, such as %,  °C, °F, km/h &amp; MPH
+        <ul>
+          <li>developer sellectable - example: {aSign: '€ '} note numeric character not allowed.</li>
+        </ul>
+      </li>
+      <li style="line-height:25px"><strong>pSign: 'p'</strong> - controls the placement of the  currency symbol (the default placement is set as a prefix
+        <ul>
+          <li>pSign: 's' - place the sign as a suffix</li>
+        </ul>
+      </li>
+      <li style="line-height:25px"><strong>vMin: '0.00'</strong> - values can be whole numbers, floating point, positive, zero or  negative. </li>
+      <li style="line-height:25px"><strong>vMax: '999999999.99'</strong> - values can be whole numbers, floating point, positive, zero or  negative. </li>
+      <li style="line-height:25px"><strong>mDec: null</strong> - overrides the number of decimal places that are set by the vMin &amp; vMax values<BR>
+      </li>
+      <li style="line-height:25px"><strong>mRound: 'S'</strong> - controls the rounding method
+        <ul>
+          <li>mRound: 'S'	Round-Half-Up Symmetric (default) </li>
+          <li>mRound: 'A'	Round-Half-Up Asymmetric </li>
+          <li>mRound: 's'	 Round-Half-Down Symmetric (lower case s) </li>
+          <li>mRound: 'a'	 Round-Half-Down Asymmetric (lower case a) </li>
+          <li>mRound: 'B'	 Round-Half-Even &quot;Bankers Rounding&quot; </li>
+          <li>mRound: 'U'	 Round Up &quot;Round-Away-From-Zero&quot; </li>
+          <li>mRound: 'D'	 Round Down &quot;Round-Toward-Zero&quot; - same as truncate </li>
+          <li>mRound: 'C'	 Round to Ceiling &quot;Toward Positive Infinity&quot; </li>
+          <li>mRound: 'F'	 Round to Floor &quot;Toward Negative Infinity&quot;</li>
+        </ul>
+      </li>
+      <li style="line-height:25px"><strong>aPad: true</strong> -  pads the decimal  places with zeros.
+        <ul>
+          <li>aPad: false - no padding</li>
+        </ul>
+      </li>
+      <li style="line-height:25px"><strong>nBracket: null</strong> - controls if negative values  are display with brackets when the input does NOT have focus.
+        <ul>
+          <li>nBracket: '(,)'	Parentheses - visable only on 'focusout' </li>
+          <li>nBracket: '[,]'	Brackets - visable only on 'focusout' </li>
+          <li>nBracket: '{,}'	Braces - visable only on 'focusout' </li>
+          <li>nBracket: '&lt;,&gt;'	 Angle brackets - visable only on 'focusout'</li>
+        </ul>
+      </li>
+      <li style="line-height:25px"><strong>wEmpty: 'empty'</strong> - field allowed to be empty
+        <ul>
+          <li>wEmpty: 'zero'	 input field will have at least a zero value </li>
+          <li>wEmpty: 'sign'	 the currency symbol is always present</li>
+        </ul>
+      </li>
+      <li style="line-height:25px"><strong>lZero: 'allow'</strong> - allows leading zeros as you type but are removed on focusout event
+        <ul>
+          <li>lZero: 'deny'	 leading zeros not allowed. </li>
+          <li>lZero: 'keep'	 leading zeros allowed and will be retained on the focusout event</li>
+        </ul>
+      </li>
+      <li style="line-height:25px"><strong>aForm: true</strong>- formats the default values on page ready (default value decimal must be a period / full stop &quot;####.##&quot;)
+        <ul>
+          <li>aForm: false - default value are not formatted on page ready.</li>
+        </ul>
+      </li>
+    </ul>
+    <hr>
+    <table width="997" class="method" >
+      <tbody>
+        <tr>
+          <td colspan="2"><strong>Method(s)</strong></td>
+          <td width="397"><strong>Description</strong></td>
+          <td width="423"><strong>Format</strong></td>
+        </tr>
+        <tr>
+          <td width="26">&nbsp;</td>
+          <td width="131">'init'</td>
+          <td width="397">initializes autoNumeric</td>
+          <td>$(selector).autoNumeric('init', {options});</td>
+        </tr>
+        <tr>
+          <td width="26">&nbsp;</td>
+          <td width="131">'destroy'</td>
+          <td width="397">disables autoNumeric for the selected element</td>
+          <td>$(selector).autoNumeric('destroy');</td>
+        </tr>
+        <tr>
+          <td width="26">&nbsp;</td>
+          <td width="131">'update'</td>
+          <td width="397">updates options - can be called multiple times</td>
+          <td>$(selector).autoNumeric('update', {options});</td>
+        </tr>
+        <tr>
+          <td width="26">&nbsp;</td>
+          <td width="131">'set'</td>
+          <td width="397">returns a formatted string via ".val()" or ".text'</td>
+          <td>$(selector).autoNumeric('set', value);</td>
+        </tr>
+        <tr>
+          <td width="26">&nbsp;</td>
+          <td width="131">'get'</td>
+          <td width="397">returns un-formatted object via ".val()" or ".text()"</td>
+          <td>$(selector).autoNumeric('get');</td>
+        </tr>
+        <tr>
+          <td width="26">&nbsp;</td>
+          <td width="131">'getString'</td>
+          <td width="397">returns a string 'URL encoded' from the selected form</td>
+          <td>$(selector).autoNumeric('getString');</td>
+        </tr>
+        <tr>
+          <td width="26">&nbsp;</td>
+          <td width="131">'getArray'</td>
+          <td width="397">returns a array of objects from the selected form</td>
+          <td>$(selector).autoNumeric('getArray');</td>
+        </tr>
+        <tr>
+          <td width="26">&nbsp;</td>
+          <td width="131">'getSettings'</td>
+          <td width="397">returns settings for the selected element </td>
+          <td>$(selector).autoNumeric('getSettings');</td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+    <p><strong>'init' method </strong><strong>- </strong>initializes autoNumeric and must be run before other methods can be called.</p>
+    <ul>
+      <li>$(selector).autoNumeric('init'); <em>"initialized with defaults only"</em></li>
+      <li>$(selector).autoNumeric(); <em>"initialized with defaults only"</em></li>
+      <li>$(selector).autoNumeric('init', {options}); <em>"initialized with options"</em></li>
+      <li>$(selector).autoNumeric({options}); <em>"initialized with options"</em></li>
+      <li>var someOptions = {options}<em>; &quot;options placesd as a variable"</em>
+        <ul>
+          <li>$(selector).autoNumeric('init', someOptions); </li>
+          <li>$(selector).autoNumeric(someOptions);</li>
+        </ul>
+      </li>
+    </ul>
+    <p><strong>Note the following</strong>:</p>
+    <ul>
+      <li>Using <strong>'init'</strong> is optional on the initialize method all other methods require being declared.</li>
+      <li>'init' is case sensitive.</li>
+      <li>The input element is the only tag that supports auto formatting as you type.</li>
+      <li>Calling the 'init' method on a element that is already initilized will NOT change the options.</li>
+    </ul>
+    <p><strong>Warning</strong></p>
+    <p>Calling the "init" method on a element where the decimal point "aDec" and the thousand separator "aSep" are equal will cause an error message to be thrown to the javascript console.</p>
+    <p> Calling the 'init' methods on a element that is not supported by autoNumeric will cause an error message to be thrown to the javascript console.</p>
+    <hr>
+    <p><strong>'destroy' method </strong>- removes autoNumeric from the selected element(s).</p>
+    <ul>
+      <li>$(selector).autoNumeric('destroy'); </li>
+    </ul>
+    <p><strong>Note the following</strong>:</p>
+    <ul>
+      <li>The method name 'destroy' is required</li>
+      <li>'destroy' is case sensitive.</li>
+      <li>Options and arguments are NOT accepted.</li>
+      <li>Existing values are NOT modified or deleted. If you need to remove the formatting you should do so prior to calling the destroy method via the 'get' method described later.</li>
+      <li>The selected fields or elements can be re-initialized at any time.</li>
+    </ul>
+    <hr>
+    <p><strong>"update' method </strong>- easily update element(s) that have been previously initialized 'init' by autoNumeric.</p>
+    <ul>
+      <li>$(selector).autoNumeric('update', {options}); </li>
+    </ul>
+    <p><strong>Note the following</strong>:</p>
+    <ul>
+      <li>The 'update' method name is required "$(selector).autoNumeric('update', {options});".</li>
+      <li>'update' is case sensitive.</li>
+      <li>Options are required and are accepted as an argument or variable (see the 'init' method description).</li>
+      <li>The 'update' method will function on all elements supported by autoNumeric.</li>
+      <li>The 'update' method can be called repeatably with one or more options at a time.</li>
+      <li>Existing values will be stripped, preserved and reformatted to the new settings.</li>
+      <li>Values that fall outside the range of the new min/max range will be returned as "0.00" (depending on the number of decimal places and the decimal separator character in the settings).</li>
+    </ul>
+    <p><strong>Warning</strong></p>
+    <p> Calling the 'update' method prior to the 'init' method will cause a error message to be thrown to the Javascript console.</p>
+    <p> Calling the "update" method on a element where the decimal point "aDec" and the thousand separator "aSep" are equal will cause an error message to be thrown to the javascript console.</p>
+    <p> Calling the 'update' method on a element that is not supported by autoNumeric will cause an error message to be thrown to the javascript console.</p>
+    <hr>
+    <p><strong>'set' method </strong>- The 'set' method allows you to easily format numbers and numeric strings</p>
+    <p><strong>Proper format for the 'set' method</strong>.</p>
+    <ul>
+      <li>$(selector).autoNumeric('set', value); </li>
+    </ul>
+    <p><strong>Note the following</strong>:</p>
+    <ul>
+      <li>The 'set' method name is required "$(selector).autoNumeric('set', value);".</li>
+      <li>'set' is case sensitive.</li>
+      <li>Options are NOT accepted.</li>
+      <li>The 'set' method can be used on any element that are supported by autoNumeric.</li>
+      <li>The value can be sent as a string or variable
+        <ul>
+          <li>$(selector).autoNumeric('set', '1234.56');</li>
+          <li>var someValue = 1234.56 then $(selector).autoNumeric('set', someValue);</li>
+        </ul>
+      </li>
+      <li>Returns a string</li>
+      <li>Values that fall outside the min/max range will not be 'set' and a error message will be thrown to the javascript console.</li>
+    </ul>
+    <p> Calling the 'set' method prior to the 'init' method will cause a error message to be thrown to the Javascript console.</p>
+    <p> Calling the 'set' method on a element that is not supported by autoNumeric will cause an error message to be thrown to the javascript console.</p>
+    <hr>
+    <p><strong>'get' method - </strong>The 'get' method allows you to easily remove the formating from a string on a autoNumeric controlled element and returns a string.</p>
+    <p><strong>Proper format for the 'get' method</strong>.</p>
+    <ul>
+      <li>$(selector).autoNumeric('get'); </li>
+    </ul>
+    <p><strong>Note the following:</strong></p>
+    <ul>
+      <li>The 'get' method name is required "$(selector).autoNumeric('get');".</li>
+      <li>'get' is case sensitive.</li>
+      <li>Options and values are NOT accepted.</li>
+      <li>Works on any element supported by autoNumeric.</li>
+      <li>Returns only the first element of the selector.</li>
+      <li>Returns a string.</li>
+    </ul>
+    <p><strong>Warning</strong></p>
+    <p> Calling the 'get' method prior to the 'init' method will cause a error message to be thrown to the Javascript console.</p>
+    <p> Calling the 'get' method on a element that is not supported by autoNumeric will cause an error message to be thrown to the javascript console.</p>
+    <hr>
+    <p><strong>'</strong><strong>getString' method </strong>- this basically uses jQuery's .serialize() method which creates a text string (URL-encoded notation) from a set of form elements that is ready for submission. The extra step taken here is the string is split and iterated through and the formatted values are replaced with unformatted values. The string is then joined back together and returned.</p>
+    <p><strong>Proper format for the 'getString' method</strong>.</p>
+    <ul>
+      <li>$(selector).autoNumeric('getString'); </li>
+    </ul>
+    <p><strong>Note the following:</strong></p>
+    <ul>
+      <li>The 'getString' method name is required "$(selector).autoNumeric('getString');".</li>
+      <li>Options and value are NOT accepted.</li>
+      <li>The "getString" method does NOT validate the form inputs. It will return what has been entered including empty strings.</li>
+      <li>If your selector includes non-autoNumeric fields they will be returned untouched.</li>
+      <li>Only <a href="http://www.w3.org/TR/html401/interact/forms.html#h-17.13.2">"successful controls</a>" are serialized to the string. Please read more about <a href="http://api.jquery.com/serialize/">jQuery's .serialize() method</a> to see if "getString" method will work for your application.</li>
+      <li>Returns a string</li>
+    </ul>
+    <p><strong>Warning</strong></p>
+    <p> At least one input must be controled by autoNumeric. If not the 'getSting' method will cause a error message to be thrown the the Javascript console.</p>
+    <hr>
+    <p><strong>'getArray' method </strong>- this basically uses jQuery's .serializeArray() method which returns a Javascript array of objects, ready to be encoded as a JSON string. The extra step taken here is the the object array is iterated through and formatted values are replaced with un-formatted values and returned.</p>
+    <p><strong>Proper format for the 'getArray' method</strong>.</p>
+    <ul>
+      <li>$(selector).autoNumeric('getArray'); </li>
+    </ul>
+    <p><strong>Note the following:</strong></p>
+    <ul>
+      <li>The 'getArray' method name is required "$(selector).autoNumeric('getArray');".</li>
+      <li>Options are NOT accepted.</li>
+      <li>An object is returned. If you want this converted to a valid JSON string to submit to the server you should consider <a href="https://github.com/douglascrockford/JSON-js">JSON2.js</a> as I did in this demo.</li>
+      <li>The "getArray" method does NOT validate the form inputs. It will return what has been entered including empty strings.</li>
+      <li>If your selector includes non-autoNumeric fields they will be returned untouched.</li>
+      <li>Only <a href="http://www.w3.org/TR/html401/interact/forms.html#h-17.13.2">"successful controls</a>" are serialized to the string. Please read more about <a href="http://api.jquery.com/serializeArray/">jQuery's .serializeArray() method</a> to see if "getArray" method will work for your application.</li>
+    </ul>
+    <p><strong>Warning</strong></p>
+    <p> At least one input must be controled by autoNumeric. If not the 'getArray' method will cause a error message to be thrown the the Javascript console.</p>
+    <hr>
+    <p><strong>'getSettings' method </strong>- this returns an object that shows the autoNumeric settings for the field. You may find this helpful when developing a page.</p>
+    <p><strong>Proper format for the 'getArray' method</strong>.</p>
+    <ul>
+      <li>$(selector).autoNumeric('getSettings'); </li>
+    </ul>
+    <p><strong>Note the following</strong>:</p>
+    <ul>
+      <li>Only the first element from the selector will be returned.</li>
+      <li>If the selector points to a non-autoNumeric field or tag "undefined" is returned.</li>
+    </ul>
+    <p><strong>Warning</strong></p>
+    <p> Calling the 'getSettings' method prior to the 'init' will cause a error message to be thrown the the Javascript console.</p>
+    <p>&nbsp;</p>
+    <hr>
+    <p>Complete documentation and examples can be found at <a href="http://www.decorplanit.com/plugin/">http://www.decorplanit.com/plugin/</a> </p>
+    <p>Need a custom modification? Cantact me at bob{@}decorplanit.com or github.</p>
+    <p>Enjoy</p>
+  </div>
+</div>
+</body>
+</html>

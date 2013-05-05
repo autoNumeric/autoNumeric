@@ -1,8 +1,12 @@
 ### Change log:
 
+#### Version 1.9.7
++ Modified /fixed the format default values on page ready.
++ Fixed the caret position when jumping over the thousand separator with back arrow.
+
 #### Version 1.9.6
 + Fixed bug introduced in 1.9.3 with shift key.
-+ dditional modification to the processKeypress function that automatically inserts a negative sign when vMax less tham or equal to 0 and vMin is less tham vMax.
++ additional modification to the processKeypress function that automatically inserts a negative sign when vMax less tham or equal to 0 and vMin is less tham vMax.
 
 #### Version 1.9.5
 + Modified processKeypress function to automatically insert a negative sign when vMax <=0 and vMin < 0.

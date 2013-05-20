@@ -1,5 +1,9 @@
 ### Change log:
 
+#### Version 1.9.8
++ Changed bind / unbind to on / off.
++ added lastSetValue to settings - this saves the unrounded value from the set method - $('selector').data('autoNumeric').lastSetValue; - helpful when you need to change the rounding accuracy
+
 #### Version 1.9.7
 + Modified /fixed the format default values on page ready.
 + Fixed the caret position when jumping over the thousand separator with back arrow.

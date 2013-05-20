@@ -2,13 +2,13 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.9.7 - 2013-05-05 GMT 9:30 AM
+* @version: 1.9.8 - 2013-05-20 GMT 3:00 PM
 *
-* Created by Robert J. Knothe on 2010-10-25. Please report any bug at http://www.decorplanit.com/plugin/
-* Created by Sokolov Yura on 2010-11-07. http://github.com/funny_falcon
+* Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
+* Created by Sokolov Yura on 2010-11-07
 *
 * Copyright (c) 2011 Robert J. Knothe http://www.decorplanit.com/plugin/
-* Copyright (c) 2011 Sokolov Yura aka funny_falcon
+* Copyright (c) 2011 Sokolov Yura
 *
 * The MIT License (http://www.opensource.org/licenses/mit-license.php)
 *
@@ -669,8 +669,7 @@
             var settingsClone = this.settingsClone;
             var cCode = String.fromCharCode(this.which);
             var parts = this.getBeforeAfterStriped();
-            var left = parts[0],
-                right = parts[1]; /** start rules when the decimal charactor key is pressed */
+            var left = parts[0], right = parts[1]; /** start rules when the decimal charactor key is pressed */
             /** always use numeric pad dot to insert decimal separator */
             if (cCode === settingsClone.aDec || (settingsClone.altDec && cCode === settingsClone.altDec) || ((cCode === '.' || cCode === ',') && this.kdCode === 110)) { /** do not allow decimal character if no decimal part allowed */
                 if (!settingsClone.mDec || !settingsClone.aDec) {
@@ -691,6 +690,7 @@
                 this.setValueParts(left + settingsClone.aDec, right);
                 return true;
             } /** start rule on negative sign */
+
             if (cCode === '-' || cCode === '+') { /** prevent minus if not allowed */
                 if (!settingsClone.aNeg) {
                     return true;
@@ -915,6 +915,7 @@
                 } else {
                     return this;
                 }
+                settings.lastSetValue = '';
                 var holder = getHolder($this, settings);
                 if (settings.runOnce === undefined && settings.aForm) {/** routine to format default value on page load */
                     if ($this.is('input[type=text], input[type=hidden], input:not([type])')) {
@@ -937,7 +938,7 @@
                 }
                 settings.runOnce = true;
                 if ($this.is('input[type=text], input[type=hidden], input:not([type])')) { /**added hidden type */
-                    $this.bind('keydown.autoNumeric', function(e) {
+                    $this.on('keydown.autoNumeric', function(e) {
                         holder = getHolder($this);
                         if (holder.settings.aDec === holder.settings.aSep) {
                             $.error("autoNumeric will not function properly when the decimal character aDec: '" + holder.settings.aDec + "' and thousand seperater aSep: '" + holder.settings.aSep + "' are the same character");
@@ -967,7 +968,7 @@
                         holder.formatted = false;
                         return true;
                     });
-                    $this.bind('keypress.autoNumeric', function(e) {
+                    $this.on('keypress.autoNumeric', function(e) {
                         var holder = getHolder($this), processed = holder.processed;
                         holder.init(e);
                         holder.settings.oEvent = 'keypress';
@@ -986,7 +987,7 @@
                         holder.formatted = false;
 
                     });
-                    $this.bind('keyup.autoNumeric', function(e) {
+                    $this.on('keyup.autoNumeric', function(e) {
                         var holder = getHolder($this);
                         holder.init(e);
                         holder.settings.oEvent = 'keyup';
@@ -1003,7 +1004,7 @@
                             holder.formatQuick();
                         }
                     });
-                    $this.bind('focusin.autoNumeric', function() {
+                    $this.on('focusin.autoNumeric', function() {
                         var holder = getHolder($this);
                         holder.settingsClone.oEvent = 'focusin';
                         if (holder.settingsClone.nBracket !== null) {
@@ -1016,7 +1017,7 @@
                             $this.val(onempty);
                         }
                     });
-                    $this.bind('focusout.autoNumeric', function() {
+                    $this.on('focusout.autoNumeric', function() {
                         var holder = getHolder($this),
                             settingsClone = holder.settingsClone,
                             value = $this.val(),
@@ -1060,7 +1061,7 @@
         destroy: function() {
             return $(this).each(function() {
                 var $this = $(this);
-                $this.unbind('.autoNumeric');
+                $this.off('.autoNumeric');
                 $this.removeData('autoNumeric');
             });
         },
@@ -1101,6 +1102,7 @@
                 }
                 value = checkValue(value);
                 settings.oEvent = 'set';
+                settings.lastSetValue = value; /** saves the unrounded value from the set method - $('selector').data('autoNumeric').lastSetValue; - helpful when you need to change the rounding accuracy*/
                 value.toString();
                 if (value !== '') {
                     value = autoRound(value, settings);

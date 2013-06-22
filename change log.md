@@ -1,5 +1,10 @@
 ### Change log:
 
+#### Version 1.9.9
++ Fixed how non-input tags default value is handled.  When the default is an empty string and aSign is not empty the return value is now and empty string.
++ Modified how default values are handled when the decimal character equals ',' comma. Your default value can now use either a a period '.' or comma ',' as the decimal separator
++ Modified the caret placement on focusin (tab in). If only the currency sign is visible the caret is placed in the proper location depending on the sign placement (prefix or suffix).  
+
 #### Version 1.9.8
 + Changed bind / unbind to on / off.
 + added lastSetValue to settings - this saves the unrounded value from the set method - $('selector').data('autoNumeric').lastSetValue; - helpful when you need to change the rounding accuracy

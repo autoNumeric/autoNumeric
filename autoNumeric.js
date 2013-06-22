@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.9.8 - 2013-05-20 GMT 3:00 PM
+* @version: 1.9.9 - 2013-06-22 GMT 3:00 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -932,7 +932,7 @@
                             $this.autoNumeric('set', $this.val());
                         }
                     }
-                    if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
+                    if ($.inArray($this.prop('tagName'), settings.tagList) !== -1 && $this.text() !== '') {
                         $this.autoNumeric('set', $this.text());
                     }
                 }
@@ -994,6 +994,13 @@
                         var skip = holder.skipAllways(e);
                         holder.kdCode = 0;
                         delete holder.valuePartsBeforePaste;
+                        if ($this[0].value === holder.settings.aSign) { /** added to properly place the caret when only the currency is present */
+                            if (holder.settings.pSign === 's') {
+                                setElementSelection(this, 0, 0);
+                            } else {
+                                setElementSelection(this, holder.settings.aSign.length, holder.settings.aSign.length);
+                            }
+                        }
                         if (skip) {
                             return true;
                         }
@@ -1015,6 +1022,11 @@
                         var onempty = checkEmpty(holder.inVal, holder.settingsClone, true);
                         if (onempty !== null) {
                             $this.val(onempty);
+                            if (holder.settings.pSign === 's') {
+                                setElementSelection(this, 0, 0);
+                            } else {
+                                setElementSelection(this, holder.settings.aSign.length, holder.settings.aSign.length);
+                            }
                         }
                     });
                     $this.on('focusout.autoNumeric', function() {
@@ -1095,6 +1107,10 @@
                 if (typeof settings !== 'object') {
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'set' method");
                     return this;
+                }
+                /** returns a empty string if the value being 'set' contains non-numeric characters and or more than decimal point (full stop) and will not be formatted */
+                if (settings.aDec === ',' && settings.runOnce === undefined) {
+                    value = value.replace(',', '.');
                 }
                 /** returns a empty string if the value being 'set' contains non-numeric characters and or more than decimal point (full stop) and will not be formatted */
                 if (!$.isNumeric(+value)) {

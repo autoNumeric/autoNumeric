@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.9.10 - 2013-06-29 GMT 1:00 PM
+* @version: 1.9.11 - 2013-06-29 GMT 5:30 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -1113,14 +1113,14 @@
                 if (testValue === $this.attr('value')) {
                     value = value.replace(',', '.');
                 }
-                /** returns a empty string if the value being 'set' contains non-numeric characters and or more than decimal point (full stop) and will not be formatted */
-                if (!$.isNumeric(+value)) {
-                    return '';
-                }
                 /** routine to handle page re-load from back button */
                 if (testValue !== $this.attr('value') && settings.runOnce === false) {
                     value = autoStrip(value, settings);
                 }
+                /** returns a empty string if the value being 'set' contains non-numeric characters and or more than decimal point (full stop) and will not be formatted */
+                if (!$.isNumeric(+value)) {
+                    return '';
+                }				
                 value = checkValue(value);
                 settings.oEvent = 'set';
                 settings.lastSetValue = value; /** saves the unrounded value from the set method - $('selector').data('autoNumeric').lastSetValue; - helpful when you need to change the rounding accuracy*/

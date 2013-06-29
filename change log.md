@@ -1,5 +1,8 @@
 ### Change log:
 
+#### Version 1.9.11
++ Another mod to the 'set' method.
+
 #### Version 1.9.10
 + Fixed the 'set' method to handle page reload using the back button.
 

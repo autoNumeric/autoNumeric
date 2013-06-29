@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.9.9 - 2013-06-22 GMT 3:00 PM
+* @version: 1.9.10 - 2013-06-29 GMT 1:00 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -916,8 +916,9 @@
                     return this;
                 }
                 settings.lastSetValue = '';
+                settings.runOnce = false;
                 var holder = getHolder($this, settings);
-                if (settings.runOnce === undefined && settings.aForm) {/** routine to format default value on page load */
+                if (settings.runOnce === false && settings.aForm) {/** routine to format default value on page load */
                     if ($this.is('input[type=text], input[type=hidden], input:not([type])')) {
                         var setValue = true;
                         if ($this[0].value === '' && settings.wEmpty === 'empty') {
@@ -1103,18 +1104,22 @@
         /** returns a formated strings for "input:text" fields Uses jQuery's .val() method*/
         set: function(valueIn) {
             return $(this).each(function() {
-                var $this = autoGet($(this)), settings = $this.data('autoNumeric'), value = valueIn.toString();
+                var $this = autoGet($(this)), settings = $this.data('autoNumeric'), value = valueIn.toString(), testValue = valueIn.toString();
                 if (typeof settings !== 'object') {
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'set' method");
                     return this;
                 }
-                /** returns a empty string if the value being 'set' contains non-numeric characters and or more than decimal point (full stop) and will not be formatted */
-                if (settings.aDec === ',' && settings.runOnce === undefined) {
+               /** allows locale decimal seperator to be a comma */
+                if (testValue === $this.attr('value')) {
                     value = value.replace(',', '.');
                 }
                 /** returns a empty string if the value being 'set' contains non-numeric characters and or more than decimal point (full stop) and will not be formatted */
                 if (!$.isNumeric(+value)) {
                     return '';
+                }
+                /** routine to handle page re-load from back button */
+                if (testValue !== $this.attr('value') && settings.runOnce === false) {
+                    value = autoStrip(value, settings);
                 }
                 value = checkValue(value);
                 settings.oEvent = 'set';

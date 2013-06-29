@@ -1,5 +1,8 @@
 ### Change log:
 
+#### Version 1.9.10
++ Fixed the 'set' method to handle page reload using the back button.
+
 #### Version 1.9.9
 + Fixed how non-input tags default value is handled.  When the default is an empty string and aSign is not empty the return value is now and empty string.
 + Modified how default values are handled when the decimal character equals ',' comma. Your default value can now use either a a period '.' or comma ',' as the decimal separator

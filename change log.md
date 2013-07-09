@@ -1,5 +1,8 @@
 ### Change log:
 
+#### Version 1.9.12
++ Fixed brackets on page load when the decimal character is a comma.
+
 #### Version 1.9.11
 + Another mod to the 'set' method.
 

@@ -1,14 +1,13 @@
-/**
+﻿/**
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.9.11 - 2013-06-29 GMT 5:30 PM
+* @version: 1.9.12 - 2013-07-09 GMT 2:30 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
 *
 * Copyright (c) 2011 Robert J. Knothe http://www.decorplanit.com/plugin/
-* Copyright (c) 2011 Sokolov Yura
 *
 * The MIT License (http://www.opensource.org/licenses/mit-license.php)
 *
@@ -109,8 +108,7 @@
         runCallbacks($this, settings);
         settings.oEvent = null;
         settings.tagList = ['DD', 'DT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LABEL', 'P', 'SPAN', 'TD', 'TH'];
-        var vmax = settings.vMax.toString().split('.'),
-            vmin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
+        var vmax = settings.vMax.toString().split('.'), vmin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
         convertKeyToNumber(settings, 'vMax');
         convertKeyToNumber(settings, 'vMin');
         convertKeyToNumber(settings, 'mDec'); /** set mDec if not defained by user */
@@ -310,7 +308,7 @@
      */
     function autoGroup(iv, settings) {
         iv = autoStrip(iv, settings);
-        var testNeg = iv,
+        var testNeg = iv.replace(',', '.'),
             empty = checkEmpty(iv, settings, true);
         if (empty !== null) {
             return empty;
@@ -420,7 +418,8 @@
                     ivArray[i] = +ivArray[i] + 1;
                     if (ivArray[i] < 10) {
                         break;
-                    } else if (i > 0) {
+                    }
+                    if (i > 0) {
                         ivArray[i] = '0';
                     }
                 }
@@ -1120,7 +1119,7 @@
                 /** returns a empty string if the value being 'set' contains non-numeric characters and or more than decimal point (full stop) and will not be formatted */
                 if (!$.isNumeric(+value)) {
                     return '';
-                }				
+                }
                 value = checkValue(value);
                 settings.oEvent = 'set';
                 settings.lastSetValue = value; /** saves the unrounded value from the set method - $('selector').data('autoNumeric').lastSetValue; - helpful when you need to change the rounding accuracy*/

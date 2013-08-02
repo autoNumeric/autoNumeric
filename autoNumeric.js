@@ -1161,9 +1161,9 @@
                 $.error("The <" + $this.prop('tagName') + "> is not supported by autoNumeric()");
                 return false;
             }
-			if ((getValue === '' && settings.wEmpty === 'empty') || (getValue === settings.aSign && (settings.wEmpty === 'sign'|| settings.wEmpty === 'empty' ))) {
+            if ((getValue === '' && settings.wEmpty === 'empty') || (getValue === settings.aSign && (settings.wEmpty === 'sign'|| settings.wEmpty === 'empty' ))) {
                 return '';
-            }			
+            }
             if (settings.nBracket !== null && getValue !== '') {
                 getValue = negativeBracket(getValue, settings.nBracket, settings.oEvent);
             }

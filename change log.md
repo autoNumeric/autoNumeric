@@ -1,5 +1,8 @@
 ### Change log:
 
+#### Version 1.9.13
++ Fixed the "get" method when the input recieves focus for a second time.
+
 #### Version 1.9.12
 + Fixed brackets on page load when the decimal character is a comma.
 

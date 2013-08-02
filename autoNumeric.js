@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.9.12 - 2013-07-09 GMT 2:30 PM
+* @version: 1.9.13 - 2013-08-02 GMT 1:00 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -1161,9 +1161,9 @@
                 $.error("The <" + $this.prop('tagName') + "> is not supported by autoNumeric()");
                 return false;
             }
-            if ((getValue === '' && settings.wEmpty === 'empty') || (getValue === settings.aSign && settings.wEmpty === 'sign')) {
+			if ((getValue === '' && settings.wEmpty === 'empty') || (getValue === settings.aSign && (settings.wEmpty === 'sign'|| settings.wEmpty === 'empty' ))) {
                 return '';
-            }
+            }			
             if (settings.nBracket !== null && getValue !== '') {
                 getValue = negativeBracket(getValue, settings.nBracket, settings.oEvent);
             }

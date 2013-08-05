@@ -1,4 +1,4 @@
-[autoNumeric-1.9.13](http://www.decorplanit.com/plugin/)
+[autoNumeric-1.9.14](http://www.decorplanit.com/plugin/)
 ================================
 ### International currency formatting made easy
 

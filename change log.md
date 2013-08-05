@@ -1,5 +1,8 @@
 ### Change log:
 
+#### Version 1.9.15
++ Fixed bug introduced in version 1.9.14
+
 #### Version 1.9.14
 + Added additional supported tags ('b', 'caption', 'cite', 'code', 'dd', 'del', 'div', 'dfn', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ins', 'kdb', 'label', 'li', 'output', 'p', 'q', 's', 'sample', 'span', 'strong', 'td', 'th', 'u', 'var')
 + Moved the routine that tests for supported tags 

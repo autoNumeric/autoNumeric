@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<!-- saved from url=(0067)http://www.decorplanit.com/plugin/beta-2.0/autoNumeric-2.0-BETA.htm -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>autoNumeric 2.0</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="autoNumeric-2.0-BETA.js"></script>
+<script type="text/javascript">
+jQuery(function($) {
+
+	$('input:text').autoNumeric("init");
+	$('#bob2').autoNumeric("init");
+
+
+   $("#unSet").click(function(){
+		$('form input').autoNumeric('unSet');
+   }); 
+
+    $("#set").click(function(){
+		$('input:text').autoNumeric('set', 'reSet');
+   }); 
+
+});
+</script>
+<style>
+input[type="text"] {
+	text-align:right;
+}
+</style>
+<meta name="chromesniffer" id="chromesniffer_meta" content="{&quot;jQuery&quot;:&quot;1.10.2&quot;}"><script type="text/javascript" src="chrome-extension://homgcnaoacgigpkkljjjekpignblkeae/detector.js"></script></head>
+
+<body class=" hasGoogleVoiceExt" style="">
+<form id="testBeta">
+  <p><strong>autoNumeric-2.0-BETA</strong></p>
+  <p>last update 2013-08-12 GMT 10:00 AM</p>
+  <p>Key features:</p>
+  <p>New "unSet" method - displays the raw value of the input.</p>
+  <ul>
+    <li>This displays unformatted (xxxx.xx) numeric strings in the form inputs that are controlled by autoNumeric.</li>
+    <li>autoNumeric is not "destroyed" allowing you to easily reformat the field after the form has been posted via the "set" method.</li>
+    <li>The "unSet" method will display the expanded decimal places if  the "eDec" option is used.</li>
+  </ul>
+  <p>Modified "set" method so the form inputs can easily reset after post. </p>
+  <ul>
+    <li>To reSet the inputs $(selector).autoNumeric('set', 'reSet');</li>
+  </ul>
+<p>New "eDec" option - this displays expanded decimal places when the input has focus.</p>
+  <ul>
+    <li>eDec - value must be enclosed in quotes - example eDec: '5'</li>
+    <li>The "eDec" value should be either "null" or greater than the normal decimal places set by the "vMin" &amp; "vMax" values or "mDec" option.</li>
+    <li>If the value being "set" is longer than the "eDec" value being set will be rounded.</li>
+    <li>Currently there is no padding when the input has focus.</li>
+  </ul>
+  <p>Modified the "get"  method.</p>
+  <ul>
+    <li>automatically checks if the "eDec" option is set and returns the expanded value.</li>
+    <li>The "getString" &amp; "getArray" methods use the "get" method to return values.</li>
+  </ul>
+  <p>Added "rawValue" to the settings. The rawValue is also saved via "sessionStorage" so if the the page looses focus the rawValue can be retrieved.</p>
+  <ul>
+    <li>The "rawValue" is saved in settings (settings.rawValue) and is saved  on "pageload", "keyup" &amp; "focusout" events and the "set" method.</li>
+  </ul>
+  <p>Test inputs to demonstrate "eDec", "unSet" &amp; "reSet".</p>
+  <ul>
+    <li>The first two inputs have "eDec" set to 5 and 10 respectively.</li>
+    <li>Enter these and you will see the extended decimal places - modify them and focus out and repeat.</li>
+    <li>The buttons calls the "unSet" and the "set" method with the "reSet" value.</li>
+  </ul>
+  <input type="text" name="one" id="one" size="30" value="123.888889" data-a-sign="$" data-e-dec="5">
+  &lt;input type="text" name="one" id="one" size="30" value="123.888889" data-a-sign="$" data-e-dec="5" &gt;<br>
+  <input type="text" name="two" id="two" size="30" value="-10000,009999" data-e-dec="10" data-a-sep="." data-a-dec="," data-v-min="-111111" data-n-bracket="(,)">
+  &lt;input type="text" name="two" id="two" size="30" value="-10000,009999" data-e-dec="10" data-a-sep="." data-a-dec=',' data-v-min='-111111' data-n-bracket='(,)'&gt;<br>
+  <input type="text" name="three" id="three" size="30" value="123" data-a-sign=" $" data-p-sign="s">
+  &lt;input type="text" name="three" id="three" size="30" value="123" data-a-sign=" $" data-p-sign="s"&gt;<br>
+  <input type="text" name="four" id="four" size="30" value="7658.98798798" data-a-sign="$ ">
+  &lt;input type="text" name="four" id="four" size="30" value="7658.98798798" data-a-sign="$ "&gt;<br>
+  <input type="button" name="unSet" id="unSet" value="unSet">
+  <input type="button" name="set" id="set" value="reSet">
+  <br>
+  <br>
+</form>
+<br>
+<p>Text " contenteditable" - this is on my wish list is to eventally get autoNumeric to work here.</p>
+<p id="bob2" data-a-sign="$" contenteditable="true">$1,000.00</p>
+
+</body></html>

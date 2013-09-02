@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>autoNumeric 2.0</title>
+<!-- <script type="text/javascript" src="jquery-1.10.2.min.js"></script> -->
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script type="text/javascript" src="autoNumeric-2.0-BETA.js"></script>
 <script type="text/javascript">
@@ -32,6 +33,18 @@ jQuery(function($) {
         console.log(testGetArray);
         return false;
     });
+		/* getarray method script */
+    $('#update').click(function () {
+        var opts = {
+			aSign: '€ ',
+			eDec: '5',
+			rVal: false,
+			aDec:',',
+			aSep: '.'
+		}
+		$('#five').autoNumeric('update', opts);			
+        return;
+    });
    
    
    
@@ -46,12 +59,12 @@ input[type="text"] {
 
 <body style="">
 <p><strong>autoNumeric-2.0-BETA</strong></p>
-<p>last update 2013-08-30 GMT 1:00 PM</p>
+<p>last update 2013-09-02 GMT 2:00 PM</p>
 <p>Key features:</p>
 <p>New "unSet" method - displays the raw value of the input.</p>
 <ul>
   <li>This displays unformatted (xxxx.xx) numeric strings in the form inputs that are controlled by autoNumeric.</li>
-  <li>autoNumeric is not "destroyed" allowing you to easily reformat the field after the form has been posted via the "set" method.</li>
+  <li>autoNumeric is not "destroyed" allowing you to easily reformat the field after the form has been posted via the &quot;reSet&quot; option of the "set" method (see below).</li>
   <li>The "unSet" method will display the expanded decimal places if  the "eDec" option is used.</li>
 </ul>
 <p>Modified "set" method so the form inputs can easily reset after post. </p>
@@ -118,7 +131,12 @@ input[type="text"] {
       <td>value=&quot;1237658.98798798&quot; data-a-sign=&quot;$ &quot; data-r-val=true</td>
     </tr>
     <tr style="height:35px">
-      <td><input type="text" name="five" id="five" size="25" value="123456789123" data-a-sign="Rs. " data-d-group="2"></td>
+      <td><input type="text" name="five" id="five" size="25" value="1234.98798798" data-a-sign="$ " data-e-dec="10" data-r-val=true></td>
+      <td>eDec &amp; rVal</td>
+      <td>value=&quot;1234.98798798&quot; data-a-sign=&quot;$ &quot; data-e-dec=&quot;10&quot; data-r-val=true ** see update button</td>
+    </tr>
+    <tr style="height:35px">
+      <td><input type="text" name="seven" id="seven" size="25" value="123456789123" data-a-sign="Rs. " data-d-group="2"></td>
       <td>&quot;Lakh                  Crore&quot;</td>
       <td>value=&quot;123456789123&quot; data-a-sign=&quot;Rs. &quot; data-d-group=&quot;2&quot;</td>
     </tr>
@@ -133,9 +151,13 @@ input[type="text"] {
   &nbsp;
   <input type="button" style="width:75px" name="getArray" id="getArray" value="getArray">
   <br />
+   &nbsp;
+  <input type="button" style="width:75px" name="upDate" id="update" value="update">
+  &nbsp;&nbsp;&nbsp;updates the input demo with eDec &amp; rVal to 
+  data-a-sign=&quot;&#8364; &quot; data-e-dec=&quot;5&quot; data-r-val=false data-a-dec='&quot;,&quot; data-a-sep=&quot;.'<br />
 </form>
 <br>
-<p>Text " contenteditable" - this is on my wish list is to eventally get autoNumeric to work here.</p>
+<p>Text " contenteditable" - this is on my wish list is to eventally get autoNumeric to work here - the issue is there is no reliable method to place the ceret.</p>
 <p id="bob2" data-a-sign="$" contenteditable="true">1000.00</p>
 </body>
 </html>

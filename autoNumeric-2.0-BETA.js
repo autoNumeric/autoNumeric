@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributor: Sokolov Yura
-* @version: 2.0-beta - 2013-08-30 GMT 1:00 PM
+* @version: 2.0-beta - 2013-09-2 GMT 2:00 PM
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -175,6 +175,7 @@
             }
             s = nSign + parts.join(settings.aDec);
         }
+
         if ((strip_zero && settings.lZero === 'deny') || (strip_zero && settings.lZero === 'allow' && settings.allowLeading === false)) {
             var strip_reg = '^' + settings.aNegRegAutoStrip + '0*(\\d' + (strip_zero === 'leading' ? ')' : '|$)');
             strip_reg = new RegExp(strip_reg);
@@ -819,6 +820,15 @@
         }
         return holder;
     }
+    /** original settings saved for use when eDec & rVal options are being used */
+    function originalSettings(settings) {
+        settings.oDec = settings.mDec;
+        settings.oPad = settings.aPad;
+        settings.oBracket = settings.nBracket;
+        settings.oSep = settings.aSep;
+        settings.oSign = settings.aSign;
+        return settings;
+    }
     function readCookie(name) { /** from quirksmode */
         var nameEQ = name + "=",
             ca = document.cookie.split(';'),
@@ -989,12 +999,8 @@
                 } else {
                     return this;
                 }
+                settings = originalSettings(settings); /** original settings saved for use when eDec & rVal options are being used */
                 settings.rawValue = '';
-                settings.oDec = settings.mDec; /** oDec - original decimal places */
-                settings.oPad = settings.aPad; /** oPad - original padding settings */
-                settings.oBracket = settings.nBracket; /** oDec - original negative bracket settings */
-                settings.oSep = settings.aSep; /** oDec - original negative bracket settings */
-                settings.oSign = settings.aSign;  /** original currency sign settings */
                 settings.runOnce = false;
                 var holder = getHolder($this, settings);
                 if (!$this.is('input[type=text], input[type=hidden], input:not([type])') && $this.prop('tagName') === 'INPUT') { /** checks for non-supported input types */
@@ -1207,6 +1213,7 @@
                 }
                 var strip = $this.autoNumeric('get');
                 settings = $.extend(settings, options);
+                settings = originalSettings(settings); /** update original settings */
                 getHolder($this, settings, true);
                 if (settings.aDec === settings.aSep) {
                     $.error("autoNumeric will not function properly when the decimal character aDec: '" + settings.aDec + "' and thousand separator aSep: '" + settings.aSep + "' are the same character");

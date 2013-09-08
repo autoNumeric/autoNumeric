@@ -33,7 +33,7 @@ jQuery(function($) {
         console.log(testGetArray);
         return false;
     });
-		/* getarray method script */
+		/* update method */
     $('#update').click(function () {
         var opts = {
 			aSign: '€ ',
@@ -59,7 +59,7 @@ input[type="text"] {
 
 <body style="">
 <p><strong>autoNumeric-2.0-BETA</strong></p>
-<p>last update 2013-09-02 GMT 2:00 PM</p>
+<p>last update 2013-09-08 GMT 10:00 AM</p>
 <p>Key features:</p>
 <p>New "unSet" method - displays the raw value of the input.</p>
 <ul>
@@ -73,13 +73,21 @@ input[type="text"] {
 </ul>
 <p>New "eDec" option - this displays expanded decimal places when the input has focus.</p>
 <ul>
+  <li>Default value &quot;eDec: null&quot;</li>
   <li>eDec - value must be enclosed in quotes - example eDec: '5'</li>
   <li>The "eDec" value should be either "null" or greater than the normal decimal places set by the "vMin" &amp; "vMax" values or "mDec" option.</li>
   <li>If the value being "set" is longer than the "eDec" value being set will be rounded.</li>
   <li>Currently there is no padding when the input has focus.</li>
+  <li><strong>Note - </strong>  &quot;eDec&quot; will function properly with the following exception: if the &quot;aStor = false&quot; (the default) and the client navigates away from the page the extended value is lost and will be replaced with the non extended value! </li>
+  <li><strong>Note</strong> - to  ensure the  extended value (eDec) is retained the &quot;aStor&quot; option must be set to &quot;true&quot; see details below.</li>
 </ul>
-<p><strong>NOTE - </strong> the value with extended decimal places is saved in a new setting named    "rawValue" to the settings. If the client navigates away from the page the extended value is lost so to ensure extended value is retained it is saved  via sessionStorage on compatible browsers of a session cookie in EI 6 &amp; 7 so if the the page looses focus the extended value  can be retrieved. SessionStorage or coolie is used only on fields when eDec does not equal null and is greater than aDec. Once the browser is shut down or the tab is closed all extended values held in sessionStorage or cookies are lost.</p>
-<p>I am considering adding an option that will require you to opt in to use the sessionStorage or cookies</p>
+<p>New &quot;aStor&quot; option - when true allows the &quot;eDec&quot; value to be retained via sessionStorage on compatible browsers of a session cookie in EI 6 &amp; 7.</p>
+<ul>
+  <li>Default value &quot;aStor: false&quot; </li>
+  <li>Set to &quot;aStor: true&quot; to use session storage.</li>
+  <li><strong>Note</strong> - sessionStorage or session cookie is used only on fields when eDec does not equal null and is greater than mDec. </li>
+  <li><strong>Note</strong> - once the browser is shut down or the tab is closed all extended values held in sessionStorage or cookies are deleted.</li>
+</ul>
 <p>New "rVal" option - this displays the number with decimal only  when the input has focus.</p>
 <ul>
   <li>This is similar to the behavior of a spread  spreadsheet </li>
@@ -99,25 +107,25 @@ input[type="text"] {
 <ul>
   <li>Focus and focusout of the inputs to see the behaviors for the different inputs.</li>
   <li>Change the values.</li>
-  <li>Navigate away and return to see the values are retained.</li>
+  <li>Navigate away and return to see the values are retained and see how the &quot;aStor&quot; option behaves.</li>
   <li>Press  the "unSet" and the "set" method with the "reSet" value.</li>
   <li>To view the &quot;getString&quot; and &quot;getArray&quot; results open the javascript console. Note &quot;getArray&quot; is not stringified.</li>
 </ul>
 <form id="testBeta">
-  <table width="1074" border="0">
+  <table width="1206" border="0">
     <tr style="height:35px;">
       <td width="204"><strong> &nbsp;Input</strong></td>
-      <td width="124"><strong>Demonstrates</strong></td>
-      <td width="732"><strong>HTML 5 data &amp; value</strong></td>
+      <td width="189"><strong>Demonstrates</strong></td>
+      <td width="799"><strong>HTML 5 data &amp; value</strong></td>
     </tr>
     <tr style="height:35px">
-      <td><input type="text" name="one" id="one" size="25" value="1233333.888881" data-a-sign="$" data-e-dec="5"></td>
-      <td>eDec</td>
-      <td>value=&quot;1233333.888881&quot; data-a-sign=&quot;$&quot; data-e-dec=&quot;5&quot;</td>
+      <td><input type="text" name="one" id="one" size="25" value="1233333.888881" data-a-sign="$" data-e-dec="5" data-a-stor=true></td>
+      <td>eDec when aStor=true</td>
+      <td>value=&quot;1233333.888881&quot; data-a-sign=&quot;$&quot; data-e-dec=&quot;5&quot; data-a-stor=true</td>
     </tr>
     <tr style="height:35px">
       <td><input type="text" name="two" id="two" size="25" value="-10000,009999" data-e-dec="10" data-a-sep="." data-a-dec="," data-v-min="-111111" data-n-bracket="(,)" ></td>
-      <td>eDec</td>
+      <td>eDec when aStor=false</td>
       <td>value=&quot;-10000,009999&quot; data-e-dec=&quot;10&quot; data-a-sep=&quot;.&quot; data-a-dec=&quot;,&quot; data-v-min=&quot;-111111&quot; data-n-bracket=&quot;(,)&quot;</td>
     </tr>
     <tr style="height:35px">
@@ -131,9 +139,9 @@ input[type="text"] {
       <td>value=&quot;1237658.98798798&quot; data-a-sign=&quot;$ &quot; data-r-val=true</td>
     </tr>
     <tr style="height:35px">
-      <td><input type="text" name="five" id="five" size="25" value="1234.98798798" data-a-sign="$ " data-e-dec="10" data-r-val=true></td>
-      <td>eDec &amp; rVal</td>
-      <td>value=&quot;1234.98798798&quot; data-a-sign=&quot;$ &quot; data-e-dec=&quot;10&quot; data-r-val=true ** see update button</td>
+      <td><input type="text" name="five" id="five" size="25" value="1234.98798798" data-a-sign="$ " data-e-dec="10" data-a-stor=true data-r-val=true></td>
+      <td>eDec, aStor=true &amp; rVal</td>
+      <td>value=&quot;1234.98798798&quot; data-a-sign=&quot;$ &quot; data-e-dec=&quot;10&quot; data-a-stor=true data-r-val=true ** see update button</td>
     </tr>
     <tr style="height:35px">
       <td><input type="text" name="seven" id="seven" size="25" value="123456789123" data-a-sign="Rs. " data-d-group="2"></td>

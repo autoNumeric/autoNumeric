@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributor: Sokolov Yura
-* @version: 2.0-beta - 2013-09-2 GMT 2:00 PM
+* @version: 2.0-beta - 2013-09-8 GMT 10:00 AM
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -856,29 +856,31 @@
         }
     }
     function autoSave($this, settings, toDo) {
-        var storedName = ($this[0].name !== '' && $this[0].name !== undefined) ? 'AUTO_' + decodeURIComponent($this[0].name) : 'AUTO_' + $this[0].id;
-        if (storageTest() === false) { /** sets cookie for browser that do not support sessionStorage IE 6 & ie7 */
-            if (toDo === 'get') {
-                return readCookie(storedName);
-            }
-            if (toDo === 'set') {
-                document.cookie = storedName + '=' + settings.rawValue + '; expires= ; path=/';
-            }
-            if (toDo === 'remove') {
-                var date = new Date();
-                date.setTime(date.getTime() + (-1 * 24 * 60 * 60 * 1000));
-                var expires = "; expires=" + date.toGMTString();
-                document.cookie = storedName + '="" ;' + expires + '; path=/';
-            }
-        } else {
-            if (toDo === 'get') {
-                return sessionStorage.getItem(storedName);
-            }
-            if (toDo === 'set') {
-                sessionStorage.setItem(storedName, settings.rawValue);
-            }
-            if (toDo === 'remove') {
-                sessionStorage.removeItem(storedName);
+        if (settings.aStor) {
+            var storedName = ($this[0].name !== '' && $this[0].name !== undefined) ? 'AUTO_' + decodeURIComponent($this[0].name) : 'AUTO_' + $this[0].id;
+            if (storageTest() === false) { /** sets cookie for browser that do not support sessionStorage IE 6 & ie7 */
+                if (toDo === 'get') {
+                    return readCookie(storedName);
+                }
+                if (toDo === 'set') {
+                    document.cookie = storedName + '=' + settings.rawValue + '; expires= ; path=/';
+                }
+                if (toDo === 'remove') {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (-1 * 24 * 60 * 60 * 1000));
+                    var expires = "; expires=" + date.toGMTString();
+                    document.cookie = storedName + '="" ;' + expires + '; path=/';
+                }
+            } else {
+                if (toDo === 'get') {
+                    return sessionStorage.getItem(storedName);
+                }
+                if (toDo === 'set') {
+                    sessionStorage.setItem(storedName, settings.rawValue);
+                }
+                if (toDo === 'remove') {
+                    sessionStorage.removeItem(storedName);
+                }
             }
         }
         return;
@@ -947,6 +949,10 @@
                          * value must be enclosed in quotes example mDec: '3',
                          */
                         eDec: null,
+                        /** Set to true to allow the eDec value to be saved with sessionStorage
+                         * if ie 6 or 7 the value will be saved as a session cookie
+                         */
+                        aStor: false,
                         /** method used for rounding
                          * mRound: 'S', Round-Half-Up Symmetric (default)
                          * mRound: 'A', Round-Half-Up Asymmetric
@@ -1133,11 +1139,6 @@
                         var onEmpty = checkEmpty(holder.inVal, $settings, true);
                         if (onEmpty !== null && onEmpty !== '') {
                             $this.val(onEmpty);
-                            if ($settings.pSign === 's') {
-                                setElementSelection(this, 0, 0);
-                            } else {
-                                setElementSelection(this, $settings.aSign.length, $settings.aSign.length);
-                            }
                         }
                         $settings.oEvent = null;
                     });
@@ -1256,10 +1257,10 @@
                     if (settings.nBracket !== null) {
                         value = negativeBracket(value, settings.nBracket, 'pageLoad');
                     }
-                    if (settings.eDec === null) {
+                    if (settings.eDec === null || settings.eDec !== null && settings.aStor === false) {
                         settings.rawValue = value.replace(settings.oSign, '').replace(settings.oSep, '').replace(',', '.');
                     }
-                    if (settings.eDec !== null) {
+                    if (settings.eDec !== null && settings.aStor) {
                         settings.rawValue = autoSave($this, settings, 'get');
                     }
                     return;

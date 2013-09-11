@@ -236,8 +236,9 @@
      */
     function checkValue(value) {
         var decimal = value.indexOf('.'),
+            sNotation =  value.indexOf('e'),
             checkSmall = +value;
-        if (decimal !== -1) {
+        if (decimal !== -1 || sNotation !== -1) {
             if (checkSmall < 0.000001 && checkSmall > -1) {
                 value = +value;
                 if (value < 0.000001 && value > 0) {

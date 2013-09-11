@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.9.15 - 2013-08-05 GMT 6:30 PM
+* @version: 1.9.16 - 2013-09-11 GMT 9:00 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -93,7 +93,6 @@
             }
         });
     }
-
     function convertKeyToNumber(settings, key) {
         if (typeof (settings[key]) === 'string') {
             settings[key] *= 1;
@@ -231,31 +230,30 @@
         return s;
     }
     /**
-     * function to handle numbers less than 0 that are stored in Exponential notaion ex: .0000001 stored as 1e-7
+     * function to handle numbers less than 0 that are stored in scientific notaion ex: .0000001 stored as 1e-7
      */
     function checkValue(value) {
-        var decimal = value.indexOf('.');
-        if (decimal !== -1) {
-            if (decimal === 1 && value.charAt(0) === '0') {
-                value = +value;
-                if (value < 0.000001 && value > 0) {
-                    value = (value + 1).toString();
-                    value = value.substring(1);
-                }
-                if (value < 0 && value > -1) {
-                    value = (value - 1).toString();
-                    value = '-' + value.substring(2);
-                }
-                value = value.toString();
-            } else {
-                var parts = value.split('.');
-                if (parts[1] !== undefined) {
-                    if (+parts[1] === 0) {
-                        value = parts[0];
-                    } else {
-                        parts[1] = parts[1].replace(/0*$/, '');
-                        value = parts.join('.');
-                    }
+        var decimal = value.indexOf('.'),
+            sNotation = value.indexOf('e');
+        if (decimal !== -1 || sNotation !== -1) {
+            value = +value;
+            if (value < 0.000001 && value > 0) {
+                value = (value + 1).toString();
+                value = value.substring(1);
+            }
+            if (value < 0 && value > -1) {
+                value = (value - 1).toString();
+                value = '-' + value.substring(2);
+            }
+            value = value.toString();
+        } else {
+            var parts = value.split('.');
+            if (parts[1] !== undefined) {
+                if (+parts[1] === 0) {
+                    value = parts[0];
+                } else {
+                    parts[1] = parts[1].replace(/0*$/, '');
+                    value = parts.join('.');
                 }
             }
         }
@@ -427,7 +425,7 @@
         } /** Reconstruct the string, converting any 10's to 0's */
         ivArray = ivArray.slice(0, rLength + 1);
         ivRounded = truncateZeros(ivArray.join('')); /** return rounded value */
-        return nSign + ivRounded;
+        return (+ivRounded === 0) ? ivRounded : nSign + ivRounded;
     }
     /**
      * Holder object for field properties
@@ -1249,3 +1247,4 @@
         $.error('Method "' + method + '" is not supported by autoNumeric()');
     };
 }(jQuery));
+// JavaScript Document

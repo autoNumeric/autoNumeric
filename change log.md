@@ -1,15 +1,19 @@
 ### Change log:
 
+#### Version 1.9.16
++ Fixed the checkValue function when vary small numbers in scientific notation are passed via the set method.
++ Modified the rounding method so zero value is not returned with a negative sign
+
 #### Version 1.9.15
 + Fixed bug introduced in version 1.9.14
 
 #### Version 1.9.14
 + Added additional supported tags ('b', 'caption', 'cite', 'code', 'dd', 'del', 'div', 'dfn', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ins', 'kdb', 'label', 'li', 'output', 'p', 'q', 's', 'sample', 'span', 'strong', 'td', 'th', 'u', 'var')
 + Moved the routine that tests for supported tags 
-+ General code cleanup
++ General code clean-up
 
 #### Version 1.9.13
-+ Fixed the "get" method when the input recieves focus for a second time.
++ Fixed the "get" method when the input receives focus for a second time.
 
 #### Version 1.9.12
 + Fixed brackets on page load when the decimal character is a comma.

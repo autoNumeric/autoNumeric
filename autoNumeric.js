@@ -411,7 +411,7 @@
             odd = (iv.charAt(rLength) === '.') ? (iv.charAt(rLength - 1) % 2) : (iv.charAt(rLength) % 2);
         if ((tRound > 4 && settings.mRound === 'S') || (tRound > 4 && settings.mRound === 'A' && nSign === '') || (tRound > 5 && settings.mRound === 'A' && nSign === '-') || (tRound > 5 && settings.mRound === 's') || (tRound > 5 && settings.mRound === 'a' && nSign === '') || (tRound > 4 && settings.mRound === 'a' && nSign === '-') || (tRound > 5 && settings.mRound === 'B') || (tRound === 5 && settings.mRound === 'B' && odd === 1) || (tRound > 0 && settings.mRound === 'C' && nSign === '') || (tRound > 0 && settings.mRound === 'F' && nSign === '-') || (tRound > 0 && settings.mRound === 'U')) {
             /** Round up the last digit if required, and continue until no more 9's are found */
-            for (i = (ivArray.length - 1); i >= 0; i -= 1) {
+            for (i = (ivArray.length - 1) ; i >= 0; i -= 1) {
                 if (ivArray[i] !== '.') {
                     ivArray[i] = +ivArray[i] + 1;
                     if (ivArray[i] < 10) {
@@ -902,7 +902,7 @@
                          */
                         aForm: true,
                         /** future use */
-                        onSomeEvent: function () {}
+                        onSomeEvent: function () { }
                     };
                     settings = $.extend({}, defaults, tagData, options); /** Merge defaults, tagData and options */
                     if (settings.aDec === settings.aSep) {
@@ -1115,7 +1115,7 @@
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'set' method");
                     return this;
                 }
-               /** allows locale decimal seperator to be a comma */
+                /** allows locale decimal seperator to be a comma */
                 if (testValue === $this.attr('value')) {
                     value = value.replace(',', '.');
                 }
@@ -1210,6 +1210,72 @@
             }
             $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'getString' method");
             return this;
+        },
+        /** method to get the a friendly string formatted value of a numeric, ie: 235k, 235 Million, 235 Billion */
+        getFriendlyString: function () {
+            var $this = autoGet($(this)),
+                settings = $this.data('autoNumeric');
+            if (typeof settings !== 'object') {
+                $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'getFriendlyString' method");
+                return this;
+            }
+            settings.oEvent = 'getFriendlyString';
+            var getValue = '';
+            /** determine the element type then use .eq(0) selector to grab the value of the first element in selector */
+            if ($this.is('input[type=text], input[type=hidden], input:not([type])')) { /**added hidden type */
+                getValue = $this.eq(0).val();
+            } else if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
+                getValue = $this.eq(0).text();
+            } else {
+                $.error("The <" + $this.prop('tagName') + "> is not supported by autoNumeric()");
+                return false;
+            }
+            if ((getValue === '' && settings.wEmpty === 'empty') || (getValue === settings.aSign && (settings.wEmpty === 'sign' || settings.wEmpty === 'empty'))) {
+                return '';
+            }
+            if (settings.nBracket !== null && getValue !== '') {
+                getValue = negativeBracket(getValue, settings.nBracket, settings.oEvent);
+            }
+            if (settings.runOnce || settings.aForm === false) {
+                getValue = autoStrip(getValue, settings);
+            }
+            getValue = fixNumber(getValue, settings.aDec, settings.aNeg);
+            if (+getValue === 0 && settings.lZero !== 'keep') {
+                getValue = '0';
+            }
+            getValue = checkValue(getValue);
+            //Everything above this is taken from get()
+            //Valid range: [1000, 1000000)
+            //output example: 235.5K
+            if (getValue >= 1000 && getValue < 1000000) {
+                getValue = (getValue / 1000).toFixed(1);
+                getValue = getValue + "K";
+            }
+                //Valid range: [1000000,1000000000)
+                //output example: 235.5 Million
+            else if (getValue >= 1000000 && getValue < 1000000000) {
+                getValue = (getValue / 1000000).toFixed(1);
+                getValue = getValue + " million";
+            }
+                //Valid range: [1000000000,1000000000000)
+                //output example: 235.5 Billion
+            else if (getValue >= 1000000000 && getValue < 1000000000000) {
+                getValue = (getValue / 1000000000).toFixed(1);
+                getValue = getValue + " billion";
+            }
+                //Valid range: [1000000000000, 1000000000000000)
+                //output example: 235.5 Trillion
+            else if (getValue >= 1000000000000 && getValue < 1000000000000000) {
+                getValue = (getValue / 1000000000000).toFixed(1);
+                getValue = getValue + " trillion";
+            }
+            //If they've specified a sign, add it to the front
+            if (settings.aSign) {
+                return settings.aSign + getValue;
+            }
+            else {
+                return getValue;
+            }
         },
         /** method to get the unformated value from multiple fields */
         getArray: function () {

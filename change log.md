@@ -1,5 +1,8 @@
 ### Change log:
 
+#### Version 1.9.17
++ Fixed leading zero on page load when option lZero is set to 'keep'.
+
 #### Version 1.9.16
 + Fixed the checkValue function when vary small numbers in scientific notation are passed via the set method.
 + Modified the rounding method so zero value is not returned with a negative sign

@@ -230,34 +230,36 @@
         return s;
     }
     /**
-     * function to handle numbers less than 0 that are stored in scientific notaion ex: .0000001 stored as 1e-7
+     * function to handle numbers less than 0 that are stored in Exponential notation ex: .0000001 stored as 1e-7
      */
-    function checkValue(value) {
+    function checkValue(value, settings) {
         var decimal = value.indexOf('.'),
-            sNotation = value.indexOf('e');
-        if (decimal !== -1 || sNotation !== -1) {
-            value = +value;
-            if (value < 0.000001 && value > 0) {
-                value = (value + 1).toString();
-                value = value.substring(1);
-            }
-            if (value < 0 && value > -1) {
-                value = (value - 1).toString();
-                value = '-' + value.substring(2);
-            }
-            value = value.toString();
-        } else {
-            var parts = value.split('.');
-            if (parts[1] !== undefined) {
-                if (+parts[1] === 0) {
-                    value = parts[0];
-                } else {
-                    parts[1] = parts[1].replace(/0*$/, '');
-                    value = parts.join('.');
+            checkSmall = +value;
+        if (decimal !== -1) {
+            if (checkSmall < 0.000001 && checkSmall > -1) {
+                value = +value;
+                if (value < 0.000001 && value > 0) {
+                    value = (value + 10).toString();
+                    value = value.substring(1);
+                }
+                if (value < 0 && value > -1) {
+                    value = (value - 10).toString();
+                    value = '-' + value.substring(2);
+                }
+                value = value.toString();
+            } else {
+                var parts = value.split('.');
+                if (parts[1] !== undefined) {
+                    if (+parts[1] === 0) {
+                        value = parts[0];
+                    } else {
+                        parts[1] = parts[1].replace(/0*$/, '');
+                        value = parts.join('.');
+                    }
                 }
             }
         }
-        return value.replace(/^0*(\d)/, '$1');
+        return (settings.lZero === 'keep') ? value : value.replace(/^0*(\d)/, '$1');
     }
     /**
      * prepare real number to be converted to our format
@@ -1104,7 +1106,7 @@
                 return;
             });
         },
-        /** returns a formated strings for "input:text" fields Uses jQuery's .val() method*/
+        /** returns a formatted strings for "input:text" fields Uses jQuery's .val() method*/
         set: function (valueIn) {
             return $(this).each(function () {
                 var $this = autoGet($(this)),
@@ -1115,7 +1117,7 @@
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'set' method");
                     return this;
                 }
-               /** allows locale decimal seperator to be a comma */
+               /** allows locale decimal separator to be a comma */
                 if (testValue === $this.attr('value')) {
                     value = value.replace(',', '.');
                 }
@@ -1127,9 +1129,9 @@
                 if (!$.isNumeric(+value)) {
                     return '';
                 }
-                value = checkValue(value);
+                value = checkValue(value, settings);
                 settings.oEvent = 'set';
-                settings.lastSetValue = value; /** saves the unrounded value from the set method - $('selector').data('autoNumeric').lastSetValue; - helpful when you need to change the rounding accuracy*/
+                settings.lastSetValue = value; /** saves the un-rounded value from the set method - $('selector').data('autoNumeric').lastSetValue; - helpful when you need to change the rounding accuracy*/
                 value.toString();
                 if (value !== '') {
                     value = autoRound(value, settings);
@@ -1149,7 +1151,7 @@
                 return false;
             });
         },
-        /** method to get the unformated value from a specific input field, returns a numeric value */
+        /** method to get the unformatted value from a specific input field, returns a numeric value */
         get: function () {
             var $this = autoGet($(this)),
                 settings = $this.data('autoNumeric');

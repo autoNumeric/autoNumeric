@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributor: Sokolov Yura
-* @version: 2.0-beta - 2013-11-8 GMT 2:30 PM
+* @version: 2.0-beta - 2013-11-8 GMT 10:00 PM
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -392,7 +392,6 @@
         iv = (iv === '') ? '0' : iv.toString();
         convertKeyToNumber(settings, 'mDec'); /** set mDec to number needed when mDec set by 'update method */
         if (settings.mRound === 'CHF') {
-            iv = (Math.ceil(iv * 20) / 20);
             iv = (Math.round(iv * 20) / 20).toString();
         }
         var ivRounded = '',

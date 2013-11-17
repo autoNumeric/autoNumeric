@@ -324,17 +324,17 @@
         var ivSplit = iv.split(settings.aDec);
         if (settings.altDec && ivSplit.length === 1) {
             ivSplit = iv.split(settings.altDec);
-        } /** assigns the whole number to the a varibale (s) */
+        } /** assigns the whole number to the a variable (s) */
         var s = ivSplit[0];
         if (settings.aSep) {
-            while (digitalGroup.test(s)) { /** re-inserts the thousand sepparator via a regualer expression */
+            while (digitalGroup.test(s)) { /** re-inserts the thousand separator via a regular expression */
                 s = s.replace(digitalGroup, '$1' + settings.aSep + '$2');
             }
         }
         if (settings.mDec !== 0 && ivSplit.length > 1) {
             if (ivSplit[1].length > settings.mDec) {
                 ivSplit[1] = ivSplit[1].substring(0, settings.mDec);
-            } /** joins the whole number with the deciaml value */
+            } /** joins the whole number with the decimal value */
             iv = s + settings.aDec + ivSplit[1];
         } else { /** if whole numbers only */
             iv = s;
@@ -583,7 +583,7 @@
         },
         /**
          * process pasting, cursor moving and skipping of not interesting keys
-         * if returns true, futher processing is not performed
+         * if returns true, further processing is not performed
          */
         skipAllways: function (e) {
             var kdCode = this.kdCode,
@@ -763,12 +763,12 @@
                     position = newLeft[0].length;
                     /** if we are just before sign which is in prefix position */
                     if (((position === 0 && value.charAt(0) !== settingsClone.aNeg) || (position === 1 && value.charAt(0) === settingsClone.aNeg)) && settingsClone.aSign && settingsClone.pSign === 'p') {
-                        /** place carret after prefix sign */
+                        /** place caret after prefix sign */
                         position = this.settingsClone.aSign.length + (value.charAt(0) === '-' ? 1 : 0);
                     }
                 } else if (settingsClone.aSign && settingsClone.pSign === 's') {
                     /** if we could not find a place for cursor and have a sign as a suffix */
-                    /** place carret before suffix currency sign */
+                    /** place caret before suffix currency sign */
                     position -= settingsClone.aSign.length;
                 }
             }

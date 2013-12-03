@@ -35,8 +35,8 @@ input[type="text"] {
     <p>Web site: <a href="http://www.decorplanit.com/plugin/">http://www.decorplanit.com/plugin/</a> complete with detailed examples and option/html 5 data code generator/</p>
     <p>github: <a href="https://github.com/BobKnothe/autoNumeric">https://github.com/BobKnothe/autoNumeric</a></p>
     <p>jQuery: <a href="http://plugins.jquery.com/autoNumeric/">http://plugins.jquery.com/autoNumeric/</a></p>
-    <p><strong>autoNumeric 1.9.16</strong> is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. It supports most International numeric formats and currency signs including those used in Europe, North and South America, Asia and India (lakhs**).</p>
-    <p>Any number of currency formats can reside on the same page and are configured by options that can be placed as HTML5 data attribute or passed as an argument. These settings can easily be changed at any time using the new &lsquo;update&rsquo; method or via the callback feature. </p>
+    <p><strong>autoNumeric 1.9.18</strong> is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. It supports most International numeric formats and currency signs including those used in Europe, North and South America, Asia and India (lakhs**).</p>
+    <p>Any number of currency formats can reside on the same page and are configured by options that can be placed as HTML5 data attribute or passed as an argument. These settings can easily be changed at any time using the new &lsquo;update&rsquo; method or via the callback feature. </p>
     <p>Seven built in methods and fifteen options gives you the flexibility needed to use autoNumeric to its maximum potential (details below).</p>
     <p><strong>Examples of autoNumeric's flexibility:</strong></p>
     <form name="form1" method="post" action="">
@@ -134,7 +134,7 @@ input[type="text"] {
     <ul>
       <li>The input types supported:
         <ul>
-          <li>&lt;input type="text"&gt;, &lt;input type="hidden"&gt; &amp; &lt;input&gt;  no type attribute. </li>
+          <li>&lt;input type="text"&gt;, &lt;input type="hidden"&gt; &amp; &lt;input&gt;  no type attribute. </li>
           <li>Other input types are NOT supported including HTML 5 number type. </li>
         </ul>
       </li>
@@ -212,7 +212,7 @@ input[type="text"] {
           <li>aDec: ','	 comma</li>
         </ul>
       </li>
-      <li style="line-height:25px"><strong>altDec: null </strong>- altDec allows you to declare  an alternative key to enter the decimal separator assigned in aDec.
+      <li style="line-height:25px"><strong>altDec: null </strong>- altDec allows you to declare  an alternative key to enter the decimal separator assigned in aDec.
         <ul>
           <li>developer sellectable - example: {aSep: '.', aDec: ',',  altDec: '.'}  would allow the period on the numeric pad to enter the decimal &quot;,&quot;</li>
         </ul>
@@ -334,22 +334,22 @@ input[type="text"] {
       </tbody>
     </table>
     <hr>
-    <p><strong>'init' method </strong><strong>- </strong>initializes autoNumeric and must be run before other methods can be called.</p>
+    <p><strong>'init' method </strong><strong>- </strong>initializes autoNumeric and must be run before other methods can be called.</p>
     <ul>
-      <li>$(selector).autoNumeric('init'); <em>"initialized with defaults only"</em></li>
-      <li>$(selector).autoNumeric(); <em>"initialized with defaults only"</em></li>
-      <li>$(selector).autoNumeric('init', {options}); <em>"initialized with options"</em></li>
-      <li>$(selector).autoNumeric({options}); <em>"initialized with options"</em></li>
+      <li>$(selector).autoNumeric('init'); <em>"initialized with defaults only"</em></li>
+      <li>$(selector).autoNumeric(); <em>"initialized with defaults only"</em></li>
+      <li>$(selector).autoNumeric('init', {options}); <em>"initialized with options"</em></li>
+      <li>$(selector).autoNumeric({options}); <em>"initialized with options"</em></li>
       <li>var someOptions = {options}<em>; &quot;options placesd as a variable"</em>
         <ul>
-          <li>$(selector).autoNumeric('init', someOptions); </li>
+          <li>$(selector).autoNumeric('init', someOptions); </li>
           <li>$(selector).autoNumeric(someOptions);</li>
         </ul>
       </li>
     </ul>
     <p><strong>Note the following</strong>:</p>
     <ul>
-      <li>Using <strong>'init'</strong> is optional on the initialize method all other methods require being declared.</li>
+      <li>Using <strong>'init'</strong> is optional on the initialize method all other methods require being declared.</li>
       <li>'init' is case sensitive.</li>
       <li>The input element is the only tag that supports auto formatting as you type.</li>
       <li>Calling the 'init' method on a element that is already initilized will NOT change the options.</li>
@@ -358,9 +358,9 @@ input[type="text"] {
     <p>Calling the "init" method on a element where the decimal point "aDec" and the thousand separator "aSep" are equal will cause an error message to be thrown to the javascript console.</p>
     <p> Calling the 'init' methods on a element that is not supported by autoNumeric will cause an error message to be thrown to the javascript console.</p>
     <hr>
-    <p><strong>'destroy' method </strong>- removes autoNumeric from the selected element(s).</p>
+    <p><strong>'destroy' method </strong>- removes autoNumeric from the selected element(s).</p>
     <ul>
-      <li>$(selector).autoNumeric('destroy'); </li>
+      <li>$(selector).autoNumeric('destroy'); </li>
     </ul>
     <p><strong>Note the following</strong>:</p>
     <ul>
@@ -371,9 +371,9 @@ input[type="text"] {
       <li>The selected fields or elements can be re-initialized at any time.</li>
     </ul>
     <hr>
-    <p><strong>"update' method </strong>- easily update element(s) that have been previously initialized 'init' by autoNumeric.</p>
+    <p><strong>"update' method </strong>- easily update element(s) that have been previously initialized 'init' by autoNumeric.</p>
     <ul>
-      <li>$(selector).autoNumeric('update', {options}); </li>
+      <li>$(selector).autoNumeric('update', {options}); </li>
     </ul>
     <p><strong>Note the following</strong>:</p>
     <ul>
@@ -390,10 +390,10 @@ input[type="text"] {
     <p> Calling the "update" method on a element where the decimal point "aDec" and the thousand separator "aSep" are equal will cause an error message to be thrown to the javascript console.</p>
     <p> Calling the 'update' method on a element that is not supported by autoNumeric will cause an error message to be thrown to the javascript console.</p>
     <hr>
-    <p><strong>'set' method </strong>- The 'set' method allows you to easily format numbers and numeric strings</p>
+    <p><strong>'set' method </strong>- The 'set' method allows you to easily format numbers and numeric strings</p>
     <p><strong>Proper format for the 'set' method</strong>.</p>
     <ul>
-      <li>$(selector).autoNumeric('set', value); </li>
+      <li>$(selector).autoNumeric('set', value); </li>
     </ul>
     <p><strong>Note the following</strong>:</p>
     <ul>
@@ -413,10 +413,10 @@ input[type="text"] {
     <p> Calling the 'set' method prior to the 'init' method will cause a error message to be thrown to the Javascript console.</p>
     <p> Calling the 'set' method on a element that is not supported by autoNumeric will cause an error message to be thrown to the javascript console.</p>
     <hr>
-    <p><strong>'get' method - </strong>The 'get' method allows you to easily remove the formating from a string on a autoNumeric controlled element and returns a string.</p>
+    <p><strong>'get' method - </strong>The 'get' method allows you to easily remove the formating from a string on a autoNumeric controlled element and returns a string.</p>
     <p><strong>Proper format for the 'get' method</strong>.</p>
     <ul>
-      <li>$(selector).autoNumeric('get'); </li>
+      <li>$(selector).autoNumeric('get'); </li>
     </ul>
     <p><strong>Note the following:</strong></p>
     <ul>
@@ -431,10 +431,10 @@ input[type="text"] {
     <p> Calling the 'get' method prior to the 'init' method will cause a error message to be thrown to the Javascript console.</p>
     <p> Calling the 'get' method on a element that is not supported by autoNumeric will cause an error message to be thrown to the javascript console.</p>
     <hr>
-    <p><strong>'</strong><strong>getString' method </strong>- this basically uses jQuery's .serialize() method which creates a text string (URL-encoded notation) from a set of form elements that is ready for submission. The extra step taken here is the string is split and iterated through and the formatted values are replaced with unformatted values. The string is then joined back together and returned.</p>
+    <p><strong>'</strong><strong>getString' method </strong>- this basically uses jQuery's .serialize() method which creates a text string (URL-encoded notation) from a set of form elements that is ready for submission. The extra step taken here is the string is split and iterated through and the formatted values are replaced with unformatted values. The string is then joined back together and returned.</p>
     <p><strong>Proper format for the 'getString' method</strong>.</p>
     <ul>
-      <li>$(selector).autoNumeric('getString'); </li>
+      <li>$(selector).autoNumeric('getString'); </li>
     </ul>
     <p><strong>Note the following:</strong></p>
     <ul>
@@ -442,33 +442,33 @@ input[type="text"] {
       <li>Options and value are NOT accepted.</li>
       <li>The "getString" method does NOT validate the form inputs. It will return what has been entered including empty strings.</li>
       <li>If your selector includes non-autoNumeric fields they will be returned untouched.</li>
-      <li>Only <a href="http://www.w3.org/TR/html401/interact/forms.html#h-17.13.2">"successful controls</a>" are serialized to the string. Please read more about <a href="http://api.jquery.com/serialize/">jQuery's .serialize() method</a> to see if "getString" method will work for your application.</li>
+      <li>Only <a href="http://www.w3.org/TR/html401/interact/forms.html#h-17.13.2">"successful controls</a>" are serialized to the string. Please read more about <a href="http://api.jquery.com/serialize/">jQuery's .serialize() method</a> to see if "getString" method will work for your application.</li>
       <li>Returns a string</li>
     </ul>
     <p><strong>Warning</strong></p>
     <p> At least one input must be controled by autoNumeric. If not the 'getSting' method will cause a error message to be thrown the the Javascript console.</p>
     <hr>
-    <p><strong>'getArray' method </strong>- this basically uses jQuery's .serializeArray() method which returns a Javascript array of objects, ready to be encoded as a JSON string. The extra step taken here is the the object array is iterated through and formatted values are replaced with un-formatted values and returned.</p>
+    <p><strong>'getArray' method </strong>- this basically uses jQuery's .serializeArray() method which returns a Javascript array of objects, ready to be encoded as a JSON string. The extra step taken here is the the object array is iterated through and formatted values are replaced with un-formatted values and returned.</p>
     <p><strong>Proper format for the 'getArray' method</strong>.</p>
     <ul>
-      <li>$(selector).autoNumeric('getArray'); </li>
+      <li>$(selector).autoNumeric('getArray'); </li>
     </ul>
     <p><strong>Note the following:</strong></p>
     <ul>
       <li>The 'getArray' method name is required "$(selector).autoNumeric('getArray');".</li>
       <li>Options are NOT accepted.</li>
-      <li>An object is returned. If you want this converted to a valid JSON string to submit to the server you should consider <a href="https://github.com/douglascrockford/JSON-js">JSON2.js</a> as I did in this demo.</li>
+      <li>An object is returned. If you want this converted to a valid JSON string to submit to the server you should consider <a href="https://github.com/douglascrockford/JSON-js">JSON2.js</a> as I did in this demo.</li>
       <li>The "getArray" method does NOT validate the form inputs. It will return what has been entered including empty strings.</li>
       <li>If your selector includes non-autoNumeric fields they will be returned untouched.</li>
-      <li>Only <a href="http://www.w3.org/TR/html401/interact/forms.html#h-17.13.2">"successful controls</a>" are serialized to the string. Please read more about <a href="http://api.jquery.com/serializeArray/">jQuery's .serializeArray() method</a> to see if "getArray" method will work for your application.</li>
+      <li>Only <a href="http://www.w3.org/TR/html401/interact/forms.html#h-17.13.2">"successful controls</a>" are serialized to the string. Please read more about <a href="http://api.jquery.com/serializeArray/">jQuery's .serializeArray() method</a> to see if "getArray" method will work for your application.</li>
     </ul>
     <p><strong>Warning</strong></p>
     <p> At least one input must be controled by autoNumeric. If not the 'getArray' method will cause a error message to be thrown the the Javascript console.</p>
     <hr>
-    <p><strong>'getSettings' method </strong>- this returns an object that shows the autoNumeric settings for the field. You may find this helpful when developing a page.</p>
+    <p><strong>'getSettings' method </strong>- this returns an object that shows the autoNumeric settings for the field. You may find this helpful when developing a page.</p>
     <p><strong>Proper format for the 'getArray' method</strong>.</p>
     <ul>
-      <li>$(selector).autoNumeric('getSettings'); </li>
+      <li>$(selector).autoNumeric('getSettings'); </li>
     </ul>
     <p><strong>Note the following</strong>:</p>
     <ul>

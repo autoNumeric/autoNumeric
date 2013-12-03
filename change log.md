@@ -1,5 +1,8 @@
 ### Change log:
 
+#### Version 1.9.18
++ Fixed formatting on page load for text elements.
+
 #### Version 1.9.17
 + Fixed leading zero on page load when option lZero is set to 'keep'.
 

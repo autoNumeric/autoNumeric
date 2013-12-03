@@ -10,10 +10,12 @@
         "number",
         "numeric",
         "format",
-        "input",
+        "jquery",
+        "form",
+		"input",
 		"mask"
     ],
-    "version": "1.9.17",
+    "version": "1.9.18",
     "author": {
         "name": "Robert (Bob) Knothe",
         "url": "https://github.com/BobKnothe/autoNumeric"

@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.9.17 - 2013-09-28 GMT 9:00 AM
+* @version: 1.9.17 - 2013-12-03 GMT 9:00 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -324,17 +324,17 @@
         var ivSplit = iv.split(settings.aDec);
         if (settings.altDec && ivSplit.length === 1) {
             ivSplit = iv.split(settings.altDec);
-        } /** assigns the whole number to the a variable (s) */
+        } /** assigns the whole number to the a varibale (s) */
         var s = ivSplit[0];
         if (settings.aSep) {
-            while (digitalGroup.test(s)) { /** re-inserts the thousand separator via a regular expression */
+            while (digitalGroup.test(s)) { /** re-inserts the thousand sepparator via a regualer expression */
                 s = s.replace(digitalGroup, '$1' + settings.aSep + '$2');
             }
         }
         if (settings.mDec !== 0 && ivSplit.length > 1) {
             if (ivSplit[1].length > settings.mDec) {
                 ivSplit[1] = ivSplit[1].substring(0, settings.mDec);
-            } /** joins the whole number with the decimal value */
+            } /** joins the whole number with the deciaml value */
             iv = s + settings.aDec + ivSplit[1];
         } else { /** if whole numbers only */
             iv = s;
@@ -583,7 +583,7 @@
         },
         /**
          * process pasting, cursor moving and skipping of not interesting keys
-         * if returns true, further processing is not performed
+         * if returns true, futher processing is not performed
          */
         skipAllways: function (e) {
             var kdCode = this.kdCode,
@@ -763,12 +763,12 @@
                     position = newLeft[0].length;
                     /** if we are just before sign which is in prefix position */
                     if (((position === 0 && value.charAt(0) !== settingsClone.aNeg) || (position === 1 && value.charAt(0) === settingsClone.aNeg)) && settingsClone.aSign && settingsClone.pSign === 'p') {
-                        /** place caret after prefix sign */
+                        /** place carret after prefix sign */
                         position = this.settingsClone.aSign.length + (value.charAt(0) === '-' ? 1 : 0);
                     }
                 } else if (settingsClone.aSign && settingsClone.pSign === 's') {
                     /** if we could not find a place for cursor and have a sign as a suffix */
-                    /** place caret before suffix currency sign */
+                    /** place carret before suffix currency sign */
                     position -= settingsClone.aSign.length;
                 }
             }
@@ -1117,11 +1117,11 @@
                     return this;
                 }
                /** allows locale decimal separator to be a comma */
-                if (testValue === $this.attr('value')) {
+                if ((testValue === $this.attr('value') || testValue === $this.text()) && settings.runOnce === false) {
                     value = value.replace(',', '.');
                 }
                 /** routine to handle page re-load from back button */
-                if (testValue !== $this.attr('value') && settings.runOnce === false) {
+                if (testValue !== $this.attr('value') && $this.prop('tagName') === 'INPUT' && settings.runOnce === false) {
                     value = autoStrip(value, settings);
                 }
                 /** returns a empty string if the value being 'set' contains non-numeric characters and or more than decimal point (full stop) and will not be formatted */

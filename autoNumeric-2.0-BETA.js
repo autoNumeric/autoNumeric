@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributor: Sokolov Yura
-* @version: 2.0-beta - 2013-11-8 GMT 10:00 PM
+* @version: 2.0-beta - 2013-12-04 GMT 2:00 PM
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -113,7 +113,12 @@
         settings.mDec = (settings.mRound === 'CHF') ? '2' : settings.mDec;
         convertKeyToNumber(settings, 'mDec'); /** set mDec if not defined by user */
         settings.allowLeading = true;
-        settings.aNeg = settings.vMin < 0 ? '-' : '';
+		if (settings.oRide !== null) {
+			var parts = settings.oRide.split(',');
+			settings.aNeg = parts[1] > 0 ? '-' : '';
+		} else {
+			settings.aNeg = settings.vMin < 0 ? '-' : '';
+		}
         vmax[0] = vmax[0].replace('-', '');
         vmin[0] = vmin[0].replace('-', '');
         settings.mInt = Math.max(vmax[0].length, vmin[0].length, 1);
@@ -209,11 +214,8 @@
     /**
      * truncate decimal part of a number
      */
-    function truncateDecimal(s, settings) {
-        var aDec = settings.aDec,
-            mDec = settings.mDec,
-            oRide = settings.oRide;
-        if (aDec && mDec && !oRide) {
+    function truncateDecimal(s, aDec, mDec) {
+        if (aDec && mDec) {
             var parts = s.split(aDec);
             /** truncate decimal part to satisfying length
              * cause we would round it anyway */
@@ -297,8 +299,21 @@
         s = s.replace(',', '.');
         s = truncateDecimal(s, settings);
         s = fixNumber(s, settings.aDec, settings.aNeg);
-        var value = +s;
-        return settings.oRide ? true : value >= settings.vMin && value <= settings.vMax;
+		if (settings.oRide !== null) {
+			var parts = settings.oRide.split(','),
+				strLength = s.indexOf('.') === -1 ? s.length : s.indexOf('.') - 1;
+			if (s.indexOf('-') === -1) {
+				if (parts[0] === '0' && s === '0') {
+					return true;
+				}
+				return strLength > parts[0] ? false : true;
+			} else {
+				return strLength - 1 > parts[1] ? false : true;
+			}		
+		} else {
+			var value = +s;
+			return value >= settings.vMin && value <= settings.vMax;
+		}
     }
     /**
      * private function to check for empty value
@@ -347,7 +362,7 @@
             }
         }
         if (settings.mDec !== 0 && ivSplit.length > 1) {
-            if (ivSplit[1].length > settings.mDec && !settings.oRide) {
+            if (ivSplit[1].length > settings.mDec) {
                 ivSplit[1] = ivSplit[1].substring(0, settings.mDec);
             } /** joins the whole number with the decimal value */
             iv = s + settings.aDec + ivSplit[1];
@@ -562,6 +577,19 @@
                     right = right.replace(/^0*(\d)/, '$1');
                 }
             }
+			if (settingsClone.oRide !== null) {
+				var parts = settingsClone.oRide.split(',');
+				if (left.indexOf('-') === -1) {
+					if (left.charAt(0) === '0' && left.length > parts[0]) {
+						left = (left === '0') ? left : left.substr(1);
+					}
+				} else {
+					if (left.charAt(1) === '0' && left.length - 1 > parts[1]) {
+						left = left.substr(2);
+						left = '-' + left;
+					}
+				}
+			}
             var new_value = left + right; /** insert zero if has leading dot */
             if (settingsClone.aDec) {
                 var m = new_value.match(new RegExp('^' + settingsClone.aNegRegAutoStrip + '\\' + settingsClone.aDec));
@@ -585,17 +613,17 @@
                 position = parts[0].length;
             if (autoCheck(new_value, settingsClone)) {
                 new_value = truncateDecimal(new_value, settingsClone);
-                var test_value = (new_value.indexOf(',') !== -1) ? new_value.replace(',', '.') : new_value;
-                if (test_value === '' || test_value === '-') {
+                var test_value = (new_value.indexOf(',') !== -1) ? new_value.replace(',', '.') : new_value,
+					text_value = test_value;
+				if (test_value === '' || test_value === '-') {
                     settingsClone.rawValue = '';
                 } else {
                     if (+test_value < 0.000001 && +test_value > -1) {
                         test_value = checkValue(test_value, settingsClone);
                     } else {
-                        test_value = +test_value;
                         test_value = test_value.toString();
                     }
-                    settingsClone.rawValue = test_value;
+                    settingsClone.rawValue =  settingsClone.oRide === null ? test_value : text_value;
                 }
                 if (position > new_value.length) {
                     position = new_value.length;
@@ -1026,11 +1054,12 @@
                          * value must be enclosed in quotes example mDec: '3',
                          */
                         eDec: null,
-                        /** overides min / max values and allows unlimited length
-                         * potential future use is to have callback function to validate
-                         * numbers that are too large for using with separate script (examples bignumber.js)
+                        /** overrides min / max values and controls the number of integers
+                         * example oRide: '6,0' allows 6 digits positive 0 negative
+						 * example oRide: '8,8' allow 8 digits both positive and negative
+						 * decimal places are controlled via the mDec option default is 2 places
                          */
-                        oRide: false,
+                        oRide: null,
                         /** Set to true to allow the eDec value to be saved with sessionStorage
                          * if ie 6 or 7 the value will be saved as a session cookie
                          */
@@ -1045,7 +1074,7 @@
                          * mRound: 'D', Round Down "Round-Toward-Zero" - same as truncate
                          * mRound: 'C', Round to Ceiling "Toward Positive Infinity"
                          * mRound: 'F', Round to Floor "Toward Negative Infinity"
-                         * mRound: 'CHF' Rounds to the nearest .00 .05 - Switerland
+                         * mRound: 'CHF' Rounds to the nearest .00 .05 - Switzerland
                          */
                         mRound: 'S',
                         /** controls decimal padding
@@ -1189,7 +1218,7 @@
                             setElementSelection(this, 0, 0);
                         }
                         if (holder.settingsClone.eDec !== null) { /** saves the extended decimal to preserve the data when navigating away from the page */
-                            autoSave($this, settings, 'set');
+                            autoSave($this, settings, 'set');							
                         }
                         if (skip) {
                             return true;
@@ -1363,7 +1392,9 @@
                     return '';
                 }
                 value = checkValue(value, settings);
-                settings.oEvent = 'set';
+				if (settings.oEvent !== 'focusin') {
+					settings.oEvent = 'set';
+				}
                 value.toString();
                 if (value !== '') {
                     if (settings.eDec !== null) {

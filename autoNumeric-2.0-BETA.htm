@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <title>autoNumeric 2.0</title>
-<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="jquery-2.0.3.js"></script>
 <script type="text/javascript" src="autoNumeric-2.0-BETA.js"></script>
 <script type="text/javascript">
 jQuery(function($) {
@@ -88,7 +88,7 @@ input[type="text"] {
 
 <body style="">
 <h2>autoNumeric-2.0-BETA</strong></h2>
-<p>last update 2013-11-08 GMT 10:00 PM</p>
+<p>last update 2013-12-04 GMT 2:00 PM</p>
 <h3>&nbsp;</h3>
 <h3>New methods</strong> and modifications</h3>
 <p><strong>"unSet"</strong> - displays the raw value of the input.</p>
@@ -132,10 +132,11 @@ input[type="text"] {
   <li><strong>Note</strong> - sessionStorage or session cookie is used only on fields when eDec does not equal null and is greater than mDec. </li>
   <li><strong>Note</strong> - once the browser is shut down or the tab is closed all extended values held in sessionStorage or cookies are deleted.</li>
 </ul>
-<p><strong>"oRide"</strong> - overrides the min/max values and allows unlimited entry</p>
+<p><strong>"oRide"</strong> - overrides min / max values and controls the number of integers. Helpful when you run into the limits of javaScript math accuracy.</p>
 <ul>
-  <li>Possible use is to validate numbers with another script such as &quot;bignumber&quot;</li>
-  <li>Only limited by input length</li>
+  <li> example oRide: '6,0' allows 6 digits positive 0 negative</li>
+  <li> example oRide: '8,8' allow 8 digits both positive and negative</li>
+  <li> decimal places are controlled via the mDec option default is 2 places</li>
 </ul>
 <p><strong>"pNeg"</strong> - positions the minus sign &quot;-&quot; to the left or the right of the currency sign.</p>
 <ul>
@@ -174,7 +175,7 @@ input[type="text"] {
         <td width="806"><strong> value and options</strong></td>
       </tr>
       <tr style="height:35px">
-        <td><input type="text" name="one" id="one" size="25" value="1233333.888881" data-a-sign="$" data-e-dec="5"></td>
+        <td><input type="text" name="one" id="one" size="25" value="658765.66887" data-a-sign="$" data-e-dec="5"></td>
         <td>eDec, aStor</td>
         <td>value="1233333.888881" data-e-dec="5" data-a-stor=true</td>
       </tr>
@@ -211,9 +212,9 @@ input[type="text"] {
         <td>value="1234.98798798" data-a-sign="$ " data-e-dec="10" data-a-stor=true data-r-val=true</td>
       </tr>
       <tr style="height:35px">
-        <td><input type="text" name="eight" id="eight" size="25" data-o-ride="true" ></td>
-        <td>oRide=true</td>
-        <td> data-o-ride=&quot;true&quot; Overrides the min/max values and allow unlimited number</td>
+        <td><input type="text" name="eight" id="eight" size="25" data-o-ride="6,2" ></td>
+        <td>oRide: '6,2'</td>
+        <td> data-o-ride=&quot;true&quot; Overrides the min/max values and controls the number of intergers</td>
       </tr>
       <tr style="height:35px">
         <td><input type="text" name="nine" id="nine" size="25" value="-1234567890" data-v-min="-9999999999999" data-p-neg="left" data-a-sign="&#8364; " data-a-sep='.' data-a-dec=','></td>

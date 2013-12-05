@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>autoNumeric</id>
+        <version>0.0.0</version>
+        <title>autoNumeric - Currency formatting made easy</title>
+        <authors>Robert (Bob) Knothe</authors>
+        <owners>Robert (Bob) Knothe</owners>
+        <licenseUrl>https://github.com/BobKnothe/autoNumeric/blob/master/license.txt</licenseUrl>
+        <projectUrl>https://github.com/BobKnothe/autoNumeric</projectUrl>
+        <requireLicenseAcceptance>true</requireLicenseAcceptance>
+		<summary>autoNumeric - Currency formatting made easy</summary>
+        <description>jQuery plugin that automatically formats currency (money) and numbers as you type on form inputs. It supports most International numeric formats and currency signs including those used in Europe, North and South America, Afirica, Asia and India (lakhs**)..
+		</description>
+        <tags>jQuery, plugins, input, form, inputmask, mask, numeric</tags>
+    </metadata>
+    <files>
+        <file src="..\js\autoNumeric.js" target="content\Scripts\autoNumeric\autoNumeric-0.0.0.js" />
+        <file src="..\dist\min\autoNumeric.js" target="content\Scripts\autoNumeric\autoNumeric-0.0.0.min.js" />
+    </files>
+</package>

@@ -186,4 +186,23 @@ $('someSelector').autoNumeric('init');
 *Note: By convention the data attribute is written in lowercase. Compound words (example: "aDec") need to be split and separated by a dash. The equal sign separates the name and value. The value should be enclosed with quote marks. If multiple options are being used they each need to have the own data attribute.*
 
 
- 
+ ## Compiling with Google Closure Compiler
+
+First grab the sources from github.  In the root you type ant.
+A new folder dist is created with the minified and optimized js-files
+
+## .NET Nuget Package Install
+```html
+PM> Install-Package autoNumeric
+```
+
+In App_Start, BundleConfig.cs
+```c#
+bundles.Add(new ScriptBundle("~/bundles/autoNumeric").Include(
+                        "~/Scripts/autoNumeric/autoNumeric-{version}.js"));
+```
+
+In Layout
+```html
+@Scripts.Render("~/bundles/autoNumeric")
+```

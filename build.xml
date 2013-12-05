@@ -11,14 +11,14 @@
 	<target name="updateVersions">
        <replaceregexp file="nuget/autoNumeric.nuspec" match="&lt;version&gt;.*&lt;/version&gt;" replace="&lt;version&gt;${build.major}.${build.minor}.${build.revision}&lt;/version&gt;" />
        <replaceregexp file="nuget/autoNumeric.nuspec" match="-0.0.0" replace="-${build.major}.${build.minor}.${build.revision}"  byline="true"/>
-	   <replaceregexp file="${srcdir}/autoNumeric.js" match="Version:.*" replace="Version: ${build.major}.${build.minor}.${build.revision}"  byline="true"/>
+	   <replaceregexp file="${srcdir}/autoNumeric.js" match="version:.*" replace="version: ${build.major}.${build.minor}.${build.revision}"  byline="true"/>
 	   <replaceregexp file="./jquery.inputmask.jquery.json" match="&quot;version&quot;:.*" replace="&quot;version&quot;: &quot;${build.major}.${build.minor}.${build.revision}&quot;,"  byline="true"/>
 	</target>
 
 	<target name="resetVersions">
        <replaceregexp file="nuget/autoNumeric.nuspec" match="&lt;version&gt;.*&lt;/version&gt;" replace="&lt;version&gt;0.0.0&lt;/version&gt;" />
 	   <replaceregexp file="nuget/autoNumeric.nuspec" replace="-0.0.0" match="-${build.major}.${build.minor}.${build.revision}"  byline="true"/>
-	   <replaceregexp file="${srcdir}/autoNumeric.js" match="Version:.*" replace="Version: 0.0.0"  byline="true"/>
+	   <replaceregexp file="${srcdir}/autoNumeric.js" match="version:.*" replace="version: 0.0.0"  byline="true"/>
     </target>
 	
     <target name="autoNumeric" depends="init, updateVersions">

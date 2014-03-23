@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura aka funny_falcon
-* @version: 1.9.18 - 2013-12-03 GMT 9:00 PM
+* @version: 1.9.19 - 2014-03-23 GMT 2:00 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -361,12 +361,15 @@
     function autoRound(iv, settings) { /** value to string */
         iv = (iv === '') ? '0' : iv.toString();
         convertKeyToNumber(settings, 'mDec'); /** set mDec to number needed when mDec set by 'update method */
+        if (settings.mRound === 'CHF') {
+            iv = (Math.round(iv * 20) / 20).toString();
+        }
         var ivRounded = '',
             i = 0,
             nSign = '',
             rDec = (typeof (settings.aPad) === 'boolean' || settings.aPad === null) ? (settings.aPad ? settings.mDec : 0) : +settings.aPad;
         var truncateZeros = function (ivRounded) { /** truncate not needed zeros */
-            var regex = rDec === 0 ? (/(\.[1-9]*)0*$/) : rDec === 1 ? (/(\.\d[1-9]*)0*$/) : new RegExp('(\\.\\d{' + rDec + '}[1-9]*)0*$');
+            var regex = (rDec === 0) ? (/(\.(?:\d*[1-9])?)0*$/) : rDec === 1 ? (/(\.\d(?:\d*[1-9])?)0*$/) : new RegExp('(\\.\\d{' + rDec + '}(?:\\d*[1-9])?)0*$');
             ivRounded = ivRounded.replace(regex, '$1'); /** If there are no decimal places, we don't need a decimal point at the end */
             if (rDec === 0) {
                 ivRounded = ivRounded.replace(/\.$/, '');
@@ -374,20 +377,20 @@
             return ivRounded;
         };
         if (iv.charAt(0) === '-') { /** Checks if the iv (input Value)is a negative value */
-            nSign = '-'; /** removes the negative sign will be added back later if required */
-            iv = iv.replace('-', '');
-        } /** prepend a zero if first character is not a digit (then it is likely to be a dot)*/
-        if (!iv.match(/^\d/)) {
+            nSign = '-';
+            iv = iv.replace('-', ''); /** removes the negative sign will be added back later if required */
+        }
+        if (!iv.match(/^\d/)) { /** append a zero if first character is not a digit (then it is likely to be a dot)*/
             iv = '0' + iv;
-        } /** determines if the value is zero - if zero no negative sign */
-        if (nSign === '-' && +iv === 0) {
+        }
+        if (nSign === '-' && +iv === 0) { /** determines if the value is zero - if zero no negative sign */
             nSign = '';
         }
         if ((+iv > 0 && settings.lZero !== 'keep') || (iv.length > 0 && settings.lZero === 'allow')) { /** trims leading zero's if needed */
             iv = iv.replace(/^0*(\d)/, '$1');
         }
         var dPos = iv.lastIndexOf('.'), /** virtual decimal position */
-            vdPos = dPos === -1 ? iv.length - 1 : dPos, /** checks decimal places to determine if rounding is required */
+            vdPos = (dPos === -1) ? iv.length - 1 : dPos, /** checks decimal places to determine if rounding is required */
             cDec = (iv.length - 1) - vdPos; /** check if no rounding is required */
         if (cDec <= settings.mDec) {
             ivRounded = iv; /** check if we need to pad with zeros */
@@ -395,8 +398,9 @@
                 if (dPos === -1) {
                     ivRounded += '.';
                 }
+                var zeros = '000000';
                 while (cDec < rDec) {
-                    var zeros = '000000'.substring(0, rDec - cDec);
+                    zeros = zeros.substring(0, rDec - cDec);
                     ivRounded += zeros;
                     cDec += zeros.length;
                 }
@@ -405,17 +409,51 @@
             } else if (cDec === 0 && rDec === 0) {
                 ivRounded = ivRounded.replace(/\.$/, '');
             }
-            return nSign + ivRounded;
+            if (settings.mRound !== 'CHF') {
+                return (+ivRounded === 0) ? ivRounded : nSign + ivRounded;
+            }
+            if (settings.mRound === 'CHF') {
+                dPos = ivRounded.lastIndexOf('.');
+                iv = ivRounded;
+            }
+
         } /** rounded length of the string after rounding */
-        var rLength = dPos + settings.mDec, /** test round */
+        var rLength = dPos + settings.mDec,
             tRound = +iv.charAt(rLength + 1),
             ivArray = iv.substring(0, rLength + 1).split(''),
-            odd = (iv.charAt(rLength) === '.') ? (iv.charAt(rLength - 1) % 2) : (iv.charAt(rLength) % 2);
-        if ((tRound > 4 && settings.mRound === 'S') || (tRound > 4 && settings.mRound === 'A' && nSign === '') || (tRound > 5 && settings.mRound === 'A' && nSign === '-') || (tRound > 5 && settings.mRound === 's') || (tRound > 5 && settings.mRound === 'a' && nSign === '') || (tRound > 4 && settings.mRound === 'a' && nSign === '-') || (tRound > 5 && settings.mRound === 'B') || (tRound === 5 && settings.mRound === 'B' && odd === 1) || (tRound > 0 && settings.mRound === 'C' && nSign === '') || (tRound > 0 && settings.mRound === 'F' && nSign === '-') || (tRound > 0 && settings.mRound === 'U')) {
-            /** Round up the last digit if required, and continue until no more 9's are found */
-            for (i = (ivArray.length - 1); i >= 0; i -= 1) {
+            odd = (iv.charAt(rLength) === '.') ? (iv.charAt(rLength - 1) % 2) : (iv.charAt(rLength) % 2),
+            onePass = true;
+        odd = (odd === 0 && (iv.substring(rLength + 2, iv.length) > 0)) ? 1 : 0;
+        if ((tRound > 4 && settings.mRound === 'S') || /** Round half up symmetric */
+                (tRound > 4 && settings.mRound === 'A' && nSign === '') || /** Round half up asymmetric positive values */
+                (tRound > 5 && settings.mRound === 'A' && nSign === '-') || /** Round half up asymmetric negative values */
+                (tRound > 5 && settings.mRound === 's') || /** Round half down symmetric */
+                (tRound > 5 && settings.mRound === 'a' && nSign === '') || /** Round half down asymmetric positive values */
+                (tRound > 4 && settings.mRound === 'a' && nSign === '-') || /** Round half down asymmetric negative values */
+                (tRound > 5 && settings.mRound === 'B') || /** Round half even "Banker's Rounding" */
+                (tRound === 5 && settings.mRound === 'B' && odd === 1) || /** Round half even "Banker's Rounding" */
+                (tRound > 0 && settings.mRound === 'C' && nSign === '') || /** Round to ceiling toward positive infinite */
+                (tRound > 0 && settings.mRound === 'F' && nSign === '-') || /** Round to floor toward negative infinite */
+                (tRound > 0 && settings.mRound === 'U') ||
+                (settings.mRound === 'CHF')) { /** round up away from zero */
+            for (i = (ivArray.length - 1); i >= 0; i -= 1) { /** Round up the last digit if required, and continue until no more 9's are found */
                 if (ivArray[i] !== '.') {
-                    ivArray[i] = +ivArray[i] + 1;
+                    if (settings.mRound === 'CHF' && ivArray[i] <= 2 && onePass) {
+                        ivArray[i] = 0;
+                        onePass = false;
+                        break;
+                    }
+                    if (settings.mRound === 'CHF' && ivArray[i] <= 7 && onePass) {
+                        ivArray[i] = 5;
+                        onePass = false;
+                        break;
+                    }
+                    if (settings.mRound === 'CHF' && onePass) {
+                        ivArray[i] = 10;
+                        onePass = false;
+                    } else {
+                        ivArray[i] = +ivArray[i] + 1;
+                    }
                     if (ivArray[i] < 10) {
                         break;
                     }
@@ -424,8 +462,8 @@
                     }
                 }
             }
-        } /** Reconstruct the string, converting any 10's to 0's */
-        ivArray = ivArray.slice(0, rLength + 1);
+        }
+        ivArray = ivArray.slice(0, rLength + 1); /** Reconstruct the string, converting any 10's to 0's */
         ivRounded = truncateZeros(ivArray.join('')); /** return rounded value */
         return (+ivRounded === 0) ? ivRounded : nSign + ivRounded;
     }
@@ -923,7 +961,7 @@
                     return this;
                 }
                 if (settings.runOnce === false && settings.aForm) {/** routine to format default value on page load */
-                    if ($this.is('input[type=text], input[type=hidden], input:not([type])')) {
+                    if ($this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) {
                         var setValue = true;
                         if ($this[0].value === '' && settings.wEmpty === 'empty') {
                             $this[0].value = '';
@@ -942,7 +980,7 @@
                     }
                 }
                 settings.runOnce = true;
-                if ($this.is('input[type=text], input[type=hidden], input:not([type])')) { /**added hidden type */
+                if ($this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) { /**added hidden type */
                     $this.on('keydown.autoNumeric', function (e) {
                         holder = getHolder($this);
                         if (holder.settings.aDec === holder.settings.aSep) {
@@ -1140,7 +1178,7 @@
                     value = autoRound('', settings);
                 }
                 value = autoGroup(value, settings);
-                if ($this.is('input[type=text], input[type=hidden], input:not([type])')) { /**added hidden type */
+                if ($this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) { /**added hidden type */
                     return $this.val(value);
                 }
                 if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
@@ -1161,7 +1199,7 @@
             settings.oEvent = 'get';
             var getValue = '';
             /** determine the element type then use .eq(0) selector to grab the value of the first element in selector */
-            if ($this.is('input[type=text], input[type=hidden], input:not([type])')) { /**added hidden type */
+            if ($this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) { /**added hidden type */
                 getValue = $this.eq(0).val();
             } else if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
                 getValue = $this.eq(0).text();

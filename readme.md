@@ -1,4 +1,4 @@
-[autoNumeric-1.9.18](http://www.decorplanit.com/plugin/)
+[autoNumeric-1.9.19](http://www.decorplanit.com/plugin/)
 ================================
 ### International currency formatting made easy
 
@@ -123,6 +123,7 @@ The following is a list of the methods and settings/options the control autoNume
 + 	mRound: 'D'	Round Down "Round-Toward-Zero" - same as truncate
 + 	mRound: 'C'	Round to Ceiling "Toward Positive Infinity"
 + 	mRound: 'F'	Round to Floor "Toward Negative Infinity"
++ 	mRound: 'CHF'	Rounding for Swiss currency "to the nearest .00 or .05"
 
 **"aPad"** - controls padding of the decimal places
 

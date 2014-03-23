@@ -1,6 +1,11 @@
 ### Change log:
 
 #### Version 1.9.18
++ Added input type="tel" support.
++ Added support for Swiss currency rounding to the nearest ".00 or .05"
++ Fixed bug in Round-Half-Even "Bankers Rounding"
+
+#### Version 1.9.18
 + Fixed formatting on page load for text elements.
 
 #### Version 1.9.17

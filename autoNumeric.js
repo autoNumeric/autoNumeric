@@ -1,8 +1,8 @@
 ﻿/**
 * autoNumeric.js
 * @author: Bob Knothe
-* @author: Sokolov Yura aka funny_falcon
-* @version: 1.9.19 - 2014-03-23 GMT 2:00 PM
+* @author: Sokolov Yura
+* @version: 1.9.20 - 2014-03-30 GMT 8:30 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07

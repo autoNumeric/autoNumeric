@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributor: Sokolov Yura
-* @version: 2.0-beta - 2013-12-04 GMT 2:00 PM
+* @version: 2.0-beta - 2014-03-30 GMT 4:00 PM
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -249,29 +249,26 @@
      * function to handle numbers less than 0 that are stored in Exponential notation ex: .0000001 stored as 1e-7
      */
     function checkValue(value, settings) {
-        var decimal = value.indexOf('.'),
-            checkSmall = +value;
-        if (decimal !== -1) {
-            if (checkSmall < 0.000001 && checkSmall > -1) {
-                value = +value;
-                if (value < 0.000001 && value > 0) {
-                    value = (value + 10).toString();
-                    value = value.substring(1);
-                }
-                if (value < 0 && value > -1) {
-                    value = (value - 10).toString();
-                    value = '-' + value.substring(2);
-                }
-                value = value.toString();
-            } else {
-                var parts = value.split('.');
-                if (parts[1] !== undefined) {
-                    if (+parts[1] === 0) {
-                        value = parts[0];
-                    } else {
-                        parts[1] = parts[1].replace(/0*$/, '');
-                        value = parts.join('.');
-                    }
+        var checkSmall = +value;
+        if (checkSmall < 0.000001 && checkSmall > -1) {
+            value = +value;
+            if (value < 0.000001 && value > 0) {
+                value = (value + 10).toString();
+                value = value.substring(1);
+            }
+            if (value < 0 && value > -1) {
+                value = (value - 10).toString();
+                value = '-' + value.substring(2);
+            }
+            value = value.toString();
+        } else {
+            var parts = value.split('.');
+            if (parts[1] !== undefined) {
+                if (+parts[1] === 0) {
+                    value = parts[0];
+                } else {
+                    parts[1] = parts[1].replace(/0*$/, '');
+                    value = parts.join('.');
                 }
             }
         }
@@ -467,6 +464,7 @@
             ivArray = iv.substring(0, rLength + 1).split(''),
             odd = (iv.charAt(rLength) === '.') ? (iv.charAt(rLength - 1) % 2) : (iv.charAt(rLength) % 2),
             onePass = true;
+        odd = (odd === 0 && (iv.substring(rLength + 2, iv.length) > 0)) ? 1 : 0;
         if ((tRound > 4 && settings.mRound === 'S') || /** Round half up symmetric */
                 (tRound > 4 && settings.mRound === 'A' && nSign === '') || /** Round half up asymmetric positive values */
                 (tRound > 5 && settings.mRound === 'A' && nSign === '-') || /** Round half up asymmetric negative values */
@@ -1118,7 +1116,7 @@
                 settings.rawValue = '';
                 settings.runOnce = false;
                 var holder = getHolder($this, settings);
-                if (!$this.is('input[type=text], input[type=hidden], input:not([type])') && $this.prop('tagName') === 'INPUT') { /** checks for non-supported input types */
+                if (!$this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])') && $this.prop('tagName') === 'INPUT') { /** checks for non-supported input types */
                     $.error('The input type "' + $this.prop('type') + '" is not supported by autoNumeric()');
                     return this;
                 }
@@ -1135,7 +1133,7 @@
                     return this;
                 }
                 if (settings.runOnce === false && settings.aForm) {/** routine to format default value on page load */
-                    if ($this.is('input[type=text], input[type=hidden], input:not([type])')) {
+                    if ($this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) {
                         var setValue = true;
                         if ($this[0].value === '' && settings.wEmpty === 'empty') {
                             $this[0].value = '';
@@ -1154,7 +1152,7 @@
                     $this.autoNumeric('set', $this.text());
                 }
                 settings.runOnce = true;
-                if ($this.is('input[type=text], input[type=hidden], input:not([type])')) { /**input types supported "text", "hidden" and no type*/
+                if ($this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) { /**input types supported "text", "hidden" and no type*/
                     $this.on('keydown.autoNumeric', function (e) {
                         holder = getHolder($this);
                         if (holder.that.readOnly) {
@@ -1365,7 +1363,7 @@
                     settings = $this.data('autoNumeric'),
                     value = valueIn.toString(),
                     testValue = valueIn.toString(),
-                    $input = $this.is('input[type=text], input[type=hidden], input:not([type])');
+                    $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
                 if (typeof settings !== 'object') {
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'set' method");
                     return false;
@@ -1468,7 +1466,7 @@
             }
             var getValue = '';
             /** determine the element type then use .eq(0) selector to grab the value of the first element in selector */
-            if ($this.is('input[type=text], input[type=hidden], input:not([type])')) {
+            if ($this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) {
                 getValue = $this.eq(0).val();
             } else if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
                 getValue = $this.eq(0).text();

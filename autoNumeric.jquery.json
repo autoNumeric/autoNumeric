@@ -7,14 +7,14 @@
         "money",
         "Euro",
         "Dollar",
-		"Pound",
+        "Pound",
         "number",
         "numeric",
         "format",
         "jquery",
         "form",
-		"input",
-		"mask"
+        "input",
+        "mask"
     ],
     "version": "1.9.21",
     "author": {

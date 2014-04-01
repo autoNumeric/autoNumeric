@@ -7,6 +7,7 @@
         "money",
         "Euro",
         "Dollar",
+		"Pound"
         "number",
         "numeric",
         "format",
@@ -15,7 +16,7 @@
 		"input",
 		"mask"
     ],
-    "version": "1.9.20",
+    "version": "1.9.21",
     "author": {
         "name": "Robert (Bob) Knothe",
         "url": "https://github.com/BobKnothe/autoNumeric"

@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributor: Sokolov Yura
-* @version: 2.0-beta - 2014-03-30 GMT 4:00 PM
+* @version: 2.0-beta - 2014-04-01 GMT 9:00 AM
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -249,26 +249,28 @@
      * function to handle numbers less than 0 that are stored in Exponential notation ex: .0000001 stored as 1e-7
      */
     function checkValue(value, settings) {
-        var checkSmall = +value;
-        if (checkSmall < 0.000001 && checkSmall > -1) {
-            value = +value;
-            if (value < 0.000001 && value > 0) {
-                value = (value + 10).toString();
-                value = value.substring(1);
-            }
-            if (value < 0 && value > -1) {
-                value = (value - 10).toString();
-                value = '-' + value.substring(2);
-            }
-            value = value.toString();
-        } else {
-            var parts = value.split('.');
-            if (parts[1] !== undefined) {
-                if (+parts[1] === 0) {
-                    value = parts[0];
-                } else {
-                    parts[1] = parts[1].replace(/0*$/, '');
-                    value = parts.join('.');
+        if (value) {
+            var checkSmall = +value;
+            if (checkSmall < 0.000001 && checkSmall > -1) {
+                value = +value;
+                if (value < 0.000001 && value > 0) {
+                    value = (value + 10).toString();
+                    value = value.substring(1);
+                }
+                if (value < 0 && value > -1) {
+                    value = (value - 10).toString();
+                    value = '-' + value.substring(2);
+                }
+                value = value.toString();
+            } else {
+                var parts = value.split('.');
+                if (parts[1] !== undefined) {
+                    if (+parts[1] === 0) {
+                        value = parts[0];
+                    } else {
+                        parts[1] = parts[1].replace(/0*$/, '');
+                        value = parts.join('.');
+                    }
                 }
             }
         }

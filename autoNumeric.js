@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura
-* @version: 1.9.20 - 2014-03-30 GMT 8:30 PM
+* @version: 1.9.21 - 2014-04-01 GMT 9:00 AM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -110,7 +110,8 @@
             vmin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
         convertKeyToNumber(settings, 'vMax');
         convertKeyToNumber(settings, 'vMin');
-        convertKeyToNumber(settings, 'mDec'); /** set mDec if not defained by user */
+        convertKeyToNumber(settings, 'mDec'); /** set mDec if not defined by user */
+        settings.mDec = (settings.mRound === 'CHF') ? '2' : settings.mDec;
         settings.allowLeading = true;
         settings.aNeg = settings.vMin < 0 ? '-' : '';
         vmax[0] = vmax[0].replace('-', '');

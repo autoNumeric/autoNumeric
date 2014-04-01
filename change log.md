@@ -1,5 +1,9 @@
 ### Change log:
 
+#### Version 1.9.21
++ Mod to checkValue function to handle empty string - thanks to jedichenbin.
++ If CHF rounding is used decimal is automatically set to 2 places  
+
 #### Version 1.9.20
 + Fixed issue for very small numbers - thanks to jedichenbin.
 

@@ -1154,6 +1154,10 @@
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'set' method");
                     return this;
                 }
+                /** clear thousand separator characters before any action */
+                if (testValue.indexOf(settings.aSep) > -1) {
+                    value = value.replace(new RegExp('\\' + settings.aSep, 'g'), '');
+                }
                /** allows locale decimal separator to be a comma */
                 if ((testValue === $this.attr('value') || testValue === $this.text()) && settings.runOnce === false) {
                     value = value.replace(',', '.');

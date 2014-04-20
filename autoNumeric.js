@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura
-* @version: 1.9.21 - 2014-04-01 GMT 9:00 AM
+* @version: 1.9.22 - 2014-04-20 GMT 7:00 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -953,7 +953,6 @@
                 } else {
                     return this;
                 }
-                settings.lastSetValue = '';
                 settings.runOnce = false;
                 var holder = getHolder($this, settings);
                 if ($.inArray($this.prop('tagName'), settings.tagList) === -1 && $this.prop('tagName') !== 'INPUT') {
@@ -1154,13 +1153,14 @@
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'set' method");
                     return this;
                 }
+                /** routine to handle page re-load from back button */
+                if (testValue !== $this.attr('value') && $this.prop('tagName') === 'INPUT' && settings.runOnce === false) {
+                    value = (settings.nBracket !== null) ? negativeBracket($this.val(), settings.nBracket, 'pageLoad') : value;
+                    value = autoStrip(value, settings);
+                }
                /** allows locale decimal separator to be a comma */
                 if ((testValue === $this.attr('value') || testValue === $this.text()) && settings.runOnce === false) {
                     value = value.replace(',', '.');
-                }
-                /** routine to handle page re-load from back button */
-                if (testValue !== $this.attr('value') && $this.prop('tagName') === 'INPUT' && settings.runOnce === false) {
-                    value = autoStrip(value, settings);
                 }
                 /** returns a empty string if the value being 'set' contains non-numeric characters and or more than decimal point (full stop) and will not be formatted */
                 if (!$.isNumeric(+value)) {
@@ -1168,7 +1168,6 @@
                 }
                 value = checkValue(value, settings);
                 settings.oEvent = 'set';
-                settings.lastSetValue = value; /** saves the unrounded value from the set method - $('selector').data('autoNumeric').lastSetValue; - helpful when you need to change the rounding accuracy*/
                 value.toString();
                 if (value !== '') {
                     value = autoRound(value, settings);

@@ -1,5 +1,10 @@
 ### Change log:
 
+#### Version 1.9.22
++ Fixed a bug when a negative value uses brackets and currency sign on page reload thanks to Allen Dumaine
++ Additional mods to the "set" method.
++ Eliminated lastSetValue setting
+
 #### Version 1.9.21
 + Mod to checkValue function to handle empty string - thanks to jedichenbin.
 + If CHF rounding is used decimal is automatically set to 2 places  

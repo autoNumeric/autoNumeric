@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributor: Sokolov Yura
-* @version: 2.0-beta - 2014-04-01 GMT 9:00 AM
+* @version: 2.0-beta - 2014-04-20 GMT 9:00 PM
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -1370,10 +1370,6 @@
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'set' method");
                     return false;
                 }
-                /** routine to handle page load */
-                if (settings.runOnce === false && (testValue === $this.attr('value') || $.inArray($this.prop('tagName'), settings.tagList) !== -1)) {
-                    value = value.replace(',', '.'); /** allows locale decimal separator to be a comma */
-                }
                 /** routine to handle page re-load from back button & saves the raw value to settings.rawValue */
                 if (settings.runOnce === false && testValue !== $this.attr('value') && $input) {
                     if (settings.nBracket !== null) {
@@ -1387,6 +1383,10 @@
                     }
                     return;
                 }
+                /** routine to handle page load */
+                if (settings.runOnce === false && (testValue === $this.attr('value') || $.inArray($this.prop('tagName'), settings.tagList) !== -1)) {
+                    value = value.replace(',', '.'); /** allows locale decimal separator to be a comma */
+                }				
                 /** returns a empty string if the value being 'set' contains non-numeric characters and or more than decimal point (full stop) and will not be formatted */
                 if (!$.isNumeric(+value)) {
                     return '';

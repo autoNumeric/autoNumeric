@@ -187,9 +187,12 @@
      */
     function negativeBracket(s, nBracket, oEvent) { /** oEvent = settings.oEvent */
         nBracket = nBracket.split(',');
+                
         if (oEvent === 'set' || oEvent === 'focusout') {
-            s = s.replace('-', '');
-            s = nBracket[0] + s + nBracket[1];
+            if (s.indexOf(nBracket[0]) != 0 && s.indexOf(nBracket[1]) != (s.length - 1)) {
+                s = s.replace('-', '');
+                s = nBracket[0] + s + nBracket[1];
+            }
         } else if ((oEvent === 'get' || oEvent === 'focusin' || oEvent === 'pageLoad') && s.charAt(0) === nBracket[0]) {
             s = s.replace(nBracket[0], '-');
             s = s.replace(nBracket[1], '');

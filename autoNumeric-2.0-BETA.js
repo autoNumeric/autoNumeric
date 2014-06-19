@@ -1521,8 +1521,7 @@
             if (isAutoNumeric === true) {
                 return parts.join('&');
             }
-            $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'getString' method");
-            return this;
+            return str;
         },
         /** method to get the unformatted value from multiple fields */
         getArray: function () {

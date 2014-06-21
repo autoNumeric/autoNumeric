@@ -621,7 +621,7 @@
         },
         /**
          * process pasting, cursor moving and skipping of not interesting keys
-         * if returns true, futher processing is not performed
+         * if returns true, further processing is not performed
          */
         skipAllways: function (e) {
             var kdCode = this.kdCode,
@@ -731,9 +731,11 @@
                 }
                 this.setValueParts(left + settingsClone.aDec, right);
                 return true;
-            } /** start rule on negative sign */
-
-            if (cCode === '-' || cCode === '+') { /** prevent minus if not allowed */
+            }
+			/** 
+			 * start rule on negative sign & prevent minus if not allowed 
+			 */
+            if (cCode === '-' || cCode === '+') {
                 if (!settingsClone.aNeg) {
                     return true;
                 } /** caret is always after minus */
@@ -801,7 +803,7 @@
                     position = newLeft[0].length;
                     /** if we are just before sign which is in prefix position */
                     if (((position === 0 && value.charAt(0) !== settingsClone.aNeg) || (position === 1 && value.charAt(0) === settingsClone.aNeg)) && settingsClone.aSign && settingsClone.pSign === 'p') {
-                        /** place carret after prefix sign */
+                        /** place caret after prefix sign */
                         position = this.settingsClone.aSign.length + (value.charAt(0) === '-' ? 1 : 0);
                     }
                 } else if (settingsClone.aSign && settingsClone.pSign === 's') {
@@ -1108,6 +1110,11 @@
                             $this.val(negativeBracket($this.val(), settingsClone.nBracket, settingsClone.oEvent));
                         }
                     });
+                    $this.on('paste.autoNumeric', function () {
+                        var holder = getHolder($this);
+                        holder.settingsClone.oEvent = 'paste';
+						console.log('paste');
+                    });					
                 }
             });
         },

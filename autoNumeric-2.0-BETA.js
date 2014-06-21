@@ -1282,6 +1282,8 @@
                         }
                         if (value !== '') {
                             value = autoStrip(value, $settings, strip_zero);
+							
+							
                             if (checkEmpty(value, $settings) === null && autoCheck(value, $settings, $this[0])) {
                                 value = fixNumber(value, $settings.aDec, $settings.aNeg);
                                 value = autoRound(value, $settings);

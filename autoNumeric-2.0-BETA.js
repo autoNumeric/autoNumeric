@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributor: Sokolov Yura
-* @version: 2.0-beta - 2014-04-20 GMT 9:00 PM
+* @version: 2.0-beta - 2014-06-21 GMT 10:00 AM
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -115,9 +115,8 @@
         settings.allowLeading = true;
 		if (settings.oRide !== null) {
 			var parts = settings.oRide.split(',');
-			settings.aNeg = parts[1] > 0 ? '-' : '';
-		} else {
-			settings.aNeg = settings.vMin < 0 ? '-' : '';
+			settings.aNeg = parts[0] < 0 ? '-' : '';
+			settings.mDec = +parts[1];
 		}
         vmax[0] = vmax[0].replace('-', '');
         vmin[0] = vmin[0].replace('-', '');

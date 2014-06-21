@@ -1,5 +1,8 @@
 ### Change log:
 
+#### Version 1.9.23
++ Merged mod on the "getString" method
+
 #### Version 1.9.22
 + Fixed a bug when a negative value uses brackets and currency sign on page reload thanks to Allen Dumaine
 + Additional mods to the "set" method.

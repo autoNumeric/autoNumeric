@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura
-* @version: 1.9.23 - 2014-06-21 GMT 10:00 AM
+* @version: 1.9.24 - 2014-06-29 GMT 10:30 AM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -105,7 +105,7 @@
     function autoCode($this, settings) {
         runCallbacks($this, settings);
         settings.oEvent = null;
-        settings.tagList = ['B', 'CAPTION', 'CITE', 'CODE', 'DD', 'DEL', 'DIV', 'DFN', 'DT', 'EM', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'INS', 'KDB', 'LABEL', 'LI', 'OUTPUT', 'P', 'Q', 'S', 'SAMPLE', 'SPAN', 'STRONG', 'TD', 'TH', 'U', 'VAR'];
+        settings.tagList = ['b', 'caption', 'cite', 'code', 'dd', 'del', 'div', 'dfn', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ins', 'kdb', 'label', 'li', 'output', 'p', 'q', 's', 'sample', 'span', 'strong', 'td', 'th', 'u', 'var'];
         var vmax = settings.vMax.toString().split('.'),
             vmin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
         convertKeyToNumber(settings, 'vMax');
@@ -732,9 +732,9 @@
                 this.setValueParts(left + settingsClone.aDec, right);
                 return true;
             }
-			/** 
-			 * start rule on negative sign & prevent minus if not allowed 
-			 */
+            /**
+             * start rule on negative sign & prevent minus if not allowed
+             */
             if (cCode === '-' || cCode === '+') {
                 if (!settingsClone.aNeg) {
                     return true;
@@ -957,8 +957,8 @@
                 }
                 settings.runOnce = false;
                 var holder = getHolder($this, settings);
-                if ($.inArray($this.prop('tagName'), settings.tagList) === -1 && $this.prop('tagName') !== 'INPUT') {
-                    $.error("The <" + $this.prop('tagName') + "> is not supported by autoNumeric()");
+                if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) === -1 && $this.prop('tagName').toLowerCase() !== 'input') {
+                    $.error("The <" + $this.prop('tagName').toLowerCase() + "> is not supported by autoNumeric()");
                     return this;
                 }
                 if (settings.runOnce === false && settings.aForm) {/** routine to format default value on page load */
@@ -976,7 +976,7 @@
                             $this.autoNumeric('set', $this.val());
                         }
                     }
-                    if ($.inArray($this.prop('tagName'), settings.tagList) !== -1 && $this.text() !== '') {
+                    if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1 && $this.text() !== '') {
                         $this.autoNumeric('set', $this.text());
                     }
                 }
@@ -1110,11 +1110,6 @@
                             $this.val(negativeBracket($this.val(), settingsClone.nBracket, settingsClone.oEvent));
                         }
                     });
-                    $this.on('paste.autoNumeric', function () {
-                        var holder = getHolder($this);
-                        holder.settingsClone.oEvent = 'paste';
-						console.log('paste');
-                    });					
                 }
             });
         },
@@ -1161,7 +1156,7 @@
                     return this;
                 }
                 /** routine to handle page re-load from back button */
-                if (testValue !== $this.attr('value') && $this.prop('tagName') === 'INPUT' && settings.runOnce === false) {
+                if (testValue !== $this.attr('value') && $this.prop('tagName').toLowerCase() === 'input' && settings.runOnce === false) {
                     value = (settings.nBracket !== null) ? negativeBracket($this.val(), settings.nBracket, 'pageLoad') : value;
                     value = autoStrip(value, settings);
                 }
@@ -1187,10 +1182,10 @@
                 if ($this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) { /**added hidden type */
                     return $this.val(value);
                 }
-                if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
+                if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1) {
                     return $this.text(value);
                 }
-                $.error("The <" + $this.prop('tagName') + "> is not supported by autoNumeric()");
+                $.error("The <" + $this.prop('tagName').toLowerCase() + "> is not supported by autoNumeric()");
                 return false;
             });
         },
@@ -1207,10 +1202,10 @@
             /** determine the element type then use .eq(0) selector to grab the value of the first element in selector */
             if ($this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) { /**added hidden type */
                 getValue = $this.eq(0).val();
-            } else if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
+            } else if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1) {
                 getValue = $this.eq(0).text();
             } else {
-                $.error("The <" + $this.prop('tagName') + "> is not supported by autoNumeric()");
+                $.error("The <" + $this.prop('tagName').toLowerCase() + "> is not supported by autoNumeric()");
                 return false;
             }
             if ((getValue === '' && settings.wEmpty === 'empty') || (getValue === settings.aSign && (settings.wEmpty === 'sign' || settings.wEmpty === 'empty'))) {

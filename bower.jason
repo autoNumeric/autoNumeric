@@ -1,6 +1,6 @@
 {
   "name": "BobKnothe/autoNumeric",
-  "version": "1.9.23",
+  "version": "1.9.24",
   "main": "autoNumeric/autoNumeric.js",
   "keywords": ["currency", "money", "Euro", "Dollar", "Pound", "number", "numeric", "format", "jquery", "form", "input", "mask"],
   "description": "is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. It supports most International numeric formats and currency signs including those used in Europe, North and South America, Asia and India lakhs.",

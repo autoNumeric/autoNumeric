@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributor: Sokolov Yura
-* @version: 2.0-beta - 2014-06-21 GMT 10:00 AM
+* @version: 2.0-beta - 2014-07-02 GMT 1:00 PM
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -105,7 +105,7 @@
     function autoCode($this, settings) {
         runCallbacks($this, settings);
         settings.oEvent = null;
-        settings.tagList = ['B', 'CAPTION', 'CITE', 'CODE', 'DD', 'DEL', 'DIV', 'DFN', 'DT', 'EM', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'INS', 'KDB', 'LABEL', 'LI', 'OUTPUT', 'P', 'Q', 'S', 'SAMPLE', 'SPAN', 'STRONG', 'TD', 'TH', 'U', 'VAR'];
+        settings.tagList = ['b', 'caption', 'cite', 'code', 'dd', 'del', 'div', 'dfn', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ins', 'kdb', 'label', 'li', 'output', 'p', 'q', 's', 'sample', 'span', 'strong', 'td', 'th', 'u', 'var'];
         var vmax = settings.vMax.toString().split('.'),
             vmin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
         convertKeyToNumber(settings, 'vMax');
@@ -1117,12 +1117,12 @@
                 settings.rawValue = '';
                 settings.runOnce = false;
                 var holder = getHolder($this, settings);
-                if (!$this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])') && $this.prop('tagName') === 'INPUT') { /** checks for non-supported input types */
+                if (!$this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])') && $this.prop('tagName').toLowerCase() === 'input') { /** checks for non-supported input types */
                     $.error('The input type "' + $this.prop('type') + '" is not supported by autoNumeric()');
                     return this;
                 }
-                if ($.inArray($this.prop('tagName'), settings.tagList) === -1 && $this.prop('tagName') !== 'INPUT') { /** checks for non-supported tags */
-                    $.error("The <" + $this.prop('tagName') + "> is not supported by autoNumeric()");
+                if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) === -1 && $this.prop('tagName').toLowerCase() !== 'input') { /** checks for non-supported tags */
+                    $.error("The <" + $this.prop('tagName').toLowerCase() + "> is not supported by autoNumeric()");
                     return this;
                 }
                 if (settings.aDec === settings.aSep) { /** checks if the decimal and thousand are characters are the same */
@@ -1149,7 +1149,7 @@
                         }
                     }
                 }
-                if ($.inArray($this.prop('tagName'), settings.tagList) !== -1 && $this.text() !== '') {
+                if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1 && $this.text() !== '') {
                     $this.autoNumeric('set', $this.text());
                 }
                 settings.runOnce = true;
@@ -1385,7 +1385,7 @@
                     return;
                 }
                 /** routine to handle page load */
-                if (settings.runOnce === false && (testValue === $this.attr('value') || $.inArray($this.prop('tagName'), settings.tagList) !== -1)) {
+                if (settings.runOnce === false && (testValue === $this.attr('value') || $.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1)) {
                     value = value.replace(',', '.'); /** allows locale decimal separator to be a comma */
                 }				
                 /** returns a empty string if the value being 'set' contains non-numeric characters and or more than decimal point (full stop) and will not be formatted */
@@ -1422,10 +1422,10 @@
                 if ($input) {
                     return $this.val(value);
                 }
-                if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
+                if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1) {
                     return $this.text(value);
                 }
-                $.error("The <" + $this.prop('tagName') + "> is not supported by autoNumeric()");
+                $.error("The <" + $this.prop('tagName').toLowerCase() + "> is not supported by autoNumeric()");
                 return false;
             });
         },
@@ -1471,10 +1471,10 @@
             /** determine the element type then use .eq(0) selector to grab the value of the first element in selector */
             if ($this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) {
                 getValue = $this.eq(0).val();
-            } else if ($.inArray($this.prop('tagName'), settings.tagList) !== -1) {
+            } else if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1) {
                 getValue = $this.eq(0).text();
             } else {
-                $.error("The <" + $this.prop('tagName') + "> is not supported by autoNumeric()");
+                $.error("The <" + $this.prop('tagName').toLowerCase() + "> is not supported by autoNumeric()");
                 return false;
             }
             if (settings.rawValue !== '') {

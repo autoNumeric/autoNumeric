@@ -88,9 +88,14 @@ input[type="text"] {
 
 <body style="">
 <h2>autoNumeric-2.0-BETA</strong></h2>
-<p>last update 2014-07-02 GMT 1:00 PM</p>
-<h3>New methods</strong> and modifications</h3>
+<p>last update 2014-07-27 GMT 10:00 PM</p>
+<h3>New methods</h3>
 <p><strong>"unSet"</strong> - displays the raw value of the input.</p>
+<ul>
+  <li>$(selector).autoNumeric('unSet'); - returns a numeric string as 'nnnn.nn' with the period '.' as the decinal charcter</li>
+  <li>$(selector).autoNumeric('unSet', 'asKomma'); - returns numeric string 'nnnn,nn' with the comma / Komma  ',' as the decinal charcter</li>
+  <li>$(selector).autoNumeric('unSet', 'checkOptions'); - checks the options for the input and returns numeric string 'nnnn.nn' or 'nnn,nn' based on the settings.</li>
+</ul>
 <ul>
   <li>This displays unformatted (xxxx.xx) numeric strings in the form inputs that are controlled by autoNumeric.</li>
   <li>autoNumeric is not "destroyed" allowing you to easily reformat the field after the form has been posted via the "reSet" option of the "set" method (see below).</li>
@@ -106,7 +111,25 @@ input[type="text"] {
   <li>See option aStor below</li>
 </ul>
 <p><strong>&quot;destroy'</strong> - modified to delete value, sessionStorage or cookies that were created by autoNumeric and kills autoNumeric</p>
-<h3>&nbsp;</h3>
+<h3>Modified methods</h3>
+<p><strong>"get"</strong> - displays the raw value of the input.</p>
+<ul>
+  <li>$(selector).autoNumeric('get'); - returns a numeric string as 'nnnn.nn' with the period '.' as the decinal charcter</li>
+  <li>$(selector).autoNumeric('get', 'asKomma'); - returns numeric string 'nnnn,nn' with the comma / Komma  ',' as the decinal charcter</li>
+  <li>$(selector).autoNumeric('get', 'checkOptions'); - checks the options for the input and returns numeric string 'nnnn.nn' or 'nnn,nn' based on the settings.</li>
+</ul>
+<p><strong>"getString"</strong> - displays the raw value of the input.</p>
+<ul>
+  <li>$(selector).autoNumeric('getString'); - returns a numeric string as 'nnnn.nn' with the period '.' as the decinal charcter</li>
+  <li>$(selector).autoNumeric('getString', 'asKomma'); - returns numeric string 'nnnn,nn' with the comma / Komma  ',' as the decinal charcter</li>
+  <li>$(selector).autoNumeric('getString', 'checkOptions'); - checks the options for the input and returns numeric string 'nnnn.nn' or 'nnn,nn' based on the settings.</li>
+</ul>
+<p><strong>"getArray"</strong> - displays the raw value of the input.</p>
+<ul>
+  <li>$(selector).autoNumeric('getArray'); - returns a numeric string as 'nnnn.nn' with the period '.' as the decinal charcter</li>
+  <li>$(selector).autoNumeric('getArray', 'asKomma'); - returns numeric string 'nnnn,nn' with the comma / Komma  ',' as the decinal charcter</li>
+  <li>$(selector).autoNumeric('getArray', 'checkOptions'); - checks the options for the input and returns numeric string 'nnnn.nn' or 'nnn,nn' based on the settings.</li>
+</ul>
 <h3>New options and modifications</h3>
 <p><strong>"eDec"</strong> - this displays expanded decimal places when the input has focus.</p>
 <ul>
@@ -122,7 +145,6 @@ input[type="text"] {
 <ul>
   <li>This is similar to the behavior of a spread  spreadsheet </li>
   <li>On focusout the value is formatted again</li>
-  <li><strong>Also need to see if the fixes the android caret placement issue on versions prior to android 4.0</strong>.</li>
 </ul>
 <p><strong>"aStor"</strong> - when true allows the "eDec" value to be retained via sessionStorage on compatible browsers of a session cookie in EI 6 &amp; 7.</p>
 <ul>
@@ -133,9 +155,9 @@ input[type="text"] {
 </ul>
 <p><strong>"oRide"</strong> - overrides min / max values and controls the number of integers. Helpful when you run into the limits of javaScript math accuracy.</p>
 <ul>
-  <li> example oRide: '6,0' allows 6 digits positive 0 negative</li>
-  <li> example oRide: '8,8' allow 8 digits both positive and negative</li>
-  <li> decimal places are controlled via the mDec option default is 2 places</li>
+  <li> example oRide: '6,0' allows positive values only with 6 intergers with zero decmal places</li>
+  <li> example oRide: '-8,2' allows positive and negative values with 8 intergers and 2 decimal places</li>
+  <li>Note - do not use the 'mDec' option whem using &quot;oRide&quot;</li>
 </ul>
 <p><strong>"pNeg"</strong> - positions the minus sign &quot;-&quot; to the left or the right of the currency sign.</p>
 <ul>
@@ -154,7 +176,11 @@ input[type="text"] {
 <ul>
   <li>Support for a modified lakh &quot;22,333,22,22,333.00&quot; that can be used for scaling</li>
 </ul>
-<p>Demonstration showing the new features:</p>
+<p><strong>Notes:</strong></p>
+<ul>
+  <li>Default values and Values being set can use either the period '.' or Komma ',' as the decimal character</li>
+</ul>
+<p><strong>Demonstration showing the new features:</strong></p>
 <ul>
   <li>Focus and focusout of the inputs to see the behavior for the different inputs.</li>
   <li>Change the values.</li>

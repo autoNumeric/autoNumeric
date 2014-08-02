@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura
-* @version: 1.9.24 - 2014-06-29 GMT 10:30 AM
+* @version: 1.9.25 - 2014-08-02 GMT 11:00 AM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -423,7 +423,9 @@
             ivArray = iv.substring(0, rLength + 1).split(''),
             odd = (iv.charAt(rLength) === '.') ? (iv.charAt(rLength - 1) % 2) : (iv.charAt(rLength) % 2),
             onePass = true;
-        odd = (odd === 0 && (iv.substring(rLength + 2, iv.length) > 0)) ? 1 : 0;
+        if (odd !== 1) {
+            odd = (odd === 0 && (iv.substring(rLength + 2, iv.length) > 0)) ? 1 : 0;
+        }
         if ((tRound > 4 && settings.mRound === 'S') || /** Round half up symmetric */
                 (tRound > 4 && settings.mRound === 'A' && nSign === '') || /** Round half up asymmetric positive values */
                 (tRound > 5 && settings.mRound === 'A' && nSign === '-') || /** Round half up asymmetric negative values */
@@ -1146,6 +1148,9 @@
         },
         /** returns a formatted strings for "input:text" fields Uses jQuery's .val() method*/
         set: function (valueIn) {
+            if (valueIn === null) {
+                return;
+            }
             return $(this).each(function () {
                 var $this = autoGet($(this)),
                     settings = $this.data('autoNumeric'),

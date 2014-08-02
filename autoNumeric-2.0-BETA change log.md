@@ -1,5 +1,8 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2014-08-02 GMT 11:00 AM
++ Fixed mRound option "round-half-even"
+
 ### 2014-07-27 GMT 10:00 PM
 + Default values and Values being 'set' can use either the period '.' or Komma ',' as the decimal character
 + Added a parameter to the 'unSet', 'get', 'getString' & 'getArray' methods

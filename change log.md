@@ -1,5 +1,9 @@
 ### Change log:
 
+#### Version 1.9.25
++ Fixed mRound option "round-half-even"
++ Modified the "set" method to not throw an error when trying to "set" a null value
+
 #### Version 1.9.24
 + Changed the case on the supported elements
 + This was required because jQuery.prop('tagName') returns upper-case on html5 pages and returns lower-case on xmhtl pages

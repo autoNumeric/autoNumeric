@@ -714,6 +714,12 @@
                 return true;
             }
             if ((ctrlKey || cmdKey) && kdCode === 65) { /** if select all (a=65)*/
+                if (this.settings.sNumber){
+                    e.preventDefault();
+                    var start = this.settings.aSign.length;
+                    var end = this.that.value.length - this.settings.aSuffix.length;
+                    setElementSelection(this.that, start, end);
+                }
                 return true;
             }
             if ((ctrlKey || cmdKey) && (kdCode === 67 || kdCode === 86 || kdCode === 88)) { /** if copy (c=67) paste (v=86) or cut (x=88) */
@@ -1112,6 +1118,8 @@
                          * false = will not format the default value
                          */
                         aForm: true,
+                        /** determine if the select all keyboard command will select the complete input text or only the input numeric value" */
+                        sNumber: false,
                         /** future use */
                         onSomeEvent: function () {}
                     };

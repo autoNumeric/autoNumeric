@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributor: Sokolov Yura
-* @version: 2.0-beta - 2014-08-02 GMT 11:00 AM
+* @version: 2.0-beta - 2014-10-07 GMT 9:00 PM
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -1520,10 +1520,11 @@
                 $this = autoGet($(this)),
                 str = $this.serialize(),
                 parts = str.split('&'),
-                i = 0;
-            for (i; i < parts.length; i += 1) {
+                formIndex = $('form').index($this),
+				i = 0;
+			for (i; i < parts.length; i += 1) {
                 var miniParts = parts[i].split('='),
-                    $field = $('*[name="' + decodeURIComponent(miniParts[0]) + '"]'),
+					$field = $('form:eq(' + formIndex + ') input[name="' + decodeURIComponent(miniParts[0]) + '"]'),
                     settings = $field.data('autoNumeric');
                 if (typeof settings === 'object') {
                     if (miniParts[1] !== null) {
@@ -1542,10 +1543,11 @@
         getArray: function (outPut) {
             var isAutoNumeric = false,
                 $this = autoGet($(this)),
-                formFields = $this.serializeArray();
+                formFields = $this.serializeArray(),
+				formIndex = $('form').index($this);
             /*jslint unparam: true*/
             $.each(formFields, function (i, field) {
-                var $field = $('*[name="' + decodeURIComponent(field.name) + '"]'),
+				var $field = $('form:eq(' + formIndex + ') input[name="' + decodeURIComponent(field.name) + '"]'),
                     settings = $field.data('autoNumeric');
                 if (typeof settings === 'object') {
                     if (field.value !== '') {

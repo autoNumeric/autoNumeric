@@ -1,5 +1,9 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2014-10-07 GMT 9:00 PM
++ Merged mod from Zayter that adds option to highlight only the numbers when select all from keyboard
++ Fixed "getString" & "getArray" methods when multiple forms having some shared named inputs
+
 ### 2014-08-02 GMT 11:00 AM
 + Fixed mRound option "round-half-even"
 

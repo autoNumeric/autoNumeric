@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura
-* @version: 1.9.25 - 2014-08-02 GMT 11:00 AM
+* @version: 1.9.26 - 2014-10-07 GMT 2:00 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -1238,13 +1238,15 @@
                 $this = autoGet($(this)),
                 str = $this.serialize(),
                 parts = str.split('&'),
+                formIndex = $('form').index($this),
                 i = 0;
             for (i; i < parts.length; i += 1) {
-                var miniParts = parts[i].split('=');
-                var settings = $('*[name="' + decodeURIComponent(miniParts[0]) + '"]').data('autoNumeric');
+                var miniParts = parts[i].split('='),
+                    $field = $('form:eq(' + formIndex + ') input[name="' + decodeURIComponent(miniParts[0]) + '"]'),
+                    settings = $field.data('autoNumeric');
                 if (typeof settings === 'object') {
-                    if (miniParts[1] !== null && $('*[name="' + decodeURIComponent(miniParts[0]) + '"]').data('autoNumeric') !== undefined) {
-                        miniParts[1] = $('input[name="' + decodeURIComponent(miniParts[0]) + '"]').autoNumeric('get');
+                    if (miniParts[1] !== null) {
+                        miniParts[1] = $field.autoNumeric('get');
                         parts[i] = miniParts.join('=');
                         isAutoNumeric = true;
                     }
@@ -1259,20 +1261,23 @@
         getArray: function () {
             var isAutoNumeric = false,
                 $this = autoGet($(this)),
-                formFields = $this.serializeArray();
+                formFields = $this.serializeArray(),
+                formIndex = $('form').index($this);
+            /*jslint unparam: true*/
             $.each(formFields, function (i, field) {
-                var settings = $('*[name="' + decodeURIComponent(field.name) + '"]').data('autoNumeric');
+                var $field = $('form:eq(' + formIndex + ') input[name="' + decodeURIComponent(field.name) + '"]'),
+                    settings = $field.data('autoNumeric');
                 if (typeof settings === 'object') {
-                    if (field.value !== '' && $('*[name="' + decodeURIComponent(field.name) + '"]').data('autoNumeric') !== undefined) {
-                        field.value = $('input[name="' + decodeURIComponent(field.name) + '"]').autoNumeric('get').toString();
+                    if (field.value !== '') {
+                        field.value = $field.autoNumeric('get').toString();
                     }
                     isAutoNumeric = true;
                 }
             });
+            /*jslint unparam: false*/
             if (isAutoNumeric === true) {
                 return formFields;
             }
-            $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'getArray' method");
             return this;
         },
         /** returns the settings object for those who need to look under the hood */

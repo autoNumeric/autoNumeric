@@ -16,7 +16,7 @@
         "input",
         "mask"
     ],
-    "version": "1.9.25",
+    "version": "1.9.26",
     "author": {
         "name": "Robert (Bob) Knothe",
         "url": "https://github.com/BobKnothe/autoNumeric"

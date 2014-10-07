@@ -1,5 +1,8 @@
 ### Change log:
 
+### Version 1.9.26
++ Fixed "getString" & "getArray" methods when multiple forms having some shared named inputs
+
 #### Version 1.9.25
 + Fixed mRound option "round-half-even"
 + Modified the "set" method to not throw an error when trying to "set" a null value

@@ -948,7 +948,7 @@
                         /** future use */
                         onSomeEvent: function () {}
                     };
-                    settings = $.extend({}, defaults, tagData, options); /** Merge defaults, tagData and options */
+                    settings = $.extend({}, defaults,  options,tagData); /** Merge defaults, tagData and options */
                     if (settings.aDec === settings.aSep) {
                         $.error("autoNumeric will not function properly when the decimal character aDec: '" + settings.aDec + "' and thousand separator aSep: '" + settings.aSep + "' are the same character");
                         return this;

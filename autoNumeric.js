@@ -1176,6 +1176,12 @@
                 value = checkValue(value, settings);
                 settings.oEvent = 'set';
                 value.toString();
+                if (value === null || value === '') {
+                    $this.val('');
+                    settings.rawValue = '';
+
+                    return;
+                }
                 if (value !== '') {
                     value = autoRound(value, settings);
                 }

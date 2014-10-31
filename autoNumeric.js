@@ -848,8 +848,8 @@
             return this.each(function () {
                 var $this = $(this),
                     settings = $this.data('autoNumeric'), /** attempt to grab 'autoNumeric' settings, if they don't exist returns "undefined". */
-                    tagData = $this.data(); /** attempt to grab HTML5 data, if they don't exist we'll get "undefined".*/
-                if (typeof settings !== 'object') { /** If we couldn't grab settings, create them from defaults and passed options. */
+                    defaults = $.fn.autoNumeric.defaults; /** attempt to grab the default global configuration.*/
+                if (typeof settings !== 'object' && typeof defaults !== 'object') { /** If we couldn't grab settings, create them from defaults and passed options. */
                     var defaults = {
                         /** allowed numeric values
                          * please do not modify
@@ -1284,7 +1284,15 @@
         getSettings: function () {
             var $this = autoGet($(this));
             return $this.eq(0).data('autoNumeric');
-        }
+        },
+		/** configure the default settings to autoNumeric */
+		setDefaults: function (options) {
+			if (typeof options !== 'object') {
+				$.error("You must initialize autoNumeric('init', {options}) prior to calling the 'update' method");
+				return this;
+			}
+            $.fn.autoNumeric.defaults = $.extend({}, $.fn.autoNumeric.defaults, options); /** Merge defaults and options */
+		}
     };
     $.fn.autoNumeric = function (method) {
         if (methods[method]) {

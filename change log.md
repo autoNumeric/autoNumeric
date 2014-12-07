@@ -1,5 +1,9 @@
 ### Change log:
 
+### Version 1.9.27
++ Merged a mod that makes the defaults public and over ridable - Thanks Peter Boccia
++ Fixed page reload when the thousand separator is a period "."
+
 ### Version 1.9.26
 + Fixed "getString" & "getArray" methods when multiple forms having some shared named inputs
 

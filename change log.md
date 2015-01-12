@@ -1,5 +1,8 @@
 ### Change log:
 
+### Version 1.9.29
++ Fixed introduced in 1.9.27
+
 ### Version 1.9.28
 + Fixed focusout event when the thousand separator is a period "." and only one is present "x.xxx" with not other alpha characters.
 

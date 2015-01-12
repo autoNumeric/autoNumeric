@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura
-* @version: 1.9.27 - 2014-12-07 GMT 5:30 PM
+* @version: 1.9.28 - 2015-01-12 GMT 2:30 PM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -1002,11 +1002,9 @@
                         if (groupedValue === null) {
                             groupedValue = autoGroup(value, settingsClone);
                         }
-                        if (groupedValue !== origValue) {
-                            $this.val(groupedValue);
-                        }
-                        if (groupedValue !== holder.inVal) {
+                        if (groupedValue !== holder.inVal || groupedValue !== origValue) {
                             $this.change();
+                            $this.val(groupedValue);
                             delete holder.inVal;
                         }
                         if (settingsClone.nBracket !== null && $this.autoNumeric('get') < 0) {

@@ -1,5 +1,8 @@
 ### Change log:
 
+### Version 1.9.28
++ Fixed focusout event when the thousand separator is a period "." and only one is present "x.xxx" with not other alpha characters.
+
 ### Version 1.9.27
 + Merged a mod that makes the defaults public and over ridable - Thanks Peter Boccia
 + Fixed page reload when the thousand separator is a period "."

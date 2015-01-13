@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @author: Sokolov Yura
-* @version: 1.9.29 - 2015-01-12 GMT 11:00 PM
+* @version: 1.9.30 - 2015-01-13 GMT 3:30 AM
 *
 * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 * Created by Sokolov Yura on 2010-11-07
@@ -876,7 +876,7 @@
                             $this[0].value = settings.aSign;
                             setValue = false;
                         }
-                        if (setValue &&  && $this[0].value === $this.prop('defaultValue')) {
+                        if (setValue && $this[0].value === $this.prop('defaultValue')) {
                             $this.autoNumeric('set', $this.val());
                         }
                     }

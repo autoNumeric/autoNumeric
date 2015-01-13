@@ -1,5 +1,8 @@
 ### Change log:
 
+### Version 1.9.30
++ Fixed in 1.9.29 too interest in Ohio State vs. Oregon
+
 ### Version 1.9.29
 + Fixed introduced in 1.9.27
 

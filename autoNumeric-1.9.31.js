@@ -294,10 +294,10 @@
         s = truncateDecimal(s, settings.aDec, settings.mDec);
         s = fixNumber(s, settings.aDec, settings.aNeg);
         var value = +s;
-        if (settings.setEvent && (value < settings.vMin || value > settings.vMax)) {
-            settings.setEvent = false;
-            $.error("The value (" + value + ") from the 'set' method falls outside of the vMin / vMax range");
-        }
+        //if (settings.setEvent && (value < settings.vMin || value > settings.vMax)) {
+           // settings.setEvent = false;
+            //$.error("The value (" + value + ") from the 'set' method falls outside of the vMin / vMax range");
+        //}
         return value >= settings.vMin && value <= settings.vMax;
     }
     /**

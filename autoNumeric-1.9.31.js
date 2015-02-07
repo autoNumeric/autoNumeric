@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
- * @version: 1.9.31 - 2015-02-06 GMT 3:00 PM
+ * @version: 1.9.31 - 2015-02-07 GMT 3:00 PM
  *
  * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  * Created by Sokolov Yura on 2010-11-07

@@ -1,10 +1,18 @@
 ### Change log:
 
+### Version 1.9.32
++ Fixed bug when the "update" method is called in the "onfocus" event
++ Fixed the "getString" & "getArray" methods when multiple inputs share the same name - Thanks Retromax
++ Fixed bug in "ctrl + v" paste event to properly round 
+
+### Version 1.9.31
++ never officially release
+
 ### Version 1.9.30
-+ Fixed in 1.9.29 too interest in Ohio State vs. Oregon
++ Fixed bug introduced 1.9.29 too interested in Ohio State vs. Oregon
 
 ### Version 1.9.29
-+ Fixed introduced in 1.9.27
++ Fixed bug introduced in 1.9.27
 
 ### Version 1.9.28
 + Fixed focusout event when the thousand separator is a period "." and only one is present "x.xxx" with not other alpha characters.

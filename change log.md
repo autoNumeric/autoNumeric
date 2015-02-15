@@ -1,5 +1,8 @@
 ### Change log:
 
+### Version 1.9.33
++ Fixed bug in "ctrl + v" paste event introduced in 1.9.32 
+
 ### Version 1.9.32
 + Fixed bug when the "update" method is called in the "onfocus" event
 + Fixed the "getString" & "getArray" methods when multiple inputs share the same name - Thanks Retromax

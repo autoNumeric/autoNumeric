@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
- * @version: 1.9.32 - 2015-02-15 GMT 3:30 PM
+ * @version: 1.9.33 - 2015-02-15 GMT 11:00 PM
  *
  * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  * Created by Sokolov Yura on 2010-11-07
@@ -554,13 +554,13 @@
         /**
          * set part of number to value keeping position of cursor
          */
-        setValueParts: function (left, right) {
+        setValueParts: function (left, right, paste) {
             var settingsClone = this.settingsClone,
                 parts = this.normalizeParts(left, right),
                 new_value = parts.join(''),
                 position = parts[0].length;
             if (autoCheck(new_value, settingsClone)) {
-                new_value = truncateDecimal(new_value, settingsClone, 'paste');
+                new_value = truncateDecimal(new_value, settingsClone, paste);
                 if (position > new_value.length) {
                     position = new_value.length;
                 }
@@ -617,7 +617,7 @@
                     oldParts = this.valuePartsBeforePaste;
                 delete this.valuePartsBeforePaste; /** try to strip pasted value first */
                 parts[0] = parts[0].substr(0, oldParts[0].length) + autoStrip(parts[0].substr(oldParts[0].length), this.settingsClone);
-                if (!this.setValueParts(parts[0], parts[1])) {
+                if (!this.setValueParts(parts[0], parts[1], 'paste')) {
                     this.value = oldParts.join('');
                     this.setPosition(oldParts[0].length, false);
                 }

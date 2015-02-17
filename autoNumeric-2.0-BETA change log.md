@@ -1,5 +1,13 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2015-02-17 GMT 7:30 PM
++ Modified the oRide option
++ Fixed the "update" method when it is called during the "onfocus" event
++ Fixed the "getString" & "getArray" methods when multiple inputs share the same name - Thanks Retromax
++ Fixed bug in "ctrl + v" paste event to properly round 
++ Merged a mod that makes the defaults public and over ridable - Thanks Peter Boccia
++ Fixed page reload when the thousand separator is a period "."
+
 ### 2014-10-07 GMT 9:00 PM
 + Merged mod from Zayter that adds option to highlight only the numbers when select all from keyboard
 + Fixed "getString" & "getArray" methods when multiple forms having some shared named inputs

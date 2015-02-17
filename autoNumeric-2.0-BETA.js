@@ -1,43 +1,43 @@
 /**
-* autoNumeric.js
-* @author: Bob Knothe
-* @contributor: Sokolov Yura
-* @version: 2.0-beta - 2014-10-07 GMT 9:00 PM
-*
-* Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
-*
-* Copyright (c) 2009 Robert J. Knothe http://www.decorplanit.com/plugin/
-*
-* The MIT License (http://www.opensource.org/licenses/mit-license.php)
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sub license, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*/
+ * autoNumeric.js
+ * @author: Bob Knothe
+ * @contributor: Sokolov Yura
+ * @version: 2.0-beta - 2015-02-17 GMT 7:30 PM
+ *
+ * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
+ *
+ * Copyright (c) 2009 Robert J. Knothe http://www.decorplanit.com/plugin/
+ *
+ * The MIT License (http://www.opensource.org/licenses/mit-license.php)
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sub license, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 (function ($) {
     "use strict";
     /*jslint browser: true*/
     /*global jQuery: false, sessionStorage: false*/
     /**
-    * Cross browser routine for getting selected range/cursor position
-    */
+     * Cross browser routine for getting selected range/cursor position
+     */
     function getElementSelection(that) {
         var position = {};
         if (that.selectionStart === undefined) {
@@ -104,7 +104,6 @@
      */
     function autoCode($this, settings) {
         runCallbacks($this, settings);
-        settings.oEvent = null;
         settings.tagList = ['b', 'caption', 'cite', 'code', 'dd', 'del', 'div', 'dfn', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ins', 'kdb', 'label', 'li', 'output', 'p', 'q', 's', 'sample', 'span', 'strong', 'td', 'th', 'u', 'var'];
         var vmax = settings.vMax.toString().split('.'),
             vmin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
@@ -115,8 +114,8 @@
         settings.allowLeading = true;
         if (settings.oRide !== null) {
             var parts = settings.oRide.split(',');
-            settings.aNeg = parts[0] < 0 ? '-' : '';
-            settings.mDec = +parts[1];
+            settings.aNeg = Math.abs(parts[1]) > 0 ? '-' : '';
+            settings.mDec =(parts.length > 2) ? Math.abs(+parts[2]) : null;
         } else {
             settings.aNeg = settings.vMin < 0 ? '-' : '';
         }
@@ -155,18 +154,18 @@
     /**
      * places or removes brackets on negative values
      */
-    function negativeBracket(s, nBracket, oEvent, suffix, pNeg) { /** oEvent = settings.oEvent */
-        if (pNeg === 'right') {
+    function negativeBracket(s, settings) {
+        if (settings.pNeg === 'right') {
             return s;
         }
-        nBracket = nBracket.split(',');
-        if (oEvent === 'set' || oEvent === 'focusout') {
+        var brackets = settings.nBracket.split(',');
+        if (s.charAt(0) === '-' && !settings.hasFocus && !settings.unSet) {
             s = s.replace('-', '');
-            s = (suffix !== '') ? s.replace(suffix, '') : s;
-            s = nBracket[0] + s + nBracket[1] + suffix;
-        } else if ((oEvent === 'get' || oEvent === 'focusin' || oEvent === 'pageLoad') && s.charAt(0) === nBracket[0]) {
-            s = s.replace(nBracket[0], '-');
-            s = s.replace(nBracket[1], '');
+            s = (settings.aSuffix !== '') ? s.replace(settings.aSuffix, '') : s;
+            s = brackets[0] + s + brackets[1] + settings.aSuffix;
+        } else if ((settings.hasFocus && s.charAt(0) === brackets[0]) || (settings.unSet && s.charAt(0) === brackets[0])) {
+            s = s.replace(brackets[0], '-');
+            s = s.replace(brackets[1], '');
         }
         return s;
     }
@@ -175,7 +174,7 @@
      */
     function autoStrip(s, settings, strip_zero) {
         if (settings.nBracket !== null && s.indexOf(settings.nBracket.split(',')[0]) !== -1) {
-            s = negativeBracket(s, settings.nBracket, 'get', settings.aSuffix, settings.pNeg);
+            s = negativeBracket(s, settings);
         }
         if (settings.aSign) { /** remove currency sign */
             while (s.indexOf(settings.aSign) > -1) {
@@ -212,25 +211,6 @@
             var strip_reg = '^' + settings.aNegRegAutoStrip + '0*(\\d' + (strip_zero === 'leading' ? ')' : '|$)');
             strip_reg = new RegExp(strip_reg);
             s = s.replace(strip_reg, '$1$2');
-        }
-        return s;
-    }
-    /**
-     * truncate decimal part of a number
-     */
-    function truncateDecimal(s, aDec, mDec) {
-        if (aDec && mDec) {
-            var parts = s.split(aDec);
-            /** truncate decimal part to satisfying length
-             * cause we would round it anyway */
-            if (parts[1] && parts[1].length > mDec) {
-                if (mDec > 0) {
-                    parts[1] = parts[1].substring(0, mDec);
-                    s = parts.join(aDec);
-                } else {
-                    s = parts[0];
-                }
-            }
         }
         return s;
     }
@@ -291,31 +271,6 @@
             s = s.replace('.', aDec);
         }
         return s;
-    }
-    /**
-     * checking that number satisfy format conditions
-     * and lays between settings.vMin and settings.vMax
-     * and the string length does not exceed the digits in settings.vMin and settings.vMax
-     */
-    function autoCheck(s, settings) {
-        s = s.replace(',', '.');
-        s = truncateDecimal(s, settings);
-        s = fixNumber(s, settings.aDec, settings.aNeg);
-        if (settings.oRide !== null) {
-            var parts = settings.oRide.split(','),
-                strLength = (s.indexOf('.') === -1) ? s.length : s.indexOf('.');
-            if (s.indexOf('-') === -1) {
-                if (Math.abs(parts[0]) === '0' && s === '0') {
-                    return true;
-                }
-                return strLength > Math.abs(parts[0]) ? false : true;
-            } else {
-                return strLength - 1 > Math.abs(parts[0]) ? false : true;
-            }
-        } else {
-            var value = +s;
-            return value >= settings.vMin && value <= settings.vMax;
-        }
     }
     /**
      * private function to check for empty value
@@ -394,8 +349,9 @@
         if (settings.aSuffix) {
             iv = iv + settings.aSuffix;
         }
-        if (settings.oEvent === 'set' && testNeg < 0 && settings.nBracket !== null) { /** removes the negative sign and places brackets */
-            iv = negativeBracket(iv, settings.nBracket, settings.oEvent, settings.aSuffix, settings.pNeg);
+        if (settings.setEvent && testNeg < 0 && settings.nBracket !== null) { /** removes the negative sign and places brackets */
+            iv = negativeBracket(iv, settings);
+            settings.setEvent = false;
         }
         return iv;
     }
@@ -436,8 +392,10 @@
         if ((+iv > 0 && settings.lZero !== 'keep') || (iv.length > 0 && settings.lZero === 'allow')) { /** trims leading zero's if needed */
             iv = iv.replace(/^0*(\d)/, '$1');
         }
-        var dPos = iv.lastIndexOf('.'), /** virtual decimal position */
-            vdPos = (dPos === -1) ? iv.length - 1 : dPos, /** checks decimal places to determine if rounding is required */
+        var dPos = iv.lastIndexOf('.'),
+            /** virtual decimal position */
+            vdPos = (dPos === -1) ? iv.length - 1 : dPos,
+            /** checks decimal places to determine if rounding is required */
             cDec = (iv.length - 1) - vdPos; /** check if no rounding is required */
         if (cDec <= settings.mDec) {
             ivRounded = iv; /** check if we need to pad with zeros */
@@ -473,17 +431,17 @@
             odd = (odd === 0 && (iv.substring(rLength + 2, iv.length) > 0)) ? 1 : 0;
         }
         if ((tRound > 4 && settings.mRound === 'S') || /** Round half up symmetric */
-                (tRound > 4 && settings.mRound === 'A' && nSign === '') || /** Round half up asymmetric positive values */
-                (tRound > 5 && settings.mRound === 'A' && nSign === '-') || /** Round half up asymmetric negative values */
-                (tRound > 5 && settings.mRound === 's') || /** Round half down symmetric */
-                (tRound > 5 && settings.mRound === 'a' && nSign === '') || /** Round half down asymmetric positive values */
-                (tRound > 4 && settings.mRound === 'a' && nSign === '-') || /** Round half down asymmetric negative values */
-                (tRound > 5 && settings.mRound === 'B') || /** Round half even "Banker's Rounding" */
-                (tRound === 5 && settings.mRound === 'B' && odd === 1) || /** Round half even "Banker's Rounding" */
-                (tRound > 0 && settings.mRound === 'C' && nSign === '') || /** Round to ceiling toward positive infinite */
-                (tRound > 0 && settings.mRound === 'F' && nSign === '-') || /** Round to floor toward negative infinite */
-                (tRound > 0 && settings.mRound === 'U') ||
-                (settings.mRound === 'CHF')) { /** round up away from zero */
+            (tRound > 4 && settings.mRound === 'A' && nSign === '') || /** Round half up asymmetric positive values */
+            (tRound > 5 && settings.mRound === 'A' && nSign === '-') || /** Round half up asymmetric negative values */
+            (tRound > 5 && settings.mRound === 's') || /** Round half down symmetric */
+            (tRound > 5 && settings.mRound === 'a' && nSign === '') || /** Round half down asymmetric positive values */
+            (tRound > 4 && settings.mRound === 'a' && nSign === '-') || /** Round half down asymmetric negative values */
+            (tRound > 5 && settings.mRound === 'B') || /** Round half even "Banker's Rounding" */
+            (tRound === 5 && settings.mRound === 'B' && odd === 1) || /** Round half even "Banker's Rounding" */
+            (tRound > 0 && settings.mRound === 'C' && nSign === '') || /** Round to ceiling toward positive infinite */
+            (tRound > 0 && settings.mRound === 'F' && nSign === '-') || /** Round to floor toward negative infinite */
+            (tRound > 0 && settings.mRound === 'U') ||
+            (settings.mRound === 'CHF')) { /** round up away from zero */
             for (i = (ivArray.length - 1); i >= 0; i -= 1) { /** Round up the last digit if required, and continue until no more 9's are found */
                 if (ivArray[i] !== '.') {
                     if (settings.mRound === 'CHF' && ivArray[i] <= 2 && onePass) {
@@ -514,6 +472,51 @@
         ivArray = ivArray.slice(0, rLength + 1); /** Reconstruct the string, converting any 10's to 0's */
         ivRounded = truncateZeros(ivArray.join('')); /** return rounded value */
         return (+ivRounded === 0) ? ivRounded : nSign + ivRounded;
+    }
+    /**
+     * truncate decimal part of a number
+     */
+    function truncateDecimal(s, settings, paste) {
+        var aDec = settings.aDec,
+            mDec = settings.mDec;
+        s = (paste === 'paste') ? autoRound(s, settings) : s;
+        if (aDec && mDec) {
+            var parts = s.split(aDec);
+            /** truncate decimal part to satisfying length
+             * cause we would round it anyway */
+            if (parts[1] && parts[1].length > mDec) {
+                if (mDec > 0) {
+                    parts[1] = parts[1].substring(0, mDec);
+                    s = parts.join(aDec);
+                } else {
+                    s = parts[0];
+                }
+            }
+        }
+        return s;
+    }
+    /**
+     * checking that number satisfy format conditions
+     * and lays between settings.vMin and settings.vMax
+     * and the string length does not exceed the digits in settings.vMin and settings.vMax
+     */
+    function autoCheck(s, settings) {
+        s = s.replace(',', '.');
+        s = truncateDecimal(s, settings, null);
+        s = fixNumber(s, settings.aDec, settings.aNeg);
+        if (settings.oRide !== null) {
+            var parts = settings.oRide.split(','),
+                strLength = (s.indexOf('.') === -1) ? s.length : s.indexOf('.');
+            if (s.indexOf('-') === -1) {
+                if (Math.abs(parts[0]) === '0' && s === '0') {
+                    return true;
+                }
+                return strLength > Math.abs(parts[0]) ? false : true;
+            }
+            return strLength - 1 > Math.abs(parts[1]) ? false : true;
+        }
+        var value = +s;
+        return value >= settings.vMin && value <= settings.vMax;
     }
     /**
      * Holder object for field properties
@@ -589,7 +592,7 @@
                         left = (left === '0') ? left : left.substr(1);
                     }
                 } else {
-                    if (left.length - 1 > Math.abs(parts[0])) {
+                    if (left.length - 1 > Math.abs(parts[1])) {
                         left = left.substr(1);
                         left = (left.charAt(0) === '0') ? left.substr(1) : left;
                         left = '-' + left;
@@ -612,13 +615,13 @@
         /**
          * set part of number to value keeping position of cursor
          */
-        setValueParts: function (left, right) {
+        setValueParts: function (left, right, paste) {
             var settingsClone = this.settingsClone,
                 parts = this.normalizeParts(left, right),
                 new_value = parts.join(''),
                 position = parts[0].length;
             if (autoCheck(new_value, settingsClone)) {
-                new_value = truncateDecimal(new_value, settingsClone);
+                new_value = truncateDecimal(new_value, settingsClone, paste);
                 var test_value = (new_value.indexOf(',') !== -1) ? new_value.replace(',', '.') : new_value,
                     text_value = test_value;
                 if (test_value === '' || test_value === '-') {
@@ -629,7 +632,7 @@
                     } else {
                         test_value = test_value.toString();
                     }
-                    settingsClone.rawValue =  settingsClone.oRide === null ? test_value : text_value;
+                    settingsClone.rawValue = settingsClone.oRide === null ? test_value : text_value;
                 }
                 if (position > new_value.length) {
                     position = new_value.length;
@@ -687,7 +690,7 @@
                     oldParts = this.valuePartsBeforePaste;
                 delete this.valuePartsBeforePaste; /** try to strip pasted value first */
                 parts[0] = parts[0].substr(0, oldParts[0].length) + autoStrip(parts[0].substr(oldParts[0].length), this.settingsClone);
-                if (!this.setValueParts(parts[0], parts[1])) {
+                if (!this.setValueParts(parts[0], parts[1], 'paste')) {
                     this.value = oldParts.join('');
                     this.setPosition(oldParts[0].length, false);
                 }
@@ -714,7 +717,7 @@
                 return true;
             }
             if ((ctrlKey || cmdKey) && kdCode === 65) { /** if select all (a=65)*/
-                if (this.settings.sNumber){
+                if (this.settings.sNumber) {
                     e.preventDefault();
                     var start = this.settings.aSign.length;
                     var end = this.that.value.length - this.settings.aSuffix.length;
@@ -773,11 +776,11 @@
                     } else {
                         parts[1] = parts[1].substring(1, parts[1].length);
                     }
-                    this.setValueParts(parts[0], parts[1]);
+                    this.setValueParts(parts[0], parts[1], null);
                 } else {
                     this.expandSelectionOnSign(false);
                     parts = this.getBeforeAfterStriped();
-                    this.setValueParts(parts[0], parts[1]);
+                    this.setValueParts(parts[0], parts[1], null);
                 }
                 return true;
             }
@@ -810,7 +813,7 @@
                 if (right.indexOf(settingsClone.aDec) === 0) {
                     right = right.substr(1);
                 }
-                this.setValueParts(left + settingsClone.aDec, right);
+                this.setValueParts(left + settingsClone.aDec, right, null);
                 return true;
             } /** start rule on negative sign */
 
@@ -827,7 +830,7 @@
                 } else {
                     left = (cCode === '-') ? settingsClone.aNeg + left : left;
                 }
-                this.setValueParts(left, right);
+                this.setValueParts(left, right, null);
                 return true;
             } /** digits */
             if (cCode >= '0' && cCode <= '9') { /** if try to insert digit before minus */
@@ -838,7 +841,7 @@
                 if (settingsClone.vMax <= 0 && settingsClone.vMin < settingsClone.vMax && this.value.indexOf(settingsClone.aNeg) === -1 && cCode !== '0') {
                     left = settingsClone.aNeg + left;
                 }
-                this.setValueParts(left + cCode, right);
+                this.setValueParts(left + cCode, right, null);
                 return true;
             } /** prevent any other character */
             return true;
@@ -876,7 +879,7 @@
                     }
                 }
                 var leftReg = new RegExp('^.*?' + left_ar.join('.*?')),
-                    newLeft = value.match(leftReg);/** search cursor position in formatted value */
+                    newLeft = value.match(leftReg); /** search cursor position in formatted value */
                 if (newLeft) {
                     position = newLeft[0].length;
                     /** if we are just before sign which is in prefix position */
@@ -903,6 +906,7 @@
         }
     };
     /** thanks to Anthony & Evan C */
+
     function autoGet(obj) {
         if (typeof obj === 'string') {
             obj = obj.replace(/\[/g, "\\[").replace(/\]/g, "\\]");
@@ -912,6 +916,7 @@
         }
         return $(obj);
     }
+
     function getHolder($that, settings, update) {
         var data = $that.data('autoNumeric');
         if (!data) {
@@ -926,6 +931,7 @@
         return holder;
     }
     /** original settings saved for use when eDec & nSep options are being used */
+
     function originalSettings(settings) {
         settings.oDec = settings.mDec;
         settings.oPad = settings.aPad;
@@ -934,6 +940,7 @@
         settings.oSign = settings.aSign;
         return settings;
     }
+
     function readCookie(name) { /** from quirksmode */
         var nameEQ = name + "=",
             ca = document.cookie.split(';'),
@@ -950,6 +957,7 @@
         }
         return null;
     }
+
     function storageTest() { /** from moderizr */
         var test = 'test';
         try {
@@ -960,6 +968,7 @@
             return false;
         }
     }
+
     function autoSave($this, settings, toDo) {
         if (settings.aStor) {
             var storedName = ($this[0].name !== '' && $this[0].name !== undefined) ? 'AUTO_' + decodeURIComponent($this[0].name) : 'AUTO_' + $this[0].id;
@@ -994,136 +1003,15 @@
         init: function (options) {
             return this.each(function () {
                 var $this = $(this),
-                    settings = $this.data('autoNumeric'),/** attempt to grab 'autoNumeric' settings, if they don't exist returns "undefined". */
-                    tagData = $this.data();/** attempt to grab HTML5 data, if they don't exist we'll get "undefined".*/
+                    settings = $this.data('autoNumeric'),
+                    /** attempt to grab 'autoNumeric' settings, if they don't exist returns "undefined". */
+                    tagData = $this.data(); /** attempt to grab HTML5 data, if they don't exist we'll get "undefined".*/
                 if (typeof settings !== 'object') { /** If we couldn't grab settings, create them from defaults and passed options. */
-                    var defaults = {
-                        /** allowed numeric values
-                         * please do not modify
-                         */
-                        aNum: '0123456789',
-                        /** allowed thousand separator characters
-                         * comma = ','
-                         * period "full stop" = '.'
-                         * apostrophe is escaped = '\''
-                         * space = ' '
-                         * none = ''
-                         * NOTE: do not use numeric characters
-                         */
-                        aSep: ',',
-                        /** when true & the input has focus only the decimal character is visible
-                         */
-                        nSep: false,
-                        /** digital grouping for the thousand separator used in Format
-                         * dGroup: '2', results in 99,99,99,999 common in India for values less than 1 billion and greater than -1 billion
-                         * dGroup: '3', results in 999,999,999 default
-                         * dGroup: '4', results in 9999,9999,9999 used in some Asian countries
-                         */
-                        dGroup: '3',
-                        /** allowed decimal separator characters
-                         * period "full stop" = '.'
-                         * comma = ','
-                         */
-                        aDec: '.',
-                        /** allow to declare alternative decimal separator which is automatically replaced by aDec
-                         * developed for countries the use a comma ',' as the decimal character
-                         * and have keyboards\numeric pads that have a period 'full stop' as the decimal characters (Spain is an example)
-                         */
-                        altDec: null,
-                        /** allowed currency symbol
-                         * Must be in quotes aSign: '$', a space is allowed aSign: '$ '
-                         */
-                        aSign: '',
-                        /** placement of currency sign
-                         * for prefix pSign: 'p',
-                         * for suffix pSign: 's',
-                         */
-                        pSign: 'p',
-                        /** placement of negative sign to the right of the currency sign
-                         * to the left of the currency sign pNeg: 'left',
-                         * to the right of the currency sign pNeg: 'right',
-                         */
-                        pNeg: 'left',
-                        /** Additional suffix
-                         * Must be in quotes aSuffix: 'gross', a space is allowed aSuffix: ' gross'
-                         */
-                        aSuffix: '',
-                        /** maximum possible value
-                         * value must be enclosed in quotes and use the period for the decimal point
-                         * value must be larger than vMin
-                         */
-                        vMax: '9999999999999.99',
-                        /** minimum possible value
-                         * value must be enclosed in quotes and use the period for the decimal point
-                         * value must be smaller than vMax
-                         */
-                        vMin: '-9999999999999.99',
-                        /** Maximum number of decimal places = used to override decimal places set by the vMin & vMax values
-                         * value must be enclosed in quotes example mDec: '3',
-                         */
-                        mDec: null,
-                        /** Expanded decimal places visible when input has focus
-                         * value must be enclosed in quotes example mDec: '3',
-                         */
-                        eDec: null,
-                        /** overrides min / max values and controls the number of integers
-                         * example oRide: '6,0' allows 6 digits positive 0 negative
-                         * example oRide: '8,8' allow 8 digits both positive and negative
-                         * decimal places are controlled via the mDec option default is 2 places
-                         */
-                        oRide: null,
-                        /** Set to true to allow the eDec value to be saved with sessionStorage
-                         * if ie 6 or 7 the value will be saved as a session cookie
-                         */
-                        aStor: true,
-                        /** method used for rounding
-                         * mRound: 'S', Round-Half-Up Symmetric (default)
-                         * mRound: 'A', Round-Half-Up Asymmetric
-                         * mRound: 's', Round-Half-Down Symmetric (lower case s)
-                         * mRound: 'a', Round-Half-Down Asymmetric (lower case a)
-                         * mRound: 'B', Round-Half-Even "Bankers Rounding"
-                         * mRound: 'U', Round Up "Round-Away-From-Zero"
-                         * mRound: 'D', Round Down "Round-Toward-Zero" - same as truncate
-                         * mRound: 'C', Round to Ceiling "Toward Positive Infinity"
-                         * mRound: 'F', Round to Floor "Toward Negative Infinity"
-                         * mRound: 'CHF' Rounds to the nearest .00 .05 - Switzerland
-                         */
-                        mRound: 'S',
-                        /** controls decimal padding
-                         * aPad: true - always Pad decimals with zeros
-                         * aPad: false - does not pad with zeros.
-                         * aPad: `some number` - pad decimals with zero to number different from mDec
-                         * thanks to Jonas Johansson for the suggestion
-                         */
-                        aPad: true,
-                        /** places brackets on negative value -$ 999.99 to (999.99)
-                         * visible only when the field does NOT have focus the left and right symbols should be enclosed in quotes and separated by a comma
-                         * nBracket: null, nBracket: '(,)', nBracket: '[,]', nBracket: '<,>' or nBracket: '{,}'
-                         */
-                        nBracket: null,
-                        /** Displayed on empty string
-                         * wEmpty: 'empty', - input can be blank
-                         * wEmpty: 'zero', - displays zero
-                         * wEmpty: 'sign', - displays the currency sign
-                         */
-                        wEmpty: 'empty',
-                        /** controls leading zero behavior
-                         * lZero: 'allow', - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
-                         * lZero: 'deny', - allows only one leading zero on values less than one
-                         * lZero: 'keep', - allows leading zeros to be entered. on fousout zeros will be retained.
-                         */
-                        lZero: 'allow',
-                        /** determine if the default value will be formatted on page ready.
-                         * true = automatically formats the default value on page ready
-                         * false = will not format the default value
-                         */
-                        aForm: true,
-                        /** determine if the select all keyboard command will select the complete input text or only the input numeric value" */
-                        sNumber: false,
-                        /** future use */
-                        onSomeEvent: function () {}
-                    };
-                    settings = $.extend({}, defaults, tagData, options); /** Merge defaults, tagData and options */
+                    settings = $.extend({}, $.fn.autoNumeric.defaults, tagData, options, {hasFocus: false, setEvent: false, unSet: false}); /** Merge defaults, tagData and options */
+                    if (settings.aDec === settings.aSep) {
+                        $.error("autoNumeric will not function properly when the decimal character aDec: '" + settings.aDec + "' and thousand separator aSep: '" + settings.aSep + "' are the same character");
+                        return this;
+                    }
                     $this.data('autoNumeric', settings); /** Save our new settings */
                 } else {
                     return this;
@@ -1148,7 +1036,8 @@
                     $.error("autoNumeric will not function properly when the extended decimal places 'eDec: '" + settings.eDec + "' is greater than mDec: '" + settings.mDec + "' value");
                     return this;
                 }
-                if (settings.runOnce === false && settings.aForm) {/** routine to format default value on page load */
+                /** routine to format default value on page load */
+                if (settings.runOnce === false && settings.aForm) {
                     if ($this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) {
                         var setValue = true;
                         /** routine to handle page re-load from back button & saves the raw value to settings.rawValue */
@@ -1157,12 +1046,11 @@
                                 if (autoSave($this, settings, 'get') !== null) {
                                     $this.autoNumeric('set', autoSave($this, settings, 'get'));
                                 }
-                                setValue = false;
                             }
-                            if (settings.eDec !== null && settings.aStor === false || autoSave($this, settings, 'get') === null) {
+                            if ((settings.eDec !== null && settings.aStor === false) || autoSave($this, settings, 'get') === null) {
                                 $this.autoNumeric('set', autoStrip($this.val(), settings).replace(',', '.'));
-                                setValue = false;
                             }
+                            setValue = false;
                         }
                         if ($this.val() === '' && settings.wEmpty === 'empty') {
                             $this.val('');
@@ -1260,10 +1148,10 @@
                     $this.on('focusin.autoNumeric', function () {
                         var holder = getHolder($this),
                             $settings = holder.settingsClone;
-                        $settings.oEvent = 'focusin';
+                        $settings.hasFocus = true;
                         if ($settings.nBracket !== null) {
                             var checkVal = $this.val();
-                            $this.val(negativeBracket(checkVal, $settings.nBracket, $settings.oEvent, $settings.aSuffix, $settings.pNeg));
+                            $this.val(negativeBracket(checkVal, $settings));
                         }
                         if ($settings.nSep === true) {
 
@@ -1283,14 +1171,13 @@
                         if (onEmpty !== null && onEmpty !== '') {
                             $this.val(onEmpty);
                         }
-                        $settings.oEvent = null;
                     });
                     $this.on('focusout.autoNumeric', function () {
                         var holder = getHolder($this),
                             value = $this.val(),
                             origValue = value,
                             $settings = holder.settingsClone;
-                        $settings.oEvent = 'focusout';
+                        $settings.hasFocus = false;
                         if ($settings.eDec !== null) {
                             autoSave($this, $settings, 'set');
                         }
@@ -1332,9 +1219,8 @@
                             delete holder.inVal;
                         }
                         if ($settings.nBracket !== null && $settings.rawValue < 0) {
-                            $this.val(negativeBracket($this.val(), $settings.nBracket, $settings.oEvent, $settings.aSuffix, $settings.pNeg));
+                            $this.val(negativeBracket($this.val(), $settings));
                         }
-                        $settings.oEvent = null;
                     });
                 }
             });
@@ -1399,22 +1285,22 @@
                     value = valueIn.toString(),
                     testValue = valueIn.toString(),
                     $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
-                    testValue = valueIn.toString();
+                testValue = valueIn.toString();
                 if (typeof settings !== 'object') {
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'set' method");
                     return false;
                 }
                 /** allows locale decimal separator to be a comma */
-                value = value.replace(',', '.');
+                if ((testValue === $this.attr('value') || testValue === $this.text()) && settings.runOnce === false) {
+                    value = value.replace(',', '.');
+                }
                 /** Throws an error if the value being set is not numeric */
                 if (!$.isNumeric(+value)) {
                     $.error("The value being 'set' is not numeric that has caused a error to be thrown");
                     return;
                 }
                 value = checkValue(value, settings);
-                if (settings.oEvent !== 'focusin') {
-                    settings.oEvent = 'set';
-                }
+                settings.setEvent = true;
                 value.toString();
                 if (value !== '') {
                     if (settings.eDec !== null) {
@@ -1464,12 +1350,14 @@
             return $(this).each(function () {
                 var $this = autoGet($(this)),
                     settings = $this.data('autoNumeric');
+                settings.unSet = true;
                 if (typeof settings !== 'object') {
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'unSet' method");
                     return this;
                 }
                 if (typeof settings === 'object') {
                     $this.val($this.autoNumeric('get', outPut));
+                    settings.unSet = false;
                 }
             });
         },
@@ -1481,6 +1369,7 @@
                 $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'get' method");
                 return false;
             }
+            settings.setEvent = false;
             var getValue = '';
             /** determine the element type then use .eq(0) selector to grab the value of the first element in selector */
             if ($this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) {
@@ -1497,9 +1386,8 @@
             if ((getValue === '' && settings.wEmpty === 'empty') || (getValue === settings.aSign && (settings.wEmpty === 'sign' || settings.wEmpty === 'empty'))) {
                 return '';
             }
-            settings.oEvent = 'get';
-            if (settings.nBracket !== null && getValue !== '') {
-                getValue = negativeBracket(getValue, settings.nBracket, settings.oEvent, settings.aSuffix, settings.pNeg);
+            if (getValue !== '' && settings.nBracket !== null) {
+                getValue = negativeBracket(getValue, settings);
             }
             getValue = fixNumber(getValue, settings.aDec, settings.aNeg);
             if (+getValue === 0 && settings.lZero !== 'keep') {
@@ -1515,20 +1403,29 @@
             return getValue; /** returned Numeric String */
         },
         /** method to get the unformatted value from multiple fields */
-        getString: function (outPut) {
+        getString: function () {
             var isAutoNumeric = false,
                 $this = autoGet($(this)),
                 str = $this.serialize(),
                 parts = str.split('&'),
                 formIndex = $('form').index($this),
-				i = 0;
-			for (i; i < parts.length; i += 1) {
+                inputIndex = [],
+                i = 0;
+            for (i; i < parts.length; i += 1) {
                 var miniParts = parts[i].split('='),
-					$field = $('form:eq(' + formIndex + ') input[name="' + decodeURIComponent(miniParts[0]) + '"]'),
+                    $field = $('form:eq(' + formIndex + ') input[name="' + decodeURIComponent(miniParts[0]) + '"]'),
                     settings = $field.data('autoNumeric');
+                if ($field.length > 1) {
+                    if (inputIndex[decodeURIComponent(miniParts[0])] === undefined) {
+                        inputIndex[decodeURIComponent(miniParts[0])] = 0;
+                    } else {
+                        inputIndex[decodeURIComponent(miniParts[0])]++;
+                    }
+                    $field = $field.eq(inputIndex[decodeURIComponent(miniParts[0])]);
+                }
                 if (typeof settings === 'object') {
                     if (miniParts[1] !== null) {
-                        miniParts[1] = $field.autoNumeric('get', outPut);
+                        miniParts[1] = $field.autoNumeric('get');
                         parts[i] = miniParts.join('=');
                         isAutoNumeric = true;
                     }
@@ -1540,18 +1437,27 @@
             return str;
         },
         /** method to get the unformatted value from multiple fields */
-        getArray: function (outPut) {
+        getArray: function () {
             var isAutoNumeric = false,
                 $this = autoGet($(this)),
                 formFields = $this.serializeArray(),
-				formIndex = $('form').index($this);
+                formIndex = $('form').index($this),
+                inputIndex = [];
             /*jslint unparam: true*/
             $.each(formFields, function (i, field) {
-				var $field = $('form:eq(' + formIndex + ') input[name="' + decodeURIComponent(field.name) + '"]'),
+                var $field = $('form:eq(' + formIndex + ') input[name="' + decodeURIComponent(field.name) + '"]'),
                     settings = $field.data('autoNumeric');
+                if ($field.length > 1) {
+                    if (inputIndex[decodeURIComponent(field.name)] === undefined) {
+                        inputIndex[decodeURIComponent(field.name)] = 0;
+                    } else {
+                        inputIndex[decodeURIComponent(field.name)]++;
+                    }
+                    $field = $field.eq(inputIndex[decodeURIComponent(field.name)]);
+                }
                 if (typeof settings === 'object') {
                     if (field.value !== '') {
-                        field.value = $field.autoNumeric('get', outPut).toString();
+                        field.value = $field.autoNumeric('get').toString();
                     }
                     isAutoNumeric = true;
                 }
@@ -1560,7 +1466,6 @@
             if (isAutoNumeric === true) {
                 return formFields;
             }
-            $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'getArray' method");
             return this;
         },
         /** returns the settings object for those who need to look under the hood */
@@ -1577,5 +1482,132 @@
             return methods.init.apply(this, arguments);
         }
         $.error('Method "' + method + '" is not supported by autoNumeric()');
+    };
+    /* Make defaults public */
+    $.fn.autoNumeric.defaults = {
+       /** allowed numeric values
+         * please do not modify
+         */
+        aNum: '0123456789',
+        /** allowed thousand separator characters
+         * comma = ','
+         * period "full stop" = '.'
+         * apostrophe is escaped = '\''
+         * space = ' '
+         * none = ''
+         * NOTE: do not use numeric characters
+         */
+        aSep: ',',
+        /** when true & the input has focus only the decimal character is visible
+         */
+        nSep: false,
+        /** digital grouping for the thousand separator used in Format
+         * dGroup: '2', results in 99,99,99,999 common in India for values less than 1 billion and greater than -1 billion
+         * dGroup: '3', results in 999,999,999 default
+         * dGroup: '4', results in 9999,9999,9999 used in some Asian countries
+         */
+        dGroup: '3',
+        /** allowed decimal separator characters
+         * period "full stop" = '.'
+         * comma = ','
+         */
+        aDec: '.',
+        /** allow to declare alternative decimal separator which is automatically replaced by aDec
+         * developed for countries the use a comma ',' as the decimal character
+         * and have keyboards\numeric pads that have a period 'full stop' as the decimal characters (Spain is an example)
+         */
+        altDec: null,
+        /** allowed currency symbol
+         * Must be in quotes aSign: '$', a space is allowed aSign: '$ '
+         */
+        aSign: '',
+        /** placement of currency sign
+         * for prefix pSign: 'p',
+         * for suffix pSign: 's',
+         */
+        pSign: 'p',
+        /** placement of negative sign to the right of the currency sign
+         * to the left of the currency sign pNeg: 'left',
+         * to the right of the currency sign pNeg: 'right',
+         */
+        pNeg: 'left',
+        /** Additional suffix
+         * Must be in quotes aSuffix: 'gross', a space is allowed aSuffix: ' gross'
+         */
+        aSuffix: '',
+        /** maximum possible value
+         * value must be enclosed in quotes and use the period for the decimal point
+         * value must be larger than vMin
+         */
+        vMax: '9999999999999.99',
+        /** minimum possible value
+         * value must be enclosed in quotes and use the period for the decimal point
+         * value must be smaller than vMax
+         */
+        vMin: '-9999999999999.99',
+        /** Maximum number of decimal places = used to override decimal places set by the vMin & vMax values
+         * value must be enclosed in quotes example mDec: '3',
+         */
+        mDec: null,
+        /** Expanded decimal places visible when input has focus
+         * value must be enclosed in quotes example mDec: '3',
+         */
+        eDec: null,
+        /** overrides min / max values and controls the number of integers (positive & negative) and decimal places (optional)
+         * example oRide: '6,0' allows 6 digits positive 0 negative
+         * example oRide: '8,6,3' allow 8 positive integers 6 negative digits and two decimal place for both positive and negative
+         * 2 decimal places is the default - decimal places can be changed as stated in the oRide option or mDec option
+         */
+        oRide: null,
+        /** Set to true to allow the eDec value to be saved with sessionStorage
+         * if ie 6 or 7 the value will be saved as a session cookie
+         */
+        aStor: true,
+        /** method used for rounding
+         * mRound: 'S', Round-Half-Up Symmetric (default)
+         * mRound: 'A', Round-Half-Up Asymmetric
+         * mRound: 's', Round-Half-Down Symmetric (lower case s)
+         * mRound: 'a', Round-Half-Down Asymmetric (lower case a)
+         * mRound: 'B', Round-Half-Even "Bankers Rounding"
+         * mRound: 'U', Round Up "Round-Away-From-Zero"
+         * mRound: 'D', Round Down "Round-Toward-Zero" - same as truncate
+         * mRound: 'C', Round to Ceiling "Toward Positive Infinity"
+         * mRound: 'F', Round to Floor "Toward Negative Infinity"
+         * mRound: 'CHF' Rounds to the nearest .00 .05 - Switzerland
+         */
+        mRound: 'S',
+        /** controls decimal padding
+         * aPad: true - always Pad decimals with zeros
+         * aPad: false - does not pad with zeros.
+         * aPad: `some number` - pad decimals with zero to number different from mDec
+         * thanks to Jonas Johansson for the suggestion
+         */
+        aPad: true,
+        /** places brackets on negative value -$ 999.99 to (999.99)
+         * visible only when the field does NOT have focus the left and right symbols should be enclosed in quotes and separated by a comma
+         * nBracket: null, nBracket: '(,)', nBracket: '[,]', nBracket: '<,>' or nBracket: '{,}'
+         */
+        nBracket: null,
+        /** Displayed on empty string
+         * wEmpty: 'empty', - input can be blank
+         * wEmpty: 'zero', - displays zero
+         * wEmpty: 'sign', - displays the currency sign
+         */
+        wEmpty: 'empty',
+        /** controls leading zero behavior
+         * lZero: 'allow', - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
+         * lZero: 'deny', - allows only one leading zero on values less than one
+         * lZero: 'keep', - allows leading zeros to be entered. on fousout zeros will be retained.
+         */
+        lZero: 'allow',
+        /** determine if the default value will be formatted on page ready.
+         * true = automatically formats the default value on page ready
+         * false = will not format the default value
+         */
+        aForm: true,
+        /** determine if the select all keyboard command will select the complete input text or only the input numeric value" */
+        sNumber: false,
+        /** future use */
+        onSomeEvent: function () {}
     };
 }(jQuery, window, document));

@@ -88,7 +88,7 @@ input[type="text"] {
 
 <body style="">
 <h2>autoNumeric-2.0-BETA</strong></h2>
-<p>last update 2014-17-07 GMT 9:00 PM</p>
+<p>last update 2015-02-77 GMT 7:30 PM</p>
 <h3>New methods</h3>
 <p><strong>"unSet"</strong> - displays the raw value of the input.</p>
 <ul>
@@ -155,9 +155,10 @@ input[type="text"] {
 </ul>
 <p><strong>"oRide"</strong> - overrides min / max values and controls the number of integers. Helpful when you run into the limits of javaScript math accuracy.</p>
 <ul>
-  <li> example oRide: '6,0' allows positive values only with 6 integers with zero decimal places</li>
-  <li> example oRide: '-8,2' allows positive and negative values with 8 integers and 2 decimal places</li>
-  <li>Note - do not use the 'mDec' option when using &quot;oRide&quot;</li>
+  <li> Ooverrides min / max values and controls the number of integers (positive &amp; negative) and decimal places (optional)</li>
+  <li> example oRide: '6,0' allows 6 digits positive 0 negative</li>
+  <li>Example oRide: '8,6,3' allow 8 positive integers 6 negative digits and three decimal places for both positive and negative</li>
+  <li>2 decimal places is the default - this can being  changed as stated in the oRide option or mDec option</li>
 </ul>
 <p><strong>"pNeg"</strong> - positions the minus sign &quot;-&quot; to the left or the right of the currency sign.</p>
 <ul>

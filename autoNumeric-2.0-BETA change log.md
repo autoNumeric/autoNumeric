@@ -1,5 +1,10 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2015-03-08
++ Modified the 'set', 'getString' & 'getArray' methods
++ Modified the 'nBracket' function
++ General code clean up
+
 ### 2015-02-17 GMT 7:30 PM
 + Modified the oRide option
 + Fixed the "update" method when it is called during the "onfocus" event

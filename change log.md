@@ -1,5 +1,10 @@
 ### Change log:
 
+### Version 1.9.34
++ Modified the 'set', 'getString' & 'getArray' methods
++ Modified the 'nBracket' function
++ General code clean up
+
 ### Version 1.9.33
 + Fixed bug in "ctrl + v" paste event introduced in 1.9.32 
 

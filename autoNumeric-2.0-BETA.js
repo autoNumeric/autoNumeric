@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @contributor: Sokolov Yura
- * @version: 2.0-beta - 2015-03-8 GMT 8:00 PM
+ * @version: 2.0-beta - 2015-03-18 GMT 2:00 PM
  *
  * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  *
@@ -100,7 +100,6 @@
             settings[key] *= 1;
         }
     }
-
     /**
      * Preparing user defined options for further usage
      * merge them with defaults appropriately
@@ -151,7 +150,6 @@
         settings.skipFirstAutoStrip = new RegExp(aNegReg + '[^-' + (settings.aNeg ? '\\' + settings.aNeg : '') + '\\' + settings.aDec + '\\d]' + '.*?(\\d|\\' + settings.aDec + '\\d)');
         settings.skipLastAutoStrip = new RegExp('(\\d\\' + settings.aDec + '?)[^\\' + settings.aDec + '\\d]\\D*$');
         var allowed = '-' + settings.aNum + '\\' + settings.aDec;
-        // var allowed = settings.aNeg + settings.aNum + '\\' + settings.aDec;
         settings.allowedAutoStrip = new RegExp('[^' + allowed + ']', 'gi');
         settings.numRegAutoStrip = new RegExp(aNegReg + '(?:\\' + settings.aDec + '?(\\d+\\' + settings.aDec + '\\d+)|(\\d*(?:\\' + settings.aDec + '\\d*)?))');
         return settings;
@@ -218,10 +216,10 @@
     /**
      * function to handle numbers less than 0 that are stored in Exponential notation ex: .0000001 stored as 1e-7
      */
-    function checkValue(value, settings) {
+    function checkSmall(value, settings) {
         if (value) {
-            var checkSmall = +value;
-            if (checkSmall < 0.000001 && checkSmall > -1) {
+            var checkValue = +value;
+            if (checkValue < 0.000001 && checkValue > -1) {
                 value = +value;
                 if (value < 0.000001 && value > 0) {
                     value = (value + 10).toString();
@@ -245,6 +243,25 @@
             }
         }
         return (settings.lZero === 'keep') ? value : value.replace(/^0*(\d)/, '$1');
+    }
+
+    /**
+     * convert locale format to javaSript numeric string
+     * allows locale decimal separator to be a period or comma - no thousand separator allowed of currency signs allowed
+     * '1234.56'    OK
+     * '-1234.56'   OK
+     * '1234.56-'   OK
+     * '1234,56'    OK
+     * '-1234,56'   OK
+     * '1234,56-'   OK
+     */
+    function convertLocale(s) {
+        s = s.replace(',', '.');
+        if (s.lastIndexOf('-') !== -1 && s.lastIndexOf('-') === s.length - 1) {
+            s = s.replace('-', '');
+            s = '-' + s;
+        }
+        return s;
     }
 
     /**
@@ -298,7 +315,7 @@
     function autoGroup(iv, settings) {
         iv = autoStrip(iv, settings);
         var empty = checkEmpty(iv, settings, true),
-            isNeg = settings.rawValue < 0;
+            isNeg = iv < 0;
         if (isNeg) {
             iv = iv.replace('-', '');
         }
@@ -352,7 +369,7 @@
                 iv = iv + settings.aSign + settings.aNeg;
             }
             if (isNeg && settings.pNeg === 'left') {
-                iv = iv + settings.aSign + iv;
+                iv = iv + settings.aNeg + settings.aSign;
             }
             if (isNeg && settings.pNeg === 'prefix') {
                 iv = settings.aNeg + iv + settings.aSign;
@@ -645,7 +662,7 @@
                     settingsClone.rawValue = '';
                 } else {
                     if (+test_value < 0.000001 && +test_value > -1) {
-                        test_value = checkValue(test_value, settingsClone);
+                        test_value = checkSmall(test_value, settingsClone).toString();
                     } else {
                         test_value = test_value.toString();
                     }
@@ -1092,35 +1109,32 @@
                 }
                 /** routine to format default value on page load */
                 if (settings.runOnce === false && settings.aForm) {
+                    var setValue = true;
                     if ($input) {
-                        var setValue = true;
                         /** routine to handle page re-load from back button & saves the raw value to settings.rawValue */
                         if ($this.val() !== '' && $this.val() !== $this.attr('value')) {
                             if (settings.eDec !== null && settings.aStor) {
-                                if (autoSave($this, settings, 'get') !== null) {
-                                    $this.autoNumeric('set', autoSave($this, settings, 'get'));
-                                }
+                                settings.rawValue = autoSave($this, settings, 'get');
                             }
-                            if ((settings.eDec !== null && settings.aStor === false) || autoSave($this, settings, 'get') === null) {
-                                $this.autoNumeric('set', autoStrip($this.val(), settings).replace(',', '.'));
+                            if (!settings.aStor) {
+                                settings.rawValue = autoStrip($this.val(), settings);
                             }
                             setValue = false;
                         }
                         if ($this.val() === '' && settings.wEmpty === 'empty') {
-                            $this.val('');
                             setValue = false;
                         }
                         if ($this.val() === '' && settings.wEmpty === 'sign') {
                             $this.val(settings.aSign);
                             setValue = false;
                         }
-                        if (setValue) {
+                        if (setValue && $this.val() !== '' && $this.val() === $this.attr('value')) {
                             $this.autoNumeric('set', $this.val());
                         }
                     }
-                }
-                if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1 && $this.text() !== '') {
-                    $this.autoNumeric('set', $this.text());
+                    if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1 && $this.text() !== '') {
+                        $this.autoNumeric('set', $this.text());
+                    }
                 }
                 settings.runOnce = true;
                 if ($input) { /**input types supported "text", "hidden" and no type*/
@@ -1150,6 +1164,9 @@
                         return true;
                     });
                     $this.on('keypress.autoNumeric', function (e) {
+                        if (e.keyCode === 45) {
+                            return;
+                        }
                         holder = getHolder($this);
                         var processed = holder.processed;
                         holder.init(e);
@@ -1348,25 +1365,17 @@
                 var $this = autoGet($(this)),
                     settings = $this.data('autoNumeric'),
                     value = valueIn.toString(),
-                    testValue = valueIn.toString(),
                     $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
                 if (typeof settings !== 'object') {
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'set' method");
                 }
-                /** allows locale decimal separator to be a comma */
-                if ((testValue === $this.attr('value') || testValue === $this.text()) && settings.runOnce === false) {
-                    value = value.replace(',', '.');
-                    if (testValue.charAt(testValue.length - 1) === '-' && settings.pNeg === 'end') {
-                        value = value.replace('-', '');
-                        value = '-' + value;
-                    }
-                }
+                /** allows locale decimal separator to be a comma - no thousand separator allowed */
+                value = convertLocale(value);
                 /** Throws an error if the value being set is not numeric */
                 if (!$.isNumeric(+value)) {
                     $.error("The value (" + value + ") being 'set' is not numeric and has caused a error to be thrown");
                 }
-                value = checkValue(value, settings);
-                value.toString();
+                value = checkSmall(value, settings).toString();
                 if (value !== '') {
                     if ($input && settings.eDec !== null) {
                         settings.rawValue = value;
@@ -1382,12 +1391,10 @@
                         value = presentNumber(value, settings.aDec, settings.aNeg);
                         value = autoGroup(value, settings);
                     } else {
-                        if (settings.devMode) {
-                            $.error("The value (" + value + ") being set falls outside the min ( " + settings.vMin + " ) max ( " + settings.vMax + " ) settings for this element");
-                        }
                         settings.rawValue = '';
                         autoSave($this, settings, 'wipe');
                         value = '';
+                        $.error("The value (" + value + ") being set falls outside the min ( " + settings.vMin + " ) max ( " + settings.vMax + " ) settings for this element");
                     }
                 }
                 if ($input) {
@@ -1471,7 +1478,7 @@
             if (+getValue === 0 && settings.lZero !== 'keep') {
                 getValue = '0';
             }
-            getValue = checkValue(getValue, settings);
+            getValue = checkSmall(getValue, settings).toString();
             if (outPut === 'asKomma') {
                 getValue = getValue.replace('.', ',');
             }
@@ -1665,7 +1672,7 @@
         /** Set to true to allow the eDec value to be saved with sessionStorage
          * if ie 6 or 7 the value will be saved as a session cookie
          */
-        aStor: true,
+        aStor: false,
         /** method used for rounding
          * mRound: 'S', Round-Half-Up Symmetric (default)
          * mRound: 'A', Round-Half-Up Asymmetric
@@ -1700,7 +1707,7 @@
         /** controls leading zero behavior
          * lZero: 'allow', - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
          * lZero: 'deny', - allows only one leading zero on values less than one
-         * lZero: 'keep', - allows leading zeros to be entered. on fousout zeros will be retained.
+         * lZero: 'keep', - allows leading zeros to be entered. on focusout zeros will be retained.
          */
         lZero: 'allow',
         /** determine if the default value will be formatted on page ready.

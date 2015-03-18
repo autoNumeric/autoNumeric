@@ -1,5 +1,9 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2015-03-18
++ Modified the 'init' && 'set' methods
++ General code clean up
+
 ### 2015-03-08
 + Modified the 'set', 'getString' & 'getArray' methods
 + Modified the 'nBracket' function

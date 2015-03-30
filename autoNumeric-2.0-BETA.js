@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @contributor: Sokolov Yura
- * @version: 2.0-beta - 2015-03-18 GMT 2:00 PM
+ * @version: 2.0-beta - 2015-03-30 GMT 6:30 PM
  *
  * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  *
@@ -1164,7 +1164,7 @@
                         return true;
                     });
                     $this.on('keypress.autoNumeric', function (e) {
-                        if (e.keyCode === 45) {
+                        if (e.shiftKey && e.keyCode === 45) { /** FF fix for Shift && insert paste event */
                             return;
                         }
                         holder = getHolder($this);

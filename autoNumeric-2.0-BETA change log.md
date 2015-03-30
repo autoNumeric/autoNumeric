@@ -1,6 +1,6 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
-### 2015-03-18
+### 2015-03-30
 + Modified the 'init' && 'set' methods
 + General code clean up
 

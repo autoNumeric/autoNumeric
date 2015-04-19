@@ -1,6 +1,6 @@
 {
   "name": "autoNumeric",
-  "version": "1.9.34",
+  "version": "1.9.35",
   "main": "./autoNumeric.js",
   "keywords": [
     "currency",

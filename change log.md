@@ -1,5 +1,8 @@
 ### Change log:
 
+### Version 1.9.35
++ Revert 'set' back to version 1.9.34
+
 ### Version 1.9.34
 + Modified the 'set', 'getString' & 'getArray' methods
 + Modified the 'nBracket' function

@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
- * @version: 1.9.34 - 2015-03-08 GMT 8:00 PM
+ * @version: 1.9.35 - 2015-04-16 GMT 10:30 AM
  *
  * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  * Created by Sokolov Yura on 2010-11-07
@@ -645,6 +645,7 @@
         checkPaste: function () {
             if (this.valuePartsBeforePaste !== undefined) {
                 var parts = this.getBeforeAfter(),
+
                     oldParts = this.valuePartsBeforePaste;
                 delete this.valuePartsBeforePaste; /** try to strip pasted value first */
                 parts[0] = parts[0].substr(0, oldParts[0].length) + autoStrip(parts[0].substr(oldParts[0].length), this.settingsClone);
@@ -1138,19 +1139,16 @@
                     $.error("The value (" + value + ") being 'set' is not numeric and has caused a error to be thrown");
                 }
                 value = checkValue(value, settings);
+                settings.setEvent = true;
                 value.toString();
                 if (value !== '') {
-                    if (autoCheck(value, settings)) {
-                        value = autoRound(value, settings);
-                        value = presentNumber(value, settings.aDec, settings.aNeg);
-                        value = autoGroup(value, settings);
-                    } else {
-                        if (settings.devMode) {
-                            $.error("The value (" + value + ") being set falls outside the min ( " + settings.vMin + " ) max ( " + settings.vMax + " ) settings for this element");
-                        }
-                        value = '';
-                    }
+                    value = autoRound(value, settings);
                 }
+                value = presentNumber(value, settings.aDec, settings.aNeg);
+                if (!autoCheck(value, settings)) {
+                    value = autoRound('', settings);
+                }
+                value = autoGroup(value, settings);
                 if ($input) {
                     return $this.val(value);
                 }

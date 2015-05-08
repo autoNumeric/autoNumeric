@@ -327,6 +327,8 @@
             digitalGroup = /(\d)((\d)(\d{2}?)+)$/;
         } else if (settings.dGroup === '2s') {
             digitalGroup = /(\d)((?:\d{2}){0,2}\d{3}(?:(?:\d{2}){2}\d{3})*?)$/;
+        } else if (settings.dGroup === '2d') {
+            digitalGroup = /(\d{2})((\d{1,2})+)/;
         } else if (settings.dGroup === 4) {
             digitalGroup = /(\d)((\d{4}?)+)$/;
         } else {

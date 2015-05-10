@@ -660,7 +660,7 @@
         * check maxlength from field
         */
         checkMaxLength: function (e) {
-            var cCode = String.fromCharCode(this.which);
+
             var m_length  = this.that.maxLength;
             if(m_length <= 0) return false;
 
@@ -677,17 +677,11 @@
 
             var re = $settings.aDec;
             if(myValue.match(re)){
-              if( myValue.length >= (m_length + $settings.mDec)) {
+              if( myValue.length >= m_length ) {
                 return true;
               }
             } else {
-              if (cCode === $settings.aDec ||
-                 ($settings.altDec && cCode === $settings.altDec) ||
-                 ((cCode === '.' || cCode === ','))) {
-                      return false;
-              }
-
-              if( myValue.length >= maxLength) {
+              if( myValue.length >= maxLength ) {
                 return true;
               }
             }

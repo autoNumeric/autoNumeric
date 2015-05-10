@@ -1,4 +1,4 @@
-/**
+﻿/**
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
@@ -657,38 +657,6 @@
         },
 
         /**
-        * check maxlength from field
-        */
-        checkMaxLength: function (e) {
-
-            var m_length  = this.that.maxLength;
-            if(m_length <= 0) return false;
-
-            var start     = e.target.selectionStart;
-            var end       = e.target.selectionEnd;
-            var myValue = this.that.value;
-
-            if(start==0 && end == (myValue.length)){
-              return false;
-
-            }
-            var $settings = this.settingsClone;
-            var maxLength = (m_length - $settings.mDec);
-
-            var re = $settings.aDec;
-            if(myValue.match(re)){
-              if( myValue.length >= m_length ) {
-                return true;
-              }
-            } else {
-              if( myValue.length >= maxLength ) {
-                return true;
-              }
-            }
-
-        },
-
-        /**
          * process pasting, cursor moving and skipping of not interesting keys
          * if returns true, further processing is not performed
          */
@@ -1021,16 +989,11 @@
                             e.preventDefault();
                             return false;
                         }
-                        if(holder.checkMaxLength(e)) {
-                          e.preventDefault();
-                          return false;
-                        }
                         if (holder.processAllways() || holder.processKeypress()) {
                             holder.formatQuick();
                             e.preventDefault();
                             return false;
                         }
-
                         holder.formatted = false;
                     });
                     $this.on('keyup.autoNumeric', function (e) {

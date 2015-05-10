@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
- * @version: 1.9.35 - 2015-04-16 GMT 10:30 AM
+ * @version: 1.9.36 - 2015-05-10 GMT 8:00 PM / 20:00
  *
  * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  * Created by Sokolov Yura on 2010-11-07
@@ -672,6 +672,7 @@
             }
             /** codes are taken from http://www.cambiaresearch.com/c4/702b8cd1-e5b0-42e6-83ac-25f0306e3e25/Javascript-Char-Codes-Key-Codes.aspx
              * skip Fx keys, windows keys, other special keys
+             * Thanks Ney Estrabelli for the FF for Mac meta key support "keycode 224"
              */
             if ((kdCode >= 112 && kdCode <= 123) || (kdCode >= 91 && kdCode <= 93) || (kdCode >= 9 && kdCode <= 31) || (kdCode < 8 && (which === 0 || which === kdCode)) || kdCode === 144 || kdCode === 145 || kdCode === 45 || kdCode === 224) {
                 return true;
@@ -1211,23 +1212,52 @@
         getString: function () {
             var isAutoNumeric = false,
                 $this = autoGet($(this)),
-                str = $this.serialize(),
-                parts = str.split('&'),
+                formFields = $this.serialize(),
+                formParts = formFields.split('&'),
                 formIndex = $('form').index($this),
-                inputIndex = [];
+                allFormElements = $('form:eq(' + formIndex + ')'),
+                aiIndex = [], /* all input index */
+                scIndex = [], /* successful control index */
+                rsubmitterTypes = /^(?:submit|button|image|reset|file)$/i, /* from jQuery serialize method */
+                rsubmittable = /^(?:input|select|textarea|keygen)/i, /* from jQuery serialize method */
+                rcheckableType = /^(?:checkbox|radio)$/i,
+                rnonAutoNumericTypes = /^(?:button|checkbox|color|date|datetime|datetime-local|email|file|image|month|number|password|radio|range|reset|search|submit|time|url|week)/i,
+                count = 0;
             /*jslint unparam: true*/
-            $.each(parts, function (i, miniParts) {
-                miniParts = parts[i].split('=');
-                var $field = $('form:eq(' + formIndex + ') input:eq(' + i + ')'),
-                    settings = $field.data('autoNumeric');
-                if ($field.length > 1) {
-                    $field = $field.eq(inputIndex[i]);
+            /* index of successful elements */
+            $.each(allFormElements[0], function (i, field) {
+                if (field.name !== '' && rsubmittable.test(field.localName) && !rsubmitterTypes.test(field.type) && !field.disabled && (field.checked || !rcheckableType.test(field.type))) {
+                    scIndex.push(count);
+                    count = count + 1;
+                } else {
+                    scIndex.push(-1);
                 }
-                if (typeof settings === 'object' && settings !== '') {
-                    if (miniParts[1] !== null) {
-                        miniParts[1] = $field.autoNumeric('get');
-                        parts[i] = miniParts.join('=');
-                        isAutoNumeric = true;
+            });
+            /* index of all inputs tags except checkbox */
+            count = 0;
+            $.each(allFormElements[0], function (i, field) {
+                if (field.localName === 'input' && (field.type === '' || field.type === 'text' || field.type === 'hidden' || field.type === 'tel')) {
+                    aiIndex.push(count);
+                    count = count + 1;
+                } else {
+                    aiIndex.push(-1);
+                    if (field.localName === 'input' && rnonAutoNumericTypes.test(field.type)) {
+                        count = count + 1;
+                    }
+                }
+            });
+            $.each(formParts, function (i, miniParts) {
+                miniParts = formParts[i].split('=');
+                var scElement = $.inArray(i, scIndex);
+                if (scElement > -1 && aiIndex[scElement] > -1) {
+                    var testInput = $('form:eq(' + formIndex + ') input:eq(' + aiIndex[scElement] + ')'),
+                        settings = testInput.data('autoNumeric');
+                    if (typeof settings === 'object') {
+                        if (miniParts[1] !== null) {
+                            miniParts[1] = $('form:eq(' + formIndex + ') input:eq(' + aiIndex[scElement] + ')').autoNumeric('get').toString();
+                            formParts[i] = miniParts.join('=');
+                            isAutoNumeric = true;
+                        }
                     }
                 }
             });
@@ -1235,7 +1265,7 @@
             if (!isAutoNumeric) {
                 $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'getString' method");
             }
-            return parts.join('&');
+            return formParts.join('&');
         },
 
         /**
@@ -1249,24 +1279,51 @@
                 $this = autoGet($(this)),
                 formFields = $this.serializeArray(),
                 formIndex = $('form').index($this),
-                inputIndex = [];
+                allFormElements = $('form:eq(' + formIndex + ')'),
+                aiIndex = [], /* all input index */
+                scIndex = [], /* successful control index */
+                rsubmitterTypes = /^(?:submit|button|image|reset|file)$/i, /* from jQuery serialize method */
+                rsubmittable = /^(?:input|select|textarea|keygen)/i, /* from jQuery serialize method */
+                rcheckableType = /^(?:checkbox|radio)$/i,
+                rnonAutoNumericTypes = /^(?:button|checkbox|color|date|datetime|datetime-local|email|file|image|month|number|password|radio|range|reset|search|submit|time|url|week)/i,
+                count = 0;
             /*jslint unparam: true*/
-            $.each(formFields, function (i, field) {
-                var $field = $('form:eq(' + formIndex + ') input:eq(' + i + ')'),
-                    settings = $field.data('autoNumeric');
-                if ($field.length > 1) {
-                    $field = $field.eq(inputIndex[i]);
+            /* index of successful elements */
+            $.each(allFormElements[0], function (i, field) {
+                if (field.name !== '' && rsubmittable.test(field.localName) && !rsubmitterTypes.test(field.type) && !field.disabled && (field.checked || !rcheckableType.test(field.type))) {
+                    scIndex.push(count);
+                    count = count + 1;
+                } else {
+                    scIndex.push(-1);
                 }
-                if (typeof settings === 'object') {
-                    if (field.value !== '') {
-                        field.value = $field.autoNumeric('get').toString();
+            });
+            /* index of all inputs tags */
+            count = 0;
+            $.each(allFormElements[0], function (i, field) {
+                if (field.localName === 'input' && (field.type === '' || field.type === 'text' || field.type === 'hidden' || field.type === 'tel')) {
+                    aiIndex.push(count);
+                    count = count + 1;
+                } else {
+                    aiIndex.push(-1);
+                    if (field.localName === 'input' && rnonAutoNumericTypes.test(field.type)) {
+                        count = count + 1;
                     }
-                    isAutoNumeric = true;
+                }
+            });
+            $.each(formFields, function (i, field) {
+                var scElement = $.inArray(i, scIndex);
+                if (scElement > -1 && aiIndex[scElement] > -1) {
+                    var testInput = $('form:eq(' + formIndex + ') input:eq(' + aiIndex[scElement] + ')'),
+                        settings = testInput.data('autoNumeric');
+                    if (typeof settings === 'object') {
+                        field.value = $('form:eq(' + formIndex + ') input:eq(' + aiIndex[scElement] + ')').autoNumeric('get').toString();
+                        isAutoNumeric = true;
+                    }
                 }
             });
             /*jslint unparam: false*/
             if (!isAutoNumeric) {
-                $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'getArray' method");
+                $.error("None of the successful form inputs are initialized by autoNumeric.");
             }
             return formFields;
         },

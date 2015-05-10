@@ -1,5 +1,9 @@
 ### Change log:
 
+### Version 1.9.36
++ Rewrote the "getString" & "getArray" methods to index successful elements and inputs that are controlled by autoNumeric. This ensures the proper input index is used when replacing the formatted value.
++ Added support for FireFox for Mac meta key "keycode 224" - Thanks Ney Estrabelli
+
 ### Version 1.9.35
 + Revert 'set' back to version 1.9.34
 
@@ -9,12 +13,12 @@
 + General code clean up
 
 ### Version 1.9.33
-+ Fixed bug in "ctrl + v" paste event introduced in 1.9.32 
++ Fixed bug in "ctrl + v" paste event introduced in 1.9.32
 
 ### Version 1.9.32
 + Fixed bug when the "update" method is called in the "onfocus" event
 + Fixed the "getString" & "getArray" methods when multiple inputs share the same name - Thanks Retromax
-+ Fixed bug in "ctrl + v" paste event to properly round 
++ Fixed bug in "ctrl + v" paste event to properly round
 
 ### Version 1.9.31
 + never officially release
@@ -53,7 +57,7 @@
 
 #### Version 1.9.21
 + Mod to checkValue function to handle empty string - thanks to jedichenbin.
-+ If CHF rounding is used decimal is automatically set to 2 places  
++ If CHF rounding is used decimal is automatically set to 2 places
 
 #### Version 1.9.20
 + Fixed issue for very small numbers - thanks to jedichenbin.
@@ -78,7 +82,7 @@
 
 #### Version 1.9.14
 + Added additional supported tags ('b', 'caption', 'cite', 'code', 'dd', 'del', 'div', 'dfn', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ins', 'kdb', 'label', 'li', 'output', 'p', 'q', 's', 'sample', 'span', 'strong', 'td', 'th', 'u', 'var')
-+ Moved the routine that tests for supported tags 
++ Moved the routine that tests for supported tags
 + General code clean-up
 
 #### Version 1.9.13
@@ -96,7 +100,7 @@
 #### Version 1.9.9
 + Fixed how non-input tags default value is handled.  When the default is an empty string and aSign is not empty the return value is now and empty string.
 + Modified how default values are handled when the decimal character equals ',' comma. Your default value can now use either a a period '.' or comma ',' as the decimal separator
-+ Modified the caret placement on focusin (tab in). If only the currency sign is visible the caret is placed in the proper location depending on the sign placement (prefix or suffix).  
++ Modified the caret placement on focusin (tab in). If only the currency sign is visible the caret is placed in the proper location depending on the sign placement (prefix or suffix).
 
 #### Version 1.9.8
 + Changed bind / unbind to on / off.
@@ -149,17 +153,17 @@
 
 #### Version 1.8.7
 
-+ Fixed the "getSting" method - it use to returned an error when no values were entered 
++ Fixed the "getSting" method - it use to returned an error when no values were entered
 + Modified the "init" method to better handle default and pre-existing values
 + Modified the "set" method - removed the routine that checked for values less than .000001 and greater than -1 and placed it in a separate function named checkValue()
 + Modified the "get" method:
-	+ Added a call to the checkValue() function - this corrects returned values example - when the input value was "12." the returned value was "12." - it now returns "12" 
-	+ When no numeric character is entered the returned value is an empty string "". 
+    + Added a call to the checkValue() function - this corrects returned values example - when the input value was "12." the returned value was "12." - it now returns "12"
+    + When no numeric character is entered the returned value is an empty string "".
 
 #### Version 1.8.6
 
 + Removed the error message when calling the 'init' methods multiple times. This was done when using the class selector for the 'init' method and then dynamically adding input(s) it allows you to use the same selector to init autoNumeric. **Please note:** if the input is already been initialized no changes to the option will occur you still need to use the update method to change exisiting options.
-+ Added support for brackets '[,]', parentheses '(,)', braces '{,}' and '<,>' to the nBracket setting. **Please note:** the following format nBracket: '(,)' that the left and right symbol used to represent negative numbers must be enclosed in quote marks and separated by a comma to function properly. 
++ Added support for brackets '[,]', parentheses '(,)', braces '{,}' and '<,>' to the nBracket setting. **Please note:** the following format nBracket: '(,)' that the left and right symbol used to represent negative numbers must be enclosed in quote marks and separated by a comma to function properly.
 
 #### Version 1.8.5
 
@@ -194,11 +198,11 @@
 
 + autoNumeric() 1.8.0 is not compatible with earlier versions but I believe you will find version 1.8.0's new functionality and ease of use worth the effort to convert.
 
-+ Changed autoNumeric structure to conform to jQuery's recommended plugin development. 
++ Changed autoNumeric structure to conform to jQuery's recommended plugin development.
 
 + Created a single namespace and added multiple methods.
 
-+ Added HTML 5 data support and eliminated the metadata plugin dependency. 
++ Added HTML 5 data support and eliminated the metadata plugin dependency.
 
 + Added support for the following elements: 'DD', 'DT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'input', 'LABEL', 'P', 'SPAN', 'TD', 'TH'.
 

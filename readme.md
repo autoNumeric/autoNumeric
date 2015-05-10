@@ -1,4 +1,6 @@
-[autoNumeric-1.9.35](http://www.decorplanit.com/plugin/)
+[autoNumeric-1.9.36](http://www.decorplanit.com/plugin/)
+
+Last update: 2015-05-10 GMT 8:00 PM / 20:00
 ================================
 ### International currency formatting made easy
 

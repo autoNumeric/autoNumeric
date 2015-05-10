@@ -1,4 +1,4 @@
-﻿/**
+/**
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
@@ -657,6 +657,44 @@
         },
 
         /**
+        * check maxlength from field
+        */
+        checkMaxLength: function (e) {
+            var cCode = String.fromCharCode(this.which);
+            var m_length  = this.that.maxLength;
+            if(m_length <= 0) return false;
+
+            var start     = e.target.selectionStart;
+            var end       = e.target.selectionEnd;
+            var myValue = this.that.value;
+
+            if(start==0 && end == (myValue.length)){
+              return false;
+
+            }
+            var $settings = this.settingsClone;
+            var maxLength = (m_length - $settings.mDec);
+
+            var re = $settings.aDec;
+            if(myValue.match(re)){
+              if( myValue.length >= (m_length + $settings.mDec)) {
+                return true;
+              }
+            } else {
+              if (cCode === $settings.aDec ||
+                 ($settings.altDec && cCode === $settings.altDec) ||
+                 ((cCode === '.' || cCode === ','))) {
+                      return false;
+              }
+
+              if( myValue.length >= maxLength) {
+                return true;
+              }
+            }
+
+        },
+
+        /**
          * process pasting, cursor moving and skipping of not interesting keys
          * if returns true, further processing is not performed
          */
@@ -673,7 +711,7 @@
             /** codes are taken from http://www.cambiaresearch.com/c4/702b8cd1-e5b0-42e6-83ac-25f0306e3e25/Javascript-Char-Codes-Key-Codes.aspx
              * skip Fx keys, windows keys, other special keys
              */
-            if ((kdCode >= 112 && kdCode <= 123) || (kdCode >= 91 && kdCode <= 93) || (kdCode >= 9 && kdCode <= 31) || (kdCode < 8 && (which === 0 || which === kdCode)) || kdCode === 144 || kdCode === 145 || kdCode === 45) {
+            if ((kdCode >= 112 && kdCode <= 123) || (kdCode >= 91 && kdCode <= 93) || (kdCode >= 9 && kdCode <= 31) || (kdCode < 8 && (which === 0 || which === kdCode)) || kdCode === 144 || kdCode === 145 || kdCode === 45 || kdCode === 224) {
                 return true;
             }
             if ((ctrlKey || cmdKey) && kdCode === 65) { /** if select all (a=65)*/
@@ -989,11 +1027,16 @@
                             e.preventDefault();
                             return false;
                         }
+                        if(holder.checkMaxLength(e)) {
+                          e.preventDefault();
+                          return false;
+                        }
                         if (holder.processAllways() || holder.processKeypress()) {
                             holder.formatQuick();
                             e.preventDefault();
                             return false;
                         }
+
                         holder.formatted = false;
                     });
                     $this.on('keyup.autoNumeric', function (e) {

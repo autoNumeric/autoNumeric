@@ -1,4 +1,4 @@
-[autoNumeric-1.9.36](http://www.decorplanit.com/plugin/)
+[autoNumeric-1.9.37](http://www.decorplanit.com/plugin/)
 ================================
 ### International currency formatting made easy
 
@@ -15,6 +15,8 @@ There are fifteen settings/options which controls the behavior and format of the
 The settings can also be modified via callback function allows the returned value to be taken as parameter to the default/options settings. You can pass the callback function via options or HTML5 data and can be used on any of the 15 options.
 
 If you are developing sites that span across International lines that use different currency symbols and formats you will find autoNumeric the ideal tool to shorten your development time.
+
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NCW5699RY8NN2)
 
 ****
 

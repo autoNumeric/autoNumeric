@@ -2,10 +2,10 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
- * @version: 1.9.36 - 2015-05-10 GMT 8:00 PM / 20:00
+ * @version: 1.9.37 - 2015-05-24 GMT 7:00 PM / 19:00
  *
  * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
- * Created by Sokolov Yura on 2010-11-07
+ * Contributor by Sokolov Yura on 2010-11-07
  *
  * Copyright (c) 2011 Robert J. Knothe http://www.decorplanit.com/plugin/
  *
@@ -941,7 +941,12 @@
                             $this[0].value = settings.aSign;
                             setValue = false;
                         }
-                        if (setValue && $this[0].value === $this.prop('defaultValue')) {
+                         /** checks for page reload from back button
+                          * also checks for ASP.net form post back
+                          * the following HTML data attribute is REQUIRED (data-an-default="same value as the value attribute")
+                          * example: <asp:TextBox runat="server" id="someID" value="1234.56" data-an-default="1234.56">
+                          */
+                        if (setValue && $this.val() !== '' && ((settings.anDefault === undefined && $this[0].value === $this.prop('defaultValue')) || (settings.anDefault !== undefined && settings.anDefault.toString() === $this.val()))) {
                             $this.autoNumeric('set', $this.val());
                         }
                     }
@@ -1126,11 +1131,6 @@
                     $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
                 if (typeof settings !== 'object') {
                     $.error("You must initialize autoNumeric('init', {options}) prior to calling the 'set' method");
-                }
-                /** routine to handle page re-load from back button */
-                if (testValue !== $this.attr('value') && $this.prop('tagName').toLowerCase() === 'input' && settings.runOnce === false) {
-                    value = (settings.nBracket !== null) ? negativeBracket($this.val(), settings) : value;
-                    value = autoStrip(value, settings);
                 }
                 /** allows locale decimal separator to be a comma */
                 if ((testValue === $this.attr('value') || testValue === $this.text()) && settings.runOnce === false) {

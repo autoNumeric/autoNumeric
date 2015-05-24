@@ -6,7 +6,7 @@
 + Because autoNumeric cannot distinguish between a page re-load and asp.net form postback, the following HTML data attribute is REQUIRED (data-an-default="same value as the value attribute") to prevent errors on postback
 + Example: 
 '''HTML
-<asp:TextBox runat="server" id="someID" value="1234.56" data-an-default="1234.56">
+<input id="someID" value="1234.56" data-an-default="1234.56">
 '''
 
 ### Version 1.9.36

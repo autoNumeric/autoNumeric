@@ -1,7 +1,7 @@
 {
-  "name": "autoNumeric",
-  "version": "1.9.37",
-  "main": "./autoNumeric.js",
+  "name": "autonumeric",
+  "version": "1.9.38",
+  "main": "./autonumeric.js",
   "keywords": [
     "currency",
     "money",
@@ -18,8 +18,21 @@
   ],
   "description": "autoNumeric is a jQuery plugin that automatically formats currency (money) and numbers as you type on form inputs. It supports most International numeric formats and currency signs including those used in Europe, North and South America, Asia and India (lakhs**).",
   "license": "MIT",
-  "authors": [{
-    "name": "Robert Knothe"
-  }],
-  "homepage": "http://www.decorplanit.com/plugin/"
+  "authors": [
+    {
+      "name": "Robert Knothe"
+    }
+  ],
+  "homepage": "http://www.decorplanit.com/plugin/",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BobKnothe/autoNumeric.git"
+  },
+  "author": "Robert Knothe",
+  "bugs": {
+    "url": "https://github.com/BobKnothe/autoNumeric/issues"
+  }
 }

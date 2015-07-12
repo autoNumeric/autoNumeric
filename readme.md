@@ -1,4 +1,4 @@
-[autoNumeric-1.9.37](http://www.decorplanit.com/plugin/)
+[autoNumeric-1.9.38](http://www.decorplanit.com/plugin/)
 ================================
 ### International currency formatting made easy
 
@@ -158,6 +158,13 @@ The following is a list of the methods and settings/options the control autoNume
 +	aForm: true	default values are formatted on page ready (default)
 +	aForm: false	default values are NOT formatted on page ready
 
+**"anDefault"** - helper option for ASP.NET postback
+
++ 	should be the value of the unformatted default value
++	this can be set as an option or HTML5 data
++	examples:
++	no default value='' {anDefault: ''}
++	value=1234.56 {anDefault: '1234.56'}
 ****
 
 **Changing the defaults via options**

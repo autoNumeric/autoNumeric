@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
- * @version: 1.9.37 - 2015-05-24 GMT 7:00 PM / 19:00
+ * @version: 1.9.38 - 2015-07-12 GMT 7:00 PM / 19:00
  *
  * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  * Contributor by Sokolov Yura on 2010-11-07
@@ -946,7 +946,7 @@
                           * the following HTML data attribute is REQUIRED (data-an-default="same value as the value attribute")
                           * example: <asp:TextBox runat="server" id="someID" value="1234.56" data-an-default="1234.56">
                           */
-                        if (setValue && $this.val() !== '' && ((settings.anDefault === undefined && $this[0].value === $this.prop('defaultValue')) || (settings.anDefault !== undefined && settings.anDefault.toString() === $this.val()))) {
+                        if (setValue && $this.val() !== '' && ((settings.anDefault === null && $this[0].value === $this.prop('defaultValue')) || (settings.anDefault !== null && settings.anDefault.toString() === $this.val()))) {
                             $this.autoNumeric('set', $this.val());
                         }
                     }
@@ -1444,10 +1444,17 @@
          * lZero: 'keep', - allows leading zeros to be entered. on fousout zeros will be retained.
          */
         lZero: 'allow',
-        /** determine if the default value will be formatted on page ready.
-         * true = automatically formats the default value on page ready
-         * false = will not format the default value
+        /** determine if the select all keyboard command will select
+         * the complete input text or only the input numeric value
+         * if the currency symbol is between the numeric value and the negative sign only the numeric value will sellected
          */
-        aForm: true
+        sNumber: true,
+        /** helper option for ASP.NET postback
+         * should be the value of the unformatted default value
+         * examples:
+         * no default value='' {anDefault: ''}
+         * value=1234.56 {anDefault: '1234.56'}
+         */
+        anDefault: null
     };
 }(jQuery));

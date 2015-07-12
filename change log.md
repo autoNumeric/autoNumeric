@@ -1,5 +1,9 @@
 ### Change log:
 
+### Version 1.9.38
++ Added / fixed option to address asp.Net WebForm postback.
++ please see the readme section on default settings & options 
+
 ### Version 1.9.37
 + Added / fixed support for asp.Net WebForm postback.
 + During postback the default value is re-rendered showing the updated value

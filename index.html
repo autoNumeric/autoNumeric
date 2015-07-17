@@ -35,7 +35,7 @@ input[type="text"] {
     <p>Web site: <a href="http://www.decorplanit.com/plugin/">http://www.decorplanit.com/plugin/</a> complete with detailed examples and option/html 5 data code generator/</p>
     <p>github: <a href="https://github.com/BobKnothe/autoNumeric">https://github.com/BobKnothe/autoNumeric</a></p>
     <p>jQuery: <a href="http://plugins.jquery.com/autoNumeric/">http://plugins.jquery.com/autoNumeric/</a></p>
-<p><strong>autoNumeric 1.9.38 </strong>is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. It supports most International numeric formats and currency signs including those used in Europe, North and South America, Asia and India (lakhs**).</p>
+<p><strong>autoNumeric 1.9.39 </strong>is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. It supports most International numeric formats and currency signs including those used in Europe, North and South America, Asia and India (lakhs**).</p>
     <p>Any number of currency formats can reside on the same page and are configured by options that can be placed as HTML5 data attribute or passed as an argument. These settings can easily be changed at any time using the new &lsquo;update&rsquo; method or via the callback feature. </p>
     <p>Seven built in methods and fifteen options gives you the flexibility needed to use autoNumeric to its maximum potential (details below).</p>
     <p><strong>Examples of autoNumeric's flexibility:</strong></p>
@@ -163,8 +163,8 @@ input[type="text"] {
     </ul>
     <p><strong>asp.Net WebForm requirements (new in version 1.9.37):</strong></p>
     <ul>
-      <li>During postback the default value is re-rendered showing the updated value, because autoNumeric cannot distinguish between a page re-load and asp.net form postback so the following HTML5 data attribute is NEEDED (data-an-default=&quot;same value as the value attribute&quot;) to prevent errors on postback.</li>
-      <li>Example: &lt;asp:TextBox runat=&quot;server&quot; id=&quot;someID&quot; value=&quot;1234.56&quot; data-an-default=&quot;1234.56&quot;&gt;</li>
+      <li>During postback the default value is re-rendered showing the updated value, because autoNumeric cannot distinguish between a page re-load and asp.net form postback so the following option or HTML5 data attribute is NEEDED (data-an-default=&quot;same value as the value attribute&quot;) to prevent errors on postback.</li>
+      <li>Example: if the value=&quot;1234.56&quot; then anDefault option should be {anDefault&quot;1234.56} or HTML5 data-an-default=&quot;1234.56&quot; </li>
     </ul>
 <p><strong>Callback function:</strong></p>
     <ul>

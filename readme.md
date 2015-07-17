@@ -22,7 +22,7 @@ Below is a quick tutorial - for demo's documentation and option code generator  
 ###  Getting started:
 
 
-Include jQuery and autoNumeric js-files in your header. No other files or libararys are required.
+Include jQuery and autoNumeric js-files in your header. No other files or library are required.
 
 ```html
 <script src="jquery.js" type="text/javascript"></script>
@@ -74,7 +74,7 @@ $(document).ready(function(){
 Passed options as **HTML5 data**
 
 ```html
-<input type='text' name="someName" ' value="1234.56" data-a-sep="." data-a-dec="," data-a-sign="&#8364; "/>
+<input type='text' name="someName" ' value="1234.56" data-a-sep="." data-a-dec="," data-a-sign="€ "/>
 ```
 Pass options via **jQuery's $.extend method** - in this example <span style="color:red;">ASP.NET</span> current culture settings are passed.
 
@@ -116,7 +116,7 @@ Pass options via a **Callback function** - this example changes the number of de
 ****
 ### Values
 
-By default autoNumeric formats the default values on page ready. The values should be sent as text. To accommodate locale formats autoNumeric will treat the first periord "." or comma "," as the decimal point. So the following rules apply:
+By default autoNumeric formats the default values on page ready. The values should be sent as text. To accommodate locale formats autoNumeric will treat the first period "." or comma "," as the decimal point. So the following rules apply:
 
 | value / text  | valid?       |
 | ------------- | ------------ |
@@ -135,29 +135,29 @@ All values being "set" need to fall with the min/max rules.
 If you do not want the default values formatted on set the option from "aForm: true" to "aForm: false" 
 
 ****
-### ASP.NET default value and postback
+### ASP.NET default value and post-back
 
 During page load / re-load autoNumeric compares the value of the input "$this[0].value" and the "$this.prop('defaultValue')" value. If they are equal and "aForm: true" the value is formatted.
 
-What happens during ASP.NET form postback is the input tag is re-rendered. An example Page loaded 
+What happens during ASP.NET form post-back is the input tag is re-rendered. An example Page loaded 
 
 ```html
 <input type='text' name="someName"  id="someID" class='someClass' value="" />
 
 // user enters "1234.56" => "1,234.56" with default settings
-// during postback the input is re-rendered and is now showing the new default value. 
+// during post-back the input is re-rendered and is now showing the new default value. 
 
 <input type='text' name="someName"  id="someID" class='someClass' value="1,234.56" />
 ```
 
-Once the page is reloaded on postback and autoNumeric compares $this[0].value" and the "$this.prop('defaultValue')" and sees they are equal it attenpts to format the values. From the above valid value table the "1,234.56" would be invalid. Luckily there are multiple ways to address the postback event:
+Once the page is reloaded on post-back and autoNumeric compares $this[0].value" and the "$this.prop('defaultValue')" and sees they are equal it attenpts to format the values. From the above valid value table the "1,234.56" would be invalid. Luckily there are multiple ways to address the post-back event:
 
 **1) Change the "aForm" option to "aForm: false" and then use the 'set" as follows**
 
 ```javascript
 <script type="text/javascript">  
   jQuery(function($) {
-  	$('selector').autoNumeric('int, {aForm: false});    
+  	$('selector').autoNumeric('init'', {aForm: false});    
     $('selector').autoNumeric('set, '1234.56'); // produces "1,234.56"    
   });
 </script>
@@ -173,7 +173,7 @@ Once the page is reloaded on postback and autoNumeric compares $this[0].value" a
 ```javascript
 <script type="text/javascript">  
   jQuery(function($) {
-  	$('selector').autoNumeric('int, {anDefault: "123.45"});       
+  	$('selector').autoNumeric('init', {anDefault: "123.45"});       
   });
 </script>
 ```
@@ -208,7 +208,7 @@ Notes:
 
 ****
 
-The following is a list of the methods and settings/options that control autoNumeric - for demos, documentation and the option code generator please see [http://www.decorplanit.com/plugin/](http://www.decorplanit.com/plugin/)
+The following is a list of the methods and settings/options that control autoNumeric - for demo's, documentation and the option code generator please see [http://www.decorplanit.com/plugin/](http://www.decorplanit.com/plugin/)
 
 ****
 
@@ -349,7 +349,7 @@ The following is a list of the methods and settings/options that control autoNum
 -	aForm: true	default values are formatted on page ready (default)
 -	aForm: false	default values are NOT formatted on page ready
 
-**"anDefault"** - helper option for ASP.NET postback
+**"anDefault"** - helper option for ASP.NET post-back
 
 - 	should be the value of the un-formatted default value
 -	this can be set as an option or HTML5 data

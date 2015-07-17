@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
- * @version: 1.9.38 - 2015-07-12 GMT 7:00 PM / 19:00
+ * @version: 1.9.39 - 2015-07-17 GMT 5:00 PM / 19:00
  *
  * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  * Contributor by Sokolov Yura on 2010-11-07
@@ -1449,6 +1449,11 @@
          * if the currency symbol is between the numeric value and the negative sign only the numeric value will sellected
          */
         sNumber: true,
+        /** determine if the default value will be formatted on page ready.
+         * true = automatically formats the default value on page ready
+         * false = will not format the default value
+         */
+        aForm: true,
         /** helper option for ASP.NET postback
          * should be the value of the unformatted default value
          * examples:

@@ -1,5 +1,9 @@
 ### Change log:
 
+### Version 1.9.39
++ Fixed 'aForm'option.
++ Updated the readme file
+
 ### Version 1.9.38
 + Added / fixed option to address asp.Net WebForm postback.
 + please see the readme section on default settings & options 

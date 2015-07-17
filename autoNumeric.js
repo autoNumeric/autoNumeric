@@ -1065,8 +1065,8 @@
                             groupedValue = autoGroup(value, $settings);
                         }
                         if (groupedValue !== holder.inVal || groupedValue !== origValue) {
-                            $this.change();
                             $this.val(groupedValue);
+                            $this.change();
                             delete holder.inVal;
                         }
                     });

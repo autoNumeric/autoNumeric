@@ -3,7 +3,7 @@
 Copyright (c) 2010 - 2015 Robert Knothe Licensed under the [MIT-license](http://opensource.org/licenses/mit-license.php)
 
 
-[![npm](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com/package/autonumeric)
+[![NPM Version][npm-image]][npm-url]
 
 
 ### International currency formatting
@@ -394,4 +394,6 @@ $('someSelector').autoNumeric('init');
 
 *Note: By convention the data attribute is written in lower-case. Compound words (example: "aDec") need to be split and separated by a dash. The equal sign separates the name and value. The value should be enclosed with quote marks. If multiple options are being used they each need to have the own data attribute.*
 
+[npm-url]: https://npmjs.org/package/autonumeric
+[npm-image]: https://img.shields.io/npm/v/autonumeric.svg
  

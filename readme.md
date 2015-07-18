@@ -1,8 +1,6 @@
 [autoNumeric-1.9.39](http://www.decorplanit.com/plugin/)
 ================================
-Copyright (c) 2010 - 2015 Robert Knothe Licensed under the MIT license ([http://opensource.org/licenses/mit-license.php](http://opensource.org/licenses/mit-license.php))
-
-[![NPM Version][npm-image]][npm-url] [![Dependency Status][david-image]][david-url] [![devDependency Status][david-dev-image]][david-dev-url]
+Copyright (c) 2010 - 2015 Robert Knothe Licensed under the [MIT-license](http://opensource.org/licenses/mit-license.php)
 
 ### International currency formatting
 

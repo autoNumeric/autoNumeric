@@ -2,6 +2,8 @@
 ================================
 Copyright (c) 2010 - 2015 Robert Knothe Licensed under the [MIT-license](http://opensource.org/licenses/mit-license.php)
 
+[![npm version](https://badge.fury.io/js/autonumeric.svg)](http://badge.fury.io/js/autonumeric)
+
 ### International currency formatting
 
 autoNumeric is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. 

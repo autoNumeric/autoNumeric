@@ -3,7 +3,7 @@
 Copyright (c) 2010 - 2015 Robert Knothe Licensed under the [MIT-license](http://opensource.org/licenses/mit-license.php)
 
 
-[![NPM Version][npm-image]][npm-url]
+[![NPM Version][npm-image]][npm-url] [![Dependency Status][david-image]][david-url]
 
 
 ### International currency formatting
@@ -396,4 +396,6 @@ $('someSelector').autoNumeric('init');
 
 [npm-url]: https://npmjs.org/package/autonumeric
 [npm-image]: https://img.shields.io/npm/v/autonumeric.svg
+[david-url]: https://david-dm.org/BobKnothe/autoNumeric#info=dependencies
+[david-image]: https://img.shields.io/david/BobKnothe/autoNumeric.svg
  

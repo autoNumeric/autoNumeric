@@ -2,7 +2,9 @@
 ================================
 Copyright (c) 2010 - 2015 Robert Knothe Licensed under the [MIT-license](http://opensource.org/licenses/mit-license.php)
 
-[![npm version](https://badge.fury.io/js/autonumeric.svg)](http://badge.fury.io/js/autonumeric)
+
+[![npm](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com/package/autonumeric)
+
 
 ### International currency formatting
 

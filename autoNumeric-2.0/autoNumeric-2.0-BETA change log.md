@@ -1,5 +1,16 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2015-08-09
++ Added support for rbitrary-precision decimal arithmetic. This was adapted from Big.js https://github.com/MikeMcl/big.js/ Many thanks to Mike
++ Added support for trailing minus signs
++ Added rounding methods for currencys with smallest coin being $0.05
++ Added modified sNumber option that selects only numbers ctr & a keys thanks Zayter
++ Added support for return values to have locale formats
++ Added debug option to turn off errors
++ Added option anDefault to help ASP.NETR postback erros
++ Modified the wEmpty option
++ Removed oRide option
+
 ### 2015-03-30
 + Modified the 'init' && 'set' methods
 + General code clean up

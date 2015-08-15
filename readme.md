@@ -27,6 +27,7 @@ Below is a quick tutorial - for demo's documentation and option code generator  
 ****
 ###  Getting started:
 
+**Note**: For integration into rails projects, see [autonumeric-rails](https://github.com/randoum/autonumeric-rails)
 
 Include jQuery and autoNumeric js-files in your header. No other files or library are required.
 
@@ -72,7 +73,7 @@ $(document).ready(function(){
    $(selector).autoNumeric("init",{
 		aSep: '.',
 		aDec: ',', 
-		aSign: '€ '
+		aSign: 'â‚¬ '
 	});
 });
 ```
@@ -80,7 +81,7 @@ $(document).ready(function(){
 Passed options as **HTML5 data**
 
 ```html
-<input type='text' name="someName" ' value="1234.56" data-a-sep="." data-a-dec="," data-a-sign="€ "/>
+<input type='text' name="someName" ' value="1234.56" data-a-sep="." data-a-dec="," data-a-sign="â‚¬ "/>
 ```
 Pass options via **jQuery's $.extend method** - in this example <span style="color:red;">ASP.NET</span> current culture settings are passed.
 
@@ -134,7 +135,7 @@ By default autoNumeric formats the default values on page ready. The values shou
 |"-123456,78"   | true         |
 |"123,456.78"   | false        |
 |"123.456.78"   | false        |
-|"€ 123456.78"  | false        |
+|"â‚¬ 123456.78"  | false        |
 
 All values being "set" need to fall with the min/max rules.
 

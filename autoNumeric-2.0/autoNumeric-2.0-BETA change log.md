@@ -1,5 +1,9 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2015-08-15
++ Added option "unSetOnSubmit" to unformat input on the submit event
++ Added option "debug" to turn on and off error being thrown
+
 ### 2015-08-09
 + Added support for rbitrary-precision decimal arithmetic. This was adapted from Big.js https://github.com/MikeMcl/big.js/ Many thanks to Mike
 + Added support for trailing minus signs

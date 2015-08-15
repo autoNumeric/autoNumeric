@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @contributor: Sokolov Yura
- * @version: 2.0-beta - 2015-08-09 GMT 8:00 PM / 20:00
+ * @version: 2.0-beta - 2015-08-15 GMT 2:00 PM / 14:00
  *
  * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  *
@@ -1462,6 +1462,14 @@
                             delete holder.inVal;
                         }
                     });
+                    $this.closest('form').on('submit.autoNumeric', function () {
+                        holder = getHolder($this);
+                        var $settings = holder.settingsClone;
+                        if ($settings.unSetOnSubmit) {
+                            $this.val($settings.rawValue);
+                        }
+
+                    });
                 }
             });
         },
@@ -1950,6 +1958,11 @@
          * value=1234.56 {anDefault: '1234.56'}
          */
         anDefault: null,
+        /** removes formatting on submit event
+         * this output format: positive nnnn.nn, negative -nnnn.nn
+         * review the 'unSet' method for other formats
+         */
+        unSetOnSubmit: false,
         /** error handling function
          * true => all errors are thrown - helpful in site development
          * false => throws errors when calling methods prior to the supported element has been initialized be autoNumeric

@@ -177,7 +177,7 @@ Once the page is reloaded on post-back and autoNumeric compares $this[0].value" 
 
 Change the "aForm" option to ***"aForm: false"*** - this can be done when initalizing "init" the element as an option or as HTML5 data attribute
 
-If there are no default value simply initialize 'init' the element 
+If there are no default value(vs) simply initialize 'init' the element 
 
 ```javascript
 <script type="text/javascript">  
@@ -428,5 +428,15 @@ The following is a list of the methods and settings/options that control autoNum
 -	examples:
 -	no default value='' {anDefault: ''}
 -	value=1234.56 {anDefault: '1234.56'}
+
+**"unSetOnSubmit"**	*removes the format on the submit event*
+- 	unSetOnSubmit: false (default) does not remove the formatting
+- 	unSetOnSubmit: true - removes the formatting on the submit event
+- 	this canbe be done globally via the extend method or by elemnt via the jQuery selector
+- 	output is always "nnnn.nn" or negative "-nnnn.nn". n = 0-9 
+
+**"debug"**	*error handling function*
+- 	debug: true - (default) throws errors - helpful during developing.
+-	debug: false - stops most errors from being thrown.
 
 ****

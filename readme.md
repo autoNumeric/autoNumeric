@@ -164,8 +164,8 @@ Once the page is reloaded on post-back and autoNumeric compares $this[0].value" 
 ```javascript
 <script type="text/javascript">  
   jQuery(function($) {
-  	$('selector').autoNumeric('init'', {aForm: false});    
-    $('selector').autoNumeric('set, '1234.56'); // produces "1,234.56"    
+  	$('selector').autoNumeric('init', {aForm: false});    
+    $('selector').autoNumeric('set', '1234.56'); // produces "1,234.56"    
   });
 </script>
 ```

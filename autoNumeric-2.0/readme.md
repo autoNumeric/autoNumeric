@@ -1,6 +1,7 @@
 [autoNumeric-2.0](http://www.decorplanit.com/plugin/)
 ================================
-### International currency formatting
+
+### International currency formatting - Updated 2015-10-25 9:00pm 20:00
 
 autoNumeric is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. 
 
@@ -432,7 +433,7 @@ The following is a list of the methods and settings/options that control autoNum
 **"unSetOnSubmit"**	*removes the format on the submit event*
 - 	unSetOnSubmit: false (default) does not remove the formatting
 - 	unSetOnSubmit: true - removes the formatting on the submit event
-- 	this canbe be done globally via the extend method or by elemnt via the jQuery selector
+- 	this can be done globally via the extend method or by elemnt via the jQuery selector
 - 	output is always "nnnn.nn" or negative "-nnnn.nn". n = 0-9 
 
 **"debug"**	*error handling function*

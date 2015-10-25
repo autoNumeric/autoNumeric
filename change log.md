@@ -1,5 +1,8 @@
 ### Change log:
 
+### 2015-10-25
++ Fixed bug when pasting value and the decimal seperator is a comma ","
+
 ### Version 1.9.39
 + Fixed 'aForm'option.
 + Updated the readme file

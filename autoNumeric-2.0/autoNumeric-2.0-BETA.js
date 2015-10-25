@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @contributor: Sokolov Yura
- * @version: 2.0-beta - 2015-08-15 GMT 2:00 PM / 14:00
+ * @version: 2.0-beta - 2015-10-25 GMT 9:00 PM / 21:00
  *
  * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  *
@@ -282,7 +282,9 @@
      * private function that formats our number
      */
     function autoGroup(iv, settings) {
-        iv = autoStrip(iv, settings);
+        if (Number(iv) !== NaN && settings.aDec === '.' || Number(iv) === NaN && settings.aDec === ',') {
+            iv = autoStrip(iv, settings);
+        }
         if (settings.trailingNegative && iv.indexOf('-') === -1) {
             iv = '-' + iv;
         }
@@ -1482,11 +1484,13 @@
         destroy: function () {
             return $(this).each(function () {
                 var $this = autoGet($(this)),
-                    settings = $this.data('autoNumeric');
-                $this.val('');
-                autoSave($this, settings, 'wipe');
-                $this.off('.autoNumeric');
-                $this.removeData('autoNumeric');
+                settings = $this.data('autoNumeric');
+                if (typeof settings === 'object') {
+                    $this.val('');
+                    autoSave($this, settings, 'wipe');
+                    $this.off('.autoNumeric');
+                    $this.removeData('autoNumeric');
+                }
             });
         },
 

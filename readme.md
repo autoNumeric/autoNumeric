@@ -1,7 +1,8 @@
-[autoNumeric-1.9.39](http://www.decorplanit.com/plugin/)
+[autoNumeric-1.9.40](http://www.decorplanit.com/plugin/)
 ================================
 Copyright (c) 2010 - 2015 Robert Knothe Licensed under the [MIT-license](http://opensource.org/licenses/mit-license.php)
 
+updated 2015-10-25
 
 [![NPM Version][npm-image]][npm-url] [![Dependency Status][david-image]][david-url]
 
@@ -164,8 +165,8 @@ Once the page is reloaded on post-back and autoNumeric compares $this[0].value" 
 ```javascript
 <script type="text/javascript">  
   jQuery(function($) {
-  	$('selector').autoNumeric('init'', {aForm: false});    
-    $('selector').autoNumeric('set, '1234.56'); // produces "1,234.56"    
+  	$('selector').autoNumeric('init', {aForm: false});    
+    $('selector').autoNumeric('set', '1234.56'); // produces "1,234.56"    
   });
 </script>
 ```

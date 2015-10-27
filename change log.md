@@ -1,6 +1,6 @@
 ### Change log:
 
-### 2015-10-25
+### Version 1.9.40 released 2015-10-25
 + Fixed bug when pasting value and the decimal seperator is a comma ","
 
 ### Version 1.9.39

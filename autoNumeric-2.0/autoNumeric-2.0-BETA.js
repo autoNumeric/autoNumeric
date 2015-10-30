@@ -282,7 +282,7 @@
      * private function that formats our number
      */
     function autoGroup(iv, settings) {
-        if (Number(iv) !== NaN && settings.aDec === '.' || Number(iv) === NaN && settings.aDec === ',') {
+        if (Number(iv) !== NaN && settings.aDec === '.' || Number(iv) !== NaN && settings.aDec === ',') {
             iv = autoStrip(iv, settings);
         }
         if (settings.trailingNegative && iv.indexOf('-') === -1) {

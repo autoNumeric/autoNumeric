@@ -1,5 +1,8 @@
 ### Change log:
 
+### Version 1.9.40 released 2015-11-2
++ Fixed bug that allowed two currency symbols
+
 ### Version 1.9.40 released 2015-10-25
 + Fixed bug when pasting value and the decimal seperator is a comma ","
 

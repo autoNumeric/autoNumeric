@@ -1,5 +1,8 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2015-11-2
++ Fixed bug that allowed two currency symbols - thanks Mic Biert
+
 ### 2015-10-25
 + Fixed bug when pasting value and the decimal seperator is a comma ","
 + Modified the "destroy" method so that an error is not thrown if the "init" method has not been called previously 

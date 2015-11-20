@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
- * @version: 1.9.41 - 2015-11-2 GMT 3:00 PM / 15:00
+ * @version: 1.9.42 - 2015-11-20 GMT 3:00 PM / 15:00
  *
  * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  * Contributor by Sokolov Yura on 2010-11-07
@@ -293,9 +293,7 @@
      * private function that formats our number
      */
     function autoGroup(iv, settings) {
-        if (Number(iv) !== NaN && settings.aDec === '.' || Number(iv) !== NaN && settings.aDec === ',') {
-            iv = autoStrip(iv, settings);
-        }
+        iv = autoStrip(iv, settings);
         var testNeg = iv.replace(',', '.'),
             empty = checkEmpty(iv, settings, true);
         if (empty !== null) {
@@ -387,7 +385,7 @@
             ivRounded = iv; /** check if we need to pad with zeros */
             if (cDec < rDec) {
                 if (dPos === -1) {
-                    ivRounded += '.';
+                    ivRounded += settings.aDec;
                 }
                 var zeros = '000000';
                 while (cDec < rDec) {

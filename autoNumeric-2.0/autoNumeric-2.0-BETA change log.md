@@ -1,5 +1,8 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2015-11-20
++ Fixed bug when pasting using  ctrl & v keys
+
 ### 2015-11-2
 + Fixed bug that allowed two currency symbols - thanks Mic Biert
 

@@ -1,6 +1,9 @@
 ### Change log:
 
-### Version 1.9.40 released 2015-11-2
+### Version 1.9.42 released 2015-11-20
++ Fixed bug when pasting using  ctrl & v keys
+
+### Version 1.9.41 released 2015-11-2
 + Fixed bug that allowed two currency symbols
 
 ### Version 1.9.40 released 2015-10-25

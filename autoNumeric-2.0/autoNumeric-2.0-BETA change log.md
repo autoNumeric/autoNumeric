@@ -1,5 +1,8 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2015-11-29
++ Modified & improved the shim for throwing the "input" event
+
 ### 2015-11-20
 + Fixed bug when pasting using  ctrl & v keys
 

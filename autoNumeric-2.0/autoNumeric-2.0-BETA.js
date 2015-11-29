@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @contributor: Sokolov Yura
- * @version: 2.0-beta - 2015-11-20 GMT 3:00 PM / 15:00
+ * @version: 2.0-beta - 2015-11-29 GMT 9:00 PM / 21:00
  *
  * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  *
@@ -407,6 +407,7 @@
             ivRounded = iv; /** check if we need to pad with zeros */
             if (cDec < rDec) {
                 if (dPos === -1) {
+                    //ivRounded += '.';
                     ivRounded += settings.aDec;
                 }
                 var zeros = '000000';
@@ -618,7 +619,7 @@
             this.formatted = false;
         },
         setSelection: function (start, end, setReal) {
-            start = Math.max(start, 0);
+           start = Math.max(start, 0);
             end = Math.min(end, this.that.value.length);
             this.selection = {
                 start: start,
@@ -905,6 +906,9 @@
             if (this.kdCode === 8 || this.kdCode === 46) {
                 if (!this.selection.length) {
                     parts = this.getBeforeAfterStriped();
+                    if (parts[0] === '' && parts[1] === '') {
+                        settingsClone.throwInput = false;
+                    }
                     if ((settingsClone.pSign === 'p' && settingsClone.pNeg === 's') || (settingsClone.pSign === 's' && settingsClone.pNeg !== 'p')) {
                         parts = this.processTrailing(parts);
                     } else {
@@ -935,6 +939,7 @@
                 parts = this.getBeforeAfterStriped(),
                 left = parts[0],
                 right = parts[1];
+            settingsClone.throwInput = true;
             /** start rules when the decimal character key is pressed always use numeric pad dot to insert decimal separator */
             if (cCode === settingsClone.aDec || (settingsClone.altDec && cCode === settingsClone.altDec) || ((cCode === '.' || cCode === ',') && this.kdCode === 110)) { /** do not allow decimal character if no decimal part allowed */
                 if (!settingsClone.mDec || !settingsClone.aDec) {
@@ -994,6 +999,7 @@
                 this.setValueParts(left + cCode, right, null);
                 return true;
             } /** prevent any other character */
+            settingsClone.throwInput = false;
             return true;
         },
 
@@ -1241,6 +1247,7 @@
                         rawValue: '',
                         trailingNegative: false,
                         caretFix: false,
+                        throwInput: true,
                         tagList: ['b', 'caption', 'cite', 'code', 'dd', 'del', 'div', 'dfn', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ins', 'kdb', 'label', 'li', 'option', 'output', 'p', 'q', 's', 'sample', 'span', 'strong', 'td', 'th', 'u', 'var']
                     }); /** Merge defaults, tagData and options */
                     if (settings.aDec === settings.aSep) {
@@ -1311,6 +1318,30 @@
                 }
                 settings.runOnce = true;
                 if ($input) { /**input types supported "text", "hidden", "tel" and no type*/
+                    $this.on('focusin.autoNumeric', function () {
+                        holder = getHolder($this);
+                        var $settings = holder.settingsClone;
+                        $settings.onOff = true;
+                        if ($settings.nBracket !== null && $settings.aNeg !== '') {
+                            $this.val(negativeBracket($this.val(), $settings));
+                        }
+                        if ($settings.nSep === true) {
+                            $settings.aSep = '';
+                            $settings.aSign = '';
+                        }
+                        if ($settings.eDec !== null) {
+                            $settings.mDec = $settings.eDec;
+                            $this.autoNumeric('set', $settings.rawValue);
+                        } else {
+                            $this.autoNumeric('set', $settings.rawValue);
+                        }
+                        holder.inVal = $this.val();
+                        holder.lastVal = $this.val();
+                        var onEmpty = checkEmpty(holder.inVal, $settings, true);
+                        if ((onEmpty !== null && onEmpty !== '') && $settings.wEmpty === 'focus') {
+                            $this.val(onEmpty);
+                        }
+                    });
                     $this.on('keydown.autoNumeric', function (e) {
                         holder = getHolder($this);
                         if (holder.that.readOnly) {
@@ -1330,7 +1361,11 @@
                         if (holder.processAllways()) {
                             holder.processed = true;
                             holder.formatQuick(e);
-                            $this.trigger('input'); /** throws input event in deletion character */
+                            if (($this.val() !== holder.lastVal) && holder.settingsClone.throwInput) {
+                                $this.trigger('input'); /** throws input event in deletion character */
+                            }
+                            holder.lastVal = $this.val();
+                            holder.settingsClone.throwInput = true;
                             e.preventDefault();
                             return false;
                         }
@@ -1353,7 +1388,11 @@
                         }
                         if (holder.processAllways() || holder.processKeypress()) {
                             holder.formatQuick(e);
-                            $this.trigger('input'); /** throws input event on adding character */
+                            if (($this.val() !== holder.lastVal) && holder.settingsClone.throwInput) {
+                                $this.trigger('input'); /** throws input event on adding character */
+                            }
+                            holder.lastVal = $this.val();
+                            holder.settingsClone.throwInput = true;
                             e.preventDefault();
                             return;
                         }
@@ -1365,7 +1404,7 @@
                         var skip = holder.skipAllways(e);
                         holder.kdCode = 0;
                         delete holder.valuePartsBeforePaste;
-                        if ($this[0].value === holder.settingsClone.aSign) { /** added to properly place the caret when only the currency is present */
+                        if ($this[0].value === holder.settingsClone.aSign) { /** added to properly place the caret when only the currency sign is present */
                             if (holder.settingsClone.pSign === 's') {
                                 setElementSelection(this, 0, 0);
                             } else {
@@ -1389,29 +1428,6 @@
                         }
                         if (!holder.formatted) {
                             holder.formatQuick(e);
-                        }
-                    });
-                    $this.on('focusin.autoNumeric', function () {
-                        holder = getHolder($this);
-                        var $settings = holder.settingsClone;
-                        $settings.onOff = true;
-                        if ($settings.nBracket !== null && $settings.aNeg !== '') {
-                            $this.val(negativeBracket($this.val(), $settings));
-                        }
-                        if ($settings.nSep === true) {
-                            $settings.aSep = '';
-                            $settings.aSign = '';
-                        }
-                        if ($settings.eDec !== null) {
-                            $settings.mDec = $settings.eDec;
-                            $this.autoNumeric('set', $settings.rawValue);
-                        } else {
-                            $this.autoNumeric('set', $settings.rawValue);
-                        }
-                        holder.inVal = $this.val();
-                        var onEmpty = checkEmpty(holder.inVal, $settings, true);
-                        if ((onEmpty !== null && onEmpty !== '') && $settings.wEmpty === 'focus') {
-                            $this.val(onEmpty);
                         }
                     });
                     $this.on('focusout.autoNumeric', function () {
@@ -1460,6 +1476,17 @@
                         if (groupedValue !== holder.inVal) {
                             $this.change();
                             delete holder.inVal;
+                        }
+                    });
+                    $this.on('paste.autoNumeric', function (e) {
+                        holder = getHolder($this);
+                        var clipboardData = e.clipboardData || e.originalEvent.clipboardData || window.clipboardData,
+                            pastedData = clipboardData.getData('text');
+                        if (pastedData !== holder.lastVal) {
+                            $this.trigger('input'); /** throws input event on adding character */
+                            holder.lastVal = window.setTimeout( function() {
+                                $this.val();
+                            }, 100);
                         }
                     });
                     $this.closest('form').on('submit.autoNumeric', function () {
@@ -1654,7 +1681,7 @@
             if (settings.rawValue !== '') {
                 getValue = settings.rawValue;
             }
-            if ((!/\d/.test(getValue) || Number(getValue) === 0) && settings.wEmpty === 'focus') {
+            if (((!/\d/).test(getValue) || Number(getValue) === 0) && settings.wEmpty === 'focus') {
                 return '';
             }
             if (getValue !== '' && settings.nBracket !== null) {

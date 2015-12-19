@@ -1,5 +1,8 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2015-12-19
++ Added UMD support
+
 ### 2015-11-29
 + Modified & improved the shim for throwing the "input" event
 

@@ -1,8 +1,8 @@
-[autoNumeric-1.9.42](http://www.decorplanit.com/plugin/)
+[autoNumeric-1.9.43](http://www.decorplanit.com/plugin/)
 ================================
 Copyright (c) 2010 - 2015 Robert Knothe Licensed under the [MIT-license](http://opensource.org/licenses/mit-license.php)
 
-updated 2015-11-20
+updated 2015-12-19
 
 [![NPM Version][npm-image]][npm-url] [![Dependency Status][david-image]][david-url]
 
@@ -213,6 +213,7 @@ Notes:
 - vMin should always be a lower value tham vMax!
 - vMin and vMax can be both positive or negative. But do so with caution.
 - If the range of the vMin & vMax is small or you make them numbers other then "9" nines (example "1000) you could create a situation where the uses will need to delete characters before the can obtain the vMin / vMax limits. 
+- If there are no decimal places the decimal character cannot be entered.
 
 ****
 

@@ -1,5 +1,8 @@
 ### Change log:
 
+### Version 1.9.43 released 2015-12-19
++ UMD support
+
 ### Version 1.9.42 released 2015-11-20
 + Fixed bug when pasting using  ctrl & v keys
 

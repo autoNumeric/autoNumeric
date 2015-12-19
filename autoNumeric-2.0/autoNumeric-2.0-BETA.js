@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @contributor: Sokolov Yura
- * @version: 2.0-beta - 2015-11-29 GMT 9:00 PM / 21:00
+ * @version: 2.0-beta - 2015-12-19 GMT 4:00 PM / 16:00
  *
  * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  *
@@ -31,7 +31,18 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-;(function ($, window, document, undefined) {
+(function (factory) {
+    if (typeof define === "function" && define.amd) {
+        /** AMD. Register as an anonymous module. */
+        define(["jquery"], factory);
+    } else if (typeof module === "object" && module.exports) {
+        /** Node/CommonJS */
+        module.exports = factory(require("jquery"));
+    } else {
+        /** Browser globals */
+        factory(window.jQuery);
+    }
+}(function ($) {
     "use strict";
     /*jslint browser: true, bitwise: true*/
     /*global jQuery: false, sessionStorage: false*/
@@ -1313,7 +1324,13 @@
                         }
                     }
                     if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1 && $this.text() !== '') {
-                        $this.autoNumeric('set', $this.text());
+						if (settings.anDefault !== null) {
+							if (settings.anDefault === $this.text()) {
+								$this.autoNumeric('set', $this.text());
+							}
+						} else {
+							$this.autoNumeric('set', $this.text());
+						}
                     }
                 }
                 settings.runOnce = true;
@@ -1998,4 +2015,4 @@
          */
         debug: true
     };
-}(jQuery, window, document));
+}));

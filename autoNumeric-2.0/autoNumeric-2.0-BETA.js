@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @contributor: Sokolov Yura
- * @version: 2.0-beta - 2015-12-19 GMT 4:00 PM / 16:00
+ * @version: 2.0-beta - 2016-01-11 GMT 2:00 PM / 14:00
  *
  * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  *
@@ -50,6 +50,7 @@
     /**
      * Cross browser routine for getting selected range/cursor position
      */
+
     function getElementSelection(that) {
         var position = {};
         if (that.selectionStart === undefined) {
@@ -70,6 +71,7 @@
     /**
      * Cross browser routine for setting selected range/cursor position
      */
+
     function setElementSelection(that, start, end) {
         if (that.selectionStart === undefined) {
             that.focus();
@@ -87,6 +89,7 @@
     /**
      * Function to handle errors messages
      */
+
     function throwErr(message, debug) {
         if (debug) {
             var err = new Error(message);
@@ -100,6 +103,7 @@
      * - a function, which invoked with jQuery element, parameters and this parameter name and returns parameter value
      * - a name of function, attached to $(selector).autoNumeric.functionName(){} - which was called previously
      */
+
     function runCallbacks($this, settings) {
         /**
          * loops through the settings object (option array) to find the following
@@ -122,6 +126,7 @@
      * Preparing user defined options for further usage
      * merge them with defaults appropriately
      */
+
     function autoCode($this, settings) {
         runCallbacks($this, settings);
         var vmax = settings.vMax.toString().split('.'),
@@ -167,6 +172,7 @@
     /**
      * strip all unwanted characters and leave only a number alert
      */
+
     function autoStrip(s, settings) {
         if (settings.aSign !== '') { /** remove currency sign */
             s = s.replace(settings.aSign, '');
@@ -214,6 +220,7 @@
     /**
      * places or removes brackets on negative values
      */
+
     function negativeBracket(s, settings) {
         if ((settings.pSign === 'p' && settings.pNeg === 'l') || (settings.pSign === 's' && settings.pNeg === 'p')) {
             var brackets = settings.nBracket.split(',');
@@ -238,6 +245,7 @@
      * '-1234,56'   OK
      * '1234,56-'   OK
      */
+
     function convertLocale(s) {
         s = s.replace(',', '.');
         if (s.lastIndexOf('-') !== -1 && s.lastIndexOf('-') === s.length - 1) {
@@ -250,6 +258,7 @@
     /**
      * prepare number string to be converted to real number
      */
+
     function fixNumber(s, aDec, aNeg) {
         if (aDec && aDec !== '.') {
             s = s.replace(aDec, '.');
@@ -266,6 +275,7 @@
     /**
      * prepare real number to be converted to our format
      */
+
     function presentNumber(s, aDec, aNeg) {
         if (aNeg && aNeg !== '-') {
             s = s.replace('-', aNeg);
@@ -279,6 +289,7 @@
     /**
      * private function to check for empty value
      */
+
     function checkEmpty(iv, settings, signOnEmpty) {
         if (iv === '' || iv === settings.aNeg) {
             if (settings.wEmpty === 'always' || signOnEmpty) {
@@ -298,10 +309,7 @@
             iv = '-' + iv;
         }
         var empty = checkEmpty(iv, settings, true),
-            isNeg = iv.replace(',', '.') < 0;
-        if (iv.indexOf('-') > -1 && Number(iv) === 0) {
-            isNeg = true;
-        }
+            isNeg = iv.indexOf('-') > -1;
         if (isNeg) {
             iv = iv.replace('-', '');
         }
@@ -347,7 +355,7 @@
             if (isNeg && settings.pNeg === 's') {
                 iv = settings.aSign + iv + settings.aNeg;
             }
-            if (!isNeg && !settings.trailingNegative) {
+            if (!isNeg) {
                 iv = settings.aSign + iv;
             }
         }
@@ -378,6 +386,7 @@
      * please note this handled as text - JavaScript math function can return inaccurate values
      * also this offers multiple rounding methods that are not easily accomplished in JavaScript
      */
+
     function autoRound(iv, settings) { /** value to string */
         iv = (iv === '') ? '0' : iv.toString();
         if (settings.mRound === 'N05' || settings.mRound === 'U05' || settings.mRound === 'D05') {
@@ -387,7 +396,7 @@
         var ivRounded = '',
             i = 0,
             nSign = '',
-            rDec = (typeof (settings.aPad) === 'boolean' || settings.aPad === null) ? (settings.aPad ? settings.mDec : 0) : Number(settings.aPad);
+            rDec = (typeof(settings.aPad) === 'boolean' || settings.aPad === null) ? (settings.aPad ? settings.mDec : 0) : Number(settings.aPad);
         var truncateZeros = function (ivRounded) { /** truncate not needed zeros */
             var regex = rDec === 0 ? (/(\.(?:\d*[1-9])?)0*$/) : rDec === 1 ? (/(\.\d(?:\d*[1-9])?)0*$/) : new RegExp('(\\.\\d{' + rDec + '}(?:\\d*[1-9])?)0*');
             ivRounded = ivRounded.replace(regex, '$1'); /** If there are no decimal places, we don't need a decimal point at the end */
@@ -450,7 +459,7 @@
             (tRound > 0 && settings.mRound === 'C' && nSign === '') || /**      Round to ceiling toward positive infinite */
             (tRound > 0 && settings.mRound === 'F' && nSign === '-') || /**     Round to floor toward negative infinite */
             (tRound > 0 && settings.mRound === 'U')) { /**                      Round up away from zero */
-        /*jslint white: false*/
+            /*jslint white: false*/
             for (i = (ivArray.length - 1); i >= 0; i -= 1) { /** Round up the last digit if required, and continue until no more 9's are found */
                 if (ivArray[i] !== '.') {
                     ivArray[i] = +ivArray[i] + 1;
@@ -471,6 +480,7 @@
     /**
      * truncate decimal part of a number
      */
+
     function truncateDecimal(s, settings, paste) {
         var aDec = settings.aDec,
             mDec = settings.mDec;
@@ -497,6 +507,7 @@
      * This function is adapted from Big.js https://github.com/MikeMcl/big.js/
      * Many thanks to Mike
      */
+
     function parseStr(n) {
         var x = {},
             e,
@@ -555,6 +566,7 @@
      * This function is adapted from Big.js https://github.com/MikeMcl/big.js/
      * Many thanks to Mike
      */
+
     function testMinMax(y, x) {
         var xNeg,
             xc = x.c,
@@ -595,6 +607,7 @@
      * and lays between settings.vMin and settings.vMax
      * and the string length does not exceed the digits in settings.vMin and settings.vMax
      */
+
     function autoCheck(s, settings) {
         s = s.replace(',', '.');
         var minParse = parseStr(settings.vMin),
@@ -606,6 +619,7 @@
     /**
      * Holder object for field properties
      */
+
     function AutoNumericHolder(that, settings) {
         this.settings = settings;
         this.that = that;
@@ -630,7 +644,7 @@
             this.formatted = false;
         },
         setSelection: function (start, end, setReal) {
-           start = Math.max(start, 0);
+            start = Math.max(start, 0);
             end = Math.min(end, this.that.value.length);
             this.selection = {
                 start: start,
@@ -799,9 +813,9 @@
                     var valueLen = this.that.value.length,
                         aSignLen = this.settings.aSign.length,
                         negLen = (this.that.value.indexOf('-') === -1) ? 0 : 1,
-                        aSuffixLen =  this.settings.aSuffix.length,
+                        aSuffixLen = this.settings.aSuffix.length,
                         pSign = this.settings.pSign,
-                        pNeg =  this.settings.pNeg,
+                        pNeg = this.settings.pNeg,
                         start = (pSign === 's') ? 0 : (pNeg === 'l' && negLen === 1 && aSignLen > 0) ? aSignLen + 1 : aSignLen,
                         end = (pSign === 'p') ? valueLen - aSuffixLen : (pNeg === 'l') ? valueLen - (aSuffixLen + aSignLen) : (pNeg === 'r') ? (aSignLen > 0) ? valueLen - (aSignLen + negLen + aSuffixLen) : valueLen - (aSignLen + aSuffixLen) : valueLen - (aSignLen + aSuffixLen);
                     setElementSelection(this.that, start, end);
@@ -870,7 +884,7 @@
                 }
             }
             if (settingsClone.pSign === 's' && settingsClone.pNeg === 'l') {
-                settingsClone.caretFix = (this.selection.start >=  this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length) ? true : false;
+                settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length) ? true : false;
                 if (this.kdCode === 8) {
                     if (this.selection.start === (this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length) && this.value.indexOf(settingsClone.aNeg) !== -1) {
                         parts[0] = parts[0].substring(1);
@@ -887,7 +901,7 @@
                 }
             }
             if (settingsClone.pSign === 's' && settingsClone.pNeg === 'r') {
-                settingsClone.caretFix = (this.selection.start >=  this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length) ? true : false;
+                settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length) ? true : false;
                 if (this.kdCode === 8) {
                     if (this.selection.start === (this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length)) {
                         parts[0] = parts[0].substring(1);
@@ -920,7 +934,7 @@
                     if (parts[0] === '' && parts[1] === '') {
                         settingsClone.throwInput = false;
                     }
-                    if ((settingsClone.pSign === 'p' && settingsClone.pNeg === 's') || (settingsClone.pSign === 's' && settingsClone.pNeg !== 'p')) {
+                    if (((settingsClone.pSign === 'p' && settingsClone.pNeg === 's') || (settingsClone.pSign === 's' && (settingsClone.pNeg === 'l' || settingsClone.pNeg === 'r'))) && this.value.indexOf('-') !== -1) {
                         parts = this.processTrailing(parts);
                     } else {
                         if (this.kdCode === 8) {
@@ -971,7 +985,7 @@
                 this.setValueParts(left + settingsClone.aDec, right, null);
                 return true;
             }
-            if (cCode === '-' || cCode === '+') { /** prevent minus if not allowed */
+            if ((cCode === '-' || cCode === '+') && settingsClone.aNeg === '-') { /** prevent minus if not allowed ************************************************************************************************************************************/
                 if (!settingsClone) {
                     return true;
                 } /** caret is always after minus */
@@ -1022,7 +1036,7 @@
                 parts = this.getBeforeAfterStriped(),
                 leftLength = this.value,
                 kuCode = e.keyCode;
-                /** no grouping separator and no currency sign */
+            /** no grouping separator and no currency sign */
             if ((settingsClone.aSep === '' || (settingsClone.aSep !== '' && leftLength.indexOf(settingsClone.aSep) === -1)) && (settingsClone.aSign === '' || (settingsClone.aSign !== '' && leftLength.indexOf(settingsClone.aSign) === -1))) {
                 var subParts = [],
                     nSign = '';
@@ -1114,6 +1128,7 @@
     /**
      * thanks to Anthony & Evan C
      */
+
     function autoGet(obj) {
         if (typeof obj === 'string') {
             obj = obj.replace(/\[/g, "\\[").replace(/\]/g, "\\]");
@@ -1128,6 +1143,7 @@
      * function to attach data to the element
      * and imitate the holder
      */
+
     function getHolder($that, settings, update) {
         var data = $that.data('autoNumeric');
         if (!data) {
@@ -1145,6 +1161,7 @@
     /**
      * original settings saved for use when eDec & nSep options are being used
      */
+
     function originalSettings(settings) {
         settings.oDec = settings.mDec;
         settings.oPad = settings.aPad;
@@ -1158,6 +1175,7 @@
      * original settings saved for use when eDec & nSep options are being used
      * taken from Quirksmode
      */
+
     function readCookie(name) {
         var nameEQ = name + "=",
             ca = document.cookie.split(';'),
@@ -1178,6 +1196,7 @@
     /**
      * Test if sessionStorage is supported - taken from moderizr
      */
+
     function storageTest() {
         var mod = 'modernizr';
         try {
@@ -1192,6 +1211,7 @@
     /**
      * creates or removes sessionStorage or cookie depending on browser support
      */
+
     function autoSave($this, settings, toDo) {
         if (settings.aStor) {
             var storedName = ($this[0].name !== '' && $this[0].name !== undefined) ? 'AUTO_' + decodeURIComponent($this[0].name) : 'AUTO_' + $this[0].id;
@@ -1246,7 +1266,7 @@
                     /** supported input types*/
                     $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
                 $.each(tagData, function (key, value) {
-                    if (typeof value ===  'number') {
+                    if (typeof value === 'number') {
                         tagData[key] = value.toString();
                     }
                 });
@@ -1265,7 +1285,7 @@
                         throwErr('autoNumeric will not function properly when the decimal character aDec: "' + settings.aDec + '" and thousand separator aSep: "' + settings.aSep + '" are the same character', settings.debug);
                     }
                     $.each(settings, function (key, value) {
-                        if (value ===  'true' || value ===  'false') {
+                        if (value === 'true' || value === 'false') {
                             settings[key] = (value === 'true') ? true : false;
                         }
                     });
@@ -1324,13 +1344,13 @@
                         }
                     }
                     if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1 && $this.text() !== '') {
-						if (settings.anDefault !== null) {
-							if (settings.anDefault === $this.text()) {
-								$this.autoNumeric('set', $this.text());
-							}
-						} else {
-							$this.autoNumeric('set', $this.text());
-						}
+                        if (settings.anDefault !== null) {
+                            if (settings.anDefault === $this.text()) {
+                                $this.autoNumeric('set', $this.text());
+                            }
+                        } else {
+                            $this.autoNumeric('set', $this.text());
+                        }
                     }
                 }
                 settings.runOnce = true;
@@ -1477,8 +1497,7 @@
                                 value = autoRound(value, $settings);
                                 value = presentNumber(value, $settings.aDec, $settings.aNeg);
                             } else {
-                                value = '';
-                                $settings.rawValue = '';
+                                value = $settings.rawValue;
                             }
                         } else {
                             $settings.rawValue = '';
@@ -1493,17 +1512,6 @@
                         if (groupedValue !== holder.inVal) {
                             $this.change();
                             delete holder.inVal;
-                        }
-                    });
-                    $this.on('paste.autoNumeric', function (e) {
-                        holder = getHolder($this);
-                        var clipboardData = e.clipboardData || e.originalEvent.clipboardData || window.clipboardData,
-                            pastedData = clipboardData.getData('text');
-                        if (pastedData !== holder.lastVal) {
-                            $this.trigger('input'); /** throws input event on adding character */
-                            holder.lastVal = window.setTimeout( function() {
-                                $this.val();
-                            }, 100);
                         }
                     });
                     $this.closest('form').on('submit.autoNumeric', function () {
@@ -1526,7 +1534,7 @@
         destroy: function () {
             return $(this).each(function () {
                 var $this = autoGet($(this)),
-                settings = $this.data('autoNumeric');
+                    settings = $this.data('autoNumeric');
                 if (typeof settings === 'object') {
                     $this.val('');
                     autoSave($this, settings, 'wipe');
@@ -1698,7 +1706,7 @@
             if (settings.rawValue !== '') {
                 getValue = settings.rawValue;
             }
-            if (((!/\d/).test(getValue) || Number(getValue) === 0) && settings.wEmpty === 'focus') {
+            if (!((/\d/).test(getValue) || Number(getValue) === 0) && settings.wEmpty === 'focus') {
                 return '';
             }
             if (getValue !== '' && settings.nBracket !== null) {
@@ -1734,10 +1742,14 @@
                 formParts = formFields.split('&'),
                 formIndex = $('form').index($this),
                 allFormElements = $('form:eq(' + formIndex + ')'),
-                aiIndex = [], /** all input index */
-                scIndex = [], /** successful control index */
-                rsubmitterTypes = /^(?:submit|button|image|reset|file)$/i, /* from jQuery serialize method */
-                rsubmittable = /^(?:input|select|textarea|keygen)/i, /* from jQuery serialize method */
+                aiIndex = [],
+                /** all input index */
+                scIndex = [],
+                /** successful control index */
+                rsubmitterTypes = /^(?:submit|button|image|reset|file)$/i,
+                /* from jQuery serialize method */
+                rsubmittable = /^(?:input|select|textarea|keygen)/i,
+                /* from jQuery serialize method */
                 rcheckableType = /^(?:checkbox|radio)$/i,
                 rnonAutoNumericTypes = /^(?:button|checkbox|color|date|datetime|datetime-local|email|file|image|month|number|password|radio|range|reset|search|submit|time|url|week)/i,
                 count = 0;
@@ -1794,10 +1806,14 @@
                 formFields = $this.serializeArray(),
                 formIndex = $('form').index($this),
                 allFormElements = $('form:eq(' + formIndex + ')'),
-                aiIndex = [], /* all input index */
-                scIndex = [], /* successful control index */
-                rsubmitterTypes = /^(?:submit|button|image|reset|file)$/i, /* from jQuery serialize method */
-                rsubmittable = /^(?:input|select|textarea|keygen)/i, /* from jQuery serialize method */
+                aiIndex = [],
+                /* all input index */
+                scIndex = [],
+                /* successful control index */
+                rsubmitterTypes = /^(?:submit|button|image|reset|file)$/i,
+                /* from jQuery serialize method */
+                rsubmittable = /^(?:input|select|textarea|keygen)/i,
+                /* from jQuery serialize method */
                 rcheckableType = /^(?:checkbox|radio)$/i,
                 rnonAutoNumericTypes = /^(?:button|checkbox|color|date|datetime|datetime-local|email|file|image|month|number|password|radio|range|reset|search|submit|time|url|week)/i,
                 count = 0;

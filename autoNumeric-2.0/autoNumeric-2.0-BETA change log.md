@@ -1,5 +1,9 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2016-01-11
++ Fixed bug in "get" method
++ Mods to the trailing minus sign code 
+
 ### 2015-12-19
 + Added UMD support
 

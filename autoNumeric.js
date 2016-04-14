@@ -1100,6 +1100,7 @@
                             $this.change();
                             delete holder.inVal;
                         }
+                        $this.trigger('autoNumeric:itemFormatted');
                     });
                 }
             });

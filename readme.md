@@ -1,8 +1,8 @@
-[autoNumeric-1.9.43](http://www.decorplanit.com/plugin/)
+[autoNumeric-1.9.44](http://www.decorplanit.com/plugin/)
 ================================
-Copyright (c) 2010 - 2015 Robert Knothe Licensed under the [MIT-license](http://opensource.org/licenses/mit-license.php)
+Copyright (c) 2010 - 2016 Robert Knothe Licensed under the [MIT-license](http://opensource.org/licenses/mit-license.php)
 
-updated 2015-12-19
+updated 2016-06-06
 
 [![NPM Version][npm-image]][npm-url] [![Dependency Status][david-image]][david-url]
 

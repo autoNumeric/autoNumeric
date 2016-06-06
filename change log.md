@@ -1,5 +1,9 @@
 ### Change log:
 
+### Version 1.9.44 released 2016-06-06
++ Fixed destroy method
++ Added Typings support - thanks bcherny 
+
 ### Version 1.9.43 released 2015-12-19
 + UMD support
 

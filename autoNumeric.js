@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
- * @version: 1.9.43 - 2015-12-19 GMT 4:00 PM / 16:00
+ * @version: 1.9.44 - 2015-06-06 GMT 2:00 PM / 14:00
  *
  * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  * Contributor by Sokolov Yura on 2010-11-07
@@ -1113,8 +1113,8 @@
         destroy: function () {
             return $(this).each(function () {
                 var $this = $(this);
-                $this.off('.autoNumeric');
                 $this.removeData('autoNumeric');
+                $this.off('autoNumeric');
             });
         },
 

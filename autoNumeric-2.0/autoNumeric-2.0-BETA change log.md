@@ -1,5 +1,9 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2016-06-06
++ Fixed bug in "destroy" method
++ Fixed bug in unSetOnSubmit option to handle non autoNumeric controlled inputs 
+
 ### 2016-01-11
 + Fixed bug in "get" method
 + Mods to the trailing minus sign code 

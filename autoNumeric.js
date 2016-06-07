@@ -1,4 +1,4 @@
-﻿/**
+/**
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
@@ -359,6 +359,7 @@
         if (testNeg < 0 && settings.nBracket !== null) { /** removes the negative sign and places brackets */
             iv = negativeBracket(iv, settings);
         }
+        settings.callbacks.afterConvert(iv);
         return iv;
     }
 
@@ -1499,6 +1500,11 @@
          * no default value='' {anDefault: ''}
          * value=1234.56 {anDefault: '1234.56'}
          */
-        anDefault: null
+        anDefault: null,
+        callbacks: {
+            afterConvert: function(value){
+                
+            }
+        }
     };
 }));

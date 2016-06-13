@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
- * @version: 1.9.44 - 2015-06-06 GMT 2:00 PM / 14:00
+ * @version: 1.9.45 - 2015-06-13 GMT 5:00 PM / 19:00
  *
  * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  * Contributor by Sokolov Yura on 2010-11-07
@@ -1151,7 +1151,7 @@
          * must contain only numbers and one decimal (period) character
          */
         set: function (valueIn) {
-            if (valueIn === null) {
+            if (valueIn === null || isNaN(valueIn)) {
                 return;
             }
             return $(this).each(function () {

@@ -1,5 +1,8 @@
 ### Change log:
 
+### Version 1.9.45 released 2016-06-13
++ Modified the "set" method to handle NaN
+
 ### Version 1.9.44 released 2016-06-06
 + Fixed destroy method
 + Added Typings support - thanks bcherny 

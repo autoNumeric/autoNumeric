@@ -1,5 +1,8 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2016-06-13
++ Modified the "set" method to handle NaN
+
 ### 2016-06-06
 + Fixed bug in "destroy" method
 + Fixed bug in unSetOnSubmit option to handle non autoNumeric controlled inputs 

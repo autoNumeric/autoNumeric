@@ -1114,6 +1114,11 @@
             return $(this).each(function () {
                 var $this = $(this);
                 $this.removeData('autoNumeric');
+                $this.off("keyup.autoNumeric");
+                $this.off("keydown.autoNumeric");
+                $this.off("keypress.autoNumeric");
+                $this.off("focusin.autoNumeric");
+                $this.off("focusout.autoNumeric");
                 $this.off('autoNumeric');
             });
         },

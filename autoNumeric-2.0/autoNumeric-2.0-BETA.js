@@ -1541,7 +1541,7 @@
                     $this.val('');
                     autoSave($this, settings, 'wipe');
                     $this.removeData('autoNumeric');
-                    $this.off('autoNumeric');
+                    $this.off('.autoNumeric');
                 }
             });
         },

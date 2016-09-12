@@ -1114,7 +1114,7 @@
             return $(this).each(function () {
                 var $this = $(this);
                 $this.removeData('autoNumeric');
-                $this.off('autoNumeric');
+                $this.off('.autoNumeric');
             });
         },
 

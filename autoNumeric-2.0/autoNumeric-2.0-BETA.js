@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @contributor: Sokolov Yura
- * @version: 2.0-beta - 2016-06-13 GMT 5:00 PM / 15:00
+ * @version: 2.0-beta - 2016-09-11 GMT 10:00 PM / 22:00
  *
  * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  *
@@ -1120,8 +1120,10 @@
                     }
                 }
             }
-            this.that.value = value;
-            this.setPosition(position);
+            if (this.that.value !== value) {
+                this.that.value = value;
+                this.setPosition(position);
+            }
             this.formatted = true;
         }
     };
@@ -1439,7 +1441,8 @@
                     $this.on('keyup.autoNumeric', function (e) {
                         holder = getHolder($this);
                         holder.init(e);
-                        var skip = holder.skipAllways(e);
+                        var skip = holder.skipAllways(e),
+							tab = holder.kdCode;;
                         holder.kdCode = 0;
                         delete holder.valuePartsBeforePaste;
                         if ($this[0].value === holder.settingsClone.aSign) { /** added to properly place the caret when only the currency sign is present */
@@ -1448,6 +1451,8 @@
                             } else {
                                 setElementSelection(this, holder.settingsClone.aSign.length, holder.settingsClone.aSign.length);
                             }
+                        } else if (tab === 9) {
+                            setElementSelection(this, 0, $this.val().length);
                         }
                         if ($this[0].value === holder.settingsClone.aSuffix) {
                             setElementSelection(this, 0, 0);

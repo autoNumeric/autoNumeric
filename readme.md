@@ -1,8 +1,8 @@
-[autoNumeric-1.9.45](http://www.decorplanit.com/plugin/)
+[autoNumeric-1.9.46](http://www.decorplanit.com/plugin/)
 ================================
 Copyright (c) 2010 - 2016 Robert Knothe Licensed under the [MIT-license](http://opensource.org/licenses/mit-license.php)
 
-updated 2016-06-13
+updated 2016-09-11
 
 [![NPM Version][npm-image]][npm-url] [![Dependency Status][david-image]][david-url]
 
@@ -95,11 +95,10 @@ Pass options via **jQuery's $.extend method** - in this example <span style="col
 			aDec: '@System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator',
             aSign: '@System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat.CurrencySymbol'
 		});      
+		
+		$('selector').autoNumeric('init'); 
+		 
 	});
-
-  jQuery(function($) {
-      $('selector').autoNumeric('init');    
-  });
   
 </script>
 ```

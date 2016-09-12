@@ -1,5 +1,11 @@
 ### Change log:
 
+### Version 1.9.46 released 2016-09-11
++ Fixed tab in key // thanks movalz issue #212
++ Fixed the cusor position when tabbing in Chrome // thanks Dennis Smith issue #221
++ Fixed the destroy method // thanks brunoporto & Mabusto issue #225
++ Fixed the readme file to show correct $.extend defaults // thanks  gayan85 issue #229 
+
 ### Version 1.9.45 released 2016-06-13
 + Modified the "set" method to handle NaN
 

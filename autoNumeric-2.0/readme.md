@@ -1,7 +1,7 @@
 [autoNumeric-2.0](http://www.decorplanit.com/plugin/)
 ================================
 
-### International currency formatting - Updated 2016-06-13 5:00pm 19:00
+### International currency formatting - Updated 2016-09-11 GMT 10:00 PM / 22:00
 
 autoNumeric is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. 
 
@@ -93,11 +93,10 @@ note: - *this can change defaults globally*
 			aDec: '@System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator',
             aSign: '@System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat.CurrencySymbol'
 		});      
+		
+		$('selector').autoNumeric('init'); 
+		 
 	});
-
-  jQuery(function($) {
-      $('selector').autoNumeric('init');    
-  });
   
 </script>
 ```

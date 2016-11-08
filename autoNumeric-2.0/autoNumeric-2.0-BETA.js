@@ -805,10 +805,18 @@
             /** codes are taken from http://www.cambiaresearch.com/c4/702b8cd1-e5b0-42e6-83ac-25f0306e3e25/Javascript-Char-Codes-Key-Codes.aspx
              * skip Fx keys, windows keys, other special keys
              */
-            if ((kdCode >= 112 && kdCode <= 123) || (kdCode >= 91 && kdCode <= 93) || (kdCode >= 9 && kdCode <= 31) || (kdCode < 8 && (which === 0 || which === kdCode)) || kdCode === 144 || kdCode === 145 || kdCode === 45 || kdCode === 224) {
+            if ((kdCode >= keyCode.F1 && kdCode <= keyCode.F12) ||
+                (kdCode >= keyCode.Windows && kdCode <= keyCode.RightClick) ||
+                (kdCode >= keyCode.Tab && kdCode < keyCode.Space) ||
+                (kdCode < keyCode.Backspace &&
+                (which === 0 || which === kdCode)) ||
+                kdCode === keyCode.NumLock ||
+                kdCode === keyCode.ScrollLock ||
+                kdCode === keyCode.Insert ||
+                kdCode === keyCode.Command) {
                 return true;
             }
-            if ((ctrlKey || cmdKey) && kdCode === 65) { /** if select all (a=65)*/
+            if ((ctrlKey || cmdKey) && kdCode === keyCode.a) { /** if select all (a)*/
                 if (this.settings.sNumber) {
                     e.preventDefault();
                     var valueLen = this.that.value.length,
@@ -823,11 +831,11 @@
                 }
                 return true;
             }
-            if ((ctrlKey || cmdKey) && (kdCode === 67 || kdCode === 86 || kdCode === 88)) { /** if copy (c=67) paste (v=86) or cut (x=88) */
+            if ((ctrlKey || cmdKey) && (kdCode === keyCode.c || kdCode === keyCode.v || kdCode === keyCode.x)) { /** if copy (c) paste (v) or cut (x) */
                 if (e.type === 'keydown') {
                     this.expandSelectionOnSign();
                 }
-                if (kdCode === 86 || kdCode === 45) { /** try to prevent wrong paste */
+                if (kdCode === keyCode.v || kdCode === keyCode.Insert) { /** try to prevent wrong paste */
                     if (e.type === 'keydown' || e.type === 'keypress') {
                         if (this.valuePartsBeforePaste === undefined) {
                             this.valuePartsBeforePaste = this.getBeforeAfter();
@@ -836,26 +844,26 @@
                         this.checkPaste();
                     }
                 }
-                return e.type === 'keydown' || e.type === 'keypress' || kdCode === 67;
+                return e.type === 'keydown' || e.type === 'keypress' || kdCode === keyCode.c;
             }
             if (ctrlKey || cmdKey) {
                 return true;
             }
-            if (kdCode === 37 || kdCode === 39) { /** jump over thousand separator */
+            if (kdCode === keyCode.LeftArrow || kdCode === keyCode.RightArrow) { /** jump over thousand separator */
                 var aSep = this.settingsClone.aSep,
                     aDec = this.settingsClone.aDec,
                     startJump = this.selection.start,
                     value = this.that.value;
                 if (e.type === 'keydown' && !this.shiftKey) {
-                    if (kdCode === 37 && (value.charAt(startJump - 2) === aSep || value.charAt(startJump - 2) === aDec)) {
+                    if (kdCode === keyCode.LeftArrow && (value.charAt(startJump - 2) === aSep || value.charAt(startJump - 2) === aDec)) {
                         this.setPosition(startJump - 1);
-                    } else if (kdCode === 39 && (value.charAt(startJump + 1) === aSep || value.charAt(startJump + 1) === aDec)) {
+                    } else if (kdCode === keyCode.RightArrow && (value.charAt(startJump + 1) === aSep || value.charAt(startJump + 1) === aDec)) {
                         this.setPosition(startJump + 1);
                     }
                 }
                 return true;
             }
-            if (kdCode >= 34 && kdCode <= 40) {
+            if (kdCode >= keyCode.PageDown && kdCode <= keyCode.DownArrow) {
                 return true;
             }
             return false;
@@ -929,7 +937,7 @@
         processAllways: function () {
             var settingsClone = this.settingsClone,
                 parts = [];
-            if (this.kdCode === 8 || this.kdCode === 46) {
+            if (this.kdCode === keyCode.Backspace || this.kdCode === keyCode.Delete) {
                 if (!this.selection.length) {
                     parts = this.getBeforeAfterStriped();
                     if (parts[0] === '' && parts[1] === '') {
@@ -967,7 +975,7 @@
                 right = parts[1];
             settingsClone.throwInput = true;
             /** start rules when the decimal character key is pressed always use numeric pad dot to insert decimal separator */
-            if (cCode === settingsClone.aDec || (settingsClone.altDec && cCode === settingsClone.altDec) || ((cCode === '.' || cCode === ',') && this.kdCode === 110)) { /** do not allow decimal character if no decimal part allowed */
+            if (cCode === settingsClone.aDec || (settingsClone.altDec && cCode === settingsClone.altDec) || ((cCode === '.' || cCode === ',') && this.kdCode === keyCode.DotNumpad)) { /** do not allow decimal character if no decimal part allowed */
                 if (!settingsClone.mDec || !settingsClone.aDec) {
                     return true;
                 } /** do not allow decimal character before aNeg character */
@@ -986,7 +994,7 @@
                 this.setValueParts(left + settingsClone.aDec, right, null);
                 return true;
             }
-            if ((cCode === '-' || cCode === '+') && settingsClone.aNeg === '-') { /** prevent minus if not allowed ************************************************************************************************************************************/
+            if ((cCode === '-' || cCode === '+') && settingsClone.aNeg === '-') { /** prevent minus if not allowed */
                 if (!settingsClone) {
                     return true;
                 } /** caret is always after minus */
@@ -1064,15 +1072,15 @@
                 /** fixes caret position with trailing minus sign */
                 if ((settingsClone.pNeg === 's' || (settingsClone.pSign === 's' && settingsClone.pNeg !== 'p')) && left_ar[0] === '-' && settingsClone.aNeg !== '') {
                     left_ar.shift();
-                    if (settingsClone.pSign === 's' && settingsClone.pNeg === 'l' && (kuCode === 8 || this.kdCode === 8 || kuCode === 46 || this.kdCode === 46) && settingsClone.caretFix) {
+                    if (settingsClone.pSign === 's' && settingsClone.pNeg === 'l' && (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace || kuCode === keyCode.Delete || this.kdCode === keyCode.Delete) && settingsClone.caretFix) {
                         left_ar.push('-');
                         settingsClone.caretFix = (e.type === 'keydown') ? true : false;
                     }
-                    if (settingsClone.pSign === 'p' && settingsClone.pNeg === 's' && (kuCode === 8 || this.kdCode === 8 || kuCode === 46 || this.kdCode === 46) && settingsClone.caretFix) {
+                    if (settingsClone.pSign === 'p' && settingsClone.pNeg === 's' && (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace || kuCode === keyCode.Delete || this.kdCode === keyCode.Delete) && settingsClone.caretFix) {
                         left_ar.push('-');
                         settingsClone.caretFix = (e.type === 'keydown') ? true : false;
                     }
-                    if (settingsClone.pSign === 's' && settingsClone.pNeg === 'r' && (kuCode === 8 || this.kdCode === 8 || kuCode === 46 || this.kdCode === 46) && settingsClone.caretFix) {
+                    if (settingsClone.pSign === 's' && settingsClone.pNeg === 'r' && (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace || kuCode === keyCode.Delete || this.kdCode === keyCode.Delete) && settingsClone.caretFix) {
                         var signParts = settingsClone.aSign.split(''),
                             escapeChr = ['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '['],
                             escapedParts = [],
@@ -1085,7 +1093,7 @@
                                 escapedParts.push(miniParts);
                             }
                         });
-                        if (kuCode === 8 || this.kdCode === 8) {
+                        if (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace) {
                             escapedParts.push('-');
                         }
                         escapedSign = escapedParts.join('');
@@ -1247,6 +1255,113 @@
     }
 
     /**
+     * Object that give sense to numeric key codes.
+     */
+    var keyCode = {
+        'Backspace':      8,
+        'Tab':            9,
+        'Enter':          13,
+        'Shift':          16,
+        'Ctrl':           17,
+        'Alt':            18,
+        'PauseBreak':     19,
+        'CapsLock':       20,
+        'Esc':            27,
+        'Space':          32,
+        'PageUp':         33,
+        'PageDown':       34,
+        'End':            35,
+        'Home':           36,
+        'LeftArrow':      37,
+        'UpArrow':        38,
+        'RightArrow':     39,
+        'DownArrow':      40,
+        'Insert':         45,
+        'Delete':         46,
+        'num0':           48,
+        'num1':           49,
+        'num2':           50,
+        'num3':           51,
+        'num4':           52,
+        'num5':           53,
+        'num6':           54,
+        'num7':           55,
+        'num8':           56,
+        'num9':           57,
+        'a':              65,
+        'b':              66,
+        'c':              67,
+        'd':              68,
+        'e':              69,
+        'f':              70,
+        'g':              71,
+        'h':              72,
+        'i':              73,
+        'j':              74,
+        'k':              75,
+        'l':              76,
+        'm':              77,
+        'n':              78,
+        'o':              79,
+        'p':              80,
+        'q':              81,
+        'r':              82,
+        's':              83,
+        't':              84,
+        'u':              85,
+        'v':              86,
+        'w':              87,
+        'x':              88,
+        'y':              89,
+        'z':              90,
+        'Windows':        91,
+        'RightClick':     93,
+        'numpad0':        96,
+        'numpad1':        97,
+        'numpad2':        98,
+        'numpad3':        99,
+        'numpad4':        100,
+        'numpad5':        101,
+        'numpad6':        102,
+        'numpad7':        103,
+        'numpad8':        104,
+        'numpad9':        105,
+        'MultiplyNumpad': 106,
+        'PlusNumpad':     107,
+        'MinusNumpad':    109,
+        'DotNumpad':      110,
+        'SlashNumpad':    111,
+        'F1':             112,
+        'F2':             113,
+        'F3':             114,
+        'F4':             115,
+        'F5':             116,
+        'F6':             117,
+        'F7':             118,
+        'F8':             119,
+        'F9':             120,
+        'F10':            121,
+        'F11':            122,
+        'F12':            123,
+        'NumLock':        144,
+        'ScrollLock':     145,
+        'MyComputer':     182,
+        'MyCalculator':   183,
+        'Semicolon':      186,
+        'Equal':          187,
+        'Comma':          188,
+        'Hyphen':         189,
+        'Dot':            190,
+        'Slash':          191,
+        'Backquote':      192,
+        'LeftBracket':    219,
+        'Backslash':      220,
+        'RightBracket':   221,
+        'Quote':          222,
+        'Command':        224,
+    };
+
+    /**
      * Methods supported by autoNumeric
      */
     var methods = {
@@ -1389,7 +1504,7 @@
                             return true;
                         }
                         /** The below streamed code / comment allows the "enter" keydown to throw a change() event */
-                        /** if (e.keyCode === 13 && holder.inVal !== $this.val()){
+                        /** if (e.keyCode === keyCode.Enter && holder.inVal !== $this.val()){
                             $this.change();
                             holder.inVal = $this.val();
                         }*/
@@ -1413,7 +1528,7 @@
                         return true;
                     });
                     $this.on('keypress.autoNumeric', function (e) {
-                        if (e.shiftKey && e.keyCode === 45) { /** FF fix for Shift && insert paste event */
+                        if (e.shiftKey && e.keyCode === keyCode.Insert) { /** FF fix for Shift && insert paste event */
                             return;
                         }
                         holder = getHolder($this);
@@ -1442,7 +1557,7 @@
                         holder = getHolder($this);
                         holder.init(e);
                         var skip = holder.skipAllways(e),
-							tab = holder.kdCode;;
+                            tab = holder.kdCode;
                         holder.kdCode = 0;
                         delete holder.valuePartsBeforePaste;
                         if ($this[0].value === holder.settingsClone.aSign) { /** added to properly place the caret when only the currency sign is present */
@@ -1451,7 +1566,7 @@
                             } else {
                                 setElementSelection(this, holder.settingsClone.aSign.length, holder.settingsClone.aSign.length);
                             }
-                        } else if (tab === 9) {
+                        } else if (tab === keyCode.Tab) {
                             setElementSelection(this, 0, $this.val().length);
                         }
                         if ($this[0].value === holder.settingsClone.aSuffix) {

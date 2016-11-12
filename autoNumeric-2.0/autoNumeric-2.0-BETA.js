@@ -1637,13 +1637,13 @@
                     $this.on("paste", function (e) {
                         e.preventDefault();
                         holder = getHolder($this);
-                        var $settings = holder.settingsClone;
-                        var oldRawValue = $this.autoNumeric('get');
-                        var currentValue = this.value || '';
-                        var prefix = currentValue.substring(0, this.selectionStart || 0);
-                        var suffix = currentValue.substring(this.selectionEnd || 0, currentValue.length);
-                        var pastedText = e.originalEvent.clipboardData.getData('text/plain');
-                        var newValue = autoStrip(prefix + pastedText + suffix, $settings);
+                        var $settings = holder.settingsClone,
+                            oldRawValue = $this.autoNumeric('get'),
+                            currentValue = this.value || '',
+                            prefix = currentValue.substring(0, this.selectionStart || 0),
+                            suffix = currentValue.substring(this.selectionEnd || 0, currentValue.length),
+                            pastedText = e.originalEvent.clipboardData.getData('text/plain'),
+                            newValue = autoStrip(prefix + pastedText + suffix, $settings);
                         if (newValue !== '' && !isNaN(newValue) && new Number(oldRawValue).valueOf() !== new Number(newValue).valueOf()) {
                             $this.autoNumeric('set', newValue);
                             $this.trigger('input');

@@ -1635,15 +1635,16 @@
                         }
                     });
                     $this.on("paste", function (e) {
+                        e.preventDefault();
                         holder = getHolder($this);
                         var $settings = holder.settingsClone;
-                        if ($settings.mouseUp) {
-                            window.setTimeout(function()
-                            {
-                                var pastedValue = autoStrip($this.val(), $settings);
-                                $this.autoNumeric("set", pastedValue);
-
-                            }, 1);
+                        var currentValue = this.value || '';
+                        var prefix = currentValue.substring(0, this.selectionStart || 0);
+                        var suffix = currentValue.substring(this.selectionEnd || 0, currentValue.length);
+                        var pastedValue =  autoStrip(prefix + e.originalEvent.clipboardData.getData('text/plain') + suffix, $settings);
+                        if (pastedValue !== '' && !isNaN(pastedValue)) {
+                            $this.autoNumeric("set", pastedValue);
+                            $this.trigger('input');
                         }
                     });
                     $this.on("mouseup", function (e) {

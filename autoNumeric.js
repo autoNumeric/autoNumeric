@@ -1185,7 +1185,9 @@
                 if (!autoCheck(value, settings)) {
                     value = autoRound('', settings);
                 }
-                value = autoGroup(value, settings);
+                if (value !== '') {
+                    value = autoGroup(value, settings);
+                }
                 if ($input) {
                     return $this.val(value);
                 }

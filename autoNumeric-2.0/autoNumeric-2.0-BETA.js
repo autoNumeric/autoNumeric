@@ -1642,7 +1642,7 @@
                             prefix = currentValue.substring(0, this.selectionStart || 0),
                             currentValue = this.value || '',
                             pastedValue = '';
-                        prefix = currentValue.substring(0, this.selectionStart || 0),
+                        prefix = currentValue.substring(0, this.selectionStart || 0);
                         suffix = currentValue.substring(this.selectionEnd || 0, currentValue.length);
                         pastedValue =  autoStrip(prefix + e.originalEvent.clipboardData.getData('text/plain') + suffix, $settings);
                         if (pastedValue !== '' && !isNaN(pastedValue)) {

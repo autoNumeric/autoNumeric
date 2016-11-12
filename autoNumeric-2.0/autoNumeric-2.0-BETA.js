@@ -1638,6 +1638,7 @@
                         e.preventDefault();
                         holder = getHolder($this);
                         var $settings = holder.settingsClone;
+                        var oldRawValue = $this.autoNumeric('get');
                         var currentValue = this.value || '';
                         var prefix = currentValue.substring(0, this.selectionStart || 0);
                         var suffix = currentValue.substring(this.selectionEnd || 0, currentValue.length);
@@ -1645,7 +1646,10 @@
                         var newValue = autoStrip(prefix + pastedText + suffix, $settings);
                         if (newValue !== '' && !isNaN(newValue)) {
                             $this.autoNumeric('set', newValue);
-                            $this.trigger('input');
+                            console.log(new Number(oldRawValue), new Number(newValue));
+                            if (new Number(oldRawValue).valueOf() !== new Number(newValue).valueOf()) {
+                                $this.trigger('input');
+                            }
                         }
                     });
                     $this.on("mouseup", function (e) {

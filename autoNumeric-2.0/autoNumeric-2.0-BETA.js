@@ -1638,15 +1638,14 @@
                         e.preventDefault();
                         holder = getHolder($this);
                         var $settings = holder.settingsClone,
+                            oldRawValue = $this.autoNumeric('get'),
                             currentValue = this.value || '',
                             prefix = currentValue.substring(0, this.selectionStart || 0),
-                            currentValue = this.value || '',
-                            pastedValue = '';
-                        prefix = currentValue.substring(0, this.selectionStart || 0);
-                        suffix = currentValue.substring(this.selectionEnd || 0, currentValue.length);
-                        pastedValue =  autoStrip(prefix + e.originalEvent.clipboardData.getData('text/plain') + suffix, $settings);
-                        if (pastedValue !== '' && !isNaN(pastedValue)) {
-                            $this.autoNumeric("set", pastedValue);
+                            suffix = currentValue.substring(this.selectionEnd || 0, currentValue.length),
+                            pastedText = e.originalEvent.clipboardData.getData('text/plain'),
+                            newValue = autoStrip(prefix + pastedText + suffix, $settings);
+                        if (newValue !== '' && !isNaN(newValue) && new Number(oldRawValue).valueOf() !== new Number(newValue).valueOf()) {
+                            $this.autoNumeric('set', newValue);
                             $this.trigger('input');
                         }
                     });

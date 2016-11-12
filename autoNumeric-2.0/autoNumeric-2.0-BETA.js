@@ -1637,13 +1637,11 @@
                     $this.on("paste", function (e) {
                         holder = getHolder($this);
                         var $settings = holder.settingsClone;
-                        if ($settings.mouseUp) {
-                            window.setTimeout(function()
-                            {
-                                var pastedValue = autoStrip($this.val(), $settings);
-                                $this.autoNumeric("set", pastedValue);
-
-                            }, 1);
+                        e.preventDefault();
+                        var pastedValue = autoStrip(e.originalEvent.clipboardData.getData('text/plain'), $settings);
+                        if (pastedValue !== '' && !isNaN(pastedValue)) {
+                            $this.autoNumeric("set", pastedValue);
+                            $this.trigger('input');
                         }
                     });
                     $this.on("mouseup", function (e) {

@@ -1,5 +1,11 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
+### 2016-11-12
++ Fixed tab in key select all and deletion // issue #246
++ Fixed issue with Vue.js 2.0 // issue #247 
++ Fixed context menu paste event // issue #251
++ switch from jsLint to jsHint
+
 ### 2016-09-11
 + Fixed tab in key // thanks movalz issue #212
 + Fixed the cusor position when tabbing in Chrome // thanks Dennis Smith issue #221

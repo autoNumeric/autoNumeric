@@ -1641,8 +1641,8 @@
                         var currentValue = this.value || '';
                         var prefix = currentValue.substring(0, this.selectionStart || 0);
                         var suffix = currentValue.substring(this.selectionEnd || 0, currentValue.length);
-                        var pastedValue = e.originalEvent.clipboardData.getData('text/plain');
-                        var newValue = autoStrip(prefix + pastedValue + suffix, $settings);
+                        var pastedText = e.originalEvent.clipboardData.getData('text/plain');
+                        var newValue = autoStrip(prefix + pastedText + suffix, $settings);
                         if (newValue !== '' && !isNaN(newValue)) {
                             $this.autoNumeric("set", newValue);
                             $this.trigger('input');

@@ -1644,11 +1644,9 @@
                         var suffix = currentValue.substring(this.selectionEnd || 0, currentValue.length);
                         var pastedText = e.originalEvent.clipboardData.getData('text/plain');
                         var newValue = autoStrip(prefix + pastedText + suffix, $settings);
-                        if (newValue !== '' && !isNaN(newValue)) {
+                        if (newValue !== '' && !isNaN(newValue) && new Number(oldRawValue).valueOf() !== new Number(newValue).valueOf()) {
                             $this.autoNumeric('set', newValue);
-                            if (new Number(oldRawValue).valueOf() !== new Number(newValue).valueOf()) {
-                                $this.trigger('input');
-                            }
+                            $this.trigger('input');
                         }
                     });
                     $this.on("mouseup", function (e) {

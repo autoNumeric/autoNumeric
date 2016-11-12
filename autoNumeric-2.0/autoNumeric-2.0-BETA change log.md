@@ -1,6 +1,9 @@
 ### Change log autoNumeric-2.0-BETA.js:
 
 ### 2016-11-12
++ Fixed paste event on both vcontext menu and "ctrl" & "v" // issue #251 special thanks to @rhyek
+
+### 2016-11-12
 + Fixed tab in key select all and deletion // issue #246
 + Fixed issue with Vue.js 2.0 // issue #247 
 + Fixed context menu paste event // issue #251

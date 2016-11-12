@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @contributor: Sokolov Yura
- * @version: 2.0-beta  (last update 2016-11-12 GMT 2:00 PM / 14:00)
+ * @version: 2.0-beta  (last update 2016-11-12 GMT 6:30 PM / 18:30)
  *
  * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  *
@@ -1637,19 +1637,18 @@
                     $this.on("paste", function (e) {
                         e.preventDefault();
                         holder = getHolder($this);
-                        var $settings = holder.settingsClone;
-                        var currentValue = this.value || '';
-                        var prefix = currentValue.substring(0, this.selectionStart || 0);
-                        var suffix = currentValue.substring(this.selectionEnd || 0, currentValue.length);
-                        var pastedValue =  autoStrip(prefix + e.originalEvent.clipboardData.getData('text/plain') + suffix, $settings);
+                        var $settings = holder.settingsClone,
+                            currentValue = this.value || '',
+                            prefix = currentValue.substring(0, this.selectionStart || 0),
+                            currentValue = this.value || '',
+                            pastedValue = '';
+                        prefix = currentValue.substring(0, this.selectionStart || 0),
+                        suffix = currentValue.substring(this.selectionEnd || 0, currentValue.length);
+                        pastedValue =  autoStrip(prefix + e.originalEvent.clipboardData.getData('text/plain') + suffix, $settings);
                         if (pastedValue !== '' && !isNaN(pastedValue)) {
                             $this.autoNumeric("set", pastedValue);
                             $this.trigger('input');
                         }
-                    });
-                    $this.on("mouseup", function (e) {
-                        holder = getHolder($this);
-                        holder.settingsClone.mouseUp = true;
                     });
                     $this.closest('form').on('submit.autoNumeric', function () {
                         holder = getHolder($this);

@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @contributor: Sokolov Yura
- * @version: 2.0-beta  (last update 2016-11-12 GMT 2:00 PM / 14:00)
+ * @version: 2.0-beta  (last update 2016-11-12 GMT 6:30 PM / 18:30)
  *
  * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  *
@@ -1648,10 +1648,6 @@
                             $this.autoNumeric('set', newValue);
                             $this.trigger('input');
                         }
-                    });
-                    $this.on("mouseup", function (e) {
-                        holder = getHolder($this);
-                        holder.settingsClone.mouseUp = true;
                     });
                     $this.closest('form').on('submit.autoNumeric', function () {
                         holder = getHolder($this);

@@ -1641,9 +1641,10 @@
                         var currentValue = this.value || '';
                         var prefix = currentValue.substring(0, this.selectionStart || 0);
                         var suffix = currentValue.substring(this.selectionEnd || 0, currentValue.length);
-                        var pastedValue =  autoStrip(prefix + e.originalEvent.clipboardData.getData('text/plain') + suffix, $settings);
-                        if (pastedValue !== '' && !isNaN(pastedValue)) {
-                            $this.autoNumeric("set", pastedValue);
+                        var pastedText = e.originalEvent.clipboardData.getData('text/plain');
+                        var newValue = autoStrip(prefix + pastedText + suffix, $settings);
+                        if (newValue !== '' && !isNaN(newValue)) {
+                            $this.autoNumeric('set', newValue);
                             $this.trigger('input');
                         }
                     });

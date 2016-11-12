@@ -1646,7 +1646,6 @@
                         var newValue = autoStrip(prefix + pastedText + suffix, $settings);
                         if (newValue !== '' && !isNaN(newValue)) {
                             $this.autoNumeric('set', newValue);
-                            console.log(new Number(oldRawValue), new Number(newValue));
                             if (new Number(oldRawValue).valueOf() !== new Number(newValue).valueOf()) {
                                 $this.trigger('input');
                             }

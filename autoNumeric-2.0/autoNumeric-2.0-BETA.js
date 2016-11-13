@@ -1635,19 +1635,27 @@
                         }
                     });
                     $this.on("paste", function (e) {
+                        function isValid(text) {
+                            return text !== '' && !isNaN(text);
+                        }
                         e.preventDefault();
                         holder = getHolder($this);
                         var $settings = holder.settingsClone,
+                            oldRawValue = $this.autoNumeric('get'),
                             currentValue = this.value || '',
-                            prefix = currentValue.substring(0, this.selectionStart || 0),
-                            currentValue = this.value || '',
-                            pastedValue = '';
-                        prefix = currentValue.substring(0, this.selectionStart || 0);
-                        suffix = currentValue.substring(this.selectionEnd || 0, currentValue.length);
-                        pastedValue =  autoStrip(prefix + e.originalEvent.clipboardData.getData('text/plain') + suffix, $settings);
-                        if (pastedValue !== '' && !isNaN(pastedValue)) {
-                            $this.autoNumeric("set", pastedValue);
-                            $this.trigger('input');
+                            selectionStart = this.selectionStart || 0,
+                            selectionEnd = this.selectionEnd || 0,
+                            prefix = currentValue.substring(0, selectionStart),
+                            suffix = currentValue.substring(selectionEnd, currentValue.length),
+                            pastedText = autoStrip(e.originalEvent.clipboardData.getData('text/plain'), $settings);
+                        if (isValid(pastedText)) {
+                            var newValue = autoStrip(prefix + new Number(pastedText).valueOf() + suffix, $settings);
+                            if (isValid(newValue) && new Number(oldRawValue).valueOf() !== new Number(newValue).valueOf()) {
+                                $this.autoNumeric('set', newValue);
+                                $this.trigger('input');
+                            }
+                        } else {
+                            this.selectionStart = selectionEnd;
                         }
                     });
                     $this.closest('form').on('submit.autoNumeric', function () {

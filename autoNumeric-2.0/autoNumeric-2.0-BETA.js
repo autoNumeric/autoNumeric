@@ -1635,21 +1635,23 @@
                         }
                     });
                     $this.on("paste", function (e) {
+                        e.preventDefault();
+                        holder = getHolder($this);
+                        function prepare(text) {
+                            return autoStrip(text, holder.settingsClone).replace(holder.settingsClone.aDec, '.');
+                        }
                         function isValid(text) {
                             return text !== '' && !isNaN(text);
                         }
-                        e.preventDefault();
-                        holder = getHolder($this);
-                        var $settings = holder.settingsClone,
-                            oldRawValue = $this.autoNumeric('get'),
+                        var oldRawValue = $this.autoNumeric('get'),
                             currentValue = this.value || '',
                             selectionStart = this.selectionStart || 0,
                             selectionEnd = this.selectionEnd || 0,
                             prefix = currentValue.substring(0, selectionStart),
                             suffix = currentValue.substring(selectionEnd, currentValue.length),
-                            pastedText = autoStrip(e.originalEvent.clipboardData.getData('text/plain'), $settings);
+                            pastedText = prepare(e.originalEvent.clipboardData.getData('text/plain'));
                         if (isValid(pastedText)) {
-                            var newValue = autoStrip(prefix + new Number(pastedText).valueOf() + suffix, $settings);
+                            var newValue = prepare(prefix + new Number(pastedText).valueOf() + suffix);
                             if (isValid(newValue) && new Number(oldRawValue).valueOf() !== new Number(newValue).valueOf()) {
                                 $this.autoNumeric('set', newValue);
                                 $this.trigger('input');

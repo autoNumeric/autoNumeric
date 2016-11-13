@@ -502,6 +502,13 @@
     }
 
     /**
+     *  Function that returns true if the value is an integer, and false otherwise.
+     */
+    function isInt(value) {
+        return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value))
+    }
+
+    /**
      * Function to parse vMin, vMax & the input value to prepare for testing to determine if the value falls within the min / max range
      * Return an object example: vMin: "999999999999999.99" returns the following "{s: -1, e: 12, c: Array[15]}"
      * This function is adapted from Big.js https://github.com/MikeMcl/big.js/
@@ -517,6 +524,11 @@
         /** Minus zero? */
         if (n === 0 && 1 / n < 0) {
             n = '-0';
+        }
+
+        /** We cast the n parameter to a string if it's an integer **/
+        if (isInt(n)){
+            n = n.toString();
         }
         /** Determine sign. 1 positive, -1 negative */
         if (n.charAt(0) === '-') {

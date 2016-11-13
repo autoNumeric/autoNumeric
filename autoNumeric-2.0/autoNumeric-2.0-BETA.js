@@ -1665,7 +1665,7 @@
                         if (holder) {
                             var $settings = holder.settingsClone;
                             if ($settings.unSetOnSubmit) {
-                            $this.val($settings.rawValue);
+								$this.val($settings.rawValue);
                             }
                         }
                     });

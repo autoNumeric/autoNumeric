@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributor: Sokolov Yura
-* @version: autoNumeric.js 2.0 - 2016-11-13 GMT 6:00 PM / 18:00
+* @version: autoNumeric.js 2.0 - 2016-11-14 GMT 3:00 AM / 3:00
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -1925,7 +1925,7 @@
             } else {
                 throwErr("The \"<" + $this.prop("tagName").toLowerCase() + ">\" is not supported by autoNumeric()", settings.debug);
             }
-            if (settings.rawValue !== "") {
+            if (settings.eDec || settings.aScale) {
                 value = settings.rawValue;
             } else {
                 if (!((/\d/).test(value) || Number(value) === 0) && settings.wEmpty === "focus") {

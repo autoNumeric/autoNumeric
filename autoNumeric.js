@@ -707,6 +707,12 @@
             if ((ctrlKey || cmdKey) && kdCode === 65) { /** if select all (a=65)*/
                 return true;
             }
+            /**
+             * to prevent loss of selection if 'a' is released after 'ctrl'
+             * */
+            if (e.type === 'keyup' && kdCode === 65){
+                return true;
+            }
             if ((ctrlKey || cmdKey) && (kdCode === 67 || kdCode === 86 || kdCode === 88)) { /** if copy (c=67) paste (v=86) or cut (x=88) */
                 if (e.type === 'keydown') {
                     this.expandSelectionOnSign();

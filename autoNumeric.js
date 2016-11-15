@@ -756,6 +756,10 @@
                     if (this.kdCode === 8) {
                         parts[0] = parts[0].substring(0, parts[0].length - 1);
                     } else {
+                        if(parts[1][0] == this.settingsClone.aDec){
+			    return true;
+			}
+
                         parts[1] = parts[1].substring(1, parts[1].length);
                     }
                     this.setValueParts(parts[0], parts[1]);

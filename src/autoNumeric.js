@@ -1,8 +1,8 @@
 /**
 * autoNumeric.js
 * @author: Bob Knothe
-* @contributor: Sokolov Yura
-* @version: autoNumeric.js 2.0 - 2016-11-14 GMT 3:00 AM / 3:00
+* @contributor: Sokolov Yura and other github users
+* @version: 2.0 - 2016-11-16 UTC-10 12:00
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -94,8 +94,7 @@
     */
     function throwErr(message, debug) {
         if (debug) {
-            var err = new Error(message);
-            throw err;
+            throw new Error(message);
         }
     }
 
@@ -200,9 +199,8 @@
         var m = s.match(settings.numRegAutoStrip);
         s = m ? [m[1], m[2], m[3]].join("") : "";
         if (settings.lZero === "allow" || settings.lZero === "keep") {
-            var parts = [],
+            var parts = s.split(settings.aDec),
                 nSign = "";
-            parts = s.split(settings.aDec);
             if (parts[0].indexOf(settings.aNeg) !== -1) {
                 nSign = settings.aNeg;
                 parts[0] = parts[0].replace(settings.aNeg, "");
@@ -241,7 +239,7 @@
     }
 
     /**
-    * convert locale format to javaSript numeric string
+    * convert locale format to Javascript numeric string
     * allows locale decimal separator to be a period or comma - no thousand separator allowed of currency signs allowed
     * '1234.56'    OK
     * '-1234.56'   OK
@@ -708,7 +706,7 @@
     }
 
     /**
-    * Test if sessionStorage is supported - taken from moderizr
+    * Test if sessionStorage is supported - taken from modernizr
     */
     function storageTest() {
         var mod = "modernizr";
@@ -752,7 +750,6 @@
                 }
             }
         }
-        return;
     }
 
     /**
@@ -836,7 +833,7 @@
                 var m = new_value.match(new RegExp("^" + settingsClone.aNegRegAutoStrip + "\\" + settingsClone.aDec));
                 if (m) {
                     left = left.replace(m[1], m[1] + "0");
-                    new_value = left + right;
+                    new_value = left + right; //FIXME new_value is never used
                 }
             }
             return [left, right];
@@ -854,12 +851,11 @@
                 maxTest = autoCheck(new_value, settingsClone)[1];
             if (minTest && maxTest) {
                 new_value = truncateDecimal(new_value, settingsClone, advent);
-                var test_value = (new_value.indexOf(",") !== -1) ? new_value.replace(",", ".") : new_value,
-                    text_value = test_value;
+                var test_value = (new_value.indexOf(",") !== -1) ? new_value.replace(",", ".") : new_value;
                 if (test_value === "" || test_value === settingsClone.aNeg) {
                     settingsClone.rawValue = "";
                 } else {
-                    settingsClone.rawValue = text_value;
+                    settingsClone.rawValue = test_value;
                 }
                 if (position > new_value.length) {
                     position = new_value.length;
@@ -1191,9 +1187,8 @@
                 kuCode = e.keyCode;
             /** no grouping separator and no currency sign */
             if ((settingsClone.aSep === "" || (settingsClone.aSep !== "" && leftLength.indexOf(settingsClone.aSep) === -1)) && (settingsClone.aSign === "" || (settingsClone.aSign !== "" && leftLength.indexOf(settingsClone.aSign) === -1))) {
-                var subParts = [],
+                var subParts = leftLength.split(settingsClone.aDec),
                     nSign = "";
-                subParts = leftLength.split(settingsClone.aDec);
                 if (subParts[0].indexOf("-") > -1) {
                     nSign = "-";
                     subParts[0] = subParts[0].replace("-", "");
@@ -1228,7 +1223,7 @@
                         var signParts = settingsClone.aSign.split(""),
                             escapeChr = ["\\", "^", "$", ".", "|", "?", "*", "+", "(", ")", "["],
                             escapedParts = [],
-                            escapedSign = "";
+                            escapedSign;
                         $.each(signParts, function (i, miniParts) {
                             miniParts = signParts[i];
                             if ($.inArray(miniParts, escapeChr) !== -1) {
@@ -1393,7 +1388,7 @@
         * $(someSelector).autoNumeric('init', {option}); // initiate autoNumeric with options
         * $(someSelector).autoNumeric(); // initiate autoNumeric with defaults
         * $(someSelector).autoNumeric({option}); // initiate autoNumeric with options
-        * options passes as a parameter example '{aSep: ".", aDec: ",", aSign: '€ '}
+        * options passes as a parameter example '{aSep: ".", aDec: ",", aSign: 'ï¿½ '}
         */
         init: function (options) {
             return this.each(function () {
@@ -1705,8 +1700,8 @@
                             suffix = currentValue.substring(selectionEnd, currentValue.length),
                             pastedText = prepare(e.originalEvent.clipboardData.getData("text/plain"));
                         if (isValid(pastedText)) {
-                            var newValue = prepare(prefix + new Number(pastedText).valueOf() + suffix);
-                            if (isValid(newValue) && new Number(oldRawValue).valueOf() !== new Number(newValue).valueOf()) {
+                            var newValue = prepare(prefix + Number(pastedText).valueOf() + suffix);
+                            if (isValid(newValue) && Number(oldRawValue).valueOf() !== Number(newValue).valueOf()) {
                                 $this.autoNumeric("set", newValue);
                                 $this.trigger("input");
                             }
@@ -1765,7 +1760,7 @@
         /**
         * method to update settings - can be call as many times
         * $(someSelector).autoNumeric("update", {options}); // updates the settings
-        * options passed as a parameter example '{aSep: ".", aDec: ",", aSign: '€ '}
+        * options passed as a parameter example '{aSep: ".", aDec: ",", aSign: 'ï¿½ '}
         */
         update: function (options) {
             return $(this).each(function () {
@@ -1790,7 +1785,6 @@
                 if ($this.val() !== "" || $this.text() !== "") {
                     return $this.autoNumeric("set", strip);
                 }
-                return;
             });
         },
 
@@ -2069,7 +2063,7 @@
         },
 
         /**
-        * The 'getSteetings returns the object with autoNumeric settings for those who need to look under the hood
+        * The 'getSettings' function returns the object with autoNumeric settings for those who need to look under the hood
         * $(someSelector).autoNumeric('getSettings'); // no parameters accepted
         * $(someSelector).autoNumeric('getSettings').aDec; // return the aDec setting as a string - ant valid setting can be used
         */
@@ -2165,7 +2159,7 @@
         */
         aSuffix: "",
 
-        /** overide min max limits'
+        /** override min max limits'
         * oLimits: "ceiling" adheres to vMax and ignores vMin settings
         * oLimits: "floor" adheres to vMin and ignores vMax settings
         * oLimits: "ignore" ignores both vMin & vMax
@@ -2195,12 +2189,12 @@
         */
         eDec: null,
 
-        /** Scaled number diplayed when input does not have focus example with the follwoing:
+        /** Scaled number displayed when input does not have focus example with the following:
         * {aScale: ["1000", "0", "K"]}  => with focus "1,000.00" without focus "1K"
         * ["divisor", "decimal places", "symbol"]
-        * divisor value - does not need to be whole number - please understand that javaSript has limited in accuracy in math
+        * divisor value - does not need to be whole number - please understand that Javascript has limited accuracy in math
         * the "get" method returns the full value and scaled value.
-        * decimal places "optional" when not in focus - if ommited the decimal places will be the same when the input has focus
+        * decimal places "optional" when not in focus - if omitted the decimal places will be the same when the input has focus
         * Symbol "optional" displayed when the input does not have focus - NOTE: if a symbol is used you MUST also specify the decimal places
         * value must be enclosed in quotes example mDec: "3"
         */

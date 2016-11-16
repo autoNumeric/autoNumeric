@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @contributor: Sokolov Yura
- * @version: 2.0-beta - 2016-09-11 GMT 10:00 PM / 22:00
+ * @version: 2.0-beta  (last update 2016-11-12 GMT 6:30 PM / 18:30)
  *
  * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  *
@@ -31,7 +31,11 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
+
+/*jshint browser: true, node: true, bitwise: false*/
+/*global module, require, define*/
 (function (factory) {
+    "use strict";
     if (typeof define === "function" && define.amd) {
         /** AMD. Register as an anonymous module. */
         define(["jquery"], factory);
@@ -44,8 +48,6 @@
     }
 }(function ($) {
     "use strict";
-    /*jslint browser: true, bitwise: true*/
-    /*global jQuery: false, sessionStorage: false*/
 
     /**
      * Cross browser routine for getting selected range/cursor position
@@ -75,11 +77,11 @@
     function setElementSelection(that, start, end) {
         if (that.selectionStart === undefined) {
             that.focus();
-            var r = that.createTextRange();
-            r.collapse(true);
-            r.moveEnd('character', end);
-            r.moveStart('character', start);
-            r.select();
+            var range = that.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
         } else {
             that.selectionStart = start;
             that.selectionEnd = end;
@@ -447,7 +449,6 @@
             tRound = Number(iv.charAt(rLength + 1)),
             ivArray = iv.substring(0, rLength + 1).split(''),
             odd = (iv.charAt(rLength) === '.') ? (iv.charAt(rLength - 1) % 2) : (iv.charAt(rLength) % 2);
-        /*jslint white: true*/
         if ((tRound > 4 && settings.mRound === 'S') || /**                      Round half up symmetric */
             (tRound > 4 && settings.mRound === 'A' && nSign === '') || /**      Round half up asymmetric positive values */
             (tRound > 5 && settings.mRound === 'A' && nSign === '-') || /**     Round half up asymmetric negative values */
@@ -459,7 +460,6 @@
             (tRound > 0 && settings.mRound === 'C' && nSign === '') || /**      Round to ceiling toward positive infinite */
             (tRound > 0 && settings.mRound === 'F' && nSign === '-') || /**     Round to floor toward negative infinite */
             (tRound > 0 && settings.mRound === 'U')) { /**                      Round up away from zero */
-            /*jslint white: false*/
             for (i = (ivArray.length - 1); i >= 0; i -= 1) { /** Round up the last digit if required, and continue until no more 9's are found */
                 if (ivArray[i] !== '.') {
                     ivArray[i] = +ivArray[i] + 1;
@@ -1128,10 +1128,8 @@
                     }
                 }
             }
-            if (this.that.value !== value) {
-                this.that.value = value;
-                this.setPosition(position);
-            }
+            this.that.value = value;
+            this.setPosition(position);
             this.formatted = true;
         }
     };
@@ -1487,8 +1485,8 @@
                         if ($settings.eDec !== null) {
                             $settings.mDec = $settings.eDec;
                             $this.autoNumeric('set', $settings.rawValue);
-                        } else {
-                            $this.autoNumeric('set', $settings.rawValue);
+                        } else if (autoStrip($this.val(), $settings) !== $settings.rawValue) {
+                            $this.autoNumeric("set", autoStrip($this.val(), $settings));
                         }
                         holder.inVal = $this.val();
                         holder.lastVal = $this.val();
@@ -1499,6 +1497,7 @@
                     });
                     $this.on('keydown.autoNumeric', function (e) {
                         holder = getHolder($this);
+                        holder.settingsClone.mouseUp = false;
                         if (holder.that.readOnly) {
                             holder.processed = true;
                             return true;
@@ -1635,12 +1634,38 @@
                             delete holder.inVal;
                         }
                     });
+                    $this.on("paste", function (e) {
+                        e.preventDefault();
+                        holder = getHolder($this);
+                        function prepare(text) {
+                            return autoStrip(text, holder.settingsClone).replace(holder.settingsClone.aDec, '.');
+                        }
+                        function isValid(text) {
+                            return text !== '' && !isNaN(text);
+                        }
+                        var oldRawValue = $this.autoNumeric('get'),
+                            currentValue = this.value || '',
+                            selectionStart = this.selectionStart || 0,
+                            selectionEnd = this.selectionEnd || 0,
+                            prefix = currentValue.substring(0, selectionStart),
+                            suffix = currentValue.substring(selectionEnd, currentValue.length),
+                            pastedText = prepare(e.originalEvent.clipboardData.getData('text/plain'));
+                        if (isValid(pastedText)) {
+                            var newValue = prepare(prefix + new Number(pastedText).valueOf() + suffix);
+                            if (isValid(newValue) && new Number(oldRawValue).valueOf() !== new Number(newValue).valueOf()) {
+                                $this.autoNumeric('set', newValue);
+                                $this.trigger('input');
+                            }
+                        } else {
+                            this.selectionStart = selectionEnd;
+                        }
+                    });
                     $this.closest('form').on('submit.autoNumeric', function () {
                         holder = getHolder($this);
                         if (holder) {
                             var $settings = holder.settingsClone;
                             if ($settings.unSetOnSubmit) {
-                            $this.val($settings.rawValue);
+								$this.val($settings.rawValue);
                             }
                         }
                     });
@@ -1875,7 +1900,6 @@
                 rcheckableType = /^(?:checkbox|radio)$/i,
                 rnonAutoNumericTypes = /^(?:button|checkbox|color|date|datetime|datetime-local|email|file|image|month|number|password|radio|range|reset|search|submit|time|url|week)/i,
                 count = 0;
-            /*jslint unparam: true*/
             /** index of successful elements */
             $.each(allFormElements[0], function (i, field) {
                 if (field.name !== '' && rsubmittable.test(field.localName) && !rsubmitterTypes.test(field.type) && !field.disabled && (field.checked || !rcheckableType.test(field.type))) {
@@ -1912,7 +1936,6 @@
                     }
                 }
             });
-            /*jslint unparam: false*/
             return formParts.join('&');
         },
 
@@ -1939,7 +1962,6 @@
                 rcheckableType = /^(?:checkbox|radio)$/i,
                 rnonAutoNumericTypes = /^(?:button|checkbox|color|date|datetime|datetime-local|email|file|image|month|number|password|radio|range|reset|search|submit|time|url|week)/i,
                 count = 0;
-            /*jslint unparam: true*/
             /* index of successful elements */
             $.each(allFormElements[0], function (i, field) {
                 if (field.name !== '' && rsubmittable.test(field.localName) && !rsubmitterTypes.test(field.type) && !field.disabled && (field.checked || !rcheckableType.test(field.type))) {
@@ -1972,7 +1994,6 @@
                     }
                 }
             });
-            /*jslint unparam: false*/
             return formFields;
         },
 

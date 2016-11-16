@@ -1,7 +1,7 @@
 [autoNumeric-2.0](http://www.decorplanit.com/plugin/)
 ================================
 
-### International currency formatting - Updated 2016-09-11 GMT 10:00 PM / 22:00
+### International currency formatting (last update 2016-11-12 GMT 2:00 PM / 14:00)
 
 autoNumeric is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. 
 

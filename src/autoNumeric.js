@@ -1388,7 +1388,7 @@
         * $(someSelector).autoNumeric('init', {option}); // initiate autoNumeric with options
         * $(someSelector).autoNumeric(); // initiate autoNumeric with defaults
         * $(someSelector).autoNumeric({option}); // initiate autoNumeric with options
-        * options passes as a parameter example '{aSep: ".", aDec: ",", aSign: '� '}
+        * options passes as a parameter example '{aSep: ".", aDec: ",", aSign: '€ '}
         */
         init: function (options) {
             return this.each(function () {
@@ -1760,7 +1760,7 @@
         /**
         * method to update settings - can be call as many times
         * $(someSelector).autoNumeric("update", {options}); // updates the settings
-        * options passed as a parameter example '{aSep: ".", aDec: ",", aSign: '� '}
+        * options passed as a parameter example '{aSep: ".", aDec: ",", aSign: '€ '}
         */
         update: function (options) {
             return $(this).each(function () {

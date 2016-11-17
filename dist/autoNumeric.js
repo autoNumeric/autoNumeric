@@ -218,7 +218,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             s = nSign + parts.join(settings.aDec);
         }
         if (settings.onOff && settings.lZero === "deny" || settings.lZero === "allow" && settings.onOff === false) {
-            var strip_reg = "^" + settings.aNegRegAutoStrip + "0*(\\d|$)";
+            var strip_reg = "^" + settings.aNegRegAutoStrip + "0*(\\d)"; //Using `^${settings.aNegRegAutoStrip}0*(\\d|$)` entirely clear the input on blur
             strip_reg = new RegExp(strip_reg);
             s = s.replace(strip_reg, "$1$2");
         }

@@ -4,38 +4,41 @@
 <meta charset="utf-8">
 <title>autoNumeric</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-<script type="text/javascript" src="http://rawgit.com/BobKnothe/autoNumeric/master/autoNumeric.js"></script>
+<script type="text/javascript" src="http://rawgit.com/BobKnothe/autoNumeric/master/src/autoNumeric.js"></script>
 <script type="text/javascript">
-jQuery(function($) {
-    $('.auto').autoNumeric('init');
-});
+    jQuery(function($) {
+        $('.auto').autoNumeric('init');
+    });
 </script>
 <style>
-input[type="text"] {
-	text-align:right;
-}
-.method {
-	margin-top: 25px;
-	margin-bottom:25px;
-}
-.method td {
-	height:25px;
-}
+    body {
+        color: #333;
+    }
+    input[type="text"] {
+        text-align:right;
+    }
+    .method {
+        margin-top: 25px;
+        margin-bottom:25px;
+    }
+    .method td {
+        height:25px;
+    }
 </style>
 </head>
 
 <body>
-<div id="main" style="width:900px; border:#000000; border-width: 1px; border-style: solid; background-color:#FFFFFF">
+<div id="main" style="width:900px; border:#000000; border-width: 1px; border-style: solid; background-color:#FFFFFF; color: #333;">
   <div id="banner">
     <h1 style="font-family:'Comic Sans MS', cursive; background-color:#000; color:#CCCCCC; height:100px; margin-top:0px; padding-top:25px; padding-left:10px; margin-bottom: 0px;">$(selector).<span style="color:#00F">autoNumeric</span>('init', {options});</h1>
   </div>
   <div id="content" style="padding: 5px 10px 10px 10px; margin-top:0px">
     <p>Author: Robert  Knothe</p>
     <p>Contact:	bob{@}decorplanit.com (remove brackets)</p>
-    <p>Web site: <a href="http://www.decorplanit.com/plugin/">http://www.decorplanit.com/plugin/</a> complete with detailed examples and option/html 5 data code generator/</p>
+    <p>Web site: <a href="http://www.decorplanit.com/plugin/">http://www.decorplanit.com/plugin/</a> complete with detailed examples and option/html 5 data code generator</p>
     <p>github: <a href="https://github.com/BobKnothe/autoNumeric">https://github.com/BobKnothe/autoNumeric</a></p>
     <p>jQuery: <a href="http://plugins.jquery.com/autoNumeric/">http://plugins.jquery.com/autoNumeric/</a></p>
-<p><strong>autoNumeric 1.9.46 </strong>is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. It supports most International numeric formats and currency signs including those used in Europe, North and South America, Asia and India (lakhs**).</p>
+<p><strong>autoNumeric</strong> is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. It supports most international numeric formats and currency signs including those used in Europe, North and South America, Asia and India (lakhs**).</p>
     <p>Any number of currency formats can reside on the same page and are configured by options that can be placed as HTML5 data attribute or passed as an argument. These settings can easily be changed at any time using the new &lsquo;update&rsquo; method or via the callback feature. </p>
     <p>Seven built in methods and fifteen options gives you the flexibility needed to use autoNumeric to its maximum potential (details below).</p>
     <p><strong>Examples of autoNumeric's flexibility:</strong></p>
@@ -187,7 +190,7 @@ input[type="text"] {
     </ul>
     <p><strong>Defaults values formats accepted when aForm = true:</strong></p>
     <ul>
-      <li>Only one decimal characters is allowed - one locale decimal chartacters are accepted</li>
+      <li>Only one decimal characters is allowed - one locale decimal characters are accepted</li>
       <li>Examples:
         <ul>
           <li>1234.56 =&gt; OK</li>

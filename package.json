@@ -34,8 +34,7 @@
     "uglify-js": "^2.7.4"
   },
   "scripts": {
-    "build": "babel src -d dist && uglifyjs dist/autoNumeric.js -m -c -o dist/autoNumeric-min.js",
-    "test": "echo \"Error: no test specified, yet.\" && exit 1"
+    "build": "babel src -d dist --source-maps && uglifyjs dist/autoNumeric.js -m -c -o dist/autoNumeric-min.js"
   },
   "repository": {
     "type": "git",

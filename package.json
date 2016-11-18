@@ -1,6 +1,6 @@
 {
   "name": "autonumeric",
-  "version": "2.0.0",
+  "version": "2.0.0-beta.1",
   "description": "autoNumeric is a jQuery plugin that automatically formats currency (money) and numbers as you type on form inputs. It supports most international numeric formats and currency signs including those used in Europe, North and South America, Asia and India's' lakhs.",
   "main": "src/autoNumeric.js",
   "typings": "typings.d.ts",
@@ -31,10 +31,12 @@
   "devDependencies": {
     "babel-cli": "^6.18.0",
     "babel-preset-latest": "^6.16.0",
+    "eslint": "^3.10.2",
     "uglify-js": "^2.7.4"
   },
   "scripts": {
-    "build": "babel src -d dist --source-maps && uglifyjs dist/autoNumeric.js -m -c -o dist/autoNumeric-min.js"
+    "build": "babel src -d dist --source-maps && uglifyjs dist/autoNumeric.js -m -c -o dist/autoNumeric-min.js",
+    "lint": "eslint --ext .js src test/unit"
   },
   "repository": {
     "type": "git",

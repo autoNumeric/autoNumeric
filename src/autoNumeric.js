@@ -164,6 +164,64 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * Return TRUE if the given parameter is as String
+     *
+     * @param {*} str
+     * @returns {boolean}
+     */
+    function isString(str) {
+        return (typeof str === 'string' || str instanceof String);
+    }
+
+    /**
+     * Return TRUE is the string `str` contains the string `needle`
+     * Note: this function does not coerce the parameters types
+     *
+     * @param {string} str
+     * @param {string} needle
+     * @returns {boolean}
+     */
+    function contains(str, needle) {
+        if (!isString(str) || !isString(needle) || str === '' || needle === '') {
+            return false;
+        }
+
+        return str.indexOf(needle) !== -1;
+    }
+
+    /**
+     * Return TRUE is the `needle` is in the array.
+     *
+     * @param {Array} array
+     * @param {*} needle
+     * @returns {boolean}
+     */
+    function isInArray(needle, array) {
+        if (!isArray(array) || array === [] || isUndefined(needle) || needle === '' || needle === null) {
+            return false;
+        }
+
+        return array.indexOf(needle) !== -1;
+    }
+
+    /**
+     * Return TRUE if the parameter is an Array
+     *
+     * @param {*} arr
+     * @throws Error
+     * @returns {*|boolean}
+     */
+    function isArray(arr) {
+        if (Object.prototype.toString.call([]) === '[object Array]') { // Make sure an array has a class attribute of [object Array]
+            // Test passed, now check if is an Array
+            return Array.isArray(arr) || (typeof arr === 'object' && Object.prototype.toString.call(arr) === '[object Array]');
+        }
+        else {
+            throw new Error('toString message changed for Object Array'); // Verify that the string returned by `toString` does not change in the future (cf. http://stackoverflow.com/a/8365215)
+        }
+    }
+
+    /**
      * Cross browser routine for getting selected range/cursor position
      */
     function getElementSelection(that) {
@@ -298,14 +356,15 @@ if (typeof define === 'function' && define.amd) {
         }
         if (settings.aSuffix) {
             // remove suffix
-            while (s.indexOf(settings.aSuffix) > -1) {
+            while (contains(s, settings.aSuffix)) {
                 s = s.replace(settings.aSuffix, '');
             }
         }
 
         // first replace anything before digits
         s = s.replace(settings.skipFirstAutoStrip, '$1$2');
-        if ((settings.pNeg === 's' || (settings.pSign === 's' && settings.pNeg !== 'p')) && s.indexOf('-') > -1 && s !== '') {
+
+        if ((settings.pNeg === 's' || (settings.pSign === 's' && settings.pNeg !== 'p')) && contains(s, '-') && s !== '') {
             settings.trailingNegative = true;
         }
 
@@ -325,7 +384,7 @@ if (typeof define === 'function' && define.amd) {
             let nSign = '';
             const [integerPart, decimalPart] = s.split(settings.aDec);
             let modifiedIntegerPart = integerPart;
-            if (modifiedIntegerPart.indexOf(settings.aNeg) !== -1) {
+            if (contains(modifiedIntegerPart, settings.aNeg)) {
                 nSign = settings.aNeg;
                 modifiedIntegerPart = modifiedIntegerPart.replace(settings.aNeg, '');
             }
@@ -381,7 +440,7 @@ if (typeof define === 'function' && define.amd) {
      */
     function fromLocale(s) {
         s = s.replace(',', '.');
-        if (s.lastIndexOf('-') !== -1 && s.lastIndexOf('-') === s.length - 1) {
+        if (contains(s, '-') && s.lastIndexOf('-') === s.length - 1) {
             s = s.replace('-', '');
             s = '-' + s;
         }
@@ -399,14 +458,14 @@ if (typeof define === 'function' && define.amd) {
      */
     function toLocale(value, locale) {
         if (locale === '.-') {
-            value = (value.indexOf('-') > -1) ? value.replace('-', '') + '-' : value;
+            value = contains(value, '-') ? value.replace('-', '') + '-' : value;
         }
         if (locale === ',' || locale === '-,') {
             value = value.replace('.', ',');
         }
         if (locale === ',-') {
             value = value.replace('.', ',');
-            value = (value.indexOf('-') > -1) ? value.replace('-', '') + '-' : value;
+            value = contains(value, '-') ? value.replace('-', '') + '-' : value;
         }
 
         return value;
@@ -464,11 +523,11 @@ if (typeof define === 'function' && define.amd) {
         if (settings.strip) {
             iv = autoStrip(iv, settings);
         }
-        if (settings.trailingNegative && iv.indexOf('-') === -1) {
+        if (settings.trailingNegative && !contains(iv, '-')) {
             iv = '-' + iv;
         }
         const empty = checkEmpty(iv, settings, true);
-        const isNeg = iv.indexOf('-') > -1;
+        const isNeg = contains(iv, '-');
         if (isNeg) {
             iv = iv.replace('-', '');
         }
@@ -593,7 +652,7 @@ if (typeof define === 'function' && define.amd) {
             }
 
             let result;
-            if (iv.indexOf('.') === -1) {
+            if (!contains(iv, '.')) {
                 result = iv + '.00';
             } else if (iv.length - iv.indexOf('.') < 3) {
                 result = iv + '0';
@@ -668,7 +727,7 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // rounded length of the string after rounding
-        const rLength = dPos + settings.mDec;
+        const rLength = dPos + settings.mDec; //TODO Modify `dPos` here if it's not intended that it can be equal to '-1'
         const tRound = Number(iv.charAt(rLength + 1));
         const odd = (iv.charAt(rLength) === '.') ? (iv.charAt(rLength - 1) % 2) : (iv.charAt(rLength) % 2);
         let ivArray = iv.substring(0, rLength + 1).split('');
@@ -1064,7 +1123,7 @@ if (typeof define === 'function' && define.amd) {
             let [left, right] = this.getBeforeAfter();
             left = autoStrip(left, this.settingsClone);
             right = autoStrip(right, this.settingsClone);
-            if (settingsClone.trailingNegative && left.indexOf('-') === -1) {
+            if (settingsClone.trailingNegative && !contains(left, '-')) {
                 left = '-' + left;
                 right = (right === '-') ? '' : right;
             }
@@ -1084,7 +1143,7 @@ if (typeof define === 'function' && define.amd) {
 
             // if right is not empty and first character is not aDec,
             right = autoStrip(right, settingsClone);
-            if (settingsClone.trailingNegative && left.indexOf('-') === -1) {
+            if (settingsClone.trailingNegative && !contains(left, '-')) {
                 left = '-' + left;
                 settingsClone.trailingNegative = false;
             }
@@ -1118,7 +1177,7 @@ if (typeof define === 'function' && define.amd) {
             this.newValue = parts.join('');
             if (minTest && maxTest) {
                 this.newValue = truncateDecimal(this.newValue, settingsClone, advent);
-                const testValue = (this.newValue.indexOf(',') !== -1) ? this.newValue.replace(',', '.') : this.newValue;
+                const testValue = (contains(this.newValue, ',')) ? this.newValue.replace(',', '.') : this.newValue;
                 if (testValue === '' || testValue === settingsClone.aNeg) {
                     settingsClone.rawValue = '';
                 } else {
@@ -1239,7 +1298,7 @@ if (typeof define === 'function' && define.amd) {
                     e.preventDefault();
                     const valueLen = this.that.value.length;
                     const aSignLen = this.settings.aSign.length;
-                    const negLen = (this.that.value.indexOf('-') === -1)?0:1;
+                    const negLen = (!contains(this.that.value, '-'))?0:1;
                     const aSuffixLen = this.settings.aSuffix.length;
                     const pSign = this.settings.pSign;
                     const pNeg = this.settings.pNeg;
@@ -1332,7 +1391,7 @@ if (typeof define === 'function' && define.amd) {
                     if (this.selection.start >= this.value.indexOf(settingsClone.aSign) + settingsClone.aSign.length) {
                         right = right.substring(1, right.length);
                     }
-                    if (left.indexOf('-') > -1 && this.value.charAt(this.selection.start) === '-') {
+                    if (contains(left, '-') && this.value.charAt(this.selection.start) === '-') {
                         left = left.substring(1);
                     }
                 }
@@ -1341,16 +1400,16 @@ if (typeof define === 'function' && define.amd) {
             if (settingsClone.pSign === 's' && settingsClone.pNeg === 'l') {
                 settingsClone.caretFix = Boolean(this.selection.start >= this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length);
                 if (this.kdCode === 8) {
-                    if (this.selection.start === (this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length) && this.value.indexOf(settingsClone.aNeg) !== -1) {
+                    if (this.selection.start === (this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length) && contains(this.value, settingsClone.aNeg)) {
                         left = left.substring(1);
-                    } else if (left !== '-' && ((this.selection.start <= this.value.indexOf(settingsClone.aNeg)) || this.value.indexOf(settingsClone.aNeg) === -1)) {
+                    } else if (left !== '-' && ((this.selection.start <= this.value.indexOf(settingsClone.aNeg)) || !contains(this.value, settingsClone.aNeg))) {
                         left = left.substring(0, left.length - 1);
                     }
                 } else {
                     if (left[0] === '-') {
                         right = right.substring(1);
                     }
-                    if (this.selection.start === this.value.indexOf(settingsClone.aNeg) && this.value.indexOf(settingsClone.aNeg) !== -1) {
+                    if (this.selection.start === this.value.indexOf(settingsClone.aNeg) && contains(this.value, settingsClone.aNeg)) {
                         left = left.substring(1);
                     }
                 }
@@ -1363,7 +1422,7 @@ if (typeof define === 'function' && define.amd) {
                         left = left.substring(1);
                     } else if (left !== '-' && this.selection.start <= (this.value.indexOf(settingsClone.aNeg) - settingsClone.aSign.length)) {
                         left = left.substring(0, left.length - 1);
-                    } else if (left !== '' && this.value.indexOf(settingsClone.aNeg) === -1) {
+                    } else if (left !== '' && !contains(this.value, settingsClone.aNeg)) {
                         left = left.substring(0, left.length - 1);
                     }
                 } else {
@@ -1394,7 +1453,7 @@ if (typeof define === 'function' && define.amd) {
                     }
                     if (((settingsClone.pSign === 'p' && settingsClone.pNeg === 's') ||
                             (settingsClone.pSign === 's' && (settingsClone.pNeg === 'l' || settingsClone.pNeg === 'r'))) &&
-                            this.value.indexOf('-') !== -1) {
+                            contains(this.value, '-')) {
                         [left, right] = this.processTrailing([left, right]);
                     } else {
                         if (this.kdCode === 8) {
@@ -1433,12 +1492,12 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 // do not allow decimal character before aNeg character
-                if (settingsClone.aNeg && right.indexOf(settingsClone.aNeg) > -1) {
+                if (settingsClone.aNeg && contains(right, settingsClone.aNeg)) {
                     return true;
                 }
 
                 // do not allow decimal character if other decimal character present
-                if (left.indexOf(settingsClone.aDec) > -1) {
+                if (contains(left, settingsClone.aDec)) {
                     return true;
                 }
                 if (right.indexOf(settingsClone.aDec) > 0) {
@@ -1459,19 +1518,19 @@ if (typeof define === 'function' && define.amd) {
 
                 // caret is always after minus
                 if ((settingsClone.pSign === 'p' && settingsClone.pNeg === 's') || (settingsClone.pSign === 's' && settingsClone.pNeg !== 'p')) {
-                    if (left === '' && right.indexOf(settingsClone.aNeg) > -1) {
+                    if (left === '' && contains(right, settingsClone.aNeg)) {
                         left = settingsClone.aNeg;
                         right = right.substring(1, right.length);
                     }
 
                     // change sign of number, remove part if should
-                    if (left.charAt(0) === '-' || left.indexOf(settingsClone.aNeg) !== -1) {
+                    if (left.charAt(0) === '-' || contains(left, settingsClone.aNeg)) {
                         left = left.substring(1, left.length);
                     } else {
                         left = (cCode === '-') ? settingsClone.aNeg + left : left;
                     }
                 } else {
-                    if (left === '' && right.indexOf(settingsClone.aNeg) > -1) {
+                    if (left === '' && contains(right, settingsClone.aNeg)) {
                         left = settingsClone.aNeg;
                         right = right.substring(1, right.length);
                     }
@@ -1489,11 +1548,11 @@ if (typeof define === 'function' && define.amd) {
 
             // if try to insert digit before minus
             if (cCode >= '0' && cCode <= '9') {
-                if (settingsClone.aNeg && left === '' && right.indexOf(settingsClone.aNeg) > -1) {
+                if (settingsClone.aNeg && left === '' && contains(right, settingsClone.aNeg)) {
                     left = settingsClone.aNeg;
                     right = right.substring(1, right.length);
                 }
-                if (settingsClone.vMax <= 0 && settingsClone.vMin < settingsClone.vMax && this.value.indexOf(settingsClone.aNeg) === -1 && cCode !== '0') {
+                if (settingsClone.vMax <= 0 && settingsClone.vMin < settingsClone.vMax && !contains(this.value, settingsClone.aNeg) && cCode !== '0') {
                     left = settingsClone.aNeg + left;
                 }
                 this.setValueParts(left + cCode, right, null);
@@ -1516,22 +1575,23 @@ if (typeof define === 'function' && define.amd) {
             let [left] = this.getBeforeAfterStriped();
 
             // no grouping separator and no currency sign
-            if ((settingsClone.aSep === '' || (settingsClone.aSep !== '' && leftLength.indexOf(settingsClone.aSep) === -1)) && (settingsClone.aSign === '' || (settingsClone.aSign !== '' && leftLength.indexOf(settingsClone.aSign) === -1))) {
-                const subParts = leftLength.split(settingsClone.aDec);
+            if ((settingsClone.aSep  === '' || (settingsClone.aSep !== ''  && !contains(leftLength, settingsClone.aSep))) &&
+                (settingsClone.aSign === '' || (settingsClone.aSign !== '' && !contains(leftLength, settingsClone.aSign)))) {
+                let [subParts] = leftLength.split(settingsClone.aDec);
                 let nSign = '';
-                if (subParts[0].indexOf('-') > -1) {
+                if (contains(subParts, '-')) {
                     nSign = '-';
-                    subParts[0] = subParts[0].replace('-', '');
+                    subParts = subParts.replace('-', '');
                     left = left.replace('-', '');
                 }
 
                 // strip leading zero on positive value if need
-                if (nSign === '' && subParts[0].length > settingsClone.mIntPos && left.charAt(0) === '0') {
+                if (nSign === '' && subParts.length > settingsClone.mIntPos && left.charAt(0) === '0') {
                     left = left.slice(1);
                 }
 
                 // strip leading zero on negative value if need
-                if (nSign === '-' && subParts[0].length > settingsClone.mIntNeg && left.charAt(0) === '0') {
+                if (nSign === '-' && subParts.length > settingsClone.mIntNeg && left.charAt(0) === '0') {
                     left = left.slice(1);
                 }
                 left = nSign + left;
@@ -1560,7 +1620,7 @@ if (typeof define === 'function' && define.amd) {
                         const escapedParts = [];
                         $.each(signParts, (i, miniParts) => {
                             miniParts = signParts[i];
-                            if ($.inArray(miniParts, escapeChr) !== -1) {
+                            if (isInArray(miniParts, escapeChr)) {
                                 escapedParts.push('\\' + miniParts);
                             } else {
                                 escapedParts.push(miniParts);
@@ -1685,7 +1745,7 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 // checks for non-supported tags
-                if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) === -1 && $this.prop('tagName').toLowerCase() !== 'input') {
+                if (!isInArray($this.prop('tagName').toLowerCase(), settings.tagList) && $this.prop('tagName').toLowerCase() !== 'input') {
                     throwError(`The <${$this.prop('tagName').toLowerCase()}> tag is not supported by autoNumeric`, settings.debug);
                 }
 
@@ -1704,12 +1764,13 @@ if (typeof define === 'function' && define.amd) {
                 if (settings.runOnce === false && settings.aForm) {
                     let setValue = true;
                     if ($input) {
+                        const currentValue = $this.val();
                         /* checks for page reload from back button
                          * also checks for ASP.net form post back
                          * the following HTML data attribute is REQUIRED (data-an-default="same value as the value attribute")
                          * example: <asp:TextBox runat="server" id="someID" text="1234.56" data-an-default="1234.56">
                          */
-                        if ((settings.anDefault && settings.anDefault.toString() !== $this.val()) || (settings.anDefault === null && $this.val() !== '' && $this.val() !== $this.attr('value')) || ($this.val() !== '' && $this.attr('type') === 'hidden' && !$.isNumeric($this.val().replace(',', '.')))) {
+                        if ((settings.anDefault && settings.anDefault.toString() !== currentValue) || (settings.anDefault === null && currentValue !== '' && currentValue !== $this.attr('value')) || (currentValue !== '' && $this.attr('type') === 'hidden' && !$.isNumeric(currentValue.replace(',', '.')))) {
                             if (settings.eDec && settings.aStor) {
                                 settings.rawValue = autoSave($this, settings, 'get');
                             }
@@ -1720,16 +1781,15 @@ if (typeof define === 'function' && define.amd) {
                                 let toStrip;
                                 if (settings.nBracket !== null && settings.aNeg !== '') {
                                     settings.onOff = true;
-                                    toStrip = negativeBracket($this.val(), settings);
+                                    toStrip = negativeBracket(currentValue, settings);
                                 } else {
-                                    toStrip = $this.val();
+                                    toStrip = currentValue;
                                 }
-                                settings.rawValue = ((settings.pNeg === 's' || (settings.pSign === 's' && settings.pNeg !== 'p')) && settings.aNeg !== '' && $this.val().indexOf('-') > -1) ? '-' + autoStrip(toStrip, settings) : autoStrip(toStrip, settings);
+                                settings.rawValue = ((settings.pNeg === 's' || (settings.pSign === 's' && settings.pNeg !== 'p')) && settings.aNeg !== '' && contains(currentValue, '-')) ? '-' + autoStrip(toStrip, settings) : autoStrip(toStrip, settings);
                             }
                             setValue = false;
                         }
 
-                        const currentValue = $this.val();
                         if (currentValue === '') {
                             switch (settings.wEmpty) {
                                 case 'focus':
@@ -1751,7 +1811,7 @@ if (typeof define === 'function' && define.amd) {
                             $this.autoNumeric('set', currentValue);
                         }
                     }
-                    if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1 && $this.text() !== '') {
+                    if (isInArray($this.prop('tagName').toLowerCase(), settings.tagList) && $this.text() !== '') {
                         if (settings.anDefault !== null) {
                             if (settings.anDefault === $this.text()) {
                                 $this.autoNumeric('set', $this.text());
@@ -1777,17 +1837,20 @@ if (typeof define === 'function' && define.amd) {
                             $settings.aSep = '';
                             $settings.aSign = '';
                         }
+
+                        let result;
                         if ($settings.eDec) {
                             $settings.mDec = $settings.eDec;
                             $this.autoNumeric('set', $settings.rawValue);
                         } else if ($settings.aScale) {
                             $settings.mDec = $settings.oDec;
                             $this.autoNumeric('set', $settings.rawValue);
-                        } else if (autoStrip($this.val(), $settings) !== $settings.rawValue) {
-                            $this.autoNumeric('set', autoStrip($this.val(), $settings));
+                        } else if ((result = autoStrip($this.val(), $settings)) !== $settings.rawValue) {
+                            $this.autoNumeric('set', result);
                         }
+
                         holder.inVal = $this.val();
-                        holder.lastVal = $this.val();
+                        holder.lastVal = holder.inVal;
                         const onEmpty = checkEmpty(holder.inVal, $settings, true);
                         if ((onEmpty !== null && onEmpty !== '') && $settings.wEmpty === 'focus') {
                             $this.val(onEmpty);
@@ -1814,11 +1877,12 @@ if (typeof define === 'function' && define.amd) {
                         if (holder.processAlways()) {
                             holder.processed = true;
                             holder.formatQuick(e);
-                            if (($this.val() !== holder.lastVal) && holder.settingsClone.throwInput) {
+                            const currentValue = $this.val();
+                            if ((currentValue !== holder.lastVal) && holder.settingsClone.throwInput) {
                                 // throws input event in deletion character
                                 $this.trigger('input');
                             }
-                            holder.lastVal = $this.val();
+                            holder.lastVal = currentValue;
                             holder.settingsClone.throwInput = true;
                             e.preventDefault();
                             return false;
@@ -1844,11 +1908,12 @@ if (typeof define === 'function' && define.amd) {
                         }
                         if (holder.processAlways() || holder.processKeypress()) {
                             holder.formatQuick(e);
-                            if (($this.val() !== holder.lastVal) && holder.settingsClone.throwInput) {
+                            const currentValue = $this.val();
+                            if ((currentValue !== holder.lastVal) && holder.settingsClone.throwInput) {
                                 // throws input event on adding character
                                 $this.trigger('input');
                             }
-                            holder.lastVal = $this.val();
+                            holder.lastVal = currentValue;
                             holder.settingsClone.throwInput = true;
                             e.preventDefault();
                             return;
@@ -2105,7 +2170,7 @@ if (typeof define === 'function' && define.amd) {
                         }
 
                         // checks if the value falls within the min max range
-                        if ($input || $.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1) {
+                        if ($input || isInArray($this.prop('tagName').toLowerCase(), settings.tagList)) {
                             if (settings.aScale && !settings.onOff) {
                                 value = value / settings.scaleFactor;
                                 value = value.toString();
@@ -2145,7 +2210,7 @@ if (typeof define === 'function' && define.amd) {
                 if ($input) {
                     return $this.val(value);
                 }
-                if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1) {
+                if (isInArray($this.prop('tagName').toLowerCase(), settings.tagList)) {
                     return $this.text(value);
                 }
 
@@ -2203,7 +2268,7 @@ if (typeof define === 'function' && define.amd) {
             // determine the element type then use .eq(0) selector to grab the value of the first element in selector
             if ($input) {
                 value = $this.eq(0).val();
-            } else if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1) {
+            } else if (isInArray($this.prop('tagName').toLowerCase(), settings.tagList)) {
                 value = $this.eq(0).text();
             } else {
                 throwError(`The "<${$this.prop('tagName').toLowerCase()}>" tag is not supported by autoNumeric`, settings.debug);

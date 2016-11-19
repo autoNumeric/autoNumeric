@@ -1,5 +1,7 @@
 'use strict';
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 /**
@@ -36,11 +38,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/*global module, require, define*/
+/* global module, require, define */
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        //noinspection JSCheckFunctionSignatures
         define(['jquery'], factory);
     } else if ((typeof module === 'undefined' ? 'undefined' : _typeof(module)) === 'object' && module.exports) {
         // Node/CommonJS
@@ -51,11 +52,129 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     }
 })(function ($) {
     /**
+     * Wrapper variable that hold named keyboard keys with their respective keyCode as seen in DOM events.
+     */
+    var keyCode = {
+        Backspace: 8,
+        Tab: 9,
+        Enter: 13,
+        Shift: 16,
+        Ctrl: 17,
+        Alt: 18,
+        PauseBreak: 19,
+        CapsLock: 20,
+        Esc: 27,
+        Space: 32,
+        PageUp: 33,
+        PageDown: 34,
+        End: 35,
+        Home: 36,
+        LeftArrow: 37,
+        UpArrow: 38,
+        RightArrow: 39,
+        DownArrow: 40,
+        Insert: 45,
+        Delete: 46,
+        num0: 48,
+        num1: 49,
+        num2: 50,
+        num3: 51,
+        num4: 52,
+        num5: 53,
+        num6: 54,
+        num7: 55,
+        num8: 56,
+        num9: 57,
+        a: 65,
+        b: 66,
+        c: 67,
+        d: 68,
+        e: 69,
+        f: 70,
+        g: 71,
+        h: 72,
+        i: 73,
+        j: 74,
+        k: 75,
+        l: 76,
+        m: 77,
+        n: 78,
+        o: 79,
+        p: 80,
+        q: 81,
+        r: 82,
+        s: 83,
+        t: 84,
+        u: 85,
+        v: 86,
+        w: 87,
+        x: 88,
+        y: 89,
+        z: 90,
+        Windows: 91,
+        RightClick: 93,
+        numpad0: 96,
+        numpad1: 97,
+        numpad2: 98,
+        numpad3: 99,
+        numpad4: 100,
+        numpad5: 101,
+        numpad6: 102,
+        numpad7: 103,
+        numpad8: 104,
+        numpad9: 105,
+        MultiplyNumpad: 106,
+        PlusNumpad: 107,
+        MinusNumpad: 109,
+        DotNumpad: 110,
+        SlashNumpad: 111,
+        F1: 112,
+        F2: 113,
+        F3: 114,
+        F4: 115,
+        F5: 116,
+        F6: 117,
+        F7: 118,
+        F8: 119,
+        F9: 120,
+        F10: 121,
+        F11: 122,
+        F12: 123,
+        NumLock: 144,
+        ScrollLock: 145,
+        MyComputer: 182,
+        MyCalculator: 183,
+        Semicolon: 186,
+        Equal: 187,
+        Comma: 188,
+        Hyphen: 189,
+        Dot: 190,
+        Slash: 191,
+        Backquote: 192,
+        LeftBracket: 219,
+        Backslash: 220,
+        RightBracket: 221,
+        Quote: 222,
+        Command: 224
+    };
+
+    /**
+     * Return TRUE if the `value` is undefined
+     *
+     * @static
+     * @param {*} value
+     * @returns {boolean}
+     */
+    function isUndefined(value) {
+        return value === void 0;
+    }
+
+    /**
      * Cross browser routine for getting selected range/cursor position
      */
     function getElementSelection(that) {
         var position = {};
-        if (that.selectionStart === undefined) {
+        if (isUndefined(that.selectionStart)) {
             that.focus();
             var select = document.selection.createRange();
             position.length = select.text.length;
@@ -67,6 +186,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             position.end = that.selectionEnd;
             position.length = position.end - position.start;
         }
+
         return position;
     }
 
@@ -74,7 +194,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      * Cross browser routine for setting selected range/cursor position
      */
     function setElementSelection(that, start, end) {
-        if (that.selectionStart === undefined) {
+        if (isUndefined(that.selectionStart)) {
             that.focus();
             var range = that.createTextRange();
             range.collapse(true);
@@ -118,14 +238,15 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      * Determine the decimal length from the vMin vMax settings
      */
     function decLength(vMin, vMax) {
-        var vMaxLength = 0,
-            vMinLength = 0;
+        var vMaxLength = 0;
+        var vMinLength = 0;
         if (vMax[1]) {
             vMaxLength = vMax[1].length;
         }
         if (vMin[1]) {
             vMinLength = vMin[1].length;
         }
+
         return Math.max(vMaxLength, vMinLength);
     }
 
@@ -135,8 +256,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      */
     function autoCode($this, settings) {
         runCallbacks($this, settings);
-        var vMax = settings.vMax.toString().split('.'),
-            vMin = !settings.vMin && settings.vMin !== 0 ? [] : settings.vMin.toString().split('.');
+        var vMax = settings.vMax.toString().split('.');
+        var vMin = !settings.vMin && settings.vMin !== 0 ? [] : settings.vMin.toString().split('.');
         settings.aNeg = settings.vMin < 0 ? '-' : '';
         vMax[0] = vMax[0].replace('-', '');
         vMin[0] = vMin[0].replace('-', '');
@@ -151,6 +272,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         if (settings.scaleDecimal) {
             settings.mDec = settings.scaleDecimal;
         }
+
         // set alternative decimal separator key
         if (settings.altDec === null && settings.mDec > 0) {
             if (settings.aDec === '.' && settings.aSep !== ',') {
@@ -159,6 +281,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 settings.altDec = '.';
             }
         }
+
         // cache regexps for autoStrip
         var aNegReg = settings.aNeg ? '([-\\' + settings.aNeg + ']?)' : '(-?)';
         settings.aNegRegAutoStrip = aNegReg;
@@ -167,6 +290,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         var allowed = '-0123456789\\' + settings.aDec;
         settings.allowedAutoStrip = new RegExp('[^' + allowed + ']', 'gi');
         settings.numRegAutoStrip = new RegExp(aNegReg + '(?:\\' + settings.aDec + '?(\\d+\\' + settings.aDec + '\\d+)|(\\d*(?:\\' + settings.aDec + '\\d*)?))');
+
         return settings;
     }
 
@@ -184,39 +308,57 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 s = s.replace(settings.aSuffix, '');
             }
         }
-        s = s.replace(settings.skipFirstAutoStrip, '$1$2'); // first replace anything before digits
+
+        // first replace anything before digits
+        s = s.replace(settings.skipFirstAutoStrip, '$1$2');
         if ((settings.pNeg === 's' || settings.pSign === 's' && settings.pNeg !== 'p') && s.indexOf('-') > -1 && s !== '') {
             settings.trailingNegative = true;
         }
-        s = s.replace(settings.skipLastAutoStrip, '$1'); // then replace anything after digits
-        s = s.replace(settings.allowedAutoStrip, ''); // then remove any uninterested characters
+
+        // then replace anything after digits
+        s = s.replace(settings.skipLastAutoStrip, '$1');
+
+        // then remove any uninterested characters
+        s = s.replace(settings.allowedAutoStrip, '');
         if (settings.altDec) {
             s = s.replace(settings.altDec, settings.aDec);
-        } // get only number string
+        }
+
+        // get only number string
         var m = s.match(settings.numRegAutoStrip);
         s = m ? [m[1], m[2], m[3]].join('') : '';
         if (settings.lZero === 'allow' || settings.lZero === 'keep') {
-            var parts = s.split(settings.aDec);
             var nSign = '';
-            if (parts[0].indexOf(settings.aNeg) !== -1) {
+
+            var _s$split = s.split(settings.aDec),
+                _s$split2 = _slicedToArray(_s$split, 2),
+                integerPart = _s$split2[0],
+                decimalPart = _s$split2[1];
+
+            var modifiedIntegerPart = integerPart;
+            if (modifiedIntegerPart.indexOf(settings.aNeg) !== -1) {
                 nSign = settings.aNeg;
-                parts[0] = parts[0].replace(settings.aNeg, '');
+                modifiedIntegerPart = modifiedIntegerPart.replace(settings.aNeg, '');
             }
-            if (nSign === '' && parts[0].length > settings.mIntPos && parts[0].charAt(0) === '0') {
-                // strip leading zero if need
-                parts[0] = parts[0].slice(1);
+
+            // strip leading zero on positive value if need
+            if (nSign === '' && modifiedIntegerPart.length > settings.mIntPos && modifiedIntegerPart.charAt(0) === '0') {
+                modifiedIntegerPart = modifiedIntegerPart.slice(1);
             }
-            if (nSign !== '' && parts[0].length > settings.mIntNeg && parts[0].charAt(0) === '0') {
-                // strip leading zero if need
-                parts[0] = parts[0].slice(1);
+
+            // strip leading zero on negative value if need
+            if (nSign !== '' && modifiedIntegerPart.length > settings.mIntNeg && modifiedIntegerPart.charAt(0) === '0') {
+                modifiedIntegerPart = modifiedIntegerPart.slice(1);
             }
-            s = nSign + parts.join(settings.aDec);
+            s = '' + nSign + modifiedIntegerPart + (isUndefined(decimalPart) ? '' : settings.aDec + decimalPart);
         }
         if (settings.onOff && settings.lZero === 'deny' || settings.lZero === 'allow' && settings.onOff === false) {
-            var strip_reg = '^' + settings.aNegRegAutoStrip + '0*(\\d)'; //Using `^${settings.aNegRegAutoStrip}0*(\\d|$)` entirely clear the input on blur
-            strip_reg = new RegExp(strip_reg);
-            s = s.replace(strip_reg, '$1$2');
+            // Using this regex version `^${settings.aNegRegAutoStrip}0*(\\d|$)` entirely clear the input on blur
+            var stripReg = '^' + settings.aNegRegAutoStrip + '0*(\\d)';
+            stripReg = new RegExp(stripReg);
+            s = s.replace(stripReg, '$1$2');
         }
+
         return s;
     }
 
@@ -225,15 +367,20 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      */
     function negativeBracket(s, settings) {
         if (settings.pSign === 'p' && settings.pNeg === 'l' || settings.pSign === 's' && settings.pNeg === 'p') {
-            var brackets = settings.nBracket.split(',');
+            var _settings$nBracket$sp = settings.nBracket.split(','),
+                _settings$nBracket$sp2 = _slicedToArray(_settings$nBracket$sp, 2),
+                firstBracket = _settings$nBracket$sp2[0],
+                lastBracket = _settings$nBracket$sp2[1];
+
             if (!settings.onOff) {
                 s = s.replace(settings.aNeg, '');
-                s = brackets[0] + s + brackets[1];
-            } else if (settings.onOff && s.charAt(0) === brackets[0]) {
-                s = s.replace(brackets[0], settings.aNeg);
-                s = s.replace(brackets[1], '');
+                s = firstBracket + s + lastBracket;
+            } else if (settings.onOff && s.charAt(0) === firstBracket) {
+                s = s.replace(firstBracket, settings.aNeg);
+                s = s.replace(lastBracket, '');
             }
         }
+
         return s;
     }
 
@@ -253,6 +400,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             s = s.replace('-', '');
             s = '-' + s;
         }
+
         return s;
     }
 
@@ -275,6 +423,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             value = value.replace('.', ',');
             value = value.indexOf('-') > -1 ? value.replace('-', '') + '-' : value;
         }
+
         return value;
     }
 
@@ -291,6 +440,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         if (!s.match(/\d/)) {
             s += '0';
         }
+
         return s;
     }
 
@@ -304,6 +454,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         if (settings.aDec && settings.aDec !== '.') {
             s = s.replace('.', settings.aDec);
         }
+
         return s;
     }
 
@@ -317,6 +468,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
             return iv;
         }
+
         return null;
     }
 
@@ -330,8 +482,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         if (settings.trailingNegative && iv.indexOf('-') === -1) {
             iv = '-' + iv;
         }
-        var empty = checkEmpty(iv, settings, true),
-            isNeg = iv.indexOf('-') > -1;
+        var empty = checkEmpty(iv, settings, true);
+        var isNeg = iv.indexOf('-') > -1;
         if (isNeg) {
             iv = iv.replace('-', '');
         }
@@ -348,26 +500,39 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             digitalGroup = /(\d)((\d{4}?)+)$/;
         } else {
             digitalGroup = /(\d)((\d{3}?)+)$/;
-        } // splits the string at the decimal string
-        var ivSplit = iv.split(settings.aDec);
-        if (settings.altDec && ivSplit.length === 1) {
-            ivSplit = iv.split(settings.altDec);
-        } // assigns the whole number to the a variable (s)
-        var s = ivSplit[0];
+        }
+
+        // splits the string at the decimal string
+
+        var _iv$split = iv.split(settings.aDec),
+            _iv$split2 = _slicedToArray(_iv$split, 2),
+            integerPart = _iv$split2[0],
+            decimalPart = _iv$split2[1];
+
+        if (settings.altDec && isUndefined(decimalPart)) {
+            var _iv$split3 = iv.split(settings.altDec);
+
+            var _iv$split4 = _slicedToArray(_iv$split3, 2);
+
+            integerPart = _iv$split4[0];
+            decimalPart = _iv$split4[1];
+        }
         if (settings.aSep !== '') {
-            while (digitalGroup.test(s)) {
-                // re-inserts the thousand separator via a regular expression
-                s = s.replace(digitalGroup, '$1' + settings.aSep + '$2');
+            // re-inserts the thousand separator via a regular expression
+            while (digitalGroup.test(integerPart)) {
+                integerPart = integerPart.replace(digitalGroup, '$1' + settings.aSep + '$2');
             }
         }
-        if (settings.mDec !== 0 && ivSplit.length > 1) {
-            if (ivSplit[1].length > settings.mDec) {
-                ivSplit[1] = ivSplit[1].substring(0, settings.mDec);
-            } // joins the whole number with the decimal value
-            iv = s + settings.aDec + ivSplit[1];
+        if (settings.mDec !== 0 && !isUndefined(decimalPart)) {
+            if (decimalPart.length > settings.mDec) {
+                decimalPart = decimalPart.substring(0, settings.mDec);
+            }
+
+            // joins the whole number with the decimal value
+            iv = integerPart + settings.aDec + decimalPart;
         } else {
             // if whole numbers only
-            iv = s;
+            iv = integerPart;
         }
         if (settings.pSign === 'p') {
             if (isNeg && settings.pNeg === 'l') {
@@ -397,12 +562,39 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 iv = iv + settings.aSign;
             }
         }
+
+        // removes the negative sign and places brackets
         if (settings.nBracket !== null && (settings.rawValue < 0 || iv.charAt(0) === '-')) {
-            // removes the negative sign and places brackets
             iv = negativeBracket(iv, settings);
         }
         settings.trailingNegative = false;
+
         return iv + settings.aSuffix;
+    }
+
+    /**
+     * Truncate not needed zeros
+     */
+    function truncateZeros(ivRounded, rDec) {
+        var regex = void 0;
+        switch (rDec) {
+            case 0:
+                regex = /(\.(?:\d*[1-9])?)0*$/;
+                break;
+            case 1:
+                regex = /(\.\d(?:\d*[1-9])?)0*$/;
+                break;
+            default:
+                regex = new RegExp('(\\.\\d{' + rDec + '}(?:\\d*[1-9])?)0*');
+        }
+
+        // If there are no decimal places, we don't need a decimal point at the end
+        ivRounded = ivRounded.replace(regex, '$1');
+        if (rDec === 0) {
+            ivRounded = ivRounded.replace(/\.$/, '');
+        }
+
+        return ivRounded;
     }
 
     /**
@@ -437,10 +629,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             return result;
         }
 
-        var ivRounded = '',
-            i = 0,
-            nSign = '',
-            rDec = void 0;
+        var ivRounded = '';
+        var i = 0;
+        var nSign = '';
+        var rDec = void 0;
 
         if (typeof settings.aPad === 'boolean' || settings.aPad === null) {
             rDec = settings.aPad ? settings.mDec : 0;
@@ -448,50 +640,40 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             rDec = Number(settings.aPad);
         }
 
-        var truncateZeros = function truncateZeros(ivRounded) {
-            // truncate not needed zeros
-            var regex = void 0;
-            switch (rDec) {
-                case 0:
-                    regex = /(\.(?:\d*[1-9])?)0*$/;
-                    break;
-                case 1:
-                    regex = /(\.\d(?:\d*[1-9])?)0*$/;
-                    break;
-                default:
-                    regex = new RegExp('(\\.\\d{' + rDec + '}(?:\\d*[1-9])?)0*');
-            }
-            ivRounded = ivRounded.replace(regex, '$1'); // If there are no decimal places, we don't need a decimal point at the end
-            if (rDec === 0) {
-                ivRounded = ivRounded.replace(/\.$/, '');
-            }
-            return ivRounded;
-        };
+        // Checks if the iv (input Value)is a negative value
         if (iv.charAt(0) === '-') {
-            // Checks if the iv (input Value)is a negative value
             nSign = '-';
-            iv = iv.replace('-', ''); // removes the negative sign will be added back later if required
+
+            // removes the negative sign will be added back later if required
+            iv = iv.replace('-', '');
         }
+
+        // append a zero if first character is not a digit (then it is likely to be a dot
         if (!iv.match(/^\d/)) {
-            // append a zero if first character is not a digit (then it is likely to be a dot
             iv = '0' + iv;
         }
+
+        // determines if the value is zero - if zero no negative sign
         if (nSign === '-' && Number(iv) === 0) {
-            // determines if the value is zero - if zero no negative sign
             nSign = '';
         }
+
+        // trims leading zero's needed
         if (Number(iv) > 0 && settings.lZero !== 'keep' || iv.length > 0 && settings.lZero === 'allow') {
-            // trims leading zero's needed */
             iv = iv.replace(/^0*(\d)/, '$1');
         }
-        var dPos = iv.lastIndexOf('.'),
+
+        var dPos = iv.lastIndexOf('.');
 
         // virtual decimal position
-        vdPos = dPos === -1 ? iv.length - 1 : dPos;
-        // checks decimal places to determine if rounding is required
-        var cDec = iv.length - 1 - vdPos; // check if no rounding is required
+        var vdPos = dPos === -1 ? iv.length - 1 : dPos;
+
+        // checks decimal places to determine if rounding is required :
+        // check if no rounding is required
+        var cDec = iv.length - 1 - vdPos;
         if (cDec <= settings.mDec) {
-            ivRounded = iv; // check if we need to pad with zeros
+            // check if we need to pad with zeros
+            ivRounded = iv;
             if (cDec < rDec) {
                 if (dPos === -1) {
                     ivRounded += settings.aDec;
@@ -503,15 +685,18 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     cDec += zeros.length;
                 }
             } else if (cDec > rDec) {
-                ivRounded = truncateZeros(ivRounded);
+                ivRounded = truncateZeros(ivRounded, rDec);
             } else if (cDec === 0 && rDec === 0) {
                 ivRounded = ivRounded.replace(/\.$/, '');
             }
+
             return Number(ivRounded) === 0 ? ivRounded : nSign + ivRounded;
-        } // rounded length of the string after rounding
-        var rLength = dPos + settings.mDec,
-            tRound = Number(iv.charAt(rLength + 1)),
-            odd = iv.charAt(rLength) === '.' ? iv.charAt(rLength - 1) % 2 : iv.charAt(rLength) % 2;
+        }
+
+        // rounded length of the string after rounding
+        var rLength = dPos + settings.mDec;
+        var tRound = Number(iv.charAt(rLength + 1));
+        var odd = iv.charAt(rLength) === '.' ? iv.charAt(rLength - 1) % 2 : iv.charAt(rLength) % 2;
         var ivArray = iv.substring(0, rLength + 1).split('');
         if (tRound > 4 && settings.mRound === 's' || // Round half up symmetric
         tRound > 4 && settings.mRound === 'A' && nSign === '' || // Round half up asymmetric positive values
@@ -525,8 +710,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         tRound > 0 && settings.mRound === 'F' && nSign === '-' || // Round to floor toward negative infinite
         tRound > 0 && settings.mRound === 'U') {
             // Round up away from zero
+            // Round up the last digit if required, and continue until no more 9's are found
             for (i = ivArray.length - 1; i >= 0; i -= 1) {
-                // Round up the last digit if required, and continue until no more 9's are found
                 if (ivArray[i] !== '.') {
                     ivArray[i] = +ivArray[i] + 1;
                     if (ivArray[i] < 10) {
@@ -538,8 +723,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 }
             }
         }
-        ivArray = ivArray.slice(0, rLength + 1); // Reconstruct the string, converting any 10's to 0's
-        ivRounded = truncateZeros(ivArray.join('')); // return rounded value
+
+        // Reconstruct the string, converting any 10's to 0's
+        ivArray = ivArray.slice(0, rLength + 1);
+
+        // return rounded value
+        ivRounded = truncateZeros(ivArray.join(''), rDec);
+
         return Number(ivRounded) === 0 ? ivRounded : nSign + ivRounded;
     }
 
@@ -547,21 +737,28 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      * truncates the decimal part of a number
      */
     function truncateDecimal(s, settings, paste) {
-        var aDec = settings.aDec,
-            mDec = settings.mDec;
+        var aDec = settings.aDec;
+        var mDec = settings.mDec;
         s = paste === 'paste' ? autoRound(s, settings) : s;
         if (aDec && mDec) {
-            var parts = s.split(aDec);
+            var _s$split3 = s.split(aDec),
+                _s$split4 = _slicedToArray(_s$split3, 2),
+                integerPart = _s$split4[0],
+                decimalPart = _s$split4[1];
+
             // truncate decimal part to satisfying length since we would round it anyway
-            if (parts[1] && parts[1].length > mDec) {
+
+
+            if (decimalPart && decimalPart.length > mDec) {
                 if (mDec > 0) {
-                    parts[1] = parts[1].substring(0, mDec);
-                    s = parts.join(aDec);
+                    var modifiedDecimalPart = decimalPart.substring(0, mDec);
+                    s = '' + integerPart + aDec + modifiedDecimalPart;
                 } else {
-                    s = parts[0];
+                    s = integerPart;
                 }
             }
         }
+
         return s;
     }
 
@@ -572,15 +769,17 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      * Many thanks to Mike
      */
     function parseStr(n) {
-        var x = {},
-            e = void 0,
-            i = void 0,
-            nL = void 0,
-            j = void 0;
+        var x = {};
+        var e = void 0;
+        var i = void 0;
+        var nL = void 0;
+        var j = void 0;
+
         // Minus zero?
         if (n === 0 && 1 / n < 0) {
             n = '-0';
         }
+
         // Determine sign. 1 positive, -1 negative
         n = n.toString();
         if (n.charAt(0) === '-') {
@@ -589,16 +788,19 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } else {
             x.s = 1;
         }
+
         // Decimal point?
         e = n.indexOf('.');
         if (e > -1) {
             n = n.replace('.', '');
         }
+
         // length of string if no decimal character
         if (e < 0) {
             // Integer
             e = n.length;
         }
+
         // Determine leading zeros
         i = n.search(/[1-9]/i) === -1 ? n.length : n.search(/[1-9]/i);
         nL = n.length;
@@ -612,15 +814,18 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 nL -= 1;
             }
             nL -= 1;
+
             // Decimal location
             x.e = e - i - 1;
             x.c = [];
+
             // Convert string to array of digits without leading/trailing zeros
             for (e = 0; i <= nL; i += 1) {
                 x.c[e] = +n.charAt(i);
                 e += 1;
             }
         }
+
         return x;
     }
 
@@ -631,13 +836,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      * Many thanks to Mike
      */
     function testMinMax(y, x) {
-        var xNeg = void 0,
-            xc = x.c,
-            yc = y.c,
-            i = x.s,
-            j = y.s,
-            k = x.e,
-            l = y.e;
+        var xc = x.c;
+        var yc = y.c;
+        var i = x.s;
+        var j = y.s;
+        var k = x.e;
+        var l = y.e;
+
         // Either zero?
         if (!xc[0] || !yc[0]) {
             var _result = void 0;
@@ -648,11 +853,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
             return _result;
         }
+
         // Signs differ?
         if (i !== j) {
             return i;
         }
-        xNeg = i < 0;
+        var xNeg = i < 0;
+
         // Compare exponents
         if (k !== l) {
             return k > l ^ xNeg ? 1 : -1;
@@ -661,12 +868,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         k = xc.length;
         l = yc.length;
         j = k < l ? k : l;
+
         // Compare digit by digit
         for (i += 1; i < j; i += 1) {
             if (xc[i] !== yc[i]) {
                 return xc[i] > yc[i] ^ xNeg ? 1 : -1;
             }
         }
+
         // Compare lengths
         var result = void 0;
         if (k === l) {
@@ -674,6 +883,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } else {
             result = k > l ^ xNeg ? 1 : -1;
         }
+
         return result;
     }
 
@@ -685,9 +895,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     function autoCheck(s, settings) {
         s = s.toString();
         s = s.replace(',', '.');
-        var minParse = parseStr(settings.vMin),
-            maxParse = parseStr(settings.vMax),
-            valParse = parseStr(s);
+        var minParse = parseStr(settings.vMin);
+        var maxParse = parseStr(settings.vMax);
+        var valParse = parseStr(s);
 
         var result = void 0;
         switch (settings.oLimits) {
@@ -712,10 +922,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      */
     function autoGet(obj) {
         if (typeof obj === 'string' || obj instanceof String) {
-            obj = obj.replace(/\[/g, '\\[').replace(/\]/g, '\\]');
+            obj = obj.replace(/\[/g, '\\[').replace(/]/g, '\\]');
             obj = '#' + obj.replace(/(:|\.)/g, '\\$1');
             // obj = '#' + obj.replace(/([;&,\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|])/g, '\\$1'); // possible modification to replace the above 2 lines
         }
+
         return $(obj);
     }
 
@@ -730,10 +941,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             $that.data('autoNumeric', data);
         }
         var holder = data.holder;
-        if (holder === undefined && settings || update) {
+        if (isUndefined(holder) && settings || update) {
             holder = new AutoNumericHolder($that.get(0), settings);
             data.holder = holder;
         }
+
         return holder;
     }
 
@@ -746,6 +958,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         settings.oBracket = settings.nBracket;
         settings.oSep = settings.aSep;
         settings.oSign = settings.aSign;
+
         return settings;
     }
 
@@ -754,8 +967,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      * taken from Quirksmode
      */
     function readCookie(name) {
-        var nameEQ = name + '=',
-            ca = document.cookie.split(';');
+        var nameEQ = name + '=';
+        var ca = document.cookie.split(';');
         var c = '';
         for (var i = 0; i < ca.length; i += 1) {
             c = ca[i];
@@ -766,6 +979,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 return c.substring(nameEQ.length, c.length);
             }
         }
+
         return null;
     }
 
@@ -788,11 +1002,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      */
     function autoSave($this, settings, toDo) {
         if (settings.aStor) {
-            var storedName = $this[0].name !== '' && $this[0].name !== undefined ? 'AUTO_' + decodeURIComponent($this[0].name) : 'AUTO_' + $this[0].id;
-            var date = void 0,
-                expires = void 0;
+            var storedName = $this[0].name !== '' && !isUndefined($this[0].name) ? 'AUTO_' + decodeURIComponent($this[0].name) : 'AUTO_' + $this[0].id;
+            var date = void 0;
+            var expires = void 0;
+
+            // sets cookie for browser that do not support sessionStorage IE 6 & IE 7
             if (storageTest() === false) {
-                // sets cookie for browser that do not support sessionStorage IE 6 & IE 7
                 switch (toDo) {
                     case 'set':
                         document.cookie = storedName + '=' + settings.rawValue + '; expires= ; path=/';
@@ -800,14 +1015,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     case 'wipe':
                         date = new Date();
                         date.setTime(date.getTime() + -1 * 24 * 60 * 60 * 1000);
-                        expires = '; expires=' + date.toUTCString(); //Note : `toGMTString()` has been deprecated (cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toGMTString)
+                        expires = '; expires=' + date.toUTCString(); // Note : `toGMTString()` has been deprecated (cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toGMTString)
                         document.cookie = storedName + '=\'\' ;' + expires + '; path=/';
                         break;
                     case 'get':
                         return readCookie(storedName);
                 }
             } else {
-                //noinspection Eslint
                 switch (toDo) {
                     case 'set':
                         sessionStorage.setItem(storedName, settings.rawValue);
@@ -833,6 +1047,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         this.settingsClone = autoCode(this.$that, this.settings);
         this.value = that.value;
     }
+
     AutoNumericHolder.prototype = {
         init: function init(e) {
             this.value = this.that.value;
@@ -840,7 +1055,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             this.ctrlKey = e.ctrlKey;
             this.cmdKey = e.metaKey;
             this.shiftKey = e.shiftKey;
-            this.selection = getElementSelection(this.that); // keypress event overwrites meaningful value of e.keyCode
+
+            // keypress event overwrites meaningful value of e.keyCode
+            this.selection = getElementSelection(this.that);
             if (e.type === 'keydown' || e.type === 'keyup') {
                 this.kdCode = e.keyCode;
             }
@@ -856,7 +1073,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 end: end,
                 length: end - start
             };
-            if (setReal === undefined || setReal) {
+            if (isUndefined(setReal) || setReal) {
                 setElementSelection(this.that, start, end);
             }
         },
@@ -864,31 +1081,43 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             this.setSelection(pos, pos, setReal);
         },
         getBeforeAfter: function getBeforeAfter() {
-            var value = this.value,
-                left = value.substring(0, this.selection.start),
-                right = value.substring(this.selection.end, value.length);
+            var value = this.value;
+            var left = value.substring(0, this.selection.start);
+            var right = value.substring(this.selection.end, value.length);
+
             return [left, right];
         },
         getBeforeAfterStriped: function getBeforeAfterStriped() {
-            var settingsClone = this.settingsClone,
-                parts = this.getBeforeAfter();
-            parts[0] = autoStrip(parts[0], this.settingsClone);
-            parts[1] = autoStrip(parts[1], this.settingsClone);
-            if (settingsClone.trailingNegative && parts[0].indexOf('-') === -1) {
-                parts[0] = '-' + parts[0];
-                parts[1] = parts[1] === '-' ? '' : parts[1];
+            var settingsClone = this.settingsClone;
+
+            var _getBeforeAfter = this.getBeforeAfter(),
+                _getBeforeAfter2 = _slicedToArray(_getBeforeAfter, 2),
+                left = _getBeforeAfter2[0],
+                right = _getBeforeAfter2[1];
+
+            left = autoStrip(left, this.settingsClone);
+            right = autoStrip(right, this.settingsClone);
+            if (settingsClone.trailingNegative && left.indexOf('-') === -1) {
+                left = '-' + left;
+                right = right === '-' ? '' : right;
             }
             settingsClone.trailingNegative = false;
-            return parts;
+
+            return [left, right];
         },
+
 
         /**
          * strip parts from excess characters and leading zeroes
          */
         normalizeParts: function normalizeParts(left, right) {
             var settingsClone = this.settingsClone;
-            left = autoStrip(left, settingsClone); // prevents multiple leading zeros from being entered
-            right = autoStrip(right, settingsClone); // if right is not empty and first character is not aDec,
+
+            // prevents multiple leading zeros from being entered
+            left = autoStrip(left, settingsClone);
+
+            // if right is not empty and first character is not aDec,
+            right = autoStrip(right, settingsClone);
             if (settingsClone.trailingNegative && left.indexOf('-') === -1) {
                 left = '-' + left;
                 settingsClone.trailingNegative = false;
@@ -898,39 +1127,47 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     right = right.replace(/^0*(\d)/, '$1');
                 }
             }
-            this.new_value = left + right; // insert zero if has leading dot
+
+            // insert zero if has leading dot
+            this.newValue = left + right;
             if (settingsClone.aDec) {
-                var m = this.new_value.match(new RegExp('^' + settingsClone.aNegRegAutoStrip + '\\' + settingsClone.aDec));
+                var m = this.newValue.match(new RegExp('^' + settingsClone.aNegRegAutoStrip + '\\' + settingsClone.aDec));
                 if (m) {
                     left = left.replace(m[1], m[1] + '0');
-                    this.new_value = left + right;
+                    this.newValue = left + right;
                 }
             }
+
             return [left, right];
         },
+
 
         /**
          * set part of number to value keeping position of cursor
          */
         setValueParts: function setValueParts(left, right, advent) {
-            var settingsClone = this.settingsClone,
-                parts = this.normalizeParts(left, right),
-                minTest = autoCheck(this.new_value, settingsClone)[0],
-                maxTest = autoCheck(this.new_value, settingsClone)[1];
+            var settingsClone = this.settingsClone;
+            var parts = this.normalizeParts(left, right);
+
+            var _autoCheck = autoCheck(this.newValue, settingsClone),
+                _autoCheck2 = _slicedToArray(_autoCheck, 2),
+                minTest = _autoCheck2[0],
+                maxTest = _autoCheck2[1];
+
             var position = parts[0].length;
-            this.new_value = parts.join('');
+            this.newValue = parts.join('');
             if (minTest && maxTest) {
-                this.new_value = truncateDecimal(this.new_value, settingsClone, advent);
-                var test_value = this.new_value.indexOf(',') !== -1 ? this.new_value.replace(',', '.') : this.new_value;
-                if (test_value === '' || test_value === settingsClone.aNeg) {
+                this.newValue = truncateDecimal(this.newValue, settingsClone, advent);
+                var testValue = this.newValue.indexOf(',') !== -1 ? this.newValue.replace(',', '.') : this.newValue;
+                if (testValue === '' || testValue === settingsClone.aNeg) {
                     settingsClone.rawValue = '';
                 } else {
-                    settingsClone.rawValue = test_value;
+                    settingsClone.rawValue = testValue;
                 }
-                if (position > this.new_value.length) {
-                    position = this.new_value.length;
+                if (position > this.newValue.length) {
+                    position = this.newValue.length;
                 }
-                this.value = this.new_value;
+                this.value = this.newValue;
                 this.setPosition(position, false);
                 return true;
             }
@@ -939,17 +1176,19 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             } else if (!maxTest) {
                 this.$that.trigger('autoNumeric:maxExceeded');
             }
+
             return false;
         },
+
 
         /**
          * helper function for expandSelectionOnSign
          * returns sign position of a formatted value
          */
         signPosition: function signPosition() {
-            var settingsClone = this.settingsClone,
-                aSign = settingsClone.aSign,
-                that = this.that;
+            var settingsClone = this.settingsClone;
+            var aSign = settingsClone.aSign;
+            var that = this.that;
             if (aSign) {
                 var aSignLen = aSign.length;
                 if (settingsClone.pSign === 'p') {
@@ -959,76 +1198,93 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 var valueLen = that.value.length;
                 return [valueLen - aSignLen, valueLen];
             }
+
             return [1000, -1];
         },
+
 
         /**
          * expands selection to cover whole sign
          * prevents partial deletion/copying/overwriting of a sign
          */
         expandSelectionOnSign: function expandSelectionOnSign(setReal) {
-            var sign_position = this.signPosition(),
-                selection = this.selection;
-            if (selection.start < sign_position[1] && selection.end > sign_position[0]) {
-                // if selection catches something except sign and catches only space from sign
-                if ((selection.start < sign_position[0] || selection.end > sign_position[1]) && this.value.substring(Math.max(selection.start, sign_position[0]), Math.min(selection.end, sign_position[1])).match(/^\s*$/)) {
-                    // then select without empty space
-                    if (selection.start < sign_position[0]) {
-                        this.setSelection(selection.start, sign_position[0], setReal);
+            var signPosition = this.signPosition();
+            var selection = this.selection;
+
+            // if selection catches something except sign and catches only space from sign
+            if (selection.start < signPosition[1] && selection.end > signPosition[0]) {
+                // then select without empty space
+                if ((selection.start < signPosition[0] || selection.end > signPosition[1]) && this.value.substring(Math.max(selection.start, signPosition[0]), Math.min(selection.end, signPosition[1])).match(/^\s*$/)) {
+                    if (selection.start < signPosition[0]) {
+                        this.setSelection(selection.start, signPosition[0], setReal);
                     } else {
-                        this.setSelection(sign_position[1], selection.end, setReal);
+                        this.setSelection(signPosition[1], selection.end, setReal);
                     }
                 } else {
                     // else select with whole sign
-                    this.setSelection(Math.min(selection.start, sign_position[0]), Math.max(selection.end, sign_position[1]), setReal);
+                    this.setSelection(Math.min(selection.start, signPosition[0]), Math.max(selection.end, signPosition[1]), setReal);
                 }
             }
         },
+
 
         /**
          * try to strip pasted value to digits
          */
         checkPaste: function checkPaste() {
-            if (this.valuePartsBeforePaste !== undefined) {
-                var parts = this.getBeforeAfter(),
-                    oldParts = this.valuePartsBeforePaste;
-                delete this.valuePartsBeforePaste; // try to strip pasted value first
-                parts[0] = parts[0].substr(0, oldParts[0].length) + autoStrip(parts[0].substr(oldParts[0].length), this.settingsClone);
-                if (!this.setValueParts(parts[0], parts[1], 'paste')) {
+            if (!isUndefined(this.valuePartsBeforePaste)) {
+                var oldParts = this.valuePartsBeforePaste;
+
+                var _getBeforeAfter3 = this.getBeforeAfter(),
+                    _getBeforeAfter4 = _slicedToArray(_getBeforeAfter3, 2),
+                    left = _getBeforeAfter4[0],
+                    right = _getBeforeAfter4[1];
+
+                // try to strip pasted value first
+
+
+                delete this.valuePartsBeforePaste;
+                var modifiedLeftPart = left.substr(0, oldParts[0].length) + autoStrip(left.substr(oldParts[0].length), this.settingsClone);
+                if (!this.setValueParts(modifiedLeftPart, right, 'paste')) {
                     this.value = oldParts.join('');
                     this.setPosition(oldParts[0].length, false);
                 }
             }
         },
 
+
         /**
          * process pasting, cursor moving and skipping of not interesting keys
          * if returns true, further processing is not performed
          */
         skipAlways: function skipAlways(e) {
-            var kdCode = this.kdCode,
-                which = this.which,
-                ctrlKey = this.ctrlKey,
-                cmdKey = this.cmdKey,
-                shiftKey = this.shiftKey; // catch the ctrl up on ctrl-v
-            if ((ctrlKey || cmdKey) && e.type === 'keyup' && this.valuePartsBeforePaste !== undefined || shiftKey && kdCode === keyCode.Insert) {
+            var kdCode = this.kdCode;
+            var which = this.which;
+            var ctrlKey = this.ctrlKey;
+            var cmdKey = this.cmdKey;
+
+            // catch the ctrl up on ctrl-v
+            var shiftKey = this.shiftKey;
+            if ((ctrlKey || cmdKey) && e.type === 'keyup' && !isUndefined(this.valuePartsBeforePaste) || shiftKey && kdCode === keyCode.Insert) {
                 this.checkPaste();
                 return false;
             }
+
             // skip Fx keys, windows keys, other special keys
             if (kdCode >= keyCode.F1 && kdCode <= keyCode.F12 || kdCode >= keyCode.Windows && kdCode <= keyCode.RightClick || kdCode >= keyCode.Tab && kdCode < keyCode.Space || kdCode < keyCode.Backspace && (which === 0 || which === kdCode) || kdCode === keyCode.NumLock || kdCode === keyCode.ScrollLock || kdCode === keyCode.Insert || kdCode === keyCode.Command) {
                 return true;
             }
+
+            // if select all (a)
             if ((ctrlKey || cmdKey) && kdCode === keyCode.a) {
-                // if select all (a)
                 if (this.settings.sNumber) {
                     e.preventDefault();
-                    var valueLen = this.that.value.length,
-                        aSignLen = this.settings.aSign.length,
-                        negLen = this.that.value.indexOf('-') === -1 ? 0 : 1,
-                        aSuffixLen = this.settings.aSuffix.length,
-                        pSign = this.settings.pSign,
-                        pNeg = this.settings.pNeg;
+                    var valueLen = this.that.value.length;
+                    var aSignLen = this.settings.aSign.length;
+                    var negLen = this.that.value.indexOf('-') === -1 ? 0 : 1;
+                    var aSuffixLen = this.settings.aSuffix.length;
+                    var pSign = this.settings.pSign;
+                    var pNeg = this.settings.pNeg;
 
                     var start = void 0;
                     if (pSign === 's') {
@@ -1057,15 +1313,17 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 }
                 return true;
             }
+
+            // if copy (c)
             if ((ctrlKey || cmdKey) && (kdCode === keyCode.c || kdCode === keyCode.v || kdCode === keyCode.x)) {
-                // if copy (c)
                 if (e.type === 'keydown') {
                     this.expandSelectionOnSign();
                 }
+
+                // try to prevent wrong paste
                 if (kdCode === keyCode.v || kdCode === keyCode.Insert) {
-                    // try to prevent wrong paste
                     if (e.type === 'keydown' || e.type === 'keypress') {
-                        if (this.valuePartsBeforePaste === undefined) {
+                        if (isUndefined(this.valuePartsBeforePaste)) {
                             this.valuePartsBeforePaste = this.getBeforeAfter();
                         }
                     } else {
@@ -1074,15 +1332,17 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 }
                 return e.type === 'keydown' || e.type === 'keypress' || kdCode === keyCode.c;
             }
+
             if (ctrlKey || cmdKey) {
                 return true;
             }
+
+            // jump over thousand separator
             if (kdCode === keyCode.LeftArrow || kdCode === keyCode.RightArrow) {
-                // jump over thousand separator
-                var aSep = this.settingsClone.aSep,
-                    aDec = this.settingsClone.aDec,
-                    startJump = this.selection.start,
-                    value = this.that.value;
+                var aSep = this.settingsClone.aSep;
+                var aDec = this.settingsClone.aDec;
+                var startJump = this.selection.start;
+                var value = this.that.value;
                 if (e.type === 'keydown' && !this.shiftKey) {
                     if (kdCode === keyCode.LeftArrow && (value.charAt(startJump - 2) === aSep || value.charAt(startJump - 2) === aDec)) {
                         this.setPosition(startJump - 1);
@@ -1092,69 +1352,79 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 }
                 return true;
             }
+
             return kdCode >= keyCode.PageDown && kdCode <= keyCode.DownArrow;
         },
+
 
         /**
          * process deletion of characters when the minus sign is to the right of the numeric characters
          */
-        processTrailing: function processTrailing(parts) {
+        processTrailing: function processTrailing(_ref) {
+            var _ref2 = _slicedToArray(_ref, 2),
+                left = _ref2[0],
+                right = _ref2[1];
+
             var settingsClone = this.settingsClone;
             if (settingsClone.pSign === 'p' && settingsClone.pNeg === 's') {
                 if (this.kdCode === 8) {
                     settingsClone.caretFix = Boolean(this.selection.start >= this.value.indexOf(settingsClone.aSuffix) && settingsClone.aSuffix !== '');
                     if (this.value.charAt(this.selection.start - 1) === '-') {
-                        parts[0] = parts[0].substring(1);
+                        left = left.substring(1);
                     } else if (this.selection.start <= this.value.length - settingsClone.aSuffix.length) {
-                        parts[0] = parts[0].substring(0, parts[0].length - 1);
+                        left = left.substring(0, left.length - 1);
                     }
                 } else {
                     settingsClone.caretFix = Boolean(this.selection.start >= this.value.indexOf(settingsClone.aSuffix) && settingsClone.aSuffix !== '');
                     if (this.selection.start >= this.value.indexOf(settingsClone.aSign) + settingsClone.aSign.length) {
-                        parts[1] = parts[1].substring(1, parts[1].length);
+                        right = right.substring(1, right.length);
                     }
-                    if (parts[0].indexOf('-') > -1 && this.value.charAt(this.selection.start) === '-') {
-                        parts[0] = parts[0].substring(1);
+                    if (left.indexOf('-') > -1 && this.value.charAt(this.selection.start) === '-') {
+                        left = left.substring(1);
                     }
                 }
             }
+
             if (settingsClone.pSign === 's' && settingsClone.pNeg === 'l') {
                 settingsClone.caretFix = Boolean(this.selection.start >= this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length);
                 if (this.kdCode === 8) {
                     if (this.selection.start === this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length && this.value.indexOf(settingsClone.aNeg) !== -1) {
-                        parts[0] = parts[0].substring(1);
-                    } else if (parts[0] !== '-' && (this.selection.start <= this.value.indexOf(settingsClone.aNeg) || this.value.indexOf(settingsClone.aNeg) === -1)) {
-                        parts[0] = parts[0].substring(0, parts[0].length - 1);
+                        left = left.substring(1);
+                    } else if (left !== '-' && (this.selection.start <= this.value.indexOf(settingsClone.aNeg) || this.value.indexOf(settingsClone.aNeg) === -1)) {
+                        left = left.substring(0, left.length - 1);
                     }
                 } else {
-                    if (parts[0][0] === '-') {
-                        parts[1] = parts[1].substring(1);
+                    if (left[0] === '-') {
+                        right = right.substring(1);
                     }
                     if (this.selection.start === this.value.indexOf(settingsClone.aNeg) && this.value.indexOf(settingsClone.aNeg) !== -1) {
-                        parts[0] = parts[0].substring(1);
+                        left = left.substring(1);
                     }
                 }
             }
+
             if (settingsClone.pSign === 's' && settingsClone.pNeg === 'r') {
                 settingsClone.caretFix = Boolean(this.selection.start >= this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length);
                 if (this.kdCode === 8) {
                     if (this.selection.start === this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length) {
-                        parts[0] = parts[0].substring(1);
-                    } else if (parts[0] !== '-' && this.selection.start <= this.value.indexOf(settingsClone.aNeg) - settingsClone.aSign.length) {
-                        parts[0] = parts[0].substring(0, parts[0].length - 1);
-                    } else if (parts[0] !== '' && this.value.indexOf(settingsClone.aNeg) === -1) {
-                        parts[0] = parts[0].substring(0, parts[0].length - 1);
+                        left = left.substring(1);
+                    } else if (left !== '-' && this.selection.start <= this.value.indexOf(settingsClone.aNeg) - settingsClone.aSign.length) {
+                        left = left.substring(0, left.length - 1);
+                    } else if (left !== '' && this.value.indexOf(settingsClone.aNeg) === -1) {
+                        left = left.substring(0, left.length - 1);
                     }
                 } else {
                     settingsClone.caretFix = Boolean(this.selection.start >= this.value.indexOf(settingsClone.aSign) && settingsClone.aSign !== '');
                     if (this.selection.start === this.value.indexOf(settingsClone.aNeg)) {
-                        parts[0] = parts[0].substring(1);
+                        left = left.substring(1);
                     }
-                    parts[1] = parts[1].substring(1);
+                    right = right.substring(1);
                 }
             }
-            return parts;
+
+            return [left, right];
         },
+
 
         /**
          * process deletion of characters
@@ -1162,53 +1432,82 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          */
         processAlways: function processAlways() {
             var settingsClone = this.settingsClone;
-            var parts = [];
             if (this.kdCode === keyCode.Backspace || this.kdCode === keyCode.Delete) {
+                var left = void 0;
+                var right = void 0;
                 if (!this.selection.length) {
-                    parts = this.getBeforeAfterStriped();
-                    if (parts[0] === '' && parts[1] === '') {
+                    var _getBeforeAfterStripe = this.getBeforeAfterStriped();
+
+                    var _getBeforeAfterStripe2 = _slicedToArray(_getBeforeAfterStripe, 2);
+
+                    left = _getBeforeAfterStripe2[0];
+                    right = _getBeforeAfterStripe2[1];
+
+                    if (left === '' && right === '') {
                         settingsClone.throwInput = false;
                     }
                     if ((settingsClone.pSign === 'p' && settingsClone.pNeg === 's' || settingsClone.pSign === 's' && (settingsClone.pNeg === 'l' || settingsClone.pNeg === 'r')) && this.value.indexOf('-') !== -1) {
-                        parts = this.processTrailing(parts);
+                        var _processTrailing = this.processTrailing([left, right]);
+
+                        var _processTrailing2 = _slicedToArray(_processTrailing, 2);
+
+                        left = _processTrailing2[0];
+                        right = _processTrailing2[1];
                     } else {
                         if (this.kdCode === 8) {
-                            parts[0] = parts[0].substring(0, parts[0].length - 1);
+                            left = left.substring(0, left.length - 1);
                         } else {
-                            parts[1] = parts[1].substring(1, parts[1].length);
+                            right = right.substring(1, right.length);
                         }
                     }
-                    this.setValueParts(parts[0], parts[1]);
+                    this.setValueParts(left, right);
                 } else {
                     this.expandSelectionOnSign(false);
-                    parts = this.getBeforeAfterStriped();
-                    this.setValueParts(parts[0], parts[1]);
+
+                    var _getBeforeAfterStripe3 = this.getBeforeAfterStriped();
+
+                    var _getBeforeAfterStripe4 = _slicedToArray(_getBeforeAfterStripe3, 2);
+
+                    left = _getBeforeAfterStripe4[0];
+                    right = _getBeforeAfterStripe4[1];
+
+                    this.setValueParts(left, right);
                 }
                 return true;
             }
+
             return false;
         },
+
 
         /**
          * process insertion of characters
          * returns true if processing performed
          */
         processKeypress: function processKeypress() {
-            var settingsClone = this.settingsClone,
-                cCode = String.fromCharCode(this.which),
-                parts = this.getBeforeAfterStriped();
-            var left = parts[0],
-                right = parts[1];
+            var settingsClone = this.settingsClone;
+            var cCode = String.fromCharCode(this.which);
+
+            var _getBeforeAfterStripe5 = this.getBeforeAfterStriped(),
+                _getBeforeAfterStripe6 = _slicedToArray(_getBeforeAfterStripe5, 2),
+                left = _getBeforeAfterStripe6[0],
+                right = _getBeforeAfterStripe6[1];
+
             settingsClone.throwInput = true;
+
             // start rules when the decimal character key is pressed always use numeric pad dot to insert decimal separator
+            // do not allow decimal character if no decimal part allowed
             if (cCode === settingsClone.aDec || settingsClone.altDec && cCode === settingsClone.altDec || (cCode === '.' || cCode === ',') && this.kdCode === keyCode.DotNumpad) {
-                // do not allow decimal character if no decimal part allowed
                 if (!settingsClone.mDec || !settingsClone.aDec) {
                     return true;
-                } // do not allow decimal character before aNeg character
+                }
+
+                // do not allow decimal character before aNeg character
                 if (settingsClone.aNeg && right.indexOf(settingsClone.aNeg) > -1) {
                     return true;
-                } // do not allow decimal character if other decimal character present
+                }
+
+                // do not allow decimal character if other decimal character present
                 if (left.indexOf(settingsClone.aDec) > -1) {
                     return true;
                 }
@@ -1221,16 +1520,21 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 this.setValueParts(left + settingsClone.aDec, right, null);
                 return true;
             }
+
+            // prevent minus if not allowed
             if ((cCode === '-' || cCode === '+') && settingsClone.aNeg === '-') {
-                // prevent minus if not allowed
                 if (!settingsClone) {
                     return true;
-                } // caret is always after minus
+                }
+
+                // caret is always after minus
                 if (settingsClone.pSign === 'p' && settingsClone.pNeg === 's' || settingsClone.pSign === 's' && settingsClone.pNeg !== 'p') {
                     if (left === '' && right.indexOf(settingsClone.aNeg) > -1) {
                         left = settingsClone.aNeg;
                         right = right.substring(1, right.length);
-                    } // change sign of number, remove part if should
+                    }
+
+                    // change sign of number, remove part if should
                     if (left.charAt(0) === '-' || left.indexOf(settingsClone.aNeg) !== -1) {
                         left = left.substring(1, left.length);
                     } else {
@@ -1240,7 +1544,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     if (left === '' && right.indexOf(settingsClone.aNeg) > -1) {
                         left = settingsClone.aNeg;
                         right = right.substring(1, right.length);
-                    } // change sign of number, remove part if should
+                    }
+
+                    // change sign of number, remove part if should
                     if (left.charAt(0) === settingsClone.aNeg) {
                         left = left.substring(1, left.length);
                     } else {
@@ -1250,8 +1556,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 this.setValueParts(left, right, null);
                 return true;
             }
+
+            // if try to insert digit before minus
             if (cCode >= '0' && cCode <= '9') {
-                // if try to insert digit before minus
                 if (settingsClone.aNeg && left === '' && right.indexOf(settingsClone.aNeg) > -1) {
                     left = settingsClone.aNeg;
                     right = right.substring(1, right.length);
@@ -1261,10 +1568,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 }
                 this.setValueParts(left + cCode, right, null);
                 return true;
-            } // prevent any other character
+            }
+
+            // prevent any other character
             settingsClone.throwInput = false;
+
             return true;
         },
+
 
         /**
          * formatting of just processed value with keeping of cursor position
@@ -1272,51 +1583,60 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         formatQuick: function formatQuick(e) {
             var _this = this;
 
-            var settingsClone = this.settingsClone,
-                parts = this.getBeforeAfterStriped(),
-                leftLength = this.value,
-                kuCode = e.keyCode;
+            var settingsClone = this.settingsClone;
+            var leftLength = this.value;
+            var kuCode = e.keyCode;
+
+            var _getBeforeAfterStripe7 = this.getBeforeAfterStriped(),
+                _getBeforeAfterStripe8 = _slicedToArray(_getBeforeAfterStripe7, 1),
+                left = _getBeforeAfterStripe8[0];
+
             // no grouping separator and no currency sign
+
+
             if ((settingsClone.aSep === '' || settingsClone.aSep !== '' && leftLength.indexOf(settingsClone.aSep) === -1) && (settingsClone.aSign === '' || settingsClone.aSign !== '' && leftLength.indexOf(settingsClone.aSign) === -1)) {
                 var subParts = leftLength.split(settingsClone.aDec);
                 var nSign = '';
                 if (subParts[0].indexOf('-') > -1) {
                     nSign = '-';
                     subParts[0] = subParts[0].replace('-', '');
-                    parts[0] = parts[0].replace('-', '');
+                    left = left.replace('-', '');
                 }
-                if (nSign === '' && subParts[0].length > settingsClone.mIntPos && parts[0].charAt(0) === '0') {
-                    // strip leading zero on positive value if need
-                    parts[0] = parts[0].slice(1);
+
+                // strip leading zero on positive value if need
+                if (nSign === '' && subParts[0].length > settingsClone.mIntPos && left.charAt(0) === '0') {
+                    left = left.slice(1);
                 }
-                if (nSign === '-' && subParts[0].length > settingsClone.mIntNeg && parts[0].charAt(0) === '0') {
-                    // strip leading zero on negative value if need
-                    parts[0] = parts[0].slice(1);
+
+                // strip leading zero on negative value if need
+                if (nSign === '-' && subParts[0].length > settingsClone.mIntNeg && left.charAt(0) === '0') {
+                    left = left.slice(1);
                 }
-                parts[0] = nSign + parts[0];
+                left = nSign + left;
             }
+
             var value = autoGroup(this.value, this.settingsClone);
             var position = value.length;
             if (value) {
                 // prepare regexp which searches for cursor position from unformatted left part
-                var left_ar = parts[0].split('');
+                var leftAr = left.split('');
+
                 // fixes caret position with trailing minus sign
-                if ((settingsClone.pNeg === 's' || settingsClone.pSign === 's' && settingsClone.pNeg !== 'p') && left_ar[0] === '-' && settingsClone.aNeg !== '') {
-                    left_ar.shift();
+                if ((settingsClone.pNeg === 's' || settingsClone.pSign === 's' && settingsClone.pNeg !== 'p') && leftAr[0] === '-' && settingsClone.aNeg !== '') {
+                    leftAr.shift();
                     if (settingsClone.pSign === 's' && settingsClone.pNeg === 'l' && (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace || kuCode === keyCode.Delete || this.kdCode === keyCode.Delete) && settingsClone.caretFix) {
-                        left_ar.push('-');
+                        leftAr.push('-');
                         settingsClone.caretFix = Boolean(e.type === 'keydown');
                     }
                     if (settingsClone.pSign === 'p' && settingsClone.pNeg === 's' && (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace || kuCode === keyCode.Delete || this.kdCode === keyCode.Delete) && settingsClone.caretFix) {
-                        left_ar.push('-');
+                        leftAr.push('-');
                         settingsClone.caretFix = Boolean(e.type === 'keydown');
                     }
                     if (settingsClone.pSign === 's' && settingsClone.pNeg === 'r' && (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace || kuCode === keyCode.Delete || this.kdCode === keyCode.Delete) && settingsClone.caretFix) {
                         (function () {
-                            var signParts = settingsClone.aSign.split(''),
-                                escapeChr = ['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '['],
-                                escapedParts = [];
-                            var escapedSign = void 0;
+                            var signParts = settingsClone.aSign.split('');
+                            var escapeChr = ['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '['];
+                            var escapedParts = [];
                             $.each(signParts, function (i, miniParts) {
                                 miniParts = signParts[i];
                                 if ($.inArray(miniParts, escapeChr) !== -1) {
@@ -1328,22 +1648,27 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                             if (kuCode === keyCode.Backspace || _this.kdCode === keyCode.Backspace) {
                                 escapedParts.push('-');
                             }
-                            escapedSign = escapedParts.join('');
-                            left_ar.push(escapedSign);
+
+                            // pushing the escaped sign
+                            leftAr.push(escapedParts.join(''));
                             settingsClone.caretFix = Boolean(e.type === 'keydown');
                         })();
                     }
                 }
-                for (var i = 0; i < left_ar.length; i++) {
-                    // thanks Peter Kovari
-                    if (!left_ar[i].match('\\d')) {
-                        left_ar[i] = '\\' + left_ar[i];
+
+                for (var i = 0; i < leftAr.length; i++) {
+                    if (!leftAr[i].match('\\d')) {
+                        leftAr[i] = '\\' + leftAr[i];
                     }
                 }
-                var leftReg = new RegExp('^.*?' + left_ar.join('.*?')),
-                    newLeft = value.match(leftReg); // search cursor position in formatted value
+
+                var leftReg = new RegExp('^.*?' + leftAr.join('.*?'));
+
+                // search cursor position in formatted value
+                var newLeft = value.match(leftReg);
                 if (newLeft) {
                     position = newLeft[0].length;
+
                     // if we are just before sign which is in prefix position
                     if ((position === 0 && value.charAt(0) !== settingsClone.aNeg || position === 1 && value.charAt(0) === settingsClone.aNeg) && settingsClone.aSign && settingsClone.pSign === 'p') {
                         // place caret after prefix sign
@@ -1369,117 +1694,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     };
 
     /**
-     * Wrapper variable that hold named keyboard keys with their respective keyCode as seen in DOM events.
-     */
-    var keyCode = {
-        'Backspace': 8,
-        'Tab': 9,
-        'Enter': 13,
-        'Shift': 16,
-        'Ctrl': 17,
-        'Alt': 18,
-        'PauseBreak': 19,
-        'CapsLock': 20,
-        'Esc': 27,
-        'Space': 32,
-        'PageUp': 33,
-        'PageDown': 34,
-        'End': 35,
-        'Home': 36,
-        'LeftArrow': 37,
-        'UpArrow': 38,
-        'RightArrow': 39,
-        'DownArrow': 40,
-        'Insert': 45,
-        'Delete': 46,
-        'num0': 48,
-        'num1': 49,
-        'num2': 50,
-        'num3': 51,
-        'num4': 52,
-        'num5': 53,
-        'num6': 54,
-        'num7': 55,
-        'num8': 56,
-        'num9': 57,
-        'a': 65,
-        'b': 66,
-        'c': 67,
-        'd': 68,
-        'e': 69,
-        'f': 70,
-        'g': 71,
-        'h': 72,
-        'i': 73,
-        'j': 74,
-        'k': 75,
-        'l': 76,
-        'm': 77,
-        'n': 78,
-        'o': 79,
-        'p': 80,
-        'q': 81,
-        'r': 82,
-        's': 83,
-        't': 84,
-        'u': 85,
-        'v': 86,
-        'w': 87,
-        'x': 88,
-        'y': 89,
-        'z': 90,
-        'Windows': 91,
-        'RightClick': 93,
-        'numpad0': 96,
-        'numpad1': 97,
-        'numpad2': 98,
-        'numpad3': 99,
-        'numpad4': 100,
-        'numpad5': 101,
-        'numpad6': 102,
-        'numpad7': 103,
-        'numpad8': 104,
-        'numpad9': 105,
-        'MultiplyNumpad': 106,
-        'PlusNumpad': 107,
-        'MinusNumpad': 109,
-        'DotNumpad': 110,
-        'SlashNumpad': 111,
-        'F1': 112,
-        'F2': 113,
-        'F3': 114,
-        'F4': 115,
-        'F5': 116,
-        'F6': 117,
-        'F7': 118,
-        'F8': 119,
-        'F9': 120,
-        'F10': 121,
-        'F11': 122,
-        'F12': 123,
-        'NumLock': 144,
-        'ScrollLock': 145,
-        'MyComputer': 182,
-        'MyCalculator': 183,
-        'Semicolon': 186,
-        'Equal': 187,
-        'Comma': 188,
-        'Hyphen': 189,
-        'Dot': 190,
-        'Slash': 191,
-        'Backquote': 192,
-        'LeftBracket': 219,
-        'Backslash': 220,
-        'RightBracket': 221,
-        'Quote': 222,
-        'Command': 224
-    };
-
-    /**
      * Methods supported by autoNumeric
      */
     var methods = {
-
         /**
          * Method to initiate autoNumeric and attached the settings (default and options passed as a parameter
          * $(someSelector).autoNumeric('init');           // initiate autoNumeric with defaults
@@ -1490,17 +1707,19 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          */
         init: function init(options) {
             return this.each(function () {
-                var $this = $(this),
+                var $this = $(this);
 
                 // attempt to grab HTML5 data, if they don't exist we'll get "undefined"
-                tagData = $this.data(),
+                var tagData = $this.data();
 
                 // supported input type
-                $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
+                var $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
+
                 // attempt to grab "autoNumeric" settings, if they don't exist returns "undefined"
                 var settings = $this.data('autoNumeric');
+
+                // If we couldn't grab settings, create them from defaults and passed options
                 if ((typeof settings === 'undefined' ? 'undefined' : _typeof(settings)) !== 'object') {
-                    // If we couldn't grab settings, create them from defaults and passed options
                     settings = $.extend({}, $.fn.autoNumeric.defaults, tagData, options, {
                         onOff: false,
                         runOnce: false,
@@ -1510,7 +1729,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                         throwInput: true,
                         strip: true,
                         tagList: ['b', 'caption', 'cite', 'code', 'dd', 'del', 'div', 'dfn', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ins', 'kdb', 'label', 'li', 'option', 'output', 'p', 'q', 's', 'sample', 'span', 'strong', 'td', 'th', 'u', 'const']
-                    }); // Merge defaults, tagData and options
+                    });
+
+                    // Merge defaults, tagData and options
                     if (settings.aDec === settings.aSep) {
                         throwError('autoNumeric will not function properly when the decimal character aDec [' + settings.aDec + '] and the thousand separator aSep [' + settings.aSep + '] are the same character', settings.debug);
                     }
@@ -1527,29 +1748,38 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                         settings.scaleDecimal = settings.aScale[1] ? +settings.aScale[1] : null;
                         settings.scaleSuffix = settings.aScale[2] ? settings.aScale[2] : '';
                     }
-                    $this.data('autoNumeric', settings); // Save our new settings
+
+                    // Save our new settings
+                    $this.data('autoNumeric', settings);
                 } else {
                     return this;
                 }
-                settings = originalSettings(settings); // original settings saved for use when eDec & nSep options are being used
+
+                // original settings saved for use when eDec & nSep options are being used
+                settings = originalSettings(settings);
                 var holder = getHolder($this, settings);
+
+                // checks for non-supported input types
                 if (!$input && $this.prop('tagName').toLowerCase() === 'input') {
-                    // checks for non-supported input types
                     throwError('The input type "' + $this.prop('type') + '" is not supported by autoNumeric', settings.debug);
                 }
+
+                // checks for non-supported tags
                 if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) === -1 && $this.prop('tagName').toLowerCase() !== 'input') {
-                    // checks for non-supported tags
                     throwError('The <' + $this.prop('tagName').toLowerCase() + '> tag is not supported by autoNumeric', settings.debug);
                 }
+
                 //TODO Replace the two next tests with a `validateOptions()` function
+                // checks if the decimal and thousand are characters are the same
                 if (settings.aDec === settings.aSep) {
-                    // checks if the decimal and thousand are characters are the same
                     throwError('autoNumeric will not function properly when the decimal character aDec [' + settings.aDec + '] and the thousand separator aSep [' + settings.aSep + '] are the same character', settings.debug);
                 }
+
+                // checks the extended decimal places "eDec" is greater than the normal decimal places "mDec"
                 if (settings.eDec < settings.mDec && settings.eDec !== null) {
-                    // checks the extended decimal places "eDec" is greater than the normal decimal places "mDec"
                     throwError('autoNumeric will not function properly when the extended decimal places eDec [' + settings.eDec + '] is greater than the mDec [' + settings.mDec + '] value', settings.debug);
                 }
+
                 // routine to format default value on page load
                 if (settings.runOnce === false && settings.aForm) {
                     var setValue = true;
@@ -1579,7 +1809,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                             setValue = false;
                         }
 
-                        if ($this.val() === '') {
+                        var currentValue = $this.val();
+                        if (currentValue === '') {
                             switch (settings.wEmpty) {
                                 case 'focus':
                                     setValue = false;
@@ -1595,8 +1826,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                                 default:
                                 //
                             }
-                        } else if (setValue && $this.val() === $this.attr('value')) {
-                            $this.autoNumeric('set', $this.val());
+                        } else if (setValue && currentValue === $this.attr('value')) {
+                            $this.autoNumeric('set', currentValue);
                         }
                     }
                     if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1 && $this.text() !== '') {
@@ -1609,9 +1840,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                         }
                     }
                 }
+
                 settings.runOnce = true;
+
+                // input types supported "text", "hidden", "tel" and no type
                 if ($input) {
-                    // input types supported "text", "hidden", "tel" and no type
                     $this.on('focusin.autoNumeric', function () {
                         holder = getHolder($this);
                         var $settings = holder.settingsClone;
@@ -1646,11 +1879,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                             holder.processed = true;
                             return true;
                         }
-                        // The below streamed code / comment allows the "enter" keydown to throw a change() event
-                        /*if (e.keyCode === keyCode.Enter && holder.inVal !== $this.val()) {
+
+                        /* // The code below allows the "enter" keydown to throw a change() event
+                        if (e.keyCode === keyCode.Enter && holder.inVal !== $this.val()) {
                             $this.change();
                             holder.inVal = $this.val();
-                        }*/
+                        } */
                         holder.init(e);
                         if (holder.skipAlways(e)) {
                             holder.processed = true;
@@ -1660,7 +1894,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                             holder.processed = true;
                             holder.formatQuick(e);
                             if ($this.val() !== holder.lastVal && holder.settingsClone.throwInput) {
-                                $this.trigger('input'); // throws input event in deletion character
+                                // throws input event in deletion character
+                                $this.trigger('input');
                             }
                             holder.lastVal = $this.val();
                             holder.settingsClone.throwInput = true;
@@ -1672,8 +1907,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     });
 
                     $this.on('keypress.autoNumeric', function (e) {
+                        // Firefox fix for Shift && insert paste event
                         if (e.shiftKey && e.keyCode === keyCode.Insert) {
-                            // FF fix for Shift && insert paste event
                             return;
                         }
                         holder = getHolder($this);
@@ -1689,7 +1924,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                         if (holder.processAlways() || holder.processKeypress()) {
                             holder.formatQuick(e);
                             if ($this.val() !== holder.lastVal && holder.settingsClone.throwInput) {
-                                $this.trigger('input'); // throws input event on adding character
+                                // throws input event on adding character
+                                $this.trigger('input');
                             }
                             holder.lastVal = $this.val();
                             holder.settingsClone.throwInput = true;
@@ -1702,12 +1938,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     $this.on('keyup.autoNumeric', function (e) {
                         holder = getHolder($this);
                         holder.init(e);
-                        var skip = holder.skipAlways(e),
-                            tab = holder.kdCode;
+                        var skip = holder.skipAlways(e);
+                        var tab = holder.kdCode;
                         holder.kdCode = 0;
                         delete holder.valuePartsBeforePaste;
+
+                        // added to properly place the caret when only the currency sign is present
                         if ($this[0].value === holder.settingsClone.aSign) {
-                            // added to properly place the caret when only the currency sign is present
                             if (holder.settingsClone.pSign === 's') {
                                 setElementSelection(this, 0, 0);
                             } else {
@@ -1722,8 +1959,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                         if (holder.settingsClone.rawValue === '' && holder.settingsClone.aSign !== '' && holder.settingsClone.aSuffix !== '') {
                             setElementSelection(this, 0, 0);
                         }
+
+                        // saves the extended decimal to preserve the data when navigating away from the page
                         if (holder.settingsClone.eDec !== null && holder.settingsClone.aStor) {
-                            // saves the extended decimal to preserve the data when navigating away from the page
                             autoSave($this, settings, 'set');
                         }
                         if (skip) {
@@ -1740,8 +1978,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     $this.on('focusout.autoNumeric', function () {
                         holder = getHolder($this);
                         var value = $this.val();
-                        var origValue = value,
-                            $settings = holder.settingsClone;
+                        var origValue = value;
+                        var $settings = holder.settingsClone;
                         $settings.onOff = false;
                         if ($settings.aStor) {
                             autoSave($this, $settings, 'set');
@@ -1761,8 +1999,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                                 value = '-' + value;
                                 $settings.trailingNegative = false;
                             }
-                            var minTest = autoCheck(value, $settings)[0],
-                                maxTest = autoCheck(value, $settings)[1];
+
+                            var _autoCheck3 = autoCheck(value, $settings),
+                                _autoCheck4 = _slicedToArray(_autoCheck3, 2),
+                                minTest = _autoCheck4[0],
+                                maxTest = _autoCheck4[1];
+
                             if (checkEmpty(value, $settings) === null && minTest && maxTest) {
                                 value = fixNumber(value, $settings.aDec, $settings.aNeg);
                                 $settings.rawValue = value;
@@ -1805,7 +2047,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     });
 
                     $this.on('paste', function (e) {
-                        //FIXME After a paste, the caret is put on the far right of the input, it should be set to something like `newCaretPosition = oldCaretPosition + pasteText.length;`, while taking into account the thousand separators and the decimals characters
+                        //FIXME After a paste, the caret is put on the far right of the input, it should be set to something like `newCaretPosition = oldCaretPosition + pasteText.length;`, while taking into account the thousand separators and the decimal character
                         e.preventDefault();
                         holder = getHolder($this);
                         function prepare(text) {
@@ -1814,13 +2056,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                         function isValid(text) {
                             return text !== '' && !isNaN(text);
                         }
-                        var oldRawValue = $this.autoNumeric('get'),
-                            currentValue = this.value || '',
-                            selectionStart = this.selectionStart || 0,
-                            selectionEnd = this.selectionEnd || 0,
-                            prefix = currentValue.substring(0, selectionStart),
-                            suffix = currentValue.substring(selectionEnd, currentValue.length),
-                            pastedText = prepare(e.originalEvent.clipboardData.getData('text/plain'));
+                        var oldRawValue = $this.autoNumeric('get');
+                        var currentValue = this.value || '';
+                        var selectionStart = this.selectionStart || 0;
+                        var selectionEnd = this.selectionEnd || 0;
+                        var prefix = currentValue.substring(0, selectionStart);
+                        var suffix = currentValue.substring(selectionEnd, currentValue.length);
+                        var pastedText = prepare(e.originalEvent.clipboardData.getData('text/plain'));
                         if (isValid(pastedText)) {
                             var newValue = prepare(prefix + Number(pastedText).valueOf() + suffix);
                             if (isValid(newValue) && Number(oldRawValue).valueOf() !== Number(newValue).valueOf()) {
@@ -1845,6 +2087,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             });
         },
 
+
         /**
          * method to remove settings and stop autoNumeric() - does not remove the formatting
          * $(someSelector).autoNumeric("destroy"); // destroys autoNumeric
@@ -1852,8 +2095,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          */
         destroy: function destroy() {
             return $(this).each(function () {
-                var $this = autoGet($(this)),
-                    settings = $this.data('autoNumeric');
+                var $this = autoGet($(this));
+                var settings = $this.data('autoNumeric');
                 if ((typeof settings === 'undefined' ? 'undefined' : _typeof(settings)) === 'object') {
                     $this.val('');
                     autoSave($this, settings, 'wipe');
@@ -1863,6 +2106,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             });
         },
 
+
         /**
          * method to clear the value and sessionStorage or cookie depending on browser supports
          * $(someSelector).autoNumeric("wipe"); // removes session storage and cookies from memory
@@ -1870,8 +2114,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          */
         wipe: function wipe() {
             return $(this).each(function () {
-                var $this = autoGet($(this)),
-                    settings = $this.data('autoNumeric');
+                var $this = autoGet($(this));
+                var settings = $this.data('autoNumeric');
                 if ((typeof settings === 'undefined' ? 'undefined' : _typeof(settings)) === 'object') {
                     $this.val('');
                     settings.rawValue = '';
@@ -1879,6 +2123,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 }
             });
         },
+
 
         /**
          * method to update settings - can be call as many times
@@ -1911,6 +2156,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             });
         },
 
+
         /**
          * method to format value sent as a parameter ""
          * $(someSelector).autoNumeric('set', 'value'}); // formats the value being passed
@@ -1919,32 +2165,39 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          */
         set: function set(valueIn) {
             return $(this).each(function () {
-                if (valueIn === null || valueIn === void 0) {
+                if (valueIn === null || isUndefined(valueIn)) {
                     return;
                 }
-                var $this = autoGet($(this)),
-                    settings = $this.data('autoNumeric'),
-                    $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
+                var $this = autoGet($(this));
+                var settings = $this.data('autoNumeric');
+                var $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
                 var value = valueIn.toString();
                 if ((typeof settings === 'undefined' ? 'undefined' : _typeof(settings)) !== 'object') {
                     throwError('Initializing autoNumeric is required prior to calling the "set" method', true);
                 }
+
                 // allows locale decimal separator to be a comma - no thousand separator allowed
                 value = fromLocale(value);
+
                 // Throws an error if the value being set is not numeric
                 if (!$.isNumeric(Number(value))) {
                     throwError('The value "' + value + '" being "set" is not numeric and has caused a error to be thrown', settings.debug);
                     return $this.val('');
                 }
+
                 if (value !== '') {
-                    var minTest = autoCheck(value, settings)[0],
-                        maxTest = autoCheck(value, settings)[1];
+                    var _autoCheck5 = autoCheck(value, settings),
+                        _autoCheck6 = _slicedToArray(_autoCheck5, 2),
+                        minTest = _autoCheck6[0],
+                        maxTest = _autoCheck6[1];
+
                     if (minTest && maxTest) {
                         if ($input && (!settings.eDec || !settings.aScale)) {
                             settings.rawValue = value;
                         }
+
+                        // checks if the value falls within the min max range
                         if ($input || $.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1) {
-                            // checks if the value falls within the min max range
                             if (settings.aScale && !settings.onOff) {
                                 value = value / settings.scaleFactor;
                                 value = value.toString();
@@ -1977,6 +2230,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 } else {
                     return $this.val('');
                 }
+
                 if (!settings.onOff && settings.scaleSuffix) {
                     value = value + settings.scaleSuffix;
                 }
@@ -1986,9 +2240,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1) {
                     return $this.text(value);
                 }
+
                 return false;
             });
         },
+
 
         /**
          * method to un-format inputs - handy to use right before form submission
@@ -1998,14 +2254,15 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          */
         unSet: function unSet() {
             return $(this).each(function () {
-                var $this = autoGet($(this)),
-                    settings = $this.data('autoNumeric');
+                var $this = autoGet($(this));
+                var settings = $this.data('autoNumeric');
                 if ((typeof settings === 'undefined' ? 'undefined' : _typeof(settings)) === 'object') {
                     settings.onOff = true;
                     $this.val($this.autoNumeric('get'));
                 }
             });
         },
+
 
         /**
          * method to re-format inputs - handy to use right after form submission
@@ -2014,13 +2271,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          */
         reSet: function reSet() {
             return $(this).each(function () {
-                var $this = autoGet($(this)),
-                    settings = $this.data('autoNumeric');
+                var $this = autoGet($(this));
+                var settings = $this.data('autoNumeric');
                 if ((typeof settings === 'undefined' ? 'undefined' : _typeof(settings)) === 'object') {
                     $this.autoNumeric('set', $this.val());
                 }
             });
         },
+
 
         /**
          * method to get the unformatted that accepts up to one parameter
@@ -2029,13 +2287,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          * locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" => please see option "localeOutput" for details
          */
         get: function get() {
-            var $this = autoGet($(this)),
-                settings = $this.data('autoNumeric'),
-                $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
+            var $this = autoGet($(this));
+            var settings = $this.data('autoNumeric');
+            var $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
             var value = '';
             if ((typeof settings === 'undefined' ? 'undefined' : _typeof(settings)) !== 'object') {
                 throwError('Initializing autoNumeric is required prior to calling the "get" method', true);
             }
+
             // determine the element type then use .eq(0) selector to grab the value of the first element in selector
             if ($input) {
                 value = $this.eq(0).val();
@@ -2044,6 +2303,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             } else {
                 throwError('The "<' + $this.prop('tagName').toLowerCase() + '>" tag is not supported by autoNumeric', settings.debug);
             }
+
             if (settings.eDec || settings.aScale) {
                 value = settings.rawValue;
             } else {
@@ -2059,14 +2319,18 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 }
                 value = fixNumber(value, settings.aDec, settings.aNeg);
             }
+
             if (Number(value) === 0 && settings.lZero !== 'keep') {
                 value = '0';
             }
             if (settings.localeOutput) {
                 value = toLocale(value, settings.localeOutput);
             }
-            return value; // returned Numeric String
+
+            // returned Numeric String
+            return value;
         },
+
 
         /**
          * This function factorise the `getString()` and `getArray()` functions since they share quite a lot of code.
@@ -2085,43 +2349,45 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         _getStringOrArray: function _getStringOrArray() {
             var getArrayBehavior = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-            var $this = autoGet($(this)),
-                formIndex = $('form').index($this),
-                allFormElements = $('form:eq(' + formIndex + ')'),
-                aiIndex = [],
+            var $this = autoGet($(this));
+            var formIndex = $('form').index($this);
+            var allFormElements = $('form:eq(' + formIndex + ')')[0];
+            var aiIndex = [];
 
             // all input index
-            scIndex = [],
+            var scIndex = [];
 
             // successful control index
-            rsubmitterTypes = /^(?:submit|button|image|reset|file)$/i,
+            var rSubmitterTypes = /^(?:submit|button|image|reset|file)$/i;
 
             // from jQuery serialize method
-            rsubmittable = /^(?:input|select|textarea|keygen)/i,
+            var rSubmittable = /^(?:input|select|textarea|keygen)/i;
 
             // from jQuery serialize method
-            rcheckableType = /^(?:checkbox|radio)$/i,
-                rnonAutoNumericTypes = /^(?:button|checkbox|color|date|datetime|datetime-local|email|file|image|month|number|password|radio|range|reset|search|submit|time|url|week)/i;
+            var rCheckableType = /^(?:checkbox|radio)$/i;
+            var rNonAutoNumericTypes = /^(?:button|checkbox|color|date|datetime|datetime-local|email|file|image|month|number|password|radio|range|reset|search|submit|time|url|week)/i;
 
             var count = 0;
+
             // index of successful elements
-            $.each(allFormElements[0], function (i, field) {
-                if (field.name !== '' && rsubmittable.test(field.localName) && !rsubmitterTypes.test(field.type) && !field.disabled && (field.checked || !rcheckableType.test(field.type))) {
+            $.each(allFormElements, function (i, field) {
+                if (field.name !== '' && rSubmittable.test(field.localName) && !rSubmitterTypes.test(field.type) && !field.disabled && (field.checked || !rCheckableType.test(field.type))) {
                     scIndex.push(count);
                     count++;
                 } else {
                     scIndex.push(-1);
                 }
             });
+
             // index of all inputs tags except checkbox
             count = 0;
-            $.each(allFormElements[0], function (i, field) {
+            $.each(allFormElements, function (i, field) {
                 if (field.localName === 'input' && (field.type === '' || field.type === 'text' || field.type === 'hidden' || field.type === 'tel')) {
                     aiIndex.push(count);
                     count++;
                 } else {
                     aiIndex.push(-1);
-                    if (field.localName === 'input' && rnonAutoNumericTypes.test(field.type)) {
+                    if (field.localName === 'input' && rNonAutoNumericTypes.test(field.type)) {
                         count++;
                     }
                 }
@@ -2129,12 +2395,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
             if (getArrayBehavior) {
                 var formFields = $this.serializeArray();
-
                 $.each(formFields, function (i, field) {
                     var scElement = $.inArray(i, scIndex);
                     if (scElement > -1 && aiIndex[scElement] > -1) {
-                        var testInput = $('form:eq(' + formIndex + ') input:eq(' + aiIndex[scElement] + ')'),
-                            settings = testInput.data('autoNumeric');
+                        var testInput = $('form:eq(' + formIndex + ') input:eq(' + aiIndex[scElement] + ')');
+                        var settings = testInput.data('autoNumeric');
                         if ((typeof settings === 'undefined' ? 'undefined' : _typeof(settings)) === 'object') {
                             field.value = testInput.autoNumeric('get', settings.localeOutput).toString();
                         }
@@ -2152,8 +2417,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                         miniParts = formParts[i].split('=');
                         var scElement = $.inArray(i, scIndex);
                         if (scElement > -1 && aiIndex[scElement] > -1) {
-                            var testInput = $('form:eq(' + formIndex + ') input:eq(' + aiIndex[scElement] + ')'),
-                                settings = testInput.data('autoNumeric');
+                            var testInput = $('form:eq(' + formIndex + ') input:eq(' + aiIndex[scElement] + ')');
+                            var settings = testInput.data('autoNumeric');
                             if ((typeof settings === 'undefined' ? 'undefined' : _typeof(settings)) === 'object') {
                                 if (miniParts[1] !== null) {
                                     miniParts[1] = testInput.autoNumeric('get', settings.localeOutput).toString();
@@ -2172,6 +2437,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
         },
 
+
         /**
          * The "getString" method uses jQuery's .serialize() method that creates a text string in standard URL-encoded notation.
          *
@@ -2182,6 +2448,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         getString: function getString() {
             this._getStringOrArray(false);
         },
+
 
         /**
          * The "getArray" method on the other hand uses jQuery's .serializeArray() method that creates array or objects that can be encoded as a JSON string.
@@ -2194,6 +2461,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             this._getStringOrArray(true);
         },
 
+
         /**
          * The 'getSettings' function returns the object with autoNumeric settings for those who need to look under the hood
          * $(someSelector).autoNumeric('getSettings'); // no parameters accepted
@@ -2201,6 +2469,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          */
         getSettings: function getSettings() {
             var $this = autoGet($(this));
+
             return $this.eq(0).data('autoNumeric');
         }
     };
@@ -2209,11 +2478,15 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      * autoNumeric function
      */
     $.fn.autoNumeric = function (method) {
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            args[_key - 1] = arguments[_key];
+        }
+
         if (methods[method]) {
-            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+            return methods[method].apply(this, args);
         }
         if ((typeof method === 'undefined' ? 'undefined' : _typeof(method)) === 'object' || !method) {
-            return methods.init.apply(this, arguments);
+            return methods.init.apply(this, args);
         }
         throwError('Method "' + method + '" is not supported by autoNumeric', true);
     };
@@ -2434,19 +2707,25 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             settings.aNeg = '-';
         }
         if (settings.mDec === null) {
-            var vMax = settings.vMax.toString().split('.'),
-                vMin = !settings.vMin && settings.vMin !== 0 ? [] : settings.vMin.toString().split('.');
+            var vMax = settings.vMax.toString().split('.');
+            var vMin = !settings.vMin && settings.vMin !== 0 ? [] : settings.vMin.toString().split('.');
             settings.mDec = decLength(vMin, vMax);
         }
-        var minTest = autoCheck(value, settings)[0],
-            maxTest = autoCheck(value, settings)[1];
+
+        var _autoCheck7 = autoCheck(value, settings),
+            _autoCheck8 = _slicedToArray(_autoCheck7, 2),
+            minTest = _autoCheck8[0],
+            maxTest = _autoCheck8[1];
+
         if (!minTest || !maxTest) {
-            sendCustomEvent('autoFormat.autoNumeric', 'Range test failed'); //throw a custom event
+            // Throw a custom event
+            sendCustomEvent('autoFormat.autoNumeric', 'Range test failed');
             throwError('The value [' + value + '] being set falls outside the vMin [' + settings.vMin + '] and vMax [' + settings.vMax + '] settings', settings.debug);
         }
         value = autoRound(value, settings);
         value = presentNumber(value, settings);
         value = autoGroup(value, settings);
+
         return value;
     };
 
@@ -2454,9 +2733,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      * public function that allows formatting without an element
      */
     $.fn.autoUnformat = function (value, options) {
-        var settings = $.extend({}, $.fn.autoNumeric.defaults, { strip: false }, options),
-            allowed = '-0123456789\\' + settings.aDec,
-            autoStrip = new RegExp('[^' + allowed + ']', 'gi');
+        var settings = $.extend({}, $.fn.autoNumeric.defaults, { strip: false }, options);
+        var allowed = '-0123456789\\' + settings.aDec;
+        var autoStrip = new RegExp('[^' + allowed + ']', 'gi');
         value = value.toString();
         if (value.charAt(0) === '-') {
             settings.aNeg = '-';
@@ -2470,6 +2749,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         if (settings.localeOutput) {
             value = toLocale(value, settings.localeOutput);
         }
+
         return value;
     };
 
@@ -2482,11 +2762,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      * @returns {CustomEvent}
      */
     function createCustomEvent(eventName, detail) {
-        /*let eventInfo = new CustomEventInit(); //This should be used instead, but IE does not support 'CustomEventInit' yet
+        /* let eventInfo = new CustomEventInit(); //This should be used instead, but IE does not support 'CustomEventInit' yet
         eventInfo.detail = detail;
-        return new CustomEvent(eventName, eventInfo);*/
-        //noinspection JSCheckFunctionSignatures
-        return new CustomEvent(eventName, { detail: detail, bubbles: false, cancelable: false }); //This is not supported by default by IE ; We use the polyfill for IE9 and later.
+        return new CustomEvent(eventName, eventInfo); */
+        return new CustomEvent(eventName, { detail: detail, bubbles: false, cancelable: false }); // This is not supported by default by IE ; We use the polyfill for IE9 and later.
     }
 
     /**
@@ -2511,7 +2790,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         }
 
         function CustomEvent(event, params) {
-            params = params || { bubbles: false, cancelable: false, detail: undefined };
+            params = params || { bubbles: false, cancelable: false, detail: void 0 };
             var evt = document.createEvent('CustomEvent');
             evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
             return evt;

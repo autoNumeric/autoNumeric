@@ -1,6 +1,6 @@
 {
   "name": "autonumeric",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "description": "autoNumeric is a jQuery plugin that automatically formats currency (money) and numbers as you type on form inputs. It supports most international numeric formats and currency signs including those used in Europe, North and South America, Asia and India's' lakhs.",
   "main": "src/autoNumeric.js",
   "typings": "typings.d.ts",
@@ -29,14 +29,42 @@
     "jquery": ">=1.7"
   },
   "devDependencies": {
-    "babel-cli": "^6.18.0",
+    "babel-core": "^6.18.2",
+    "babel-eslint": "^7.1.1",
+    "babel-istanbul": "^0.11.0",
+    "babel-istanbul-loader": "^0.1.0",
+    "babel-loader": "^6.2.8",
+    "babel-plugin-add-module-exports": "^0.2.1",
     "babel-preset-latest": "^6.16.0",
     "eslint": "^3.10.2",
-    "uglify-js": "^2.7.4"
+    "imports-loader": "^0.6.5",
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.3.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-coverage": "^1.1.1",
+    "karma-firefox-launcher": "^1.0.0",
+    "karma-jasmine": "^1.0.2",
+    "karma-phantomjs-launcher": "^1.0.2",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^1.8.0",
+    "loader-utils": "^0.2.16",
+    "phantomjs": "^2.1.7",
+    "rimraf": "^2.5.4",
+    "uglify-js": "^2.7.4",
+    "webpack": "^1.13.3"
   },
   "scripts": {
-    "build": "babel src -d dist --source-maps && uglifyjs dist/autoNumeric.js -m -c -o dist/autoNumeric-min.js",
-    "lint": "eslint --ext .js src test/unit"
+    "build:dev": "webpack src/autoNumeric.js dist/autoNumeric.js --config config/webpack.config.dev.js",
+    "build:prd": "webpack src/autoNumeric.js dist/autoNumeric.min.js --config config/webpack.config.prd.js",
+    "build": "npm run clean:build && npm run build:dev && npm run build:prd",
+    "clean:build": "rimraf dist build",
+    "clean:coverage": "rimraf test/unit/coverage",
+    "clean:log": "rimraf npm-debug.log",
+    "clean": "npm run clean:build && npm run clean:coverage && npm run clean:log",
+    "lint": "eslint --ext .js src test/unit test/e2e",
+    "test:unit": "QT_QPA_PLATFORM='' ./node_modules/karma/bin/karma start karma.conf.js --single-run",
+    "test:e2e": "node test/e2e/runner.js",
+    "test": "npm run test:unit && npm run test:e2e"
   },
   "repository": {
     "type": "git",

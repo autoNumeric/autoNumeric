@@ -32,8 +32,14 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
+let autoFormat;
+let autoUnFormat;
+let getDefaultConfig;
+
 /* global module, require, define */
+
 (function(factory) {
+    //TODO This surely can be improved by letting webpack take care of generating this UMD part
 if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
     define(['jquery'], factory);
@@ -164,6 +170,16 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * Return TRUE if the `value` is undefined, null or empty
+     *
+     * @param value
+     * @returns {boolean}
+     */
+    function isUndefinedOrNullOrEmpty(value) {
+        return value === null || value === void(0) || '' === value;
+    }
+
+    /**
      * Return TRUE if the given parameter is as String
      *
      * @param {*} str
@@ -190,7 +206,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Return TRUE is the `needle` is in the array.
+     * Return TRUE if the `needle` is in the array
      *
      * @param {Array} array
      * @param {*} needle
@@ -951,7 +967,8 @@ if (typeof define === 'function' && define.amd) {
         if (typeof obj === 'string' || obj instanceof String) {
             obj = obj.replace(/\[/g, '\\[').replace(/]/g, '\\]');
             obj = '#' + obj.replace(/(:|\.)/g, '\\$1');
-            // obj = '#' + obj.replace(/([;&,\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|])/g, '\\$1'); // possible modification to replace the above 2 lines
+            // possible modification to replace the above 2 lines
+            // obj = '#' + obj.replace(/([;&,\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|])/g, '\\$1');
         }
 
         return $(obj);
@@ -1674,16 +1691,122 @@ if (typeof define === 'function' && define.amd) {
     };
 
     /**
+     * This function factorise the `getString()` and `getArray()` functions since they share quite a lot of code.
+     *
+     * The "getString" method uses jQuery's .serialize() method that creates a text string in standard URL-encoded notation.
+     * The "getArray" method on the other hand uses jQuery's .serializeArray() method that creates array or objects that can be encoded as a JSON string.
+     *
+     * It then loops through the string and un-formats the inputs with autoNumeric.
+     * By defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
+     * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" => please see option "localeOutput" for details
+     *
+     * @param {boolean} getArrayBehavior - If set to TRUE, then this function behave like `getArray()`, otherwise if set to FALSE, it behave like `getString()`
+     * @returns {*}
+     * @private
+     */
+    function _getStringOrArray(getArrayBehavior = true, that) {
+        const $this = autoGet($(that));
+        const formIndex = $('form').index($this);
+        const allFormElements = $(`form:eq(${formIndex})`)[0];
+        const aiIndex = [];
+
+        // all input index
+        const scIndex = [];
+
+        // successful control index
+        const rSubmitterTypes = /^(?:submit|button|image|reset|file)$/i;
+
+        // from jQuery serialize method
+        const rSubmittable = /^(?:input|select|textarea|keygen)/i;
+
+        // from jQuery serialize method
+        const rCheckableType = /^(?:checkbox|radio)$/i;
+        const rNonAutoNumericTypes = /^(?:button|checkbox|color|date|datetime|datetime-local|email|file|image|month|number|password|radio|range|reset|search|submit|time|url|week)/i;
+
+        let count = 0;
+
+        // index of successful elements
+        $.each(allFormElements, (i, field) => {
+            if (field.name !== '' && rSubmittable.test(field.localName) && !rSubmitterTypes.test(field.type) && !field.disabled && (field.checked || !rCheckableType.test(field.type))) {
+                scIndex.push(count);
+                count++;
+            } else {
+                scIndex.push(-1);
+            }
+        });
+
+        // index of all inputs tags except checkbox
+        count = 0;
+        $.each(allFormElements, (i, field) => {
+            if (field.localName === 'input' && (field.type === '' || field.type === 'text' || field.type === 'hidden' || field.type === 'tel')) {
+                aiIndex.push(count);
+                count++;
+            } else {
+                aiIndex.push(-1);
+                if (field.localName === 'input' && rNonAutoNumericTypes.test(field.type)) {
+                    count++;
+                }
+            }
+        });
+
+        if (getArrayBehavior) {
+            const formFields = $this.serializeArray();
+
+            $.each(formFields, (i, field) => {
+                const scElement = $.inArray(i, scIndex);
+
+                if (scElement > -1 && aiIndex[scElement] > -1) {
+                    const testInput = $(`form:eq(${formIndex}) input:eq(${aiIndex[scElement]})`);
+                    const settings = testInput.data('autoNumeric');
+
+                    if (typeof settings === 'object') {
+                        field.value = testInput.autoNumeric('get', settings.localeOutput).toString();
+                    }
+                }
+            });
+
+            return formFields;
+        }
+        else {
+            // getString() behavior
+            const formFields = $this.serialize();
+            const formParts = formFields.split('&');
+
+            $.each(formParts, i => {
+                const [inputName, inputValue] = formParts[i].split('=');
+                const scElement = $.inArray(i, scIndex);
+
+                // If the current element is a valid element
+                if (scElement > -1 && aiIndex[scElement] > -1) {
+                    const testInput = $(`form:eq(${formIndex}) input:eq(${aiIndex[scElement]})`);
+                    const settings = testInput.data('autoNumeric');
+
+                    if (typeof settings === 'object') {
+                        if (inputValue !== null) {
+                            const modifiedInputValue = testInput.autoNumeric('get', settings.localeOutput).toString();
+                            formParts[i] = `${inputName}=${modifiedInputValue}`;
+                        }
+                    }
+                }
+            });
+
+            return formParts.join('&');
+        }
+    }
+
+    /**
      * Methods supported by autoNumeric
      */
     const methods = {
         /**
-         * Method to initiate autoNumeric and attached the settings (default and options passed as a parameter
-         * $(someSelector).autoNumeric('init');           // initiate autoNumeric with defaults
-         * $(someSelector).autoNumeric('init', {option}); // initiate autoNumeric with options
-         * $(someSelector).autoNumeric();                 // initiate autoNumeric with defaults
-         * $(someSelector).autoNumeric({option});         // initiate autoNumeric with options
-         * options passes as a parameter example '{aSep: ".", aDec: ",", aSign: '€ '}
+         * Method to initiate autoNumeric and attach the settings (options can be passed as a parameter)
+         * The options passed as a parameter is an object that contains the settings (ie. {aSep: ".", aDec: ",", aSign: '€ '})
+         *
+         * @example
+         * $(someSelector).autoNumeric('init');            // initiate autoNumeric with defaults
+         * $(someSelector).autoNumeric();                  // initiate autoNumeric with defaults
+         * $(someSelector).autoNumeric('init', {options}); // initiate autoNumeric with options
+         * $(someSelector).autoNumeric({options});         // initiate autoNumeric with options
          */
         init(options) {
             return this.each(function() {
@@ -1701,20 +1824,54 @@ if (typeof define === 'function' && define.amd) {
                 // If we couldn't grab settings, create them from defaults and passed options
                 if (typeof settings !== 'object') {
                     settings = $.extend({}, $.fn.autoNumeric.defaults, tagData, options, {
-                        onOff: false,
-                        runOnce: false,
-                        rawValue: '',
+                        onOff           : false,
+                        runOnce         : false,
+                        rawValue        : '',
                         trailingNegative: false,
-                        caretFix: false,
-                        throwInput: true,
-                        strip: true,
-                        tagList: ['b', 'caption', 'cite', 'code', 'dd', 'del', 'div', 'dfn', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ins', 'kdb', 'label', 'li', 'option', 'output', 'p', 'q', 's', 'sample', 'span', 'strong', 'td', 'th', 'u', 'const'],
+                        caretFix        : false,
+                        throwInput      : true,
+                        strip           : true,
+                        tagList         : [
+                            'b',
+                            'caption',
+                            'cite',
+                            'code',
+                            'const',
+                            'dd',
+                            'del',
+                            'div',
+                            'dfn',
+                            'dt',
+                            'em',
+                            'h1',
+                            'h2',
+                            'h3',
+                            'h4',
+                            'h5',
+                            'h6',
+                            'ins',
+                            'kdb',
+                            'label',
+                            'li',
+                            'option',
+                            'output',
+                            'p',
+                            'q',
+                            's',
+                            'sample',
+                            'span',
+                            'strong',
+                            'td',
+                            'th',
+                            'u',
+                        ],
                     });
 
                     // Merge defaults, tagData and options
                     if (settings.aDec === settings.aSep) {
                         throwError(`autoNumeric will not function properly when the decimal character aDec [${settings.aDec}] and the thousand separator aSep [${settings.aSep}] are the same character`, settings.debug);
                     }
+
                     $.each(settings, (key, value) => {
                         if (value === 'true' || value === 'false') {
                             settings[key] = Boolean(value === 'true');
@@ -1723,6 +1880,7 @@ if (typeof define === 'function' && define.amd) {
                             settings[key] = value.toString();
                         }
                     });
+
                     if (settings.aScale !== null) {
                         settings.scaleFactor = +settings.aScale[0];
                         settings.scaleDecimal = (settings.aScale[1]) ? +settings.aScale[1] : null;
@@ -1765,29 +1923,60 @@ if (typeof define === 'function' && define.amd) {
                     let setValue = true;
                     if ($input) {
                         const currentValue = $this.val();
-                        /* checks for page reload from back button
-                         * also checks for ASP.net form post back
-                         * the following HTML data attribute is REQUIRED (data-an-default="same value as the value attribute")
-                         * example: <asp:TextBox runat="server" id="someID" text="1234.56" data-an-default="1234.56">
+
+                        /*
+                         * If the input value has been set by the dev, but not directly as an attribute in the html, then it takes
+                         * precedence and should get formatted on init (if that this input value is a valid number and that the
+                         * developer wants it formatted on init (cf. `settings.aForm`)). Note; this is true whatever the developer
+                         * has set for `data-an-default` in the html (asp.net users).
+                         *
+                         * In other words : if `anDefault` is not null, it means the developer is trying to prevent postback problems.
+                         * But if `input.value` is set to a number, and `$this.attr('value')` is not set, then it means the dev has
+                         * changed the input value, and then it means we should not overwrite his own decision to do so.
+                         * Hence, if `anDefault` is not null, but `input.value` is a number and `$this.attr('value')` is not set,
+                         * we should ignore `anDefault` altogether.
                          */
-                        if ((settings.anDefault && settings.anDefault.toString() !== currentValue) || (settings.anDefault === null && currentValue !== '' && currentValue !== $this.attr('value')) || (currentValue !== '' && $this.attr('type') === 'hidden' && !$.isNumeric(currentValue.replace(',', '.')))) {
-                            if (settings.eDec && settings.aStor) {
-                                settings.rawValue = autoSave($this, settings, 'get');
+                        if (settings.aForm && currentValue !== '' && isUndefinedOrNullOrEmpty($this.attr('value'))) {
+                            // Check if the `value` is valid or not
+                            const testedCurrentValue = parseFloat(currentValue.replace(',', '.')); //TODO Replace whatever locale character is used by a '.', and not only the comma ','
+                            if (!isNaN(testedCurrentValue) && Infinity !== testedCurrentValue) {
+                                $this.autoNumeric('set', testedCurrentValue);
+                                setValue = false;
                             }
-                            if (settings.aScale && settings.aStor) {
-                                settings.rawValue = autoSave($this, settings, 'get');
+                            else {
+                                // If not, inform the developer that nothing usable has been provided
+                                throwError(`The value [${currentValue}] used in the input is not a valid value autoNumeric can work with.`, false);
                             }
-                            if (!settings.aStor) {
-                                let toStrip;
-                                if (settings.nBracket !== null && settings.aNeg !== '') {
-                                    settings.onOff = true;
-                                    toStrip = negativeBracket(currentValue, settings);
-                                } else {
-                                    toStrip = currentValue;
+                        }
+                        else {
+                            /* Checks for :
+                             * - page reload from back button, and
+                             * - ASP.net form post back
+                             *      The following HTML data attribute is REQUIRED (data-an-default="same value as the value attribute")
+                             *      example: <asp:TextBox runat="server" id="someID" text="1234.56" data-an-default="1234.56">
+                             */
+                            //TODO Replace whatever locale character is used by a '.', and not only the comma ',', based on the locale used by the user
+                            if ((settings.anDefault !== null && settings.anDefault.toString() !== currentValue) ||
+                                    (settings.anDefault === null && currentValue !== '' && currentValue !== $this.attr('value')) ||
+                                    (currentValue !== '' && $this.attr('type') === 'hidden' && !$.isNumeric(currentValue.replace(',', '.')))) {
+                                if (settings.eDec !== null && settings.aStor) {
+                                    settings.rawValue = autoSave($this, settings, 'get');
                                 }
-                                settings.rawValue = ((settings.pNeg === 's' || (settings.pSign === 's' && settings.pNeg !== 'p')) && settings.aNeg !== '' && contains(currentValue, '-')) ? '-' + autoStrip(toStrip, settings) : autoStrip(toStrip, settings);
+                                if (settings.aScale && settings.aStor) {
+                                    settings.rawValue = autoSave($this, settings, 'get');
+                                }
+                                if (!settings.aStor) {
+                                    let toStrip;
+                                    if (settings.nBracket !== null && settings.aNeg !== '') {
+                                        settings.onOff = true;
+                                        toStrip = negativeBracket(currentValue, settings);
+                                    } else {
+                                        toStrip = currentValue;
+                                    }
+                                    settings.rawValue = ((settings.pNeg === 's' || (settings.pSign === 's' && settings.pNeg !== 'p')) && settings.aNeg !== '' && contains(currentValue, '-'))?'-' + autoStrip(toStrip, settings):autoStrip(toStrip, settings);
+                                }
+                                setValue = false;
                             }
-                            setValue = false;
                         }
 
                         if (currentValue === '') {
@@ -1806,11 +1995,11 @@ if (typeof define === 'function' && define.amd) {
                                 default :
                                     //
                             }
-                        }
-                        else if (setValue && currentValue === $this.attr('value')) {
+                        } else if (setValue && currentValue === $this.attr('value')) {
                             $this.autoNumeric('set', currentValue);
                         }
                     }
+
                     if (isInArray($this.prop('tagName').toLowerCase(), settings.tagList) && $this.text() !== '') {
                         if (settings.anDefault !== null) {
                             if (settings.anDefault === $this.text()) {
@@ -1824,6 +2013,7 @@ if (typeof define === 'function' && define.amd) {
 
                 settings.runOnce = true;
 
+                //TODO Extract the event listeners to another function
                 // input types supported "text", "hidden", "tel" and no type
                 if ($input) {
                     $this.on('focusin.autoNumeric', () => {
@@ -2034,9 +2224,11 @@ if (typeof define === 'function' && define.amd) {
                         function prepare(text) {
                             return autoStrip(text, holder.settingsClone).replace(holder.settingsClone.aDec, '.');
                         }
+
                         function isValid(text) {
                             return text !== '' && !isNaN(text);
                         }
+
                         const oldRawValue = $this.autoNumeric('get');
                         const currentValue = this.value || '';
                         const selectionStart = this.selectionStart || 0;
@@ -2104,19 +2296,23 @@ if (typeof define === 'function' && define.amd) {
         },
 
         /**
-         * method to update settings - can be call as many times
-         * $(someSelector).autoNumeric("update", {options}); // updates the settings
-         * options passed as a parameter example '{aSep: ".", aDec: ",", aSign: '€ '}
+         * Method that updates the autoNumeric settings
+         * It can be called multiple times if needed
+         * The options passed as a parameter is an object that contains the settings (ie. {aSep: ".", aDec: ",", aSign: '€ '})
+         *
+         * @usage $(someSelector).autoNumeric("update", {options}); // updates the settings
          */
         update(options) {
             return $(this).each(function() {
                 const $this = autoGet($(this));
                 let settings = $this.data('autoNumeric');
+
                 if (typeof settings !== 'object') {
                     throwError(`Initializing autoNumeric is required prior to calling the "update" method`, true);
                 }
                 const strip = $this.autoNumeric('get');
                 settings = $.extend(settings, options);
+
                 if (settings.aScale !== null) {
                     settings.scaleFactor = +settings.aScale[0];
                     settings.scaleDecimal = (settings.aScale[1]) ? +settings.aScale[1] : null;
@@ -2124,10 +2320,12 @@ if (typeof define === 'function' && define.amd) {
                 }
                 settings = originalSettings(settings);
                 getHolder($this, settings, true);
+
                 if (settings.aDec === settings.aSep) {
                     throwError(`autoNumeric will not function properly when the decimal character aDec: "${settings.aDec}" and thousand separator aSep: "${settings.aSep}" are the same character`, settings.debug);
                 }
                 $this.data('autoNumeric', settings);
+
                 if ($this.val() !== '' || $this.text() !== '') {
                     return $this.autoNumeric('set', strip);
                 }
@@ -2135,10 +2333,10 @@ if (typeof define === 'function' && define.amd) {
         },
 
         /**
-         * method to format value sent as a parameter ""
-         * $(someSelector).autoNumeric('set', 'value'}); // formats the value being passed
-         * value passed as a string - can be a integer '1234' or double '1234.56789'
-         * must contain only numbers and one decimal (period) character
+         * Method to format the value passed as a parameter.
+         * $(someSelector).autoNumeric('set', 'value'); // formats the value being passed as the second parameter
+         * If the value is passed as a string, it can be an integer '1234' or a double '1234.56789'
+         * and must contain only numbers and one decimal (period) character
          */
         set(valueIn) {
             return $(this).each(function() {
@@ -2298,105 +2496,23 @@ if (typeof define === 'function' && define.amd) {
             }
 
             // returned Numeric String
+            //TODO Shouldn't we return `Number(value)` since the goal of `get` is to get the raw javascript value?
             return value;
         },
 
         /**
-         * This function factorise the `getString()` and `getArray()` functions since they share quite a lot of code.
+         * Return the current formatted value of the autoNumeric element.
+         * @usage aNInput.autoNumeric('getFormatted'))
          *
-         * The "getString" method uses jQuery's .serialize() method that creates a text string in standard URL-encoded notation.
-         * The "getArray" method on the other hand uses jQuery's .serializeArray() method that creates array or objects that can be encoded as a JSON string.
-         *
-         * It then loops through the string and un-formats the inputs with autoNumeric.
-         * By defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
-         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" => please see option "localeOutput" for details
-         *
-         * @param {boolean} getArrayBehavior - If set to TRUE, then this function behave like `getArray()`, otherwise if set to FALSE, it behave like `getString()`
-         * @returns {*}
-         * @private
+         * @returns {string}
          */
-        _getStringOrArray(getArrayBehavior = true) {
-            const $this = autoGet($(this));
-            const formIndex = $('form').index($this);
-            const allFormElements = $(`form:eq(${formIndex})`)[0];
-            const aiIndex = [];
-
-            // all input index
-            const scIndex = [];
-
-            // successful control index
-            const rSubmitterTypes = /^(?:submit|button|image|reset|file)$/i;
-
-            // from jQuery serialize method
-            const rSubmittable = /^(?:input|select|textarea|keygen)/i;
-
-            // from jQuery serialize method
-            const rCheckableType = /^(?:checkbox|radio)$/i;
-            const rNonAutoNumericTypes = /^(?:button|checkbox|color|date|datetime|datetime-local|email|file|image|month|number|password|radio|range|reset|search|submit|time|url|week)/i;
-
-            let count = 0;
-
-            // index of successful elements
-            $.each(allFormElements, (i, field) => {
-                if (field.name !== '' && rSubmittable.test(field.localName) && !rSubmitterTypes.test(field.type) && !field.disabled && (field.checked || !rCheckableType.test(field.type))) {
-                    scIndex.push(count);
-                    count++;
-                } else {
-                    scIndex.push(-1);
-                }
-            });
-
-            // index of all inputs tags except checkbox
-            count = 0;
-            $.each(allFormElements, (i, field) => {
-                if (field.localName === 'input' && (field.type === '' || field.type === 'text' || field.type === 'hidden' || field.type === 'tel')) {
-                    aiIndex.push(count);
-                    count++;
-                } else {
-                    aiIndex.push(-1);
-                    if (field.localName === 'input' && rNonAutoNumericTypes.test(field.type)) {
-                        count++;
-                    }
-                }
-            });
-
-            if (getArrayBehavior) {
-                const formFields = $this.serializeArray();
-                $.each(formFields, (i, field) => {
-                    const scElement = $.inArray(i, scIndex);
-                    if (scElement > -1 && aiIndex[scElement] > -1) {
-                        const testInput = $(`form:eq(${formIndex}) input:eq(${aiIndex[scElement]})`);
-                        const settings = testInput.data('autoNumeric');
-                        if (typeof settings === 'object') {
-                            field.value = testInput.autoNumeric('get', settings.localeOutput).toString();
-                        }
-                    }
-                });
-
-                return formFields;
+        getFormatted() {
+            // Make sure `this[0]` exists as well as `.value` before trying to access that property
+            if (!isArray(this) || this.length !== 1 || !this[0].hasOwnProperty('value')) {
+                throwError('Unable to get the formatted string from the element.');
             }
-            else {
-                // getString() behavior
-                const formFields = $this.serialize();
-                const formParts = formFields.split('&');
 
-                $.each(formParts, (i, miniParts) => {
-                    miniParts = formParts[i].split('=');
-                    const scElement = $.inArray(i, scIndex);
-                    if (scElement > -1 && aiIndex[scElement] > -1) {
-                        const testInput = $(`form:eq(${formIndex}) input:eq(${aiIndex[scElement]})`);
-                        const settings = testInput.data('autoNumeric');
-                        if (typeof settings === 'object') {
-                            if (miniParts[1] !== null) {
-                                miniParts[1] = testInput.autoNumeric('get', settings.localeOutput).toString();
-                                formParts[i] = miniParts.join('=');
-                            }
-                        }
-                    }
-                });
-
-                return formParts.join('&');
-            }
+            return this[0].value;
         },
 
         /**
@@ -2407,7 +2523,7 @@ if (typeof define === 'function' && define.amd) {
          * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" => please see option "localeOutput" for details
          */
         getString() {
-            this._getStringOrArray(false);
+            return _getStringOrArray(false, this);
         },
 
         /**
@@ -2418,7 +2534,7 @@ if (typeof define === 'function' && define.amd) {
          * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" => please see option "localeOutput" for details
          */
         getArray() {
-            this._getStringOrArray(true);
+            return _getStringOrArray(true, this);
         },
 
         /**
@@ -2440,9 +2556,13 @@ if (typeof define === 'function' && define.amd) {
         if (methods[method]) {
             return methods[method].apply(this, args);
         }
+
         if (typeof method === 'object' || !method) {
-            return methods.init.apply(this, args);
+            // The options have been passed directly, without using a named method
+            //TODO First validate the options passed as an argument, before using `init`
+            return methods.init.apply(this, [method]);
         }
+
         throwError(`Method "${method}" is not supported by autoNumeric`, true);
     };
 
@@ -2601,6 +2721,7 @@ if (typeof define === 'function' && define.amd) {
          * wEmpty: "always" - always displays the currency sign only
          * wEmpty: "zero" - if the input has no value on focus out displays a zero "rounded" with or with a currency sign
          */
+        //TODO Add an option to display the currency sign only on hover (if the input is empty)
         wEmpty: 'focus',
 
         /* controls leading zero behavior
@@ -2610,8 +2731,8 @@ if (typeof define === 'function' && define.amd) {
          */
         lZero: 'allow',
 
-        /* determine if the default value will be formatted on page ready.
-         * true = automatically formats the default value on page ready
+        /* determine if the default value will be formatted on initialization.
+         * true = automatically formats the default value on initialization
          * false = will not format the default value
          */
         aForm: true,
@@ -2651,10 +2772,18 @@ if (typeof define === 'function' && define.amd) {
         debug: false,
     };
 
+    getDefaultConfig = function() {
+        return $.fn.autoNumeric.defaults;
+    };
+
     /**
      * public function that allows formatting without an element trigger
      */
-    $.fn.autoFormat = function(value, options) {
+    autoFormat = function(value, options) {
+        if (isUndefined(value) || value === null) {
+            return null;
+        }
+
         const settings = $.extend({}, $.fn.autoNumeric.defaults, { strip: false }, options);
         value = value.toString();
         value = fromLocale(value);
@@ -2679,10 +2808,16 @@ if (typeof define === 'function' && define.amd) {
         return value;
     };
 
+    $.fn.autoFormat = autoFormat;
+
     /**
-     * public function that allows formatting without an element
+     * public function that allows unformatting without an element
      */
-    $.fn.autoUnformat = function(value, options) {
+    autoUnFormat = function(value, options) {
+        if (isUndefined(value) || value === null) {
+            return null;
+        }
+
         const settings = $.extend({}, $.fn.autoNumeric.defaults, { strip: false }, options);
         const allowed = `-0123456789\\${settings.aDec}`;
         const autoStrip = new RegExp(`[^${allowed}]`, 'gi');
@@ -2700,8 +2835,10 @@ if (typeof define === 'function' && define.amd) {
             value = toLocale(value, settings.localeOutput);
         }
 
-        return value;
+        return Number(value);
     };
+
+    $.fn.autoUnformat = autoUnFormat;
 
     /**
      * Create a custom event.
@@ -2733,7 +2870,9 @@ if (typeof define === 'function' && define.amd) {
      * Polyfill from https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent for obsolete browsers (IE)
      */
     (function() {
-        if (typeof window.CustomEvent === 'function') {return false;}
+        if (typeof window.CustomEvent === 'function') {
+            return false;
+        }
 
         function CustomEvent(event, params) {
             params = params || { bubbles: false, cancelable: false, detail: void(0) };
@@ -2746,3 +2885,27 @@ if (typeof define === 'function' && define.amd) {
         window.CustomEvent = CustomEvent;
     })();
 }));
+
+/**
+ * This exports the interface for the autoNumeric object
+ */
+export default {
+    format  : autoFormat,
+    unFormat: autoUnFormat,
+    getDefaultConfig,
+
+    //TODO Complete the interface with functions having the following signatures :
+    //init         : an.init(options, input)
+    //get          : an.get(input)
+    //set          : an.set(value, input)
+    //formString   : an.formString(form)
+    //formArray    : an.formArray(form)
+    //getFormatted : an.getFormatted(input)
+    //unset        : an.unset(input) //to rename to 'unformat'? (and merge with autoUnFormat/unFormat?)
+    //reformat     : an.reformat(input) // 'reSet' is very to close to 'reset' and therefore should be renamed. We could still expose 'reSet', but add a @deprecated tag on its declaration.
+    //settings     : an.settings(input)
+    //update       : an.update(options, input)
+    //wipe         : an.wipe(input)
+    //destroy      : an.destroy(input)
+    //validate     : an.validate(options)
+};

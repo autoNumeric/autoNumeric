@@ -1,0 +1,9 @@
+.DS_Store
+node_modules/
+*.log
+npm-debug.log
+test/unit/coverage
+test/e2e/reports
+test/e2e/screenshots
+dist/*.gz
+dist/*.map

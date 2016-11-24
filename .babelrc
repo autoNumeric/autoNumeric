@@ -1,0 +1,7 @@
+{
+	"presets": ["latest"],
+	"comments": true,
+	"sourceMaps": true,
+	"compact" : false,
+	"minified" : false
+}

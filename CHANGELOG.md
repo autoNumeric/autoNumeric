@@ -1,5 +1,46 @@
 ### Change log:
 
+### Version 2.0.0 released 2016-11-16
++ Prepare the code base for future Jasmine tests
++ Add initial babel support
++ Add uglify and npm-build-process support
++ Merge the 2.0 changes into master
++ Add npm support for building the minified version
++ Multiple small fixes
++ Fixed paste event on both context menu and `ctrl-v` // issue #251 special thanks to @rhyek
++ Fixed tab in key select all and deletion // issue #246
++ Fixed issue with Vue.js 2.0 // issue #247 
++ Fixed context menu paste event // issue #251
++ switch from jsLint to jsHint
++ Fixed tab in key // thanks movalz issue #212
++ Fixed the cursor position when tabbing in Chrome // thanks Dennis Smith issue #221
++ Fixed the destroy method // thanks brunoporto & Mabusto issue #225
++ Fixed the readme file to show correct `$.extend` defaults // thanks  gayan85 issue #229
++ Fixed bug in unSetOnSubmit option to handle non autoNumeric controlled inputs
++ Fixed bug in `get` method
++ Mods to the trailing minus sign code 
++ Added UMD support
++ Modified & improved the shim for throwing the `input` event
++ Added option `unSetOnSubmit` to unformat input on the submit event
++ Added option `debug` to turn on and off error being thrown
++ Added support for arbitrary-precision decimal arithmetic. This was adapted from Big.js https://github.com/MikeMcl/big.js/ Many thanks to Mike
++ Added support for trailing minus signs
++ Added rounding methods for currencies with smallest coin being $0.05
++ Added modified `sNumber` option that selects only numbers ctr & a keys thanks Zayter
++ Added support for return values to have locale formats
++ Added debug option to turn off errors
++ Added option `anDefault` to help ASP.NETR postback errors
++ Modified the `wEmpty` option
++ Modified the `init` && `set` methods
++ General code clean up
++ Modified the `set`, `getString` & `getArray` methods
++ Modified the `nBracket` function
++ Fixed the `update` method when it is called during the `onfocus` event
++ Fixed the `getString` & `getArray` methods when multiple inputs share the same name - Thanks Retromax
++ Fixed bug in `ctrl + v` paste event to properly round 
++ Merged a mod that makes the defaults public and overridable - Thanks Peter Boccia
++ Fixed page reload when the thousand separator is a period `.`
+
 ### Version 1.9.46 released 2016-09-11
 + Fixed tab in key // thanks movalz issue #212
 + Fixed the cusor position when tabbing in Chrome // thanks Dennis Smith issue #221
@@ -20,10 +61,11 @@
 + Fixed bug when pasting using  ctrl & v keys
 
 ### Version 1.9.41 released 2015-11-2
-+ Fixed bug that allowed two currency symbols
++ Fixed bug that allowed two currency symbols - thanks Mic Biert
 
 ### Version 1.9.40 released 2015-10-25
 + Fixed bug when pasting value and the decimal seperator is a comma ","
++ Modified the "destroy" method so that an error is not thrown if the "init" method has not been called previously
 
 ### Version 1.9.39
 + Fixed 'aForm'option.

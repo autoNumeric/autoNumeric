@@ -1,13 +1,12 @@
 /**
  * autoNumeric.js
  * @author: Bob Knothe
- * @author: Sokolov Yura
- * @version: 1.9.46 - 2016-09-11 GMT 10:00 PM / 22:00
+ * @contributors: Sokolov Yura and other github users
+ * @version: 2.0 - 2016-11-16 UTC-10 23:00
  *
- * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
- * Contributor by Sokolov Yura on 2010-11-07
+ * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  *
- * Copyright (c) 2011 Robert J. Knothe http://www.decorplanit.com/plugin/
+ * Copyright (c) 2009 Robert J. Knothe http://www.decorplanit.com/plugin/
  *
  * The MIT License (http://www.opensource.org/licenses/mit-license.php)
  *
@@ -15,7 +14,7 @@
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
  * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copy, modify, merge, publish, distribute, sub license, and/or sell
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:

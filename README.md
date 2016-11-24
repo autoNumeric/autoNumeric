@@ -1,7 +1,7 @@
-[autoNumeric-2.0](http://www.decorplanit.com/plugin/)
+[autoNumeric](http://www.decorplanit.com/plugin/)
 ================================
 
-### International currency formatting (last update 2016-11-12 GMT 2:00 PM / 14:00)
+### International currency formatting
 
 autoNumeric is a jQuery plugin that automatically formats currency and numbers as you type on form inputs. 
 
@@ -14,12 +14,24 @@ autoNumeric is a jQuery plugin that automatically formats currency and numbers a
 - Eleven (11) built in methods gives you the flexibility needed to use autoNumeric to its maximum potential
 - There are twenty three (23) settings/options which controls the behavior and format of the form input field
 
-Below is a quick tutorial - for demo's documentation and option code generator  [http://www.decorplanit.com/plugin/ ](http://www.decorplanit.com/plugin/)
+Below is a quick tutorial - for more examples, documentation and option code generator, take a look at [http://www.decorplanit.com/plugin/ ](http://www.decorplanit.com/plugin/)
 
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NCW5699RY8NN2)
 
 
 ****
+
+###  Building the minified version
+
+If you want to change the `src/autoNumeric.js` file, you'll need to build the ES5 and minified versions of autoNumeric in the `dist` folder, using :
+
+```
+# npm install
+# npm run build
+```
+
+****
+
 ###  Getting started:
 
 
@@ -52,6 +64,8 @@ Input types supported:
 ```html
 <input type='text' name="someName"  id="someID" class='someClass' value="1234.56"/>
 ```
+
+Note : the previous stable version of autoNumeric v1.9.46 can be found [here](https://github.com/BobKnothe/autoNumeric/releases/tag/1.9.46). 
 
 ****
 ### Changing the defaults / options
@@ -233,12 +247,7 @@ Notes:
 
 ****
 
-The following is a list of the methods and settings/options that control autoNumeric - for demo's, documentation and the option code generator please see [http://www.decorplanit.com/plugin/](http://www.decorplanit.com/plugin/)
-
-****
-
-### Methods supported by autoNumeric 2.0
-
+The following is a list of the methods and settings/options that control autoNumeric 2.0 :
 
 **'init'** - *initializes autoNumeric* Must be run before other methods can be called 
 -	$('someSelector').autoNumeric();
@@ -291,6 +300,28 @@ The following is a list of the methods and settings/options that control autoNum
 -	$('someSelector').autoNumeric('getSettings'); // returns the jQuery data opbect with settings 
 -	$('someSelector').autoNumeric('getSettings').aDec; // returns the 'aDec' value 	
 - 	any individual setting can be returned by replacing 'aDec' with the desired settings / option name		
+
+For more examples, documentation and the option code generator please take a look at [http://www.decorplanit.com/plugin/](http://www.decorplanit.com/plugin/).
+
+****
+
+Additionally, autoNumeric now supports formatting and unformatting directly without having to first initiate a DOM element :
+
+**'autoUnformat'** : *this returns an Number given the formatted string and the autoNumeric options passed as arguments*
+For instance, to *unformat*, you would use :
+```
+let autoNumericOptions = { aSep: '.', aDec: ',', altDec: '.', aSign: ' €', pSign: 's', mRound: 'U' };
+let formattedString = "1.234,56 €";
+$.fn.autoUnformat(formattedString, autoNumericOptions); // Returns 1234.56
+```
+
+**'autoFormat'** : *this returns a formatted string given a Number and the autoNumeric options passed as arguments*
+For instance, to *format*, you would use :
+```
+let autoNumericOptions = { aSep: '.', aDec: ',', altDec: '.', aSign: ' €', pSign: 's', mRound: 'U' };
+let number = 1234.56;
+$.fn.autoFormat(number, autoNumericOptions); // Returns "1.234,56 €"
+```
 
 
 ****

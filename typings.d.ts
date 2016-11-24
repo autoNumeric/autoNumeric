@@ -1,7 +1,9 @@
 interface AutoNumericOptions {
   aSep?: string
+  aScale?: string
   dGroup?: number
   aDec?: string
+  eDec?: number
   altDec?: string
   aSign?: string
   pSign?: "p" | "s"

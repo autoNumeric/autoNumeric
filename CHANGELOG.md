@@ -1,5 +1,12 @@
 ### Change log:
 
+###
++ modified the scaling o[tiona and seperated the options
++ aScale - removed
++ scaleDivisor added
++ scaleDecimal added
++ scaleSymbol added
+
 ### Version 2.0.0 released 2016-11-16
 + Prepare the code base for future Jasmine tests
 + Add initial babel support

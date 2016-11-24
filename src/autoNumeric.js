@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributors: Sokolov Yura and other Github users
-* @version: 2.0 - 2016-11-24 GMT UTC-10 21:15
+* @version: 2.0 - 2016-11-24 GMT 23:30
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -1007,7 +1007,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * original settings saved for use when eDec & nSep options are being used
+     * original settings saved for use when eDec options are being used
      * taken from Quirksmode
      */
     function readCookie(name) {
@@ -1890,7 +1890,7 @@ if (typeof define === 'function' && define.amd) {
                     return this;
                 }
 
-                // original settings saved for use when eDec & nSep options are being used
+                // original settings saved for use when eDec, scaleDivisor & nSep options are being used
                 settings = originalSettings(settings);
                 let holder = getHolder($this, settings);
 
@@ -2016,11 +2016,13 @@ if (typeof define === 'function' && define.amd) {
                     $this.on('focusin.autoNumeric', () => {
                         holder = getHolder($this);
                         const $settings = holder.settingsClone;
+                        console.log($settings);
                         $settings.onOff = true;
                         if ($settings.nBracket !== null && $settings.aNeg !== '') {
                             $this.val(negativeBracket($this.val(), $settings));
                         }
                         if ($settings.nSep === true) {
+                            console.log("y");
                             $settings.aSep = '';
                             $settings.aSign = '';
                         }
@@ -2676,19 +2678,19 @@ if (typeof define === 'function' && define.amd) {
          * the divisor value - does not need to be whole number but please understand that Javascript has limited accuracy in math
          * the "get" method returns the full value.
          */
-        scaleDivisor: 1000,
+        scaleDivisor: null,
 
         /*
          * scaledDecimal option is the number of decimal place when not in focus - for this to function scaledDivisor must not be null
          * this is "optional" if omitted the decimal places will be the same when the input has focus
          */
-        scaleDecimal: 1,
+        scaleDecimal: null,
 
         /*
          * scaledSymbol option is a symbol placed as a suffix when not in focus.
          * this is "optional"
          */
-        scaleSymbol: 'x',
+        scaleSymbol: null,
 
         /* Set to true to allow the eDec value to be saved with sessionStorage
          * if ie 6 or 7 the value will be saved as a session cookie

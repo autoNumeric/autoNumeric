@@ -1,6 +1,10 @@
 ### Change log:
 
 ###
++ fixed nSep option which removes the Currency symbom and thousand seperator on focusin
++ changed the defaulys of scaleDivisor, scaleDecimal & scaleSymbol to null
+
+###
 + modified the scaling o[tiona and seperated the options
 + aScale - removed
 + scaleDivisor added

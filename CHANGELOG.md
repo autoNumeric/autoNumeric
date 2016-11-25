@@ -1,10 +1,14 @@
 ### Change log:
 
 ###
-+ Mod/fixed the "aPad" option to only handle true / false
-+ Mod the "nSep" to also handle the "aSuffix"
++ "2.0.0-beta.4"
++ Removed the index.html file
++ Additional mods/fixes to the scaling options
++ Additional mods/fixes to the "nSep" to also handle the "aSuffix"
++ Fixed the "mRound" default
 
 ###
++ "2.0.0-beta.3"
 + fixed nSep option which removes the Currency symbom and thousand seperator on focusin
 + changed the defaulys of scaleDivisor, scaleDecimal & scaleSymbol to null
 

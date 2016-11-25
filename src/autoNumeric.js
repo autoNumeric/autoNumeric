@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributors: Sokolov Yura and other Github users
-* @version: 2.0 - 2016-11-25 GMT 18:45
+* @version: 2.0 - 2016-11-25 GMT 23:00
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -337,9 +337,7 @@ if (typeof define === 'function' && define.amd) {
         } else {
             settings.mDec = Number(settings.mDec);
         }
-        if (settings.scaleDecimal) {
-            settings.mDec = settings.scaleDecimal;
-        }
+        settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
 
         // set alternative decimal separator key
         if (settings.altDec === null && settings.mDec > 0) {
@@ -749,7 +747,7 @@ if (typeof define === 'function' && define.amd) {
         const tRound = Number(iv.charAt(rLength + 1));
         const odd = (iv.charAt(rLength) === '.') ? (iv.charAt(rLength - 1) % 2) : (iv.charAt(rLength) % 2);
         let ivArray = iv.substring(0, rLength + 1).split('');
-        if ((tRound > 4 && settings.mRound === 's')                  || // Round half up symmetric
+        if ((tRound > 4 && settings.mRound === 'S')                  || // Round half up symmetric
             (tRound > 4 && settings.mRound === 'A' && nSign === '')  || // Round half up asymmetric positive values
             (tRound > 5 && settings.mRound === 'A' && nSign === '-') || // Round half up asymmetric negative values
             (tRound > 5 && settings.mRound === 's')                  || // Round half down symmetric
@@ -1881,12 +1879,6 @@ if (typeof define === 'function' && define.amd) {
                         }
                     });
 
-                    if (settings.scaleDivisor !== null) {
-                        settings.scaleDivisor = +settings.scaleDivisor;
-                        settings.scaleDecimal = (settings.scaleDecimal) ? +settings.scaleDecimal : null;
-                        settings.scaleSymbol = (settings.scaleSymbol) ? settings.scaleSymbol : '';
-                    }
-
                     // Save our new settings
                     $this.data('autoNumeric', settings);
                 } else {
@@ -1896,6 +1888,8 @@ if (typeof define === 'function' && define.amd) {
                 // original settings saved for use when eDec, scaleDivisor & nSep options are being used
                 settings = originalSettings(settings);
                 let holder = getHolder($this, settings);
+
+                settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
 
                 // checks for non-supported input types
                 if (!$input && $this.prop('tagName').toLowerCase() === 'input') {
@@ -2023,12 +2017,6 @@ if (typeof define === 'function' && define.amd) {
                         if ($settings.nBracket !== null && $settings.aNeg !== '') {
                             $this.val(negativeBracket($this.val(), $settings));
                         }
-                        if ($settings.nSep === true) {
-                            $settings.aSep = '';
-                            $settings.aSign = '';
-                            $settings.aSuffix = '';
-                        }
-
                         let result;
                         if ($settings.eDec) {
                             $settings.mDec = $settings.eDec;
@@ -2036,10 +2024,14 @@ if (typeof define === 'function' && define.amd) {
                         } else if ($settings.scaleDivisor) {
                             $settings.mDec = $settings.oDec;
                             $this.autoNumeric('set', $settings.rawValue);
+                        } else if ($settings.nSep) {
+                            $settings.aSep = '';
+                            $settings.aSign = '';
+                            $settings.aSuffix = '';
+                            $this.autoNumeric('set', $settings.rawValue);
                         } else if ((result = autoStrip($this.val(), $settings)) !== $settings.rawValue) {
                             $this.autoNumeric('set', result);
                         }
-
                         holder.inVal = $this.val();
                         holder.lastVal = holder.inVal;
                         const onEmpty = checkEmpty(holder.inVal, $settings, true);
@@ -2315,10 +2307,8 @@ if (typeof define === 'function' && define.amd) {
                 const strip = $this.autoNumeric('get');
                 settings = $.extend(settings, options);
 
-                if (settings.scaleDivisor !== null) {
-                    settings.scaleDivisor = +settings.scaleDivisor;
-                    settings.scaleDecimal = (settings.scaleDecimal) ? +settings.scaleDecimal : null;
-                    settings.scaleSymbol = (settings.scaleSymbol) ? settings.scaleSymbol : '';
+                if (settings.scaleDivisor) {
+                    settings.mDec = (settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
                 }
                 settings = originalSettings(settings);
                 getHolder($this, settings, true);
@@ -2365,7 +2355,7 @@ if (typeof define === 'function' && define.amd) {
                 if (value !== '') {
                     const [minTest, maxTest] = autoCheck(value, settings);
                     if (minTest && maxTest) {
-                        if ($input && (!settings.eDec || !settings.divisor)) {
+                        if ($input && (settings.eDec || settings.scaleDivisor)) {
                             settings.rawValue = value;
                         }
 
@@ -2374,7 +2364,7 @@ if (typeof define === 'function' && define.amd) {
                             if (settings.scaleDivisor && !settings.onOff) {
                                 value = value / settings.scaleDivisor;
                                 value = value.toString();
-                                settings.mDec = settings.scaleDecimal;
+                                settings.mDec = (settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
                             }
                             value = autoRound(value, settings);
                             if (settings.eDec === null && settings.scaleDivisor === null) {
@@ -2383,7 +2373,7 @@ if (typeof define === 'function' && define.amd) {
                             value = presentNumber(value, settings);
                             value = autoGroup(value, settings);
                         }
-                        if (settings.aStor && (settings.eDec !== null || settings.scaleDivisor !== null)) {
+                        if (settings.aStor && (settings.eDec || settings.scaleDivisor)) {
                             autoSave($this, settings, 'set');
                         }
                     } else {
@@ -2498,7 +2488,7 @@ if (typeof define === 'function' && define.amd) {
             }
 
             // returned Numeric String
-            //TODO Shouldn't we return `Number(value)` since the goal of `get` is to get the raw javascript value?
+            // TODO Shouldn't we return `Number(value)` since the goal of `get` is to get the raw javascript value?
             return value;
         },
 
@@ -2716,7 +2706,7 @@ if (typeof define === 'function' && define.amd) {
          * mRound: "U05" Rounds up to next .05
          * mRound: "D05" Rounds down to next .05
          */
-        mRound: 's',
+        mRound: 'S',
 
         /* controls decimal padding
          * aPad: true - always Pad decimals with zeros

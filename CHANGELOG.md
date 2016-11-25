@@ -1,6 +1,10 @@
 ### Change log:
 
 ###
++ Mod/fixed the "aPad" option to only handle true / false
++ Mod the "nSep" to also handle the "aSuffix"
+
+###
 + fixed nSep option which removes the Currency symbom and thousand seperator on focusin
 + changed the defaulys of scaleDivisor, scaleDecimal & scaleSymbol to null
 

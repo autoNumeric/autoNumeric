@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributors: Sokolov Yura and other Github users
-* @version: 2.0 - 2016-11-24 GMT 23:30
+* @version: 2.0 - 2016-11-25 GMT 18:45
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -629,12 +629,15 @@ if (typeof define === 'function' && define.amd) {
         let regex;
         switch (rDec) {
             case 0:
+                // prevents padding - removes trailing zeros to the first significant digit
                 regex = /(\.(?:\d*[1-9])?)0*$/;
                 break;
             case 1:
+                // allows padding when mDec equals one - leaves one zero trailing the decimal character
                 regex = /(\.\d(?:\d*[1-9])?)0*$/;
                 break;
             default :
+                // removes access zeros to the mDec length when aPad is set true
                 regex = new RegExp(`(\\.\\d{${rDec}}(?:\\d*[1-9])?)0*`);
         }
 
@@ -682,13 +685,12 @@ if (typeof define === 'function' && define.amd) {
         let i = 0;
         let nSign = '';
         let rDec;
-
-        if (typeof(settings.aPad) === 'boolean' || settings.aPad === null) {
-            rDec = settings.aPad?settings.mDec:0;
+        // sets the truncate zero method
+        if (settings.aPad) {
+            rDec = settings.mDec;
         } else {
-            rDec = Number(settings.aPad);
+            rDec = 0
         }
-
         // Checks if the iv (input Value)is a negative value
         if (iv.charAt(0) === '-') {
             nSign = '-';
@@ -1002,6 +1004,7 @@ if (typeof define === 'function' && define.amd) {
         settings.oBracket = settings.nBracket;
         settings.oSep     = settings.aSep;
         settings.oSign    = settings.aSign;
+        settings.oSuffix  = settings.aSuffix
 
         return settings;
     }
@@ -2016,15 +2019,14 @@ if (typeof define === 'function' && define.amd) {
                     $this.on('focusin.autoNumeric', () => {
                         holder = getHolder($this);
                         const $settings = holder.settingsClone;
-                        console.log($settings);
                         $settings.onOff = true;
                         if ($settings.nBracket !== null && $settings.aNeg !== '') {
                             $this.val(negativeBracket($this.val(), $settings));
                         }
                         if ($settings.nSep === true) {
-                            console.log("y");
                             $settings.aSep = '';
                             $settings.aSign = '';
+                            $settings.aSuffix = '';
                         }
 
                         let result;
@@ -2162,6 +2164,7 @@ if (typeof define === 'function' && define.amd) {
                         if ($settings.nSep === true) {
                             $settings.aSep = $settings.oSep;
                             $settings.aSign = $settings.oSign;
+                            $settings.aSuffix = $settings.oSuffix;
                         }
                         if ($settings.eDec !== null) {
                             $settings.mDec = $settings.oDec;
@@ -2565,7 +2568,7 @@ if (typeof define === 'function' && define.amd) {
         throwError(`Method "${method}" is not supported by autoNumeric`, true);
     };
 
-    /**
+    /*
      * Defaults are public - these can be overridden by the following:
      * HTML5 data attributes
      * Options passed by the 'init' or 'update' methods
@@ -2582,7 +2585,9 @@ if (typeof define === 'function' && define.amd) {
          */
         aSep: ',',
 
-        /* when true => when the input has focus only the decimal character is visible
+        /* When true => removes the thousand seperator, currency symbol & suffix "focusin"
+         * example if the input value "$ 1,999.88 suffix"
+         * on "focusin" it becomes "1999.88" and back to "$ 1,999.88 suffix" on focus out.
          */
         nSep: false,
 
@@ -2716,7 +2721,6 @@ if (typeof define === 'function' && define.amd) {
         /* controls decimal padding
          * aPad: true - always Pad decimals with zeros
          * aPad: false - does not pad with zeros.
-         * aPad: `some number` - pad decimals with zero to number different from mDec
          * thanks to Jonas Johansson for the suggestion
          */
         aPad: true,
@@ -2902,7 +2906,7 @@ if (typeof define === 'function' && define.amd) {
 /**
  * This exports the interface for the autoNumeric object
  */
-export default {
+/* export default {
     format  : autoFormat,
     unFormat: autoUnFormat,
     getDefaultConfig,
@@ -2921,4 +2925,4 @@ export default {
     //wipe         : an.wipe(input)
     //destroy      : an.destroy(input)
     //validate     : an.validate(options)
-};
+}; */

@@ -1,6 +1,6 @@
 ### Change log:
 
-### Version 2.0.0 released 2016-11-16
+### Version 2.0.0-beta.0 released 2016-11-16
 + Prepare the code base for future Jasmine tests
 + Add initial babel support
 + Add uglify and npm-build-process support

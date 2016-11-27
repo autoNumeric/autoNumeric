@@ -35,6 +35,8 @@
 let autoFormat;
 let autoUnFormat;
 let getDefaultConfig;
+let validate;
+let areSettingsValid;
 
 /* global module, require, define */
 
@@ -159,6 +161,17 @@ if (typeof define === 'function' && define.amd) {
     };
 
     /**
+     * Return TRUE if the `value` is null
+     *
+     * @static
+     * @param {*} value
+     * @returns {boolean}
+     */
+    function isNull(value) {
+        return value === null;
+    }
+
+    /**
      * Return TRUE if the `value` is undefined
      *
      * @static
@@ -172,7 +185,7 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Return TRUE if the `value` is undefined, null or empty
      *
-     * @param value
+     * @param {*} value
      * @returns {boolean}
      */
     function isUndefinedOrNullOrEmpty(value) {
@@ -180,13 +193,62 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Return TRUE if the given parameter is as String
+     * Return TRUE if the given parameter is a String
      *
      * @param {*} str
      * @returns {boolean}
      */
     function isString(str) {
         return (typeof str === 'string' || str instanceof String);
+    }
+
+    /**
+     * Return TRUE if the parameter is a boolean
+     *
+     * @static
+     * @param {*} value
+     * @returns {boolean}
+     */
+    function isBoolean(value) {
+        return typeof(value) === 'boolean';
+    }
+
+    /**
+     * Return TRUE if the parameter is a string 'true' or 'false'
+     *
+     * This function accepts any cases for those strings.
+     * @param value
+     * @returns {boolean}
+     */
+    function isTrueOrFalseString(value) {
+        const lowercaseValue = String(value).toLowerCase();
+        return lowercaseValue === 'true' || lowercaseValue === 'false';
+    }
+
+    /**
+     * Return TRUE if the parameter is an object
+     *
+     * @param {*} reference
+     * @returns {boolean}
+     */
+    function isObject(reference) {
+        return typeof reference === 'object' && reference !== null && !Array.isArray(reference);
+    }
+
+    /**
+     * Return TRUE if the given object is empty
+     * cf. http://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object and http://jsperf.com/empty-object-test
+     *
+     * @param obj
+     * @returns {boolean}
+     */
+    function isEmptyObj(obj) {
+        for (const prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -213,7 +275,7 @@ if (typeof define === 'function' && define.amd) {
      * @returns {boolean}
      */
     function isInArray(needle, array) {
-        if (!isArray(array) || array === [] || isUndefined(needle) || needle === '' || needle === null) {
+        if (!isArray(array) || array === [] || isUndefined(needle)) {
             return false;
         }
 
@@ -235,6 +297,33 @@ if (typeof define === 'function' && define.amd) {
         else {
             throw new Error('toString message changed for Object Array'); // Verify that the string returned by `toString` does not change in the future (cf. http://stackoverflow.com/a/8365215)
         }
+    }
+
+    /**
+     * Return TRUE if the parameter is a string that represents a float number, and that number has a decimal part
+     *
+     * @param {string} str
+     * @returns {boolean}
+     */
+    function hasDecimals(str) {
+        const [, decimalPart] = str.split('.');
+        return !isUndefined(decimalPart);
+    }
+
+    /**
+     * Return the number of decimal places if the parameter is a string that represents a float number, and that number has a decimal part.
+     * Return `null` otherwise.
+     *
+     * @param {string} str
+     * @returns {null|int}
+     */
+    function decimalPlaces(str) {
+        const [, decimalPart] = str.split('.');
+        if (!isUndefined(decimalPart)) {
+            return decimalPart.length;
+        }
+
+        return null;
     }
 
     /**
@@ -278,9 +367,19 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Function to handle errors messages
      */
-    function throwError(message, debug) {
+    function throwError(message, debug = true) {
         if (debug) {
             throw new Error(message);
+        }
+    }
+
+    /**
+     * Function to handle warning messages
+     */
+    function warning(message, suppressWarnings = false) {
+        if (suppressWarnings) {
+            /* eslint no-console: 0 */
+            console.warn(`Warning: ${message}`);
         }
     }
 
@@ -683,50 +782,52 @@ if (typeof define === 'function' && define.amd) {
         let nSign = '';
         let rDec;
 
+        //FIXME `settings.aPad` should never be 'null' since the default is 'true'
         if (typeof(settings.aPad) === 'boolean' || settings.aPad === null) {
             rDec = settings.aPad?settings.mDec:0;
         } else {
             rDec = Number(settings.aPad);
         }
 
-        // Checks if the iv (input Value)is a negative value
+        // Checks if the iv (input Value) is a negative value
         if (iv.charAt(0) === '-') {
             nSign = '-';
 
-            // removes the negative sign will be added back later if required
+            // Removes the negative sign that will be added back later if required
             iv = iv.replace('-', '');
         }
 
-        // append a zero if first character is not a digit (then it is likely to be a dot
+        // Append a zero if the first character is not a digit (then it is likely to be a dot)
         if (!iv.match(/^\d/)) {
             iv = '0' + iv;
         }
 
-        // determines if the value is zero - if zero no negative sign
+        // Determines if the value is equal to zero. If it is, remove the negative sign
         if (nSign === '-' && Number(iv) === 0) {
             nSign = '';
         }
 
-        // trims leading zero's needed
+        // Trims leading zero's as needed
         if ((Number(iv) > 0 && settings.lZero !== 'keep') || (iv.length > 0 && settings.lZero === 'allow')) {
             iv = iv.replace(/^0*(\d)/, '$1');
         }
 
         const dPos = iv.lastIndexOf('.');
 
-        // virtual decimal position
+        // Virtual decimal position
         const vdPos = (dPos === -1) ? iv.length - 1 : dPos;
 
-        // checks decimal places to determine if rounding is required :
-        // check if no rounding is required
+        // Checks decimal places to determine if rounding is required :
+        // Check if no rounding is required
         let cDec = (iv.length - 1) - vdPos;
         if (cDec <= settings.mDec) {
-            // check if we need to pad with zeros
+            // Check if we need to pad with zeros
             ivRounded = iv;
             if (cDec < rDec) {
                 if (dPos === -1) {
                     ivRounded += settings.aDec;
                 }
+
                 let zeros = '000000';
                 while (cDec < rDec) {
                     zeros = zeros.substring(0, rDec - cDec);
@@ -742,7 +843,7 @@ if (typeof define === 'function' && define.amd) {
             return (Number(ivRounded) === 0) ? ivRounded : nSign + ivRounded;
         }
 
-        // rounded length of the string after rounding
+        // Rounded length of the string after rounding
         const rLength = dPos + settings.mDec; //TODO Modify `dPos` here if it's not intended that it can be equal to '-1'
         const tRound = Number(iv.charAt(rLength + 1));
         const odd = (iv.charAt(rLength) === '.') ? (iv.charAt(rLength - 1) % 2) : (iv.charAt(rLength) % 2);
@@ -751,6 +852,7 @@ if (typeof define === 'function' && define.amd) {
             (tRound > 4 && settings.mRound === 'A' && nSign === '')  || // Round half up asymmetric positive values
             (tRound > 5 && settings.mRound === 'A' && nSign === '-') || // Round half up asymmetric negative values
             (tRound > 5 && settings.mRound === 's')                  || // Round half down symmetric
+            //FIXME The options 'a' is never tested here
             (tRound > 5 && settings.mRound === 'A' && nSign === '')  || // Round half down asymmetric positive values
             (tRound > 4 && settings.mRound === 'A' && nSign === '-') || // Round half down asymmetric negative values
             (tRound > 5 && settings.mRound === 'B')                  || // Round half even "Banker's Rounding"
@@ -775,14 +877,19 @@ if (typeof define === 'function' && define.amd) {
         // Reconstruct the string, converting any 10's to 0's
         ivArray = ivArray.slice(0, rLength + 1);
 
-        // return rounded value
+        // Return the rounded value
         ivRounded = truncateZeros(ivArray.join(''), rDec);
 
         return (Number(ivRounded) === 0) ? ivRounded : nSign + ivRounded;
     }
 
     /**
-     * truncates the decimal part of a number
+     * Truncates the decimal part of a number
+     *
+     * @param {string} s
+     * @param {object} settings
+     * @param {string} paste
+     * @returns {*}
      */
     function truncateDecimal(s, settings, paste) {
         const aDec = settings.aDec;
@@ -996,14 +1103,12 @@ if (typeof define === 'function' && define.amd) {
     /**
      * original settings saved for use when eDec & nSep options are being used
      */
-    function originalSettings(settings) {
+    function keepOriginalSettings(settings) {
         settings.oDec     = settings.mDec;
         settings.oPad     = settings.aPad;
         settings.oBracket = settings.nBracket;
         settings.oSep     = settings.aSep;
         settings.oSign    = settings.aSign;
-
-        return settings;
     }
 
     /**
@@ -1812,16 +1917,62 @@ if (typeof define === 'function' && define.amd) {
             return this.each(function() {
                 const $this = $(this);
 
-                // attempt to grab HTML5 data, if they don't exist we'll get "undefined"
+                // Attempt to grab HTML5 data, if it doesn't exist, we'll get "undefined"
                 const tagData = $this.data();
 
-                // supported input type
+                // Supported input type
                 const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
 
-                // attempt to grab "autoNumeric" settings, if they don't exist returns "undefined"
+                // Checks for non-supported input types
+                if (!$input && $this.prop('tagName').toLowerCase() === 'input') {
+                    throwError(`The input type "${$this.prop('type')}" is not supported by autoNumeric`);
+                }
+
+                // Checks for non-supported tags
+                //TODO Move the static configuration objects out of that block, and hoist them at the start of this file
+                const allowedTagList = [
+                    'b',
+                    'caption',
+                    'cite',
+                    'code',
+                    'const',
+                    'dd',
+                    'del',
+                    'div',
+                    'dfn',
+                    'dt',
+                    'em',
+                    'h1',
+                    'h2',
+                    'h3',
+                    'h4',
+                    'h5',
+                    'h6',
+                    'ins',
+                    'kdb',
+                    'label',
+                    'li',
+                    'option',
+                    'output',
+                    'p',
+                    'q',
+                    's',
+                    'sample',
+                    'span',
+                    'strong',
+                    'td',
+                    'th',
+                    'u',
+                ];
+                const currentElementTag = $this.prop('tagName').toLowerCase();
+                if (currentElementTag !== 'input' && !isInArray(currentElementTag, allowedTagList)) {
+                    throwError(`The <${currentElementTag}> tag is not supported by autoNumeric`);
+                }
+
+                // Attempt to grab "autoNumeric" settings. If they do not exist, it returns "undefined".
                 let settings = $this.data('autoNumeric');
 
-                // If we couldn't grab settings, create them from defaults and passed options
+                // If we couldn't grab any settings, create them from the default ones and combine them with the options passed
                 if (typeof settings !== 'object') {
                     settings = $.extend({}, $.fn.autoNumeric.defaults, tagData, options, {
                         onOff           : false,
@@ -1831,56 +1982,27 @@ if (typeof define === 'function' && define.amd) {
                         caretFix        : false,
                         throwInput      : true,
                         strip           : true,
-                        tagList         : [
-                            'b',
-                            'caption',
-                            'cite',
-                            'code',
-                            'const',
-                            'dd',
-                            'del',
-                            'div',
-                            'dfn',
-                            'dt',
-                            'em',
-                            'h1',
-                            'h2',
-                            'h3',
-                            'h4',
-                            'h5',
-                            'h6',
-                            'ins',
-                            'kdb',
-                            'label',
-                            'li',
-                            'option',
-                            'output',
-                            'p',
-                            'q',
-                            's',
-                            'sample',
-                            'span',
-                            'strong',
-                            'td',
-                            'th',
-                            'u',
-                        ],
+                        tagList         : allowedTagList,
                     });
 
-                    // Merge defaults, tagData and options
-                    if (settings.aDec === settings.aSep) {
-                        throwError(`autoNumeric will not function properly when the decimal character aDec [${settings.aDec}] and the thousand separator aSep [${settings.aSep}] are the same character`, settings.debug);
-                    }
-
+                    // Modify the user settings to make them 'exploitable'
                     $.each(settings, (key, value) => {
+                        // Convert the string 'true' and 'false' to real Boolean
                         if (value === 'true' || value === 'false') {
                             settings[key] = Boolean(value === 'true');
                         }
+
+                        // Convert numbers in options to strings
+                        //TODO if a value is of type 'Number', shouldn't we keep it as a number for further manipulation, instead of using a string?
                         if (typeof value === 'number' && key !== 'aScale') {
                             settings[key] = value.toString();
                         }
                     });
 
+                    // Validate the settings
+                    validate(settings, false); // Throws if necessary
+
+                    // Additional `aScale` settings initialization
                     if (settings.aScale !== null) {
                         settings.scaleFactor = +settings.aScale[0];
                         settings.scaleDecimal = (settings.aScale[1]) ? +settings.aScale[1] : null;
@@ -1894,29 +2016,8 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 // original settings saved for use when eDec & nSep options are being used
-                settings = originalSettings(settings);
+                keepOriginalSettings(settings);
                 let holder = getHolder($this, settings);
-
-                // checks for non-supported input types
-                if (!$input && $this.prop('tagName').toLowerCase() === 'input') {
-                    throwError(`The input type "${$this.prop('type')}" is not supported by autoNumeric`, settings.debug);
-                }
-
-                // checks for non-supported tags
-                if (!isInArray($this.prop('tagName').toLowerCase(), settings.tagList) && $this.prop('tagName').toLowerCase() !== 'input') {
-                    throwError(`The <${$this.prop('tagName').toLowerCase()}> tag is not supported by autoNumeric`, settings.debug);
-                }
-
-                //TODO Replace the two next tests with a `validateOptions()` function
-                // checks if the decimal and thousand are characters are the same
-                if (settings.aDec === settings.aSep) {
-                    throwError(`autoNumeric will not function properly when the decimal character aDec [${settings.aDec}] and the thousand separator aSep [${settings.aSep}] are the same character`, settings.debug);
-                }
-
-                // checks the extended decimal places "eDec" is greater than the normal decimal places "mDec"
-                if (settings.eDec < settings.mDec && settings.eDec !== null) {
-                    throwError(`autoNumeric will not function properly when the extended decimal places eDec [${settings.eDec}] is greater than the mDec [${settings.mDec}] value`, settings.debug);
-                }
 
                 // routine to format default value on page load
                 if (settings.runOnce === false && settings.aForm) {
@@ -2318,7 +2419,7 @@ if (typeof define === 'function' && define.amd) {
                     settings.scaleDecimal = (settings.aScale[1]) ? +settings.aScale[1] : null;
                     settings.scaleSuffix = (settings.aScale[2]) ? settings.aScale[2] : '';
                 }
-                settings = originalSettings(settings);
+                keepOriginalSettings(settings);
                 getHolder($this, settings, true);
 
                 if (settings.aDec === settings.aSep) {
@@ -2559,7 +2660,7 @@ if (typeof define === 'function' && define.amd) {
 
         if (typeof method === 'object' || !method) {
             // The options have been passed directly, without using a named method
-            //TODO First validate the options passed as an argument, before using `init`
+            //TODO First validate the options passed as an argument, before using `init` (with `validate()`)
             return methods.init.apply(this, [method]);
         }
 
@@ -2638,7 +2739,7 @@ if (typeof define === 'function' && define.amd) {
          */
         aSuffix: '',
 
-        /* override min max limits'
+        /* Override min max limits
          * oLimits: "ceiling" adheres to vMax and ignores vMin settings
          * oLimits: "floor" adheres to vMin and ignores vMax settings
          * oLimits: "ignore" ignores both vMin & vMax
@@ -2685,10 +2786,10 @@ if (typeof define === 'function' && define.amd) {
         aStor: false,
 
         /* method used for rounding
-         * mRound: "s", Round-Half-Up Symmetric (default)
+         * mRound: "S", Round-Half-Up Symmetric (default)
          * mRound: "A", Round-Half-Up Asymmetric
          * mRound: "s", Round-Half-Down Symmetric (lower case s)
-         * mRound: "A", Round-Half-Down Asymmetric (lower case a)
+         * mRound: "a", Round-Half-Down Asymmetric (lower case a)
          * mRound: "B", Round-Half-Even "Bankers Rounding"
          * mRound: "U", Round Up "Round-Away-From-Zero"
          * mRound: "D", Round Down "Round-Toward-Zero" - same as truncate
@@ -2703,13 +2804,15 @@ if (typeof define === 'function' && define.amd) {
         /* controls decimal padding
          * aPad: true - always Pad decimals with zeros
          * aPad: false - does not pad with zeros.
-         * aPad: `some number` - pad decimals with zero to number different from mDec
+         * Note: setting aPad to 'false' will override the 'mDec' setting.
+         *
          * thanks to Jonas Johansson for the suggestion
          */
         aPad: true,
 
-        /* places brackets on negative value -$ 999.99 to (999.99)
-         * visible only when the field does NOT have focus the left and right symbols should be enclosed in quotes and separated by a comma
+        /* Adds brackets on negative values (ie. transforms '-$ 999.99' to '(999.99)')
+         * Those brackets are visible only when the field does NOT have the focus.
+         * The left and right symbols should be enclosed in quotes and separated by a comma
          * nBracket: null - (default)
          * nBracket: '(,)', nBracket: '[,]', nBracket: '<,>' or nBracket: '{,}'
          */
@@ -2759,7 +2862,7 @@ if (typeof define === 'function' && define.amd) {
 
         /* allows the output to be in the locale format via the "get", "getString" & "getArray" methods
          * null => nnnn.nn or -nnnn.nn default
-         * ","  => nnnn,nn or -nnnn,nn can als be "-,"
+         * ","  => nnnn,nn or -nnnn,nn can also be "-,"
          * ".-" => nnnn.nn or nnnn.nn-
          * ",-" => nnnn,nn or nnnn,nn-
          */
@@ -2772,14 +2875,12 @@ if (typeof define === 'function' && define.amd) {
         debug: false,
     };
 
-    getDefaultConfig = function() {
-        return $.fn.autoNumeric.defaults;
-    };
+    getDefaultConfig = () => $.fn.autoNumeric.defaults;
 
     /**
      * public function that allows formatting without an element trigger
      */
-    autoFormat = function(value, options) {
+    autoFormat = (value, options) => {
         if (isUndefined(value) || value === null) {
             return null;
         }
@@ -2790,12 +2891,14 @@ if (typeof define === 'function' && define.amd) {
         if (Number(value) < 0) {
             settings.aNeg = '-';
         }
+
         if (settings.mDec === null) {
             const vMax = settings.vMax.toString().split('.');
             const vMin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
             settings.mDec = decLength(vMin, vMax);
         }
         const [minTest, maxTest] = autoCheck(value, settings);
+
         if (!minTest || !maxTest) {
             // Throw a custom event
             sendCustomEvent('autoFormat.autoNumeric', `Range test failed`);
@@ -2813,7 +2916,7 @@ if (typeof define === 'function' && define.amd) {
     /**
      * public function that allows unformatting without an element
      */
-    autoUnFormat = function(value, options) {
+    autoUnFormat = (value, options) => {
         if (isUndefined(value) || value === null) {
             return null;
         }
@@ -2822,6 +2925,7 @@ if (typeof define === 'function' && define.amd) {
         const allowed = `-0123456789\\${settings.aDec}`;
         const autoStrip = new RegExp(`[^${allowed}]`, 'gi');
         value = value.toString();
+
         if (value.charAt(0) === '-') {
             settings.aNeg = '-';
         } else if (settings.nBracket && settings.nBracket.split(',')[0] === value.charAt(0)) {
@@ -2831,6 +2935,7 @@ if (typeof define === 'function' && define.amd) {
         }
         value = value.replace(autoStrip, '');
         value = value.replace(',', '.');
+
         if (settings.localeOutput) {
             value = toLocale(value, settings.localeOutput);
         }
@@ -2839,6 +2944,215 @@ if (typeof define === 'function' && define.amd) {
     };
 
     $.fn.autoUnformat = autoUnFormat;
+
+    /**
+     * Validate the given option object.
+     * If the options are valid, this function returns nothing, otherwise if the options are invalid, this function throws an error.
+     *
+     * This tests if the options are not conflicting and are well formatted.
+     * This function is lenient since it only tests the settings properties ; it ignores any other properties the options object could have.
+     *
+     * @param {*} userOptions
+     * @param {Boolean} shouldExtendDefaultOptions If TRUE, then this function will extends the `userOptions` passed by the user, with the default options.
+     * @throws Error
+     */
+    validate = (userOptions, shouldExtendDefaultOptions = true) => {
+        const debug = true; // The error here must always be thrown, since a badly configured options object will lead to wrong results, if any.
+
+        if (isUndefinedOrNullOrEmpty(userOptions) || !isObject(userOptions) || isEmptyObj(userOptions)) {
+            throwError(`The userOptions are invalid ; it should be a valid object, [${userOptions}] given.`, debug);
+        }
+
+        // The user can choose if the `userOptions` has already been extended with the default options, or not
+        let options;
+        if (shouldExtendDefaultOptions) {
+            options = $.extend({}, $.fn.autoNumeric.defaults, userOptions);
+        } else {
+            options = userOptions;
+        }
+
+
+        // Then tests the options individually
+        if (!isInArray(options.aSep, [',', '.', ' ', ''])) {
+            throwError(`The thousand separator character option 'aSep' is invalid ; it should be ',', '.', ' ' or empty (''), [${options.aSep}] given.`, debug);
+        }
+
+        if (!isTrueOrFalseString(options.nSep) && !isBoolean(options.nSep)) {
+            throwError(`The 'nSep' option is invalid ; it should be either 'false' or 'true', [${options.nSep}] given.`, debug);
+        }
+
+        const testPositiveInteger = /^[0-9]+$/;
+        if (!testPositiveInteger.test(options.dGroup)) { // isNaN(parseInt(options.dGroup)) //DEBUG
+            throwError(`The digital grouping for thousand separator option 'dGroup' is invalid ; it should be a positive integer, [${options.dGroup}] given.`, debug);
+        }
+
+        if (!isInArray(options.aDec, [',', '.'])) {
+            throwError(`The decimal separator character option 'aDec' is invalid ; it should be '.' or ',', [${options.aDec}] given.`, debug);
+        }
+
+        // Checks if the decimal and thousand characters are the same
+        if (options.aDec === options.aSep) {
+            throwError(`autoNumeric will not function properly when the decimal character 'aDec' [${options.aDec}] and the thousand separator 'aSep' [${options.aSep}] are the same character.`, debug);
+        }
+
+        if (!isNull(options.altDec) && !isString(options.altDec)) {
+            throwError(`The alternate decimal separator character option 'altDec' is invalid ; it should be a string, [${options.altDec}] given.`, debug);
+        }
+
+        if (options.aSign !== '' && !isString(options.aSign)) {
+            throwError(`The currency symbol option 'aSign' is invalid ; it should be a string, [${options.aSign}] given.`, debug);
+        }
+
+        if (!isInArray(options.pSign, ['p', 's'])) {
+            throwError(`The placement of the currency sign option 'pSign' is invalid ; it should either be 'p' (prefix) or 's' (suffix), [${options.pSign}] given.`, debug);
+        }
+
+        if (!isInArray(options.pNeg, ['p', 's', 'l', 'r'])) {
+            throwError(`The placement of the negative sign option 'pNeg' is invalid ; it should either be 'p' (prefix), 's' (suffix), 'l' (left) or 'r' (right), [${options.pNeg}] given.`, debug);
+        }
+
+        const testNumericalCharacters = /[0-9]+/;
+        if (!isString(options.aSuffix) || (options.aSuffix !== '' && (contains(options.aSuffix, '-') || testNumericalCharacters.test(options.aSuffix)))) {
+            throwError(`The additional suffix option 'aSuffix' is invalid ; it should not contains the negative sign '-' nor any numerical characters, [${options.aSuffix}] given.`, debug);
+        }
+
+        if (!isNull(options.oLimits) && !isInArray(options.oLimits, ['ceiling', 'floor', 'ignore'])) {
+            throwError(`The override min & max limits option 'oLimits' is invalid ; it should either be 'ceiling', 'floor' or 'ignore', [${options.oLimits}] given.`, debug);
+        }
+
+        // const testFloatAndPossibleNegativeSign = /^-?[0-9]+(\.?[0-9]+)$/;
+        const testFloatOrIntegerAndPossibleNegativeSign = /^-?[0-9]+(\.?[0-9]+)?$/;
+        if (!isString(options.vMax) || !testFloatOrIntegerAndPossibleNegativeSign.test(options.vMax)) {
+            throwError(`The maximum possible value option 'vMax' is invalid ; it should be a string that represents a positive or negative number, [${options.vMax}] given.`, debug);
+        }
+
+        if (!isString(options.vMin) || !testFloatOrIntegerAndPossibleNegativeSign.test(options.vMin)) {
+            throwError(`The minimum possible value option 'vMin' is invalid ; it should be a string that represents a positive or negative number, [${options.vMin}] given.`, debug);
+        }
+
+        if (parseFloat(options.vMin) > parseFloat(options.vMax)) {
+            throwError(`The minimum possible value option is greater than the maximum possible value option ; 'vMin' [${options.vMin}] should be smaller than 'vMax' [${options.vMax}].`, debug);
+        }
+
+        if (!isNull(options.mDec) && (!isString(options.mDec) || !testPositiveInteger.test(options.mDec))) {
+            throwError(`The maximum number of decimal places option 'mDec' is invalid ; it should be a positive integer, [${options.mDec}] given.`, debug);
+        }
+
+        if (!options.aPad && !isNull(options.mDec)) {
+            warning(`Setting 'aPad' to [false] will override the current 'mDec' setting [${options.mDec}].`, debug);
+        }
+
+        // Write a warning message in the console if the number of decimal in vMin/vMax is overridden by mDec (and not if mDec is equal to the number of decimal used in vMin/vMax)
+        let dpVMin = decimalPlaces(options.vMin);
+        let dpVMax = decimalPlaces(options.vMax);
+        dpVMin = isNull(dpVMin)?0:dpVMin;
+        dpVMax = isNull(dpVMax)?0:dpVMax;
+        const vMinMaxDecimalPlaces = Math.max(dpVMin, dpVMax);
+        if (!isNull(options.mDec) &&
+            ((hasDecimals(options.vMin) || hasDecimals(options.vMax)) && vMinMaxDecimalPlaces !== Number(options.mDec))) {
+            warning(`Setting 'mDec' to [${options.mDec}] will override the decimals declared in 'vMin' [${options.vMin}] and 'vMax' [${options.vMax}].`, debug);
+        }
+
+        if (!isNull(options.eDec) && (!isString(options.eDec) || !testPositiveInteger.test(options.eDec))) {
+            throwError(`The number of expanded decimal places option 'eDec' is invalid ; it should be a positive integer, [${options.eDec}] given.`, debug);
+        }
+
+        // Checks if the extended decimal places "eDec" is greater than the normal decimal places "mDec"
+        if (!isNull(options.eDec) && !isNull(options.mDec) && Number(options.mDec) < Number(options.eDec)) {
+            throwError(`autoNumeric will not function properly when the extended decimal places 'eDec' [${options.eDec}] is greater than the 'mDec' [${options.mDec}] value.`, debug);
+        }
+
+        //FIXME Finish the aScale* options
+
+        if (!isTrueOrFalseString(options.aStor) && !isBoolean(options.aStor)) {
+            throwError(`The save to session storage option 'aStor' is invalid ; it should be either 'false' or 'true', [${options.aStor}] given.`, debug);
+        }
+
+        if (!isInArray(options.mRound, [
+            'S',
+            'A',
+            's',
+            'a',
+            'B',
+            'U',
+            'D',
+            'C',
+            'F',
+            'N05',
+            'CHF',
+            'U05',
+            'D05',
+        ])) {
+            throwError(`The rounding method option 'mRound' is invalid ; it should either be 'S', 'A', 's', 'a', 'B', 'U', 'D', 'C', 'F', 'N05', 'CHF', 'U05' or 'D05' (cf. documentation), [${options.mRound}] given.`, debug);
+        }
+
+        if (!isTrueOrFalseString(options.aPad) && !isBoolean(options.aPad)) {
+            throwError(`The control decimal padding option 'aPad' is invalid ; it should be either 'false' or 'true', [${options.aPad}] given.`, debug);
+        }
+
+        if (!isNull(options.nBracket) && !isInArray(options.nBracket, ['(,)', '[,]', '<,>', '{,}'])) {
+            throwError(`The brackets for negative values option 'nBracket' is invalid ; it should either be '(,)', '[,]', '<,>' or '{,}', [${options.nBracket}] given.`, debug);
+        }
+
+        if (!isInArray(options.wEmpty, ['focus', 'press', 'always', 'zero'])) {
+            throwError(`The display on empty string option 'wEmpty' is invalid ; it should either be 'focus', 'press', 'always' or 'zero', [${options.wEmpty}] given.`, debug);
+        }
+
+        if (!isInArray(options.lZero, ['allow', 'deny', 'keep'])) {
+            throwError(`The leading zero behavior option 'lZero' is invalid ; it should either be 'allow', 'deny' or 'keep', [${options.lZero}] given.`, debug);
+        }
+
+        if (!isTrueOrFalseString(options.aForm) && !isBoolean(options.aForm)) {
+            throwError(`The format on initialization option 'aForm' is invalid ; it should be either 'false' or 'true', [${options.aForm}] given.`, debug);
+        }
+
+        if (!isTrueOrFalseString(options.sNumber) && !isBoolean(options.sNumber)) {
+            throwError(`The select number only option 'sNumber' is invalid ; it should be either 'false' or 'true', [${options.sNumber}] given.`, debug);
+        }
+
+        if (!isNull(options.anDefault) && (options.anDefault !== '' && !testFloatOrIntegerAndPossibleNegativeSign.test(options.anDefault))) {
+            throwError(`The unformatted default value option 'anDefault' is invalid ; it should be a string that represents a positive or negative number, [${options.anDefault}] given.`, debug);
+        }
+
+        if (!isTrueOrFalseString(options.unSetOnSubmit) && !isBoolean(options.unSetOnSubmit)) {
+            throwError(`The remove formatting on submit option 'unSetOnSubmit' is invalid ; it should be either 'false' or 'true', [${options.unSetOnSubmit}] given.`, debug);
+        }
+
+        if (!isNull(options.localeOutput) && !isInArray(options.localeOutput, [
+            '.',
+            '-.',
+            ',',
+            '-,',
+            '.-',
+            ',-',
+        ])) {
+            throwError(`The custom locale format option 'localeOutput' is invalid ; it should either be empty, '.', '-.', ',', '-,', '.-' or ',-', [${options.localeOutput}] given.`, debug);
+        }
+
+        if (!isTrueOrFalseString(options.debug) && !isBoolean(options.debug)) {
+            throwError(`The debug option 'debug' is invalid ; it should be either 'false' or 'true', [${options.debug}] given.`, debug);
+        }
+    };
+
+    $.fn.validate = validate;
+
+    /**
+     * Return TRUE is the settings/options are valid, FALSE otherwise.
+     *
+     * @param {object} options
+     * @returns {boolean}
+     */
+    areSettingsValid = function(options) {
+        let isValid = true;
+        try {
+            validate(options);
+        }
+        catch (error) {
+            isValid = false;
+        }
+
+        return isValid;
+    };
 
     /**
      * Create a custom event.
@@ -2893,6 +3207,8 @@ export default {
     format  : autoFormat,
     unFormat: autoUnFormat,
     getDefaultConfig,
+    validate, // an.validate(options) : throws if necessary
+    areSettingsValid, //an.areSettingsValid(options) : return true or false //TODO Is this redundant? Should we let the developers wrap each autoNumeric.validate() calls in try/catch block? Or should we just facilitate their life by doing it already?
 
     //TODO Complete the interface with functions having the following signatures :
     //init         : an.init(options, input)
@@ -2907,5 +3223,4 @@ export default {
     //update       : an.update(options, input)
     //wipe         : an.wipe(input)
     //destroy      : an.destroy(input)
-    //validate     : an.validate(options)
 };

@@ -785,11 +785,11 @@ if (typeof define === 'function' && define.amd) {
         let rDec;
 
         // sets the truncate zero method
-	    if (settings.aPad) {
-		    rDec = settings.mDec;
-	    } else {
-		    rDec = 0;
-	    }
+        if (settings.aPad) {
+            rDec = settings.mDec;
+        } else {
+            rDec = 0;
+        }
 
         // Checks if the iv (input Value) is a negative value
         if (iv.charAt(0) === '-') {
@@ -1111,7 +1111,7 @@ if (typeof define === 'function' && define.amd) {
         settings.oBracket = settings.nBracket;
         settings.oSep     = settings.aSep;
         settings.oSign    = settings.aSign;
-        settings.oSuffix  = settings.aSuffix
+        settings.oSuffix  = settings.aSuffix;
     }
 
     /**
@@ -2005,13 +2005,6 @@ if (typeof define === 'function' && define.amd) {
                     // Validate the settings
                     validate(settings, false); // Throws if necessary
 
-                    // Additional `aScale` settings initialization
-                    if (settings.aScale !== null) {
-                        settings.scaleFactor = +settings.aScale[0];
-                        settings.scaleDecimal = (settings.aScale[1]) ? +settings.aScale[1] : null;
-                        settings.scaleSuffix = (settings.aScale[2]) ? settings.aScale[2] : '';
-                    }
-
                     // Save our new settings
                     $this.data('autoNumeric', settings);
                 } else {
@@ -2022,7 +2015,7 @@ if (typeof define === 'function' && define.amd) {
                 keepOriginalSettings(settings);
                 let holder = getHolder($this, settings);
 
-	        settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
+                settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
 
                 // routine to format default value on page load
                 if (settings.runOnce === false && settings.aForm) {
@@ -2613,7 +2606,7 @@ if (typeof define === 'function' && define.amd) {
          */
         getFormatted() {
             // Make sure `this[0]` exists as well as `.value` before trying to access that property
-            if (!isArray(this) || this.length !== 1 || !this[0].hasOwnProperty('value')) {
+            if (!this.hasOwnProperty('0') || !('value' in this[0])) {
                 throwError('Unable to get the formatted string from the element.');
             }
 
@@ -2664,7 +2657,6 @@ if (typeof define === 'function' && define.amd) {
 
         if (typeof method === 'object' || !method) {
             // The options have been passed directly, without using a named method
-            //TODO First validate the options passed as an argument, before using `init` (with `validate()`)
             return methods.init.apply(this, [method]);
         }
 
@@ -2781,22 +2773,22 @@ if (typeof define === 'function' && define.amd) {
          * Example: focusin value "1,111.11" focusout value "1.1 K"
          */
 
-        /* scaleDivisor devides the on focus value and places the result in the input on focusout
-         * example {scaleDivisor: '1000'} or <input data-scale-divisor="1000">
-         * the divisor value - does not need to be whole number but please understand that Javascript has limited accuracy in math
-         * the "get" method returns the full value.
+        /* The `scaleDivisor` decides the on focus value and places the result in the input on focusout
+         * Example {scaleDivisor: '1000'} or <input data-scale-divisor="1000">
+         * The divisor value - does not need to be whole number but please understand that Javascript has limited accuracy in math
+         * The "get" method returns the full value, including the 'hidden' decimals.
          */
         scaleDivisor: null,
 
         /*
-         * scaledDecimal option is the number of decimal place when not in focus - for this to function scaledDivisor must not be null
-         * this is "optional" if omitted the decimal places will be the same when the input has focus
+         * The `scaleDecimal` option is the number of decimal place when not in focus - for this to work, `scaledDivisor` must not be `null`.
+         * This is optional ; if omitted the decimal places will be the same when the input has the focus.
          */
         scaleDecimal: null,
 
         /*
-         * scaledSymbol option is a symbol placed as a suffix when not in focus.
-         * this is "optional"
+         * The `scaleSymbol` option is a symbol placed as a suffix when not in focus.
+         * This is optional too.
          */
         scaleSymbol: null,
 
@@ -2991,6 +2983,11 @@ if (typeof define === 'function' && define.amd) {
             options = userOptions;
         }
 
+        const testPositiveInteger = /^[0-9]+$/;
+        const testNumericalCharacters = /[0-9]+/;
+        // const testFloatAndPossibleNegativeSign = /^-?[0-9]+(\.?[0-9]+)$/;
+        const testFloatOrIntegerAndPossibleNegativeSign = /^-?[0-9]+(\.?[0-9]+)?$/;
+        const testPositiveFloatOrInteger = /^[0-9]+(\.?[0-9]+)?$/;
 
         // Then tests the options individually
         if (!isInArray(options.aSep, [',', '.', ' ', ''])) {
@@ -3001,7 +2998,6 @@ if (typeof define === 'function' && define.amd) {
             throwError(`The 'nSep' option is invalid ; it should be either 'false' or 'true', [${options.nSep}] given.`, debug);
         }
 
-        const testPositiveInteger = /^[0-9]+$/;
         if (!testPositiveInteger.test(options.dGroup)) { // isNaN(parseInt(options.dGroup)) //DEBUG
             throwError(`The digital grouping for thousand separator option 'dGroup' is invalid ; it should be a positive integer, [${options.dGroup}] given.`, debug);
         }
@@ -3031,7 +3027,6 @@ if (typeof define === 'function' && define.amd) {
             throwError(`The placement of the negative sign option 'pNeg' is invalid ; it should either be 'p' (prefix), 's' (suffix), 'l' (left) or 'r' (right), [${options.pNeg}] given.`, debug);
         }
 
-        const testNumericalCharacters = /[0-9]+/;
         if (!isString(options.aSuffix) || (options.aSuffix !== '' && (contains(options.aSuffix, '-') || testNumericalCharacters.test(options.aSuffix)))) {
             throwError(`The additional suffix option 'aSuffix' is invalid ; it should not contains the negative sign '-' nor any numerical characters, [${options.aSuffix}] given.`, debug);
         }
@@ -3040,8 +3035,6 @@ if (typeof define === 'function' && define.amd) {
             throwError(`The override min & max limits option 'oLimits' is invalid ; it should either be 'ceiling', 'floor' or 'ignore', [${options.oLimits}] given.`, debug);
         }
 
-        // const testFloatAndPossibleNegativeSign = /^-?[0-9]+(\.?[0-9]+)$/;
-        const testFloatOrIntegerAndPossibleNegativeSign = /^-?[0-9]+(\.?[0-9]+)?$/;
         if (!isString(options.vMax) || !testFloatOrIntegerAndPossibleNegativeSign.test(options.vMax)) {
             throwError(`The maximum possible value option 'vMax' is invalid ; it should be a string that represents a positive or negative number, [${options.vMax}] given.`, debug);
         }
@@ -3082,7 +3075,17 @@ if (typeof define === 'function' && define.amd) {
             throwError(`autoNumeric will not function properly when the extended decimal places 'eDec' [${options.eDec}] is greater than the 'mDec' [${options.mDec}] value.`, debug);
         }
 
-        //FIXME Finish the aScale* options
+        if (!isNull(options.scaleDivisor) && !testPositiveFloatOrInteger.test(options.scaleDivisor)) {
+            throwError(`The scale divisor option 'scaleDivisor' is invalid ; it should be a positive number, preferably an integer, [${options.scaleDivisor}] given.`, debug);
+        }
+
+        if (!isNull(options.scaleDecimal) && !testPositiveInteger.test(options.scaleDecimal)) {
+            throwError(`The scale number of decimals option 'scaleDecimal' is invalid ; it should be a positive integer, [${options.scaleDecimal}] given.`, debug);
+        }
+
+        if (!isNull(options.scaleSymbol) && !isString(options.scaleSymbol)) {
+            throwError(`The scale symbol option 'scaleSymbol' is invalid ; it should be a string, [${options.scaleSymbol}] given.`, debug);
+        }
 
         if (!isTrueOrFalseString(options.aStor) && !isBoolean(options.aStor)) {
             throwError(`The save to session storage option 'aStor' is invalid ; it should be either 'false' or 'true', [${options.aStor}] given.`, debug);

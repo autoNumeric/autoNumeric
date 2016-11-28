@@ -29,6 +29,7 @@
 
 /* eslint space-in-parens: 0 */
 /* eslint spaced-comment: 0 */
+// eslint-disable-next-line
 /* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach */
 
 import $ from '../../node_modules/jquery/dist/jquery';
@@ -78,9 +79,11 @@ describe('The autoNumeric object', () => {
         vMin         : '-9999999999999.99',
         mDec         : null,
         eDec         : null,
-        aScale       : null,
+        scaleDivisor : null,
+        scaleDecimal : null,
+        scaleSymbol  : null,
         aStor        : false,
-        mRound       : 's',
+        mRound       : 'S',
         aPad         : true,
         nBracket     : null,
         wEmpty       : 'focus',
@@ -731,7 +734,21 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ mDec: '2', eDec: '2' })).not.toThrow();
             expect(() => an.validate({ mDec: '3', eDec: '2' })).not.toThrow();
 
-            //TODO Add aScale* options tests here
+            expect(() => an.validate({ scaleDivisor: null })).not.toThrow();
+            expect(() => an.validate({ scaleDivisor: '100' })).not.toThrow();
+            expect(() => an.validate({ scaleDivisor: 100 })).not.toThrow();
+            expect(() => an.validate({ scaleDivisor: 45.89 })).not.toThrow();
+
+            expect(() => an.validate({ scaleDecimal: null })).not.toThrow();
+            expect(() => an.validate({ scaleDecimal: 0 })).not.toThrow();
+            expect(() => an.validate({ scaleDecimal: 2 })).not.toThrow();
+
+            expect(() => an.validate({ scaleSymbol: null })).not.toThrow();
+            expect(() => an.validate({ scaleSymbol: '' })).not.toThrow();
+            expect(() => an.validate({ scaleSymbol: 'foobar' })).not.toThrow();
+            expect(() => an.validate({ scaleSymbol: 'foo bar' })).not.toThrow();
+            expect(() => an.validate({ scaleSymbol: ' foobar' })).not.toThrow();
+            expect(() => an.validate({ scaleSymbol: 'foobar ' })).not.toThrow();
 
             expect(() => an.validate({ aStor: true })).not.toThrow();
             expect(() => an.validate({ aStor: false })).not.toThrow();
@@ -927,7 +944,18 @@ describe('Static autoNumeric functions', () => {
 
             expect(() => an.validate({ mDec: '2', eDec: '3' })).toThrow();
 
-            //TODO Add aScale* options tests here
+            expect(() => an.validate({ scaleDivisor: 'foobar' })).toThrow();
+            expect(() => an.validate({ scaleDivisor: true })).toThrow();
+            expect(() => an.validate({ scaleDivisor: -1000 })).toThrow();
+
+            expect(() => an.validate({ scaleDecimal: -5 })).toThrow();
+            expect(() => an.validate({ scaleDecimal: 4.2 })).toThrow();
+            expect(() => an.validate({ scaleDecimal: 'foobar' })).toThrow();
+            expect(() => an.validate({ scaleDecimal: false })).toThrow();
+
+            expect(() => an.validate({ scaleSymbol: true })).toThrow();
+            expect(() => an.validate({ scaleSymbol: 42 })).toThrow();
+            expect(() => an.validate({ scaleSymbol: [] })).toThrow();
 
             expect(() => an.validate({ aStor: 0 })).toThrow();
             expect(() => an.validate({ aStor: 1 })).toThrow();

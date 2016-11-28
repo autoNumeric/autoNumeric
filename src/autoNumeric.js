@@ -32,13 +32,382 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/* global module, require, define */
+
+// Functions names for ES6 exports
 let autoFormat;
 let autoUnFormat;
 let getDefaultConfig;
 let validate;
 let areSettingsValid;
 
-/* global module, require, define */
+// AutoNumeric default settings
+const allowedTagList = [
+    'b',
+    'caption',
+    'cite',
+    'code',
+    'const',
+    'dd',
+    'del',
+    'div',
+    'dfn',
+    'dt',
+    'em',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'ins',
+    'kdb',
+    'label',
+    'li',
+    'option',
+    'output',
+    'p',
+    'q',
+    's',
+    'sample',
+    'span',
+    'strong',
+    'td',
+    'th',
+    'u',
+];
+
+/*
+ * Defaults options are public - these can be overridden by the following:
+ * - HTML5 data attributes
+ * - Options passed by the 'init' or 'update' methods
+ * - Use jQuery's `$.extend` method for global changes - also a great way to pass ASP.NET current culture settings
+ */
+const defaultSettings = {
+    /* Allowed thousand separator characters
+     * comma = ","
+     * period "full stop" = "."
+     * apostrophe is escaped = "\""
+     * space = " "
+     * none = ""
+     * NOTE: do not use numeric characters
+     */
+    aSep: ',',
+
+    /* When true => removes the thousand seperator, currency symbol & suffix "focusin"
+     * example if the input value "$ 1,999.88 suffix"
+     * on "focusin" it becomes "1999.88" and back to "$ 1,999.88 suffix" on focus out.
+     */
+    nSep: false,
+
+    /* Digital grouping for the thousand separator used in Format
+     * dGroup: "2", results in 99,99,99,999 India's lakhs
+     * dGroup: "2s", results in 99,999,99,99,999 India's lakhs scaled
+     * dGroup: "3", results in 999,999,999 default
+     * dGroup: "4", results in 9999,9999,9999 used in some Asian countries
+     */
+    dGroup: '3',
+
+    /* Allowed decimal separator characters
+     * period "full stop" = "."
+     * comma = ","
+     */
+    aDec: '.',
+
+    /* Allow to declare alternative decimal separator which is automatically replaced by aDec
+     * developed for countries the use a comma "," as the decimal character
+     * and have keyboards\numeric pads that have a period 'full stop' as the decimal characters (Spain is an example)
+     */
+    altDec: null,
+
+    /* aSign = allowed currency symbol
+     * Must be in quotes aSign: "$"
+     * space to the right of the currency symbol aSign: '$ '
+     * space to the left of the currency symbol aSign: ' $'
+     */
+    aSign: '',
+
+    /* pSign = placement of currency sign as a p=prefix or s=suffix
+     * for prefix pSign: "p" (default)
+     * for suffix pSign: "s"
+     */
+    pSign: 'p',
+
+    /* Placement of negative sign relative to the aSign option l=left, r=right, p=prefix & s=suffix
+     * -1,234.56  => default no options required
+     * -$1,234.56 => {aSign: "$"}
+     * $-1,234.56 => {aSign: "$", pNeg: "r"}
+     * -1,234.56$ => {aSign: "$", pSign: "s", pNeg: "p"}
+     * 1,234.56-  => {pNeg: "s"}
+     * $1,234.56- => {aSign: "$", pNeg: "s"}
+     * 1,234.56-$ => {aSign: "$", pSign: "s"}
+     * 1,234.56$- => {aSign: "$", pSign: "s", pNeg: "r"}
+     */
+    pNeg: 'l',
+
+    /* Additional suffix
+     * Must be in quotes aSuffix: 'gross', a space is allowed aSuffix: ' dollars'
+     * Numeric characters and negative sign not allowed'
+     */
+    aSuffix: '',
+
+    /* Override min max limits
+     * oLimits: "ceiling" adheres to vMax and ignores vMin settings
+     * oLimits: "floor" adheres to vMin and ignores vMax settings
+     * oLimits: "ignore" ignores both vMin & vMax
+     */
+    oLimits: null,
+
+    /* Maximum possible value
+     * value must be enclosed in quotes and use the period for the decimal point
+     * value must be larger than vMin
+     */
+    vMax: '9999999999999.99',
+
+    /* Minimum possible value
+     * value must be enclosed in quotes and use the period for the decimal point
+     * value must be smaller than vMax
+     */
+    vMin: '-9999999999999.99',
+
+    /* Maximum number of decimal places = used to override decimal places set by the vMin & vMax values
+     * value must be enclosed in quotes example mDec: "3",
+     */
+    mDec: null,
+
+    /* Expanded decimal places visible when input has focus - example:
+     * {eDec: "5"} and the default 2 decimal places with focus "1,000.12345" without focus "1,000.12" the results depends on the rounding method used
+     * the "get" method returns the extended decimal places
+     */
+    eDec: null,
+
+    /* The next three options (scaleDivisor, scaleDecimal & scaleSymbol) handle scaling of the input when the input does not have focus
+     * Please note that the non-scaled value is held in data and it is advised that you use the "aStore" option to ensure retaining the value         * ["divisor", "decimal places", "symbol"]
+     * Example: with the following options set {scaleDivisor: '1000', scaleDecimal: '1', scaleSymbol: ' K'}
+     * Example: focusin value "1,111.11" focusout value "1.1 K"
+     */
+
+    /* The `scaleDivisor` decides the on focus value and places the result in the input on focusout
+     * Example {scaleDivisor: '1000'} or <input data-scale-divisor="1000">
+     * The divisor value - does not need to be whole number but please understand that Javascript has limited accuracy in math
+     * The "get" method returns the full value, including the 'hidden' decimals.
+     */
+    scaleDivisor: null,
+
+    /*
+     * The `scaleDecimal` option is the number of decimal place when not in focus - for this to work, `scaledDivisor` must not be `null`.
+     * This is optional ; if omitted the decimal places will be the same when the input has the focus.
+     */
+    scaleDecimal: null,
+
+    /*
+     * The `scaleSymbol` option is a symbol placed as a suffix when not in focus.
+     * This is optional too.
+     */
+    scaleSymbol: null,
+
+    /* Set to true to allow the eDec value to be saved with sessionStorage
+     * if ie 6 or 7 the value will be saved as a session cookie
+     */
+    aStor: false,
+
+    /* method used for rounding
+     * mRound: "S", Round-Half-Up Symmetric (default)
+     * mRound: "A", Round-Half-Up Asymmetric
+     * mRound: "s", Round-Half-Down Symmetric (lower case s)
+     * mRound: "a", Round-Half-Down Asymmetric (lower case a)
+     * mRound: "B", Round-Half-Even "Bankers Rounding"
+     * mRound: "U", Round Up "Round-Away-From-Zero"
+     * mRound: "D", Round Down "Round-Toward-Zero" - same as truncate
+     * mRound: "C", Round to Ceiling "Toward Positive Infinity"
+     * mRound: "F", Round to Floor "Toward Negative Infinity"
+     * mRound: "N05" Rounds to the nearest .05 => same as "CHF" used in 1.9X and still valid
+     * mRound: "U05" Rounds up to next .05
+     * mRound: "D05" Rounds down to next .05
+     */
+    mRound: 'S',
+
+    /* Controls decimal padding
+     * aPad: true - always Pad decimals with zeros
+     * aPad: false - does not pad with zeros.
+     * Note: setting aPad to 'false' will override the 'mDec' setting.
+     *
+     * thanks to Jonas Johansson for the suggestion
+     */
+    aPad: true,
+
+    /* Adds brackets on negative values (ie. transforms '-$ 999.99' to '(999.99)')
+     * Those brackets are visible only when the field does NOT have the focus.
+     * The left and right symbols should be enclosed in quotes and separated by a comma
+     * nBracket: null - (default)
+     * nBracket: '(,)', nBracket: '[,]', nBracket: '<,>' or nBracket: '{,}'
+     */
+    nBracket: null,
+
+    /* Displayed on empty string ""
+     * wEmpty: "focus" - (default) currency sign displayed and the input receives focus
+     * wEmpty: "press" - currency sign displays on any key being pressed
+     * wEmpty: "always" - always displays the currency sign only
+     * wEmpty: "zero" - if the input has no value on focus out displays a zero "rounded" with or with a currency sign
+     */
+    //TODO Add an option to display the currency sign only on hover (if the input is empty)
+    wEmpty: 'focus',
+
+    /* Controls leading zero behavior
+     * lZero: "allow", - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
+     * lZero: "deny", - allows only one leading zero on values less than one
+     * lZero: "keep", - allows leading zeros to be entered. on focusout zeros will be retained.
+     */
+    lZero: 'allow',
+
+    /* Determine if the default value will be formatted on initialization.
+     * true = automatically formats the default value on initialization
+     * false = will not format the default value
+     */
+    aForm: true,
+
+    /* Determine if the select all keyboard command will select
+     * the complete input text or only the input numeric value
+     * if the currency symbol is between the numeric value and the negative sign only the numeric value will selected
+     */
+    sNumber: false,
+
+    /* Helper option for ASP.NET postback
+     * should be the value of the unformatted default value
+     * examples:
+     * no default value="" {anDefault: ""}
+     * value=1234.56 {anDefault: '1234.56'}
+     */
+    anDefault: null,
+
+    /* Removes formatting on submit event
+     * this output format: positive nnnn.nn, negative -nnnn.nn
+     * review the 'unSet' method for other formats
+     */
+    unSetOnSubmit: false,
+
+    /* Allows the output to be in the locale format via the "get", "getString" & "getArray" methods
+     * null => nnnn.nn or -nnnn.nn default
+     * ","  => nnnn,nn or -nnnn,nn can also be "-,"
+     * ".-" => nnnn.nn or nnnn.nn-
+     * ",-" => nnnn,nn or nnnn,nn-
+     */
+    localeOutput: null,
+
+    /* Error handling function
+     * true => all errors are thrown - helpful in site development
+     * false => throws errors when calling methods prior to the supported element has been initialized be autoNumeric
+     */
+    debug: false,
+};
+
+/**
+ * Wrapper variable that hold named keyboard keys with their respective keyCode as seen in DOM events.
+ */
+const keyCode = {
+    Backspace:      8,
+    Tab:            9,
+    Enter:          13,
+    Shift:          16,
+    Ctrl:           17,
+    Alt:            18,
+    PauseBreak:     19,
+    CapsLock:       20,
+    Esc:            27,
+    Space:          32,
+    PageUp:         33,
+    PageDown:       34,
+    End:            35,
+    Home:           36,
+    LeftArrow:      37,
+    UpArrow:        38,
+    RightArrow:     39,
+    DownArrow:      40,
+    Insert:         45,
+    Delete:         46,
+    num0:           48,
+    num1:           49,
+    num2:           50,
+    num3:           51,
+    num4:           52,
+    num5:           53,
+    num6:           54,
+    num7:           55,
+    num8:           56,
+    num9:           57,
+    a:              65,
+    b:              66,
+    c:              67,
+    d:              68,
+    e:              69,
+    f:              70,
+    g:              71,
+    h:              72,
+    i:              73,
+    j:              74,
+    k:              75,
+    l:              76,
+    m:              77,
+    n:              78,
+    o:              79,
+    p:              80,
+    q:              81,
+    r:              82,
+    s:              83,
+    t:              84,
+    u:              85,
+    v:              86,
+    w:              87,
+    x:              88,
+    y:              89,
+    z:              90,
+    Windows:        91,
+    RightClick:     93,
+    numpad0:        96,
+    numpad1:        97,
+    numpad2:        98,
+    numpad3:        99,
+    numpad4:        100,
+    numpad5:        101,
+    numpad6:        102,
+    numpad7:        103,
+    numpad8:        104,
+    numpad9:        105,
+    MultiplyNumpad: 106,
+    PlusNumpad:     107,
+    MinusNumpad:    109,
+    DotNumpad:      110,
+    SlashNumpad:    111,
+    F1:             112,
+    F2:             113,
+    F3:             114,
+    F4:             115,
+    F5:             116,
+    F6:             117,
+    F7:             118,
+    F8:             119,
+    F9:             120,
+    F10:            121,
+    F11:            122,
+    F12:            123,
+    NumLock:        144,
+    ScrollLock:     145,
+    MyComputer:     182,
+    MyCalculator:   183,
+    Semicolon:      186,
+    Equal:          187,
+    Comma:          188,
+    Hyphen:         189,
+    Dot:            190,
+    Slash:          191,
+    Backquote:      192,
+    LeftBracket:    219,
+    Backslash:      220,
+    RightBracket:   221,
+    Quote:          222,
+    Command:        224,
+};
+
 
 (function(factory) {
     //TODO This surely can be improved by letting webpack take care of generating this UMD part
@@ -53,112 +422,7 @@ if (typeof define === 'function' && define.amd) {
     factory(window.jQuery);
 }
 }($ => {
-    /**
-     * Wrapper variable that hold named keyboard keys with their respective keyCode as seen in DOM events.
-     */
-    const keyCode = {
-        Backspace:      8,
-        Tab:            9,
-        Enter:          13,
-        Shift:          16,
-        Ctrl:           17,
-        Alt:            18,
-        PauseBreak:     19,
-        CapsLock:       20,
-        Esc:            27,
-        Space:          32,
-        PageUp:         33,
-        PageDown:       34,
-        End:            35,
-        Home:           36,
-        LeftArrow:      37,
-        UpArrow:        38,
-        RightArrow:     39,
-        DownArrow:      40,
-        Insert:         45,
-        Delete:         46,
-        num0:           48,
-        num1:           49,
-        num2:           50,
-        num3:           51,
-        num4:           52,
-        num5:           53,
-        num6:           54,
-        num7:           55,
-        num8:           56,
-        num9:           57,
-        a:              65,
-        b:              66,
-        c:              67,
-        d:              68,
-        e:              69,
-        f:              70,
-        g:              71,
-        h:              72,
-        i:              73,
-        j:              74,
-        k:              75,
-        l:              76,
-        m:              77,
-        n:              78,
-        o:              79,
-        p:              80,
-        q:              81,
-        r:              82,
-        s:              83,
-        t:              84,
-        u:              85,
-        v:              86,
-        w:              87,
-        x:              88,
-        y:              89,
-        z:              90,
-        Windows:        91,
-        RightClick:     93,
-        numpad0:        96,
-        numpad1:        97,
-        numpad2:        98,
-        numpad3:        99,
-        numpad4:        100,
-        numpad5:        101,
-        numpad6:        102,
-        numpad7:        103,
-        numpad8:        104,
-        numpad9:        105,
-        MultiplyNumpad: 106,
-        PlusNumpad:     107,
-        MinusNumpad:    109,
-        DotNumpad:      110,
-        SlashNumpad:    111,
-        F1:             112,
-        F2:             113,
-        F3:             114,
-        F4:             115,
-        F5:             116,
-        F6:             117,
-        F7:             118,
-        F8:             119,
-        F9:             120,
-        F10:            121,
-        F11:            122,
-        F12:            123,
-        NumLock:        144,
-        ScrollLock:     145,
-        MyComputer:     182,
-        MyCalculator:   183,
-        Semicolon:      186,
-        Equal:          187,
-        Comma:          188,
-        Hyphen:         189,
-        Dot:            190,
-        Slash:          191,
-        Backquote:      192,
-        LeftBracket:    219,
-        Backslash:      220,
-        RightBracket:   221,
-        Quote:          222,
-        Command:        224,
-    };
+    // Helper functions
 
     /**
      * Return TRUE if the `value` is null
@@ -382,6 +646,8 @@ if (typeof define === 'function' && define.amd) {
             console.warn(`Warning: ${message}`);
         }
     }
+
+    // autoNumeric-specific functions
 
     /**
      * run callbacks in parameters if any
@@ -822,6 +1088,7 @@ if (typeof define === 'function' && define.amd) {
         // Checks decimal places to determine if rounding is required :
         // Check if no rounding is required
         let cDec = (iv.length - 1) - vdPos;
+
         if (cDec <= settings.mDec) {
             // Check if we need to pad with zeros
             ivRounded = iv;
@@ -850,6 +1117,7 @@ if (typeof define === 'function' && define.amd) {
         const tRound = Number(iv.charAt(rLength + 1));
         const odd = (iv.charAt(rLength) === '.') ? (iv.charAt(rLength - 1) % 2) : (iv.charAt(rLength) % 2);
         let ivArray = iv.substring(0, rLength + 1).split('');
+
         if ((tRound > 4 && settings.mRound === 'S')                  || // Round half up symmetric
             (tRound > 4 && settings.mRound === 'A' && nSign === '')  || // Round half up asymmetric positive values
             (tRound > 5 && settings.mRound === 'A' && nSign === '-') || // Round half up asymmetric negative values
@@ -868,6 +1136,7 @@ if (typeof define === 'function' && define.amd) {
                     if (ivArray[i] < 10) {
                         break;
                     }
+
                     if (i > 0) {
                         ivArray[i] = '0';
                     }
@@ -896,6 +1165,7 @@ if (typeof define === 'function' && define.amd) {
         const aDec = settings.aDec;
         const mDec = settings.mDec;
         s = (paste === 'paste') ? autoRound(s, settings) : s;
+
         if (aDec && mDec) {
             const [integerPart, decimalPart] = s.split(aDec);
 
@@ -1299,6 +1569,7 @@ if (typeof define === 'function' && define.amd) {
             const [minTest, maxTest] = autoCheck(this.newValue, settingsClone);
             let position = parts[0].length;
             this.newValue = parts.join('');
+
             if (minTest && maxTest) {
                 this.newValue = truncateDecimal(this.newValue, settingsClone, advent);
                 const testValue = (contains(this.newValue, ',')) ? this.newValue.replace(',', '.') : this.newValue;
@@ -1314,6 +1585,7 @@ if (typeof define === 'function' && define.amd) {
                 this.setPosition(position, false);
                 return true;
             }
+
             if (!minTest) {
                 this.$that.trigger('autoNumeric:minExceeded');
             } else if (!maxTest) {
@@ -1331,6 +1603,7 @@ if (typeof define === 'function' && define.amd) {
             const settingsClone = this.settingsClone;
             const aSign = settingsClone.aSign;
             const that = this.that;
+
             if (aSign) {
                 const aSignLen = aSign.length;
                 if (settingsClone.pSign === 'p') {
@@ -1570,11 +1843,13 @@ if (typeof define === 'function' && define.amd) {
             if (this.kdCode === keyCode.Backspace || this.kdCode === keyCode.Delete) {
                 let left;
                 let right;
+
                 if (!this.selection.length) {
                     [left, right] = this.getBeforeAfterStriped();
                     if (left === '' && right === '') {
                         settingsClone.throwInput = false;
                     }
+
                     if (((settingsClone.pSign === 'p' && settingsClone.pNeg === 's') ||
                             (settingsClone.pSign === 's' && (settingsClone.pNeg === 'l' || settingsClone.pNeg === 'r'))) &&
                             contains(this.value, '-')) {
@@ -1592,6 +1867,7 @@ if (typeof define === 'function' && define.amd) {
                     [left, right] = this.getBeforeAfterStriped();
                     this.setValueParts(left, right);
                 }
+
                 return true;
             }
 
@@ -1631,6 +1907,7 @@ if (typeof define === 'function' && define.amd) {
                     right = right.substr(1);
                 }
                 this.setValueParts(left + settingsClone.aDec, right, null);
+
                 return true;
             }
 
@@ -1667,6 +1944,7 @@ if (typeof define === 'function' && define.amd) {
                     }
                 }
                 this.setValueParts(left, right, null);
+
                 return true;
             }
 
@@ -1931,41 +2209,6 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 // Checks for non-supported tags
-                //TODO Move the static configuration objects out of that block, and hoist them at the start of this file
-                const allowedTagList = [
-                    'b',
-                    'caption',
-                    'cite',
-                    'code',
-                    'const',
-                    'dd',
-                    'del',
-                    'div',
-                    'dfn',
-                    'dt',
-                    'em',
-                    'h1',
-                    'h2',
-                    'h3',
-                    'h4',
-                    'h5',
-                    'h6',
-                    'ins',
-                    'kdb',
-                    'label',
-                    'li',
-                    'option',
-                    'output',
-                    'p',
-                    'q',
-                    's',
-                    'sample',
-                    'span',
-                    'strong',
-                    'td',
-                    'th',
-                    'u',
-                ];
                 const currentElementTag = $this.prop('tagName').toLowerCase();
                 if (currentElementTag !== 'input' && !isInArray(currentElementTag, allowedTagList)) {
                     throwError(`The <${currentElementTag}> tag is not supported by autoNumeric`);
@@ -1976,7 +2219,7 @@ if (typeof define === 'function' && define.amd) {
 
                 // If we couldn't grab any settings, create them from the default ones and combine them with the options passed
                 if (typeof settings !== 'object') {
-                    settings = $.extend({}, $.fn.autoNumeric.defaults, tagData, options, {
+                    settings = $.extend({}, defaultSettings, tagData, options, {
                         onOff           : false,
                         runOnce         : false,
                         rawValue        : '',
@@ -2647,7 +2890,8 @@ if (typeof define === 'function' && define.amd) {
     };
 
     /**
-     * autoNumeric function
+     * The autoNumeric function accepts methods names (in string format) and those method parameters if needed.
+     * It initialize autoNumeric on the given element.
      */
     $.fn.autoNumeric = function(method, ...args) {
         if (methods[method]) {
@@ -2662,231 +2906,14 @@ if (typeof define === 'function' && define.amd) {
         throwError(`Method "${method}" is not supported by autoNumeric`, true);
     };
 
-    /*
-     * Defaults options are public - these can be overridden by the following:
-     * - HTML5 data attributes
-     * - Options passed by the 'init' or 'update' methods
-     * - Use jQuery's `$.extend` method for global changes - also a great way to pass ASP.NET current culture settings
+    /**
+     * Return the default autoNumeric settings.
+     *
+     * @return {object}
      */
-    $.fn.autoNumeric.defaults = {
-        /* Allowed thousand separator characters
-         * comma = ","
-         * period "full stop" = "."
-         * apostrophe is escaped = "\""
-         * space = " "
-         * none = ""
-         * NOTE: do not use numeric characters
-         */
-        aSep: ',',
+    getDefaultConfig = () => defaultSettings;
 
-        /* When true => removes the thousand seperator, currency symbol & suffix "focusin"
-         * example if the input value "$ 1,999.88 suffix"
-         * on "focusin" it becomes "1999.88" and back to "$ 1,999.88 suffix" on focus out.
-         */
-        nSep: false,
-
-        /* Digital grouping for the thousand separator used in Format
-         * dGroup: "2", results in 99,99,99,999 India's lakhs
-         * dGroup: "2s", results in 99,999,99,99,999 India's lakhs scaled
-         * dGroup: "3", results in 999,999,999 default
-         * dGroup: "4", results in 9999,9999,9999 used in some Asian countries
-         */
-        dGroup: '3',
-
-        /* Allowed decimal separator characters
-         * period "full stop" = "."
-         * comma = ","
-         */
-        aDec: '.',
-
-        /* Allow to declare alternative decimal separator which is automatically replaced by aDec
-         * developed for countries the use a comma "," as the decimal character
-         * and have keyboards\numeric pads that have a period 'full stop' as the decimal characters (Spain is an example)
-         */
-        altDec: null,
-
-        /* aSign = allowed currency symbol
-         * Must be in quotes aSign: "$"
-         * space to the right of the currency symbol aSign: '$ '
-         * space to the left of the currency symbol aSign: ' $'
-         */
-        aSign: '',
-
-        /* pSign = placement of currency sign as a p=prefix or s=suffix
-         * for prefix pSign: "p" (default)
-         * for suffix pSign: "s"
-         */
-        pSign: 'p',
-
-        /* Placement of negative sign relative to the aSign option l=left, r=right, p=prefix & s=suffix
-         * -1,234.56  => default no options required
-         * -$1,234.56 => {aSign: "$"}
-         * $-1,234.56 => {aSign: "$", pNeg: "r"}
-         * -1,234.56$ => {aSign: "$", pSign: "s", pNeg: "p"}
-         * 1,234.56-  => {pNeg: "s"}
-         * $1,234.56- => {aSign: "$", pNeg: "s"}
-         * 1,234.56-$ => {aSign: "$", pSign: "s"}
-         * 1,234.56$- => {aSign: "$", pSign: "s", pNeg: "r"}
-         */
-        pNeg: 'l',
-
-        /* Additional suffix
-         * Must be in quotes aSuffix: 'gross', a space is allowed aSuffix: ' dollars'
-         * Numeric characters and negative sign not allowed'
-         */
-        aSuffix: '',
-
-        /* Override min max limits
-         * oLimits: "ceiling" adheres to vMax and ignores vMin settings
-         * oLimits: "floor" adheres to vMin and ignores vMax settings
-         * oLimits: "ignore" ignores both vMin & vMax
-         */
-        oLimits: null,
-
-        /* Maximum possible value
-         * value must be enclosed in quotes and use the period for the decimal point
-         * value must be larger than vMin
-         */
-        vMax: '9999999999999.99',
-
-        /* Minimum possible value
-         * value must be enclosed in quotes and use the period for the decimal point
-         * value must be smaller than vMax
-         */
-        vMin: '-9999999999999.99',
-
-        /* Maximum number of decimal places = used to override decimal places set by the vMin & vMax values
-         * value must be enclosed in quotes example mDec: "3",
-         */
-        mDec: null,
-
-        /* Expanded decimal places visible when input has focus - example:
-         * {eDec: "5"} and the default 2 decimal places with focus "1,000.12345" without focus "1,000.12" the results depends on the rounding method used
-         * the "get" method returns the extended decimal places
-         */
-        eDec: null,
-
-        /* The next three options (scaleDivisor, scaleDecimal & scaleSymbol) handle scaling of the input when the input does not have focus
-         * Please note that the non-scaled value is held in data and it is advised that you use the "aStore" option to ensure retaining the value         * ["divisor", "decimal places", "symbol"]
-         * Example: with the following options set {scaleDivisor: '1000', scaleDecimal: '1', scaleSymbol: ' K'}
-         * Example: focusin value "1,111.11" focusout value "1.1 K"
-         */
-
-        /* The `scaleDivisor` decides the on focus value and places the result in the input on focusout
-         * Example {scaleDivisor: '1000'} or <input data-scale-divisor="1000">
-         * The divisor value - does not need to be whole number but please understand that Javascript has limited accuracy in math
-         * The "get" method returns the full value, including the 'hidden' decimals.
-         */
-        scaleDivisor: null,
-
-        /*
-         * The `scaleDecimal` option is the number of decimal place when not in focus - for this to work, `scaledDivisor` must not be `null`.
-         * This is optional ; if omitted the decimal places will be the same when the input has the focus.
-         */
-        scaleDecimal: null,
-
-        /*
-         * The `scaleSymbol` option is a symbol placed as a suffix when not in focus.
-         * This is optional too.
-         */
-        scaleSymbol: null,
-
-        /* Set to true to allow the eDec value to be saved with sessionStorage
-         * if ie 6 or 7 the value will be saved as a session cookie
-         */
-        aStor: false,
-
-        /* method used for rounding
-         * mRound: "S", Round-Half-Up Symmetric (default)
-         * mRound: "A", Round-Half-Up Asymmetric
-         * mRound: "s", Round-Half-Down Symmetric (lower case s)
-         * mRound: "a", Round-Half-Down Asymmetric (lower case a)
-         * mRound: "B", Round-Half-Even "Bankers Rounding"
-         * mRound: "U", Round Up "Round-Away-From-Zero"
-         * mRound: "D", Round Down "Round-Toward-Zero" - same as truncate
-         * mRound: "C", Round to Ceiling "Toward Positive Infinity"
-         * mRound: "F", Round to Floor "Toward Negative Infinity"
-         * mRound: "N05" Rounds to the nearest .05 => same as "CHF" used in 1.9X and still valid
-         * mRound: "U05" Rounds up to next .05
-         * mRound: "D05" Rounds down to next .05
-         */
-        mRound: 'S',
-
-        /* Controls decimal padding
-         * aPad: true - always Pad decimals with zeros
-         * aPad: false - does not pad with zeros.
-         * Note: setting aPad to 'false' will override the 'mDec' setting.
-         *
-         * thanks to Jonas Johansson for the suggestion
-         */
-        aPad: true,
-
-        /* Adds brackets on negative values (ie. transforms '-$ 999.99' to '(999.99)')
-         * Those brackets are visible only when the field does NOT have the focus.
-         * The left and right symbols should be enclosed in quotes and separated by a comma
-         * nBracket: null - (default)
-         * nBracket: '(,)', nBracket: '[,]', nBracket: '<,>' or nBracket: '{,}'
-         */
-        nBracket: null,
-
-        /* Displayed on empty string ""
-         * wEmpty: "focus" - (default) currency sign displayed and the input receives focus
-         * wEmpty: "press" - currency sign displays on any key being pressed
-         * wEmpty: "always" - always displays the currency sign only
-         * wEmpty: "zero" - if the input has no value on focus out displays a zero "rounded" with or with a currency sign
-         */
-        //TODO Add an option to display the currency sign only on hover (if the input is empty)
-        wEmpty: 'focus',
-
-        /* Controls leading zero behavior
-         * lZero: "allow", - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
-         * lZero: "deny", - allows only one leading zero on values less than one
-         * lZero: "keep", - allows leading zeros to be entered. on focusout zeros will be retained.
-         */
-        lZero: 'allow',
-
-        /* Determine if the default value will be formatted on initialization.
-         * true = automatically formats the default value on initialization
-         * false = will not format the default value
-         */
-        aForm: true,
-
-        /* Determine if the select all keyboard command will select
-         * the complete input text or only the input numeric value
-         * if the currency symbol is between the numeric value and the negative sign only the numeric value will selected
-         */
-        sNumber: false,
-
-        /* Helper option for ASP.NET postback
-         * should be the value of the unformatted default value
-         * examples:
-         * no default value="" {anDefault: ""}
-         * value=1234.56 {anDefault: '1234.56'}
-         */
-        anDefault: null,
-
-        /* Removes formatting on submit event
-         * this output format: positive nnnn.nn, negative -nnnn.nn
-         * review the 'unSet' method for other formats
-         */
-        unSetOnSubmit: false,
-
-        /* Allows the output to be in the locale format via the "get", "getString" & "getArray" methods
-         * null => nnnn.nn or -nnnn.nn default
-         * ","  => nnnn,nn or -nnnn,nn can also be "-,"
-         * ".-" => nnnn.nn or nnnn.nn-
-         * ",-" => nnnn,nn or nnnn,nn-
-         */
-        localeOutput: null,
-
-        /* Error handling function
-         * true => all errors are thrown - helpful in site development
-         * false => throws errors when calling methods prior to the supported element has been initialized be autoNumeric
-         */
-        debug: false,
-    };
-
-    getDefaultConfig = () => $.fn.autoNumeric.defaults;
+    $.fn.autoNumeric.defaults = defaultSettings; // Make those settings public via jQuery too.
 
     /**
      * public function that allows formatting without an element trigger
@@ -2896,7 +2923,7 @@ if (typeof define === 'function' && define.amd) {
             return null;
         }
 
-        const settings = $.extend({}, $.fn.autoNumeric.defaults, { strip: false }, options);
+        const settings = $.extend({}, defaultSettings, { strip: false }, options);
         value = value.toString();
         value = fromLocale(value);
         if (Number(value) < 0) {
@@ -2932,7 +2959,7 @@ if (typeof define === 'function' && define.amd) {
             return null;
         }
 
-        const settings = $.extend({}, $.fn.autoNumeric.defaults, { strip: false }, options);
+        const settings = $.extend({}, defaultSettings, { strip: false }, options);
         const allowed = `-0123456789\\${settings.aDec}`;
         const autoStrip = new RegExp(`[^${allowed}]`, 'gi');
         value = value.toString();
@@ -2977,7 +3004,7 @@ if (typeof define === 'function' && define.amd) {
         // The user can choose if the `userOptions` has already been extended with the default options, or not
         let options;
         if (shouldExtendDefaultOptions) {
-            options = $.extend({}, $.fn.autoNumeric.defaults, userOptions);
+            options = $.extend({}, defaultSettings, userOptions);
         } else {
             options = userOptions;
         }

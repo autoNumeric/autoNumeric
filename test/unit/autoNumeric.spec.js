@@ -29,6 +29,7 @@
 
 /* eslint space-in-parens: 0 */
 /* eslint spaced-comment: 0 */
+// eslint-disable-next-line
 /* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach */
 
 import $ from '../../node_modules/jquery/dist/jquery';
@@ -78,9 +79,11 @@ describe('The autoNumeric object', () => {
         vMin         : '-9999999999999.99',
         mDec         : null,
         eDec         : null,
-        aScale       : null,
+        scaleDivisor : null,
+        scaleDecimal : null,
+        scaleSymbol  : null,
         aStor        : false,
-        mRound       : 's',
+        mRound       : 'S',
         aPad         : true,
         nBracket     : null,
         wEmpty       : 'focus',
@@ -550,7 +553,7 @@ describe(`autoNumeric 'getString' and 'getArray' methods`, () => {
 //---- Static functions
 
 describe('Static autoNumeric functions', () => {
-    describe('should unformat using jQuery `$.fn`', () => {
+    describe('`autoUnformat` should unformat using jQuery `$.fn`', () => {
         it('with default options', () => {
             expect($.fn.autoUnformat('$1,234.56')).toEqual(1234.56);
             expect($.fn.autoUnformat('$123.45')).toEqual(123.45);
@@ -566,7 +569,7 @@ describe('Static autoNumeric functions', () => {
         });
     });
 
-    describe('should unformat without jQuery `$.fn`', () => {
+    describe('`unFormat` should unformat without jQuery `$.fn`', () => {
         it('with default options', () => {
             expect(an.unFormat('$1,234.56')).toEqual(1234.56);
             expect(an.unFormat('$123.45')).toEqual(123.45);
@@ -584,7 +587,7 @@ describe('Static autoNumeric functions', () => {
         });
     });
 
-    describe('should format using jQuery `$.fn`', () => {
+    describe('`autoFormat` should format using jQuery `$.fn`', () => {
         it('with default options', () => {
             expect($.fn.autoFormat(1234.56)).toEqual('1,234.56');
             expect($.fn.autoFormat(123.45)).toEqual('123.45');
@@ -602,7 +605,7 @@ describe('Static autoNumeric functions', () => {
         });
     });
 
-    describe('should format without jQuery `$.fn`', () => {
+    describe('`format` should format without jQuery `$.fn`', () => {
         it('with default options', () => {
             expect(an.format(1234.56)).toEqual('1,234.56');
             expect(an.format(123.45)).toEqual('123.45');
@@ -620,7 +623,7 @@ describe('Static autoNumeric functions', () => {
         });
     });
 
-    xit('should fail formatting wrong parameters', () => {
+    xit('`format` should fail formatting wrong parameters', () => {
         expect(() => an.format('foobar')).toThrow(); //FIXME This should throw
         expect(() => an.format([1234])).toThrow(); //FIXME This should throw
         expect(() => an.format('1234.56')).toThrow(); //FIXME This should throw
@@ -631,7 +634,7 @@ describe('Static autoNumeric functions', () => {
         expect(() => an.format([])).toThrow(); //FIXME This should throw
     });
 
-    xit('should fail unformatting wrong parameters', () => {
+    xit('`unFormat` should fail unformatting wrong parameters', () => {
         expect(() => an.unFormat('foobar')).toThrow(); //FIXME This should throw
         expect(() => an.unFormat([1234])).toThrow(); //FIXME This should throw
         expect(() => an.unFormat('1234.56')).toThrow(); //FIXME This should throw
@@ -641,6 +644,397 @@ describe('Static autoNumeric functions', () => {
         expect(() => an.unFormat([])).toThrow(); //FIXME This should throw
 
         expect(() => an.unFormat(1234.56)).not.toThrow(); //FIXME This should not throw
+    });
+
+    describe('`validate` (without jQuery `$.fn`)', () => {
+        it('should validate', () => {
+            expect(() => an.validate(autoNumericOptionsEuro)).not.toThrow();
+            expect(() => an.validate(autoNumericOptionsDollar)).not.toThrow();
+
+            expect(() => an.validate({ aSep: ',' })).not.toThrow();
+            expect(() => an.validate({ aSep: '.',  aDec: ',' })).not.toThrow();
+            expect(() => an.validate({ aSep: ' ' })).not.toThrow();
+            expect(() => an.validate({ aSep: '' })).not.toThrow();
+
+            expect(() => an.validate({ nSep: false })).not.toThrow();
+            expect(() => an.validate({ nSep: true })).not.toThrow();
+            expect(() => an.validate({ nSep: 'false' })).not.toThrow();
+            expect(() => an.validate({ nSep: 'true' })).not.toThrow();
+
+            expect(() => an.validate({ dGroup: '2' })).not.toThrow();
+            expect(() => an.validate({ dGroup: '3' })).not.toThrow();
+            expect(() => an.validate({ dGroup: 4 })).not.toThrow();
+
+            expect(() => an.validate({ aDec: ',', aSep: ' ' })).not.toThrow();
+            expect(() => an.validate({ aDec: '.' })).not.toThrow();
+
+            expect(() => an.validate({ altDec: null })).not.toThrow();
+            expect(() => an.validate({ altDec: 'longSeparator' })).not.toThrow();
+
+            expect(() => an.validate({ aSign: ' €' })).not.toThrow();
+            expect(() => an.validate({ aSign: '' })).not.toThrow();
+            expect(() => an.validate({ aSign: 'foobar' })).not.toThrow();
+
+            expect(() => an.validate({ pSign: 'p' })).not.toThrow();
+            expect(() => an.validate({ pSign: 's' })).not.toThrow();
+
+            expect(() => an.validate({ pNeg: 'p' })).not.toThrow();
+            expect(() => an.validate({ pNeg: 's' })).not.toThrow();
+            expect(() => an.validate({ pNeg: 'l' })).not.toThrow();
+            expect(() => an.validate({ pNeg: 'r' })).not.toThrow();
+
+            expect(() => an.validate({ aSuffix: '' })).not.toThrow();
+            expect(() => an.validate({ aSuffix: 'foobar' })).not.toThrow();
+            expect(() => an.validate({ aSuffix: ' foobar' })).not.toThrow();
+            expect(() => an.validate({ aSuffix: 'foo bar' })).not.toThrow();
+            expect(() => an.validate({ aSuffix: 'foobar ' })).not.toThrow();
+
+            expect(() => an.validate({ oLimits: null })).not.toThrow();
+            expect(() => an.validate({ oLimits: 'ceiling' })).not.toThrow();
+            expect(() => an.validate({ oLimits: 'floor' })).not.toThrow();
+            expect(() => an.validate({ oLimits: 'ignore' })).not.toThrow();
+
+            expect(() => an.validate({ vMax: '42' })).not.toThrow();
+            expect(() => an.validate({ vMax: '42.4' })).not.toThrow();
+            expect(() => an.validate({ vMax: '42.42' })).not.toThrow();
+            expect(() => an.validate({ vMax: '-42' })).not.toThrow();
+            expect(() => an.validate({ vMax: '-42.4' })).not.toThrow();
+            expect(() => an.validate({ vMax: '-42.42' })).not.toThrow();
+            expect(() => an.validate({ vMax: '9999999999999.99' })).not.toThrow();
+            expect(() => an.validate({ vMax: '-9999999999999.99' })).not.toThrow();
+
+            expect(() => an.validate({ vMin: '42' })).not.toThrow();
+            expect(() => an.validate({ vMin: '42.4' })).not.toThrow();
+            expect(() => an.validate({ vMin: '42.42' })).not.toThrow();
+            expect(() => an.validate({ vMin: '-42' })).not.toThrow();
+            expect(() => an.validate({ vMin: '-42.4' })).not.toThrow();
+            expect(() => an.validate({ vMin: '-42.42' })).not.toThrow();
+            expect(() => an.validate({ vMin: '9999999999999.99' })).not.toThrow();
+            expect(() => an.validate({ vMin: '-9999999999999.99' })).not.toThrow();
+
+            expect(() => an.validate({ vMin: '-10', vMax: '-5' })).not.toThrow();
+            expect(() => an.validate({ vMin: '-10', vMax:  '0' })).not.toThrow();
+            expect(() => an.validate({ vMin: '-10', vMax: '20' })).not.toThrow();
+            expect(() => an.validate({ vMin:   '0', vMax: '20' })).not.toThrow();
+            expect(() => an.validate({ vMin:  '10', vMax: '20' })).not.toThrow();
+
+            expect(() => an.validate({ mDec: null })).not.toThrow();
+            expect(() => an.validate({ mDec: '0' })).not.toThrow();
+            expect(() => an.validate({ mDec: '2' })).not.toThrow();
+            expect(() => an.validate({ mDec: '15' })).not.toThrow();
+
+            expect(() => an.validate({ aPad: false, mDec: '2' })).not.toThrow(); // This will output a warning
+            expect(() => an.validate({ mDec: '2', vMin: '0', vMax: '20' })).not.toThrow(); // This will output a warning
+
+            expect(() => an.validate({ eDec: null })).not.toThrow();
+            expect(() => an.validate({ eDec: '0' })).not.toThrow();
+            expect(() => an.validate({ eDec: '2' })).not.toThrow();
+            expect(() => an.validate({ eDec: '15' })).not.toThrow();
+
+            expect(() => an.validate({ mDec: '2', eDec: '2' })).not.toThrow();
+            expect(() => an.validate({ mDec: '3', eDec: '2' })).not.toThrow();
+
+            expect(() => an.validate({ scaleDivisor: null })).not.toThrow();
+            expect(() => an.validate({ scaleDivisor: '100' })).not.toThrow();
+            expect(() => an.validate({ scaleDivisor: 100 })).not.toThrow();
+            expect(() => an.validate({ scaleDivisor: 45.89 })).not.toThrow();
+
+            expect(() => an.validate({ scaleDecimal: null })).not.toThrow();
+            expect(() => an.validate({ scaleDecimal: 0 })).not.toThrow();
+            expect(() => an.validate({ scaleDecimal: 2 })).not.toThrow();
+
+            expect(() => an.validate({ scaleSymbol: null })).not.toThrow();
+            expect(() => an.validate({ scaleSymbol: '' })).not.toThrow();
+            expect(() => an.validate({ scaleSymbol: 'foobar' })).not.toThrow();
+            expect(() => an.validate({ scaleSymbol: 'foo bar' })).not.toThrow();
+            expect(() => an.validate({ scaleSymbol: ' foobar' })).not.toThrow();
+            expect(() => an.validate({ scaleSymbol: 'foobar ' })).not.toThrow();
+
+            expect(() => an.validate({ aStor: true })).not.toThrow();
+            expect(() => an.validate({ aStor: false })).not.toThrow();
+            expect(() => an.validate({ aStor: 'true' })).not.toThrow();
+            expect(() => an.validate({ aStor: 'false' })).not.toThrow();
+
+            expect(() => an.validate({ mRound: 'S' })).not.toThrow();
+            expect(() => an.validate({ mRound: 'A' })).not.toThrow();
+            expect(() => an.validate({ mRound: 's' })).not.toThrow();
+            expect(() => an.validate({ mRound: 'a' })).not.toThrow();
+            expect(() => an.validate({ mRound: 'B' })).not.toThrow();
+            expect(() => an.validate({ mRound: 'U' })).not.toThrow();
+            expect(() => an.validate({ mRound: 'D' })).not.toThrow();
+            expect(() => an.validate({ mRound: 'C' })).not.toThrow();
+            expect(() => an.validate({ mRound: 'F' })).not.toThrow();
+            expect(() => an.validate({ mRound: 'N05' })).not.toThrow();
+            expect(() => an.validate({ mRound: 'CHF' })).not.toThrow();
+            expect(() => an.validate({ mRound: 'U05' })).not.toThrow();
+            expect(() => an.validate({ mRound: 'D05' })).not.toThrow();
+
+            expect(() => an.validate({ aPad: true })).not.toThrow();
+            expect(() => an.validate({ aPad: false })).not.toThrow();
+            expect(() => an.validate({ aPad: 'true' })).not.toThrow();
+            expect(() => an.validate({ aPad: 'false' })).not.toThrow();
+
+            expect(() => an.validate({ nBracket: null })).not.toThrow();
+            expect(() => an.validate({ nBracket: '(,)' })).not.toThrow();
+            expect(() => an.validate({ nBracket: '[,]' })).not.toThrow();
+            expect(() => an.validate({ nBracket: '<,>' })).not.toThrow();
+            expect(() => an.validate({ nBracket: '{,}' })).not.toThrow();
+
+            expect(() => an.validate({ wEmpty: 'focus' })).not.toThrow();
+            expect(() => an.validate({ wEmpty: 'press' })).not.toThrow();
+            expect(() => an.validate({ wEmpty: 'always' })).not.toThrow();
+            expect(() => an.validate({ wEmpty: 'zero' })).not.toThrow();
+
+            expect(() => an.validate({ lZero: 'allow' })).not.toThrow();
+            expect(() => an.validate({ lZero: 'deny' })).not.toThrow();
+            expect(() => an.validate({ lZero: 'keep' })).not.toThrow();
+
+            expect(() => an.validate({ aForm: true })).not.toThrow();
+            expect(() => an.validate({ aForm: false })).not.toThrow();
+            expect(() => an.validate({ aForm: 'true' })).not.toThrow();
+            expect(() => an.validate({ aForm: 'false' })).not.toThrow();
+
+            expect(() => an.validate({ sNumber: true })).not.toThrow();
+            expect(() => an.validate({ sNumber: false })).not.toThrow();
+            expect(() => an.validate({ sNumber: 'true' })).not.toThrow();
+            expect(() => an.validate({ sNumber: 'false' })).not.toThrow();
+
+            expect(() => an.validate({ anDefault: null })).not.toThrow();
+            expect(() => an.validate({ anDefault: '' })).not.toThrow();
+            expect(() => an.validate({ anDefault: '42' })).not.toThrow();
+            expect(() => an.validate({ anDefault: '-42' })).not.toThrow();
+            expect(() => an.validate({ anDefault: '42.99' })).not.toThrow();
+            expect(() => an.validate({ anDefault: '-42.99' })).not.toThrow();
+            expect(() => an.validate({ anDefault: 5 })).not.toThrow();
+            expect(() => an.validate({ anDefault: -5 })).not.toThrow();
+
+            expect(() => an.validate({ unSetOnSubmit: true })).not.toThrow();
+            expect(() => an.validate({ unSetOnSubmit: false })).not.toThrow();
+            expect(() => an.validate({ unSetOnSubmit: 'true' })).not.toThrow();
+            expect(() => an.validate({ unSetOnSubmit: 'false' })).not.toThrow();
+
+            expect(() => an.validate({ localeOutput: null })).not.toThrow();
+            expect(() => an.validate({ localeOutput: '.' })).not.toThrow();
+            expect(() => an.validate({ localeOutput: '-.' })).not.toThrow();
+            expect(() => an.validate({ localeOutput: ',' })).not.toThrow();
+            expect(() => an.validate({ localeOutput: '-,' })).not.toThrow();
+            expect(() => an.validate({ localeOutput: '.-' })).not.toThrow();
+            expect(() => an.validate({ localeOutput: ',-' })).not.toThrow();
+
+            expect(() => an.validate({ debug: true })).not.toThrow();
+            expect(() => an.validate({ debug: false })).not.toThrow();
+            expect(() => an.validate({ debug: 'true' })).not.toThrow();
+            expect(() => an.validate({ debug: 'false' })).not.toThrow();
+        });
+
+        it('should not validate', () => {
+            expect(() => an.validate(0)).toThrow();
+            expect(() => an.validate(undefined)).toThrow();
+            expect(() => an.validate(null)).toThrow();
+            expect(() => an.validate('')).toThrow();
+            expect(() => an.validate([])).toThrow();
+            expect(() => an.validate({})).toThrow();
+            expect(() => an.validate([{ aSep: '.' }])).toThrow();
+            expect(() => an.validate('foobar')).toThrow();
+            expect(() => an.validate(42)).toThrow();
+
+            expect(() => an.validate({ aSep: '-' })).toThrow();
+            expect(() => an.validate({ aSep: 'a' })).toThrow();
+            expect(() => an.validate({ aSep: 42 })).toThrow();
+            expect(() => an.validate({ aSep: '.' })).toThrow(); // Since the default 'aDec' is '.' too
+            expect(() => an.validate({ aSep: true })).toThrow();
+            expect(() => an.validate({ aSep: null })).toThrow();
+
+            expect(() => an.validate({ nSep: 'foobar' })).toThrow();
+            expect(() => an.validate({ nSep: 42 })).toThrow();
+            expect(() => an.validate({ nSep: null })).toThrow();
+
+            expect(() => an.validate({ dGroup: '37foo' })).toThrow();
+            expect(() => an.validate({ dGroup: null })).toThrow();
+
+            expect(() => an.validate({ aDec: 'foobar' })).toThrow();
+            expect(() => an.validate({ aDec: true })).toThrow();
+            expect(() => an.validate({ aDec: 42 })).toThrow();
+            expect(() => an.validate({ aDec: '.', aSep: '.' })).toThrow();
+            expect(() => an.validate({ aDec: ',', aSep: ',' })).toThrow();
+
+            expect(() => an.validate({ altDec: 42 })).toThrow();
+            expect(() => an.validate({ altDec: true })).toThrow();
+            expect(() => an.validate({ altDec: ['foobar'] })).toThrow();
+
+            expect(() => an.validate({ aSign: [] })).toThrow();
+            expect(() => an.validate({ aSign: 42 })).toThrow();
+            expect(() => an.validate({ aSign: true })).toThrow();
+            expect(() => an.validate({ aSign: null })).toThrow();
+
+            expect(() => an.validate({ pSign: ['s'] })).toThrow();
+            expect(() => an.validate({ pSign: 42 })).toThrow();
+            expect(() => an.validate({ pSign: true })).toThrow();
+            expect(() => an.validate({ pSign: null })).toThrow();
+            expect(() => an.validate({ pSign: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ pNeg: ['r'] })).toThrow();
+            expect(() => an.validate({ pNeg: 42 })).toThrow();
+            expect(() => an.validate({ pNeg: true })).toThrow();
+            expect(() => an.validate({ pNeg: null })).toThrow();
+            expect(() => an.validate({ pNeg: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ aSuffix: '-foobar' })).toThrow();
+            expect(() => an.validate({ aSuffix: 'foo-bar' })).toThrow();
+            expect(() => an.validate({ aSuffix: 'foo42bar' })).toThrow();
+            expect(() => an.validate({ aSuffix: '42foobar' })).toThrow();
+            expect(() => an.validate({ aSuffix: 'foobar42' })).toThrow();
+            expect(() => an.validate({ aSuffix: 42 })).toThrow();
+            expect(() => an.validate({ aSuffix: -42 })).toThrow();
+            expect(() => an.validate({ aSuffix: true })).toThrow();
+            expect(() => an.validate({ aSuffix: null })).toThrow();
+
+            expect(() => an.validate({ oLimits: 'foobar' })).toThrow();
+            expect(() => an.validate({ oLimits: 42 })).toThrow();
+            expect(() => an.validate({ oLimits: true })).toThrow();
+
+            expect(() => an.validate({ vMax: true })).toThrow();
+            expect(() => an.validate({ vMax: null })).toThrow();
+            expect(() => an.validate({ vMax: 42 })).toThrow();
+            expect(() => an.validate({ vMax: 42.42 })).toThrow();
+            expect(() => an.validate({ vMax: -42 })).toThrow();
+            expect(() => an.validate({ vMax: -42.42 })).toThrow();
+            expect(() => an.validate({ vMax: '42.' })).toThrow();
+            expect(() => an.validate({ vMax: '-42.' })).toThrow();
+            expect(() => an.validate({ vMax: '.42' })).toThrow();
+            expect(() => an.validate({ vMax: '-42foobar' })).toThrow();
+            expect(() => an.validate({ vMax: '9999999999999,99' })).toThrow();
+            expect(() => an.validate({ vMax: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ vMin: true })).toThrow();
+            expect(() => an.validate({ vMin: null })).toThrow();
+            expect(() => an.validate({ vMin: 42 })).toThrow();
+            expect(() => an.validate({ vMin: 42.42 })).toThrow();
+            expect(() => an.validate({ vMin: -42 })).toThrow();
+            expect(() => an.validate({ vMin: -42.42 })).toThrow();
+            expect(() => an.validate({ vMin: '42.' })).toThrow();
+            expect(() => an.validate({ vMin: '-42.' })).toThrow();
+            expect(() => an.validate({ vMin: '.42' })).toThrow();
+            expect(() => an.validate({ vMin: '-42foobar' })).toThrow();
+            expect(() => an.validate({ vMin: '9999999999999,99' })).toThrow();
+            expect(() => an.validate({ vMin: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ vMin: '20', vMax: '-10' })).toThrow();
+            expect(() => an.validate({ vMin: '-5', vMax: '-10' })).toThrow();
+            expect(() => an.validate({ vMin:  '0', vMax: '-10' })).toThrow();
+            expect(() => an.validate({ vMin: '20', vMax: '-10' })).toThrow();
+            expect(() => an.validate({ vMin: '20', vMax:   '0' })).toThrow();
+            expect(() => an.validate({ vMin: '20', vMax:  '10' })).toThrow();
+
+            expect(() => an.validate({ mDec: [] })).toThrow();
+            expect(() => an.validate({ mDec: true })).toThrow();
+            expect(() => an.validate({ mDec: 'foobar' })).toThrow();
+            expect(() => an.validate({ mDec: '22foobar' })).toThrow();
+            expect(() => an.validate({ mDec: '-5' })).toThrow();
+            expect(() => an.validate({ mDec: 5 })).toThrow();
+            expect(() => an.validate({ mDec: -5 })).toThrow();
+
+            expect(() => an.validate({ eDec: [] })).toThrow();
+            expect(() => an.validate({ eDec: true })).toThrow();
+            expect(() => an.validate({ eDec: 'foobar' })).toThrow();
+            expect(() => an.validate({ eDec: '22foobar' })).toThrow();
+            expect(() => an.validate({ eDec: '-5' })).toThrow();
+            expect(() => an.validate({ eDec: 5 })).toThrow();
+            expect(() => an.validate({ eDec: -5 })).toThrow();
+
+            expect(() => an.validate({ mDec: '2', eDec: '3' })).toThrow();
+
+            expect(() => an.validate({ scaleDivisor: 'foobar' })).toThrow();
+            expect(() => an.validate({ scaleDivisor: true })).toThrow();
+            expect(() => an.validate({ scaleDivisor: -1000 })).toThrow();
+
+            expect(() => an.validate({ scaleDecimal: -5 })).toThrow();
+            expect(() => an.validate({ scaleDecimal: 4.2 })).toThrow();
+            expect(() => an.validate({ scaleDecimal: 'foobar' })).toThrow();
+            expect(() => an.validate({ scaleDecimal: false })).toThrow();
+
+            expect(() => an.validate({ scaleSymbol: true })).toThrow();
+            expect(() => an.validate({ scaleSymbol: 42 })).toThrow();
+            expect(() => an.validate({ scaleSymbol: [] })).toThrow();
+
+            expect(() => an.validate({ aStor: 0 })).toThrow();
+            expect(() => an.validate({ aStor: 1 })).toThrow();
+            expect(() => an.validate({ aStor: '0' })).toThrow();
+            expect(() => an.validate({ aStor: '1' })).toThrow();
+            expect(() => an.validate({ aStor: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ mRound: 0.5 })).toThrow();
+            expect(() => an.validate({ mRound: true })).toThrow();
+            expect(() => an.validate({ mRound: null })).toThrow();
+            expect(() => an.validate({ mRound: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ aPad: 0 })).toThrow();
+            expect(() => an.validate({ aPad: 1 })).toThrow();
+            expect(() => an.validate({ aPad: '0' })).toThrow();
+            expect(() => an.validate({ aPad: '1' })).toThrow();
+            expect(() => an.validate({ aPad: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ nBracket: [] })).toThrow();
+            expect(() => an.validate({ nBracket: true })).toThrow();
+            expect(() => an.validate({ nBracket: 'foobar' })).toThrow();
+            expect(() => an.validate({ nBracket: '22foobar' })).toThrow();
+            expect(() => an.validate({ nBracket: '-5' })).toThrow();
+            expect(() => an.validate({ nBracket: 5 })).toThrow();
+            expect(() => an.validate({ nBracket: -5 })).toThrow();
+
+            expect(() => an.validate({ wEmpty: [] })).toThrow();
+            expect(() => an.validate({ wEmpty: true })).toThrow();
+            expect(() => an.validate({ wEmpty: 'foobar' })).toThrow();
+            expect(() => an.validate({ wEmpty: '22foobar' })).toThrow();
+            expect(() => an.validate({ wEmpty: '-5' })).toThrow();
+            expect(() => an.validate({ wEmpty: 5 })).toThrow();
+            expect(() => an.validate({ wEmpty: -5 })).toThrow();
+
+            expect(() => an.validate({ lZero: [] })).toThrow();
+            expect(() => an.validate({ lZero: true })).toThrow();
+            expect(() => an.validate({ lZero: 'foobar' })).toThrow();
+            expect(() => an.validate({ lZero: '22foobar' })).toThrow();
+            expect(() => an.validate({ lZero: '-5' })).toThrow();
+            expect(() => an.validate({ lZero: 5 })).toThrow();
+            expect(() => an.validate({ lZero: -5 })).toThrow();
+
+            expect(() => an.validate({ aForm: 0 })).toThrow();
+            expect(() => an.validate({ aForm: 1 })).toThrow();
+            expect(() => an.validate({ aForm: '0' })).toThrow();
+            expect(() => an.validate({ aForm: '1' })).toThrow();
+            expect(() => an.validate({ aForm: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ sNumber: 0 })).toThrow();
+            expect(() => an.validate({ sNumber: 1 })).toThrow();
+            expect(() => an.validate({ sNumber: '0' })).toThrow();
+            expect(() => an.validate({ sNumber: '1' })).toThrow();
+            expect(() => an.validate({ sNumber: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ anDefault: [] })).toThrow();
+            expect(() => an.validate({ anDefault: true })).toThrow();
+            expect(() => an.validate({ anDefault: 'foobar' })).toThrow();
+            expect(() => an.validate({ anDefault: '22foobar' })).toThrow();
+
+            expect(() => an.validate({ unSetOnSubmit: 0 })).toThrow();
+            expect(() => an.validate({ unSetOnSubmit: 1 })).toThrow();
+            expect(() => an.validate({ unSetOnSubmit: '0' })).toThrow();
+            expect(() => an.validate({ unSetOnSubmit: '1' })).toThrow();
+            expect(() => an.validate({ unSetOnSubmit: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ localeOutput: [] })).toThrow();
+            expect(() => an.validate({ localeOutput: true })).toThrow();
+            expect(() => an.validate({ localeOutput: 'foobar' })).toThrow();
+            expect(() => an.validate({ localeOutput: '22foobar' })).toThrow();
+            expect(() => an.validate({ localeOutput: '-5' })).toThrow();
+            expect(() => an.validate({ localeOutput: 5 })).toThrow();
+            expect(() => an.validate({ localeOutput: -5 })).toThrow();
+
+            expect(() => an.validate({ debug: 0 })).toThrow();
+            expect(() => an.validate({ debug: 1 })).toThrow();
+            expect(() => an.validate({ debug: '0' })).toThrow();
+            expect(() => an.validate({ debug: '1' })).toThrow();
+            expect(() => an.validate({ debug: 'foobar' })).toThrow();
+        });
     });
 });
 

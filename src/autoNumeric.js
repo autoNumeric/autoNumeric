@@ -516,6 +516,27 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * Return TRUE if the text given as a parameter is valid.
+     *
+     * @param text
+     * @returns {boolean}
+     */
+    function isValidPasteText(text) {
+        return text !== '' && !isNaN(text);
+    }
+
+    /**
+     * Return the pasted text that will be used.
+     *
+     * @param text
+     * @param holder
+     * @returns {string|void|XML|*}
+     */
+    function preparePastedText(text, holder) {
+        return autoStrip(text, holder.settingsClone).replace(holder.settingsClone.aDec, '.');
+    }
+
+    /**
      * Return TRUE is the string `str` contains the string `needle`
      * Note: this function does not coerce the parameters types
      *
@@ -1356,12 +1377,13 @@ if (typeof define === 'function' && define.amd) {
      * function to attach data to the element
      * and imitate the holder
      */
-    function getHolder($that, settings, update) {
+    function getHolder($that, settings, update = false) {
         let data = $that.data('autoNumeric');
         if (!data) {
             data = {};
             $that.data('autoNumeric', data);
         }
+
         let holder = data.holder;
         if ((isUndefined(holder) && settings) || update) {
             holder = new AutoNumericHolder($that.get(0), settings);
@@ -2180,6 +2202,524 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * Handler for 'focusin' events
+     *
+     * @param $this
+     * @param holder
+     * @returns {*}
+     */
+    function onFocusIn($this, holder) {
+        $this.on('focusin.autoNumeric', () => {
+            holder = getHolder($this);
+            const $settings = holder.settingsClone;
+            $settings.onOff = true;
+
+            if ($settings.nBracket !== null && $settings.aNeg !== '') {
+                $this.val(negativeBracket($this.val(), $settings));
+            }
+
+            let result;
+            if ($settings.eDec) {
+                $settings.mDec = $settings.eDec;
+                $this.autoNumeric('set', $settings.rawValue);
+            } else if ($settings.scaleDivisor) {
+                $settings.mDec = $settings.oDec;
+                $this.autoNumeric('set', $settings.rawValue);
+            } else if ($settings.nSep) {
+                $settings.aSep = '';
+                $settings.aSign = '';
+                $settings.aSuffix = '';
+                $this.autoNumeric('set', $settings.rawValue);
+            } else if ((result = autoStrip($this.val(), $settings)) !== $settings.rawValue) {
+                $this.autoNumeric('set', result);
+            }
+
+            holder.inVal = $this.val();
+            holder.lastVal = holder.inVal;
+            const onEmpty = checkEmpty(holder.inVal, $settings, true);
+            if ((onEmpty !== null && onEmpty !== '') && $settings.wEmpty === 'focus') {
+                $this.val(onEmpty);
+            }
+        });
+
+        return holder;
+    }
+
+    /**
+     * Handler for 'keydown' events
+     *
+     * @param $this
+     * @param holder
+     * @returns {*}
+     */
+    function onKeydown($this, holder) {
+        $this.on('keydown.autoNumeric', e => {
+            holder = getHolder($this);
+            if (holder.that.readOnly) {
+                holder.processed = true;
+
+                return true;
+            }
+            /* // The code below allows the "enter" keydown to throw a change() event
+             if (e.keyCode === keyCode.Enter && holder.inVal !== $this.val()) {
+             $this.change();
+             holder.inVal = $this.val();
+             } */
+            holder.init(e);
+            if (holder.skipAlways(e)) {
+                holder.processed = true;
+
+                return true;
+            }
+            if (holder.processAlways()) {
+                holder.processed = true;
+                holder.formatQuick(e);
+                const currentValue = $this.val();
+                if ((currentValue !== holder.lastVal) && holder.settingsClone.throwInput) {
+                    // throws input event in deletion character
+                    $this.trigger('input');
+                }
+                holder.lastVal = currentValue;
+                holder.settingsClone.throwInput = true;
+                e.preventDefault();
+
+                return false;
+            }
+            holder.formatted = false;
+
+            return true;
+        });
+
+        return holder;
+    }
+
+    /**
+     * Handler for 'keypress' events
+     *
+     * @param $this
+     * @param holder
+     * @returns {*}
+     */
+    function onKeypress($this, holder) {
+        $this.on('keypress.autoNumeric', e => {
+            // Firefox fix for Shift && insert paste event
+            if (e.shiftKey && e.keyCode === keyCode.Insert) {
+                return;
+            }
+            holder = getHolder($this);
+            const processed = holder.processed;
+            holder.init(e);
+
+            if (holder.skipAlways(e)) {
+                return true;
+            }
+
+            if (processed) {
+                e.preventDefault();
+
+                return false;
+            }
+
+            if (holder.processAlways() || holder.processKeypress()) {
+                holder.formatQuick(e);
+                const currentValue = $this.val();
+                if ((currentValue !== holder.lastVal) && holder.settingsClone.throwInput) {
+                    // throws input event on adding character
+                    $this.trigger('input');
+                }
+                holder.lastVal = currentValue;
+                holder.settingsClone.throwInput = true;
+                e.preventDefault();
+
+                return;
+            }
+            holder.formatted = false;
+        });
+
+        return holder;
+    }
+
+    /**
+     * Handler for 'keyup' events
+     *
+     * @param $this
+     * @param holder
+     * @param settings
+     * @returns {*}
+     */
+    function onKeyup($this, holder, settings) {
+        $this.on('keyup.autoNumeric', function(e) {
+            holder = getHolder($this);
+            holder.init(e);
+            const skip = holder.skipAlways(e);
+            const tab = holder.kdCode;
+            holder.kdCode = 0;
+            delete holder.valuePartsBeforePaste;
+
+			// added to properly place the caret when only the currency sign is present
+            if ($this[0].value === holder.settingsClone.aSign) {
+                if (holder.settingsClone.pSign === 's') {
+                    setElementSelection(this, 0, 0);
+                } else {
+                    setElementSelection(this, holder.settingsClone.aSign.length, holder.settingsClone.aSign.length);
+                }
+            } else if (tab === keyCode.Tab) {
+                setElementSelection(this, 0, $this.val().length);
+            }
+
+            if ($this[0].value === holder.settingsClone.aSuffix) {
+                setElementSelection(this, 0, 0);
+            }
+
+            if (holder.settingsClone.rawValue === '' && holder.settingsClone.aSign !== '' && holder.settingsClone.aSuffix !== '') {
+                setElementSelection(this, 0, 0);
+            }
+
+            // saves the extended decimal to preserve the data when navigating away from the page
+            if (holder.settingsClone.eDec !== null && holder.settingsClone.aStor) {
+                autoSave($this, settings, 'set');
+            }
+            if (skip) {
+                return true;
+            }
+            if (this.value === '') {
+                return true;
+            }
+            if (!holder.formatted) {
+                holder.formatQuick(e);
+            }
+        });
+        return holder;
+    }
+
+    /**
+     * Handler for 'focusout' events
+     *
+     * @param $this
+     * @param holder
+     * @returns {*}
+     */
+    function onFocusOut($this, holder) {
+        $this.on('focusout.autoNumeric', () => {
+            holder = getHolder($this);
+            let value = $this.val();
+            const origValue = value;
+            const $settings = holder.settingsClone;
+            $settings.onOff = false;
+            if ($settings.aStor) {
+                autoSave($this, $settings, 'set');
+            }
+
+            if ($settings.nSep === true) {
+                $settings.aSep = $settings.oSep;
+                $settings.aSign = $settings.oSign;
+                $settings.aSuffix = $settings.oSuffix;
+            }
+
+            if ($settings.eDec !== null) {
+                $settings.mDec = $settings.oDec;
+                $settings.aPad = $settings.oPad;
+                $settings.nBracket = $settings.oBracket;
+            }
+
+            value = autoStrip(value, $settings);
+            if (value !== '') {
+                if ($settings.trailingNegative) {
+                    value = '-' + value;
+                    $settings.trailingNegative = false;
+                }
+
+                const [minTest, maxTest] = autoCheck(value, $settings);
+                if (checkEmpty(value, $settings) === null && minTest && maxTest) {
+                    value = fixNumber(value, $settings.aDec, $settings.aNeg);
+                    $settings.rawValue = value;
+
+                    if ($settings.scaleDivisor) {
+                        value = value / $settings.scaleDivisor;
+                        value = value.toString();
+                    }
+
+                    $settings.mDec = ($settings.scaleDivisor && $settings.scaleDecimal)?+$settings.scaleDecimal:$settings.mDec;
+                    value = autoRound(value, $settings);
+                    value = presentNumber(value, $settings);
+                } else {
+                    if (!minTest) {
+                        $this.trigger('autoNumeric:minExceeded');
+                    }
+                    if (!maxTest) {
+                        $this.trigger('autoNumeric:maxExceeded');
+                    }
+
+                    value = $settings.rawValue;
+                }
+            } else {
+                if ($settings.wEmpty === 'zero') {
+                    $settings.rawValue = '0';
+                    value = autoRound('0', $settings);
+                } else {
+                    $settings.rawValue = '';
+                }
+            }
+
+            let groupedValue = checkEmpty(value, $settings, false);
+            if (groupedValue === null) {
+                groupedValue = autoGroup(value, $settings);
+            }
+
+            if (groupedValue !== origValue) {
+                groupedValue = ($settings.scaleSymbol)?groupedValue + $settings.scaleSymbol:groupedValue;
+                $this.val(groupedValue);
+            }
+
+            if (groupedValue !== holder.inVal) {
+                $this.change();
+                delete holder.inVal;
+            }
+        });
+
+        return holder;
+    }
+
+    /**
+     * Handler for 'paste' events
+     *
+     * @param $this
+     * @param holder
+     * @returns {*}
+     */
+    function onPaste($this, holder) {
+        $this.on('paste', function(e) {
+			//FIXME After a paste, the caret is put on the far right of the input, it should be set to something like `newCaretPosition = oldCaretPosition + pasteText.length;`, while taking into account the thousand separators and the decimal character
+            e.preventDefault();
+            holder = getHolder($this);
+
+            const oldRawValue = $this.autoNumeric('get');
+            const currentValue = this.value || '';
+            const selectionStart = this.selectionStart || 0;
+            const selectionEnd = this.selectionEnd || 0;
+            const prefix = currentValue.substring(0, selectionStart);
+            const suffix = currentValue.substring(selectionEnd, currentValue.length);
+            const pastedText = preparePastedText(e.originalEvent.clipboardData.getData('text/plain').holder);
+
+            if (isValidPasteText(pastedText)) {
+                const newValue = preparePastedText(prefix + Number(pastedText).valueOf() + suffix, holder);
+
+                if (isValidPasteText(newValue) && Number(oldRawValue).valueOf() !== Number(newValue).valueOf()) {
+                    $this.autoNumeric('set', newValue);
+                    $this.trigger('input');
+                }
+            } else {
+                this.selectionStart = selectionEnd;
+            }
+        });
+
+        return holder;
+    }
+
+    /**
+     * Handler for 'submit' events
+     *
+     * @param $this
+     * @param holder
+     * @returns {*}
+     */
+    function onSubmit($this, holder) {
+        $this.closest('form').on('submit.autoNumeric', () => {
+            holder = getHolder($this);
+
+            if (holder) {
+                const $settings = holder.settingsClone;
+
+                if ($settings.unSetOnSubmit) {
+                    $this.val($settings.rawValue);
+                }
+            }
+        });
+
+        return holder;
+    }
+
+    /**
+     * Return the jQuery selected input if the tag and type are supported by autoNumeric.
+     *
+     * @param $this
+     * @returns {boolean|*}
+     */
+    function getInputIfSupportedTagAndType($this) {
+        // Supported input type
+        const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
+
+        // Checks for non-supported input types
+        if (!$input && $this.prop('tagName').toLowerCase() === 'input') {
+            throwError(`The input type "${$this.prop('type')}" is not supported by autoNumeric`);
+        }
+
+        // Checks for non-supported tags
+        const currentElementTag = $this.prop('tagName').toLowerCase();
+        if (currentElementTag !== 'input' && !isInArray(currentElementTag, allowedTagList)) {
+            throwError(`The <${currentElementTag}> tag is not supported by autoNumeric`);
+        }
+
+        return $input;
+    }
+
+    /**
+     * Routine to format the default value on page load
+     *
+     * @param settings
+     * @param $input
+     * @param $this
+     */
+    function formatDefaultValueOnPageLoad(settings, $input, $this) {
+        let setValue = true;
+
+        if ($input) {
+            const currentValue = $this.val();
+            /*
+             * If the input value has been set by the dev, but not directly as an attribute in the html, then it takes
+             * precedence and should get formatted on init (if that this input value is a valid number and that the
+             * developer wants it formatted on init (cf. `settings.aForm`)). Note; this is true whatever the developer
+             * has set for `data-an-default` in the html (asp.net users).
+             *
+             * In other words : if `anDefault` is not null, it means the developer is trying to prevent postback problems.
+             * But if `input.value` is set to a number, and `$this.attr('value')` is not set, then it means the dev has
+             * changed the input value, and then it means we should not overwrite his own decision to do so.
+             * Hence, if `anDefault` is not null, but `input.value` is a number and `$this.attr('value')` is not set,
+             * we should ignore `anDefault` altogether.
+             */
+            if (settings.aForm && currentValue !== '' && isUndefinedOrNullOrEmpty($this.attr('value'))) {
+                // Check if the `value` is valid or not
+                const testedCurrentValue = parseFloat(currentValue.replace(',', '.'));
+                //TODO Replace whatever locale character is used by a '.', and not only the comma ','
+                if (!isNaN(testedCurrentValue) && Infinity !== testedCurrentValue) {
+                    $this.autoNumeric('set', testedCurrentValue);
+                    setValue = false;
+                } else {
+                    // If not, inform the developer that nothing usable has been provided
+                    throwError(`The value [${currentValue}] used in the input is not a valid value autoNumeric can work with.`, false);
+                }
+            } else {
+                /* Checks for :
+                 * - page reload from back button, and
+                 * - ASP.net form post back
+                 *      The following HTML data attribute is REQUIRED (data-an-default="same value as the value attribute")
+                 *      example: <asp:TextBox runat="server" id="someID" text="1234.56" data-an-default="1234.56">
+                 */
+                //TODO Replace whatever locale character is used by a '.', and not only the comma ',', based on the locale used by the user
+                if ((settings.anDefault !== null && settings.anDefault.toString() !== currentValue) ||
+                    (settings.anDefault === null && currentValue !== '' && currentValue !== $this.attr('value')) ||
+                    (currentValue !== '' && $this.attr('type') === 'hidden' && !$.isNumeric(currentValue.replace(',', '.')))) {
+                    if (settings.eDec !== null && settings.aStor) {
+                        settings.rawValue = autoSave($this, settings, 'get');
+                    }
+
+                    if (settings.scaleDivisor && settings.aStor) {
+                        settings.rawValue = autoSave($this, settings, 'get');
+                    }
+
+                    if (!settings.aStor) {
+                        let toStrip;
+
+                        if (settings.nBracket !== null && settings.aNeg !== '') {
+                            settings.onOff = true;
+                            toStrip = negativeBracket(currentValue, settings);
+                        } else {
+                            toStrip = currentValue;
+                        }
+
+                        settings.rawValue = ((settings.pNeg === 's' || (settings.pSign === 's' && settings.pNeg !== 'p')) && settings.aNeg !== '' && contains(currentValue, '-'))?'-' + autoStrip(toStrip, settings):autoStrip(toStrip, settings);
+                    }
+
+                    setValue = false;
+                }
+            }
+
+            if (currentValue === '') {
+                switch (settings.wEmpty) {
+                    case 'focus':
+                        setValue = false;
+                        break;
+                    case 'always':
+                        $this.val(settings.aSign);
+                        setValue = false;
+                        break;
+                    case 'zero':
+                        $this.autoNumeric('set', '0');
+                        setValue = false;
+                        break;
+                    default :
+                    //
+                }
+            } else if (setValue && currentValue === $this.attr('value')) {
+                $this.autoNumeric('set', currentValue);
+            }
+        }
+
+        if (isInArray($this.prop('tagName').toLowerCase(), settings.tagList) && $this.text() !== '') {
+            if (settings.anDefault !== null) {
+                if (settings.anDefault === $this.text()) {
+                    $this.autoNumeric('set', $this.text());
+                }
+            } else {
+                $this.autoNumeric('set', $this.text());
+            }
+        }
+    }
+
+    /**
+     * Analyse the settings/options passed by the user, validate and clean them, then return them.
+     *
+     * @param options
+     * @param $this
+     * @returns {object|null}
+     */
+    function getInitialSettings(options, $this) {
+        // Attempt to grab "autoNumeric" settings. If they do not exist, it returns "undefined".
+        let settings = $this.data('autoNumeric');
+
+        // If we couldn't grab any settings, create them from the default ones and combine them with the options passed
+        if (typeof settings !== 'object') {
+            // Attempt to grab HTML5 data, if it doesn't exist, we'll get "undefined"
+            const tagData = $this.data();
+
+            settings = $.extend({}, defaultSettings, tagData, options, {
+                onOff           : false,
+                runOnce         : false,
+                rawValue        : '',
+                trailingNegative: false,
+                caretFix        : false,
+                throwInput      : true,
+                strip           : true,
+                tagList         : allowedTagList,
+            });
+
+            // Modify the user settings to make them 'exploitable'
+            $.each(settings, (key, value) => {
+                // Convert the string 'true' and 'false' to real Boolean
+                if (value === 'true' || value === 'false') {
+                    settings[key] = Boolean(value === 'true');
+                }
+
+                // Convert numbers in options to strings
+                //TODO if a value is of type 'Number', shouldn't we keep it as a number for further manipulation, instead of using a string?
+                if (typeof value === 'number' && key !== 'aScale') {
+                    settings[key] = value.toString();
+                }
+            });
+
+            // Validate the settings
+            validate(settings, false); // Throws if necessary
+
+            // Save our new settings
+            $this.data('autoNumeric', settings);
+
+            return settings;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Methods supported by autoNumeric
      */
     const methods = {
@@ -2196,60 +2736,10 @@ if (typeof define === 'function' && define.amd) {
         init(options) {
             return this.each(function() {
                 const $this = $(this);
+                const $input = getInputIfSupportedTagAndType($this);
 
-                // Attempt to grab HTML5 data, if it doesn't exist, we'll get "undefined"
-                const tagData = $this.data();
-
-                // Supported input type
-                const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
-
-                // Checks for non-supported input types
-                if (!$input && $this.prop('tagName').toLowerCase() === 'input') {
-                    throwError(`The input type "${$this.prop('type')}" is not supported by autoNumeric`);
-                }
-
-                // Checks for non-supported tags
-                const currentElementTag = $this.prop('tagName').toLowerCase();
-                if (currentElementTag !== 'input' && !isInArray(currentElementTag, allowedTagList)) {
-                    throwError(`The <${currentElementTag}> tag is not supported by autoNumeric`);
-                }
-
-                // Attempt to grab "autoNumeric" settings. If they do not exist, it returns "undefined".
-                let settings = $this.data('autoNumeric');
-
-                // If we couldn't grab any settings, create them from the default ones and combine them with the options passed
-                if (typeof settings !== 'object') {
-                    settings = $.extend({}, defaultSettings, tagData, options, {
-                        onOff           : false,
-                        runOnce         : false,
-                        rawValue        : '',
-                        trailingNegative: false,
-                        caretFix        : false,
-                        throwInput      : true,
-                        strip           : true,
-                        tagList         : allowedTagList,
-                    });
-
-                    // Modify the user settings to make them 'exploitable'
-                    $.each(settings, (key, value) => {
-                        // Convert the string 'true' and 'false' to real Boolean
-                        if (value === 'true' || value === 'false') {
-                            settings[key] = Boolean(value === 'true');
-                        }
-
-                        // Convert numbers in options to strings
-                        //TODO if a value is of type 'Number', shouldn't we keep it as a number for further manipulation, instead of using a string?
-                        if (typeof value === 'number' && key !== 'aScale') {
-                            settings[key] = value.toString();
-                        }
-                    });
-
-                    // Validate the settings
-                    validate(settings, false); // Throws if necessary
-
-                    // Save our new settings
-                    $this.data('autoNumeric', settings);
-                } else {
+                const settings = getInitialSettings(options, $this);
+                if (isNull(settings)) {
                     return this;
                 }
 
@@ -2257,347 +2747,24 @@ if (typeof define === 'function' && define.amd) {
                 keepOriginalSettings(settings);
                 let holder = getHolder($this, settings);
 
+                //TODO Shouldn't the next line be in the `getInitialSettings()` function?
                 settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
 
-                // routine to format default value on page load
                 if (settings.runOnce === false && settings.aForm) {
-                    let setValue = true;
-                    if ($input) {
-                        const currentValue = $this.val();
-
-                        /*
-                         * If the input value has been set by the dev, but not directly as an attribute in the html, then it takes
-                         * precedence and should get formatted on init (if that this input value is a valid number and that the
-                         * developer wants it formatted on init (cf. `settings.aForm`)). Note; this is true whatever the developer
-                         * has set for `data-an-default` in the html (asp.net users).
-                         *
-                         * In other words : if `anDefault` is not null, it means the developer is trying to prevent postback problems.
-                         * But if `input.value` is set to a number, and `$this.attr('value')` is not set, then it means the dev has
-                         * changed the input value, and then it means we should not overwrite his own decision to do so.
-                         * Hence, if `anDefault` is not null, but `input.value` is a number and `$this.attr('value')` is not set,
-                         * we should ignore `anDefault` altogether.
-                         */
-                        if (settings.aForm && currentValue !== '' && isUndefinedOrNullOrEmpty($this.attr('value'))) {
-                            // Check if the `value` is valid or not
-                            const testedCurrentValue = parseFloat(currentValue.replace(',', '.')); //TODO Replace whatever locale character is used by a '.', and not only the comma ','
-                            if (!isNaN(testedCurrentValue) && Infinity !== testedCurrentValue) {
-                                $this.autoNumeric('set', testedCurrentValue);
-                                setValue = false;
-                            }
-                            else {
-                                // If not, inform the developer that nothing usable has been provided
-                                throwError(`The value [${currentValue}] used in the input is not a valid value autoNumeric can work with.`, false);
-                            }
-                        }
-                        else {
-                            /* Checks for :
-                             * - page reload from back button, and
-                             * - ASP.net form post back
-                             *      The following HTML data attribute is REQUIRED (data-an-default="same value as the value attribute")
-                             *      example: <asp:TextBox runat="server" id="someID" text="1234.56" data-an-default="1234.56">
-                             */
-                            //TODO Replace whatever locale character is used by a '.', and not only the comma ',', based on the locale used by the user
-                            if ((settings.anDefault !== null && settings.anDefault.toString() !== currentValue) ||
-                                    (settings.anDefault === null && currentValue !== '' && currentValue !== $this.attr('value')) ||
-                                    (currentValue !== '' && $this.attr('type') === 'hidden' && !$.isNumeric(currentValue.replace(',', '.')))) {
-                                if (settings.eDec !== null && settings.aStor) {
-                                    settings.rawValue = autoSave($this, settings, 'get');
-                                }
-                                if (settings.scaleDivisor && settings.aStor) {
-                                    settings.rawValue = autoSave($this, settings, 'get');
-                                }
-                                if (!settings.aStor) {
-                                    let toStrip;
-                                    if (settings.nBracket !== null && settings.aNeg !== '') {
-                                        settings.onOff = true;
-                                        toStrip = negativeBracket(currentValue, settings);
-                                    } else {
-                                        toStrip = currentValue;
-                                    }
-                                    settings.rawValue = ((settings.pNeg === 's' || (settings.pSign === 's' && settings.pNeg !== 'p')) && settings.aNeg !== '' && contains(currentValue, '-'))?'-' + autoStrip(toStrip, settings):autoStrip(toStrip, settings);
-                                }
-                                setValue = false;
-                            }
-                        }
-
-                        if (currentValue === '') {
-                            switch (settings.wEmpty) {
-                                case 'focus':
-                                    setValue = false;
-                                    break;
-                                case 'always':
-                                    $this.val(settings.aSign);
-                                    setValue = false;
-                                    break;
-                                case 'zero':
-                                    $this.autoNumeric('set', '0');
-                                    setValue = false;
-                                    break;
-                                default :
-                                    //
-                            }
-                        } else if (setValue && currentValue === $this.attr('value')) {
-                            $this.autoNumeric('set', currentValue);
-                        }
-                    }
-
-                    if (isInArray($this.prop('tagName').toLowerCase(), settings.tagList) && $this.text() !== '') {
-                        if (settings.anDefault !== null) {
-                            if (settings.anDefault === $this.text()) {
-                                $this.autoNumeric('set', $this.text());
-                            }
-                        } else {
-                            $this.autoNumeric('set', $this.text());
-                        }
-                    }
+                    formatDefaultValueOnPageLoad(settings, $input, $this);
                 }
 
                 settings.runOnce = true;
 
-                //TODO Extract the event listeners to another function
-                // input types supported "text", "hidden", "tel" and no type
+                // Add the events listeners to supported input types ("text", "hidden", "tel" and no type)
                 if ($input) {
-                    $this.on('focusin.autoNumeric', () => {
-                        holder = getHolder($this);
-                        const $settings = holder.settingsClone;
-                        $settings.onOff = true;
-                        if ($settings.nBracket !== null && $settings.aNeg !== '') {
-                            $this.val(negativeBracket($this.val(), $settings));
-                        }
-                        let result;
-                        if ($settings.eDec) {
-                            $settings.mDec = $settings.eDec;
-                            $this.autoNumeric('set', $settings.rawValue);
-                        } else if ($settings.scaleDivisor) {
-                            $settings.mDec = $settings.oDec;
-                            $this.autoNumeric('set', $settings.rawValue);
-                        } else if ($settings.nSep) {
-                            $settings.aSep = '';
-                            $settings.aSign = '';
-                            $settings.aSuffix = '';
-                            $this.autoNumeric('set', $settings.rawValue);
-                        } else if ((result = autoStrip($this.val(), $settings)) !== $settings.rawValue) {
-                            $this.autoNumeric('set', result);
-                        }
-
-                        holder.inVal = $this.val();
-                        holder.lastVal = holder.inVal;
-                        const onEmpty = checkEmpty(holder.inVal, $settings, true);
-                        if ((onEmpty !== null && onEmpty !== '') && $settings.wEmpty === 'focus') {
-                            $this.val(onEmpty);
-                        }
-                    });
-
-                    $this.on('keydown.autoNumeric', e => {
-                        holder = getHolder($this);
-                        if (holder.that.readOnly) {
-                            holder.processed = true;
-                            return true;
-                        }
-
-                        /* // The code below allows the "enter" keydown to throw a change() event
-                        if (e.keyCode === keyCode.Enter && holder.inVal !== $this.val()) {
-                            $this.change();
-                            holder.inVal = $this.val();
-                        } */
-                        holder.init(e);
-                        if (holder.skipAlways(e)) {
-                            holder.processed = true;
-                            return true;
-                        }
-                        if (holder.processAlways()) {
-                            holder.processed = true;
-                            holder.formatQuick(e);
-                            const currentValue = $this.val();
-                            if ((currentValue !== holder.lastVal) && holder.settingsClone.throwInput) {
-                                // throws input event in deletion character
-                                $this.trigger('input');
-                            }
-                            holder.lastVal = currentValue;
-                            holder.settingsClone.throwInput = true;
-                            e.preventDefault();
-                            return false;
-                        }
-                        holder.formatted = false;
-                        return true;
-                    });
-
-                    $this.on('keypress.autoNumeric', e => {
-                        // Firefox fix for Shift && insert paste event
-                        if (e.shiftKey && e.keyCode === keyCode.Insert) {
-                            return;
-                        }
-                        holder = getHolder($this);
-                        const processed = holder.processed;
-                        holder.init(e);
-                        if (holder.skipAlways(e)) {
-                            return true;
-                        }
-                        if (processed) {
-                            e.preventDefault();
-                            return false;
-                        }
-                        if (holder.processAlways() || holder.processKeypress()) {
-                            holder.formatQuick(e);
-                            const currentValue = $this.val();
-                            if ((currentValue !== holder.lastVal) && holder.settingsClone.throwInput) {
-                                // throws input event on adding character
-                                $this.trigger('input');
-                            }
-                            holder.lastVal = currentValue;
-                            holder.settingsClone.throwInput = true;
-                            e.preventDefault();
-                            return;
-                        }
-                        holder.formatted = false;
-                    });
-
-                    $this.on('keyup.autoNumeric', function(e) {
-                        holder = getHolder($this);
-                        holder.init(e);
-                        const skip = holder.skipAlways(e);
-                        const tab = holder.kdCode;
-                        holder.kdCode = 0;
-                        delete holder.valuePartsBeforePaste;
-
-                        // added to properly place the caret when only the currency sign is present
-                        if ($this[0].value === holder.settingsClone.aSign) {
-                            if (holder.settingsClone.pSign === 's') {
-                                setElementSelection(this, 0, 0);
-                            } else {
-                                setElementSelection(this, holder.settingsClone.aSign.length, holder.settingsClone.aSign.length);
-                            }
-                        } else if (tab === keyCode.Tab) {
-                            setElementSelection(this, 0, $this.val().length);
-                        }
-                        if ($this[0].value === holder.settingsClone.aSuffix) {
-                            setElementSelection(this, 0, 0);
-                        }
-                        if (holder.settingsClone.rawValue === '' && holder.settingsClone.aSign !== '' && holder.settingsClone.aSuffix !== '') {
-                            setElementSelection(this, 0, 0);
-                        }
-
-                        // saves the extended decimal to preserve the data when navigating away from the page
-                        if (holder.settingsClone.eDec !== null && holder.settingsClone.aStor) {
-                            autoSave($this, settings, 'set');
-                        }
-                        if (skip) {
-                            return true;
-                        }
-                        if (this.value === '') {
-                            return true;
-                        }
-                        if (!holder.formatted) {
-                            holder.formatQuick(e);
-                        }
-                    });
-
-                    $this.on('focusout.autoNumeric', () => {
-                        holder = getHolder($this);
-                        let value = $this.val();
-                        const origValue = value;
-                        const $settings = holder.settingsClone;
-                        $settings.onOff = false;
-                        if ($settings.aStor) {
-                            autoSave($this, $settings, 'set');
-                        }
-                        if ($settings.nSep === true) {
-                            $settings.aSep = $settings.oSep;
-                            $settings.aSign = $settings.oSign;
-                            $settings.aSuffix = $settings.oSuffix;
-                        }
-                        if ($settings.eDec !== null) {
-                            $settings.mDec = $settings.oDec;
-                            $settings.aPad = $settings.oPad;
-                            $settings.nBracket = $settings.oBracket;
-                        }
-                        value = autoStrip(value, $settings);
-                        if (value !== '') {
-                            if ($settings.trailingNegative) {
-                                value = '-' + value;
-                                $settings.trailingNegative = false;
-                            }
-                            const [minTest, maxTest] = autoCheck(value, $settings);
-                            if (checkEmpty(value, $settings) === null && minTest && maxTest) {
-                                value = fixNumber(value, $settings.aDec, $settings.aNeg);
-                                $settings.rawValue = value;
-                                if ($settings.scaleDivisor) {
-                                    value = value / $settings.scaleDivisor;
-                                    value = value.toString();
-                                }
-                                $settings.mDec = ($settings.scaleDivisor && $settings.scaleDecimal) ? +$settings.scaleDecimal : $settings.mDec;
-                                value = autoRound(value, $settings);
-                                value = presentNumber(value, $settings);
-                            } else {
-                                if (!minTest) {
-                                    $this.trigger('autoNumeric:minExceeded');
-                                }
-                                if (!maxTest) {
-                                    $this.trigger('autoNumeric:maxExceeded');
-                                }
-                                value = $settings.rawValue;
-                            }
-                        } else {
-                            if ($settings.wEmpty === 'zero') {
-                                $settings.rawValue = '0';
-                                value = autoRound('0', $settings);
-                            } else {
-                                $settings.rawValue = '';
-                            }
-                        }
-                        let groupedValue = checkEmpty(value, $settings, false);
-                        if (groupedValue === null) {
-                            groupedValue = autoGroup(value, $settings);
-                        }
-                        if (groupedValue !== origValue) {
-                            groupedValue = ($settings.scaleSymbol) ? groupedValue + $settings.scaleSymbol : groupedValue;
-                            $this.val(groupedValue);
-                        }
-                        if (groupedValue !== holder.inVal) {
-                            $this.change();
-                            delete holder.inVal;
-                        }
-                    });
-
-                    $this.on('paste', function(e) {
-                        //FIXME After a paste, the caret is put on the far right of the input, it should be set to something like `newCaretPosition = oldCaretPosition + pasteText.length;`, while taking into account the thousand separators and the decimal character
-                        e.preventDefault();
-                        holder = getHolder($this);
-                        function prepare(text) {
-                            return autoStrip(text, holder.settingsClone).replace(holder.settingsClone.aDec, '.');
-                        }
-
-                        function isValid(text) {
-                            return text !== '' && !isNaN(text);
-                        }
-
-                        const oldRawValue = $this.autoNumeric('get');
-                        const currentValue = this.value || '';
-                        const selectionStart = this.selectionStart || 0;
-                        const selectionEnd = this.selectionEnd || 0;
-                        const prefix = currentValue.substring(0, selectionStart);
-                        const suffix = currentValue.substring(selectionEnd, currentValue.length);
-                        const pastedText = prepare(e.originalEvent.clipboardData.getData('text/plain'));
-                        if (isValid(pastedText)) {
-                            const newValue = prepare(prefix + Number(pastedText).valueOf() + suffix);
-                            if (isValid(newValue) && Number(oldRawValue).valueOf() !== Number(newValue).valueOf()) {
-                                $this.autoNumeric('set', newValue);
-                                $this.trigger('input');
-                            }
-                        } else {
-                            this.selectionStart = selectionEnd;
-                        }
-                    });
-
-                    $this.closest('form').on('submit.autoNumeric', () => {
-                        holder = getHolder($this);
-                        if (holder) {
-                            const $settings = holder.settingsClone;
-                            if ($settings.unSetOnSubmit) {
-                                $this.val($settings.rawValue);
-                            }
-                        }
-                    });
+                    holder = onFocusIn($this, holder);
+                    holder = onFocusOut($this, holder);
+                    holder = onKeydown($this, holder);
+                    holder = onKeypress($this, holder);
+                    holder = onKeyup($this, holder, settings);
+                    holder = onPaste($this, holder);
+                    onSubmit($this, holder);
                 }
             });
         },

@@ -854,9 +854,8 @@ if (typeof define === 'function' && define.amd) {
             (tRound > 4 && settings.mRound === 'A' && nSign === '')  || // Round half up asymmetric positive values
             (tRound > 5 && settings.mRound === 'A' && nSign === '-') || // Round half up asymmetric negative values
             (tRound > 5 && settings.mRound === 's')                  || // Round half down symmetric
-            //FIXME The options 'a' is never tested here
-            (tRound > 5 && settings.mRound === 'A' && nSign === '')  || // Round half down asymmetric positive values
-            (tRound > 4 && settings.mRound === 'A' && nSign === '-') || // Round half down asymmetric negative values
+            (tRound > 5 && settings.mRound === 'a' && nSign === '')  || // Round half down asymmetric positive values
+            (tRound > 4 && settings.mRound === 'a' && nSign === '-') || // Round half down asymmetric negative values
             (tRound > 5 && settings.mRound === 'B')                  || // Round half even "Banker's Rounding"
             (tRound === 5 && settings.mRound === 'B' && odd === 1)   || // Round half even "Banker's Rounding"
             (tRound > 0 && settings.mRound === 'C' && nSign === '')  || // Round to ceiling toward positive infinite

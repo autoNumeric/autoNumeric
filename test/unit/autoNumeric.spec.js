@@ -29,7 +29,7 @@
 
 /* eslint space-in-parens: 0 */
 /* eslint spaced-comment: 0 */
-/* global describe, it, xdescribe, xit, expect, beforeEach, afterEach */
+/* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach */
 
 import $ from '../../node_modules/jquery/dist/jquery';
 import an from '../../src/autoNumeric';
@@ -331,41 +331,41 @@ describe(`autoNumeric 'init' method`, () => {
         document.body.removeChild(newInput);
     });
 
-    it('should init the element with the correct settings', () => {
+    it('should init the element with the correct settings (Euro)', () => {
         newInput.value = '6789,02';
         aNInput = $(newInput).autoNumeric('init', autoNumericOptionsEuro);
         expect(aNInput.autoNumeric('get')).toEqual('6789.02');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('6.789,02 €'); //FIXME fails
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('6.789,02 €');
 
         aNInput.autoNumeric('update', autoNumericOptionsEuro);
         expect(aNInput.autoNumeric('getFormatted')).toEqual('6.789,02 €');
     });
 
-    it('should init the element with the correct settings', () => {
+    it('should init the element with the correct settings (Dollar)', () => {
         newInput.value = '6789.02';
         aNInput = $(newInput).autoNumeric('init', autoNumericOptionsDollar);
         expect(aNInput.autoNumeric('get')).toEqual('6789.02');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789.02'); //FIXME fails
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789.02');
 
         aNInput.autoNumeric('update', autoNumericOptionsDollar);
         expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789.02');
     });
 
-    it('should init the element with the correct settings (no methods)', () => {
-        newInput.value = '256789.02';
+    it('should init the element with the correct settings (no methods, Euro)', () => {
+        newInput.value = '256789,02';
         aNInput = $(newInput).autoNumeric(autoNumericOptionsEuro);
         expect(aNInput.autoNumeric('get')).toEqual('256789.02');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('256.789,02 €'); //FIXME fails
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('256.789,02 €');
 
         aNInput.autoNumeric('update', autoNumericOptionsEuro);
         expect(aNInput.autoNumeric('getFormatted')).toEqual('256.789,02 €');
     });
 
-    it('should init the element with the correct settings (no methods)', () => {
+    it('should init the element with the correct settings (no methods, Dollar)', () => {
         newInput.value = '256789.02';
         aNInput = $(newInput).autoNumeric(autoNumericOptionsDollar);
         expect(aNInput.autoNumeric('get')).toEqual('256789.02');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$256,789.02'); //FIXME fails
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('$256,789.02');
 
         aNInput.autoNumeric('update', autoNumericOptionsDollar);
         expect(aNInput.autoNumeric('getFormatted')).toEqual('$256,789.02');
@@ -458,8 +458,6 @@ describe(`autoNumeric 'getString' and 'getArray' methods`, () => {
     let anInput1;
     let anInput2;
     let anInput3;
-    let anInput4;
-    let anInput5;
 
     beforeEach(() => { // Initialization
         form = document.createElement('form');
@@ -483,6 +481,7 @@ describe(`autoNumeric 'getString' and 'getArray' methods`, () => {
         input5.name = 'bc';
 
         input1.value = '1111.11';
+        expect(input1.value).toEqual('1111.11');
         input2.value = '2222.22';
         input3.value = '3333.33';
         input4.value = 'not autoNumeric test';
@@ -490,16 +489,14 @@ describe(`autoNumeric 'getString' and 'getArray' methods`, () => {
         input5.value = 'not autoNumeric $1,234.567';
         expect(input5.value).toEqual('not autoNumeric $1,234.567');
 
-        // Initiate the autoNumeric inputs
+        // Initiate only 3 autoNumeric inputs
         const anOptions = { aSep: '.', aDec: ',', aSign: '€ ' };
         anInput1 = $(input1).autoNumeric('init', anOptions);
         anInput2 = $(input2).autoNumeric('init', anOptions);
         anInput3 = $(input3).autoNumeric('init', anOptions);
-        anInput4 = $(input4).autoNumeric('init', anOptions);
-        anInput5 = $(input5).autoNumeric('init', anOptions);
 
-        expect(input1.value).toEqual('1111.11');
-        expect(anInput1.autoNumeric('getFormatted')).toEqual('€ 1.111,11');  //FIXME fails
+        expect(input1.value).toEqual('€ 1.111,11');
+        expect(anInput1.autoNumeric('getFormatted')).toEqual('€ 1.111,11');
         anInput1.autoNumeric('update', anOptions);
         expect(anInput1.autoNumeric('getFormatted')).toEqual('€ 1.111,11');
     });
@@ -508,8 +505,6 @@ describe(`autoNumeric 'getString' and 'getArray' methods`, () => {
         anInput1.autoNumeric('destroy');
         anInput2.autoNumeric('destroy');
         anInput3.autoNumeric('destroy');
-        anInput4.autoNumeric('destroy');
-        anInput5.autoNumeric('destroy');
         form.removeChild(input1);
         form.removeChild(input2);
         form.removeChild(input3);
@@ -519,7 +514,7 @@ describe(`autoNumeric 'getString' and 'getArray' methods`, () => {
     });
 
     it('should return the correct string', () => {
-        expect($(form).autoNumeric('getString')).toEqual('aa=1111.11&bb=2222.22&cc=3333.33&ab=not%20autoNumeric%20test&bc=not%20autoNumeric%20%241%2C234.567'); //FIXME fails
+        expect($(form).autoNumeric('getString')).toEqual('aa=1111.11&bb=2222.22&cc=3333.33&ab=not%20autoNumeric%20test&bc=not%20autoNumeric%20%241%2C234.567');
     });
 
     it('should return the correct array', () => {
@@ -545,7 +540,7 @@ describe(`autoNumeric 'getString' and 'getArray' methods`, () => {
                 value: 'not autoNumeric $1,234.567',
             },
         ];
-        expect($(form).autoNumeric('getArray')).toEqual(arrayResult); //FIXME fails
+        expect($(form).autoNumeric('getArray')).toEqual(arrayResult);
     });
 });
 

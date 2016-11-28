@@ -1,5 +1,24 @@
 ### Change log:
 
+###
++ "2.0.0-beta.4"
++ Removed the index.html file
++ Additional mods/fixes to the scaling options
++ Additional mods/fixes to the "nSep" to also handle the "aSuffix"
++ Fixed the "mRound" default
+
+###
++ "2.0.0-beta.3"
++ fixed nSep option which removes the Currency symbom and thousand seperator on focusin
++ changed the defaulys of scaleDivisor, scaleDecimal & scaleSymbol to null
+
+###
++ modified the scaling o[tiona and seperated the options
++ aScale - removed
++ scaleDivisor added
++ scaleDecimal added
++ scaleSymbol added
+
 ### Version 2.0.0 released 2016-11-16
 + Prepare the code base for future Jasmine tests
 + Add initial babel support

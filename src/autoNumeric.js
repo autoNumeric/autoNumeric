@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributors: Sokolov Yura and other Github users
-* @version: 2.0 - 2016-11-16 UTC-10 23:00
+* @version: 2.0 - 2016-11-25 GMT 23:00
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -170,6 +170,16 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * Return TRUE if the `value` is undefined, null or empty
+     *
+     * @param value
+     * @returns {boolean}
+     */
+    function isUndefinedOrNullOrEmpty(value) {
+        return value === null || value === void(0) || '' === value;
+    }
+
+    /**
      * Return TRUE if the given parameter is as String
      *
      * @param {*} str
@@ -327,9 +337,7 @@ if (typeof define === 'function' && define.amd) {
         } else {
             settings.mDec = Number(settings.mDec);
         }
-        if (settings.scaleDecimal) {
-            settings.mDec = settings.scaleDecimal;
-        }
+        settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
 
         // set alternative decimal separator key
         if (settings.altDec === null && settings.mDec > 0) {
@@ -619,12 +627,15 @@ if (typeof define === 'function' && define.amd) {
         let regex;
         switch (rDec) {
             case 0:
+                // prevents padding - removes trailing zeros to the first significant digit
                 regex = /(\.(?:\d*[1-9])?)0*$/;
                 break;
             case 1:
+                // allows padding when mDec equals one - leaves one zero trailing the decimal character
                 regex = /(\.\d(?:\d*[1-9])?)0*$/;
                 break;
             default :
+                // removes access zeros to the mDec length when aPad is set true
                 regex = new RegExp(`(\\.\\d{${rDec}}(?:\\d*[1-9])?)0*`);
         }
 
@@ -672,13 +683,12 @@ if (typeof define === 'function' && define.amd) {
         let i = 0;
         let nSign = '';
         let rDec;
-
-        if (typeof(settings.aPad) === 'boolean' || settings.aPad === null) {
-            rDec = settings.aPad?settings.mDec:0;
+        // sets the truncate zero method
+        if (settings.aPad) {
+            rDec = settings.mDec;
         } else {
-            rDec = Number(settings.aPad);
+            rDec = 0
         }
-
         // Checks if the iv (input Value)is a negative value
         if (iv.charAt(0) === '-') {
             nSign = '-';
@@ -737,7 +747,7 @@ if (typeof define === 'function' && define.amd) {
         const tRound = Number(iv.charAt(rLength + 1));
         const odd = (iv.charAt(rLength) === '.') ? (iv.charAt(rLength - 1) % 2) : (iv.charAt(rLength) % 2);
         let ivArray = iv.substring(0, rLength + 1).split('');
-        if ((tRound > 4 && settings.mRound === 's')                  || // Round half up symmetric
+        if ((tRound > 4 && settings.mRound === 'S')                  || // Round half up symmetric
             (tRound > 4 && settings.mRound === 'A' && nSign === '')  || // Round half up asymmetric positive values
             (tRound > 5 && settings.mRound === 'A' && nSign === '-') || // Round half up asymmetric negative values
             (tRound > 5 && settings.mRound === 's')                  || // Round half down symmetric
@@ -992,12 +1002,13 @@ if (typeof define === 'function' && define.amd) {
         settings.oBracket = settings.nBracket;
         settings.oSep     = settings.aSep;
         settings.oSign    = settings.aSign;
+        settings.oSuffix  = settings.aSuffix
 
         return settings;
     }
 
     /**
-     * original settings saved for use when eDec & nSep options are being used
+     * original settings saved for use when eDec options are being used
      * taken from Quirksmode
      */
     function readCookie(name) {
@@ -1741,11 +1752,14 @@ if (typeof define === 'function' && define.amd) {
 
         if (getArrayBehavior) {
             const formFields = $this.serializeArray();
+
             $.each(formFields, (i, field) => {
                 const scElement = $.inArray(i, scIndex);
+
                 if (scElement > -1 && aiIndex[scElement] > -1) {
                     const testInput = $(`form:eq(${formIndex}) input:eq(${aiIndex[scElement]})`);
                     const settings = testInput.data('autoNumeric');
+
                     if (typeof settings === 'object') {
                         field.value = testInput.autoNumeric('get', settings.localeOutput).toString();
                     }
@@ -1759,16 +1773,19 @@ if (typeof define === 'function' && define.amd) {
             const formFields = $this.serialize();
             const formParts = formFields.split('&');
 
-            $.each(formParts, (i, miniParts) => {
-                miniParts = formParts[i].split('=');
+            $.each(formParts, i => {
+                const [inputName, inputValue] = formParts[i].split('=');
                 const scElement = $.inArray(i, scIndex);
+
+                // If the current element is a valid element
                 if (scElement > -1 && aiIndex[scElement] > -1) {
                     const testInput = $(`form:eq(${formIndex}) input:eq(${aiIndex[scElement]})`);
                     const settings = testInput.data('autoNumeric');
+
                     if (typeof settings === 'object') {
-                        if (miniParts[1] !== null) {
-                            miniParts[1] = testInput.autoNumeric('get', settings.localeOutput).toString();
-                            formParts[i] = miniParts.join('=');
+                        if (inputValue !== null) {
+                            const modifiedInputValue = testInput.autoNumeric('get', settings.localeOutput).toString();
+                            formParts[i] = `${inputName}=${modifiedInputValue}`;
                         }
                     }
                 }
@@ -1783,12 +1800,14 @@ if (typeof define === 'function' && define.amd) {
      */
     const methods = {
         /**
-         * Method to initiate autoNumeric and attached the settings (default and options passed as a parameter
-         * $(someSelector).autoNumeric('init');           // initiate autoNumeric with defaults
-         * $(someSelector).autoNumeric('init', {option}); // initiate autoNumeric with options
-         * $(someSelector).autoNumeric();                 // initiate autoNumeric with defaults
-         * $(someSelector).autoNumeric({option});         // initiate autoNumeric with options
-         * options passes as a parameter example '{aSep: ".", aDec: ",", aSign: '€ '}
+         * Method to initiate autoNumeric and attach the settings (options can be passed as a parameter)
+         * The options passed as a parameter is an object that contains the settings (ie. {aSep: ".", aDec: ",", aSign: '€ '})
+         *
+         * @example
+         * $(someSelector).autoNumeric('init');            // initiate autoNumeric with defaults
+         * $(someSelector).autoNumeric();                  // initiate autoNumeric with defaults
+         * $(someSelector).autoNumeric('init', {options}); // initiate autoNumeric with options
+         * $(someSelector).autoNumeric({options});         // initiate autoNumeric with options
          */
         init(options) {
             return this.each(function() {
@@ -1858,16 +1877,7 @@ if (typeof define === 'function' && define.amd) {
                         if (value === 'true' || value === 'false') {
                             settings[key] = Boolean(value === 'true');
                         }
-                        if (typeof value === 'number' && key !== 'aScale') {
-                            settings[key] = value.toString();
-                        }
                     });
-
-                    if (settings.aScale !== null) {
-                        settings.scaleFactor = +settings.aScale[0];
-                        settings.scaleDecimal = (settings.aScale[1]) ? +settings.aScale[1] : null;
-                        settings.scaleSuffix = (settings.aScale[2]) ? settings.aScale[2] : '';
-                    }
 
                     // Save our new settings
                     $this.data('autoNumeric', settings);
@@ -1875,9 +1885,11 @@ if (typeof define === 'function' && define.amd) {
                     return this;
                 }
 
-                // original settings saved for use when eDec & nSep options are being used
+                // original settings saved for use when eDec, scaleDivisor & nSep options are being used
                 settings = originalSettings(settings);
                 let holder = getHolder($this, settings);
+
+                settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
 
                 // checks for non-supported input types
                 if (!$input && $this.prop('tagName').toLowerCase() === 'input') {
@@ -1905,29 +1917,60 @@ if (typeof define === 'function' && define.amd) {
                     let setValue = true;
                     if ($input) {
                         const currentValue = $this.val();
-                        /* checks for page reload from back button
-                         * also checks for ASP.net form post back
-                         * the following HTML data attribute is REQUIRED (data-an-default="same value as the value attribute")
-                         * example: <asp:TextBox runat="server" id="someID" text="1234.56" data-an-default="1234.56">
+
+                        /*
+                         * If the input value has been set by the dev, but not directly as an attribute in the html, then it takes
+                         * precedence and should get formatted on init (if that this input value is a valid number and that the
+                         * developer wants it formatted on init (cf. `settings.aForm`)). Note; this is true whatever the developer
+                         * has set for `data-an-default` in the html (asp.net users).
+                         *
+                         * In other words : if `anDefault` is not null, it means the developer is trying to prevent postback problems.
+                         * But if `input.value` is set to a number, and `$this.attr('value')` is not set, then it means the dev has
+                         * changed the input value, and then it means we should not overwrite his own decision to do so.
+                         * Hence, if `anDefault` is not null, but `input.value` is a number and `$this.attr('value')` is not set,
+                         * we should ignore `anDefault` altogether.
                          */
-                        if ((settings.anDefault && settings.anDefault.toString() !== currentValue) || (settings.anDefault === null && currentValue !== '' && currentValue !== $this.attr('value')) || (currentValue !== '' && $this.attr('type') === 'hidden' && !$.isNumeric(currentValue.replace(',', '.')))) {
-                            if (settings.eDec && settings.aStor) {
-                                settings.rawValue = autoSave($this, settings, 'get');
+                        if (settings.aForm && currentValue !== '' && isUndefinedOrNullOrEmpty($this.attr('value'))) {
+                            // Check if the `value` is valid or not
+                            const testedCurrentValue = parseFloat(currentValue.replace(',', '.')); //TODO Replace whatever locale character is used by a '.', and not only the comma ','
+                            if (!isNaN(testedCurrentValue) && Infinity !== testedCurrentValue) {
+                                $this.autoNumeric('set', testedCurrentValue);
+                                setValue = false;
                             }
-                            if (settings.aScale && settings.aStor) {
-                                settings.rawValue = autoSave($this, settings, 'get');
+                            else {
+                                // If not, inform the developer that nothing usable has been provided
+                                throwError(`The value [${currentValue}] used in the input is not a valid value autoNumeric can work with.`, false);
                             }
-                            if (!settings.aStor) {
-                                let toStrip;
-                                if (settings.nBracket !== null && settings.aNeg !== '') {
-                                    settings.onOff = true;
-                                    toStrip = negativeBracket(currentValue, settings);
-                                } else {
-                                    toStrip = currentValue;
+                        }
+                        else {
+                            /* Checks for :
+                             * - page reload from back button, and
+                             * - ASP.net form post back
+                             *      The following HTML data attribute is REQUIRED (data-an-default="same value as the value attribute")
+                             *      example: <asp:TextBox runat="server" id="someID" text="1234.56" data-an-default="1234.56">
+                             */
+                            //TODO Replace whatever locale character is used by a '.', and not only the comma ',', based on the locale used by the user
+                            if ((settings.anDefault !== null && settings.anDefault.toString() !== currentValue) ||
+                                    (settings.anDefault === null && currentValue !== '' && currentValue !== $this.attr('value')) ||
+                                    (currentValue !== '' && $this.attr('type') === 'hidden' && !$.isNumeric(currentValue.replace(',', '.')))) {
+                                if (settings.eDec !== null && settings.aStor) {
+                                    settings.rawValue = autoSave($this, settings, 'get');
                                 }
-                                settings.rawValue = ((settings.pNeg === 's' || (settings.pSign === 's' && settings.pNeg !== 'p')) && settings.aNeg !== '' && contains(currentValue, '-')) ? '-' + autoStrip(toStrip, settings) : autoStrip(toStrip, settings);
+                                if (settings.scaleDivisor && settings.aStor) {
+                                    settings.rawValue = autoSave($this, settings, 'get');
+                                }
+                                if (!settings.aStor) {
+                                    let toStrip;
+                                    if (settings.nBracket !== null && settings.aNeg !== '') {
+                                        settings.onOff = true;
+                                        toStrip = negativeBracket(currentValue, settings);
+                                    } else {
+                                        toStrip = currentValue;
+                                    }
+                                    settings.rawValue = ((settings.pNeg === 's' || (settings.pSign === 's' && settings.pNeg !== 'p')) && settings.aNeg !== '' && contains(currentValue, '-'))?'-' + autoStrip(toStrip, settings):autoStrip(toStrip, settings);
+                                }
+                                setValue = false;
                             }
-                            setValue = false;
                         }
 
                         if (currentValue === '') {
@@ -1946,11 +1989,11 @@ if (typeof define === 'function' && define.amd) {
                                 default :
                                     //
                             }
-                        }
-                        else if (setValue && currentValue === $this.attr('value')) {
+                        } else if (setValue && currentValue === $this.attr('value')) {
                             $this.autoNumeric('set', currentValue);
                         }
                     }
+
                     if (isInArray($this.prop('tagName').toLowerCase(), settings.tagList) && $this.text() !== '') {
                         if (settings.anDefault !== null) {
                             if (settings.anDefault === $this.text()) {
@@ -1964,6 +2007,7 @@ if (typeof define === 'function' && define.amd) {
 
                 settings.runOnce = true;
 
+                //TODO Extract the event listeners to another function
                 // input types supported "text", "hidden", "tel" and no type
                 if ($input) {
                     $this.on('focusin.autoNumeric', () => {
@@ -1973,22 +2017,21 @@ if (typeof define === 'function' && define.amd) {
                         if ($settings.nBracket !== null && $settings.aNeg !== '') {
                             $this.val(negativeBracket($this.val(), $settings));
                         }
-                        if ($settings.nSep === true) {
-                            $settings.aSep = '';
-                            $settings.aSign = '';
-                        }
-
                         let result;
                         if ($settings.eDec) {
                             $settings.mDec = $settings.eDec;
                             $this.autoNumeric('set', $settings.rawValue);
-                        } else if ($settings.aScale) {
+                        } else if ($settings.scaleDivisor) {
                             $settings.mDec = $settings.oDec;
+                            $this.autoNumeric('set', $settings.rawValue);
+                        } else if ($settings.nSep) {
+                            $settings.aSep = '';
+                            $settings.aSign = '';
+                            $settings.aSuffix = '';
                             $this.autoNumeric('set', $settings.rawValue);
                         } else if ((result = autoStrip($this.val(), $settings)) !== $settings.rawValue) {
                             $this.autoNumeric('set', result);
                         }
-
                         holder.inVal = $this.val();
                         holder.lastVal = holder.inVal;
                         const onEmpty = checkEmpty(holder.inVal, $settings, true);
@@ -2113,6 +2156,7 @@ if (typeof define === 'function' && define.amd) {
                         if ($settings.nSep === true) {
                             $settings.aSep = $settings.oSep;
                             $settings.aSign = $settings.oSign;
+                            $settings.aSuffix = $settings.oSuffix;
                         }
                         if ($settings.eDec !== null) {
                             $settings.mDec = $settings.oDec;
@@ -2129,11 +2173,11 @@ if (typeof define === 'function' && define.amd) {
                             if (checkEmpty(value, $settings) === null && minTest && maxTest) {
                                 value = fixNumber(value, $settings.aDec, $settings.aNeg);
                                 $settings.rawValue = value;
-                                if ($settings.aScale) {
-                                    value = value / $settings.scaleFactor;
+                                if ($settings.scaleDivisor) {
+                                    value = value / $settings.scaleDivisor;
                                     value = value.toString();
                                 }
-                                $settings.mDec = ($settings.aScale && $settings.aScale[1]) ? +$settings.scaleDecimal : $settings.mDec;
+                                $settings.mDec = ($settings.scaleDivisor && $settings.scaleDecimal) ? +$settings.scaleDecimal : $settings.mDec;
                                 value = autoRound(value, $settings);
                                 value = presentNumber(value, $settings);
                             } else {
@@ -2158,7 +2202,7 @@ if (typeof define === 'function' && define.amd) {
                             groupedValue = autoGroup(value, $settings);
                         }
                         if (groupedValue !== origValue) {
-                            groupedValue = ($settings.scaleSuffix) ? groupedValue + $settings.scaleSuffix : groupedValue;
+                            groupedValue = ($settings.scaleSymbol) ? groupedValue + $settings.scaleSymbol : groupedValue;
                             $this.val(groupedValue);
                         }
                         if (groupedValue !== holder.inVal) {
@@ -2246,30 +2290,34 @@ if (typeof define === 'function' && define.amd) {
         },
 
         /**
-         * method to update settings - can be call as many times
-         * $(someSelector).autoNumeric("update", {options}); // updates the settings
-         * options passed as a parameter example '{aSep: ".", aDec: ",", aSign: '€ '}
+         * Method that updates the autoNumeric settings
+         * It can be called multiple times if needed
+         * The options passed as a parameter is an object that contains the settings (ie. {aSep: ".", aDec: ",", aSign: '€ '})
+         *
+         * @usage $(someSelector).autoNumeric("update", {options}); // updates the settings
          */
         update(options) {
             return $(this).each(function() {
                 const $this = autoGet($(this));
                 let settings = $this.data('autoNumeric');
+
                 if (typeof settings !== 'object') {
                     throwError(`Initializing autoNumeric is required prior to calling the "update" method`, true);
                 }
                 const strip = $this.autoNumeric('get');
                 settings = $.extend(settings, options);
-                if (settings.aScale !== null) {
-                    settings.scaleFactor = +settings.aScale[0];
-                    settings.scaleDecimal = (settings.aScale[1]) ? +settings.aScale[1] : null;
-                    settings.scaleSuffix = (settings.aScale[2]) ? settings.aScale[2] : '';
+
+                if (settings.scaleDivisor) {
+                    settings.mDec = (settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
                 }
                 settings = originalSettings(settings);
                 getHolder($this, settings, true);
+
                 if (settings.aDec === settings.aSep) {
                     throwError(`autoNumeric will not function properly when the decimal character aDec: "${settings.aDec}" and thousand separator aSep: "${settings.aSep}" are the same character`, settings.debug);
                 }
                 $this.data('autoNumeric', settings);
+
                 if ($this.val() !== '' || $this.text() !== '') {
                     return $this.autoNumeric('set', strip);
                 }
@@ -2307,25 +2355,25 @@ if (typeof define === 'function' && define.amd) {
                 if (value !== '') {
                     const [minTest, maxTest] = autoCheck(value, settings);
                     if (minTest && maxTest) {
-                        if ($input && (!settings.eDec || !settings.aScale)) {
+                        if ($input && (settings.eDec || settings.scaleDivisor)) {
                             settings.rawValue = value;
                         }
 
                         // checks if the value falls within the min max range
                         if ($input || isInArray($this.prop('tagName').toLowerCase(), settings.tagList)) {
-                            if (settings.aScale && !settings.onOff) {
-                                value = value / settings.scaleFactor;
+                            if (settings.scaleDivisor && !settings.onOff) {
+                                value = value / settings.scaleDivisor;
                                 value = value.toString();
-                                settings.mDec = settings.scaleDecimal;
+                                settings.mDec = (settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
                             }
                             value = autoRound(value, settings);
-                            if (settings.eDec === null && settings.aScale === null) {
+                            if (settings.eDec === null && settings.scaleDivisor === null) {
                                 settings.rawValue = value;
                             }
                             value = presentNumber(value, settings);
                             value = autoGroup(value, settings);
                         }
-                        if (settings.aStor && (settings.eDec !== null || settings.aScale !== null)) {
+                        if (settings.aStor && (settings.eDec || settings.scaleDivisor)) {
                             autoSave($this, settings, 'set');
                         }
                     } else {
@@ -2346,8 +2394,8 @@ if (typeof define === 'function' && define.amd) {
                     return $this.val('');
                 }
 
-                if (!settings.onOff && settings.scaleSuffix) {
-                    value = value + settings.scaleSuffix;
+                if (!settings.onOff && settings.scaleSymbol) {
+                    value = value + settings.scaleSymbol;
                 }
                 if ($input) {
                     return $this.val(value);
@@ -2416,7 +2464,7 @@ if (typeof define === 'function' && define.amd) {
                 throwError(`The "<${$this.prop('tagName').toLowerCase()}>" tag is not supported by autoNumeric`, settings.debug);
             }
 
-            if (settings.eDec || settings.aScale) {
+            if (settings.eDec || settings.scaleDivisor) {
                 value = settings.rawValue;
             } else {
                 if (!((/\d/).test(value) || Number(value) === 0) && settings.wEmpty === 'focus') {
@@ -2440,7 +2488,7 @@ if (typeof define === 'function' && define.amd) {
             }
 
             // returned Numeric String
-            //TODO Shouldn't we return `Number(value)` since the goal of `get` is to get the raw javascript value?
+            // TODO Shouldn't we return `Number(value)` since the goal of `get` is to get the raw javascript value?
             return value;
         },
 
@@ -2451,7 +2499,11 @@ if (typeof define === 'function' && define.amd) {
          * @returns {string}
          */
         getFormatted() {
-            //TODO Make sure `this[0]` exists as well as `.value` before trying to access those
+            // Make sure `this[0]` exists as well as `.value` before trying to access that property
+            if (!isArray(this) || this.length !== 1 || !this[0].hasOwnProperty('value')) {
+                throwError('Unable to get the formatted string from the element.');
+            }
+
             return this[0].value;
         },
 
@@ -2496,14 +2548,17 @@ if (typeof define === 'function' && define.amd) {
         if (methods[method]) {
             return methods[method].apply(this, args);
         }
+
         if (typeof method === 'object' || !method) {
-            return methods.init.apply(this, args);
+            // The options have been passed directly, without using a named method
+            //TODO First validate the options passed as an argument, before using `init`
+            return methods.init.apply(this, [method]);
         }
 
         throwError(`Method "${method}" is not supported by autoNumeric`, true);
     };
 
-    /**
+    /*
      * Defaults are public - these can be overridden by the following:
      * HTML5 data attributes
      * Options passed by the 'init' or 'update' methods
@@ -2520,7 +2575,9 @@ if (typeof define === 'function' && define.amd) {
          */
         aSep: ',',
 
-        /* when true => when the input has focus only the decimal character is visible
+        /* When true => removes the thousand seperator, currency symbol & suffix "focusin"
+         * example if the input value "$ 1,999.88 suffix"
+         * on "focusin" it becomes "1999.88" and back to "$ 1,999.88 suffix" on focus out.
          */
         nSep: false,
 
@@ -2605,16 +2662,30 @@ if (typeof define === 'function' && define.amd) {
          */
         eDec: null,
 
-        /* Scaled number displayed when input does not have focus example with the following:
-         * {aScale: ["1000", "0", "K"]}  => with focus "1,000.00" without focus "1K"
-         * ["divisor", "decimal places", "symbol"]
-         * divisor value - does not need to be whole number - please understand that Javascript has limited accuracy in math
-         * the "get" method returns the full value and scaled value.
-         * decimal places "optional" when not in focus - if omitted the decimal places will be the same when the input has focus
-         * Symbol "optional" displayed when the input does not have focus - NOTE: if a symbol is used you MUST also specify the decimal places
-         * value must be enclosed in quotes example mDec: "3"
+        /* The next three options (scaleDivisor, scaleDecimal & scaleSymbol) handle scaling of the input when the input does not have focus
+         * Please note that the non-scaled value is held in data and it is advised that you use the "aStore" option to ensure retaining the value         * ["divisor", "decimal places", "symbol"]
+         * Example: with the following options set {scaleDivisor: '1000', scaleDecimal: '1', scaleSymbol: ' K'}
+         * Example: focusin value "1,111.11" focusout value "1.1 K"
          */
-        aScale: null,
+
+        /* scaleDivisor devides the on focus value and places the result in the input on focusout
+         * example {scaleDivisor: '1000'} or <input data-scale-divisor="1000">
+         * the divisor value - does not need to be whole number but please understand that Javascript has limited accuracy in math
+         * the "get" method returns the full value.
+         */
+        scaleDivisor: null,
+
+        /*
+         * scaledDecimal option is the number of decimal place when not in focus - for this to function scaledDivisor must not be null
+         * this is "optional" if omitted the decimal places will be the same when the input has focus
+         */
+        scaleDecimal: null,
+
+        /*
+         * scaledSymbol option is a symbol placed as a suffix when not in focus.
+         * this is "optional"
+         */
+        scaleSymbol: null,
 
         /* Set to true to allow the eDec value to be saved with sessionStorage
          * if ie 6 or 7 the value will be saved as a session cookie
@@ -2622,10 +2693,10 @@ if (typeof define === 'function' && define.amd) {
         aStor: false,
 
         /* method used for rounding
-         * mRound: "s", Round-Half-Up Symmetric (default)
+         * mRound: "S", Round-Half-Up Symmetric (default)
          * mRound: "A", Round-Half-Up Asymmetric
          * mRound: "s", Round-Half-Down Symmetric (lower case s)
-         * mRound: "A", Round-Half-Down Asymmetric (lower case a)
+         * mRound: "a", Round-Half-Down Asymmetric (lower case a)
          * mRound: "B", Round-Half-Even "Bankers Rounding"
          * mRound: "U", Round Up "Round-Away-From-Zero"
          * mRound: "D", Round Down "Round-Toward-Zero" - same as truncate
@@ -2635,12 +2706,11 @@ if (typeof define === 'function' && define.amd) {
          * mRound: "U05" Rounds up to next .05
          * mRound: "D05" Rounds down to next .05
          */
-        mRound: 's',
+        mRound: 'S',
 
         /* controls decimal padding
          * aPad: true - always Pad decimals with zeros
          * aPad: false - does not pad with zeros.
-         * aPad: `some number` - pad decimals with zero to number different from mDec
          * thanks to Jonas Johansson for the suggestion
          */
         aPad: true,
@@ -2658,6 +2728,7 @@ if (typeof define === 'function' && define.amd) {
          * wEmpty: "always" - always displays the currency sign only
          * wEmpty: "zero" - if the input has no value on focus out displays a zero "rounded" with or with a currency sign
          */
+        //TODO Add an option to display the currency sign only on hover (if the input is empty)
         wEmpty: 'focus',
 
         /* controls leading zero behavior
@@ -2667,8 +2738,8 @@ if (typeof define === 'function' && define.amd) {
          */
         lZero: 'allow',
 
-        /* determine if the default value will be formatted on page ready.
-         * true = automatically formats the default value on page ready
+        /* determine if the default value will be formatted on initialization.
+         * true = automatically formats the default value on initialization
          * false = will not format the default value
          */
         aForm: true,
@@ -2825,7 +2896,7 @@ if (typeof define === 'function' && define.amd) {
 /**
  * This exports the interface for the autoNumeric object
  */
-export default {
+/* export default {
     format  : autoFormat,
     unFormat: autoUnFormat,
     getDefaultConfig,
@@ -2844,4 +2915,4 @@ export default {
     //wipe         : an.wipe(input)
     //destroy      : an.destroy(input)
     //validate     : an.validate(options)
-};
+}; */

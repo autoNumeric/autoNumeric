@@ -1,25 +1,31 @@
 ### Change log:
 
-###
-+ "2.0.0-beta.4"
+### "2.0.0-beta.5"
++ Add a `validate()` method that checks if the given options object is valid.
++ Reorganize the `init` function code to check for critical error first, before doing other calculus.
++ Add a `areSettingsValid()` method that return true if the options object is valid.
++ Add multiple helper functions `isBoolean`, `isNull`, `isTrueOrFalseString`, `isObject`, `isEmptyObj`, `hasDecimals`,  `decimalsPlaces`.
++ Add a `warning()` method that output warning message to the console.
++ Rename `originalSettings` to `keepOriginalSettings` to better convey what this function is doing.
+
+### "2.0.0-beta.4"
 + Removed the index.html file
 + Additional mods/fixes to the scaling options
 + Additional mods/fixes to the "nSep" to also handle the "aSuffix"
 + Fixed the "mRound" default
 
-###
-+ "2.0.0-beta.3"
+### "2.0.0-beta.3"
 + fixed nSep option which removes the Currency symbom and thousand seperator on focusin
 + changed the defaulys of scaleDivisor, scaleDecimal & scaleSymbol to null
 
-###
+### "2.0.0-beta.2"
 + modified the scaling o[tiona and seperated the options
 + aScale - removed
 + scaleDivisor added
 + scaleDecimal added
 + scaleSymbol added
 
-### Version 2.0.0 released 2016-11-16
+### Version 2.0.0-beta.0 released 2016-11-16
 + Prepare the code base for future Jasmine tests
 + Add initial babel support
 + Add uglify and npm-build-process support

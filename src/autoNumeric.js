@@ -42,6 +42,9 @@ let validate;
 let areSettingsValid;
 
 // AutoNumeric default settings
+/**
+ * List of allowed tag on which autoNumeric can be used.
+ */
 const allowedTagList = [
     'b',
     'caption',
@@ -77,7 +80,7 @@ const allowedTagList = [
     'u',
 ];
 
-/*
+/**
  * Defaults options are public - these can be overridden by the following:
  * - HTML5 data attributes
  * - Options passed by the 'init' or 'update' methods
@@ -94,7 +97,7 @@ const defaultSettings = {
      */
     aSep: ',',
 
-    /* When true => removes the thousand seperator, currency symbol & suffix "focusin"
+    /* When true => removes the thousand separator, currency symbol & suffix "focusin"
      * example if the input value "$ 1,999.88 suffix"
      * on "focusin" it becomes "1999.88" and back to "$ 1,999.88 suffix" on focus out.
      */
@@ -182,7 +185,8 @@ const defaultSettings = {
     eDec: null,
 
     /* The next three options (scaleDivisor, scaleDecimal & scaleSymbol) handle scaling of the input when the input does not have focus
-     * Please note that the non-scaled value is held in data and it is advised that you use the "aStore" option to ensure retaining the value         * ["divisor", "decimal places", "symbol"]
+     * Please note that the non-scaled value is held in data and it is advised that you use the "aStor" option to ensure retaining the value
+     * ["divisor", "decimal places", "symbol"]
      * Example: with the following options set {scaleDivisor: '1000', scaleDecimal: '1', scaleSymbol: ' K'}
      * Example: focusin value "1,111.11" focusout value "1.1 K"
      */
@@ -850,26 +854,37 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * converts the ISO numeric string to the locale decimal and minus sign placement
-     * see "localeOutput" option for determine
-     * null => nnnn.nn or -nnnn.nn default
-     * ","  => nnnn,nn or -nnnn,nn can als be "-,"
-     * ".-" => nnnn.nn or nnnn.nn-
-     * ",-" => nnnn,nn or nnnn,nn-
+     * Converts the ISO numeric string to the locale decimal and minus sign placement.
+     * See the "localeOutput" option definition for more details.
      */
     function toLocale(value, locale) {
-        if (locale === '.-') {
-            value = contains(value, '-') ? value.replace('-', '') + '-' : value;
-        }
-        if (locale === ',' || locale === '-,') {
-            value = value.replace('.', ',');
-        }
-        if (locale === ',-') {
-            value = value.replace('.', ',');
-            value = contains(value, '-') ? value.replace('-', '') + '-' : value;
+        if (isNull(locale)) {
+            return value;
         }
 
-        return value;
+        let result;
+        switch (locale) {
+            case '.-':
+                result = contains(value, '-') ? value.replace('-', '') + '-' : value;
+                break;
+            case ',':
+            case '-,':
+                result = value.replace('.', ',');
+                break;
+            case ',-':
+                result = value.replace('.', ',');
+                result = contains(result, '-') ? result.replace('-', '') + '-' : result;
+                break;
+            // The default case
+            case '.':
+            case '-.':
+                result = value;
+                break;
+            default :
+                throwError(`The given localeOutput [${locale}] option is not recognized.`, true);
+        }
+
+        return result;
     }
 
     /**
@@ -2577,9 +2592,9 @@ if (typeof define === 'function' && define.amd) {
             const currentValue = $this.val();
             /*
              * If the input value has been set by the dev, but not directly as an attribute in the html, then it takes
-             * precedence and should get formatted on init (if that this input value is a valid number and that the
-             * developer wants it formatted on init (cf. `settings.aForm`)). Note; this is true whatever the developer
-             * has set for `data-an-default` in the html (asp.net users).
+             * precedence and should get formatted on init (if this input value is a valid number and that the
+             * developer wants it formatted on init (cf. `settings.aForm`)).
+             * Note; this is true whatever the developer has set for `data-an-default` in the html (asp.net users).
              *
              * In other words : if `anDefault` is not null, it means the developer is trying to prevent postback problems.
              * But if `input.value` is set to a number, and `$this.attr('value')` is not set, then it means the dev has
@@ -2609,14 +2624,12 @@ if (typeof define === 'function' && define.amd) {
                 if ((settings.anDefault !== null && settings.anDefault.toString() !== currentValue) ||
                     (settings.anDefault === null && currentValue !== '' && currentValue !== $this.attr('value')) ||
                     (currentValue !== '' && $this.attr('type') === 'hidden' && !$.isNumeric(currentValue.replace(',', '.')))) {
-                    if (settings.eDec !== null && settings.aStor) {
+                    if ((settings.eDec !== null && settings.aStor) ||
+                        (settings.scaleDivisor && settings.aStor)) {
                         settings.rawValue = autoSave($this, settings, 'get');
                     }
 
-                    if (settings.scaleDivisor && settings.aStor) {
-                        settings.rawValue = autoSave($this, settings, 'get');
-                    }
-
+                    // If the eDec value should NOT be saved in sessionStorage
                     if (!settings.aStor) {
                         let toStrip;
 
@@ -2961,16 +2974,19 @@ if (typeof define === 'function' && define.amd) {
          * by defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
          * locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" => please see option "localeOutput" for details
          */
+        //TODO Create a `get()` method that always return the raw value, no matter what `localeOutput` is. Create a `getWithLocale()` method that behave like the current `get` method, which means that can sometimes return a number, or a string. Doing so will remove uncertainty for developers.
         get() {
+            //TODO Why would we need to get a new reference to $this since it has been done in `init()`?
             const $this = autoGet($(this));
-            const settings = $this.data('autoNumeric');
+            //TODO This looks a lot like `getInputIfSupportedTagAndType()`. Is that necessary? Can the input element be changed since autoNumeric has been initialized?
             const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
-            let value = '';
+            const settings = $this.data('autoNumeric');
             if (typeof settings !== 'object') {
                 throwError(`Initializing autoNumeric is required prior to calling the "get" method`, true);
             }
 
             // determine the element type then use .eq(0) selector to grab the value of the first element in selector
+            let value = '';
             if ($input) {
                 value = $this.eq(0).val();
             } else if (isInArray($this.prop('tagName').toLowerCase(), settings.tagList)) {
@@ -2998,12 +3014,11 @@ if (typeof define === 'function' && define.amd) {
             if (Number(value) === 0 && settings.lZero !== 'keep') {
                 value = '0';
             }
-            if (settings.localeOutput) {
-                value = toLocale(value, settings.localeOutput);
-            }
+
+            value = toLocale(value, settings.localeOutput);
 
             // returned Numeric String
-            //TODO Shouldn't we return `Number(value)` since the goal of `get` is to get the raw javascript value?
+            //TODO Shouldn't we return `Number(value)` since the goal of `get` is to get the raw javascript value? -> that could depend on `localeOutput`
             return value;
         },
 
@@ -3138,14 +3153,12 @@ if (typeof define === 'function' && define.amd) {
             settings.onOff = true;
             value = negativeBracket(value, settings);
         }
+
         value = value.replace(autoStrip, '');
         value = value.replace(',', '.');
+        value = toLocale(value, settings.localeOutput);
 
-        if (settings.localeOutput) {
-            value = toLocale(value, settings.localeOutput);
-        }
-
-        return Number(value);
+        return Number(value); //FIXME `value` here could be a string (depending on `localeOutput`), so we should only cast it to a Number when needed
     };
 
     $.fn.autoUnformat = autoUnFormat;
@@ -3379,9 +3392,6 @@ if (typeof define === 'function' && define.amd) {
      * @returns {CustomEvent}
      */
     function createCustomEvent(eventName, detail) {
-        /* let eventInfo = new CustomEventInit(); //This should be used instead, but IE does not support 'CustomEventInit' yet
-        eventInfo.detail = detail;
-        return new CustomEvent(eventName, eventInfo); */
         return new CustomEvent(eventName, { detail, bubbles: false, cancelable: false }); // This is not supported by default by IE ; We use the polyfill for IE9 and later.
     }
 

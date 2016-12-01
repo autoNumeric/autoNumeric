@@ -469,6 +469,23 @@ describe(`autoNumeric 'get' and 'getLocalized' methods`, () => {
         aNInput.autoNumeric('set', -42);
         expect(aNInput.autoNumeric('get')).toEqual('-42.00');
     });
+
+    it('should return an unformatted value even if the number is bigger than Number.MAX_SAFE_INTEGER', () => {
+        if (Number.MAX_SAFE_INTEGER === void(0)) { // Special polyfill case for PhantomJS
+            // console.log(`Setting the Number.MAX_SAFE_INTEGER polyfill...`); //DEBUG
+            //noinspection JSPrimitiveTypeWrapperUsage
+            Number.MAX_SAFE_INTEGER = 9007199254740991;
+        }
+
+        aNInput.autoNumeric('update', { vMax: '9007199254740991000000' });
+        aNInput.autoNumeric('set', Number.MAX_SAFE_INTEGER); // The exact highest safe integer
+        expect(aNInput.autoNumeric('get')).toEqual(`${Number.MAX_SAFE_INTEGER}.00`);
+        aNInput.autoNumeric('set', '9007199254740996'); // A bit higher than the biggest safest integer
+        expect(aNInput.autoNumeric('get')).toEqual('9007199254740996.00');
+        // Add a test where the user set a very big number (bigger than Number.MAX_SAFE_INTEGER), and check if `get` return the correct number
+        aNInput.autoNumeric('set', '9007199254740991000000'); // A very big number
+        expect(aNInput.autoNumeric('get')).toEqual('9007199254740991000000.00');
+    });
 });
 
 describe(`autoNumeric 'set' method`, () => {

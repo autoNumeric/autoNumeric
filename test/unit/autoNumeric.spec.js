@@ -529,6 +529,18 @@ describe(`autoNumeric 'set' method`, () => {
         aNInput.autoNumeric('set', '6789012.345');
         expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789,012.35');
     });
+
+    it('should respect the vMin and vMax settings', () => {
+        aNInput.autoNumeric('update', { vMin: '999999.99', vMax: '1111111111111.11' });
+        expect(() => aNInput.autoNumeric('set', 999999.99)).not.toThrow();
+        expect(() => aNInput.autoNumeric('set', 1111111111111.11)).not.toThrow();
+
+        expect(() => aNInput.autoNumeric('set', 999999.984)).toThrow(); // Min, with rounding up
+        expect(() => aNInput.autoNumeric('set', 999999.989)).toThrow(); // Min, even without rounding
+        expect(() => aNInput.autoNumeric('set', 999999.991)).not.toThrow();
+        expect(() => aNInput.autoNumeric('set', 1111111111111.109)).not.toThrow();
+        expect(() => aNInput.autoNumeric('set', 1111111111111.111)).toThrow(); // Max
+    });
 });
 
 describe(`autoNumeric 'getString' and 'getArray' methods`, () => {

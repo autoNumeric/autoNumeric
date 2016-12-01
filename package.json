@@ -1,6 +1,6 @@
 {
   "name": "autonumeric",
-  "version": "2.0.0-beta.5",
+  "version": "2.0.0-beta.7",
   "description": "autoNumeric is a jQuery plugin that automatically formats currency (money) and numbers as you type on form inputs. It supports most international numeric formats and currency signs including those used in Europe, North and South America, Asia and India's' lakhs.",
   "main": "src/autoNumeric.js",
   "typings": "typings.d.ts",

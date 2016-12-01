@@ -2770,7 +2770,7 @@ if (typeof define === 'function' && define.amd) {
             $.each(settings, (key, value) => {
                 // Convert the string 'true' and 'false' to real Boolean
                 if (value === 'true' || value === 'false') {
-                    settings[key] = Boolean(value === 'true');
+                    settings[key] = value === 'true';
                 }
 
                 // Convert numbers in options to strings

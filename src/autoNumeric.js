@@ -2915,6 +2915,7 @@ if (typeof define === 'function' && define.amd) {
          */
         update(options) {
             return $(this).each(function() {
+                //TODO Replace all this duplicated code with a call to `getInitialSettings()`
                 const $this = autoGet(this);
                 let settings = $this.data('autoNumeric');
 
@@ -2960,6 +2961,7 @@ if (typeof define === 'function' && define.amd) {
                     return;
                 }
 
+                //TODO This looks a lot like `getInputIfSupportedTagAndType()`. Is that necessary? Can the input element be changed since autoNumeric has been initialized?
                 const $this = autoGet(this);
                 const settings = $this.data('autoNumeric');
                 const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');

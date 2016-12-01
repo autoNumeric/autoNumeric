@@ -655,6 +655,8 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Function that throw error messages
+     *
+     * @param {string} message
      */
     function throwError(message) {
         throw new Error(message);
@@ -662,6 +664,9 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Function that display a warning messages, according to the debug level.
+     *
+     * @param {string} message
+     * @param {boolean} suppressWarnings If TRUE, then the warning message is not displayed
      */
     function warning(message, suppressWarnings = false) {
         if (suppressWarnings) {
@@ -815,6 +820,10 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Places or removes brackets on negative values
+     *
+     * @param {string} s
+     * @param {object} settings
+     * @returns {*}
      */
     function negativeBracket(s, settings) {
         if ((settings.pSign === 'p' && settings.pNeg === 'l') || (settings.pSign === 's' && settings.pNeg === 'p')) {
@@ -926,13 +935,19 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Private function to check for empty value
+     *
+     * @param {string} inputValue
+     * @param {object} settings
+     * @param {boolean} signOnEmpty
+     * @returns {*}
      */
-    function checkEmpty(iv, settings, signOnEmpty) {
-        if (iv === '' || iv === settings.aNeg) {
+    function checkEmpty(inputValue, settings, signOnEmpty) {
+        if (inputValue === '' || inputValue === settings.aNeg) {
             if (settings.wEmpty === 'always' || signOnEmpty) {
-                return (settings.pNeg === 'l') ? iv + settings.aSign + settings.aSuffix : settings.aSign + iv + settings.aSuffix;
+                return (settings.pNeg === 'l') ? inputValue + settings.aSign + settings.aSuffix : settings.aSign + inputValue + settings.aSuffix;
             }
-            return iv;
+
+            return inputValue;
         }
 
         return null;
@@ -940,22 +955,30 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Private function that formats our number
+     *
+     * @param {string} inputValue
+     * @param {object} settings
+     * @returns {*}
      */
-    function autoGroup(iv, settings) {
+    function autoGroup(inputValue, settings) {
         if (settings.strip) {
-            iv = autoStrip(iv, settings);
+            inputValue = autoStrip(inputValue, settings);
         }
-        if (settings.trailingNegative && !contains(iv, '-')) {
-            iv = '-' + iv;
+
+        if (settings.trailingNegative && !contains(inputValue, '-')) {
+            inputValue = '-' + inputValue;
         }
-        const empty = checkEmpty(iv, settings, true);
-        const isNeg = contains(iv, '-');
+
+        const empty = checkEmpty(inputValue, settings, true);
+        const isNeg = contains(inputValue, '-');
         if (isNeg) {
-            iv = iv.replace('-', '');
+            inputValue = inputValue.replace('-', '');
         }
+
         if (empty !== null) {
             return empty;
         }
+
         let digitalGroup = '';
         settings.dGroup = settings.dGroup.toString();
         if (settings.dGroup === '2') {
@@ -969,69 +992,77 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // splits the string at the decimal string
-        let [integerPart, decimalPart] = iv.split(settings.aDec);
+        let [integerPart, decimalPart] = inputValue.split(settings.aDec);
         if (settings.altDec && isUndefined(decimalPart)) {
-            [integerPart, decimalPart] = iv.split(settings.altDec);
+            [integerPart, decimalPart] = inputValue.split(settings.altDec);
         }
+
         if (settings.aSep !== '') {
             // re-inserts the thousand separator via a regular expression
             while (digitalGroup.test(integerPart)) {
                 integerPart = integerPart.replace(digitalGroup, `$1${settings.aSep}$2`);
             }
         }
+
         if (settings.mDec !== 0 && !isUndefined(decimalPart)) {
             if (decimalPart.length > settings.mDec) {
                 decimalPart = decimalPart.substring(0, settings.mDec);
             }
 
             // joins the whole number with the decimal value
-            iv = integerPart + settings.aDec + decimalPart;
+            inputValue = integerPart + settings.aDec + decimalPart;
         } else {
             // if whole numbers only
-            iv = integerPart;
+            inputValue = integerPart;
         }
+
         if (settings.pSign === 'p') {
             if (isNeg && settings.pNeg === 'l') {
-                iv = settings.aNeg + settings.aSign + iv;
+                inputValue = settings.aNeg + settings.aSign + inputValue;
             }
             if (isNeg && settings.pNeg === 'r') {
-                iv = settings.aSign + settings.aNeg + iv;
+                inputValue = settings.aSign + settings.aNeg + inputValue;
             }
             if (isNeg && settings.pNeg === 's') {
-                iv = settings.aSign + iv + settings.aNeg;
+                inputValue = settings.aSign + inputValue + settings.aNeg;
             }
             if (!isNeg) {
-                iv = settings.aSign + iv;
+                inputValue = settings.aSign + inputValue;
             }
         }
+
         if (settings.pSign === 's') {
             if (isNeg && settings.pNeg === 'r') {
-                iv = iv + settings.aSign + settings.aNeg;
+                inputValue = inputValue + settings.aSign + settings.aNeg;
             }
             if (isNeg && settings.pNeg === 'l') {
-                iv = iv + settings.aNeg + settings.aSign;
+                inputValue = inputValue + settings.aNeg + settings.aSign;
             }
             if (isNeg && settings.pNeg === 'p') {
-                iv = settings.aNeg + iv + settings.aSign;
+                inputValue = settings.aNeg + inputValue + settings.aSign;
             }
             if (!isNeg) {
-                iv = iv + settings.aSign;
+                inputValue = inputValue + settings.aSign;
             }
         }
 
         // removes the negative sign and places brackets
-        if (settings.nBracket !== null && (settings.rawValue < 0 || iv.charAt(0) === '-')) {
-            iv = negativeBracket(iv, settings);
+        if (settings.nBracket !== null && (settings.rawValue < 0 || inputValue.charAt(0) === '-')) {
+            inputValue = negativeBracket(inputValue, settings);
         }
         settings.trailingNegative = false;
 
-        return iv + settings.aSuffix;
+        return inputValue + settings.aSuffix;
     }
 
     /**
      * Truncate not needed zeros
+     *
+     * @param {string} roundedInputValue
+     * @param rDec
+     * @returns {void|XML|string|*}
      */
-    function truncateZeros(ivRounded, rDec) {
+    function truncateZeros(roundedInputValue, rDec) {
         let regex;
         switch (rDec) {
             case 0:
@@ -1048,12 +1079,12 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // If there are no decimal places, we don't need a decimal point at the end
-        ivRounded = ivRounded.replace(regex, '$1');
+        roundedInputValue = roundedInputValue.replace(regex, '$1');
         if (rDec === 0) {
-            ivRounded = ivRounded.replace(/\.$/, '');
+            roundedInputValue = roundedInputValue.replace(/\.$/, '');
         }
 
-        return ivRounded;
+        return roundedInputValue;
     }
 
     /**
@@ -1061,28 +1092,32 @@ if (typeof define === 'function' && define.amd) {
      * private function for round the number
      * please note this handled as text - JavaScript math function can return inaccurate values
      * also this offers multiple rounding methods that are not easily accomplished in JavaScript
+     *
+     * @param {string} inputValue
+     * @param {object} settings
+     * @returns {*}
      */
-    function autoRound(iv, settings) { // value to string
-        iv = (iv === '') ? '0' : iv.toString();
+    function autoRound(inputValue, settings) { // value to string
+        inputValue = (inputValue === '') ? '0' : inputValue.toString();
         if (settings.mRound === 'N05' || settings.mRound === 'CHF' || settings.mRound === 'U05' || settings.mRound === 'D05') {
             switch (settings.mRound) {
                 case 'N05':
-                    iv = (Math.round(iv * 20) / 20).toString();
+                    inputValue = (Math.round(inputValue * 20) / 20).toString();
                     break;
                 case 'U05':
-                    iv = (Math.ceil(iv * 20) / 20).toString();
+                    inputValue = (Math.ceil(inputValue * 20) / 20).toString();
                     break;
                 default :
-                    iv = (Math.floor(iv * 20) / 20).toString();
+                    inputValue = (Math.floor(inputValue * 20) / 20).toString();
             }
 
             let result;
-            if (!contains(iv, '.')) {
-                result = iv + '.00';
-            } else if (iv.length - iv.indexOf('.') < 3) {
-                result = iv + '0';
+            if (!contains(inputValue, '.')) {
+                result = inputValue + '.00';
+            } else if (inputValue.length - inputValue.indexOf('.') < 3) {
+                result = inputValue + '0';
             } else {
-                result = iv;
+                result = inputValue;
             }
             return result;
         }
@@ -1099,41 +1134,41 @@ if (typeof define === 'function' && define.amd) {
             rDec = 0;
         }
 
-        // Checks if the iv (input Value) is a negative value
-        if (iv.charAt(0) === '-') {
+        // Checks if the inputValue (input Value) is a negative value
+        if (inputValue.charAt(0) === '-') {
             nSign = '-';
 
             // Removes the negative sign that will be added back later if required
-            iv = iv.replace('-', '');
+            inputValue = inputValue.replace('-', '');
         }
 
         // Append a zero if the first character is not a digit (then it is likely to be a dot)
-        if (!iv.match(/^\d/)) {
-            iv = '0' + iv;
+        if (!inputValue.match(/^\d/)) {
+            inputValue = '0' + inputValue;
         }
 
         // Determines if the value is equal to zero. If it is, remove the negative sign
-        if (nSign === '-' && Number(iv) === 0) {
+        if (nSign === '-' && Number(inputValue) === 0) {
             nSign = '';
         }
 
         // Trims leading zero's as needed
-        if ((Number(iv) > 0 && settings.lZero !== 'keep') || (iv.length > 0 && settings.lZero === 'allow')) {
-            iv = iv.replace(/^0*(\d)/, '$1');
+        if ((Number(inputValue) > 0 && settings.lZero !== 'keep') || (inputValue.length > 0 && settings.lZero === 'allow')) {
+            inputValue = inputValue.replace(/^0*(\d)/, '$1');
         }
 
-        const dPos = iv.lastIndexOf('.');
+        const dPos = inputValue.lastIndexOf('.');
 
         // Virtual decimal position
-        const vdPos = (dPos === -1) ? iv.length - 1 : dPos;
+        const vdPos = (dPos === -1) ? inputValue.length - 1 : dPos;
 
         // Checks decimal places to determine if rounding is required :
         // Check if no rounding is required
-        let cDec = (iv.length - 1) - vdPos;
+        let cDec = (inputValue.length - 1) - vdPos;
 
         if (cDec <= settings.mDec) {
             // Check if we need to pad with zeros
-            ivRounded = iv;
+            ivRounded = inputValue;
             if (cDec < rDec) {
                 if (dPos === -1) {
                     ivRounded += settings.aDec;
@@ -1156,9 +1191,9 @@ if (typeof define === 'function' && define.amd) {
 
         // Rounded length of the string after rounding
         const rLength = dPos + settings.mDec; //TODO Modify `dPos` here if it's not intended that it can be equal to '-1'
-        const tRound = Number(iv.charAt(rLength + 1));
-        const odd = (iv.charAt(rLength) === '.') ? (iv.charAt(rLength - 1) % 2) : (iv.charAt(rLength) % 2);
-        let ivArray = iv.substring(0, rLength + 1).split('');
+        const tRound = Number(inputValue.charAt(rLength + 1));
+        const odd = (inputValue.charAt(rLength) === '.') ? (inputValue.charAt(rLength - 1) % 2) : (inputValue.charAt(rLength) % 2);
+        let ivArray = inputValue.substring(0, rLength + 1).split('');
 
         if ((tRound > 4 && settings.mRound === 'S')                  || // Round half up symmetric
             (tRound > 4 && settings.mRound === 'A' && nSign === '')  || // Round half up asymmetric positive values
@@ -1354,6 +1389,10 @@ if (typeof define === 'function' && define.amd) {
      * Check that the number satisfy the format conditions
      * and lays between settings.vMin and settings.vMax
      * and the string length does not exceed the digits in settings.vMin and settings.vMax
+     *
+     * @param {string} s
+     * @param {object} settings
+     * @returns {*}
      */
     function autoCheck(s, settings) {
         s = s.toString();
@@ -1385,6 +1424,7 @@ if (typeof define === 'function' && define.amd) {
      */
     function autoGet(obj) {
         if (typeof obj === 'string' || obj instanceof String) {
+            //TODO This block is apparently never entered. We should remove it after making sure that's 100% the case
             obj = obj.replace(/\[/g, '\\[').replace(/]/g, '\\]');
             obj = '#' + obj.replace(/(:|\.)/g, '\\$1');
             // possible modification to replace the above 2 lines
@@ -1396,6 +1436,11 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Function to attach data to the element and imitate the holder
+     *
+     * @param $that
+     * @param {object} settings
+     * @param {boolean} update
+     * @returns {*}
      */
     function getHolder($that, settings, update = false) {
         let data = $that.data('autoNumeric');
@@ -1416,6 +1461,8 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Original settings saved for use when eDec & nSep options are being used.
      * Those original settings are used exclusively in the `focusin` and `focusout` event handlers.
+     *
+     * @param {object} settings
      */
     function keepOriginalSettings(settings) {
         settings.oDec     = settings.mDec;
@@ -1502,6 +1549,10 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Holder object for field properties
+     *
+     * @param that
+     * @param {object} settings
+     * @constructor
      */
     function AutoNumericHolder(that, settings) {
         this.settings = settings;
@@ -2112,6 +2163,7 @@ if (typeof define === 'function' && define.amd) {
                     }
                 }
             }
+
             this.that.value = value;
             this.setPosition(position);
             this.formatted = true;
@@ -2129,6 +2181,7 @@ if (typeof define === 'function' && define.amd) {
      * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" => please see option "localeOutput" for details
      *
      * @param {boolean} getArrayBehavior - If set to TRUE, then this function behave like `getArray()`, otherwise if set to FALSE, it behave like `getString()`
+     * @param that - A reference to the current DOM element
      * @returns {*}
      * @private
      */
@@ -2425,44 +2478,44 @@ if (typeof define === 'function' && define.amd) {
             holder = getHolder($this);
             let value = $this.val();
             const origValue = value;
-            const $settings = holder.settingsClone;
-            $settings.onOff = false;
-            if ($settings.aStor) {
-                autoSave($this, $settings, 'set');
+            const settings = holder.settingsClone;
+            settings.onOff = false;
+            if (settings.aStor) {
+                autoSave($this, settings, 'set');
             }
 
-            if ($settings.nSep === true) {
-                $settings.aSep = $settings.oSep;
-                $settings.aSign = $settings.oSign;
-                $settings.aSuffix = $settings.oSuffix;
+            if (settings.nSep === true) {
+                settings.aSep = settings.oSep;
+                settings.aSign = settings.oSign;
+                settings.aSuffix = settings.oSuffix;
             }
 
-            if ($settings.eDec !== null) {
-                $settings.mDec = $settings.oDec;
-                $settings.aPad = $settings.oPad;
-                $settings.nBracket = $settings.oBracket;
+            if (settings.eDec !== null) {
+                settings.mDec = settings.oDec;
+                settings.aPad = settings.oPad;
+                settings.nBracket = settings.oBracket;
             }
 
-            value = autoStrip(value, $settings);
+            value = autoStrip(value, settings);
             if (value !== '') {
-                if ($settings.trailingNegative) {
+                if (settings.trailingNegative) {
                     value = '-' + value;
-                    $settings.trailingNegative = false;
+                    settings.trailingNegative = false;
                 }
 
-                const [minTest, maxTest] = autoCheck(value, $settings);
-                if (checkEmpty(value, $settings) === null && minTest && maxTest) {
-                    value = fixNumber(value, $settings);
-                    $settings.rawValue = value;
+                const [minTest, maxTest] = autoCheck(value, settings);
+                if (checkEmpty(value, settings) === null && minTest && maxTest) { //TODO `checkEmpty` is missing the third parameter
+                    value = fixNumber(value, settings);
+                    settings.rawValue = value;
 
-                    if ($settings.scaleDivisor) {
-                        value = value / $settings.scaleDivisor;
+                    if (settings.scaleDivisor) {
+                        value = value / settings.scaleDivisor;
                         value = value.toString();
                     }
 
-                    $settings.mDec = ($settings.scaleDivisor && $settings.scaleDecimal)?+$settings.scaleDecimal:$settings.mDec;
-                    value = autoRound(value, $settings);
-                    value = presentNumber(value, $settings);
+                    settings.mDec = (settings.scaleDivisor && settings.scaleDecimal)?+settings.scaleDecimal:settings.mDec;
+                    value = autoRound(value, settings);
+                    value = presentNumber(value, settings);
                 } else {
                     if (!minTest) {
                         $this.trigger('autoNumeric:minExceeded');
@@ -2471,24 +2524,24 @@ if (typeof define === 'function' && define.amd) {
                         $this.trigger('autoNumeric:maxExceeded');
                     }
 
-                    value = $settings.rawValue;
+                    value = settings.rawValue;
                 }
             } else {
-                if ($settings.wEmpty === 'zero') {
-                    $settings.rawValue = '0';
-                    value = autoRound('0', $settings);
+                if (settings.wEmpty === 'zero') {
+                    settings.rawValue = '0';
+                    value = autoRound('0', settings);
                 } else {
-                    $settings.rawValue = '';
+                    settings.rawValue = '';
                 }
             }
 
-            let groupedValue = checkEmpty(value, $settings, false);
+            let groupedValue = checkEmpty(value, settings, false);
             if (groupedValue === null) {
-                groupedValue = autoGroup(value, $settings);
+                groupedValue = autoGroup(value, settings);
             }
 
             if (groupedValue !== origValue) {
-                groupedValue = ($settings.scaleSymbol)?groupedValue + $settings.scaleSymbol:groupedValue;
+                groupedValue = (settings.scaleSymbol)?groupedValue + settings.scaleSymbol:groupedValue;
                 $this.val(groupedValue);
             }
 
@@ -2864,16 +2917,19 @@ if (typeof define === 'function' && define.amd) {
          * $(someSelector).autoNumeric('set', 'value'); // formats the value being passed as the second parameter
          * If the value is passed as a string, it can be an integer '1234' or a double '1234.56789'
          * and must contain only numbers and one decimal (period) character
+         *
+         * @param {*} newValue
+         * @returns {*|jQuery}
          */
-        set(valueIn) {
+        set(newValue) {
             return $(this).each(function() {
-                if (valueIn === null || isUndefined(valueIn)) {
+                if (newValue === null || isUndefined(newValue)) {
                     return;
                 }
                 const $this = autoGet($(this));
                 const settings = $this.data('autoNumeric');
                 const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
-                let value = valueIn.toString();
+                let value = newValue.toString();
                 if (typeof settings !== 'object') {
                     throwError(`Initializing autoNumeric is required prior to calling the "set" method`);
                 }
@@ -2901,13 +2957,16 @@ if (typeof define === 'function' && define.amd) {
                                 value = value.toString();
                                 settings.mDec = (settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
                             }
+
                             value = autoRound(value, settings);
                             if (settings.eDec === null && settings.scaleDivisor === null) {
                                 settings.rawValue = value;
                             }
+
                             value = presentNumber(value, settings);
                             value = autoGroup(value, settings);
                         }
+
                         if (settings.aStor && (settings.eDec || settings.scaleDivisor)) {
                             autoSave($this, settings, 'set');
                         }
@@ -2919,6 +2978,7 @@ if (typeof define === 'function' && define.amd) {
                         if (!minTest) {
                             $this.trigger('autoNumeric:minExceeded');
                         }
+
                         if (!maxTest) {
                             $this.trigger('autoNumeric:maxExceeded');
                         }
@@ -2934,9 +2994,11 @@ if (typeof define === 'function' && define.amd) {
                 if (!settings.onOff && settings.scaleSymbol) {
                     value = value + settings.scaleSymbol;
                 }
+
                 if ($input) {
                     return $this.val(value);
                 }
+
                 if (isInArray($this.prop('tagName').toLowerCase(), settings.tagList)) {
                     return $this.text(value);
                 }

@@ -252,7 +252,7 @@ const defaultSettings = {
      * wEmpty: "focus" - (default) currency sign displayed and the input receives focus
      * wEmpty: "press" - currency sign displays on any key being pressed
      * wEmpty: "always" - always displays the currency sign only
-     * wEmpty: "zero" - if the input has no value on focus out displays a zero "rounded" with or with a currency sign
+     * wEmpty: "zero" - if the input has no value on focus out displays a zero "rounded" with or without a currency sign
      */
     //TODO Add an option to display the currency sign only on hover (if the input is empty)
     wEmpty: 'focus',
@@ -654,7 +654,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Function to handle errors messages
+     * Function that throw error messages
      */
     function throwError(message, debug = true) {
         if (debug) {
@@ -663,7 +663,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Function to handle warning messages
+     * Function that display a warning messages, according to the debug level.
      */
     function warning(message, suppressWarnings = false) {
         if (suppressWarnings) {
@@ -816,7 +816,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * places or removes brackets on negative values
+     * Places or removes brackets on negative values
      */
     function negativeBracket(s, settings) {
         if ((settings.pSign === 'p' && settings.pNeg === 'l') || (settings.pSign === 's' && settings.pNeg === 'p')) {
@@ -888,7 +888,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * prepare number string to be converted to real number
+     * Prepare number string to be converted to real number
      */
     function fixNumber(s, aDec, aNeg) {
         if (aDec && aDec !== '.') {
@@ -905,7 +905,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * prepare real number to be converted to our format
+     * Prepare real number to be converted to our format
      */
     function presentNumber(s, settings) {
         if (settings.aNeg && settings.aNeg !== '-') {
@@ -919,7 +919,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * private function to check for empty value
+     * Private function to check for empty value
      */
     function checkEmpty(iv, settings, signOnEmpty) {
         if (iv === '' || iv === settings.aNeg) {
@@ -933,7 +933,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * private function that formats our number
+     * Private function that formats our number
      */
     function autoGroup(iv, settings) {
         if (settings.strip) {
@@ -1029,7 +1029,7 @@ if (typeof define === 'function' && define.amd) {
         let regex;
         switch (rDec) {
             case 0:
-                // Prevents padding - removes trailing zeros to the first significant digit
+                // Prevents padding - removes trailing zeros until the first significant digit is encountered
                 regex = /(\.(?:\d*[1-9])?)0*$/;
                 break;
             case 1:
@@ -1037,7 +1037,7 @@ if (typeof define === 'function' && define.amd) {
                 regex = /(\.\d(?:\d*[1-9])?)0*$/;
                 break;
             default :
-                // removes access zeros to the mDec length when aPad is set true
+                // Removes access zeros to the mDec length when aPad is set to true
                 regex = new RegExp(`(\\.\\d{${rDec}}(?:\\d*[1-9])?)0*`);
         }
 
@@ -1345,7 +1345,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * checking that number satisfy format conditions
+     * Check that the number satisfy the format conditions
      * and lays between settings.vMin and settings.vMax
      * and the string length does not exceed the digits in settings.vMin and settings.vMax
      */
@@ -1389,8 +1389,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * function to attach data to the element
-     * and imitate the holder
+     * Function to attach data to the element and imitate the holder
      */
     function getHolder($that, settings, update = false) {
         let data = $that.data('autoNumeric');
@@ -1409,7 +1408,8 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * original settings saved for use when eDec & nSep options are being used
+     * Original settings saved for use when eDec & nSep options are being used.
+     * Those original settings are used exclusively in the `focusin` and `focusout` event handlers.
      */
     function keepOriginalSettings(settings) {
         settings.oDec     = settings.mDec;
@@ -2681,6 +2681,7 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Analyse the settings/options passed by the user, validate and clean them, then return them.
+     * Note: This returns `null` if somehow the settings returned by jQuery is not an object.
      *
      * @param options
      * @param $this
@@ -3134,7 +3135,7 @@ if (typeof define === 'function' && define.amd) {
     $.fn.autoFormat = autoFormat;
 
     /**
-     * public function that allows unformatting without an element
+     * Public function that allows unformatting without an element
      */
     autoUnFormat = (value, options) => {
         if (isUndefined(value) || value === null) {

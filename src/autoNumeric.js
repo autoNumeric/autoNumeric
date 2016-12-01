@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributors: Sokolov Yura and other Github users
-* @version: 2.0 - 2016-12-01 UTC 5:00
+* @version: 2.0 - 2016-11-27 UTC 11:00
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -2286,39 +2286,37 @@ if (typeof define === 'function' && define.amd) {
      * @param holder
      * @returns {*}
      */
-    function onFocusInAndMouseEnter($this, holder) {
-        $this.on('focusin.autoNumeric mouseenter.autoNumeric', e => {
+    function onFocusIn($this, holder) {
+        $this.on('focusin.autoNumeric', () => {
             holder = getHolder($this);
             const $settings = holder.settingsClone;
-            if ( e.type === 'focusin' || e.type === 'mouseenter' && !$this.is(':focus') && $settings.wEmpty === 'focus') {
-                $settings.onOff = true;
+            $settings.onOff = true;
 
-                if ($settings.nBracket !== null && $settings.aNeg !== '') {
-                    $this.val(negativeBracket($this.val(), $settings));
-                }
+            if ($settings.nBracket !== null && $settings.aNeg !== '') {
+                $this.val(negativeBracket($this.val(), $settings));
+            }
 
-                let result;
-                if ($settings.eDec) {
-                    $settings.mDec = $settings.eDec;
-                    $this.autoNumeric('set', $settings.rawValue);
-                } else if ($settings.scaleDivisor) {
-                    $settings.mDec = $settings.oDec;
-                    $this.autoNumeric('set', $settings.rawValue);
-                } else if ($settings.nSep) {
-                    $settings.aSep = '';
-                    $settings.aSign = '';
-                    $settings.aSuffix = '';
-                    $this.autoNumeric('set', $settings.rawValue);
-                } else if ((result = autoStrip($this.val(), $settings)) !== $settings.rawValue) {
-                    $this.autoNumeric('set', result);
-                }
+            let result;
+            if ($settings.eDec) {
+                $settings.mDec = $settings.eDec;
+                $this.autoNumeric('set', $settings.rawValue);
+            } else if ($settings.scaleDivisor) {
+                $settings.mDec = $settings.oDec;
+                $this.autoNumeric('set', $settings.rawValue);
+            } else if ($settings.nSep) {
+                $settings.aSep = '';
+                $settings.aSign = '';
+                $settings.aSuffix = '';
+                $this.autoNumeric('set', $settings.rawValue);
+            } else if ((result = autoStrip($this.val(), $settings)) !== $settings.rawValue) {
+                $this.autoNumeric('set', result);
+            }
 
-                holder.inVal = $this.val();
-                holder.lastVal = holder.inVal;
-                const onEmpty = checkEmpty(holder.inVal, $settings, true);
-                if ((onEmpty !== null && onEmpty !== '') && $settings.wEmpty === 'focus') {
-                    $this.val(onEmpty);
-                }
+            holder.inVal = $this.val();
+            holder.lastVal = holder.inVal;
+            const onEmpty = checkEmpty(holder.inVal, $settings, true);
+            if ((onEmpty !== null && onEmpty !== '') && $settings.wEmpty === 'focus') {
+                $this.val(onEmpty);
             }
         });
 
@@ -2479,83 +2477,81 @@ if (typeof define === 'function' && define.amd) {
      * @param holder
      * @returns {*}
      */
-    function onFocusOutAndMouseLeave($this, holder) {
-        $this.on('focusout.autoNumeric mouseleave.autoNumeric', () => {
-            if (!$this.is(':focus')) {
-                holder = getHolder($this);
-                let value = $this.val();
-                const origValue = value;
-                const settings = holder.settingsClone;
-                settings.onOff = false;
-                if (settings.aStor) {
-                    autoSave($this, settings, 'set');
+    function onFocusOut($this, holder) {
+        $this.on('focusout.autoNumeric', () => {
+            holder = getHolder($this);
+            let value = $this.val();
+            const origValue = value;
+            const settings = holder.settingsClone;
+            settings.onOff = false;
+            if (settings.aStor) {
+                autoSave($this, settings, 'set');
+            }
+
+            if (settings.nSep === true) {
+                settings.aSep = settings.oSep;
+                settings.aSign = settings.oSign;
+                settings.aSuffix = settings.oSuffix;
+            }
+
+            if (settings.eDec !== null) {
+                settings.mDec = settings.oDec;
+                settings.aPad = settings.oPad;
+                settings.nBracket = settings.oBracket;
+            }
+
+            value = autoStrip(value, settings);
+            if (value !== '') {
+                if (settings.trailingNegative) {
+                    value = '-' + value;
+                    settings.trailingNegative = false;
                 }
 
-                if (settings.nSep === true) {
-                    settings.aSep = settings.oSep;
-                    settings.aSign = settings.oSign;
-                    settings.aSuffix = settings.oSuffix;
-                }
+                const [minTest, maxTest] = autoCheck(value, settings);
+                if (checkEmpty(value, settings) === null && minTest && maxTest) { //TODO `checkEmpty` is missing the third parameter
+                    value = fixNumber(value, settings);
+                    settings.rawValue = value;
 
-                if (settings.eDec !== null) {
-                    settings.mDec = settings.oDec;
-                    settings.aPad = settings.oPad;
-                    settings.nBracket = settings.oBracket;
-                }
-
-                value = autoStrip(value, settings);
-                if (value !== '') {
-                    if (settings.trailingNegative) {
-                        value = '-' + value;
-                        settings.trailingNegative = false;
+                    if (settings.scaleDivisor) {
+                        value = value / settings.scaleDivisor;
+                        value = value.toString();
                     }
 
-                    const [minTest, maxTest] = autoCheck(value, settings);
-                    if (checkEmpty(value, settings, false) === null && minTest && maxTest) {
-                        value = fixNumber(value, settings);
-                        settings.rawValue = value;
-
-                        if (settings.scaleDivisor) {
-                            value = value / settings.scaleDivisor;
-                            value = value.toString();
-                        }
-
-                        settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? +settings.scaleDecimal : settings.mDec;
-                        value = autoRound(value, settings);
-                        value = presentNumber(value, settings);
-                    } else {
-                        if (!minTest) {
-                            $this.trigger('autoNumeric:minExceeded');
-                        }
-                        if (!maxTest) {
-                            $this.trigger('autoNumeric:maxExceeded');
-                        }
-
-                        value = settings.rawValue;
-                    }
+                    settings.mDec = (settings.scaleDivisor && settings.scaleDecimal)?+settings.scaleDecimal:settings.mDec;
+                    value = autoRound(value, settings);
+                    value = presentNumber(value, settings);
                 } else {
-                    if (settings.wEmpty === 'zero') {
-                        settings.rawValue = '0';
-                        value = autoRound('0', settings);
-                    } else {
-                        settings.rawValue = '';
+                    if (!minTest) {
+                        $this.trigger('autoNumeric:minExceeded');
                     }
-                }
+                    if (!maxTest) {
+                        $this.trigger('autoNumeric:maxExceeded');
+                    }
 
-                let groupedValue = checkEmpty(value, settings, false);
-                if (groupedValue === null) {
-                    groupedValue = autoGroup(value, settings);
+                    value = settings.rawValue;
                 }
+            } else {
+                if (settings.wEmpty === 'zero') {
+                    settings.rawValue = '0';
+                    value = autoRound('0', settings);
+                } else {
+                    settings.rawValue = '';
+                }
+            }
 
-                if (groupedValue !== origValue) {
-                    groupedValue = (settings.scaleSymbol) ? groupedValue + settings.scaleSymbol : groupedValue;
-                    $this.val(groupedValue);
-                }
+            let groupedValue = checkEmpty(value, settings, false);
+            if (groupedValue === null) {
+                groupedValue = autoGroup(value, settings);
+            }
 
-                if (groupedValue !== holder.inVal) {
-                    $this.change();
-                    delete holder.inVal;
-                }
+            if (groupedValue !== origValue) {
+                groupedValue = (settings.scaleSymbol)?groupedValue + settings.scaleSymbol:groupedValue;
+                $this.val(groupedValue);
+            }
+
+            if (groupedValue !== holder.inVal) {
+                $this.change();
+                delete holder.inVal;
             }
         });
 
@@ -2868,8 +2864,8 @@ if (typeof define === 'function' && define.amd) {
 
                 // Add the events listeners to supported input types ("text", "hidden", "tel" and no type)
                 if ($input) {
-                    holder = onFocusInAndMouseEnter($this, holder);
-                    holder = onFocusOutAndMouseLeave($this, holder);
+                    holder = onFocusIn($this, holder);
+                    holder = onFocusOut($this, holder);
                     holder = onKeydown($this, holder);
                     holder = onKeypress($this, holder);
                     holder = onKeyup($this, holder, settings);

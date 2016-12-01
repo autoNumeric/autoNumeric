@@ -887,13 +887,17 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Prepare number string to be converted to real number
+     *
+     * @param {string} s
+     * @param {object} settings
+     * @returns {*}
      */
-    function fixNumber(s, aDec, aNeg) {
-        if (aDec && aDec !== '.') {
-            s = s.replace(aDec, '.');
+    function fixNumber(s, settings) {
+        if (settings.aDec !== '.') {
+            s = s.replace(settings.aDec, '.');
         }
-        if (aNeg && aNeg !== '-') {
-            s = s.replace(aNeg, '-');
+        if (settings.aNeg !== '-') {
+            s = s.replace(settings.aNeg, '-');
         }
         if (!s.match(/\d/)) {
             s += '0';
@@ -904,12 +908,16 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Prepare real number to be converted to our format
+     *
+     * @param {string} s
+     * @param {object} settings
+     * @returns {*}
      */
     function presentNumber(s, settings) {
-        if (settings.aNeg && settings.aNeg !== '-') {
+        if (settings.aNeg !== '-') {
             s = s.replace('-', settings.aNeg);
         }
-        if (settings.aDec && settings.aDec !== '.') {
+        if (settings.aDec !== '.') {
             s = s.replace('.', settings.aDec);
         }
 
@@ -2444,7 +2452,7 @@ if (typeof define === 'function' && define.amd) {
 
                 const [minTest, maxTest] = autoCheck(value, $settings);
                 if (checkEmpty(value, $settings) === null && minTest && maxTest) {
-                    value = fixNumber(value, $settings.aDec, $settings.aNeg);
+                    value = fixNumber(value, $settings);
                     $settings.rawValue = value;
 
                     if ($settings.scaleDivisor) {
@@ -3009,7 +3017,7 @@ if (typeof define === 'function' && define.amd) {
                 if (settings.runOnce || settings.aForm === false) {
                     value = autoStrip(value, settings);
                 }
-                value = fixNumber(value, settings.aDec, settings.aNeg);
+                value = fixNumber(value, settings);
             }
 
             if (Number(value) === 0 && settings.lZero !== 'keep') {

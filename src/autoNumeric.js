@@ -2186,7 +2186,7 @@ if (typeof define === 'function' && define.amd) {
      * @private
      */
     function _getStringOrArray(getArrayBehavior = true, that) {
-        const $this = autoGet($(that));
+        const $this = autoGet(that);
         const formIndex = $('form').index($this);
         const allFormElements = $(`form:eq(${formIndex})`)[0];
         const aiIndex = [];
@@ -2849,7 +2849,7 @@ if (typeof define === 'function' && define.amd) {
          */
         destroy() {
             return $(this).each(function() {
-                const $this = autoGet($(this));
+                const $this = autoGet(this);
                 const settings = $this.data('autoNumeric');
                 if (typeof settings === 'object') {
                     $this.val('');
@@ -2867,7 +2867,7 @@ if (typeof define === 'function' && define.amd) {
          */
         wipe() {
             return $(this).each(function() {
-                const $this = autoGet($(this));
+                const $this = autoGet(this);
                 const settings = $this.data('autoNumeric');
                 if (typeof settings === 'object') {
                     $this.val('');
@@ -2886,7 +2886,7 @@ if (typeof define === 'function' && define.amd) {
          */
         update(options) {
             return $(this).each(function() {
-                const $this = autoGet($(this));
+                const $this = autoGet(this);
                 let settings = $this.data('autoNumeric');
 
                 if (typeof settings !== 'object') {
@@ -2926,7 +2926,8 @@ if (typeof define === 'function' && define.amd) {
                 if (newValue === null || isUndefined(newValue)) {
                     return;
                 }
-                const $this = autoGet($(this));
+
+                const $this = autoGet(this);
                 const settings = $this.data('autoNumeric');
                 const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
                 let value = newValue.toString();
@@ -3015,7 +3016,7 @@ if (typeof define === 'function' && define.amd) {
          */
         unSet() {
             return $(this).each(function() {
-                const $this = autoGet($(this));
+                const $this = autoGet(this);
                 const settings = $this.data('autoNumeric');
                 if (typeof settings === 'object') {
                     settings.onOff = true;
@@ -3031,7 +3032,7 @@ if (typeof define === 'function' && define.amd) {
          */
         reSet() {
             return $(this).each(function() {
-                const $this = autoGet($(this));
+                const $this = autoGet(this);
                 const settings = $this.data('autoNumeric');
                 if (typeof settings === 'object') {
                     $this.autoNumeric('set', $this.val());
@@ -3048,7 +3049,7 @@ if (typeof define === 'function' && define.amd) {
         //TODO Create a `get()` method that always return the raw value, no matter what `localeOutput` is. Create a `getWithLocale()` method that behave like the current `get` method, which means that can sometimes return a number, or a string. Doing so will remove uncertainty for developers.
         get() {
             //TODO Why would we need to get a new reference to $this since it has been done in `init()`?
-            const $this = autoGet($(this));
+            const $this = autoGet(this);
             //TODO This looks a lot like `getInputIfSupportedTagAndType()`. Is that necessary? Can the input element be changed since autoNumeric has been initialized?
             const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
             const settings = $this.data('autoNumeric');
@@ -3136,7 +3137,7 @@ if (typeof define === 'function' && define.amd) {
          * $(someSelector).autoNumeric('getSettings').aDec; // return the aDec setting as a string - ant valid setting can be used
          */
         getSettings() {
-            const $this = autoGet($(this));
+            const $this = autoGet(this);
 
             return $this.eq(0).data('autoNumeric');
         },

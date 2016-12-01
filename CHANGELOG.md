@@ -1,5 +1,12 @@
 ### Change log:
 
+### "2.0.0-beta.6"
++ Rename the `localOutput` setting to `outputType`, and add an option 'number' that makes `getLocalized` always return a Number, instead of a string.
++ Modify the `get` function so that it always returns a valid Number or string representing a number that Javascript can interpret.
++ Add a `getLocalized` function that return the raw value of the input, but can also return the value localized with a decimal point and negative sign placement chosen by the user (basically, it replace the old `get` behavior if any user wants it back).
++ Modify the `pNeg` default value based on the `aSign` and `pSign` values. This leads to better user experience when setting a currency symbol without setting `pNeg`.
++ Errors are now always thrown. The `debug` option now only affects the warning messages (used for non-critical errors).
+
 ### "2.0.0-beta.5"
 + Add a `validate()` method that checks if the given options object is valid.
 + Reorganize the `init` function code to check for critical error first, before doing other calculus.

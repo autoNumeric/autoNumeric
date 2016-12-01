@@ -291,12 +291,13 @@ const defaultSettings = {
     unSetOnSubmit: false,
 
     /* Allows the output to be in the locale format via the "get", "getString" & "getArray" methods
-     * null => nnnn.nn or -nnnn.nn default
-     * ","  => nnnn,nn or -nnnn,nn can also be "-,"
-     * ".-" => nnnn.nn or nnnn.nn-
-     * ",-" => nnnn,nn or nnnn,nn-
+     * null or 'string' => 'nnnn.nn' or '-nnnn.nn' as text type. This is the default behavior.
+     * 'number'         => nnnn.nn or -nnnn.nn as a Number (Warning: this works only for integers inferior to Number.MAX_SAFE_INTEGER)
+     * ',' or '-,'      => 'nnnn,nn' or '-nnnn,nn'
+     * '.-'             => 'nnnn.nn' or 'nnnn.nn-'
+     * ',-'             => 'nnnn,nn' or 'nnnn,nn-'
      */
-    localeOutput: null,
+    outputType: null,
 
     /* Error handling function
      * true => all errors are thrown - helpful in site development
@@ -862,15 +863,18 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Converts the ISO numeric string to the locale decimal and minus sign placement.
-     * See the "localeOutput" option definition for more details.
+     * See the "outputType" option definition for more details.
      */
     function toLocale(value, locale) {
-        if (isNull(locale)) {
+        if (isNull(locale) || locale === 'string') {
             return value;
         }
 
         let result;
         switch (locale) {
+            case 'number':
+                result = Number(value);
+                break;
             case '.-':
                 result = contains(value, '-') ? value.replace('-', '') + '-' : value;
                 break;
@@ -888,7 +892,7 @@ if (typeof define === 'function' && define.amd) {
                 result = value;
                 break;
             default :
-                throwError(`The given localeOutput [${locale}] option is not recognized.`);
+                throwError(`The given outputType [${locale}] option is not recognized.`);
         }
 
         return result;
@@ -2178,7 +2182,7 @@ if (typeof define === 'function' && define.amd) {
      *
      * It then loops through the string and un-formats the inputs with autoNumeric.
      * By defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
-     * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" => please see option "localeOutput" for details
+     * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-", or even plain numbers => please see option "outputType" for more details
      *
      * @param {boolean} getArrayBehavior - If set to TRUE, then this function behave like `getArray()`, otherwise if set to FALSE, it behave like `getString()`
      * @param that - A reference to the current DOM element
@@ -2241,7 +2245,7 @@ if (typeof define === 'function' && define.amd) {
                     const settings = testInput.data('autoNumeric');
 
                     if (typeof settings === 'object') {
-                        field.value = testInput.autoNumeric('get', settings.localeOutput).toString();
+                        field.value = testInput.autoNumeric('getLocalized').toString();
                     }
                 }
             });
@@ -2264,7 +2268,7 @@ if (typeof define === 'function' && define.amd) {
 
                     if (typeof settings === 'object') {
                         if (inputValue !== null) {
-                            const modifiedInputValue = testInput.autoNumeric('get', settings.localeOutput).toString();
+                            const modifiedInputValue = testInput.autoNumeric('getLocalized').toString();
                             formParts[i] = `${inputName}=${modifiedInputValue}`;
                         }
                     }
@@ -3047,7 +3051,7 @@ if (typeof define === 'function' && define.amd) {
          * method to un-format inputs - handy to use right before form submission
          * $(someSelector).autoNumeric('unSet'); // no parameter accepted
          * by defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
-         * locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" => please see option "localeOutput" for details
+         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-", or even plain numbers => please see option "outputType" for more details
          */
         unSet() {
             return $(this).each(function() {
@@ -3055,7 +3059,7 @@ if (typeof define === 'function' && define.amd) {
                 const settings = $this.data('autoNumeric');
                 if (typeof settings === 'object') {
                     settings.onOff = true;
-                    $this.val($this.autoNumeric('get'));
+                    $this.val($this.autoNumeric('getLocalized'));
                 }
             });
         },
@@ -3076,12 +3080,12 @@ if (typeof define === 'function' && define.amd) {
         },
 
         /**
-         * method to get the unformatted that accepts up to one parameter
-         * $(someSelector).autoNumeric('get'); no parameter supported
-         * by defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
-         * locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" => please see option "localeOutput" for details
+         * Return the unformatted value as a string.
+         *
+         * @usage $(someSelector).autoNumeric('get');
+         *
+         * @returns {string}
          */
-        //TODO Create a `get()` method that always return the raw value, no matter what `localeOutput` is. Create a `getWithLocale()` method that behave like the current `get` method, which means that can sometimes return a number, or a string. Doing so will remove uncertainty for developers.
         get() {
             //TODO Why would we need to get a new reference to $this since it has been done in `init()`?
             const $this = autoGet(this);
@@ -3118,14 +3122,17 @@ if (typeof define === 'function' && define.amd) {
                 value = fixNumber(value, settings);
             }
 
-            //TODO Shouldn't we return `Number(value)` since the goal of `get` is to get the raw javascript value? -> that could depend on `localeOutput`
-            // returned Numeric String
+            // Always return a numeric string
             return value;
         },
 
         /**
-         * Returns the unformatted value, but following the `localeOutput` setting, which means the output is a string that could not represent a number (ie. "12345,67-").
-         * For a real number or a string representing a number, please use the `get` method.
+         * Returns the unformatted value, but following the `outputType` setting, which means the output can either be :
+         * - a string (that could or could not represent a number (ie. "12345,67-")), or
+         * - a plain number (if the setting 'number' is used).
+         *
+         * By default the returned values are an ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period.
+         * Check the "outputType" option definition for more details.
          *
          * @returns {*}
          */
@@ -3138,7 +3145,7 @@ if (typeof define === 'function' && define.amd) {
                 value = '0';
             }
 
-            return toLocale(value, settings.localeOutput);
+            return toLocale(value, settings.outputType);
         },
 
         /**
@@ -3161,7 +3168,7 @@ if (typeof define === 'function' && define.amd) {
          *
          * It then loops through the string and un-formats the inputs with autoNumeric.
          * By defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
-         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" => please see option "localeOutput" for details
+         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" or plain numbers => please see option "outputType" for details
          */
         getString() {
             return _getStringOrArray(false, this);
@@ -3172,7 +3179,7 @@ if (typeof define === 'function' && define.amd) {
          *
          * It then loops through the string and un-formats the inputs with autoNumeric.
          * By defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
-         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" => please see option "localeOutput" for details
+         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" or plain numbers => please see option "outputType" for details
          */
         getArray() {
             return _getStringOrArray(true, this);
@@ -3275,9 +3282,9 @@ if (typeof define === 'function' && define.amd) {
 
         value = value.replace(autoStrip, '');
         value = value.replace(',', '.');
-        value = toLocale(value, settings.localeOutput);
+        value = toLocale(value, settings.outputType);
 
-        return Number(value); //FIXME `value` here could be a string (depending on `localeOutput`), so we should only cast it to a Number when needed
+        return value;
     };
 
     $.fn.autoUnformat = autoUnFormat;
@@ -3466,7 +3473,9 @@ if (typeof define === 'function' && define.amd) {
             throwError(`The remove formatting on submit option 'unSetOnSubmit' is invalid ; it should be either 'false' or 'true', [${options.unSetOnSubmit}] given.`);
         }
 
-        if (!isNull(options.localeOutput) && !isInArray(options.localeOutput, [
+        if (!isNull(options.outputType) && !isInArray(options.outputType, [
+            'string',
+            'number',
             '.',
             '-.',
             ',',
@@ -3474,7 +3483,7 @@ if (typeof define === 'function' && define.amd) {
             '.-',
             ',-',
         ])) {
-            throwError(`The custom locale format option 'localeOutput' is invalid ; it should either be empty, '.', '-.', ',', '-,', '.-' or ',-', [${options.localeOutput}] given.`);
+            throwError(`The custom locale format option 'outputType' is invalid ; it should either be null, 'string', 'number', '.', '-.', ',', '-,', '.-' or ',-', [${options.outputType}] given.`);
         }
 
         if (!isTrueOrFalseString(options.debug) && !isBoolean(options.debug)) {

@@ -46,8 +46,9 @@ xdescribe('A test suite', () => {
 
 //-----------------------------------------------------------------------------
 //---- Options & settings
-const autoNumericOptionsEuro = { aSep: '.', aDec: ',', altDec: '.', aSign: ' €', pSign: 's', mRound: 'U' };
-const autoNumericOptionsDollar = { aSep: ',', aDec: '.', aSign: '$', pSign: 'p', mRound: 'U' };
+const autoNumericOptionsEuro       = { aSep: '.', aDec: ',', altDec: '.', aSign: ' €', pSign: 's', mRound: 'U' };
+const autoNumericOptionsEuroNumber = { aSep: '.', aDec: ',', altDec: '.', aSign: ' €', pSign: 's', mRound: 'U', outputType : 'number' };
+const autoNumericOptionsDollar     = { aSep: ',', aDec: '.',              aSign:  '$', pSign: 'p', mRound: 'U' };
 
 describe('The autoNumeric object', () => {
     let aNInput;
@@ -92,7 +93,7 @@ describe('The autoNumeric object', () => {
         sNumber      : false,
         anDefault    : null,
         unSetOnSubmit: false,
-        localeOutput : null,
+        outputType   : null,
         debug        : false,
     };
 
@@ -148,7 +149,7 @@ describe('The autoNumeric object', () => {
         expect(defaultSettings.sNumber      ).toEqual(aNInputSettings.sNumber      );
         expect(defaultSettings.anDefault    ).toEqual(aNInputSettings.anDefault    );
         expect(defaultSettings.unSetOnSubmit).toEqual(aNInputSettings.unSetOnSubmit);
-        expect(defaultSettings.localeOutput ).toEqual(aNInputSettings.localeOutput );
+        expect(defaultSettings.outputType   ).toEqual(aNInputSettings.outputType   );
         expect(defaultSettings.debug        ).toEqual(aNInputSettings.debug        );
     });
 
@@ -435,7 +436,7 @@ describe(`autoNumeric 'get' and 'getLocalized' methods`, () => {
     it('should return an unformatted value', () => {
         // Euros
         aNInput.autoNumeric('update', autoNumericOptionsEuro);
-        aNInput.autoNumeric('update', { localeOutput: ',-' });
+        aNInput.autoNumeric('update', { outputType: ',-' });
         aNInput.autoNumeric('set', 0);
         expect(aNInput.autoNumeric('get')).toEqual('0.00');
         expect(aNInput.autoNumeric('getLocalized')).toEqual('0');
@@ -445,11 +446,15 @@ describe(`autoNumeric 'get' and 'getLocalized' methods`, () => {
         aNInput.autoNumeric('set', -42);
         expect(aNInput.autoNumeric('get')).toEqual('-42.00');
         expect(aNInput.autoNumeric('getLocalized')).toEqual('42,00-');
-        aNInput.autoNumeric('update', { localeOutput: '-,' });
+        aNInput.autoNumeric('update', { outputType: '-,' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual('-42,00');
-        aNInput.autoNumeric('update', { localeOutput: '.-' });
+        aNInput.autoNumeric('update', { outputType: '.-' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual('42.00-');
-        aNInput.autoNumeric('update', { localeOutput: null });
+        aNInput.autoNumeric('update', { outputType: null });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42.00');
+        aNInput.autoNumeric('update', { outputType: 'number' });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual(-42);
+        aNInput.autoNumeric('update', { outputType: 'string' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual('-42.00');
 
         aNInput.autoNumeric('set', 1234.56);
@@ -647,32 +652,48 @@ describe(`autoNumeric 'getString' and 'getArray' methods`, () => {
 describe('Static autoNumeric functions', () => {
     describe('`autoUnformat` should unformat using jQuery `$.fn`', () => {
         it('with default options', () => {
-            expect($.fn.autoUnformat('$1,234.56')).toEqual(1234.56);
-            expect($.fn.autoUnformat('$123.45')).toEqual(123.45);
-            expect($.fn.autoUnformat('$0.00')).toEqual(0);
+            expect($.fn.autoUnformat('$1,234.56')).toEqual('1234.56');
+            expect($.fn.autoUnformat('$123.45')).toEqual('123.45');
+            expect($.fn.autoUnformat('$0.00')).toEqual('0.00');
+
+            expect($.fn.autoUnformat('$1,234.56', { outputType : 'number' })).toEqual(1234.56);
+            expect($.fn.autoUnformat('$123.45', { outputType : 'number' })).toEqual(123.45);
+            expect($.fn.autoUnformat('$0.00', { outputType : 'number' })).toEqual(0);
             expect($.fn.autoUnformat(null)).toEqual(null);
         });
 
         it('with user options', () => {
-            expect($.fn.autoUnformat('1.234,56 €', autoNumericOptionsEuro)).toEqual(1234.56);
-            expect($.fn.autoUnformat('123,45 €', autoNumericOptionsEuro)).toEqual(123.45);
-            expect($.fn.autoUnformat('0,00 €', autoNumericOptionsEuro)).toEqual(0);
+            expect($.fn.autoUnformat('1.234,56 €', autoNumericOptionsEuroNumber)).toEqual(1234.56);
+            expect($.fn.autoUnformat('123,45 €', autoNumericOptionsEuroNumber)).toEqual(123.45);
+            expect($.fn.autoUnformat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);
+
+            expect($.fn.autoUnformat('1.234,56 €', autoNumericOptionsEuro)).toEqual('1234.56');
+            expect($.fn.autoUnformat('123,45 €', autoNumericOptionsEuro)).toEqual('123.45');
+            expect($.fn.autoUnformat('0,00 €', autoNumericOptionsEuro)).toEqual('0.00');
             expect($.fn.autoUnformat(null, autoNumericOptionsEuro)).toEqual(null);
         });
     });
 
     describe('`unFormat` should unformat without jQuery `$.fn`', () => {
         it('with default options', () => {
-            expect(an.unFormat('$1,234.56')).toEqual(1234.56);
-            expect(an.unFormat('$123.45')).toEqual(123.45);
-            expect(an.unFormat('$0.00')).toEqual(0);
+            expect(an.unFormat('$1,234.56')).toEqual('1234.56');
+            expect(an.unFormat('$123.45')).toEqual('123.45');
+            expect(an.unFormat('$0.00')).toEqual('0.00');
+
+            expect(an.unFormat('$1,234.56', { outputType : 'number' })).toEqual(1234.56);
+            expect(an.unFormat('$123.45', { outputType : 'number' })).toEqual(123.45);
+            expect(an.unFormat('$0.00', { outputType : 'number' })).toEqual(0);
             expect(an.unFormat(null)).toEqual(null);
         });
 
         it('with user options', () => {
-            expect(an.unFormat('1.234,56 €', autoNumericOptionsEuro)).toEqual(1234.56);
-            expect(an.unFormat('123,45 €', autoNumericOptionsEuro)).toEqual(123.45);
-            expect(an.unFormat('0,00 €', autoNumericOptionsEuro)).toEqual(0);
+            expect(an.unFormat('1.234,56 €', autoNumericOptionsEuroNumber)).toEqual(1234.56);
+            expect(an.unFormat('123,45 €', autoNumericOptionsEuroNumber)).toEqual(123.45);
+            expect(an.unFormat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);
+
+            expect(an.unFormat('1.234,56 €', autoNumericOptionsEuro)).toEqual('1234.56');
+            expect(an.unFormat('123,45 €', autoNumericOptionsEuro)).toEqual('123.45');
+            expect(an.unFormat('0,00 €', autoNumericOptionsEuro)).toEqual('0.00');
             expect(an.unFormat(null, autoNumericOptionsEuro)).toEqual(null);
 
             // expect(an.unFormat(1234.56, autoNumericOptions)).toEqual(1234.56); //TODO Does giving an unformatted value should return the same unformatted value, whatever the options passed as a parameter?
@@ -905,13 +926,15 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ unSetOnSubmit: 'true' })).not.toThrow();
             expect(() => an.validate({ unSetOnSubmit: 'false' })).not.toThrow();
 
-            expect(() => an.validate({ localeOutput: null })).not.toThrow();
-            expect(() => an.validate({ localeOutput: '.' })).not.toThrow();
-            expect(() => an.validate({ localeOutput: '-.' })).not.toThrow();
-            expect(() => an.validate({ localeOutput: ',' })).not.toThrow();
-            expect(() => an.validate({ localeOutput: '-,' })).not.toThrow();
-            expect(() => an.validate({ localeOutput: '.-' })).not.toThrow();
-            expect(() => an.validate({ localeOutput: ',-' })).not.toThrow();
+            expect(() => an.validate({ outputType: null })).not.toThrow();
+            expect(() => an.validate({ outputType: 'string' })).not.toThrow();
+            expect(() => an.validate({ outputType: 'number' })).not.toThrow();
+            expect(() => an.validate({ outputType: '.' })).not.toThrow();
+            expect(() => an.validate({ outputType: '-.' })).not.toThrow();
+            expect(() => an.validate({ outputType: ',' })).not.toThrow();
+            expect(() => an.validate({ outputType: '-,' })).not.toThrow();
+            expect(() => an.validate({ outputType: '.-' })).not.toThrow();
+            expect(() => an.validate({ outputType: ',-' })).not.toThrow();
 
             expect(() => an.validate({ debug: true })).not.toThrow();
             expect(() => an.validate({ debug: false })).not.toThrow();
@@ -1113,13 +1136,13 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ unSetOnSubmit: '1' })).toThrow();
             expect(() => an.validate({ unSetOnSubmit: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ localeOutput: [] })).toThrow();
-            expect(() => an.validate({ localeOutput: true })).toThrow();
-            expect(() => an.validate({ localeOutput: 'foobar' })).toThrow();
-            expect(() => an.validate({ localeOutput: '22foobar' })).toThrow();
-            expect(() => an.validate({ localeOutput: '-5' })).toThrow();
-            expect(() => an.validate({ localeOutput: 5 })).toThrow();
-            expect(() => an.validate({ localeOutput: -5 })).toThrow();
+            expect(() => an.validate({ outputType: [] })).toThrow();
+            expect(() => an.validate({ outputType: true })).toThrow();
+            expect(() => an.validate({ outputType: 'foobar' })).toThrow();
+            expect(() => an.validate({ outputType: '22foobar' })).toThrow();
+            expect(() => an.validate({ outputType: '-5' })).toThrow();
+            expect(() => an.validate({ outputType: 5 })).toThrow();
+            expect(() => an.validate({ outputType: -5 })).toThrow();
 
             expect(() => an.validate({ debug: 0 })).toThrow();
             expect(() => an.validate({ debug: 1 })).toThrow();

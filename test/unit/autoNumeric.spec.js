@@ -340,6 +340,7 @@ describe('The autoNumeric object', () => {
         expect(() => aNInput.autoNumeric('reSet')).not.toThrow();
         expect(() => aNInput.autoNumeric('get')).not.toThrow();
         expect(() => aNInput.autoNumeric('getLocalized')).not.toThrow();
+        expect(() => aNInput.autoNumeric('getFormatted')).not.toThrow();
         expect(() => aNInput.autoNumeric('getString')).not.toThrow();
         expect(() => aNInput.autoNumeric('getArray')).not.toThrow();
         expect(() => aNInput.autoNumeric('getSettings')).not.toThrow();

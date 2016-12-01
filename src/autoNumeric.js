@@ -2739,6 +2739,32 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * Enhance the user experience by modifying the default `pNeg` option depending on `aSign` and `pSign`.
+     *
+     * If the user has not set the placement of the negative sign (`pNeg`), but has set a currency symbol (`aSign`),
+     * then we modify the default value of `pNeg` in order to keep the resulting output logical by default :
+     * - "$-1,234.56" instead of "-$1,234.56" ({aSign: "$", pNeg: "r"})
+     * - "-1,234.56$" instead of "1,234.56-$" ({aSign: "$", pSign: "s", pNeg: "p"})
+     *
+     * @param {object} options
+     * @param {object} settings
+     */
+    function correctPNegOption(options, settings) {
+        if (!isUndefined(options) && isUndefinedOrNullOrEmpty(options.pNeg) && options.aSign !== '') {
+            switch (settings.pSign) {
+                case 's':
+                    settings.pNeg = 'p';
+                    break;
+                case 'p':
+                    settings.pNeg = 'r';
+                    break;
+                default :
+                //
+            }
+        }
+    }
+
+    /**
      * Analyse the settings/options passed by the user, validate and clean them, then return them.
      * Note: This returns `null` if somehow the settings returned by jQuery is not an object.
      *
@@ -2779,6 +2805,9 @@ if (typeof define === 'function' && define.amd) {
                     settings[key] = value.toString();
                 }
             });
+
+            // Improve the `pNeg` option if needed
+            correctPNegOption(options, settings);
 
             // Validate the settings
             validate(settings, false); // Throws if necessary
@@ -2904,6 +2933,10 @@ if (typeof define === 'function' && define.amd) {
                 if (settings.aDec === settings.aSep) {
                     throwError(`autoNumeric will not function properly when the decimal character aDec: "${settings.aDec}" and thousand separator aSep: "${settings.aSep}" are the same character`);
                 }
+
+                // Improve the `pNeg` option if needed
+                correctPNegOption(options, settings);
+
                 $this.data('autoNumeric', settings);
 
                 if ($this.val() !== '' || $this.text() !== '') {

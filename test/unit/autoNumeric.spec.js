@@ -119,6 +119,8 @@ describe('The autoNumeric object', () => {
         expect(defaultSettings.altDec       ).toEqual(aNInputSettings.altDec       );
         expect(defaultSettings.aSign        ).toEqual(aNInputSettings.aSign        );
         expect(defaultSettings.pSign        ).toEqual(aNInputSettings.pSign        );
+
+        // Special case for `pNeg`, see the related tests
         expect(defaultSettings.pNeg         ).toEqual(aNInputSettings.pNeg         );
         expect(defaultSettings.aSuffix      ).toEqual(aNInputSettings.aSuffix      );
         expect(defaultSettings.oLimits      ).toEqual(aNInputSettings.oLimits      );
@@ -161,6 +163,44 @@ describe('The autoNumeric object', () => {
         expect(aNInputSettings.aSep ).toEqual('.');
         expect(aNInputSettings.aDec ).toEqual(',');
         expect(aNInputSettings.aSign).toEqual('€');
+    });
+
+    describe('manages the pNeg configuration option specially', () => {
+        it(`this should set the pNeg differently based on the aSign and pSign values`, () => {
+            /*
+             * Special case for `pNeg`:
+             * If the user has not set the placement of the negative sign (`pNeg`), but has set a currency symbol (`aSign`),
+             * then the default value of `pNeg` is modified in order to keep the resulting output logical by default :
+             * - "$-1,234.56" instead of "-$1,234.56" ({aSign: "$", pNeg: "r"})
+             * - "-1,234.56$" instead of "1,234.56-$" ({aSign: "$", pSign: "s", pNeg: "p"})
+             */
+
+            // Case 1 : settings.pSign equals 's'
+            // Initialization
+            let newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            let aNInput = $(newInput).autoNumeric('init', { aSign: '$', pSign: 's' }); // Initiate the autoNumeric input
+            let aNInputSettings = aNInput.autoNumeric('getSettings');
+
+            expect(aNInputSettings.pNeg).toEqual('p');
+
+            // Un-initialization
+            aNInput.autoNumeric('destroy');
+            document.body.removeChild(newInput);
+
+            // Case 2 : settings.pSign equals 'p'
+            // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = $(newInput).autoNumeric('init', { aSign: '$', pSign: 'p' }); // Initiate the autoNumeric input
+            aNInputSettings = aNInput.autoNumeric('getSettings');
+
+            expect(aNInputSettings.pNeg).toEqual('r');
+
+            // Un-initialization
+            aNInput.autoNumeric('destroy');
+            document.body.removeChild(newInput);
+        });
     });
 
     describe('manages the mDec configuration option specially', () => {

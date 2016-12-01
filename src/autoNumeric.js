@@ -3120,10 +3120,8 @@ if (typeof define === 'function' && define.amd) {
                 value = '0';
             }
 
-            value = toLocale(value, settings.localeOutput);
-
-            // returned Numeric String
             //TODO Shouldn't we return `Number(value)` since the goal of `get` is to get the raw javascript value? -> that could depend on `localeOutput`
+            // returned Numeric String
             return value;
         },
 

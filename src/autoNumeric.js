@@ -656,10 +656,8 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Function that throw error messages
      */
-    function throwError(message, debug = true) {
-        if (debug) {
-            throw new Error(message);
-        }
+    function throwError(message) {
+        throw new Error(message);
     }
 
     /**
@@ -881,7 +879,7 @@ if (typeof define === 'function' && define.amd) {
                 result = value;
                 break;
             default :
-                throwError(`The given localeOutput [${locale}] option is not recognized.`, true);
+                throwError(`The given localeOutput [${locale}] option is not recognized.`);
         }
 
         return result;
@@ -2611,7 +2609,7 @@ if (typeof define === 'function' && define.amd) {
                     setValue = false;
                 } else {
                     // If not, inform the developer that nothing usable has been provided
-                    throwError(`The value [${currentValue}] used in the input is not a valid value autoNumeric can work with.`, false);
+                    throwError(`The value [${currentValue}] used in the input is not a valid value autoNumeric can work with.`);
                 }
             } else {
                 /* Checks for :
@@ -2831,7 +2829,7 @@ if (typeof define === 'function' && define.amd) {
                 let settings = $this.data('autoNumeric');
 
                 if (typeof settings !== 'object') {
-                    throwError(`Initializing autoNumeric is required prior to calling the "update" method`, true);
+                    throwError(`Initializing autoNumeric is required prior to calling the "update" method`);
                 }
                 const strip = $this.autoNumeric('get');
                 settings = $.extend(settings, options);
@@ -2843,7 +2841,7 @@ if (typeof define === 'function' && define.amd) {
                 getHolder($this, settings, true);
 
                 if (settings.aDec === settings.aSep) {
-                    throwError(`autoNumeric will not function properly when the decimal character aDec: "${settings.aDec}" and thousand separator aSep: "${settings.aSep}" are the same character`, settings.debug);
+                    throwError(`autoNumeric will not function properly when the decimal character aDec: "${settings.aDec}" and thousand separator aSep: "${settings.aSep}" are the same character`);
                 }
                 $this.data('autoNumeric', settings);
 
@@ -2869,7 +2867,7 @@ if (typeof define === 'function' && define.amd) {
                 const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
                 let value = valueIn.toString();
                 if (typeof settings !== 'object') {
-                    throwError(`Initializing autoNumeric is required prior to calling the "set" method`, true);
+                    throwError(`Initializing autoNumeric is required prior to calling the "set" method`);
                 }
 
                 // allows locale decimal separator to be a comma - no thousand separator allowed
@@ -2877,7 +2875,7 @@ if (typeof define === 'function' && define.amd) {
 
                 // Throws an error if the value being set is not numeric
                 if (!$.isNumeric(Number(value))) {
-                    throwError(`The value "${value}" being "set" is not numeric and has caused a error to be thrown`, settings.debug);
+                    warning(`The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`);
                     return $this.val('');
                 }
 
@@ -2916,7 +2914,9 @@ if (typeof define === 'function' && define.amd) {
                         if (!maxTest) {
                             $this.trigger('autoNumeric:maxExceeded');
                         }
-                        throwError(`The value [${attemptedValue}] being set falls outside the vMin [${settings.vMin}] and vMax [${settings.vMax}] settings for this element`, settings.debug);
+
+                        throwError(`The value [${attemptedValue}] being set falls outside of the vMin [${settings.vMin}] and vMax [${settings.vMax}] range set for this element`);
+
                         return $this.val('');
                     }
                 } else {
@@ -2983,7 +2983,7 @@ if (typeof define === 'function' && define.amd) {
             const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
             const settings = $this.data('autoNumeric');
             if (typeof settings !== 'object') {
-                throwError(`Initializing autoNumeric is required prior to calling the "get" method`, true);
+                throwError(`Initializing autoNumeric is required prior to calling the "get" method`);
             }
 
             // determine the element type then use .eq(0) selector to grab the value of the first element in selector
@@ -2993,7 +2993,7 @@ if (typeof define === 'function' && define.amd) {
             } else if (isInArray($this.prop('tagName').toLowerCase(), settings.tagList)) {
                 value = $this.eq(0).text();
             } else {
-                throwError(`The "<${$this.prop('tagName').toLowerCase()}>" tag is not supported by autoNumeric`, settings.debug);
+                throwError(`The "<${$this.prop('tagName').toLowerCase()}>" tag is not supported by autoNumeric`);
             }
 
             if (settings.eDec || settings.scaleDivisor) {
@@ -3086,7 +3086,7 @@ if (typeof define === 'function' && define.amd) {
             return methods.init.apply(this, [method]);
         }
 
-        throwError(`Method "${method}" is not supported by autoNumeric`, true);
+        throwError(`Method "${method}" is not supported by autoNumeric`);
     };
 
     /**
@@ -3099,7 +3099,7 @@ if (typeof define === 'function' && define.amd) {
     $.fn.autoNumeric.defaults = defaultSettings; // Make those settings public via jQuery too.
 
     /**
-     * public function that allows formatting without an element trigger
+     * Public function that allows formatting without an element trigger
      */
     autoFormat = (value, options) => {
         if (isUndefined(value) || value === null) {
@@ -3123,7 +3123,7 @@ if (typeof define === 'function' && define.amd) {
         if (!minTest || !maxTest) {
             // Throw a custom event
             sendCustomEvent('autoFormat.autoNumeric', `Range test failed`);
-            throwError(`The value [${value}] being set falls outside the vMin [${settings.vMin}] and vMax [${settings.vMax}] settings`, settings.debug);
+            throwError(`The value [${value}] being set falls outside of the vMin [${settings.vMin}] and vMax [${settings.vMax}] range set for this element`);
         }
         value = autoRound(value, settings);
         value = presentNumber(value, settings);
@@ -3179,7 +3179,7 @@ if (typeof define === 'function' && define.amd) {
         const debug = true; // The error here must always be thrown, since a badly configured options object will lead to wrong results, if any.
 
         if (isUndefinedOrNullOrEmpty(userOptions) || !isObject(userOptions) || isEmptyObj(userOptions)) {
-            throwError(`The userOptions are invalid ; it should be a valid object, [${userOptions}] given.`, debug);
+            throwError(`The userOptions are invalid ; it should be a valid object, [${userOptions}] given.`);
         }
 
         // The user can choose if the `userOptions` has already been extended with the default options, or not
@@ -3198,64 +3198,64 @@ if (typeof define === 'function' && define.amd) {
 
         // Then tests the options individually
         if (!isInArray(options.aSep, [',', '.', ' ', ''])) {
-            throwError(`The thousand separator character option 'aSep' is invalid ; it should be ',', '.', ' ' or empty (''), [${options.aSep}] given.`, debug);
+            throwError(`The thousand separator character option 'aSep' is invalid ; it should be ',', '.', ' ' or empty (''), [${options.aSep}] given.`);
         }
 
         if (!isTrueOrFalseString(options.nSep) && !isBoolean(options.nSep)) {
-            throwError(`The 'nSep' option is invalid ; it should be either 'false' or 'true', [${options.nSep}] given.`, debug);
+            throwError(`The 'nSep' option is invalid ; it should be either 'false' or 'true', [${options.nSep}] given.`);
         }
 
         if (!testPositiveInteger.test(options.dGroup)) { // isNaN(parseInt(options.dGroup)) //DEBUG
-            throwError(`The digital grouping for thousand separator option 'dGroup' is invalid ; it should be a positive integer, [${options.dGroup}] given.`, debug);
+            throwError(`The digital grouping for thousand separator option 'dGroup' is invalid ; it should be a positive integer, [${options.dGroup}] given.`);
         }
 
         if (!isInArray(options.aDec, [',', '.'])) {
-            throwError(`The decimal separator character option 'aDec' is invalid ; it should be '.' or ',', [${options.aDec}] given.`, debug);
+            throwError(`The decimal separator character option 'aDec' is invalid ; it should be '.' or ',', [${options.aDec}] given.`);
         }
 
         // Checks if the decimal and thousand characters are the same
         if (options.aDec === options.aSep) {
-            throwError(`autoNumeric will not function properly when the decimal character 'aDec' [${options.aDec}] and the thousand separator 'aSep' [${options.aSep}] are the same character.`, debug);
+            throwError(`autoNumeric will not function properly when the decimal character 'aDec' [${options.aDec}] and the thousand separator 'aSep' [${options.aSep}] are the same character.`);
         }
 
         if (!isNull(options.altDec) && !isString(options.altDec)) {
-            throwError(`The alternate decimal separator character option 'altDec' is invalid ; it should be a string, [${options.altDec}] given.`, debug);
+            throwError(`The alternate decimal separator character option 'altDec' is invalid ; it should be a string, [${options.altDec}] given.`);
         }
 
         if (options.aSign !== '' && !isString(options.aSign)) {
-            throwError(`The currency symbol option 'aSign' is invalid ; it should be a string, [${options.aSign}] given.`, debug);
+            throwError(`The currency symbol option 'aSign' is invalid ; it should be a string, [${options.aSign}] given.`);
         }
 
         if (!isInArray(options.pSign, ['p', 's'])) {
-            throwError(`The placement of the currency sign option 'pSign' is invalid ; it should either be 'p' (prefix) or 's' (suffix), [${options.pSign}] given.`, debug);
+            throwError(`The placement of the currency sign option 'pSign' is invalid ; it should either be 'p' (prefix) or 's' (suffix), [${options.pSign}] given.`);
         }
 
         if (!isInArray(options.pNeg, ['p', 's', 'l', 'r'])) {
-            throwError(`The placement of the negative sign option 'pNeg' is invalid ; it should either be 'p' (prefix), 's' (suffix), 'l' (left) or 'r' (right), [${options.pNeg}] given.`, debug);
+            throwError(`The placement of the negative sign option 'pNeg' is invalid ; it should either be 'p' (prefix), 's' (suffix), 'l' (left) or 'r' (right), [${options.pNeg}] given.`);
         }
 
         if (!isString(options.aSuffix) || (options.aSuffix !== '' && (contains(options.aSuffix, '-') || testNumericalCharacters.test(options.aSuffix)))) {
-            throwError(`The additional suffix option 'aSuffix' is invalid ; it should not contains the negative sign '-' nor any numerical characters, [${options.aSuffix}] given.`, debug);
+            throwError(`The additional suffix option 'aSuffix' is invalid ; it should not contains the negative sign '-' nor any numerical characters, [${options.aSuffix}] given.`);
         }
 
         if (!isNull(options.oLimits) && !isInArray(options.oLimits, ['ceiling', 'floor', 'ignore'])) {
-            throwError(`The override min & max limits option 'oLimits' is invalid ; it should either be 'ceiling', 'floor' or 'ignore', [${options.oLimits}] given.`, debug);
+            throwError(`The override min & max limits option 'oLimits' is invalid ; it should either be 'ceiling', 'floor' or 'ignore', [${options.oLimits}] given.`);
         }
 
         if (!isString(options.vMax) || !testFloatOrIntegerAndPossibleNegativeSign.test(options.vMax)) {
-            throwError(`The maximum possible value option 'vMax' is invalid ; it should be a string that represents a positive or negative number, [${options.vMax}] given.`, debug);
+            throwError(`The maximum possible value option 'vMax' is invalid ; it should be a string that represents a positive or negative number, [${options.vMax}] given.`);
         }
 
         if (!isString(options.vMin) || !testFloatOrIntegerAndPossibleNegativeSign.test(options.vMin)) {
-            throwError(`The minimum possible value option 'vMin' is invalid ; it should be a string that represents a positive or negative number, [${options.vMin}] given.`, debug);
+            throwError(`The minimum possible value option 'vMin' is invalid ; it should be a string that represents a positive or negative number, [${options.vMin}] given.`);
         }
 
         if (parseFloat(options.vMin) > parseFloat(options.vMax)) {
-            throwError(`The minimum possible value option is greater than the maximum possible value option ; 'vMin' [${options.vMin}] should be smaller than 'vMax' [${options.vMax}].`, debug);
+            throwError(`The minimum possible value option is greater than the maximum possible value option ; 'vMin' [${options.vMin}] should be smaller than 'vMax' [${options.vMax}].`);
         }
 
         if (!isNull(options.mDec) && (!isString(options.mDec) || !testPositiveInteger.test(options.mDec))) {
-            throwError(`The maximum number of decimal places option 'mDec' is invalid ; it should be a positive integer, [${options.mDec}] given.`, debug);
+            throwError(`The maximum number of decimal places option 'mDec' is invalid ; it should be a positive integer, [${options.mDec}] given.`);
         }
 
         if (!options.aPad && !isNull(options.mDec)) {
@@ -3274,28 +3274,28 @@ if (typeof define === 'function' && define.amd) {
         }
 
         if (!isNull(options.eDec) && (!isString(options.eDec) || !testPositiveInteger.test(options.eDec))) {
-            throwError(`The number of expanded decimal places option 'eDec' is invalid ; it should be a positive integer, [${options.eDec}] given.`, debug);
+            throwError(`The number of expanded decimal places option 'eDec' is invalid ; it should be a positive integer, [${options.eDec}] given.`);
         }
 
         // Checks if the extended decimal places "eDec" is greater than the normal decimal places "mDec"
         if (!isNull(options.eDec) && !isNull(options.mDec) && Number(options.mDec) < Number(options.eDec)) {
-            throwError(`autoNumeric will not function properly when the extended decimal places 'eDec' [${options.eDec}] is greater than the 'mDec' [${options.mDec}] value.`, debug);
+            throwError(`autoNumeric will not function properly when the extended decimal places 'eDec' [${options.eDec}] is greater than the 'mDec' [${options.mDec}] value.`);
         }
 
         if (!isNull(options.scaleDivisor) && !testPositiveFloatOrInteger.test(options.scaleDivisor)) {
-            throwError(`The scale divisor option 'scaleDivisor' is invalid ; it should be a positive number, preferably an integer, [${options.scaleDivisor}] given.`, debug);
+            throwError(`The scale divisor option 'scaleDivisor' is invalid ; it should be a positive number, preferably an integer, [${options.scaleDivisor}] given.`);
         }
 
         if (!isNull(options.scaleDecimal) && !testPositiveInteger.test(options.scaleDecimal)) {
-            throwError(`The scale number of decimals option 'scaleDecimal' is invalid ; it should be a positive integer, [${options.scaleDecimal}] given.`, debug);
+            throwError(`The scale number of decimals option 'scaleDecimal' is invalid ; it should be a positive integer, [${options.scaleDecimal}] given.`);
         }
 
         if (!isNull(options.scaleSymbol) && !isString(options.scaleSymbol)) {
-            throwError(`The scale symbol option 'scaleSymbol' is invalid ; it should be a string, [${options.scaleSymbol}] given.`, debug);
+            throwError(`The scale symbol option 'scaleSymbol' is invalid ; it should be a string, [${options.scaleSymbol}] given.`);
         }
 
         if (!isTrueOrFalseString(options.aStor) && !isBoolean(options.aStor)) {
-            throwError(`The save to session storage option 'aStor' is invalid ; it should be either 'false' or 'true', [${options.aStor}] given.`, debug);
+            throwError(`The save to session storage option 'aStor' is invalid ; it should be either 'false' or 'true', [${options.aStor}] given.`);
         }
 
         if (!isInArray(options.mRound, [
@@ -3313,39 +3313,39 @@ if (typeof define === 'function' && define.amd) {
             'U05',
             'D05',
         ])) {
-            throwError(`The rounding method option 'mRound' is invalid ; it should either be 'S', 'A', 's', 'a', 'B', 'U', 'D', 'C', 'F', 'N05', 'CHF', 'U05' or 'D05' (cf. documentation), [${options.mRound}] given.`, debug);
+            throwError(`The rounding method option 'mRound' is invalid ; it should either be 'S', 'A', 's', 'a', 'B', 'U', 'D', 'C', 'F', 'N05', 'CHF', 'U05' or 'D05' (cf. documentation), [${options.mRound}] given.`);
         }
 
         if (!isTrueOrFalseString(options.aPad) && !isBoolean(options.aPad)) {
-            throwError(`The control decimal padding option 'aPad' is invalid ; it should be either 'false' or 'true', [${options.aPad}] given.`, debug);
+            throwError(`The control decimal padding option 'aPad' is invalid ; it should be either 'false' or 'true', [${options.aPad}] given.`);
         }
 
         if (!isNull(options.nBracket) && !isInArray(options.nBracket, ['(,)', '[,]', '<,>', '{,}'])) {
-            throwError(`The brackets for negative values option 'nBracket' is invalid ; it should either be '(,)', '[,]', '<,>' or '{,}', [${options.nBracket}] given.`, debug);
+            throwError(`The brackets for negative values option 'nBracket' is invalid ; it should either be '(,)', '[,]', '<,>' or '{,}', [${options.nBracket}] given.`);
         }
 
         if (!isInArray(options.wEmpty, ['focus', 'press', 'always', 'zero'])) {
-            throwError(`The display on empty string option 'wEmpty' is invalid ; it should either be 'focus', 'press', 'always' or 'zero', [${options.wEmpty}] given.`, debug);
+            throwError(`The display on empty string option 'wEmpty' is invalid ; it should either be 'focus', 'press', 'always' or 'zero', [${options.wEmpty}] given.`);
         }
 
         if (!isInArray(options.lZero, ['allow', 'deny', 'keep'])) {
-            throwError(`The leading zero behavior option 'lZero' is invalid ; it should either be 'allow', 'deny' or 'keep', [${options.lZero}] given.`, debug);
+            throwError(`The leading zero behavior option 'lZero' is invalid ; it should either be 'allow', 'deny' or 'keep', [${options.lZero}] given.`);
         }
 
         if (!isTrueOrFalseString(options.aForm) && !isBoolean(options.aForm)) {
-            throwError(`The format on initialization option 'aForm' is invalid ; it should be either 'false' or 'true', [${options.aForm}] given.`, debug);
+            throwError(`The format on initialization option 'aForm' is invalid ; it should be either 'false' or 'true', [${options.aForm}] given.`);
         }
 
         if (!isTrueOrFalseString(options.sNumber) && !isBoolean(options.sNumber)) {
-            throwError(`The select number only option 'sNumber' is invalid ; it should be either 'false' or 'true', [${options.sNumber}] given.`, debug);
+            throwError(`The select number only option 'sNumber' is invalid ; it should be either 'false' or 'true', [${options.sNumber}] given.`);
         }
 
         if (!isNull(options.anDefault) && (options.anDefault !== '' && !testFloatOrIntegerAndPossibleNegativeSign.test(options.anDefault))) {
-            throwError(`The unformatted default value option 'anDefault' is invalid ; it should be a string that represents a positive or negative number, [${options.anDefault}] given.`, debug);
+            throwError(`The unformatted default value option 'anDefault' is invalid ; it should be a string that represents a positive or negative number, [${options.anDefault}] given.`);
         }
 
         if (!isTrueOrFalseString(options.unSetOnSubmit) && !isBoolean(options.unSetOnSubmit)) {
-            throwError(`The remove formatting on submit option 'unSetOnSubmit' is invalid ; it should be either 'false' or 'true', [${options.unSetOnSubmit}] given.`, debug);
+            throwError(`The remove formatting on submit option 'unSetOnSubmit' is invalid ; it should be either 'false' or 'true', [${options.unSetOnSubmit}] given.`);
         }
 
         if (!isNull(options.localeOutput) && !isInArray(options.localeOutput, [
@@ -3356,11 +3356,11 @@ if (typeof define === 'function' && define.amd) {
             '.-',
             ',-',
         ])) {
-            throwError(`The custom locale format option 'localeOutput' is invalid ; it should either be empty, '.', '-.', ',', '-,', '.-' or ',-', [${options.localeOutput}] given.`, debug);
+            throwError(`The custom locale format option 'localeOutput' is invalid ; it should either be empty, '.', '-.', ',', '-,', '.-' or ',-', [${options.localeOutput}] given.`);
         }
 
         if (!isTrueOrFalseString(options.debug) && !isBoolean(options.debug)) {
-            throwError(`The debug option 'debug' is invalid ; it should be either 'false' or 'true', [${options.debug}] given.`, debug);
+            throwError(`The debug option 'debug' is invalid ; it should be either 'false' or 'true', [${options.debug}] given.`);
         }
     };
 

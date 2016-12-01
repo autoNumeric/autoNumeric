@@ -1427,12 +1427,14 @@ if (typeof define === 'function' && define.amd) {
      * thanks to Anthony & Evan C
      */
     function autoGet(obj) {
-        if (typeof obj === 'string' || obj instanceof String) {
+        /*
+         * If the parameter is a string (and therefore is a CSS selector), then we need to modify this string in order
+         * for jQuery to be able to parse the selector correctly.
+         * cf. http://learn.jquery.com/using-jquery-core/faq/how-do-i-select-an-element-by-an-id-that-has-characters-used-in-css-notation/
+         */
+        if (isString(obj)) {
             //TODO This block is apparently never entered. We should remove it after making sure that's 100% the case
-            obj = obj.replace(/\[/g, '\\[').replace(/]/g, '\\]');
-            obj = '#' + obj.replace(/(:|\.)/g, '\\$1');
-            // possible modification to replace the above 2 lines
-            // obj = '#' + obj.replace(/([;&,\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|])/g, '\\$1');
+            obj = `#${obj.replace(/(:|\.|\[|]|,|=)/g, '\\$1')}`;
         }
 
         return $(obj);

@@ -1,5 +1,9 @@
 ### Change log:
 
+### "2.0.0-beta.6"
++ Added "mouseenter" & "mouseleave" handlers that allows expanded views of the "eDec", "scaleDivisor" & "nSep" options.
++ Added third parameter to 'checkEmpty' call in focusOut.
+
 ### "2.0.0-beta.5"
 + Add a `validate()` method that checks if the given options object is valid.
 + Reorganize the `init` function code to check for critical error first, before doing other calculus.

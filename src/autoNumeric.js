@@ -3116,13 +3116,27 @@ if (typeof define === 'function' && define.amd) {
                 value = fixNumber(value, settings);
             }
 
+            //TODO Shouldn't we return `Number(value)` since the goal of `get` is to get the raw javascript value? -> that could depend on `localeOutput`
+            // returned Numeric String
+            return value;
+        },
+
+        /**
+         * Returns the unformatted value, but following the `localeOutput` setting, which means the output is a string that could not represent a number (ie. "12345,67-").
+         * For a real number or a string representing a number, please use the `get` method.
+         *
+         * @returns {*}
+         */
+        getLocalized() {
+            const $this = autoGet(this);
+            let value = $this.autoNumeric('get');
+            const settings = $this.data('autoNumeric');
+
             if (Number(value) === 0 && settings.lZero !== 'keep') {
                 value = '0';
             }
 
-            //TODO Shouldn't we return `Number(value)` since the goal of `get` is to get the raw javascript value? -> that could depend on `localeOutput`
-            // returned Numeric String
-            return value;
+            return toLocale(value, settings.localeOutput);
         },
 
         /**

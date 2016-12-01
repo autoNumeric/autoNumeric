@@ -339,6 +339,7 @@ describe('The autoNumeric object', () => {
         expect(() => aNInput.autoNumeric('unSet')).not.toThrow();
         expect(() => aNInput.autoNumeric('reSet')).not.toThrow();
         expect(() => aNInput.autoNumeric('get')).not.toThrow();
+        expect(() => aNInput.autoNumeric('getLocalized')).not.toThrow();
         expect(() => aNInput.autoNumeric('getString')).not.toThrow();
         expect(() => aNInput.autoNumeric('getArray')).not.toThrow();
         expect(() => aNInput.autoNumeric('getSettings')).not.toThrow();
@@ -415,7 +416,7 @@ describe(`autoNumeric 'init' method`, () => {
     });
 });
 
-describe(`autoNumeric 'get' method`, () => {
+describe(`autoNumeric 'get' and 'getLocalized' methods`, () => {
     let aNInput;
     let newInput;
 
@@ -433,6 +434,23 @@ describe(`autoNumeric 'get' method`, () => {
     it('should return an unformatted value', () => {
         // Euros
         aNInput.autoNumeric('update', autoNumericOptionsEuro);
+        aNInput.autoNumeric('update', { localeOutput: ',-' });
+        aNInput.autoNumeric('set', 0);
+        expect(aNInput.autoNumeric('get')).toEqual('0.00');
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('0');
+        aNInput.autoNumeric('update', { lZero: 'keep' });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('0,00');
+
+        aNInput.autoNumeric('set', -42);
+        expect(aNInput.autoNumeric('get')).toEqual('-42.00');
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('42,00-');
+        aNInput.autoNumeric('update', { localeOutput: '-,' });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42,00');
+        aNInput.autoNumeric('update', { localeOutput: '.-' });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('42.00-');
+        aNInput.autoNumeric('update', { localeOutput: null });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42.00');
+
         aNInput.autoNumeric('set', 1234.56);
         expect(aNInput.autoNumeric('get')).toEqual('1234.56');
         aNInput.autoNumeric('set', 6789012.345);
@@ -445,6 +463,10 @@ describe(`autoNumeric 'get' method`, () => {
         expect(aNInput.autoNumeric('get')).toEqual('1234.56');
         aNInput.autoNumeric('set', 6789012.345);
         expect(aNInput.autoNumeric('get')).toEqual('6789012.35');
+        aNInput.autoNumeric('set', 0);
+        expect(aNInput.autoNumeric('get')).toEqual('0.00');
+        aNInput.autoNumeric('set', -42);
+        expect(aNInput.autoNumeric('get')).toEqual('-42.00');
     });
 });
 

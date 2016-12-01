@@ -1871,14 +1871,14 @@ if (typeof define === 'function' && define.amd) {
             const settingsClone = this.settingsClone;
             if (settingsClone.pSign === 'p' && settingsClone.pNeg === 's') {
                 if (this.kdCode === 8) {
-                    settingsClone.caretFix = Boolean(this.selection.start >= this.value.indexOf(settingsClone.aSuffix) && settingsClone.aSuffix !== '');
+                    settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.aSuffix) && settingsClone.aSuffix !== '');
                     if (this.value.charAt(this.selection.start - 1) === '-') {
                         left = left.substring(1);
                     } else if (this.selection.start <= this.value.length - settingsClone.aSuffix.length) {
                         left = left.substring(0, left.length - 1);
                     }
                 } else {
-                    settingsClone.caretFix = Boolean(this.selection.start >= this.value.indexOf(settingsClone.aSuffix) && settingsClone.aSuffix !== '');
+                    settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.aSuffix) && settingsClone.aSuffix !== '');
                     if (this.selection.start >= this.value.indexOf(settingsClone.aSign) + settingsClone.aSign.length) {
                         right = right.substring(1, right.length);
                     }
@@ -1889,7 +1889,7 @@ if (typeof define === 'function' && define.amd) {
             }
 
             if (settingsClone.pSign === 's' && settingsClone.pNeg === 'l') {
-                settingsClone.caretFix = Boolean(this.selection.start >= this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length);
+                settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length);
                 if (this.kdCode === 8) {
                     if (this.selection.start === (this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length) && contains(this.value, settingsClone.aNeg)) {
                         left = left.substring(1);
@@ -1907,7 +1907,7 @@ if (typeof define === 'function' && define.amd) {
             }
 
             if (settingsClone.pSign === 's' && settingsClone.pNeg === 'r') {
-                settingsClone.caretFix = Boolean(this.selection.start >= this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length);
+                settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length);
                 if (this.kdCode === 8) {
                     if (this.selection.start === (this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length)) {
                         left = left.substring(1);
@@ -1917,7 +1917,7 @@ if (typeof define === 'function' && define.amd) {
                         left = left.substring(0, left.length - 1);
                     }
                 } else {
-                    settingsClone.caretFix = Boolean(this.selection.start >= this.value.indexOf(settingsClone.aSign) && settingsClone.aSign !== '');
+                    settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.aSign) && settingsClone.aSign !== '');
                     if (this.selection.start === this.value.indexOf(settingsClone.aNeg)) {
                         left = left.substring(1);
                     }
@@ -2104,11 +2104,11 @@ if (typeof define === 'function' && define.amd) {
                     leftAr.shift();
                     if (settingsClone.pSign === 's' && settingsClone.pNeg === 'l' && (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace || kuCode === keyCode.Delete || this.kdCode === keyCode.Delete) && settingsClone.caretFix) {
                         leftAr.push('-');
-                        settingsClone.caretFix = Boolean(e.type === 'keydown');
+                        settingsClone.caretFix = e.type === 'keydown';
                     }
                     if (settingsClone.pSign === 'p' && settingsClone.pNeg === 's' && (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace || kuCode === keyCode.Delete || this.kdCode === keyCode.Delete) && settingsClone.caretFix) {
                         leftAr.push('-');
-                        settingsClone.caretFix = Boolean(e.type === 'keydown');
+                        settingsClone.caretFix = e.type === 'keydown';
                     }
                     if (settingsClone.pSign === 's' && settingsClone.pNeg === 'r' && (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace || kuCode === keyCode.Delete || this.kdCode === keyCode.Delete) && settingsClone.caretFix) {
                         const signParts = settingsClone.aSign.split('');
@@ -2128,7 +2128,7 @@ if (typeof define === 'function' && define.amd) {
 
                         // pushing the escaped sign
                         leftAr.push(escapedParts.join(''));
-                        settingsClone.caretFix = Boolean(e.type === 'keydown');
+                        settingsClone.caretFix = e.type === 'keydown';
                     }
                 }
 

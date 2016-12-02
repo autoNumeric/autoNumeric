@@ -717,10 +717,10 @@ if (typeof define === 'function' && define.amd) {
      * merge them with defaults appropriately
      */
     function autoCode($this, settings) {
+        //TODO Merge `autoCode()` into `getInitialSettings()`
         runCallbacks($this, settings);
         const vMax = settings.vMax.toString().split('.');
         const vMin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
-        settings.aNeg = settings.vMin < 0 ? '-' : '';
         vMax[0] = vMax[0].replace('-', '');
         vMin[0] = vMin[0].replace('-', '');
         settings.mIntPos = Math.max(vMax[0].length, 1);
@@ -909,11 +909,12 @@ if (typeof define === 'function' && define.amd) {
         if (settings.aDec !== '.') {
             s = s.replace(settings.aDec, '.');
         }
-        if (settings.aNeg !== '-') {
+        if (settings.aNeg !== '-' && settings.aNeg !== '') {
             s = s.replace(settings.aNeg, '-');
         }
         if (!s.match(/\d/)) {
-            s += '0';
+            // The default value returned by `get` is formatted with decimals
+            s += '0.00';
         }
 
         return s;
@@ -927,7 +928,7 @@ if (typeof define === 'function' && define.amd) {
      * @returns {*}
      */
     function presentNumber(s, settings) {
-        if (settings.aNeg !== '-') {
+        if (settings.aNeg !== '-' && settings.aNeg !== '') {
             s = s.replace('-', settings.aNeg);
         }
         if (settings.aDec !== '.') {
@@ -2292,7 +2293,7 @@ if (typeof define === 'function' && define.amd) {
         $this.on('focusin.autoNumeric mouseenter.autoNumeric', e => {
             holder = getHolder($this);
             const $settings = holder.settingsClone;
-            if ( e.type === 'focusin' || e.type === 'mouseenter' && !$this.is(':focus') && $settings.wEmpty === 'focus') {
+            if (e.type === 'focusin' || e.type === 'mouseenter' && !$this.is(':focus') && $settings.wEmpty === 'focus') {
                 $settings.onOff = true;
 
                 if ($settings.nBracket !== null && $settings.aNeg !== '') {
@@ -2819,6 +2820,9 @@ if (typeof define === 'function' && define.amd) {
             // Improve the `pNeg` option if needed
             correctPNegOption(options, settings);
 
+            // Set the negative sign
+            settings.aNeg = settings.vMin < 0 ? '-' : '';
+
             // Validate the settings
             validate(settings, false); // Throws if necessary
 
@@ -3118,13 +3122,16 @@ if (typeof define === 'function' && define.amd) {
                 if (!((/\d/).test(value) || Number(value) === 0) && settings.wEmpty === 'focus') {
                     return '';
                 }
+
                 if (value !== '' && settings.nBracket !== null) {
                     settings.onOff = true;
                     value = negativeBracket(value, settings);
                 }
+
                 if (settings.runOnce || settings.aForm === false) {
                     value = autoStrip(value, settings);
                 }
+
                 value = fixNumber(value, settings);
             }
 
@@ -3241,7 +3248,7 @@ if (typeof define === 'function' && define.amd) {
         value = value.toString();
         value = fromLocale(value);
         if (Number(value) < 0) {
-            settings.aNeg = '-';
+            settings.aNeg = '-'; //TODO Replace this with `getInitialSettings()` that already sets `aNeg`?
         }
 
         if (settings.mDec === null) {

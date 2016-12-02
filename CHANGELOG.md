@@ -1,5 +1,9 @@
 ### Change log:
 
+### "2.0.0-beta.7"
++ Add "mouseenter" & "mouseleave" handlers to enable viewing the extended values for "eDec", "scaleDivisor" & "nSep" options.
++ Add third parameter to the "autoGet" call in "onFocusOutAndMouseLeave" function
+
 ### "2.0.0-beta.6"
 + Rename the `localOutput` setting to `outputType`, and add an option 'number' that makes `getLocalized` always return a Number, instead of a string.
 + Modify the `get` function so that it always returns a valid Number or string representing a number that Javascript can interpret.

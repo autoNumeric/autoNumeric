@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributors: Sokolov Yura and other Github users
-* @version: 2.0 - 2016-11-27 UTC 11:00
+* @version: 2.0 - 2016-12-01 UTC 21:00
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -717,10 +717,10 @@ if (typeof define === 'function' && define.amd) {
      * merge them with defaults appropriately
      */
     function autoCode($this, settings) {
+        //TODO Merge `autoCode()` into `getInitialSettings()`
         runCallbacks($this, settings);
         const vMax = settings.vMax.toString().split('.');
         const vMin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
-        settings.aNeg = settings.vMin < 0 ? '-' : '';
         vMax[0] = vMax[0].replace('-', '');
         vMin[0] = vMin[0].replace('-', '');
         settings.mIntPos = Math.max(vMax[0].length, 1);
@@ -909,11 +909,12 @@ if (typeof define === 'function' && define.amd) {
         if (settings.aDec !== '.') {
             s = s.replace(settings.aDec, '.');
         }
-        if (settings.aNeg !== '-') {
+        if (settings.aNeg !== '-' && settings.aNeg !== '') {
             s = s.replace(settings.aNeg, '-');
         }
         if (!s.match(/\d/)) {
-            s += '0';
+            // The default value returned by `get` is formatted with decimals
+            s += '0.00';
         }
 
         return s;
@@ -927,7 +928,7 @@ if (typeof define === 'function' && define.amd) {
      * @returns {*}
      */
     function presentNumber(s, settings) {
-        if (settings.aNeg !== '-') {
+        if (settings.aNeg !== '-' && settings.aNeg !== '') {
             s = s.replace('-', settings.aNeg);
         }
         if (settings.aDec !== '.') {
@@ -2288,37 +2289,39 @@ if (typeof define === 'function' && define.amd) {
      * @param holder
      * @returns {*}
      */
-    function onFocusIn($this, holder) {
-        $this.on('focusin.autoNumeric', () => {
+    function onFocusInAndMouseEnter($this, holder) {
+        $this.on('focusin.autoNumeric mouseenter.autoNumeric', e => {
             holder = getHolder($this);
             const $settings = holder.settingsClone;
-            $settings.onOff = true;
+            if (e.type === 'focusin' || e.type === 'mouseenter' && !$this.is(':focus') && $settings.wEmpty === 'focus') {
+                $settings.onOff = true;
 
-            if ($settings.nBracket !== null && $settings.aNeg !== '') {
-                $this.val(negativeBracket($this.val(), $settings));
-            }
+                if ($settings.nBracket !== null && $settings.aNeg !== '') {
+                    $this.val(negativeBracket($this.val(), $settings));
+                }
 
-            let result;
-            if ($settings.eDec) {
-                $settings.mDec = $settings.eDec;
-                $this.autoNumeric('set', $settings.rawValue);
-            } else if ($settings.scaleDivisor) {
-                $settings.mDec = $settings.oDec;
-                $this.autoNumeric('set', $settings.rawValue);
-            } else if ($settings.nSep) {
-                $settings.aSep = '';
-                $settings.aSign = '';
-                $settings.aSuffix = '';
-                $this.autoNumeric('set', $settings.rawValue);
-            } else if ((result = autoStrip($this.val(), $settings)) !== $settings.rawValue) {
-                $this.autoNumeric('set', result);
-            }
+                let result;
+                if ($settings.eDec) {
+                    $settings.mDec = $settings.eDec;
+                    $this.autoNumeric('set', $settings.rawValue);
+                } else if ($settings.scaleDivisor) {
+                    $settings.mDec = $settings.oDec;
+                    $this.autoNumeric('set', $settings.rawValue);
+                } else if ($settings.nSep) {
+                    $settings.aSep = '';
+                    $settings.aSign = '';
+                    $settings.aSuffix = '';
+                    $this.autoNumeric('set', $settings.rawValue);
+                } else if ((result = autoStrip($this.val(), $settings)) !== $settings.rawValue) {
+                    $this.autoNumeric('set', result);
+                }
 
-            holder.inVal = $this.val();
-            holder.lastVal = holder.inVal;
-            const onEmpty = checkEmpty(holder.inVal, $settings, true);
-            if ((onEmpty !== null && onEmpty !== '') && $settings.wEmpty === 'focus') {
-                $this.val(onEmpty);
+                holder.inVal = $this.val();
+                holder.lastVal = holder.inVal;
+                const onEmpty = checkEmpty(holder.inVal, $settings, true);
+                if ((onEmpty !== null && onEmpty !== '') && $settings.wEmpty === 'focus') {
+                    $this.val(onEmpty);
+                }
             }
         });
 
@@ -2479,81 +2482,83 @@ if (typeof define === 'function' && define.amd) {
      * @param holder
      * @returns {*}
      */
-    function onFocusOut($this, holder) {
-        $this.on('focusout.autoNumeric', () => {
-            holder = getHolder($this);
-            let value = $this.val();
-            const origValue = value;
-            const settings = holder.settingsClone;
-            settings.onOff = false;
-            if (settings.aStor) {
-                autoSave($this, settings, 'set');
-            }
-
-            if (settings.nSep === true) {
-                settings.aSep = settings.oSep;
-                settings.aSign = settings.oSign;
-                settings.aSuffix = settings.oSuffix;
-            }
-
-            if (settings.eDec !== null) {
-                settings.mDec = settings.oDec;
-                settings.aPad = settings.oPad;
-                settings.nBracket = settings.oBracket;
-            }
-
-            value = autoStrip(value, settings);
-            if (value !== '') {
-                if (settings.trailingNegative) {
-                    value = '-' + value;
-                    settings.trailingNegative = false;
+    function onFocusOutAndMouseLeave($this, holder) {
+        $this.on('focusout.autoNumeric mouseleave.autoNumeric', () => {
+            if (!$this.is(':focus')) {
+                holder = getHolder($this);
+                let value = $this.val();
+                const origValue = value;
+                const settings = holder.settingsClone;
+                settings.onOff = false;
+                if (settings.aStor) {
+                    autoSave($this, settings, 'set');
                 }
 
-                const [minTest, maxTest] = autoCheck(value, settings);
-                if (checkEmpty(value, settings) === null && minTest && maxTest) { //TODO `checkEmpty` is missing the third parameter
-                    value = fixNumber(value, settings);
-                    settings.rawValue = value;
+                if (settings.nSep === true) {
+                    settings.aSep = settings.oSep;
+                    settings.aSign = settings.oSign;
+                    settings.aSuffix = settings.oSuffix;
+                }
 
-                    if (settings.scaleDivisor) {
-                        value = value / settings.scaleDivisor;
-                        value = value.toString();
+                if (settings.eDec !== null) {
+                    settings.mDec = settings.oDec;
+                    settings.aPad = settings.oPad;
+                    settings.nBracket = settings.oBracket;
+                }
+
+                value = autoStrip(value, settings);
+                if (value !== '') {
+                    if (settings.trailingNegative) {
+                        value = '-' + value;
+                        settings.trailingNegative = false;
                     }
 
-                    settings.mDec = (settings.scaleDivisor && settings.scaleDecimal)?+settings.scaleDecimal:settings.mDec;
-                    value = autoRound(value, settings);
-                    value = presentNumber(value, settings);
+                    const [minTest, maxTest] = autoCheck(value, settings);
+                    if (checkEmpty(value, settings, false) === null && minTest && maxTest) {
+                        value = fixNumber(value, settings);
+                        settings.rawValue = value;
+
+                        if (settings.scaleDivisor) {
+                            value = value / settings.scaleDivisor;
+                            value = value.toString();
+                        }
+
+                        settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? +settings.scaleDecimal : settings.mDec;
+                        value = autoRound(value, settings);
+                        value = presentNumber(value, settings);
+                    } else {
+                        if (!minTest) {
+                            $this.trigger('autoNumeric:minExceeded');
+                        }
+                        if (!maxTest) {
+                            $this.trigger('autoNumeric:maxExceeded');
+                        }
+
+                        value = settings.rawValue;
+                    }
                 } else {
-                    if (!minTest) {
-                        $this.trigger('autoNumeric:minExceeded');
+                    if (settings.wEmpty === 'zero') {
+                        settings.rawValue = '0';
+                        value = autoRound('0', settings);
+                    } else {
+                        settings.rawValue = '';
                     }
-                    if (!maxTest) {
-                        $this.trigger('autoNumeric:maxExceeded');
-                    }
-
-                    value = settings.rawValue;
                 }
-            } else {
-                if (settings.wEmpty === 'zero') {
-                    settings.rawValue = '0';
-                    value = autoRound('0', settings);
-                } else {
-                    settings.rawValue = '';
+
+                let groupedValue = checkEmpty(value, settings, false);
+                if (groupedValue === null) {
+                    groupedValue = autoGroup(value, settings);
                 }
-            }
 
-            let groupedValue = checkEmpty(value, settings, false);
-            if (groupedValue === null) {
-                groupedValue = autoGroup(value, settings);
-            }
+                if (groupedValue !== origValue) {
+                    groupedValue = (settings.scaleSymbol) ? groupedValue + settings.scaleSymbol : groupedValue;
+                    $this.val(groupedValue);
+                }
 
-            if (groupedValue !== origValue) {
-                groupedValue = (settings.scaleSymbol)?groupedValue + settings.scaleSymbol:groupedValue;
-                $this.val(groupedValue);
-            }
-
-            if (groupedValue !== holder.inVal) {
-                $this.change();
-                delete holder.inVal;
+                if (groupedValue !== holder.inVal) {
+                    $this.change();
+                    delete holder.inVal;
+                }
             }
         });
 
@@ -2815,6 +2820,9 @@ if (typeof define === 'function' && define.amd) {
             // Improve the `pNeg` option if needed
             correctPNegOption(options, settings);
 
+            // Set the negative sign
+            settings.aNeg = settings.vMin < 0 ? '-' : '';
+
             // Validate the settings
             validate(settings, false); // Throws if necessary
 
@@ -2866,8 +2874,8 @@ if (typeof define === 'function' && define.amd) {
 
                 // Add the events listeners to supported input types ("text", "hidden", "tel" and no type)
                 if ($input) {
-                    holder = onFocusIn($this, holder);
-                    holder = onFocusOut($this, holder);
+                    holder = onFocusInAndMouseEnter($this, holder);
+                    holder = onFocusOutAndMouseLeave($this, holder);
                     holder = onKeydown($this, holder);
                     holder = onKeypress($this, holder);
                     holder = onKeyup($this, holder, settings);
@@ -3114,13 +3122,16 @@ if (typeof define === 'function' && define.amd) {
                 if (!((/\d/).test(value) || Number(value) === 0) && settings.wEmpty === 'focus') {
                     return '';
                 }
+
                 if (value !== '' && settings.nBracket !== null) {
                     settings.onOff = true;
                     value = negativeBracket(value, settings);
                 }
+
                 if (settings.runOnce || settings.aForm === false) {
                     value = autoStrip(value, settings);
                 }
+
                 value = fixNumber(value, settings);
             }
 
@@ -3237,7 +3248,7 @@ if (typeof define === 'function' && define.amd) {
         value = value.toString();
         value = fromLocale(value);
         if (Number(value) < 0) {
-            settings.aNeg = '-';
+            settings.aNeg = '-'; //TODO Replace this with `getInitialSettings()` that already sets `aNeg`?
         }
 
         if (settings.mDec === null) {

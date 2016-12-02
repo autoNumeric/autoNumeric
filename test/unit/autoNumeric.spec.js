@@ -494,7 +494,7 @@ describe(`autoNumeric 'get' and 'getLocalized' methods`, () => {
 });
 
 describe(`autoNumeric 'get' methods`, () => {
-    it(`should not return a negative value when inputing a positive one and vMin is equal to '0' (cf. issue #284)`, () => {
+    it(`should not return a negative value when inputting a positive one and vMin is equal to '0' (cf. issue #284)`, () => {
         const newInput = document.createElement('input');
         document.body.appendChild(newInput);
         const aNInput = $(newInput).autoNumeric('init', { vMin: '0', vMax: '9999', mDec: '2' }); // Initiate the autoNumeric input
@@ -507,6 +507,20 @@ describe(`autoNumeric 'get' methods`, () => {
         expect(aNInput.autoNumeric('get')).toEqual('0.00');
         aNInput.autoNumeric('set', -0);
         expect(aNInput.autoNumeric('get')).toEqual('0.00');
+
+        aNInput.autoNumeric('destroy');
+        document.body.removeChild(newInput);
+    });
+
+    it(`should not return a negative value when inputting a positive one and vMin is superior to '0' (cf. issue #284)`, () => {
+        const newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+        const aNInput = $(newInput).autoNumeric('init', { vMin: '1', vMax: '9999', mDec: '2' }); // Initiate the autoNumeric input
+
+
+        expect(aNInput.autoNumeric('get')).toEqual('0.00');
+        aNInput.autoNumeric('set', 1234);
+        expect(aNInput.autoNumeric('get')).toEqual('1234.00');
 
         aNInput.autoNumeric('destroy');
         document.body.removeChild(newInput);

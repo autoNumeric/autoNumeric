@@ -7,3 +7,6 @@ test/e2e/reports
 test/e2e/screenshots
 dist/*.gz
 dist/*.map
+
+# Config and settings directory from PhpStorm/WebStorm
+.idea

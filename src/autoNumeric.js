@@ -262,7 +262,7 @@ const defaultSettings = {
      * lZero: "deny", - allows only one leading zero on values less than one
      * lZero: "keep", - allows leading zeros to be entered. on focusout zeros will be retained.
      */
-    lZero: 'allow',
+    lZero: 'deny',
 
     /* Determine if the default value will be formatted on initialization.
      * true = automatically formats the default value on initialization
@@ -2584,7 +2584,7 @@ if (typeof define === 'function' && define.amd) {
             const selectionEnd = this.selectionEnd || 0;
             const prefix = currentValue.substring(0, selectionStart);
             const suffix = currentValue.substring(selectionEnd, currentValue.length);
-            const pastedText = preparePastedText(e.originalEvent.clipboardData.getData('text/plain').holder);
+            const pastedText = preparePastedText(e.originalEvent.clipboardData.getData('text/plain'), holder);
 
             if (isValidPasteText(pastedText)) {
                 const newValue = preparePastedText(prefix + Number(pastedText).valueOf() + suffix, holder);

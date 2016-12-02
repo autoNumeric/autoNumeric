@@ -88,7 +88,7 @@ describe('The autoNumeric object', () => {
         aPad         : true,
         nBracket     : null,
         wEmpty       : 'focus',
-        lZero        : 'allow',
+        lZero        : 'deny',
         aForm        : true,
         sNumber      : false,
         anDefault    : null,

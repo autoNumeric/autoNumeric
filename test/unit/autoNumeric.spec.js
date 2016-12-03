@@ -326,6 +326,41 @@ describe('The autoNumeric object', () => {
         });
     });
 
+    describe(`autoNumeric 'getSettings' options`, () => {
+        let aNInput;
+        let newInput;
+        const anOptions = { aDec: ',', aSep: '.' };
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = $(newInput).autoNumeric('init', anOptions); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.autoNumeric('destroy');
+            document.body.removeChild(newInput);
+        });
+
+        it('should return a correct raw value with a point as a decimal character', () => {
+            aNInput.autoNumeric('set', '1234.56');
+            expect(aNInput.autoNumeric('get')).toEqual('1234.56');
+            expect(aNInput.autoNumeric('getSettings').rawValue).toEqual('1234.56');
+
+            aNInput.autoNumeric('set', '-1234.56');
+            expect(aNInput.autoNumeric('get')).toEqual('-1234.56');
+            expect(aNInput.autoNumeric('getSettings').rawValue).toEqual('-1234.56');
+
+            aNInput.autoNumeric('set', '1234');
+            expect(aNInput.autoNumeric('get')).toEqual('1234.00');
+            expect(aNInput.autoNumeric('getSettings').rawValue).toEqual('1234.00');
+
+            aNInput.autoNumeric('set', '-1234');
+            expect(aNInput.autoNumeric('get')).toEqual('-1234.00');
+            expect(aNInput.autoNumeric('getSettings').rawValue).toEqual('-1234.00');
+        });
+    });
+
 //TODO Complete the tests in order to test every single option separately (and in the future ; with and without jQuery)
 
 //-----------------------------------------------------------------------------

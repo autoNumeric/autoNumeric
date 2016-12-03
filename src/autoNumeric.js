@@ -2584,7 +2584,7 @@ if (typeof define === 'function' && define.amd) {
             const selectionEnd = this.selectionEnd || 0;
             const prefix = currentValue.substring(0, selectionStart);
             const suffix = currentValue.substring(selectionEnd, currentValue.length);
-            const pastedText = preparePastedText(e.originalEvent.clipboardData.getData('text/plain').holder);
+            const pastedText = preparePastedText(e.originalEvent.clipboardData.getData('text/plain'), holder);
 
             if (isValidPasteText(pastedText)) {
                 const newValue = preparePastedText(prefix + Number(pastedText).valueOf() + suffix, holder);

@@ -262,7 +262,7 @@ const defaultSettings = {
      * lZero: "deny", - allows only one leading zero on values less than one
      * lZero: "keep", - allows leading zeros to be entered. on focusout zeros will be retained.
      */
-    lZero: 'allow',
+    lZero: 'deny',
 
     /* Determine if the default value will be formatted on initialization.
      * true = automatically formats the default value on initialization

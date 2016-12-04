@@ -1176,7 +1176,7 @@ if (typeof define === 'function' && define.amd) {
             ivRounded = inputValue;
             if (cDec < rDec) {
                 if (dPos === -1) {
-                    ivRounded += settings.aDec;
+                    ivRounded += '.';
                 }
 
                 let zeros = '000000';

@@ -1662,7 +1662,7 @@ if (typeof define === 'function' && define.amd) {
         },
 
         /**
-         * set part of number to value keeping position of cursor
+         * Set part of number to value while keeping the cursor position
          */
         setValueParts(left, right, advent) {
             const settingsClone = this.settingsClone;
@@ -1679,11 +1679,19 @@ if (typeof define === 'function' && define.amd) {
                 } else {
                     settingsClone.rawValue = testValue;
                 }
+
                 if (position > this.newValue.length) {
                     position = this.newValue.length;
                 }
+
+                // Make sure when the user enter a '0' on the far left with a leading zero option set to 'deny', that the caret does not moves since the input is dropped (fix issue #283)
+                if (position === 1 && parts[0] === '0' && settingsClone.lZero === 'deny') {
+                    position = 0;
+                }
+
                 this.value = this.newValue;
                 this.setPosition(position, false);
+
                 return true;
             }
 

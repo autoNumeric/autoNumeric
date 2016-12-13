@@ -521,6 +521,16 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * Return TRUE if the parameter is a number (or a number written as a string).
+     *
+     * @param {*} n
+     * @returns {boolean}
+     */
+    function isNumber(n) {
+        return !isArray(n) && !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
+    /**
      * Return TRUE if the text given as a parameter is valid.
      *
      * @param text
@@ -3252,6 +3262,12 @@ if (typeof define === 'function' && define.amd) {
             return null;
         }
 
+        // Check the validity of the `value` parameter
+        if (!isNumber(value)) {
+            throwError(`A number is needed to be able to format it, [${value}] given.`);
+        }
+
+        // Initiate a very basic settings object
         const settings = $.extend({}, defaultSettings, { strip: false }, options);
         value = value.toString();
         value = fromLocale(value);
@@ -3286,6 +3302,16 @@ if (typeof define === 'function' && define.amd) {
     autoUnFormat = (value, options) => {
         if (isUndefined(value) || value === null) {
             return null;
+        }
+
+        // Giving an unformatted value should return the same unformatted value, whatever the options passed as a parameter
+        if (isNumber(value)) {
+            return Number(value);
+        }
+
+        if (isArray(value) || isObject(value)) { //TODO Complete the test to throw when given a wrongly formatted number (ie. 'foobar')
+            // Check the validity of the `value` parameter
+            throwError(`A number or a string representing a number is needed to be able to unformat it, [${value}] given.`);
         }
 
         const settings = $.extend({}, defaultSettings, { strip: false }, options);

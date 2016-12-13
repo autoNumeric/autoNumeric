@@ -635,6 +635,16 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * Return the code for the key used to generate the given event.
+     *
+     * @param event
+     * @returns {string|Number}
+     */
+    function key(event) {
+        return (typeof event.which === 'undefined')?event.keyCode:event.which;
+    }
+
+    /**
      * Cross browser routine for getting selected range/cursor position
      */
     function getElementSelection(that) {
@@ -2310,98 +2320,135 @@ if (typeof define === 'function' && define.amd) {
      *
      * @param $this
      * @param {AutoNumericHolder} holder
+     * @param {Event} e
      * @returns {*}
      */
-    function onFocusInAndMouseEnter($this, holder) {
-        $this.on('focusin.autoNumeric mouseenter.autoNumeric', e => {
-            holder = getHolder($this);
-            const $settings = holder.settingsClone;
-            if (e.type === 'focusin' || e.type === 'mouseenter' && !$this.is(':focus') && $settings.wEmpty === 'focus') {
-                $settings.onOff = true;
+    function onFocusInAndMouseEnter($this, holder, e) {
+        const settings = holder.settingsClone;
 
-                if ($settings.nBracket !== null && $settings.aNeg !== '') {
-                    $this.val(negativeBracket($this.val(), $settings));
-                }
+        if (e.type === 'focusin' || e.type === 'mouseenter' && !$this.is(':focus') && settings.wEmpty === 'focus') {
+            settings.onOff = true;
 
-                let result;
-                if ($settings.eDec) {
-                    $settings.mDec = $settings.eDec;
-                    $this.autoNumeric('set', $settings.rawValue);
-                } else if ($settings.scaleDivisor) {
-                    $settings.mDec = $settings.oDec;
-                    $this.autoNumeric('set', $settings.rawValue);
-                } else if ($settings.nSep) {
-                    $settings.aSep = '';
-                    $settings.aSign = '';
-                    $settings.aSuffix = '';
-                    $this.autoNumeric('set', $settings.rawValue);
-                } else if ((result = autoStrip($this.val(), $settings)) !== $settings.rawValue) {
-                    $this.autoNumeric('set', result);
-                }
-
-                holder.inVal = $this.val();
-                holder.lastVal = holder.inVal;
-                const onEmpty = checkEmpty(holder.inVal, $settings, true);
-                if ((onEmpty !== null && onEmpty !== '') && $settings.wEmpty === 'focus') {
-                    $this.val(onEmpty);
-                }
+            if (settings.nBracket !== null && settings.aNeg !== '') {
+                $this.val(negativeBracket(e.target.value, settings));
             }
-        });
 
-        return holder;
+            let result;
+            if (settings.eDec) {
+                settings.mDec = settings.eDec;
+                $this.autoNumeric('set', settings.rawValue);
+            } else if (settings.scaleDivisor) {
+                settings.mDec = settings.oDec;
+                $this.autoNumeric('set', settings.rawValue);
+            } else if (settings.nSep) {
+                settings.aSep = '';
+                settings.aSign = '';
+                settings.aSuffix = '';
+                $this.autoNumeric('set', settings.rawValue);
+            } else if ((result = autoStrip(e.target.value, settings)) !== settings.rawValue) {
+                $this.autoNumeric('set', result);
+            }
+
+            // In order to send a 'native' change event when blurring the input, we need to first store the initial input value on focus.
+            holder.valueOnFocus = e.target.value;
+            holder.lastVal = holder.valueOnFocus;
+            const onEmpty = checkEmpty(holder.valueOnFocus, settings, true);
+            if ((onEmpty !== null && onEmpty !== '') && settings.wEmpty === 'focus') {
+                $this.val(onEmpty);
+            }
+        }
     }
 
     /**
      * Handler for 'keydown' events.
      * The user just started pushing any key, hence one event is sent.
      *
-     * @param $this
+     * Note :
+     * By default a 'normal' input output those events in the right order when inputting a character key (ie. 'a') :
+     * - keydown
+     * - keypress
+     * - input
+     * - keyup
+     *
+     * ...when inputting a modifier key (ie. 'ctrl') :
+     * - keydown
+     * - keyup
+     *
+     * If 'delete' or 'backspace' is entered, the following events are sent :
+     * - keydown
+     * - input
+     * - keyup
+     *
+     * If 'enter' is entered and the value has not changed, the following events are sent :
+     * - keydown
+     * - keypress
+     * - keyup
+     *
+     * If 'enter' is entered and the value has been changed, the following events are sent :
+     * - keydown
+     * - keypress
+     * - change
+     * - keyup
+     *
+     * When a paste is done, the following events are sent :
+     * - input (if paste is done with the mouse)
+     *
+     * - keydown (if paste is done with ctrl+v)
+     * - keydown
+     * - input
+     * - keyup
+     * - keyup
+     *
      * @param {AutoNumericHolder} holder
+     * @param {Event} e
      * @returns {*}
      */
-    function onKeydown($this, holder) {
-        $this.on('keydown.autoNumeric', e => {
-            holder = getHolder($this);
-            if (holder.that.readOnly) {
-                holder.processed = true;
+    function onKeydown(holder, e) {
+        //TODO Create a function that retrieve the element value (either by using `e.target.value` when the element is an <input>, or by using `element.textContent` when the element as its `contenteditable` set to true)
+        const currentKeyCode = key(e); // The key being used
 
-                return true;
+        if (holder.that.readOnly) {
+            holder.processed = true;
+
+            return;
+        }
+
+        // The "enter" key throws a `change` event if the value has changed since the `focus` event
+        if (e.keyCode === keyCode.Enter && holder.valueOnFocus !== e.target.value) {
+            triggerEvent('change', e.target);
+            holder.valueOnFocus = e.target.value;
+        }
+
+        holder._updateFieldProperties(e); //FIXME This is called 2 to 3 times
+        holder.processed = false;
+        holder.formatted = false;
+
+        if (holder._skipAlways(e)) {
+            holder.processed = true;
+
+            return;
+        }
+
+        // Check if the key is a delete/backspace key
+        if (currentKeyCode === keyCode.Backspace || currentKeyCode === keyCode.Delete) {
+            holder._processCharacterDeletion(); // Because backspace and delete only triggers keydown and keyup events, not keypress
+            holder.processed = true;
+            holder._formatQuick(e);
+
+            // If and only if the resulting value has changed after that backspace/delete, then we have to send an 'input' event like browsers normally do.
+            if ((e.target.value !== holder.lastVal) && holder.settingsClone.throwInput) {
+                // Throw an input event when a character deletion is detected
+                triggerEvent('input', e.target);
+                e.preventDefault(); // ...and immediately prevent the browser to delete a second character
             }
-            /* // The code below allows the "enter" keydown to throw a change() event
-             if (e.keyCode === keyCode.Enter && holder.inVal !== $this.val()) {
-             $this.change();
-             holder.inVal = $this.val();
-             } */
-            holder._updateFieldProperties(e); //FIXME This is called 2 to 3 times
-            holder.processed = false;
-            holder.formatted = false;
 
-            if (holder._skipAlways(e)) {
-                holder.processed = true;
+            holder.lastVal = e.target.value;
+            holder.settingsClone.throwInput = true;
 
-                return true;
-            }
+            return;
+        }
 
-            if (holder._processCharacterDeletion()) {
-                holder.processed = true;
-                holder._formatQuick(e);
-                const currentValue = $this.val();
-                if ((currentValue !== holder.lastVal) && holder.settingsClone.throwInput) {
-                    // throws input event in deletion character
-                    $this.trigger('input');
-                }
-                holder.lastVal = currentValue;
-                holder.settingsClone.throwInput = true;
-                e.preventDefault();
-
-                return false;
-            }
-            holder.formatted = false;
-
-            return true;
-        });
-
-        return holder;
+        holder.formatted = false; //TODO Is this line needed?
     }
 
     /**
@@ -2409,106 +2456,101 @@ if (typeof define === 'function' && define.amd) {
      * The user is still pressing the key, which will output a character (ie. '2') continuously until it releases the key.
      * Note: 'keypress' events are not sent for delete keys like Backspace/Delete.
      *
-     * @param $this
      * @param {AutoNumericHolder} holder
+     * @param {Event} e
      * @returns {*}
      */
-    function onKeypress($this, holder) {
-        $this.on('keypress.autoNumeric', e => {
-            // Firefox fix for Shift && insert paste event
-            if (e.shiftKey && e.keyCode === keyCode.Insert) {
-                return;
-            }
-            holder = getHolder($this);
-            const processed = holder.processed;
-            holder._updateFieldProperties(e); //FIXME This is called 2 to 3 times
-            holder.processed = false;
-            holder.formatted = false;
+    function onKeypress(holder, e) {
+        const currentKeyCode = key(e); // The key being used
 
-            if (holder._skipAlways(e)) {
-                return true;
-            }
+        // Firefox fix for Shift && insert paste event
+        if (e.shiftKey && currentKeyCode === keyCode.Insert) {
+            return;
+        }
 
-            if (processed) {
+        const processed = holder.processed;
+        holder._updateFieldProperties(e); //FIXME This is called 2 to 3 times
+        holder.processed = false;
+        holder.formatted = false;
+
+        if (holder._skipAlways(e)) {
+            return;
+        }
+
+        if (processed) {
+            e.preventDefault();
+
+            return;
+        }
+
+        //FIXME `_processCharacterInsertion()` always returns TRUE, which means `holder.formatted = false;` at the end is NEVER called.
+        if (holder._processCharacterInsertion()) {
+            holder._formatQuick(e);
+            if ((e.target.value !== holder.lastVal) && holder.settingsClone.throwInput) {
+                // Throws input event on adding a character
+                triggerEvent('input', e.target);
+                e.preventDefault(); // ...and immediately prevent the browser to add a second character
+            }
+            else {
+                // If the value has not changed, we do not allow the input event to be sent
                 e.preventDefault();
-
-                return false;
             }
 
-            if (holder._processCharacterInsertion()) {
-                holder._formatQuick(e);
-                const currentValue = $this.val();
-                if ((currentValue !== holder.lastVal) && holder.settingsClone.throwInput) {
-                    // throws input event on adding character
-                    $this.trigger('input');
-                }
-                holder.lastVal = currentValue;
-                holder.settingsClone.throwInput = true;
-                e.preventDefault();
+            holder.lastVal = e.target.value;
+            holder.settingsClone.throwInput = true;
 
-                return;
-            }
-            holder.formatted = false;
-        });
+            return;
+        }
 
-        return holder;
+        holder.formatted = false;
     }
 
     /**
      * Handler for 'keyup' events.
      * The user just released any key, hence one event is sent.
      *
-     * @param $this
      * @param {AutoNumericHolder} holder
      * @param {object} settings
+     * @param {Event} e
      * @returns {*}
      */
-    function onKeyup($this, holder, settings) {
-        $this.on('keyup.autoNumeric', function(e) {
-            holder = getHolder($this);
-            holder._updateFieldProperties(e); //FIXME This is called 2 to 3 times
-            holder.processed = false;
-            holder.formatted = false;
+    function onKeyup(holder, settings, e) {
+        const currentKeyCode = key(e); // The key being used
 
-            const skip = holder._skipAlways(e);
-            const tab = holder.kdCode;
-            holder.kdCode = 0;
-            delete holder.valuePartsBeforePaste;
+        holder._updateFieldProperties(e); //FIXME This is called 2 to 3 times
+        holder.processed = false;
+        holder.formatted = false;
 
-            // Added to properly place the caret when only the currency sign is present
-            if ($this[0].value === holder.settingsClone.aSign) {
-                if (holder.settingsClone.pSign === 's') {
-                    setElementSelection(this, 0, 0);
-                } else {
-                    setElementSelection(this, holder.settingsClone.aSign.length, holder.settingsClone.aSign.length);
-                }
-            } else if (tab === keyCode.Tab) {
-                setElementSelection(this, 0, $this.val().length);
-            }
+        const skip = holder._skipAlways(e);
+        delete holder.valuePartsBeforePaste;
+        if (skip || e.target.value === '') {
+            return;
+        }
 
-            if ($this[0].value === holder.settingsClone.aSuffix) {
-                setElementSelection(this, 0, 0);
+        // Added to properly place the caret when only the currency sign is present
+        if (e.target.value === holder.settingsClone.aSign) {
+            if (holder.settingsClone.pSign === 's') {
+                setElementSelection(e.target, 0, 0);
+            } else {
+                setElementSelection(e.target, holder.settingsClone.aSign.length, holder.settingsClone.aSign.length);
             }
+        } else if (currentKeyCode === keyCode.Tab) {
+            setElementSelection(e.target, 0, e.target.value.length);
+        }
 
-            if (holder.settingsClone.rawValue === '' && holder.settingsClone.aSign !== '' && holder.settingsClone.aSuffix !== '') {
-                setElementSelection(this, 0, 0);
-            }
+        if ((e.target.value === holder.settingsClone.aSuffix) ||
+            (holder.settingsClone.rawValue === '' && holder.settingsClone.aSign !== '' && holder.settingsClone.aSuffix !== '')) {
+            setElementSelection(e.target, 0, 0);
+        }
 
-            // Saves the extended decimal to preserve the data when navigating away from the page
-            if (holder.settingsClone.eDec !== null && holder.settingsClone.aStor) {
-                autoSave(e.target, settings, 'set');
-            }
-            if (skip) {
-                return true;
-            }
-            if (this.value === '') {
-                return true;
-            }
-            if (!holder.formatted) {
-                holder._formatQuick(e);
-            }
-        });
-        return holder;
+        // Saves the extended decimal to preserve the data when navigating away from the page
+        if (holder.settingsClone.eDec !== null && holder.settingsClone.aStor) {
+            autoSave(e.target, settings, 'set');
+        }
+
+        if (!holder.formatted) {
+            holder._formatQuick(e);
+        }
     }
 
     /**
@@ -2516,89 +2558,86 @@ if (typeof define === 'function' && define.amd) {
      *
      * @param $this
      * @param {AutoNumericHolder} holder
+     * @param {Event} e
      * @returns {*}
      */
-    function onFocusOutAndMouseLeave($this, holder) {
-        $this.on('focusout.autoNumeric mouseleave.autoNumeric', (e) => {
-            if (!$this.is(':focus')) {
-                holder = getHolder($this);
-                let value = $this.val();
-                const origValue = value;
-                const settings = holder.settingsClone;
-                settings.onOff = false;
-                if (settings.aStor) {
-                    autoSave(e.target, settings, 'set');
+    function onFocusOutAndMouseLeave($this, holder, e) {
+        if (!$this.is(':focus')) {
+            let value = e.target.value;
+            const origValue = value;
+            const settings = holder.settingsClone;
+            settings.onOff = false;
+
+            if (settings.aStor) {
+                autoSave(e.target, settings, 'set');
+            }
+
+            if (settings.nSep === true) {
+                settings.aSep = settings.oSep;
+                settings.aSign = settings.oSign;
+                settings.aSuffix = settings.oSuffix;
+            }
+
+            if (settings.eDec !== null) {
+                settings.mDec = settings.oDec;
+                settings.aPad = settings.oPad;
+                settings.nBracket = settings.oBracket;
+            }
+
+            value = autoStrip(value, settings);
+            if (value !== '') {
+                if (settings.trailingNegative) {
+                    value = '-' + value;
+                    settings.trailingNegative = false;
                 }
 
-                if (settings.nSep === true) {
-                    settings.aSep = settings.oSep;
-                    settings.aSign = settings.oSign;
-                    settings.aSuffix = settings.oSuffix;
-                }
+                const [minTest, maxTest] = autoCheck(value, settings);
+                if (checkEmpty(value, settings, false) === null && minTest && maxTest) {
+                    value = fixNumber(value, settings);
+                    settings.rawValue = value;
 
-                if (settings.eDec !== null) {
-                    settings.mDec = settings.oDec;
-                    settings.aPad = settings.oPad;
-                    settings.nBracket = settings.oBracket;
-                }
-
-                value = autoStrip(value, settings);
-                if (value !== '') {
-                    if (settings.trailingNegative) {
-                        value = '-' + value;
-                        settings.trailingNegative = false;
+                    if (settings.scaleDivisor) {
+                        value = value / settings.scaleDivisor;
+                        value = value.toString();
                     }
 
-                    const [minTest, maxTest] = autoCheck(value, settings);
-                    if (checkEmpty(value, settings, false) === null && minTest && maxTest) {
-                        value = fixNumber(value, settings);
-                        settings.rawValue = value;
-
-                        if (settings.scaleDivisor) {
-                            value = value / settings.scaleDivisor;
-                            value = value.toString();
-                        }
-
-                        settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? +settings.scaleDecimal : settings.mDec;
-                        value = autoRound(value, settings);
-                        value = presentNumber(value, settings);
-                    } else {
-                        if (!minTest) {
-                            $this.trigger('autoNumeric:minExceeded');
-                        }
-                        if (!maxTest) {
-                            $this.trigger('autoNumeric:maxExceeded');
-                        }
-
-                        value = settings.rawValue;
-                    }
+                    settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? +settings.scaleDecimal : settings.mDec;
+                    value = autoRound(value, settings);
+                    value = presentNumber(value, settings);
                 } else {
-                    if (settings.wEmpty === 'zero') {
-                        settings.rawValue = '0';
-                        value = autoRound('0', settings);
-                    } else {
-                        settings.rawValue = '';
+                    if (!minTest) {
+                        $this.trigger('autoNumeric:minExceeded');
                     }
-                }
+                    if (!maxTest) {
+                        $this.trigger('autoNumeric:maxExceeded');
+                    }
 
-                let groupedValue = checkEmpty(value, settings, false);
-                if (groupedValue === null) {
-                    groupedValue = autoGroup(value, settings);
+                    value = settings.rawValue;
                 }
-
-                if (groupedValue !== origValue) {
-                    groupedValue = (settings.scaleSymbol) ? groupedValue + settings.scaleSymbol : groupedValue;
-                    $this.val(groupedValue);
-                }
-
-                if (groupedValue !== holder.inVal) {
-                    $this.change();
-                    delete holder.inVal;
+            } else {
+                if (settings.wEmpty === 'zero') {
+                    settings.rawValue = '0';
+                    value = autoRound('0', settings);
+                } else {
+                    settings.rawValue = '';
                 }
             }
-        });
 
-        return holder;
+            let groupedValue = checkEmpty(value, settings, false);
+            if (groupedValue === null) {
+                groupedValue = autoGroup(value, settings);
+            }
+
+            if (groupedValue !== origValue) {
+                groupedValue = (settings.scaleSymbol) ? groupedValue + settings.scaleSymbol : groupedValue;
+                $this.val(groupedValue);
+            }
+
+            if (groupedValue !== holder.valueOnFocus) {
+                $this.change();
+                delete holder.valueOnFocus;
+            }
+        }
     }
 
     /**
@@ -2606,35 +2645,47 @@ if (typeof define === 'function' && define.amd) {
      *
      * @param $this
      * @param {AutoNumericHolder} holder
+     * @param {Event} e
      * @returns {*}
      */
-    function onPaste($this, holder) {
-        $this.on('paste', function(e) {
-            //FIXME After a paste, the caret is put on the far right of the input, it should be set to something like `newCaretPosition = oldCaretPosition + pasteText.length;`, while taking into account the thousand separators and the decimal character
-            e.preventDefault();
-            holder = getHolder($this);
+    function onPaste($this, holder, e) {
+        //FIXME When pasting '000' on a thousand group selection, the whole selection gets deleted, and only one '0' is pasted
+        // The event is prevented by default, since otherwise the user would be able to paste invalid characters into the input
+        e.preventDefault();
 
-            const oldRawValue = $this.autoNumeric('get');
-            const currentValue = this.value || '';
-            const selectionStart = this.selectionStart || 0;
-            const selectionEnd = this.selectionEnd || 0;
-            const prefix = currentValue.substring(0, selectionStart);
-            const suffix = currentValue.substring(selectionEnd, currentValue.length);
-            const pastedText = preparePastedText(e.originalEvent.clipboardData.getData('text/plain'), holder);
+        const oldRawValue = $this.autoNumeric('get');
+        const currentValue = e.target.value || '';
+        const selectionStart = e.target.selectionStart || 0;
+        const selectionEnd = e.target.selectionEnd || 0;
+        const prefix = currentValue.substring(0, selectionStart);
+        const suffix = currentValue.substring(selectionEnd, currentValue.length);
+        const pastedText = preparePastedText(e.clipboardData.getData('text/plain'), holder);
 
-            if (isValidPasteText(pastedText)) {
-                const newValue = preparePastedText(prefix + Number(pastedText).valueOf() + suffix, holder);
+        if (isValidPasteText(pastedText)) {
+            const newValue = preparePastedText(prefix + Number(pastedText).valueOf() + suffix, holder);
 
-                if (isValidPasteText(newValue) && Number(oldRawValue).valueOf() !== Number(newValue).valueOf()) {
-                    $this.autoNumeric('set', newValue);
-                    $this.trigger('input');
-                }
-            } else {
-                this.selectionStart = selectionEnd;
+            if (isValidPasteText(newValue) && Number(oldRawValue).valueOf() !== Number(newValue).valueOf()) {
+                $this.autoNumeric('set', newValue);
+                // On a 'normal' non-autoNumeric input, an `input` event is sent when a paste is done. We mimic that.
+                triggerEvent('input', e.target);
+                //FIXME After a paste, the caret is put on the far right of the input, it should be set to something like `newCaretPosition = oldCaretPosition + pasteText.length;`, while taking into account the thousand separators, the decimal character, the negative sign/brackets, and the currency sign.
             }
-        });
+        } else {
+            e.target.selectionStart = selectionEnd;
+        }
+    }
 
-        return holder;
+    /**
+     * When focusing out of the input, we check if the value has changed, and if it has, then we send a `change` event (since the native one would have been prevented by `e.preventDefault()` called in the other event listeners).
+     *
+     * @param {AutoNumericHolder} holder
+     * @param {Event} e
+     */
+    function onBlur(holder, e) {
+        if (e.target.value !== holder.valueOnFocus) {
+            triggerEvent('change', e.target);
+            // e.preventDefault(); // ...and immediately prevent the browser to send a second change event (that somehow gets picked up by jQuery, but not by `addEventListener()` //FIXME KNOWN BUG : This does not prevent the second change event to be picked up by jQuery
+        }
     }
 
     /**
@@ -2646,8 +2697,6 @@ if (typeof define === 'function' && define.amd) {
      */
     function onSubmit($this, holder) {
         $this.closest('form').on('submit.autoNumeric', () => {
-            holder = getHolder($this);
-
             if (holder) {
                 const $settings = holder.settingsClone;
 
@@ -2656,8 +2705,6 @@ if (typeof define === 'function' && define.amd) {
                 }
             }
         });
-
-        return holder;
     }
 
     /**
@@ -2990,7 +3037,7 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 // Create the AutoNumericHolder object that store the field properties
-                let holder = getHolder($this, settings, false);
+                const holder = getHolder($this, settings, false);
 
                 if (!settings.runOnce && settings.aForm) {
                     formatDefaultValueOnPageLoad(settings, $input, $this);
@@ -3000,13 +3047,16 @@ if (typeof define === 'function' && define.amd) {
 
                 // Add the events listeners to supported input types ("text", "hidden", "tel" and no type)
                 if ($input) {
-                    holder = onFocusInAndMouseEnter($this, holder);
-                    holder = onFocusOutAndMouseLeave($this, holder);
-                    holder = onKeydown($this, holder);
-                    holder = onKeypress($this, holder);
-                    holder = onKeyup($this, holder, settings);
-                    holder = onPaste($this, holder);
-                    onSubmit($this, holder);
+                    this.addEventListener('focusin', e => { onFocusInAndMouseEnter($this, holder, e); }, false);
+                    this.addEventListener('mouseenter', e => { onFocusInAndMouseEnter($this, holder, e); }, false);
+                    this.addEventListener('focusout', e => { onFocusOutAndMouseLeave($this, holder, e); }, false);
+                    this.addEventListener('mouseleave', e => { onFocusOutAndMouseLeave($this, holder, e); }, false);
+                    this.addEventListener('keydown', e => { onKeydown(holder, e); }, false);
+                    this.addEventListener('keypress', e => { onKeypress(holder, e); }, false);
+                    this.addEventListener('keyup', e => { onKeyup(holder, settings, e); }, false);
+                    this.addEventListener('blur', e => { onBlur(holder, e); }, false);
+                    this.addEventListener('paste', e => { onPaste($this, holder, e); }, false);
+                    onSubmit($this, holder); //TODO Switch to `addEventListener'
                 }
             });
         },
@@ -3371,7 +3421,7 @@ if (typeof define === 'function' && define.amd) {
         const [minTest, maxTest] = autoCheck(value, settings);
         if (!minTest || !maxTest) {
             // Throw a custom event
-            sendCustomEvent('autoFormat.autoNumeric', `Range test failed`);
+            triggerEvent('autoFormat.autoNumeric', document, `Range test failed`);
             throwError(`The value [${value}] being set falls outside of the vMin [${settings.vMin}] and vMax [${settings.vMax}] range set for this element`);
         }
 
@@ -3643,26 +3693,23 @@ if (typeof define === 'function' && define.amd) {
     };
 
     /**
-     * Create a custom event.
-     * cf. https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
+     * Create a custom event and immediately sent it from the given element.
+     * By default, if no element is given, the event is thrown from `document`.
      *
-     * @param eventName string
-     * @param detail
-     * @returns {CustomEvent}
+     * @param {string} eventName
+     * @param {Element} element
+     * @param {object} detail
      */
-    function createCustomEvent(eventName, detail) {
-        return new CustomEvent(eventName, { detail, bubbles: false, cancelable: false }); // This is not supported by default by IE ; We use the polyfill for IE9 and later.
-    }
+    function triggerEvent(eventName, element = document, detail = null) {
+        let event;
+        if (window.CustomEvent) {
+            event = new CustomEvent(eventName, { detail, bubbles: false, cancelable: false }); // This is not supported by default by IE ; We use the polyfill for IE9 and later.
+        } else {
+            event = document.createEvent('CustomEvent');
+            event.initCustomEvent(eventName, true, true, { detail });
+        }
 
-    /**
-     * Create a custom event and immediately broadcast it.
-     *
-     * @param eventName string
-     * @param detail
-     * @returns {boolean}
-     */
-    function sendCustomEvent(eventName, detail = null) {
-        return document.dispatchEvent(createCustomEvent(eventName, detail));
+        element.dispatchEvent(event);
     }
 
     /**

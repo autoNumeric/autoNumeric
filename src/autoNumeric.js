@@ -719,60 +719,8 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Determine the maximum decimal length from the vMin and vMax settings
      */
-    function decLength(vMin, vMax) {
-        let vMaxLength = 0;
-        let vMinLength = 0;
-        if (vMax[1]) {
-            vMaxLength = vMax[1].length;
-        }
-        if (vMin[1]) {
-            vMinLength = vMin[1].length;
-        }
-
-        return Math.max(vMaxLength, vMinLength);
-    }
-
-    /**
-     * Preparing user defined options for further usage
-     * merge them with defaults appropriately
-     */
-    function autoCode($this, settings) {
-        //TODO Merge `autoCode()` into `getInitialSettings()`
-        runCallbacksFoundInTheSettingsObject($this, settings);
-        const vMax = settings.vMax.toString().split('.');
-        const vMin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
-        vMax[0] = vMax[0].replace('-', '');
-        vMin[0] = vMin[0].replace('-', '');
-        settings.mIntPos = Math.max(vMax[0].length, 1);
-        settings.mIntNeg = Math.max(vMin[0].length, 1);
-        if (settings.mDec === null) {
-            settings.mDec = decLength(vMin, vMax);
-            settings.oDec = settings.mDec;
-        } else {
-            settings.mDec = Number(settings.mDec);
-        }
-
-        settings.mDec = Number((settings.scaleDivisor && settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec);
-
-        // set alternative decimal separator key
-        if (settings.altDec === null && settings.mDec > 0) {
-            if (settings.aDec === '.' && settings.aSep !== ',') {
-                settings.altDec = ',';
-            } else if (settings.aDec === ',' && settings.aSep !== '.') {
-                settings.altDec = '.';
-            }
-        }
-
-        // cache regexps for autoStrip
-        const aNegReg = settings.aNeg ?`([-\\${settings.aNeg}]?)` :'(-?)';
-        settings.aNegRegAutoStrip = aNegReg;
-        settings.skipFirstAutoStrip = new RegExp(`${aNegReg}[^-${(settings.aNeg?`\\${settings.aNeg}`:'')}\\${settings.aDec}\\d].*?(\\d|\\${settings.aDec}\\d)`);
-        settings.skipLastAutoStrip = new RegExp(`(\\d\\${settings.aDec}?)[^\\${settings.aDec}\\d]\\D*$`);
-        const allowed = `-0123456789\\${settings.aDec}`;
-        settings.allowedAutoStrip = new RegExp(`[^${allowed}]`, 'gi');
-        settings.numRegAutoStrip = new RegExp(`${aNegReg}(?:\\${settings.aDec}?(\\d+\\${settings.aDec}\\d+)|(\\d*(?:\\${settings.aDec}\\d*)?))`);
-
-        return settings;
+    function maximumVMinAndVMaxDecimalLength(vMin, vMax) {
+        return Math.max(decimalPlaces(vMin), decimalPlaces(vMax));
     }
 
     /**
@@ -835,11 +783,10 @@ if (typeof define === 'function' && define.amd) {
 
             s = `${nSign}${modifiedIntegerPart}${isUndefined(decimalPart)?'':settings.aDec + decimalPart}`;
         }
-        if ((settings.onOff && settings.lZero === 'deny') || (settings.lZero === 'allow' && settings.onOff === false)) {
-            // Using this regex version `^${settings.aNegRegAutoStrip}0*(\\d|$)` entirely clear the input on blur
-            let stripReg = `^${settings.aNegRegAutoStrip}0*(\\d)`;
-            stripReg = new RegExp(stripReg);
-            s = s.replace(stripReg, '$1$2');
+
+        if ((settings.onOff && settings.lZero === 'deny') ||
+            (!settings.onOff && settings.lZero === 'allow')) {
+            s = s.replace(settings.stripReg, '$1$2');
         }
 
         return s;
@@ -1504,7 +1451,7 @@ if (typeof define === 'function' && define.amd) {
         }
 
         let holder = data.holder;
-        if ((isUndefined(holder) && settings) || update) {
+        if (update || (isUndefined(holder) && settings)) {
             holder = new AutoNumericHolder($that.get(0), settings);
             data.holder = holder;
         }
@@ -1518,7 +1465,7 @@ if (typeof define === 'function' && define.amd) {
      *
      * @param {object} settings
      */
-    function keepOriginalSettings(settings) {
+    function keepAnOriginalSettingsCopy(settings) {
         settings.oDec     = settings.mDec;
         settings.oPad     = settings.aPad;
         settings.oBracket = settings.nBracket;
@@ -1616,13 +1563,12 @@ if (typeof define === 'function' && define.amd) {
             this.that = that;
             this.$that = $(that);
             this.formatted = false;
-            this.settingsClone = autoCode(this.$that, this.settings);
+            this.settingsClone = settings;
             this.value = that.value;
         }
 
         _updateFieldProperties(e) {
             this.value = this.that.value;
-            this.settingsClone = autoCode(this.$that, this.settings);
             this.ctrlKey = e.ctrlKey;
             this.cmdKey = e.metaKey;
             this.shiftKey = e.shiftKey;
@@ -1633,8 +1579,6 @@ if (typeof define === 'function' && define.amd) {
                 this.kdCode = e.keyCode;
             }
             this.which = e.which;
-            this.processed = false;
-            this.formatted = false;
         }
 
         _setSelection(start, end, setReal) {
@@ -1999,43 +1943,37 @@ if (typeof define === 'function' && define.amd) {
         }
 
         /**
-         * Process deletion of characters
-         * Returns true if processing performed
+         * Process the deletion of characters.
          */
         _processCharacterDeletion() {
             const settingsClone = this.settingsClone;
-            if (this.kdCode === keyCode.Backspace || this.kdCode === keyCode.Delete) {
-                let left;
-                let right;
+            
+            let left;
+            let right;
 
-                if (!this.selection.length) {
-                    [left, right] = this._getBeforeAfterStripped();
-                    if (left === '' && right === '') {
-                        settingsClone.throwInput = false;
-                    }
-
-                    if (((settingsClone.pSign === 'p' && settingsClone.pNeg === 's') ||
-                            (settingsClone.pSign === 's' && (settingsClone.pNeg === 'l' || settingsClone.pNeg === 'r'))) &&
-                            contains(this.value, '-')) {
-                        [left, right] = this._processTrailing([left, right]);
-                    } else {
-                        if (this.kdCode === 8) {
-                            left = left.substring(0, left.length - 1);
-                        } else {
-                            right = right.substring(1, right.length);
-                        }
-                    }
-                    this._setValueParts(left, right);
-                } else {
-                    this._expandSelectionOnSign(false);
-                    [left, right] = this._getBeforeAfterStripped();
-                    this._setValueParts(left, right);
+            if (!this.selection.length) {
+                [left, right] = this._getBeforeAfterStripped();
+                if (left === '' && right === '') {
+                    settingsClone.throwInput = false;
                 }
 
-                return true;
+                if (((settingsClone.pSign === 'p' && settingsClone.pNeg === 's') ||
+                     (settingsClone.pSign === 's' && (settingsClone.pNeg === 'l' || settingsClone.pNeg === 'r'))) &&
+                     contains(this.value, '-')) {
+                    [left, right] = this._processTrailing([left, right]);
+                } else {
+                    if (this.kdCode === keyCode.Backspace) {
+                        left = left.substring(0, left.length - 1);
+                    } else {
+                        right = right.substring(1, right.length);
+                    }
+                }
+            } else {
+                this._expandSelectionOnSign(false);
+                [left, right] = this._getBeforeAfterStripped();
             }
 
-            return false;
+            this._setValueParts(left, right);
         }
 
         /**
@@ -2866,55 +2804,149 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * Analyze and save the vMin and vMax integer size for later uses
+     *
+     * @param {object} settings
+     * @returns {{vMax: Array, vMin: Array}}
+     */
+    function calculateVMinAndVMaxIntegerSizes(settings) {
+        let [vMaxIntegerPart] = settings.vMax.toString().split('.');
+        let [vMinIntegerPart] = (!settings.vMin && settings.vMin !== 0)?[]:settings.vMin.toString().split('.');
+        vMaxIntegerPart = vMaxIntegerPart.replace('-', '');
+        vMinIntegerPart = vMinIntegerPart.replace('-', '');
+
+        settings.mIntPos = Math.max(vMaxIntegerPart.length, 1);
+        settings.mIntNeg = Math.max(vMinIntegerPart.length, 1);
+    }
+
+    /**
+     * Modify `mDec` as needed
+     *
+     * @param {object} settings
+     */
+    function correctMDecOption(settings) {
+        if (!isNull(settings.scaleDivisor) && !isNull(settings.scaleDecimal)) {
+            // Override the maximum number of decimal places with the one defined with the number of decimals to show when not in focus, if set
+            settings.mDec = settings.scaleDecimal;
+        }
+        else if (isNull(settings.mDec)) {
+            settings.mDec = maximumVMinAndVMaxDecimalLength(settings.vMin, settings.vMax);
+            settings.oDec = String(settings.mDec);
+        }
+
+        // Most calculus assume `mDec` is an integer, the following statement makes it clear (otherwise having it as a string leads to problems in rounding for instance)
+        settings.mDec = Number(settings.mDec);
+    }
+
+    /**
+     * Sets the alternative decimal separator key.
+     *
+     * @param {object} settings
+     */
+    function setsAlternativeDecimalSeparatorCharacter(settings) {
+        if (isNull(settings.altDec) && Number(settings.mDec) > 0) {
+            if (settings.aDec === '.' && settings.aSep !== ',') {
+                settings.altDec = ',';
+            } else if (settings.aDec === ',' && settings.aSep !== '.') {
+                settings.altDec = '.';
+            }
+        }
+    }
+
+    /**
+     * Caches regular expressions for autoStrip
+     *
+     * @param {object} settings
+     */
+    function cachesUsualRegularExpressions(settings) {
+        const aNegReg = settings.aNeg?`([-\\${settings.aNeg}]?)`:'(-?)';
+        settings.aNegRegAutoStrip = aNegReg;
+        settings.skipFirstAutoStrip = new RegExp(`${aNegReg}[^-${(settings.aNeg?`\\${settings.aNeg}`:'')}\\${settings.aDec}\\d].*?(\\d|\\${settings.aDec}\\d)`);
+        settings.skipLastAutoStrip = new RegExp(`(\\d\\${settings.aDec}?)[^\\${settings.aDec}\\d]\\D*$`);
+
+        const allowed = `-0123456789\\${settings.aDec}`;
+        settings.allowedAutoStrip = new RegExp(`[^${allowed}]`, 'gi');
+        settings.numRegAutoStrip = new RegExp(`${aNegReg}(?:\\${settings.aDec}?(\\d+\\${settings.aDec}\\d+)|(\\d*(?:\\${settings.aDec}\\d*)?))`);
+
+        // Using this regex version `^${settings.aNegRegAutoStrip}0*(\\d|$)` entirely clear the input on blur
+        settings.stripReg = new RegExp(`^${settings.aNegRegAutoStrip}0*(\\d)`);
+    }
+
+    /**
+     * Modify the user settings to make them 'exploitable' later.
+     *
+     * @param {object} settings
+     */
+    function transformOptionsValuesToDefaultTypes(settings) {
+        $.each(settings, (key, value) => {
+            // Convert the string 'true' and 'false' to real Boolean
+            if (value === 'true' || value === 'false') {
+                settings[key] = value === 'true';
+            }
+
+            // Convert numbers in options to strings
+            //TODO if a value is already of type 'Number', shouldn't we keep it as a number for further manipulation, instead of using a string?
+            if (typeof value === 'number' && key !== 'aScale') {
+                settings[key] = value.toString();
+            }
+        });
+    }
+
+    /**
      * Analyse the settings/options passed by the user, validate and clean them, then return them.
      * Note: This returns `null` if somehow the settings returned by jQuery is not an object.
      *
      * @param {object} options
      * @param $this
+     * @param {boolean} update - If TRUE, then the settings already exists and this function only updates them instead of recreating them from scratch
      * @returns {object|null}
      */
-    function getInitialSettings(options, $this) {
+    function getInitialSettings(options, $this, update = false) {
         // Attempt to grab "autoNumeric" settings. If they do not exist, it returns "undefined".
         let settings = $this.data('autoNumeric');
 
         // If we couldn't grab any settings, create them from the default ones and combine them with the options passed
-        if (typeof settings !== 'object') {
-            // Attempt to grab HTML5 data, if it doesn't exist, we'll get "undefined"
-            const tagData = $this.data();
-
-            settings = $.extend({}, defaultSettings, tagData, options, {
-                onOff           : false,
-                runOnce         : false,
-                rawValue        : '',
-                trailingNegative: false,
-                caretFix        : false,
-                throwInput      : true,
-                strip           : true,
-                tagList         : allowedTagList,
-            });
+        if (update || isUndefined(settings)) {
+            if (update) {
+                // The settings are updated
+                settings = $.extend(settings, options);
+            } else {
+                // The settings are generated for the first time
+                // Attempt to grab HTML5 data, if it doesn't exist, we'll get "undefined"
+                const tagData = $this.data();
+                settings = $.extend({}, defaultSettings, tagData, options, {
+                    onOff           : false,
+                    runOnce         : false,
+                    rawValue        : '',
+                    trailingNegative: false,
+                    caretFix        : false,
+                    throwInput      : true, // Throw input event
+                    strip           : true,
+                    tagList         : allowedTagList,
+                });
+            }
 
             // Modify the user settings to make them 'exploitable'
-            $.each(settings, (key, value) => {
-                // Convert the string 'true' and 'false' to real Boolean
-                if (value === 'true' || value === 'false') {
-                    settings[key] = value === 'true';
-                }
-
-                // Convert numbers in options to strings
-                //TODO if a value is of type 'Number', shouldn't we keep it as a number for further manipulation, instead of using a string?
-                if (typeof value === 'number' && key !== 'aScale') {
-                    settings[key] = value.toString();
-                }
-            });
+            transformOptionsValuesToDefaultTypes(settings);
 
             // Improve the `pNeg` option if needed
             correctPNegOption(options, settings);
 
-            // Set the negative sign
+            // Set the negative sign if needed
             settings.aNeg = settings.vMin < 0 ? '-' : '';
+
+            // Additional changes to the settings object (from the original autoCode() function)
+            runCallbacksFoundInTheSettingsObject($this, settings);
+            calculateVMinAndVMaxIntegerSizes(settings);
+            correctMDecOption(settings);
+            setsAlternativeDecimalSeparatorCharacter(settings);
+            cachesUsualRegularExpressions(settings);
 
             // Validate the settings
             validate(settings, false); // Throws if necessary
+
+            // Original settings saved for use when eDec, scaleDivisor & nSep options are being used
+            keepAnOriginalSettingsCopy(settings);
 
             // Save our new settings
             $this.data('autoNumeric', settings);
@@ -2944,20 +2976,15 @@ if (typeof define === 'function' && define.amd) {
                 const $this = $(this);
                 const $input = getInputIfSupportedTagAndType($this);
 
-                const settings = getInitialSettings(options, $this);
+                const settings = getInitialSettings(options, $this, false);
                 if (isNull(settings)) {
                     return this;
                 }
 
-                // original settings saved for use when eDec, scaleDivisor & nSep options are being used
-                keepOriginalSettings(settings);
                 // Create the AutoNumericHolder object that store the field properties
                 let holder = getHolder($this, settings, false);
 
-                //TODO Shouldn't the next line be in the `getInitialSettings()` function?
-                settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
-
-                if (settings.runOnce === false && settings.aForm) {
+                if (!settings.runOnce && settings.aForm) {
                     formatDefaultValueOnPageLoad(settings, $input, $this);
                 }
 
@@ -3020,31 +3047,12 @@ if (typeof define === 'function' && define.amd) {
          */
         update(options) {
             return $(this).each(function() {
-                //TODO Replace all this duplicated code with a call to `getInitialSettings()`
                 const $this = autoGet(this);
-                let settings = $this.data('autoNumeric');
-
-                if (typeof settings !== 'object') {
-                    throwError(`Initializing autoNumeric is required prior to calling the "update" method`);
-                }
                 const strip = $this.autoNumeric('get');
-                settings = $.extend(settings, options);
+                const settings = getInitialSettings(options, $this, true);
 
-                if (settings.scaleDivisor) {
-                    settings.mDec = (settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
-                }
-                keepOriginalSettings(settings);
                 // Update the AutoNumericHolder object that store the field properties
                 getHolder($this, settings, true);
-
-                if (settings.aDec === settings.aSep) {
-                    throwError(`autoNumeric will not function properly when the decimal character aDec: "${settings.aDec}" and thousand separator aSep: "${settings.aSep}" are the same character`);
-                }
-
-                // Improve the `pNeg` option if needed
-                correctPNegOption(options, settings);
-
-                $this.data('autoNumeric', settings);
 
                 if ($this.val() !== '' || $this.text() !== '') {
                     return $this.autoNumeric('set', strip);
@@ -3344,18 +3352,15 @@ if (typeof define === 'function' && define.amd) {
         value = value.toString();
         value = fromLocale(value);
         if (Number(value) < 0) {
-            settings.aNeg = '-'; //TODO Replace this with `getInitialSettings()` that already sets `aNeg`?
+            settings.aNeg = '-';
         }
 
-        if (settings.mDec === null) {
-            const vMax = settings.vMax.toString().split('.');
-            const vMin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
-            settings.mDec = decLength(vMin, vMax);
+        if (isNull(settings.mDec)) {
+            settings.mDec = maximumVMinAndVMaxDecimalLength(settings.vMin, settings.vMax);
         }
 
         // Basic tests to check if the given value is valid
         const [minTest, maxTest] = autoCheck(value, settings);
-
         if (!minTest || !maxTest) {
             // Throw a custom event
             sendCustomEvent('autoFormat.autoNumeric', `Range test failed`);
@@ -3510,11 +3515,7 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // Write a warning message in the console if the number of decimal in vMin/vMax is overridden by mDec (and not if mDec is equal to the number of decimal used in vMin/vMax)
-        let dpVMin = decimalPlaces(options.vMin);
-        let dpVMax = decimalPlaces(options.vMax);
-        dpVMin = isNull(dpVMin)?0:dpVMin;
-        dpVMax = isNull(dpVMax)?0:dpVMax;
-        const vMinMaxDecimalPlaces = Math.max(dpVMin, dpVMax);
+        const vMinMaxDecimalPlaces = maximumVMinAndVMaxDecimalLength(options.vMin, options.vMax);
         if (!isNull(options.mDec) &&
             ((hasDecimals(options.vMin) || hasDecimals(options.vMax)) && vMinMaxDecimalPlaces !== Number(options.mDec))) {
             warning(`Setting 'mDec' to [${options.mDec}] will override the decimals declared in 'vMin' [${options.vMin}] and 'vMax' [${options.vMax}].`, debug);

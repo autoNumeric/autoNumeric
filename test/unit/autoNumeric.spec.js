@@ -326,7 +326,7 @@ describe('The autoNumeric object', () => {
         });
     });
 
-    /* describe(`autoNumeric 'getSettings' options`, () => {
+    xdescribe(`autoNumeric 'getSettings' options`, () => { //FIXME Correct those tests
         let aNInput;
         let newInput;
         const anOptions = { aDec: ',', aSep: '.' };
@@ -359,7 +359,7 @@ describe('The autoNumeric object', () => {
             expect(aNInput.autoNumeric('get')).toEqual('-1234.00');
             expect(aNInput.autoNumeric('getSettings').rawValue).toEqual('-1234.00');
         });
-    }); */
+    });
 
 //TODO Complete the tests in order to test every single option separately (and in the future ; with and without jQuery)
 

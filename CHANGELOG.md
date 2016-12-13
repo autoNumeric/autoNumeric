@@ -1,4 +1,51 @@
-### Change log:
+### Change log for autoNumeric:
+
+### "2.0.0-beta.8"
++ Fix issue #292 where native input and change events are not sent correctly.
++ Add a `isNumber()` helper function to test if a value is a number, or a string representing a number.
++ Add a `isInt()` helper function to test if a value is a 'real' integer.
++ Modify `decimalPlaces()` so that it always return the number of decimal places (ie. `0` instead of `null` if there is none). 
++ Add a `key()` helper function to retrieve an event keyCode.
++ Complete and improve some JSDoc.
++ Rename `runCallbacks()` into `runCallbacksFoundInTheSettingsObject()`.
++ Simplify `decLength()` function, as well as removing unnecessary code before each call to this function.
++ Rename `decLength()` to `maximumVMinAndVMaxDecimalLength()`.
++ Drastically improve performance by removing duplicated function calls.
++ Improve `autoCode()` call hierarchy.
++ Merge `autoCode()` into `getInitialSettings()`.
++ Caches an additional regex.
++ Rename some functions and variables to make them more explicit.
++ Refactor `autoGroup()` to use switch statements.
++ Refactor how `dPos` was used to make it more understandable.
++ Rename `keepOriginalSettings` into `keepAnOriginalSettingsCopy()`.
++ Simplify `autoSave()` so that it directly uses the element as an argument, instead of a jQuery reference.
++ Create an AutoNumericHolder ES6 class to store the field properties of an autoNumeric element.
++ Rename the AutoNumericHolder `init()` function to `_updateFieldProperties()`.
++ Rename the AutoNumericHolder functions that should be private.
++ Fix issue #283.
++ Rename `processAlways()` into `_processCharacterDeletion()`, and simplify it so that if does not do two things at the same time.
++ Rename `processKeypress()` into `_processCharacterInsertion()`, and simplify it so that if does not do two things at the same time.
++ Merge some conditions in `_formatQuick()`.
++ Remove the need for a jQuery dependency in the events listeners.
++ Convert some jQuery event listeners to pure JS event listeners.
++ Convert some jQuery-specific functions to native JS ones (ie. `$this.val()` to `e.target.value`).
++ Simplify the event listeners by removing any unused returns.
++ Remove unnecessary `getHolder()` calls in the event listeners.
++ Make the 'enter' key send a `change` event when used and the value has been changed.
++ Add an `onBlur` event listener, allowing us to trigger `change` events as needed.
++ Reduce `getInitialSettings()` length by a great deal, making it easier to read and understand.
++ The `getInitialSettings()` functions now calls the `calculateVMinAndVMaxIntegerSizes()`, `correctMDecOption()`, `setsAlternativeDecimalSeparatorCharacter()`, `cachesUsualRegularExpressions()` and `transformOptionsValuesToDefaultTypes()` functions.
++ Refactor the `update()` code into `getInitialSettings()`, which allows to remove the `autoCode()` calls from the AutoNumericHolder constructor and the `_updateFieldProperties()` function.
++ Remove the need for jQuery in `getSettings()`.
++ Modify the `validate()` test on the `mDec` option to allow for a positive integer too.
++ Allow the `autoFormat()` function to format numbers represented as a string.
++ Complete the `autoFormat()` tests and check for the value validity.
++ Remove the `sendCustomEvent()` function and replace it by the `triggerEvent()` one (and remove `createCustomEvent()` as well).
++ Complete the `autoUnFormat()` tests and check for the value validity.
++ Modify the `autoUnFormat()` behavior so that when given a number (a real one or a string representing one), the function always return a 'real' number, whatever the options passed.
++ Modify the eslint 'radix' rule to allow for always specifying a radix for the `parseInt` function.
++ Comment out the default Jasmine test in order to see a 100% success without any skipped tests.
++ Fix the `clean:build` npm script so that it does not try to remove an inexistant folder.
 
 ### "2.0.0-beta.7"
 + Add "mouseenter" & "mouseleave" handlers to enable viewing the extended values for "eDec", "scaleDivisor" & "nSep" options.

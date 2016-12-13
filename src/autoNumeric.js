@@ -531,6 +531,16 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * Return TRUE if the parameter is an integer (and not a float).
+     *
+     * @param {*} n
+     * @returns {boolean}
+     */
+    function isInt(n) {
+        return typeof n === 'number' && parseFloat(n) === parseInt(n, 10) && !isNaN(n);
+    }
+
+    /**
      * Return TRUE if the text given as a parameter is valid.
      *
      * @param text
@@ -612,10 +622,9 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Return the number of decimal places if the parameter is a string that represents a float number, and that number has a decimal part.
-     * Return `null` otherwise.
      *
      * @param {string} str
-     * @returns {null|int}
+     * @returns {int}
      */
     function decimalPlaces(str) {
         const [, decimalPart] = str.split('.');
@@ -623,7 +632,7 @@ if (typeof define === 'function' && define.amd) {
             return decimalPart.length;
         }
 
-        return null;
+        return 0;
     }
 
     /**
@@ -742,7 +751,7 @@ if (typeof define === 'function' && define.amd) {
             settings.mDec = Number(settings.mDec);
         }
 
-        settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
+        settings.mDec = Number((settings.scaleDivisor && settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec);
 
         // set alternative decimal separator key
         if (settings.altDec === null && settings.mDec > 0) {
@@ -1173,9 +1182,10 @@ if (typeof define === 'function' && define.amd) {
         }
 
         const dPos = inputValue.lastIndexOf('.');
+        const inputValueHasADot = dPos === -1;
 
         // Virtual decimal position
-        const vdPos = (dPos === -1) ? inputValue.length - 1 : dPos;
+        const vdPos = inputValueHasADot ? inputValue.length - 1 : dPos;
 
         // Checks decimal places to determine if rounding is required :
         // Check if no rounding is required
@@ -1185,8 +1195,8 @@ if (typeof define === 'function' && define.amd) {
             // Check if we need to pad with zeros
             ivRounded = inputValue;
             if (cDec < rDec) {
-                if (dPos === -1) {
-                    ivRounded += '.';
+                if (inputValueHasADot) {
+                    ivRounded += settings.aDec;
                 }
 
                 let zeros = '000000';
@@ -1205,7 +1215,13 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // Rounded length of the string after rounding
-        const rLength = dPos + settings.mDec; //TODO Modify `dPos` here if it's not intended that it can be equal to '-1'
+        let rLength;
+        if (inputValueHasADot) {
+            rLength = settings.mDec - 1;
+        } else {
+            rLength = settings.mDec + dPos;
+        }
+
         const tRound = Number(inputValue.charAt(rLength + 1));
         const odd = (inputValue.charAt(rLength) === '.') ? (inputValue.charAt(rLength - 1) % 2) : (inputValue.charAt(rLength) % 2);
         let ivArray = inputValue.substring(0, rLength + 1).split('');
@@ -3426,12 +3442,11 @@ if (typeof define === 'function' && define.amd) {
             throwError(`The minimum possible value option is greater than the maximum possible value option ; 'vMin' [${options.vMin}] should be smaller than 'vMax' [${options.vMax}].`);
         }
 
-        if (!isNull(options.mDec) && (!isString(options.mDec) || !testPositiveInteger.test(options.mDec))) {
+        if (!(isNull(options.mDec) ||
+            (isInt(options.mDec) && options.mDec >= 0) || // If integer option
+            (isString(options.mDec) && testPositiveInteger.test(options.mDec)))  // If string option
+        ) {
             throwError(`The maximum number of decimal places option 'mDec' is invalid ; it should be a positive integer, [${options.mDec}] given.`);
-        }
-
-        if (!options.aPad && !isNull(options.mDec)) {
-            warning(`Setting 'aPad' to [false] will override the current 'mDec' setting [${options.mDec}].`, debug);
         }
 
         // Write a warning message in the console if the number of decimal in vMin/vMax is overridden by mDec (and not if mDec is equal to the number of decimal used in vMin/vMax)

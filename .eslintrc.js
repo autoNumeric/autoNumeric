@@ -157,7 +157,7 @@ module.exports = {
         ],
         "radix": [
             "error",
-            "as-needed"
+            "always"
         ],
 
         // Other misc rules

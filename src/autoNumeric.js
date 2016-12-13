@@ -1565,9 +1565,9 @@ if (typeof define === 'function' && define.amd) {
     /**
      * creates or removes sessionStorage or cookie depending on browser support
      */
-    function autoSave($this, settings, toDo) {
+    function autoSave(element, settings, toDo) {
         if (settings.aStor) {
-            const storedName = ($this[0].name !== '' && !isUndefined($this[0].name)) ?`AUTO_${decodeURIComponent($this[0].name)}` :`AUTO_${$this[0].id}`;
+            const storedName = (element.name !== '' && !isUndefined(element.name)) ?`AUTO_${decodeURIComponent(element.name)}` :`AUTO_${element.id}`;
             let date;
             let expires;
 
@@ -2532,9 +2532,9 @@ if (typeof define === 'function' && define.amd) {
                 setElementSelection(this, 0, 0);
             }
 
-            // saves the extended decimal to preserve the data when navigating away from the page
+            // Saves the extended decimal to preserve the data when navigating away from the page
             if (holder.settingsClone.eDec !== null && holder.settingsClone.aStor) {
-                autoSave($this, settings, 'set');
+                autoSave(e.target, settings, 'set');
             }
             if (skip) {
                 return true;
@@ -2557,7 +2557,7 @@ if (typeof define === 'function' && define.amd) {
      * @returns {*}
      */
     function onFocusOutAndMouseLeave($this, holder) {
-        $this.on('focusout.autoNumeric mouseleave.autoNumeric', () => {
+        $this.on('focusout.autoNumeric mouseleave.autoNumeric', (e) => {
             if (!$this.is(':focus')) {
                 holder = getHolder($this);
                 let value = $this.val();
@@ -2565,7 +2565,7 @@ if (typeof define === 'function' && define.amd) {
                 const settings = holder.settingsClone;
                 settings.onOff = false;
                 if (settings.aStor) {
-                    autoSave($this, settings, 'set');
+                    autoSave(e.target, settings, 'set');
                 }
 
                 if (settings.nSep === true) {
@@ -2770,7 +2770,7 @@ if (typeof define === 'function' && define.amd) {
                     (currentValue !== '' && $this.attr('type') === 'hidden' && !$.isNumeric(currentValue.replace(',', '.')))) {
                     if ((settings.eDec !== null && settings.aStor) ||
                         (settings.scaleDivisor && settings.aStor)) {
-                        settings.rawValue = autoSave($this, settings, 'get');
+                        settings.rawValue = autoSave($this[0], settings, 'get');
                     }
 
                     // If the eDec value should NOT be saved in sessionStorage
@@ -2970,7 +2970,7 @@ if (typeof define === 'function' && define.amd) {
                 const settings = $this.data('autoNumeric');
                 if (typeof settings === 'object') {
                     $this.val('');
-                    autoSave($this, settings, 'wipe');
+                    autoSave($this[0], settings, 'wipe');
                     $this.removeData('autoNumeric');
                     $this.off('.autoNumeric');
                 }
@@ -2989,7 +2989,7 @@ if (typeof define === 'function' && define.amd) {
                 if (typeof settings === 'object') {
                     $this.val('');
                     settings.rawValue = '';
-                    autoSave($this, settings, 'wipe');
+                    autoSave($this[0], settings, 'wipe');
                 }
             });
         },
@@ -3093,11 +3093,11 @@ if (typeof define === 'function' && define.amd) {
                         }
 
                         if (settings.aStor && (settings.eDec || settings.scaleDivisor)) {
-                            autoSave($this, settings, 'set');
+                            autoSave($this[0], settings, 'set');
                         }
                     } else {
                         settings.rawValue = '';
-                        autoSave($this, settings, 'wipe');
+                        autoSave($this[0], settings, 'wipe');
                         const attemptedValue = value;
                         value = '';
                         if (!minTest) {

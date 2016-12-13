@@ -36,11 +36,11 @@ import $ from '../../node_modules/jquery/dist/jquery';
 import an from '../../src/autoNumeric';
 
 // Default Jasmine test to make sure the test framework works
-xdescribe('A test suite', () => {
-    it('contains a spec with an expectation', () => {
-        expect(true).toBe(true);
-    });
-});
+// describe('A test suite', () => {
+//     it('contains a spec with an expectation', () => {
+//         expect(true).toBe(true);
+//     });
+// });
 
 // The autoNumeric tests :
 

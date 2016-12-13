@@ -698,18 +698,20 @@ if (typeof define === 'function' && define.amd) {
     // autoNumeric-specific functions
 
     /**
-     * run callbacks in parameters if any
-     * any parameter could be a callback:
+     * Run any callbacks found in the settings object.
+     * Any parameter could be a callback:
      * - a function, which invoked with jQuery element, parameters and this parameter name and returns parameter value
      * - a name of function, attached to $(selector).autoNumeric.functionName(){} - which was called previously
+     * @param $this
+     * @param {object} settings
      */
-    function runCallbacks($this, settings) {
-        // loops through the settings object (option array) to find the following
+    function runCallbacksFoundInTheSettingsObject($this, settings) {
+        // Loops through the settings object (option array) to find the following
         $.each(settings, (k, val) => {
             if (typeof val === 'function') {
                 settings[k] = val($this, settings, k);
             } else if (typeof $this.autoNumeric[val] === 'function') {
-                // calls the attached function from the html5 data example: data-a-sign="functionName"
+                // Calls the attached function from the html5 data example: data-a-sign="functionName"
                 settings[k] = $this.autoNumeric[val]($this, settings, k);
             }
         });
@@ -737,7 +739,7 @@ if (typeof define === 'function' && define.amd) {
      */
     function autoCode($this, settings) {
         //TODO Merge `autoCode()` into `getInitialSettings()`
-        runCallbacks($this, settings);
+        runCallbacksFoundInTheSettingsObject($this, settings);
         const vMax = settings.vMax.toString().split('.');
         const vMin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
         vMax[0] = vMax[0].replace('-', '');

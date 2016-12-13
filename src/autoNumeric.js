@@ -1001,8 +1001,8 @@ if (typeof define === 'function' && define.amd) {
         }
 
         const empty = checkEmpty(inputValue, settings, true);
-        const isNeg = contains(inputValue, '-');
-        if (isNeg) {
+        const isNegative = contains(inputValue, '-');
+        if (isNegative) {
             inputValue = inputValue.replace('-', '');
         }
 
@@ -1010,16 +1010,20 @@ if (typeof define === 'function' && define.amd) {
             return empty;
         }
 
-        let digitalGroup = '';
         settings.dGroup = settings.dGroup.toString();
-        if (settings.dGroup === '2') {
-            digitalGroup = /(\d)((\d)(\d{2}?)+)$/;
-        } else if (settings.dGroup === '2s') {
-            digitalGroup = /(\d)((?:\d{2}){0,2}\d{3}(?:(?:\d{2}){2}\d{3})*?)$/;
-        } else if (settings.dGroup === '4') {
-            digitalGroup = /(\d)((\d{4}?)+)$/;
-        } else {
-            digitalGroup = /(\d)((\d{3}?)+)$/;
+        let digitalGroup;
+        switch (settings.dGroup) {
+            case '2':
+                digitalGroup = /(\d)((\d)(\d{2}?)+)$/;
+                break;
+            case '2s':
+                digitalGroup = /(\d)((?:\d{2}){0,2}\d{3}(?:(?:\d{2}){2}\d{3})*?)$/;
+                break;
+            case '4':
+                digitalGroup = /(\d)((\d{4}?)+)$/;
+                break;
+            default :
+                digitalGroup = /(\d)((\d{3}?)+)$/;
         }
 
         // Splits the string at the decimal string
@@ -1048,31 +1052,41 @@ if (typeof define === 'function' && define.amd) {
         }
 
         if (settings.pSign === 'p') {
-            if (isNeg && settings.pNeg === 'l') {
-                inputValue = settings.aNeg + settings.aSign + inputValue;
-            }
-            if (isNeg && settings.pNeg === 'r') {
-                inputValue = settings.aSign + settings.aNeg + inputValue;
-            }
-            if (isNeg && settings.pNeg === 's') {
-                inputValue = settings.aSign + inputValue + settings.aNeg;
-            }
-            if (!isNeg) {
+            if (isNegative) {
+                switch (settings.pNeg) {
+                    case 'l':
+                        inputValue = settings.aNeg + settings.aSign + inputValue;
+                        break;
+                    case 'r':
+                        inputValue = settings.aSign + settings.aNeg + inputValue;
+                        break;
+                    case 's':
+                        inputValue = settings.aSign + inputValue + settings.aNeg;
+                        break;
+                    default :
+                        //
+                }
+            } else {
                 inputValue = settings.aSign + inputValue;
             }
         }
 
         if (settings.pSign === 's') {
-            if (isNeg && settings.pNeg === 'r') {
-                inputValue = inputValue + settings.aSign + settings.aNeg;
-            }
-            if (isNeg && settings.pNeg === 'l') {
-                inputValue = inputValue + settings.aNeg + settings.aSign;
-            }
-            if (isNeg && settings.pNeg === 'p') {
-                inputValue = settings.aNeg + inputValue + settings.aSign;
-            }
-            if (!isNeg) {
+            if (isNegative) {
+                switch (settings.pNeg) {
+                    case 'r':
+                        inputValue = inputValue + settings.aSign + settings.aNeg;
+                        break;
+                    case 'l':
+                        inputValue = inputValue + settings.aNeg + settings.aSign;
+                        break;
+                    case 'p':
+                        inputValue = settings.aNeg + inputValue + settings.aSign;
+                        break;
+                    default :
+                    //
+                }
+            } else {
                 inputValue = inputValue + settings.aSign;
             }
         }

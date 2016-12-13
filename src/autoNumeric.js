@@ -3579,6 +3579,10 @@ if (typeof define === 'function' && define.amd) {
             warning(`Setting 'mDec' to [${options.mDec}] will override the decimals declared in 'vMin' [${options.vMin}] and 'vMax' [${options.vMax}].`, debug);
         }
 
+        if (!options.aPad && !isNull(options.mDec)) {
+            warning(`Setting 'aPad' to [false] will override the current 'mDec' setting [${options.mDec}].`, debug);
+        }
+
         if (!isNull(options.eDec) && (!isString(options.eDec) || !testPositiveInteger.test(options.eDec))) {
             throwError(`The number of expanded decimal places option 'eDec' is invalid ; it should be a positive integer, [${options.eDec}] given.`);
         }

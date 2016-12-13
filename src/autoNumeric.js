@@ -3240,9 +3240,7 @@ if (typeof define === 'function' && define.amd) {
          * $(someSelector).autoNumeric('getSettings').aDec; // return the aDec setting as a string - ant valid setting can be used
          */
         getSettings() {
-            const $this = autoGet(this);
-
-            return $this.eq(0).data('autoNumeric');
+            return this.data('autoNumeric');
         },
     };
 

@@ -1603,22 +1603,24 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Holder object for field properties
-     *
-     * @param that
-     * @param {object} settings
-     * @constructor
      */
-    function AutoNumericHolder(that, settings) {
-        this.settings = settings;
-        this.that = that;
-        this.$that = $(that);
-        this.formatted = false;
-        this.settingsClone = autoCode(this.$that, this.settings);
-        this.value = that.value;
-    }
+    class AutoNumericHolder {
+        /**
+         * Class constructor
+         *
+         * @param {HTMLElement} that - A reference to the current DOM element
+         * @param {object} settings
+         */
+        constructor(that, settings) {
+            this.settings = settings;
+            this.that = that;
+            this.$that = $(that);
+            this.formatted = false;
+            this.settingsClone = autoCode(this.$that, this.settings);
+            this.value = that.value;
+        }
 
-    AutoNumericHolder.prototype = {
-        init(e) {
+        _updateFieldProperties(e) {
             this.value = this.that.value;
             this.settingsClone = autoCode(this.$that, this.settings);
             this.ctrlKey = e.ctrlKey;
@@ -1633,9 +1635,9 @@ if (typeof define === 'function' && define.amd) {
             this.which = e.which;
             this.processed = false;
             this.formatted = false;
-        },
+        }
 
-        setSelection(start, end, setReal) {
+        _setSelection(start, end, setReal) {
             start = Math.max(start, 0);
             end = Math.min(end, this.that.value.length);
             this.selection = {
@@ -1646,38 +1648,41 @@ if (typeof define === 'function' && define.amd) {
             if (isUndefined(setReal) || setReal) {
                 setElementSelection(this.that, start, end);
             }
-        },
+        }
 
-        setPosition(pos, setReal) {
-            this.setSelection(pos, pos, setReal);
-        },
+        _setPosition(pos, setReal) {
+            this._setSelection(pos, pos, setReal);
+        }
 
-        getBeforeAfter() {
+        _getBeforeAfter() {
             const value = this.value;
+            //FIXME `this.selection` can sometimes be undefined, found why and fix it
             const left = value.substring(0, this.selection.start);
             const right = value.substring(this.selection.end, value.length);
 
             return [left, right];
-        },
+        }
 
-        getBeforeAfterStriped() {
+        _getBeforeAfterStripped() {
             const settingsClone = this.settingsClone;
-            let [left, right] = this.getBeforeAfter();
+            let [left, right] = this._getBeforeAfter();
             left = autoStrip(left, this.settingsClone);
             right = autoStrip(right, this.settingsClone);
+
             if (settingsClone.trailingNegative && !contains(left, '-')) {
                 left = '-' + left;
                 right = (right === '-') ? '' : right;
             }
+
             settingsClone.trailingNegative = false;
 
             return [left, right];
-        },
+        }
 
         /**
          * strip parts from excess characters and leading zeroes
          */
-        normalizeParts(left, right) {
+        _normalizeParts(left, right) {
             const settingsClone = this.settingsClone;
 
             // prevents multiple leading zeros from being entered
@@ -1706,14 +1711,14 @@ if (typeof define === 'function' && define.amd) {
             }
 
             return [left, right];
-        },
+        }
 
         /**
          * Set part of number to value while keeping the cursor position
          */
-        setValueParts(left, right, advent) {
+        _setValueParts(left, right, advent) {
             const settingsClone = this.settingsClone;
-            const parts = this.normalizeParts(left, right);
+            const parts = this._normalizeParts(left, right);
             const [minTest, maxTest] = autoCheck(this.newValue, settingsClone);
             let position = parts[0].length;
             this.newValue = parts.join('');
@@ -1737,7 +1742,7 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 this.value = this.newValue;
-                this.setPosition(position, false);
+                this._setPosition(position, false);
 
                 return true;
             }
@@ -1749,13 +1754,13 @@ if (typeof define === 'function' && define.amd) {
             }
 
             return false;
-        },
+        }
 
         /**
-         * helper function for expandSelectionOnSign
+         * helper function for _expandSelectionOnSign
          * returns sign position of a formatted value
          */
-        signPosition() {
+        _signPosition() {
             const settingsClone = this.settingsClone;
             const aSign = settingsClone.aSign;
             const that = this.that;
@@ -1771,14 +1776,14 @@ if (typeof define === 'function' && define.amd) {
             }
 
             return [1000, -1];
-        },
+        }
 
         /**
          * Expands selection to cover whole sign
          * Prevents partial deletion/copying/overwriting of a sign
          */
-        expandSelectionOnSign(setReal) {
-            const signPosition = this.signPosition();
+        _expandSelectionOnSign(setReal) {
+            const signPosition = this._signPosition();
             const selection = this.selection;
 
             // If selection catches something except sign and catches only space from sign
@@ -1786,40 +1791,40 @@ if (typeof define === 'function' && define.amd) {
                 // Then select without empty space
                 if ((selection.start < signPosition[0] || selection.end > signPosition[1]) && this.value.substring(Math.max(selection.start, signPosition[0]), Math.min(selection.end, signPosition[1])).match(/^\s*$/)) {
                     if (selection.start < signPosition[0]) {
-                        this.setSelection(selection.start, signPosition[0], setReal);
+                        this._setSelection(selection.start, signPosition[0], setReal);
                     } else {
-                        this.setSelection(signPosition[1], selection.end, setReal);
+                        this._setSelection(signPosition[1], selection.end, setReal);
                     }
                 } else {
-                    // else select with whole sign
-                    this.setSelection(Math.min(selection.start, signPosition[0]), Math.max(selection.end, signPosition[1]), setReal);
+                    // Else select with whole sign
+                    this._setSelection(Math.min(selection.start, signPosition[0]), Math.max(selection.end, signPosition[1]), setReal);
                 }
             }
-        },
+        }
 
         /**
          * try to strip pasted value to digits
          */
-        checkPaste() {
+        _checkPaste() {
             if (!isUndefined(this.valuePartsBeforePaste)) {
                 const oldParts = this.valuePartsBeforePaste;
-                const [left, right] = this.getBeforeAfter();
+                const [left, right] = this._getBeforeAfter();
 
                 // try to strip pasted value first
                 delete this.valuePartsBeforePaste;
                 const modifiedLeftPart = left.substr(0, oldParts[0].length) + autoStrip(left.substr(oldParts[0].length), this.settingsClone);
-                if (!this.setValueParts(modifiedLeftPart, right, 'paste')) {
+                if (!this._setValueParts(modifiedLeftPart, right, 'paste')) {
                     this.value = oldParts.join('');
-                    this.setPosition(oldParts[0].length, false);
+                    this._setPosition(oldParts[0].length, false);
                 }
             }
-        },
+        }
 
         /**
          * Process pasting, cursor moving and skipping of not interesting keys
          * If returns true, further processing is not performed
          */
-        skipAlways(e) {
+        _skipAlways(e) {
             const kdCode = this.kdCode;
             const which = this.which;
             const ctrlKey = this.ctrlKey;
@@ -1828,7 +1833,7 @@ if (typeof define === 'function' && define.amd) {
             // catch the ctrl up on ctrl-v
             const shiftKey = this.shiftKey;
             if (((ctrlKey || cmdKey) && e.type === 'keyup' && !isUndefined(this.valuePartsBeforePaste)) || (shiftKey && kdCode === keyCode.Insert)) {
-                this.checkPaste();
+                this._checkPaste();
                 return false;
             }
 
@@ -1848,6 +1853,7 @@ if (typeof define === 'function' && define.amd) {
             // if select all (a)
             if ((ctrlKey || cmdKey) && kdCode === keyCode.a) {
                 if (this.settings.sNumber) {
+                    // preventDefault is used here to prevent the browser to first select all the input text (including the currency sign), otherwise we would see that whole selection first in a flash, then the selection with only the number part without the currency sign.
                     e.preventDefault();
                     const valueLen = this.that.value.length;
                     const aSignLen = this.settings.aSign.length;
@@ -1881,23 +1887,24 @@ if (typeof define === 'function' && define.amd) {
 
                     setElementSelection(this.that, start, end);
                 }
+
                 return true;
             }
 
             // if copy (c)
             if ((ctrlKey || cmdKey) && (kdCode === keyCode.c || kdCode === keyCode.v || kdCode === keyCode.x)) {
                 if (e.type === 'keydown') {
-                    this.expandSelectionOnSign();
+                    this._expandSelectionOnSign();
                 }
 
                 // try to prevent wrong paste
                 if (kdCode === keyCode.v || kdCode === keyCode.Insert) {
                     if (e.type === 'keydown' || e.type === 'keypress') {
                         if (isUndefined(this.valuePartsBeforePaste)) {
-                            this.valuePartsBeforePaste = this.getBeforeAfter();
+                            this.valuePartsBeforePaste = this._getBeforeAfter();
                         }
                     } else {
-                        this.checkPaste();
+                        this._checkPaste();
                     }
                 }
 
@@ -1916,21 +1923,21 @@ if (typeof define === 'function' && define.amd) {
                 const value = this.that.value;
                 if (e.type === 'keydown' && !this.shiftKey) {
                     if (kdCode === keyCode.LeftArrow && (value.charAt(startJump - 2) === aSep || value.charAt(startJump - 2) === aDec)) {
-                        this.setPosition(startJump - 1);
+                        this._setPosition(startJump - 1);
                     } else if (kdCode === keyCode.RightArrow && (value.charAt(startJump + 1) === aSep || value.charAt(startJump + 1) === aDec)) {
-                        this.setPosition(startJump + 1);
+                        this._setPosition(startJump + 1);
                     }
                 }
                 return true;
             }
 
             return kdCode >= keyCode.PageDown && kdCode <= keyCode.DownArrow;
-        },
+        }
 
         /**
          * process deletion of characters when the minus sign is to the right of the numeric characters
          */
-        processTrailing([left, right]) {
+        _processTrailing([left, right]) {
             const settingsClone = this.settingsClone;
             if (settingsClone.pSign === 'p' && settingsClone.pNeg === 's') {
                 if (this.kdCode === 8) {
@@ -1989,20 +1996,20 @@ if (typeof define === 'function' && define.amd) {
             }
 
             return [left, right];
-        },
+        }
 
         /**
-         * process deletion of characters
-         * returns true if processing performed
+         * Process deletion of characters
+         * Returns true if processing performed
          */
-        processAlways() {
+        _processCharacterDeletion() {
             const settingsClone = this.settingsClone;
             if (this.kdCode === keyCode.Backspace || this.kdCode === keyCode.Delete) {
                 let left;
                 let right;
 
                 if (!this.selection.length) {
-                    [left, right] = this.getBeforeAfterStriped();
+                    [left, right] = this._getBeforeAfterStripped();
                     if (left === '' && right === '') {
                         settingsClone.throwInput = false;
                     }
@@ -2010,7 +2017,7 @@ if (typeof define === 'function' && define.amd) {
                     if (((settingsClone.pSign === 'p' && settingsClone.pNeg === 's') ||
                             (settingsClone.pSign === 's' && (settingsClone.pNeg === 'l' || settingsClone.pNeg === 'r'))) &&
                             contains(this.value, '-')) {
-                        [left, right] = this.processTrailing([left, right]);
+                        [left, right] = this._processTrailing([left, right]);
                     } else {
                         if (this.kdCode === 8) {
                             left = left.substring(0, left.length - 1);
@@ -2018,18 +2025,18 @@ if (typeof define === 'function' && define.amd) {
                             right = right.substring(1, right.length);
                         }
                     }
-                    this.setValueParts(left, right);
+                    this._setValueParts(left, right);
                 } else {
-                    this.expandSelectionOnSign(false);
-                    [left, right] = this.getBeforeAfterStriped();
-                    this.setValueParts(left, right);
+                    this._expandSelectionOnSign(false);
+                    [left, right] = this._getBeforeAfterStripped();
+                    this._setValueParts(left, right);
                 }
 
                 return true;
             }
 
             return false;
-        },
+        }
 
         /**
          * This function decides if the key pressed should be dropped or accepted, and modify the value 'on-the-fly' accordingly.
@@ -2037,10 +2044,10 @@ if (typeof define === 'function' && define.amd) {
          *
          * @returns {boolean} //FIXME This always returns TRUE
          */
-        processKeypress() {
+        _processCharacterInsertion() {
             const settingsClone = this.settingsClone;
             const cCode = String.fromCharCode(this.which);
-            let [left, right] = this.getBeforeAfterStriped();
+            let [left, right] = this._getBeforeAfterStripped();
             settingsClone.throwInput = true;
 
             // Start rules when the decimal character key is pressed always use numeric pad dot to insert decimal separator
@@ -2070,7 +2077,7 @@ if (typeof define === 'function' && define.amd) {
                     right = right.substr(1);
                 }
 
-                this.setValueParts(left + settingsClone.aDec, right, null);
+                this._setValueParts(left + settingsClone.aDec, right, null);
 
                 return true;
             }
@@ -2108,7 +2115,7 @@ if (typeof define === 'function' && define.amd) {
                     }
                 }
 
-                this.setValueParts(left, right, null);
+                this._setValueParts(left, right, null);
 
                 return true;
             }
@@ -2124,7 +2131,7 @@ if (typeof define === 'function' && define.amd) {
                     left = settingsClone.aNeg + left;
                 }
 
-                this.setValueParts(left + cCode, right, null);
+                this._setValueParts(left + cCode, right, null);
 
                 return true;
             }
@@ -2133,16 +2140,16 @@ if (typeof define === 'function' && define.amd) {
             settingsClone.throwInput = false;
 
             return true;
-        },
+        }
 
         /**
          * Formatting of just processed value while keeping the cursor position
          */
-        formatQuick(e) {
+        _formatQuick(e) {
             const settingsClone = this.settingsClone;
             const leftLength = this.value;
             const kuCode = e.keyCode;
-            let [left] = this.getBeforeAfterStriped();
+            let [left] = this._getBeforeAfterStripped();
 
             // No grouping separator and no currency sign
             if ((settingsClone.aSep  === '' || (settingsClone.aSep !== ''  && !contains(leftLength, settingsClone.aSep))) &&
@@ -2242,10 +2249,10 @@ if (typeof define === 'function' && define.amd) {
             }
 
             this.that.value = value;
-            this.setPosition(position);
+            this._setPosition(position);
             this.formatted = true;
-        },
-    };
+        }
+    }
 
     /**
      * This function factorise the `getString()` and `getArray()` functions since they share quite a lot of code.
@@ -2356,7 +2363,7 @@ if (typeof define === 'function' && define.amd) {
      * Handler for 'focusin' events
      *
      * @param $this
-     * @param holder
+     * @param {AutoNumericHolder} holder
      * @returns {*}
      */
     function onFocusInAndMouseEnter($this, holder) {
@@ -2403,7 +2410,7 @@ if (typeof define === 'function' && define.amd) {
      * The user just started pushing any key, hence one event is sent.
      *
      * @param $this
-     * @param holder
+     * @param {AutoNumericHolder} holder
      * @returns {*}
      */
     function onKeydown($this, holder) {
@@ -2419,15 +2426,19 @@ if (typeof define === 'function' && define.amd) {
              $this.change();
              holder.inVal = $this.val();
              } */
-            holder.init(e);
-            if (holder.skipAlways(e)) {
+            holder._updateFieldProperties(e); //FIXME This is called 2 to 3 times
+            holder.processed = false;
+            holder.formatted = false;
+
+            if (holder._skipAlways(e)) {
                 holder.processed = true;
 
                 return true;
             }
-            if (holder.processAlways()) {
+
+            if (holder._processCharacterDeletion()) {
                 holder.processed = true;
-                holder.formatQuick(e);
+                holder._formatQuick(e);
                 const currentValue = $this.val();
                 if ((currentValue !== holder.lastVal) && holder.settingsClone.throwInput) {
                     // throws input event in deletion character
@@ -2453,7 +2464,7 @@ if (typeof define === 'function' && define.amd) {
      * Note: 'keypress' events are not sent for delete keys like Backspace/Delete.
      *
      * @param $this
-     * @param holder
+     * @param {AutoNumericHolder} holder
      * @returns {*}
      */
     function onKeypress($this, holder) {
@@ -2464,9 +2475,11 @@ if (typeof define === 'function' && define.amd) {
             }
             holder = getHolder($this);
             const processed = holder.processed;
-            holder.init(e);
+            holder._updateFieldProperties(e); //FIXME This is called 2 to 3 times
+            holder.processed = false;
+            holder.formatted = false;
 
-            if (holder.skipAlways(e)) {
+            if (holder._skipAlways(e)) {
                 return true;
             }
 
@@ -2476,8 +2489,8 @@ if (typeof define === 'function' && define.amd) {
                 return false;
             }
 
-            if (holder.processAlways() || holder.processKeypress()) {
-                holder.formatQuick(e);
+            if (holder._processCharacterInsertion()) {
+                holder._formatQuick(e);
                 const currentValue = $this.val();
                 if ((currentValue !== holder.lastVal) && holder.settingsClone.throwInput) {
                     // throws input event on adding character
@@ -2500,20 +2513,23 @@ if (typeof define === 'function' && define.amd) {
      * The user just released any key, hence one event is sent.
      *
      * @param $this
-     * @param holder
-     * @param settings
+     * @param {AutoNumericHolder} holder
+     * @param {object} settings
      * @returns {*}
      */
     function onKeyup($this, holder, settings) {
         $this.on('keyup.autoNumeric', function(e) {
             holder = getHolder($this);
-            holder.init(e);
-            const skip = holder.skipAlways(e);
+            holder._updateFieldProperties(e); //FIXME This is called 2 to 3 times
+            holder.processed = false;
+            holder.formatted = false;
+
+            const skip = holder._skipAlways(e);
             const tab = holder.kdCode;
             holder.kdCode = 0;
             delete holder.valuePartsBeforePaste;
 
-			// added to properly place the caret when only the currency sign is present
+            // Added to properly place the caret when only the currency sign is present
             if ($this[0].value === holder.settingsClone.aSign) {
                 if (holder.settingsClone.pSign === 's') {
                     setElementSelection(this, 0, 0);
@@ -2543,7 +2559,7 @@ if (typeof define === 'function' && define.amd) {
                 return true;
             }
             if (!holder.formatted) {
-                holder.formatQuick(e);
+                holder._formatQuick(e);
             }
         });
         return holder;
@@ -2553,7 +2569,7 @@ if (typeof define === 'function' && define.amd) {
      * Handler for 'focusout' events
      *
      * @param $this
-     * @param holder
+     * @param {AutoNumericHolder} holder
      * @returns {*}
      */
     function onFocusOutAndMouseLeave($this, holder) {
@@ -2643,12 +2659,12 @@ if (typeof define === 'function' && define.amd) {
      * Handler for 'paste' events
      *
      * @param $this
-     * @param holder
+     * @param {AutoNumericHolder} holder
      * @returns {*}
      */
     function onPaste($this, holder) {
         $this.on('paste', function(e) {
-			//FIXME After a paste, the caret is put on the far right of the input, it should be set to something like `newCaretPosition = oldCaretPosition + pasteText.length;`, while taking into account the thousand separators and the decimal character
+            //FIXME After a paste, the caret is put on the far right of the input, it should be set to something like `newCaretPosition = oldCaretPosition + pasteText.length;`, while taking into account the thousand separators and the decimal character
             e.preventDefault();
             holder = getHolder($this);
 
@@ -2679,7 +2695,7 @@ if (typeof define === 'function' && define.amd) {
      * Handler for 'submit' events
      *
      * @param $this
-     * @param holder
+     * @param {AutoNumericHolder} holder
      * @returns {*}
      */
     function onSubmit($this, holder) {
@@ -2935,7 +2951,8 @@ if (typeof define === 'function' && define.amd) {
 
                 // original settings saved for use when eDec, scaleDivisor & nSep options are being used
                 keepOriginalSettings(settings);
-                let holder = getHolder($this, settings);
+                // Create the AutoNumericHolder object that store the field properties
+                let holder = getHolder($this, settings, false);
 
                 //TODO Shouldn't the next line be in the `getInitialSettings()` function?
                 settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;

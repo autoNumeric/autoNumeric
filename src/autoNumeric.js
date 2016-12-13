@@ -2086,7 +2086,7 @@ if (typeof define === 'function' && define.amd) {
         _formatQuick(e) {
             const settingsClone = this.settingsClone;
             const leftLength = this.value;
-            const kuCode = e.keyCode;
+            const eventKeyCode = e.keyCode;
             let [left] = this._getBeforeAfterStripped();
 
             // No grouping separator and no currency sign
@@ -2123,33 +2123,41 @@ if (typeof define === 'function' && define.amd) {
                 if ((settingsClone.pNeg === 's' || (settingsClone.pSign === 's' && settingsClone.pNeg !== 'p')) &&
                     leftAr[0] === '-' && settingsClone.aNeg !== '') {
                     leftAr.shift();
-                    if (settingsClone.pSign === 's' && settingsClone.pNeg === 'l' && (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace || kuCode === keyCode.Delete || this.kdCode === keyCode.Delete) && settingsClone.caretFix) {
-                        leftAr.push('-');
-                        settingsClone.caretFix = e.type === 'keydown';
-                    }
-                    if (settingsClone.pSign === 'p' && settingsClone.pNeg === 's' && (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace || kuCode === keyCode.Delete || this.kdCode === keyCode.Delete) && settingsClone.caretFix) {
-                        leftAr.push('-');
-                        settingsClone.caretFix = e.type === 'keydown';
-                    }
-                    if (settingsClone.pSign === 's' && settingsClone.pNeg === 'r' && (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace || kuCode === keyCode.Delete || this.kdCode === keyCode.Delete) && settingsClone.caretFix) {
-                        const signParts = settingsClone.aSign.split('');
-                        const escapeChr = ['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '['];
-                        const escapedParts = [];
-                        $.each(signParts, (i, miniParts) => {
-                            miniParts = signParts[i];
-                            if (isInArray(miniParts, escapeChr)) {
-                                escapedParts.push('\\' + miniParts);
-                            } else {
-                                escapedParts.push(miniParts);
-                            }
-                        });
-                        if (kuCode === keyCode.Backspace || this.kdCode === keyCode.Backspace) {
-                            escapedParts.push('-');
+
+                    if ((eventKeyCode === keyCode.Backspace || this.kdCode === keyCode.Backspace ||
+                        eventKeyCode === keyCode.Delete || this.kdCode === keyCode.Delete) &&
+                        settingsClone.caretFix) {
+                        if (settingsClone.pSign === 's' && settingsClone.pNeg === 'l') {
+                            leftAr.push('-');
+                            settingsClone.caretFix = e.type === 'keydown';
                         }
 
-                        // Pushing the escaped sign
-                        leftAr.push(escapedParts.join(''));
-                        settingsClone.caretFix = e.type === 'keydown';
+                        if (settingsClone.pSign === 'p' && settingsClone.pNeg === 's') {
+                            leftAr.push('-');
+                            settingsClone.caretFix = e.type === 'keydown';
+                        }
+
+                        if (settingsClone.pSign === 's' && settingsClone.pNeg === 'r') {
+                            const signParts = settingsClone.aSign.split('');
+                            const escapeChr = ['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '['];
+                            const escapedParts = [];
+                            $.each(signParts, (i, miniParts) => {
+                                miniParts = signParts[i];
+                                if (isInArray(miniParts, escapeChr)) {
+                                    escapedParts.push('\\' + miniParts);
+                                } else {
+                                    escapedParts.push(miniParts);
+                                }
+                            });
+
+                            if (eventKeyCode === keyCode.Backspace || this.kdCode === keyCode.Backspace) {
+                                escapedParts.push('-');
+                            }
+
+                            // Pushing the escaped sign
+                            leftAr.push(escapedParts.join(''));
+                            settingsClone.caretFix = e.type === 'keydown';
+                        }
                     }
                 }
 

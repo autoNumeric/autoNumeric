@@ -88,7 +88,7 @@ describe('The autoNumeric object', () => {
         aPad         : true,
         nBracket     : null,
         wEmpty       : 'focus',
-        lZero        : 'allow',
+        lZero        : 'deny',
         aForm        : true,
         sNumber      : false,
         anDefault    : null,
@@ -326,6 +326,41 @@ describe('The autoNumeric object', () => {
         });
     });
 
+    describe(`autoNumeric 'getSettings' options`, () => {
+        let aNInput;
+        let newInput;
+        const anOptions = { aDec: ',', aSep: '.' };
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = $(newInput).autoNumeric('init', anOptions); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.autoNumeric('destroy');
+            document.body.removeChild(newInput);
+        });
+
+        it('should return a correct raw value with a point as a decimal character', () => {
+            aNInput.autoNumeric('set', '1234.56');
+            expect(aNInput.autoNumeric('get')).toEqual('1234.56');
+            expect(aNInput.autoNumeric('getSettings').rawValue).toEqual('1234.56');
+
+            aNInput.autoNumeric('set', '-1234.56');
+            expect(aNInput.autoNumeric('get')).toEqual('-1234.56');
+            expect(aNInput.autoNumeric('getSettings').rawValue).toEqual('-1234.56');
+
+            aNInput.autoNumeric('set', '1234');
+            expect(aNInput.autoNumeric('get')).toEqual('1234.00');
+            expect(aNInput.autoNumeric('getSettings').rawValue).toEqual('1234.00');
+
+            aNInput.autoNumeric('set', '-1234');
+            expect(aNInput.autoNumeric('get')).toEqual('-1234.00');
+            expect(aNInput.autoNumeric('getSettings').rawValue).toEqual('-1234.00');
+        });
+    });
+
 //TODO Complete the tests in order to test every single option separately (and in the future ; with and without jQuery)
 
 //-----------------------------------------------------------------------------
@@ -490,6 +525,40 @@ describe(`autoNumeric 'get' and 'getLocalized' methods`, () => {
         // Add a test where the user set a very big number (bigger than Number.MAX_SAFE_INTEGER), and check if `get` return the correct number
         aNInput.autoNumeric('set', '9007199254740991000000'); // A very big number
         expect(aNInput.autoNumeric('get')).toEqual('9007199254740991000000.00');
+    });
+});
+
+describe(`autoNumeric 'get' methods`, () => {
+    it(`should not return a negative value when inputting a positive one and vMin is equal to '0' (cf. issue #284)`, () => {
+        const newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+        const aNInput = $(newInput).autoNumeric('init', { vMin: '0', vMax: '9999', mDec: '2' }); // Initiate the autoNumeric input
+
+
+        expect(aNInput.autoNumeric('get')).toEqual('0.00');
+        aNInput.autoNumeric('set', 1234);
+        expect(aNInput.autoNumeric('get')).toEqual('1234.00');
+        aNInput.autoNumeric('set', 0);
+        expect(aNInput.autoNumeric('get')).toEqual('0.00');
+        aNInput.autoNumeric('set', -0);
+        expect(aNInput.autoNumeric('get')).toEqual('0.00');
+
+        aNInput.autoNumeric('destroy');
+        document.body.removeChild(newInput);
+    });
+
+    it(`should not return a negative value when inputting a positive one and vMin is superior to '0' (cf. issue #284)`, () => {
+        const newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+        const aNInput = $(newInput).autoNumeric('init', { vMin: '1', vMax: '9999', mDec: '2' }); // Initiate the autoNumeric input
+
+
+        expect(aNInput.autoNumeric('get')).toEqual('0.00');
+        aNInput.autoNumeric('set', 1234);
+        expect(aNInput.autoNumeric('get')).toEqual('1234.00');
+
+        aNInput.autoNumeric('destroy');
+        document.body.removeChild(newInput);
     });
 });
 

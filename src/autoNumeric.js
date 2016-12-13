@@ -262,7 +262,7 @@ const defaultSettings = {
      * lZero: "deny", - allows only one leading zero on values less than one
      * lZero: "keep", - allows leading zeros to be entered. on focusout zeros will be retained.
      */
-    lZero: 'allow',
+    lZero: 'deny',
 
     /* Determine if the default value will be formatted on initialization.
      * true = automatically formats the default value on initialization
@@ -717,10 +717,10 @@ if (typeof define === 'function' && define.amd) {
      * merge them with defaults appropriately
      */
     function autoCode($this, settings) {
+        //TODO Merge `autoCode()` into `getInitialSettings()`
         runCallbacks($this, settings);
         const vMax = settings.vMax.toString().split('.');
         const vMin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
-        settings.aNeg = settings.vMin < 0 ? '-' : '';
         vMax[0] = vMax[0].replace('-', '');
         vMin[0] = vMin[0].replace('-', '');
         settings.mIntPos = Math.max(vMax[0].length, 1);
@@ -909,11 +909,12 @@ if (typeof define === 'function' && define.amd) {
         if (settings.aDec !== '.') {
             s = s.replace(settings.aDec, '.');
         }
-        if (settings.aNeg !== '-') {
+        if (settings.aNeg !== '-' && settings.aNeg !== '') {
             s = s.replace(settings.aNeg, '-');
         }
         if (!s.match(/\d/)) {
-            s += '0';
+            // The default value returned by `get` is formatted with decimals
+            s += '0.00';
         }
 
         return s;
@@ -927,7 +928,7 @@ if (typeof define === 'function' && define.amd) {
      * @returns {*}
      */
     function presentNumber(s, settings) {
-        if (settings.aNeg !== '-') {
+        if (settings.aNeg !== '-' && settings.aNeg !== '') {
             s = s.replace('-', settings.aNeg);
         }
         if (settings.aDec !== '.') {
@@ -1175,7 +1176,7 @@ if (typeof define === 'function' && define.amd) {
             ivRounded = inputValue;
             if (cDec < rDec) {
                 if (dPos === -1) {
-                    ivRounded += settings.aDec;
+                    ivRounded += '.';
                 }
 
                 let zeros = '000000';
@@ -1661,7 +1662,7 @@ if (typeof define === 'function' && define.amd) {
         },
 
         /**
-         * set part of number to value keeping position of cursor
+         * Set part of number to value while keeping the cursor position
          */
         setValueParts(left, right, advent) {
             const settingsClone = this.settingsClone;
@@ -1678,11 +1679,19 @@ if (typeof define === 'function' && define.amd) {
                 } else {
                     settingsClone.rawValue = testValue;
                 }
+
                 if (position > this.newValue.length) {
                     position = this.newValue.length;
                 }
+
+                // Make sure when the user enter a '0' on the far left with a leading zero option set to 'deny', that the caret does not moves since the input is dropped (fix issue #283)
+                if (position === 1 && parts[0] === '0' && settingsClone.lZero === 'deny') {
+                    position = 0;
+                }
+
                 this.value = this.newValue;
                 this.setPosition(position, false);
+
                 return true;
             }
 
@@ -2292,7 +2301,7 @@ if (typeof define === 'function' && define.amd) {
         $this.on('focusin.autoNumeric mouseenter.autoNumeric', e => {
             holder = getHolder($this);
             const $settings = holder.settingsClone;
-            if ( e.type === 'focusin' || e.type === 'mouseenter' && !$this.is(':focus') && $settings.wEmpty === 'focus') {
+            if (e.type === 'focusin' || e.type === 'mouseenter' && !$this.is(':focus') && $settings.wEmpty === 'focus') {
                 $settings.onOff = true;
 
                 if ($settings.nBracket !== null && $settings.aNeg !== '') {
@@ -2583,7 +2592,7 @@ if (typeof define === 'function' && define.amd) {
             const selectionEnd = this.selectionEnd || 0;
             const prefix = currentValue.substring(0, selectionStart);
             const suffix = currentValue.substring(selectionEnd, currentValue.length);
-            const pastedText = preparePastedText(e.originalEvent.clipboardData.getData('text/plain').holder);
+            const pastedText = preparePastedText(e.originalEvent.clipboardData.getData('text/plain'), holder);
 
             if (isValidPasteText(pastedText)) {
                 const newValue = preparePastedText(prefix + Number(pastedText).valueOf() + suffix, holder);
@@ -2818,6 +2827,9 @@ if (typeof define === 'function' && define.amd) {
 
             // Improve the `pNeg` option if needed
             correctPNegOption(options, settings);
+
+            // Set the negative sign
+            settings.aNeg = settings.vMin < 0 ? '-' : '';
 
             // Validate the settings
             validate(settings, false); // Throws if necessary
@@ -3118,13 +3130,16 @@ if (typeof define === 'function' && define.amd) {
                 if (!((/\d/).test(value) || Number(value) === 0) && settings.wEmpty === 'focus') {
                     return '';
                 }
+
                 if (value !== '' && settings.nBracket !== null) {
                     settings.onOff = true;
                     value = negativeBracket(value, settings);
                 }
+
                 if (settings.runOnce || settings.aForm === false) {
                     value = autoStrip(value, settings);
                 }
+
                 value = fixNumber(value, settings);
             }
 
@@ -3241,7 +3256,7 @@ if (typeof define === 'function' && define.amd) {
         value = value.toString();
         value = fromLocale(value);
         if (Number(value) < 0) {
-            settings.aNeg = '-';
+            settings.aNeg = '-'; //TODO Replace this with `getInitialSettings()` that already sets `aNeg`?
         }
 
         if (settings.mDec === null) {

@@ -2,7 +2,7 @@
 * autoNumeric.js
 * @author: Bob Knothe
 * @contributors: Sokolov Yura and other Github users
-* @version: 2.0 - 2016-12-01 UTC 21:00
+* @version: 2.0-beta.9 - 2016-12-13 UTC 09:00
 *
 * Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
 *
@@ -94,99 +94,113 @@ const defaultSettings = {
      * space = " "
      * none = ""
      * NOTE: do not use numeric characters
+     * Deprecated older option name : aSep
      */
-    aSep: ',',
+    digitGroupSeparator: ',',
 
     /* When true => removes the thousand separator, currency symbol & suffix "focusin"
      * example if the input value "$ 1,999.88 suffix"
      * on "focusin" it becomes "1999.88" and back to "$ 1,999.88 suffix" on focus out.
+     * Deprecated older option name : nSep
      */
-    nSep: false,
+    noSeparatorOnFocus: false,
 
     /* Digital grouping for the thousand separator used in Format
-     * dGroup: "2", results in 99,99,99,999 India's lakhs
-     * dGroup: "2s", results in 99,999,99,99,999 India's lakhs scaled
-     * dGroup: "3", results in 999,999,999 default
-     * dGroup: "4", results in 9999,9999,9999 used in some Asian countries
+     * digitalGroupSpacing: "2", results in 99,99,99,999 India's lakhs
+     * digitalGroupSpacing: "2s", results in 99,999,99,99,999 India's lakhs scaled
+     * digitalGroupSpacing: "3", results in 999,999,999 default
+     * digitalGroupSpacing: "4", results in 9999,9999,9999 used in some Asian countries
+     * Deprecated older option name : dGroup
      */
-    dGroup: '3',
+    digitalGroupSpacing: '3',
 
     /* Allowed decimal separator characters
      * period "full stop" = "."
      * comma = ","
+     * Deprecated older option name : aDec
      */
-    aDec: '.',
+    decimalCharacter: '.',
 
-    /* Allow to declare alternative decimal separator which is automatically replaced by aDec
+    /* Allow to declare alternative decimal separator which is automatically replaced by decimalCharacter
      * developed for countries the use a comma "," as the decimal character
      * and have keyboards\numeric pads that have a period 'full stop' as the decimal characters (Spain is an example)
+     * Deprecated older option name : altDec
      */
-    altDec: null,
+    decimalCharacterAlternative: null,
 
-    /* aSign = allowed currency symbol
-     * Must be in quotes aSign: "$"
-     * space to the right of the currency symbol aSign: '$ '
-     * space to the left of the currency symbol aSign: ' $'
+    /* currencySymbol = allowed currency symbol
+     * Must be in quotes currencySymbol: "$"
+     * space to the right of the currency symbol currencySymbol: '$ '
+     * space to the left of the currency symbol currencySymbol: ' $'
+     * Deprecated older option name : aSign
      */
-    aSign: '',
+    currencySymbol: '',
 
-    /* pSign = placement of currency sign as a p=prefix or s=suffix
-     * for prefix pSign: "p" (default)
-     * for suffix pSign: "s"
+    /* currencySymbolPlacement = placement of currency sign as a p=prefix or s=suffix
+     * for prefix currencySymbolPlacement: "p" (default)
+     * for suffix currencySymbolPlacement: "s"
+     * Deprecated older option name : pSign
      */
-    pSign: 'p',
+    currencySymbolPlacement: 'p',
 
-    /* Placement of negative sign relative to the aSign option l=left, r=right, p=prefix & s=suffix
+    /* Placement of negative sign relative to the currencySymbol option l=left, r=right, p=prefix & s=suffix
      * -1,234.56  => default no options required
-     * -$1,234.56 => {aSign: "$"}
-     * $-1,234.56 => {aSign: "$", pNeg: "r"}
-     * -1,234.56$ => {aSign: "$", pSign: "s", pNeg: "p"}
-     * 1,234.56-  => {pNeg: "s"}
-     * $1,234.56- => {aSign: "$", pNeg: "s"}
-     * 1,234.56-$ => {aSign: "$", pSign: "s"}
-     * 1,234.56$- => {aSign: "$", pSign: "s", pNeg: "r"}
+     * -$1,234.56 => {currencySymbol: "$"}
+     * $-1,234.56 => {currencySymbol: "$", negativePositiveSignPlacement: "r"}
+     * -1,234.56$ => {currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "p"}
+     * 1,234.56-  => {negativePositiveSignPlacement: "s"}
+     * $1,234.56- => {currencySymbol: "$", negativePositiveSignPlacement: "s"}
+     * 1,234.56-$ => {currencySymbol: "$", currencySymbolPlacement: "s"}
+     * 1,234.56$- => {currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "r"}
+     * Deprecated older option name : pNeg
      */
-    pNeg: 'l',
+    negativePositiveSignPlacement: 'l',
 
     /* Additional suffix
-     * Must be in quotes aSuffix: 'gross', a space is allowed aSuffix: ' dollars'
+     * Must be in quotes suffixText: 'gross', a space is allowed suffixText: ' dollars'
      * Numeric characters and negative sign not allowed'
+     * Deprecated older option name : aSuffix
      */
-    aSuffix: '',
+    suffixText: '',
 
     /* Override min max limits
-     * oLimits: "ceiling" adheres to vMax and ignores vMin settings
-     * oLimits: "floor" adheres to vMin and ignores vMax settings
-     * oLimits: "ignore" ignores both vMin & vMax
+     * overrideMinMaxLimits: "ceiling" adheres to maximumValue and ignores minimumValue settings
+     * overrideMinMaxLimits: "floor" adheres to minimumValue and ignores maximumValue settings
+     * overrideMinMaxLimits: "ignore" ignores both minimumValue & maximumValue
+     * Deprecated older option name : oLimits
      */
-    oLimits: null,
+    overrideMinMaxLimits: null,
 
     /* Maximum possible value
      * value must be enclosed in quotes and use the period for the decimal point
-     * value must be larger than vMin
+     * value must be larger than minimumValue
+     * Deprecated older option name : vMax
      */
-    vMax: '9999999999999.99', // 9.999.999.999.999,99 ~= 10000 billions
+    maximumValue: '9999999999999.99', // 9.999.999.999.999,99 ~= 10000 billions
 
     /* Minimum possible value
      * value must be enclosed in quotes and use the period for the decimal point
-     * value must be smaller than vMax
+     * value must be smaller than maximumValue
+     * Deprecated older option name : vMin
      */
-    vMin: '-9999999999999.99', // -9.999.999.999.999,99 ~= 10000 billions
+    minimumValue: '-9999999999999.99', // -9.999.999.999.999,99 ~= 10000 billions
 
-    /* Maximum number of decimal places = used to override decimal places set by the vMin & vMax values
+    /* Maximum number of decimal places = used to override decimal places set by the minimumValue & maximumValue values
+     * Deprecated older option name : mDec
      */
-    mDec: null,
+    decimalPlacesOverride: null,
 
     /* Expanded decimal places visible when input has focus - example:
-     * {eDec: "5"} and the default 2 decimal places with focus "1,000.12345" without focus "1,000.12" the results depends on the rounding method used
+     * {decimalPlacesShownOnFocus: "5"} and the default 2 decimal places with focus "1,000.12345" without focus "1,000.12" the results depends on the rounding method used
      * the "get" method returns the extended decimal places
+     * Deprecated older option name : eDec
      */
-    eDec: null,
+    decimalPlacesShownOnFocus: null,
 
-    /* The next three options (scaleDivisor, scaleDecimal & scaleSymbol) handle scaling of the input when the input does not have focus
-     * Please note that the non-scaled value is held in data and it is advised that you use the "aStor" option to ensure retaining the value
+    /* The next three options (scaleDivisor, scaleDecimalPlaces & scaleSymbol) handle scaling of the input when the input does not have focus
+     * Please note that the non-scaled value is held in data and it is advised that you use the "saveValueToSessionStorage" option to ensure retaining the value
      * ["divisor", "decimal places", "symbol"]
-     * Example: with the following options set {scaleDivisor: '1000', scaleDecimal: '1', scaleSymbol: ' K'}
+     * Example: with the following options set {scaleDivisor: '1000', scaleDecimalPlaces: '1', scaleSymbol: ' K'}
      * Example: focusin value "1,111.11" focusout value "1.1 K"
      */
 
@@ -198,10 +212,11 @@ const defaultSettings = {
     scaleDivisor: null,
 
     /*
-     * The `scaleDecimal` option is the number of decimal place when not in focus - for this to work, `scaledDivisor` must not be `null`.
+     * The `scaleDecimalPlaces` option is the number of decimal place when not in focus - for this to work, `scaledDivisor` must not be `null`.
      * This is optional ; if omitted the decimal places will be the same when the input has the focus.
+     * Deprecated older option name : scaleDecimal
      */
-    scaleDecimal: null,
+    scaleDecimalPlaces: null,
 
     /*
      * The `scaleSymbol` option is a symbol placed as a suffix when not in focus.
@@ -209,85 +224,94 @@ const defaultSettings = {
      */
     scaleSymbol: null,
 
-    /* Set to true to allow the eDec value to be saved with sessionStorage
+    /* Set to true to allow the decimalPlacesShownOnFocus value to be saved with sessionStorage
      * if ie 6 or 7 the value will be saved as a session cookie
+     * Deprecated older option name : aStor
      */
-    aStor: false,
+    saveValueToSessionStorage: false,
 
     /* method used for rounding
-     * mRound: "S", Round-Half-Up Symmetric (default)
-     * mRound: "A", Round-Half-Up Asymmetric
-     * mRound: "s", Round-Half-Down Symmetric (lower case s)
-     * mRound: "a", Round-Half-Down Asymmetric (lower case a)
-     * mRound: "B", Round-Half-Even "Bankers Rounding"
-     * mRound: "U", Round Up "Round-Away-From-Zero"
-     * mRound: "D", Round Down "Round-Toward-Zero" - same as truncate
-     * mRound: "C", Round to Ceiling "Toward Positive Infinity"
-     * mRound: "F", Round to Floor "Toward Negative Infinity"
-     * mRound: "N05" Rounds to the nearest .05 => same as "CHF" used in 1.9X and still valid
-     * mRound: "U05" Rounds up to next .05
-     * mRound: "D05" Rounds down to next .05
+     * roundingMethod: "S", Round-Half-Up Symmetric (default)
+     * roundingMethod: "A", Round-Half-Up Asymmetric
+     * roundingMethod: "s", Round-Half-Down Symmetric (lower case s)
+     * roundingMethod: "a", Round-Half-Down Asymmetric (lower case a)
+     * roundingMethod: "B", Round-Half-Even "Bankers Rounding"
+     * roundingMethod: "U", Round Up "Round-Away-From-Zero"
+     * roundingMethod: "D", Round Down "Round-Toward-Zero" - same as truncate
+     * roundingMethod: "C", Round to Ceiling "Toward Positive Infinity"
+     * roundingMethod: "F", Round to Floor "Toward Negative Infinity"
+     * roundingMethod: "N05" Rounds to the nearest .05 => same as "CHF" used in 1.9X and still valid
+     * roundingMethod: "U05" Rounds up to next .05
+     * roundingMethod: "D05" Rounds down to next .05
+     * Deprecated older option name : mRound
      */
-    mRound: 'S',
+    roundingMethod: 'S',
 
     /* Controls decimal padding
-     * aPad: true - always Pad decimals with zeros
-     * aPad: false - does not pad with zeros.
-     * Note: setting aPad to 'false' will override the 'mDec' setting.
+     * allowDecimalPadding: true - always Pad decimals with zeros
+     * allowDecimalPadding: false - does not pad with zeros.
+     * Note: setting allowDecimalPadding to 'false' will override the 'decimalPlacesOverride' setting.
      *
      * thanks to Jonas Johansson for the suggestion
+     * Deprecated older option name : aPad
      */
-    aPad: true,
+    allowDecimalPadding: true,
 
     /* Adds brackets on negative values (ie. transforms '-$ 999.99' to '(999.99)')
      * Those brackets are visible only when the field does NOT have the focus.
      * The left and right symbols should be enclosed in quotes and separated by a comma
-     * nBracket: null - (default)
-     * nBracket: '(,)', nBracket: '[,]', nBracket: '<,>' or nBracket: '{,}'
+     * negativeBracketsTypeOnBlur: null - (default)
+     * negativeBracketsTypeOnBlur: '(,)', negativeBracketsTypeOnBlur: '[,]', negativeBracketsTypeOnBlur: '<,>' or negativeBracketsTypeOnBlur: '{,}'
+     * Deprecated older option name : nBracket
      */
-    nBracket: null,
+    negativeBracketsTypeOnBlur: null,
 
     /* Displayed on empty string ""
-     * wEmpty: "focus" - (default) currency sign displayed and the input receives focus
-     * wEmpty: "press" - currency sign displays on any key being pressed
-     * wEmpty: "always" - always displays the currency sign only
-     * wEmpty: "zero" - if the input has no value on focus out displays a zero "rounded" with or without a currency sign
+     * emptyInputBehavior: "focus" - (default) currency sign displayed and the input receives focus
+     * emptyInputBehavior: "press" - currency sign displays on any key being pressed
+     * emptyInputBehavior: "always" - always displays the currency sign only
+     * emptyInputBehavior: "zero" - if the input has no value on focus out displays a zero "rounded" with or without a currency sign
+     * Deprecated older option name : wEmpty
      */
-    //TODO Add an option to display the currency sign only on hover (if the input is empty)
-    wEmpty: 'focus',
+    emptyInputBehavior: 'focus',
 
     /* Controls leading zero behavior
-     * lZero: "allow", - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
-     * lZero: "deny", - allows only one leading zero on values less than one
-     * lZero: "keep", - allows leading zeros to be entered. on focusout zeros will be retained.
+     * leadingZero: "allow", - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
+     * leadingZero: "deny", - allows only one leading zero on values less than one
+     * leadingZero: "keep", - allows leading zeros to be entered. on focusout zeros will be retained.
+     * Deprecated older option name : lZero
      */
-    lZero: 'deny',
+    leadingZero: 'deny',
 
     /* Determine if the default value will be formatted on initialization.
      * true = automatically formats the default value on initialization
      * false = will not format the default value
+     * Deprecated older option name : aForm
      */
-    aForm: true,
+    formatOnPageLoad: true,
 
     /* Determine if the select all keyboard command will select
      * the complete input text or only the input numeric value
      * if the currency symbol is between the numeric value and the negative sign only the numeric value will selected
+     * Deprecated older option name : sNumber
      */
-    sNumber: false,
+    selectNumberOnly: false,
 
     /* Helper option for ASP.NET postback
      * should be the value of the unformatted default value
      * examples:
-     * no default value="" {anDefault: ""}
-     * value=1234.56 {anDefault: '1234.56'}
+     * no default value="" {defaultValueOverride: ""}
+     * value=1234.56 {defaultValueOverride: '1234.56'}
+     * Deprecated older option name : anDefault
      */
-    anDefault: null,
+    defaultValueOverride: null,
 
     /* Removes formatting on submit event
      * this output format: positive nnnn.nn, negative -nnnn.nn
      * review the 'unSet' method for other formats
+     * Deprecated older option name : unSetOnSubmit
      */
-    unSetOnSubmit: false,
+    unformatOnSubmit: false,
 
     /* Allows the output to be in the locale format via the "get", "getString" & "getArray" methods
      * null or 'string' => 'nnnn.nn' or '-nnnn.nn' as text type. This is the default behavior.
@@ -295,14 +319,16 @@ const defaultSettings = {
      * ',' or '-,'      => 'nnnn,nn' or '-nnnn,nn'
      * '.-'             => 'nnnn.nn' or 'nnnn.nn-'
      * ',-'             => 'nnnn,nn' or 'nnnn,nn-'
+     * Deprecated older option name : outputType
      */
-    outputType: null,
+    outputFormat: null,
 
     /* Error handling function
-     * true => all errors are thrown - helpful in site development
-     * false => throws errors when calling methods prior to the supported element has been initialized be autoNumeric
+     * true => all warning are shown
+     * false => no warnings are shown, only the thown errors
+     * Deprecated older option name : debug
      */
-    debug: false,
+    showWarnings: true,
 };
 
 /**
@@ -557,7 +583,7 @@ if (typeof define === 'function' && define.amd) {
      * @returns {string|void|XML|*}
      */
     function preparePastedText(text, holder) {
-        return autoStrip(text, holder.settingsClone).replace(holder.settingsClone.aDec, '.');
+        return autoStrip(text, holder.settingsClone).replace(holder.settingsClone.decimalCharacter, '.');
     }
 
     /**
@@ -695,10 +721,10 @@ if (typeof define === 'function' && define.amd) {
      * Function that display a warning messages, according to the debug level.
      *
      * @param {string} message
-     * @param {boolean} suppressWarnings If TRUE, then the warning message is not displayed
+     * @param {boolean} showWarning If FALSE, then the warning message is not displayed
      */
-    function warning(message, suppressWarnings = false) {
-        if (suppressWarnings) {
+    function warning(message, showWarning = true) {
+        if (showWarning) {
             /* eslint no-console: 0 */
             console.warn(`Warning: ${message}`);
         }
@@ -727,10 +753,10 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Determine the maximum decimal length from the vMin and vMax settings
+     * Determine the maximum decimal length from the minimumValue and maximumValue settings
      */
-    function maximumVMinAndVMaxDecimalLength(vMin, vMax) {
-        return Math.max(decimalPlaces(vMin), decimalPlaces(vMax));
+    function maximumVMinAndVMaxDecimalLength(minimumValue, maximumValue) {
+        return Math.max(decimalPlaces(minimumValue), decimalPlaces(maximumValue));
     }
 
     /**
@@ -741,21 +767,21 @@ if (typeof define === 'function' && define.amd) {
      * @returns {string|*}
      */
     function autoStrip(s, settings) {
-        if (settings.aSign !== '') {
+        if (settings.currencySymbol !== '') {
             // Remove currency sign
-            s = s.replace(settings.aSign, '');
+            s = s.replace(settings.currencySymbol, '');
         }
-        if (settings.aSuffix) {
+        if (settings.suffixText) {
             // Remove suffix
-            while (contains(s, settings.aSuffix)) {
-                s = s.replace(settings.aSuffix, '');
+            while (contains(s, settings.suffixText)) {
+                s = s.replace(settings.suffixText, '');
             }
         }
 
         // First replace anything before digits
         s = s.replace(settings.skipFirstAutoStrip, '$1$2');
 
-        if ((settings.pNeg === 's' || (settings.pSign === 's' && settings.pNeg !== 'p')) && contains(s, '-') && s !== '') {
+        if ((settings.negativePositiveSignPlacement === 's' || (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement !== 'p')) && contains(s, '-') && s !== '') {
             settings.trailingNegative = true;
         }
 
@@ -764,21 +790,21 @@ if (typeof define === 'function' && define.amd) {
 
         // Then remove any uninteresting characters
         s = s.replace(settings.allowedAutoStrip, '');
-        if (settings.altDec) {
-            s = s.replace(settings.altDec, settings.aDec);
+        if (settings.decimalCharacterAlternative) {
+            s = s.replace(settings.decimalCharacterAlternative, settings.decimalCharacter);
         }
 
         // Get only number string
         const m = s.match(settings.numRegAutoStrip);
         s = m ? [m[1], m[2], m[3]].join('') : '';
 
-        if (settings.lZero === 'allow' || settings.lZero === 'keep') {
+        if (settings.leadingZero === 'allow' || settings.leadingZero === 'keep') {
             let nSign = '';
-            const [integerPart, decimalPart] = s.split(settings.aDec);
+            const [integerPart, decimalPart] = s.split(settings.decimalCharacter);
             let modifiedIntegerPart = integerPart;
-            if (contains(modifiedIntegerPart, settings.aNeg)) {
-                nSign = settings.aNeg;
-                modifiedIntegerPart = modifiedIntegerPart.replace(settings.aNeg, '');
+            if (contains(modifiedIntegerPart, settings.negativeSignCharacter)) {
+                nSign = settings.negativeSignCharacter;
+                modifiedIntegerPart = modifiedIntegerPart.replace(settings.negativeSignCharacter, '');
             }
 
             // Strip leading zero on positive value if need
@@ -791,11 +817,11 @@ if (typeof define === 'function' && define.amd) {
                 modifiedIntegerPart = modifiedIntegerPart.slice(1);
             }
 
-            s = `${nSign}${modifiedIntegerPart}${isUndefined(decimalPart)?'':settings.aDec + decimalPart}`;
+            s = `${nSign}${modifiedIntegerPart}${isUndefined(decimalPart)?'':settings.decimalCharacter + decimalPart}`;
         }
 
-        if ((settings.onOff && settings.lZero === 'deny') ||
-            (!settings.onOff && settings.lZero === 'allow')) {
+        if ((settings.onOff && settings.leadingZero === 'deny') ||
+            (!settings.onOff && settings.leadingZero === 'allow')) {
             s = s.replace(settings.stripReg, '$1$2');
         }
 
@@ -810,13 +836,13 @@ if (typeof define === 'function' && define.amd) {
      * @returns {*}
      */
     function negativeBracket(s, settings) {
-        if ((settings.pSign === 'p' && settings.pNeg === 'l') || (settings.pSign === 's' && settings.pNeg === 'p')) {
-            const [firstBracket, lastBracket] = settings.nBracket.split(',');
+        if ((settings.currencySymbolPlacement === 'p' && settings.negativePositiveSignPlacement === 'l') || (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement === 'p')) {
+            const [firstBracket, lastBracket] = settings.negativeBracketsTypeOnBlur.split(',');
             if (!settings.onOff) {
-                s = s.replace(settings.aNeg, '');
+                s = s.replace(settings.negativeSignCharacter, '');
                 s = firstBracket + s + lastBracket;
             } else if (settings.onOff && s.charAt(0) === firstBracket) {
-                s = s.replace(firstBracket, settings.aNeg);
+                s = s.replace(firstBracket, settings.negativeSignCharacter);
                 s = s.replace(lastBracket, '');
             }
         }
@@ -846,7 +872,7 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Converts the ISO numeric string to the locale decimal and minus sign placement.
-     * See the "outputType" option definition for more details.
+     * See the "outputFormat" option definition for more details.
      */
     function toLocale(value, locale) {
         if (isNull(locale) || locale === 'string') {
@@ -875,7 +901,7 @@ if (typeof define === 'function' && define.amd) {
                 result = value;
                 break;
             default :
-                throwError(`The given outputType [${locale}] option is not recognized.`);
+                throwError(`The given outputFormat [${locale}] option is not recognized.`);
         }
 
         return result;
@@ -889,11 +915,11 @@ if (typeof define === 'function' && define.amd) {
      * @returns {*}
      */
     function fixNumber(s, settings) {
-        if (settings.aDec !== '.') {
-            s = s.replace(settings.aDec, '.');
+        if (settings.decimalCharacter !== '.') {
+            s = s.replace(settings.decimalCharacter, '.');
         }
-        if (settings.aNeg !== '-' && settings.aNeg !== '') {
-            s = s.replace(settings.aNeg, '-');
+        if (settings.negativeSignCharacter !== '-' && settings.negativeSignCharacter !== '') {
+            s = s.replace(settings.negativeSignCharacter, '-');
         }
         if (!s.match(/\d/)) {
             // The default value returned by `get` is formatted with decimals
@@ -911,11 +937,11 @@ if (typeof define === 'function' && define.amd) {
      * @returns {*}
      */
     function presentNumber(s, settings) {
-        if (settings.aNeg !== '-' && settings.aNeg !== '') {
-            s = s.replace('-', settings.aNeg);
+        if (settings.negativeSignCharacter !== '-' && settings.negativeSignCharacter !== '') {
+            s = s.replace('-', settings.negativeSignCharacter);
         }
-        if (settings.aDec !== '.') {
-            s = s.replace('.', settings.aDec);
+        if (settings.decimalCharacter !== '.') {
+            s = s.replace('.', settings.decimalCharacter);
         }
 
         return s;
@@ -930,9 +956,9 @@ if (typeof define === 'function' && define.amd) {
      * @returns {*}
      */
     function checkEmpty(inputValue, settings, signOnEmpty) {
-        if (inputValue === '' || inputValue === settings.aNeg) {
-            if (settings.wEmpty === 'always' || signOnEmpty) {
-                return (settings.pNeg === 'l') ? inputValue + settings.aSign + settings.aSuffix : settings.aSign + inputValue + settings.aSuffix;
+        if (inputValue === '' || inputValue === settings.negativeSignCharacter) {
+            if (settings.emptyInputBehavior === 'always' || signOnEmpty) {
+                return (settings.negativePositiveSignPlacement === 'l') ? inputValue + settings.currencySymbol + settings.suffixText : settings.currencySymbol + inputValue + settings.suffixText;
             }
 
             return inputValue;
@@ -967,9 +993,9 @@ if (typeof define === 'function' && define.amd) {
             return empty;
         }
 
-        settings.dGroup = settings.dGroup.toString();
+        settings.digitalGroupSpacing = settings.digitalGroupSpacing.toString();
         let digitalGroup;
-        switch (settings.dGroup) {
+        switch (settings.digitalGroupSpacing) {
             case '2':
                 digitalGroup = /(\d)((\d)(\d{2}?)+)$/;
                 break;
@@ -984,77 +1010,77 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // Splits the string at the decimal string
-        let [integerPart, decimalPart] = inputValue.split(settings.aDec);
-        if (settings.altDec && isUndefined(decimalPart)) {
-            [integerPart, decimalPart] = inputValue.split(settings.altDec);
+        let [integerPart, decimalPart] = inputValue.split(settings.decimalCharacter);
+        if (settings.decimalCharacterAlternative && isUndefined(decimalPart)) {
+            [integerPart, decimalPart] = inputValue.split(settings.decimalCharacterAlternative);
         }
 
-        if (settings.aSep !== '') {
+        if (settings.digitGroupSeparator !== '') {
             // Re-inserts the thousand separator via a regular expression
             while (digitalGroup.test(integerPart)) {
-                integerPart = integerPart.replace(digitalGroup, `$1${settings.aSep}$2`);
+                integerPart = integerPart.replace(digitalGroup, `$1${settings.digitGroupSeparator}$2`);
             }
         }
 
-        if (settings.mDec !== 0 && !isUndefined(decimalPart)) {
-            if (decimalPart.length > settings.mDec) {
-                decimalPart = decimalPart.substring(0, settings.mDec);
+        if (settings.decimalPlacesOverride !== 0 && !isUndefined(decimalPart)) {
+            if (decimalPart.length > settings.decimalPlacesOverride) {
+                decimalPart = decimalPart.substring(0, settings.decimalPlacesOverride);
             }
 
             // Joins the whole number with the decimal value
-            inputValue = integerPart + settings.aDec + decimalPart;
+            inputValue = integerPart + settings.decimalCharacter + decimalPart;
         } else {
             // Otherwise if it's an integer
             inputValue = integerPart;
         }
 
-        if (settings.pSign === 'p') {
+        if (settings.currencySymbolPlacement === 'p') {
             if (isNegative) {
-                switch (settings.pNeg) {
+                switch (settings.negativePositiveSignPlacement) {
                     case 'l':
-                        inputValue = settings.aNeg + settings.aSign + inputValue;
+                        inputValue = settings.negativeSignCharacter + settings.currencySymbol + inputValue;
                         break;
                     case 'r':
-                        inputValue = settings.aSign + settings.aNeg + inputValue;
+                        inputValue = settings.currencySymbol + settings.negativeSignCharacter + inputValue;
                         break;
                     case 's':
-                        inputValue = settings.aSign + inputValue + settings.aNeg;
+                        inputValue = settings.currencySymbol + inputValue + settings.negativeSignCharacter;
                         break;
                     default :
                         //
                 }
             } else {
-                inputValue = settings.aSign + inputValue;
+                inputValue = settings.currencySymbol + inputValue;
             }
         }
 
-        if (settings.pSign === 's') {
+        if (settings.currencySymbolPlacement === 's') {
             if (isNegative) {
-                switch (settings.pNeg) {
+                switch (settings.negativePositiveSignPlacement) {
                     case 'r':
-                        inputValue = inputValue + settings.aSign + settings.aNeg;
+                        inputValue = inputValue + settings.currencySymbol + settings.negativeSignCharacter;
                         break;
                     case 'l':
-                        inputValue = inputValue + settings.aNeg + settings.aSign;
+                        inputValue = inputValue + settings.negativeSignCharacter + settings.currencySymbol;
                         break;
                     case 'p':
-                        inputValue = settings.aNeg + inputValue + settings.aSign;
+                        inputValue = settings.negativeSignCharacter + inputValue + settings.currencySymbol;
                         break;
                     default :
                     //
                 }
             } else {
-                inputValue = inputValue + settings.aSign;
+                inputValue = inputValue + settings.currencySymbol;
             }
         }
 
         // Removes the negative sign and places brackets
-        if (settings.nBracket !== null && (settings.rawValue < 0 || inputValue.charAt(0) === '-')) {
+        if (settings.negativeBracketsTypeOnBlur !== null && (settings.rawValue < 0 || inputValue.charAt(0) === '-')) {
             inputValue = negativeBracket(inputValue, settings);
         }
         settings.trailingNegative = false;
 
-        return inputValue + settings.aSuffix;
+        return inputValue + settings.suffixText;
     }
 
     /**
@@ -1072,11 +1098,11 @@ if (typeof define === 'function' && define.amd) {
                 regex = /(\.(?:\d*[1-9])?)0*$/;
                 break;
             case 1:
-                // Allows padding when mDec equals one - leaves one zero trailing the decimal character
+                // Allows padding when decimalPlacesOverride equals one - leaves one zero trailing the decimal character
                 regex = /(\.\d(?:\d*[1-9])?)0*$/;
                 break;
             default :
-                // Removes access zeros to the mDec length when aPad is set to true
+                // Removes access zeros to the decimalPlacesOverride length when allowDecimalPadding is set to true
                 regex = new RegExp(`(\\.\\d{${rDec}}(?:\\d*[1-9])?)0*`);
         }
 
@@ -1101,8 +1127,8 @@ if (typeof define === 'function' && define.amd) {
      */
     function autoRound(inputValue, settings) { // value to string
         inputValue = (inputValue === '') ? '0' : inputValue.toString();
-        if (settings.mRound === 'N05' || settings.mRound === 'CHF' || settings.mRound === 'U05' || settings.mRound === 'D05') {
-            switch (settings.mRound) {
+        if (settings.roundingMethod === 'N05' || settings.roundingMethod === 'CHF' || settings.roundingMethod === 'U05' || settings.roundingMethod === 'D05') {
+            switch (settings.roundingMethod) {
                 case 'N05':
                     inputValue = (Math.round(inputValue * 20) / 20).toString();
                     break;
@@ -1130,8 +1156,8 @@ if (typeof define === 'function' && define.amd) {
         let rDec;
 
         // sets the truncate zero method
-        if (settings.aPad) {
-            rDec = settings.mDec;
+        if (settings.allowDecimalPadding) {
+            rDec = settings.decimalPlacesOverride;
         } else {
             rDec = 0;
         }
@@ -1155,7 +1181,7 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // Trims leading zero's as needed
-        if ((Number(inputValue) > 0 && settings.lZero !== 'keep') || (inputValue.length > 0 && settings.lZero === 'allow')) {
+        if ((Number(inputValue) > 0 && settings.leadingZero !== 'keep') || (inputValue.length > 0 && settings.leadingZero === 'allow')) {
             inputValue = inputValue.replace(/^0*(\d)/, '$1');
         }
 
@@ -1169,12 +1195,12 @@ if (typeof define === 'function' && define.amd) {
         // Check if no rounding is required
         let cDec = (inputValue.length - 1) - vdPos;
 
-        if (cDec <= settings.mDec) {
+        if (cDec <= settings.decimalPlacesOverride) {
             // Check if we need to pad with zeros
             ivRounded = inputValue;
             if (cDec < rDec) {
                 if (inputValueHasADot) {
-                    ivRounded += settings.aDec;
+                    ivRounded += settings.decimalCharacter;
                 }
 
                 let zeros = '000000';
@@ -1195,26 +1221,26 @@ if (typeof define === 'function' && define.amd) {
         // Rounded length of the string after rounding
         let rLength;
         if (inputValueHasADot) {
-            rLength = settings.mDec - 1;
+            rLength = settings.decimalPlacesOverride - 1;
         } else {
-            rLength = settings.mDec + dPos;
+            rLength = settings.decimalPlacesOverride + dPos;
         }
 
         const tRound = Number(inputValue.charAt(rLength + 1));
         const odd = (inputValue.charAt(rLength) === '.') ? (inputValue.charAt(rLength - 1) % 2) : (inputValue.charAt(rLength) % 2);
         let ivArray = inputValue.substring(0, rLength + 1).split('');
 
-        if ((tRound > 4 && settings.mRound === 'S')                  || // Round half up symmetric
-            (tRound > 4 && settings.mRound === 'A' && nSign === '')  || // Round half up asymmetric positive values
-            (tRound > 5 && settings.mRound === 'A' && nSign === '-') || // Round half up asymmetric negative values
-            (tRound > 5 && settings.mRound === 's')                  || // Round half down symmetric
-            (tRound > 5 && settings.mRound === 'a' && nSign === '')  || // Round half down asymmetric positive values
-            (tRound > 4 && settings.mRound === 'a' && nSign === '-') || // Round half down asymmetric negative values
-            (tRound > 5 && settings.mRound === 'B')                  || // Round half even "Banker's Rounding"
-            (tRound === 5 && settings.mRound === 'B' && odd === 1)   || // Round half even "Banker's Rounding"
-            (tRound > 0 && settings.mRound === 'C' && nSign === '')  || // Round to ceiling toward positive infinite
-            (tRound > 0 && settings.mRound === 'F' && nSign === '-') || // Round to floor toward negative infinite
-            (tRound > 0 && settings.mRound === 'U')) {                  // Round up away from zero
+        if ((tRound > 4 && settings.roundingMethod === 'S')                  || // Round half up symmetric
+            (tRound > 4 && settings.roundingMethod === 'A' && nSign === '')  || // Round half up asymmetric positive values
+            (tRound > 5 && settings.roundingMethod === 'A' && nSign === '-') || // Round half up asymmetric negative values
+            (tRound > 5 && settings.roundingMethod === 's')                  || // Round half down symmetric
+            (tRound > 5 && settings.roundingMethod === 'a' && nSign === '')  || // Round half down asymmetric positive values
+            (tRound > 4 && settings.roundingMethod === 'a' && nSign === '-') || // Round half down asymmetric negative values
+            (tRound > 5 && settings.roundingMethod === 'B')                  || // Round half even "Banker's Rounding"
+            (tRound === 5 && settings.roundingMethod === 'B' && odd === 1)   || // Round half even "Banker's Rounding"
+            (tRound > 0 && settings.roundingMethod === 'C' && nSign === '')  || // Round to ceiling toward positive infinite
+            (tRound > 0 && settings.roundingMethod === 'F' && nSign === '-') || // Round to floor toward negative infinite
+            (tRound > 0 && settings.roundingMethod === 'U')) {                  // Round up away from zero
             // Round up the last digit if required, and continue until no more 9's are found
             for (i = (ivArray.length - 1); i >= 0; i -= 1) {
                 if (ivArray[i] !== '.') {
@@ -1248,18 +1274,18 @@ if (typeof define === 'function' && define.amd) {
      * @returns {*}
      */
     function truncateDecimal(s, settings, paste) {
-        const aDec = settings.aDec;
-        const mDec = settings.mDec;
+        const decimalCharacter = settings.decimalCharacter;
+        const decimalPlacesOverride = settings.decimalPlacesOverride;
         s = (paste === 'paste') ? autoRound(s, settings) : s;
 
-        if (aDec && mDec) {
-            const [integerPart, decimalPart] = s.split(aDec);
+        if (decimalCharacter && decimalPlacesOverride) {
+            const [integerPart, decimalPart] = s.split(decimalCharacter);
 
             // truncate decimal part to satisfying length since we would round it anyway
-            if (decimalPart && decimalPart.length > mDec) {
-                if (mDec > 0) {
-                    const modifiedDecimalPart = decimalPart.substring(0, mDec);
-                    s = `${integerPart}${aDec}${modifiedDecimalPart}`;
+            if (decimalPart && decimalPart.length > decimalPlacesOverride) {
+                if (decimalPlacesOverride > 0) {
+                    const modifiedDecimalPart = decimalPart.substring(0, decimalPlacesOverride);
+                    s = `${integerPart}${decimalCharacter}${modifiedDecimalPart}`;
                 } else {
                     s = integerPart;
                 }
@@ -1270,8 +1296,8 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Function to parse vMin, vMax & the input value to prepare for testing to determine if the value falls within the min / max range
-     * Return an object example: vMin: "999999999999999.99" returns the following "{s: -1, e: 12, c: Array[15]}"
+     * Function to parse minimumValue, maximumValue & the input value to prepare for testing to determine if the value falls within the min / max range
+     * Return an object example: minimumValue: "999999999999999.99" returns the following "{s: -1, e: 12, c: Array[15]}"
      * This function is adapted from Big.js https://github.com/MikeMcl/big.js/
      * Many thanks to Mike
      */
@@ -1396,8 +1422,8 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Check that the number satisfy the format conditions
-     * and lays between settings.vMin and settings.vMax
-     * and the string length does not exceed the digits in settings.vMin and settings.vMax
+     * and lays between settings.minimumValue and settings.maximumValue
+     * and the string length does not exceed the digits in settings.minimumValue and settings.maximumValue
      *
      * @param {string} s
      * @param {object} settings
@@ -1406,12 +1432,12 @@ if (typeof define === 'function' && define.amd) {
     function autoCheck(s, settings) {
         s = s.toString();
         s = s.replace(',', '.');
-        const minParse = parseStr(settings.vMin);
-        const maxParse = parseStr(settings.vMax);
+        const minParse = parseStr(settings.minimumValue);
+        const maxParse = parseStr(settings.maximumValue);
         const valParse = parseStr(s);
 
         let result;
-        switch (settings.oLimits) {
+        switch (settings.overrideMinMaxLimits) {
             case 'floor':
                 result = [testMinMax(minParse, valParse) > -1, true];
                 break;
@@ -1470,22 +1496,22 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Original settings saved for use when eDec & nSep options are being used.
+     * Original settings saved for use when decimalPlacesShownOnFocus & noSeparatorOnFocus options are being used.
      * Those original settings are used exclusively in the `focusin` and `focusout` event handlers.
      *
      * @param {object} settings
      */
     function keepAnOriginalSettingsCopy(settings) {
-        settings.oDec     = settings.mDec;
-        settings.oPad     = settings.aPad;
-        settings.oBracket = settings.nBracket;
-        settings.oSep     = settings.aSep;
-        settings.oSign    = settings.aSign;
-        settings.oSuffix  = settings.aSuffix;
+        settings.oDec     = settings.decimalPlacesOverride;
+        settings.oPad     = settings.allowDecimalPadding;
+        settings.oBracket = settings.negativeBracketsTypeOnBlur;
+        settings.oSep     = settings.digitGroupSeparator;
+        settings.oSign    = settings.currencySymbol;
+        settings.oSuffix  = settings.suffixText;
     }
 
     /**
-     * original settings saved for use when eDec & nSep options are being used
+     * original settings saved for use when decimalPlacesShownOnFocus & noSeparatorOnFocus options are being used
      * taken from Quirksmode
      */
     function readCookie(name) {
@@ -1523,7 +1549,7 @@ if (typeof define === 'function' && define.amd) {
      * creates or removes sessionStorage or cookie depending on browser support
      */
     function autoSave(element, settings, toDo) {
-        if (settings.aStor) {
+        if (settings.saveValueToSessionStorage) {
             const storedName = (element.name !== '' && !isUndefined(element.name)) ?`AUTO_${decodeURIComponent(element.name)}` :`AUTO_${element.id}`;
             let date;
             let expires;
@@ -1642,13 +1668,13 @@ if (typeof define === 'function' && define.amd) {
             // prevents multiple leading zeros from being entered
             left = autoStrip(left, settingsClone);
 
-            // if right is not empty and first character is not aDec,
+            // if right is not empty and first character is not decimalCharacter,
             right = autoStrip(right, settingsClone);
             if (settingsClone.trailingNegative && !contains(left, '-')) {
                 left = '-' + left;
                 settingsClone.trailingNegative = false;
             }
-            if ((left === '' || left === settingsClone.aNeg) && settingsClone.lZero === 'deny') {
+            if ((left === '' || left === settingsClone.negativeSignCharacter) && settingsClone.leadingZero === 'deny') {
                 if (right > '') {
                     right = right.replace(/^0*(\d)/, '$1');
                 }
@@ -1656,8 +1682,8 @@ if (typeof define === 'function' && define.amd) {
 
             // insert zero if has leading dot
             this.newValue = left + right;
-            if (settingsClone.aDec) {
-                const m = this.newValue.match(new RegExp(`^${settingsClone.aNegRegAutoStrip}\\${settingsClone.aDec}`));
+            if (settingsClone.decimalCharacter) {
+                const m = this.newValue.match(new RegExp(`^${settingsClone.aNegRegAutoStrip}\\${settingsClone.decimalCharacter}`));
                 if (m) {
                     left = left.replace(m[1], m[1] + '0');
                     this.newValue = left + right;
@@ -1680,7 +1706,7 @@ if (typeof define === 'function' && define.amd) {
             if (minTest && maxTest) {
                 this.newValue = truncateDecimal(this.newValue, settingsClone, advent);
                 const testValue = (contains(this.newValue, ',')) ? this.newValue.replace(',', '.') : this.newValue;
-                if (testValue === '' || testValue === settingsClone.aNeg) {
+                if (testValue === '' || testValue === settingsClone.negativeSignCharacter) {
                     settingsClone.rawValue = '';
                 } else {
                     settingsClone.rawValue = testValue;
@@ -1691,7 +1717,7 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 // Make sure when the user enter a '0' on the far left with a leading zero option set to 'deny', that the caret does not moves since the input is dropped (fix issue #283)
-                if (position === 1 && parts[0] === '0' && settingsClone.lZero === 'deny') {
+                if (position === 1 && parts[0] === '0' && settingsClone.leadingZero === 'deny') {
                     position = 0;
                 }
 
@@ -1716,17 +1742,17 @@ if (typeof define === 'function' && define.amd) {
          */
         _signPosition() {
             const settingsClone = this.settingsClone;
-            const aSign = settingsClone.aSign;
+            const currencySymbol = settingsClone.currencySymbol;
             const that = this.that;
 
-            if (aSign) {
-                const aSignLen = aSign.length;
-                if (settingsClone.pSign === 'p') {
-                    const hasNeg = settingsClone.aNeg && that.value && that.value.charAt(0) === settingsClone.aNeg;
-                    return hasNeg ? [1, aSignLen + 1] : [0, aSignLen];
+            if (currencySymbol) {
+                const currencySymbolLen = currencySymbol.length;
+                if (settingsClone.currencySymbolPlacement === 'p') {
+                    const hasNeg = settingsClone.negativeSignCharacter && that.value && that.value.charAt(0) === settingsClone.negativeSignCharacter;
+                    return hasNeg ? [1, currencySymbolLen + 1] : [0, currencySymbolLen];
                 }
                 const valueLen = that.value.length;
-                return [valueLen - aSignLen, valueLen];
+                return [valueLen - currencySymbolLen, valueLen];
             }
 
             return [1000, -1];
@@ -1806,36 +1832,36 @@ if (typeof define === 'function' && define.amd) {
 
             // if select all (a)
             if ((ctrlKey || cmdKey) && kdCode === keyCode.a) {
-                if (this.settings.sNumber) {
+                if (this.settings.selectNumberOnly) {
                     // preventDefault is used here to prevent the browser to first select all the input text (including the currency sign), otherwise we would see that whole selection first in a flash, then the selection with only the number part without the currency sign.
                     e.preventDefault();
                     const valueLen = this.that.value.length;
-                    const aSignLen = this.settings.aSign.length;
+                    const currencySymbolLen = this.settings.currencySymbol.length;
                     const negLen = (!contains(this.that.value, '-'))?0:1;
-                    const aSuffixLen = this.settings.aSuffix.length;
-                    const pSign = this.settings.pSign;
-                    const pNeg = this.settings.pNeg;
+                    const suffixTextLen = this.settings.suffixText.length;
+                    const currencySymbolPlacement = this.settings.currencySymbolPlacement;
+                    const negativePositiveSignPlacement = this.settings.negativePositiveSignPlacement;
 
                     let start;
-                    if (pSign === 's') {
+                    if (currencySymbolPlacement === 's') {
                         start = 0;
                     } else {
-                        start = (pNeg === 'l' && negLen === 1 && aSignLen > 0)?aSignLen + 1:aSignLen;
+                        start = (negativePositiveSignPlacement === 'l' && negLen === 1 && currencySymbolLen > 0)?currencySymbolLen + 1:currencySymbolLen;
                     }
 
                     let end;
-                    if (pSign === 'p') {
-                        end = valueLen - aSuffixLen;
+                    if (currencySymbolPlacement === 'p') {
+                        end = valueLen - suffixTextLen;
                     } else {
-                        switch (pNeg) {
+                        switch (negativePositiveSignPlacement) {
                             case 'l':
-                                end = valueLen - (aSuffixLen + aSignLen);
+                                end = valueLen - (suffixTextLen + currencySymbolLen);
                                 break;
                             case 'r':
-                                end = (aSignLen > 0)?valueLen - (aSignLen + negLen + aSuffixLen):valueLen - (aSignLen + aSuffixLen);
+                                end = (currencySymbolLen > 0)?valueLen - (currencySymbolLen + negLen + suffixTextLen):valueLen - (currencySymbolLen + suffixTextLen);
                                 break;
                             default :
-                                end = valueLen - (aSignLen + aSuffixLen);
+                                end = valueLen - (currencySymbolLen + suffixTextLen);
                         }
                     }
 
@@ -1871,14 +1897,14 @@ if (typeof define === 'function' && define.amd) {
 
             // jump over thousand separator
             if (kdCode === keyCode.LeftArrow || kdCode === keyCode.RightArrow) {
-                const aSep = this.settingsClone.aSep;
-                const aDec = this.settingsClone.aDec;
+                const digitGroupSeparator = this.settingsClone.digitGroupSeparator;
+                const decimalCharacter = this.settingsClone.decimalCharacter;
                 const startJump = this.selection.start;
                 const value = this.that.value;
                 if (e.type === 'keydown' && !this.shiftKey) {
-                    if (kdCode === keyCode.LeftArrow && (value.charAt(startJump - 2) === aSep || value.charAt(startJump - 2) === aDec)) {
+                    if (kdCode === keyCode.LeftArrow && (value.charAt(startJump - 2) === digitGroupSeparator || value.charAt(startJump - 2) === decimalCharacter)) {
                         this._setPosition(startJump - 1);
-                    } else if (kdCode === keyCode.RightArrow && (value.charAt(startJump + 1) === aSep || value.charAt(startJump + 1) === aDec)) {
+                    } else if (kdCode === keyCode.RightArrow && (value.charAt(startJump + 1) === digitGroupSeparator || value.charAt(startJump + 1) === decimalCharacter)) {
                         this._setPosition(startJump + 1);
                     }
                 }
@@ -1893,17 +1919,17 @@ if (typeof define === 'function' && define.amd) {
          */
         _processTrailing([left, right]) {
             const settingsClone = this.settingsClone;
-            if (settingsClone.pSign === 'p' && settingsClone.pNeg === 's') {
+            if (settingsClone.currencySymbolPlacement === 'p' && settingsClone.negativePositiveSignPlacement === 's') {
                 if (this.kdCode === 8) {
-                    settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.aSuffix) && settingsClone.aSuffix !== '');
+                    settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.suffixText) && settingsClone.suffixText !== '');
                     if (this.value.charAt(this.selection.start - 1) === '-') {
                         left = left.substring(1);
-                    } else if (this.selection.start <= this.value.length - settingsClone.aSuffix.length) {
+                    } else if (this.selection.start <= this.value.length - settingsClone.suffixText.length) {
                         left = left.substring(0, left.length - 1);
                     }
                 } else {
-                    settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.aSuffix) && settingsClone.aSuffix !== '');
-                    if (this.selection.start >= this.value.indexOf(settingsClone.aSign) + settingsClone.aSign.length) {
+                    settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.suffixText) && settingsClone.suffixText !== '');
+                    if (this.selection.start >= this.value.indexOf(settingsClone.currencySymbol) + settingsClone.currencySymbol.length) {
                         right = right.substring(1, right.length);
                     }
                     if (contains(left, '-') && this.value.charAt(this.selection.start) === '-') {
@@ -1912,37 +1938,37 @@ if (typeof define === 'function' && define.amd) {
                 }
             }
 
-            if (settingsClone.pSign === 's' && settingsClone.pNeg === 'l') {
-                settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length);
+            if (settingsClone.currencySymbolPlacement === 's' && settingsClone.negativePositiveSignPlacement === 'l') {
+                settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.negativeSignCharacter) + settingsClone.negativeSignCharacter.length);
                 if (this.kdCode === 8) {
-                    if (this.selection.start === (this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length) && contains(this.value, settingsClone.aNeg)) {
+                    if (this.selection.start === (this.value.indexOf(settingsClone.negativeSignCharacter) + settingsClone.negativeSignCharacter.length) && contains(this.value, settingsClone.negativeSignCharacter)) {
                         left = left.substring(1);
-                    } else if (left !== '-' && ((this.selection.start <= this.value.indexOf(settingsClone.aNeg)) || !contains(this.value, settingsClone.aNeg))) {
+                    } else if (left !== '-' && ((this.selection.start <= this.value.indexOf(settingsClone.negativeSignCharacter)) || !contains(this.value, settingsClone.negativeSignCharacter))) {
                         left = left.substring(0, left.length - 1);
                     }
                 } else {
                     if (left[0] === '-') {
                         right = right.substring(1);
                     }
-                    if (this.selection.start === this.value.indexOf(settingsClone.aNeg) && contains(this.value, settingsClone.aNeg)) {
+                    if (this.selection.start === this.value.indexOf(settingsClone.negativeSignCharacter) && contains(this.value, settingsClone.negativeSignCharacter)) {
                         left = left.substring(1);
                     }
                 }
             }
 
-            if (settingsClone.pSign === 's' && settingsClone.pNeg === 'r') {
-                settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length);
+            if (settingsClone.currencySymbolPlacement === 's' && settingsClone.negativePositiveSignPlacement === 'r') {
+                settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.negativeSignCharacter) + settingsClone.negativeSignCharacter.length);
                 if (this.kdCode === 8) {
-                    if (this.selection.start === (this.value.indexOf(settingsClone.aNeg) + settingsClone.aNeg.length)) {
+                    if (this.selection.start === (this.value.indexOf(settingsClone.negativeSignCharacter) + settingsClone.negativeSignCharacter.length)) {
                         left = left.substring(1);
-                    } else if (left !== '-' && this.selection.start <= (this.value.indexOf(settingsClone.aNeg) - settingsClone.aSign.length)) {
+                    } else if (left !== '-' && this.selection.start <= (this.value.indexOf(settingsClone.negativeSignCharacter) - settingsClone.currencySymbol.length)) {
                         left = left.substring(0, left.length - 1);
-                    } else if (left !== '' && !contains(this.value, settingsClone.aNeg)) {
+                    } else if (left !== '' && !contains(this.value, settingsClone.negativeSignCharacter)) {
                         left = left.substring(0, left.length - 1);
                     }
                 } else {
-                    settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.aSign) && settingsClone.aSign !== '');
-                    if (this.selection.start === this.value.indexOf(settingsClone.aNeg)) {
+                    settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.currencySymbol) && settingsClone.currencySymbol !== '');
+                    if (this.selection.start === this.value.indexOf(settingsClone.negativeSignCharacter)) {
                         left = left.substring(1);
                     }
                     right = right.substring(1);
@@ -1967,8 +1993,8 @@ if (typeof define === 'function' && define.amd) {
                     settingsClone.throwInput = false;
                 }
 
-                if (((settingsClone.pSign === 'p' && settingsClone.pNeg === 's') ||
-                     (settingsClone.pSign === 's' && (settingsClone.pNeg === 'l' || settingsClone.pNeg === 'r'))) &&
+                if (((settingsClone.currencySymbolPlacement === 'p' && settingsClone.negativePositiveSignPlacement === 's') ||
+                     (settingsClone.currencySymbolPlacement === 's' && (settingsClone.negativePositiveSignPlacement === 'l' || settingsClone.negativePositiveSignPlacement === 'r'))) &&
                      contains(this.value, '-')) {
                     [left, right] = this._processTrailing([left, right]);
                 } else {
@@ -2000,66 +2026,66 @@ if (typeof define === 'function' && define.amd) {
 
             // Start rules when the decimal character key is pressed always use numeric pad dot to insert decimal separator
             // Do not allow decimal character if no decimal part allowed
-            if (cCode === settingsClone.aDec ||
-                (settingsClone.altDec && cCode === settingsClone.altDec) ||
+            if (cCode === settingsClone.decimalCharacter ||
+                (settingsClone.decimalCharacterAlternative && cCode === settingsClone.decimalCharacterAlternative) ||
                 ((cCode === '.' || cCode === ',') && this.kdCode === keyCode.DotNumpad)) {
-                if (!settingsClone.mDec || !settingsClone.aDec) {
+                if (!settingsClone.decimalPlacesOverride || !settingsClone.decimalCharacter) {
                     return true;
                 }
 
-                // Do not allow decimal character before aNeg character
-                if (settingsClone.aNeg && contains(right, settingsClone.aNeg)) {
+                // Do not allow decimal character before negativeSignCharacter character
+                if (settingsClone.negativeSignCharacter && contains(right, settingsClone.negativeSignCharacter)) {
                     return true;
                 }
 
                 // Do not allow decimal character if other decimal character present
-                if (contains(left, settingsClone.aDec)) {
+                if (contains(left, settingsClone.decimalCharacter)) {
                     return true;
                 }
 
-                if (right.indexOf(settingsClone.aDec) > 0) {
+                if (right.indexOf(settingsClone.decimalCharacter) > 0) {
                     return true;
                 }
 
-                if (right.indexOf(settingsClone.aDec) === 0) {
+                if (right.indexOf(settingsClone.decimalCharacter) === 0) {
                     right = right.substr(1);
                 }
 
-                this._setValueParts(left + settingsClone.aDec, right, null);
+                this._setValueParts(left + settingsClone.decimalCharacter, right, null);
 
                 return true;
             }
 
             // Prevent minus if not allowed
-            if ((cCode === '-' || cCode === '+') && settingsClone.aNeg === '-') {
+            if ((cCode === '-' || cCode === '+') && settingsClone.negativeSignCharacter === '-') {
                 if (!settingsClone) {
                     return true;
                 }
 
                 // Caret is always after minus
-                if ((settingsClone.pSign === 'p' && settingsClone.pNeg === 's') || (settingsClone.pSign === 's' && settingsClone.pNeg !== 'p')) {
-                    if (left === '' && contains(right, settingsClone.aNeg)) {
-                        left = settingsClone.aNeg;
+                if ((settingsClone.currencySymbolPlacement === 'p' && settingsClone.negativePositiveSignPlacement === 's') || (settingsClone.currencySymbolPlacement === 's' && settingsClone.negativePositiveSignPlacement !== 'p')) {
+                    if (left === '' && contains(right, settingsClone.negativeSignCharacter)) {
+                        left = settingsClone.negativeSignCharacter;
                         right = right.substring(1, right.length);
                     }
 
                     // Change number sign, remove part if should
-                    if (left.charAt(0) === '-' || contains(left, settingsClone.aNeg)) {
+                    if (left.charAt(0) === '-' || contains(left, settingsClone.negativeSignCharacter)) {
                         left = left.substring(1, left.length);
                     } else {
-                        left = (cCode === '-') ? settingsClone.aNeg + left : left;
+                        left = (cCode === '-') ? settingsClone.negativeSignCharacter + left : left;
                     }
                 } else {
-                    if (left === '' && contains(right, settingsClone.aNeg)) {
-                        left = settingsClone.aNeg;
+                    if (left === '' && contains(right, settingsClone.negativeSignCharacter)) {
+                        left = settingsClone.negativeSignCharacter;
                         right = right.substring(1, right.length);
                     }
 
                     // Change number sign, remove part if should
-                    if (left.charAt(0) === settingsClone.aNeg) {
+                    if (left.charAt(0) === settingsClone.negativeSignCharacter) {
                         left = left.substring(1, left.length);
                     } else {
-                        left = (cCode === '-') ? settingsClone.aNeg + left : left;
+                        left = (cCode === '-') ? settingsClone.negativeSignCharacter + left : left;
                     }
                 }
 
@@ -2070,13 +2096,13 @@ if (typeof define === 'function' && define.amd) {
 
             // If try to insert digit before minus
             if (cCode >= '0' && cCode <= '9') {
-                if (settingsClone.aNeg && left === '' && contains(right, settingsClone.aNeg)) {
-                    left = settingsClone.aNeg;
+                if (settingsClone.negativeSignCharacter && left === '' && contains(right, settingsClone.negativeSignCharacter)) {
+                    left = settingsClone.negativeSignCharacter;
                     right = right.substring(1, right.length);
                 }
 
-                if (settingsClone.vMax <= 0 && settingsClone.vMin < settingsClone.vMax && !contains(this.value, settingsClone.aNeg) && cCode !== '0') {
-                    left = settingsClone.aNeg + left;
+                if (settingsClone.maximumValue <= 0 && settingsClone.minimumValue < settingsClone.maximumValue && !contains(this.value, settingsClone.negativeSignCharacter) && cCode !== '0') {
+                    left = settingsClone.negativeSignCharacter + left;
                 }
 
                 this._setValueParts(left + cCode, right, null);
@@ -2100,9 +2126,9 @@ if (typeof define === 'function' && define.amd) {
             let [left] = this._getBeforeAfterStripped();
 
             // No grouping separator and no currency sign
-            if ((settingsClone.aSep  === '' || (settingsClone.aSep !== ''  && !contains(leftLength, settingsClone.aSep))) &&
-                (settingsClone.aSign === '' || (settingsClone.aSign !== '' && !contains(leftLength, settingsClone.aSign)))) {
-                let [subParts] = leftLength.split(settingsClone.aDec);
+            if ((settingsClone.digitGroupSeparator  === '' || (settingsClone.digitGroupSeparator !== ''  && !contains(leftLength, settingsClone.digitGroupSeparator))) &&
+                (settingsClone.currencySymbol === '' || (settingsClone.currencySymbol !== '' && !contains(leftLength, settingsClone.currencySymbol)))) {
+                let [subParts] = leftLength.split(settingsClone.decimalCharacter);
                 let nSign = '';
                 if (contains(subParts, '-')) {
                     nSign = '-';
@@ -2130,25 +2156,25 @@ if (typeof define === 'function' && define.amd) {
                 const leftAr = left.split('');
 
                 // Fixes caret position with trailing minus sign
-                if ((settingsClone.pNeg === 's' || (settingsClone.pSign === 's' && settingsClone.pNeg !== 'p')) &&
-                    leftAr[0] === '-' && settingsClone.aNeg !== '') {
+                if ((settingsClone.negativePositiveSignPlacement === 's' || (settingsClone.currencySymbolPlacement === 's' && settingsClone.negativePositiveSignPlacement !== 'p')) &&
+                    leftAr[0] === '-' && settingsClone.negativeSignCharacter !== '') {
                     leftAr.shift();
 
                     if ((eventKeyCode === keyCode.Backspace || this.kdCode === keyCode.Backspace ||
                         eventKeyCode === keyCode.Delete || this.kdCode === keyCode.Delete) &&
                         settingsClone.caretFix) {
-                        if (settingsClone.pSign === 's' && settingsClone.pNeg === 'l') {
+                        if (settingsClone.currencySymbolPlacement === 's' && settingsClone.negativePositiveSignPlacement === 'l') {
                             leftAr.push('-');
                             settingsClone.caretFix = e.type === 'keydown';
                         }
 
-                        if (settingsClone.pSign === 'p' && settingsClone.pNeg === 's') {
+                        if (settingsClone.currencySymbolPlacement === 'p' && settingsClone.negativePositiveSignPlacement === 's') {
                             leftAr.push('-');
                             settingsClone.caretFix = e.type === 'keydown';
                         }
 
-                        if (settingsClone.pSign === 's' && settingsClone.pNeg === 'r') {
-                            const signParts = settingsClone.aSign.split('');
+                        if (settingsClone.currencySymbolPlacement === 's' && settingsClone.negativePositiveSignPlacement === 'r') {
+                            const signParts = settingsClone.currencySymbol.split('');
                             const escapeChr = ['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '['];
                             const escapedParts = [];
                             $.each(signParts, (i, miniParts) => {
@@ -2185,21 +2211,21 @@ if (typeof define === 'function' && define.amd) {
                     position = newLeft[0].length;
 
                     // If we are just before the sign which is in prefix position
-                    if (((position === 0 && value.charAt(0) !== settingsClone.aNeg) || (position === 1 && value.charAt(0) === settingsClone.aNeg)) && settingsClone.aSign && settingsClone.pSign === 'p') {
+                    if (((position === 0 && value.charAt(0) !== settingsClone.negativeSignCharacter) || (position === 1 && value.charAt(0) === settingsClone.negativeSignCharacter)) && settingsClone.currencySymbol && settingsClone.currencySymbolPlacement === 'p') {
                         // Place caret after prefix sign
-                        position = this.settingsClone.aSign.length + (value.charAt(0) === '-' ? 1 : 0);
+                        position = this.settingsClone.currencySymbol.length + (value.charAt(0) === '-' ? 1 : 0);
                     }
                 } else {
-                    if (settingsClone.aSign && settingsClone.pSign === 's') {
+                    if (settingsClone.currencySymbol && settingsClone.currencySymbolPlacement === 's') {
                         // If we could not find a place for cursor and have a sign as a suffix
                         // Place caret before suffix currency sign
-                        position -= settingsClone.aSign.length;
+                        position -= settingsClone.currencySymbol.length;
                     }
 
-                    if (settingsClone.aSuffix) {
+                    if (settingsClone.suffixText) {
                         // If we could not find a place for cursor and have a suffix
                         // Place caret before suffix
-                        position -= settingsClone.aSuffix.length;
+                        position -= settingsClone.suffixText.length;
                     }
                 }
             }
@@ -2218,7 +2244,7 @@ if (typeof define === 'function' && define.amd) {
      *
      * It then loops through the string and un-formats the inputs with autoNumeric.
      * By defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
-     * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-", or even plain numbers => please see option "outputType" for more details
+     * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-", or even plain numbers => please see option "outputFormat" for more details
      *
      * @param {boolean} getArrayBehavior - If set to TRUE, then this function behave like `getArray()`, otherwise if set to FALSE, it behave like `getString()`
      * @param that - A reference to the current DOM element
@@ -2326,24 +2352,24 @@ if (typeof define === 'function' && define.amd) {
     function onFocusInAndMouseEnter($this, holder, e) {
         const settings = holder.settingsClone;
 
-        if (e.type === 'focusin' || e.type === 'mouseenter' && !$this.is(':focus') && settings.wEmpty === 'focus') {
+        if (e.type === 'focusin' || e.type === 'mouseenter' && !$this.is(':focus') && settings.emptyInputBehavior === 'focus') {
             settings.onOff = true;
 
-            if (settings.nBracket !== null && settings.aNeg !== '') {
+            if (settings.negativeBracketsTypeOnBlur !== null && settings.negativeSignCharacter !== '') {
                 $this.val(negativeBracket(e.target.value, settings));
             }
 
             let result;
-            if (settings.eDec) {
-                settings.mDec = settings.eDec;
+            if (settings.decimalPlacesShownOnFocus) {
+                settings.decimalPlacesOverride = settings.decimalPlacesShownOnFocus;
                 $this.autoNumeric('set', settings.rawValue);
             } else if (settings.scaleDivisor) {
-                settings.mDec = settings.oDec;
+                settings.decimalPlacesOverride = settings.oDec;
                 $this.autoNumeric('set', settings.rawValue);
-            } else if (settings.nSep) {
-                settings.aSep = '';
-                settings.aSign = '';
-                settings.aSuffix = '';
+            } else if (settings.noSeparatorOnFocus) {
+                settings.digitGroupSeparator = '';
+                settings.currencySymbol = '';
+                settings.suffixText = '';
                 $this.autoNumeric('set', settings.rawValue);
             } else if ((result = autoStrip(e.target.value, settings)) !== settings.rawValue) {
                 $this.autoNumeric('set', result);
@@ -2353,7 +2379,7 @@ if (typeof define === 'function' && define.amd) {
             holder.valueOnFocus = e.target.value;
             holder.lastVal = holder.valueOnFocus;
             const onEmpty = checkEmpty(holder.valueOnFocus, settings, true);
-            if ((onEmpty !== null && onEmpty !== '') && settings.wEmpty === 'focus') {
+            if ((onEmpty !== null && onEmpty !== '') && settings.emptyInputBehavior === 'focus') {
                 $this.val(onEmpty);
             }
         }
@@ -2528,23 +2554,23 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // Added to properly place the caret when only the currency sign is present
-        if (e.target.value === holder.settingsClone.aSign) {
-            if (holder.settingsClone.pSign === 's') {
+        if (e.target.value === holder.settingsClone.currencySymbol) {
+            if (holder.settingsClone.currencySymbolPlacement === 's') {
                 setElementSelection(e.target, 0, 0);
             } else {
-                setElementSelection(e.target, holder.settingsClone.aSign.length, holder.settingsClone.aSign.length);
+                setElementSelection(e.target, holder.settingsClone.currencySymbol.length, holder.settingsClone.currencySymbol.length);
             }
         } else if (currentKeyCode === keyCode.Tab) {
             setElementSelection(e.target, 0, e.target.value.length);
         }
 
-        if ((e.target.value === holder.settingsClone.aSuffix) ||
-            (holder.settingsClone.rawValue === '' && holder.settingsClone.aSign !== '' && holder.settingsClone.aSuffix !== '')) {
+        if ((e.target.value === holder.settingsClone.suffixText) ||
+            (holder.settingsClone.rawValue === '' && holder.settingsClone.currencySymbol !== '' && holder.settingsClone.suffixText !== '')) {
             setElementSelection(e.target, 0, 0);
         }
 
         // Saves the extended decimal to preserve the data when navigating away from the page
-        if (holder.settingsClone.eDec !== null && holder.settingsClone.aStor) {
+        if (holder.settingsClone.decimalPlacesShownOnFocus !== null && holder.settingsClone.saveValueToSessionStorage) {
             autoSave(e.target, settings, 'set');
         }
 
@@ -2568,20 +2594,20 @@ if (typeof define === 'function' && define.amd) {
             const settings = holder.settingsClone;
             settings.onOff = false;
 
-            if (settings.aStor) {
+            if (settings.saveValueToSessionStorage) {
                 autoSave(e.target, settings, 'set');
             }
 
-            if (settings.nSep === true) {
-                settings.aSep = settings.oSep;
-                settings.aSign = settings.oSign;
-                settings.aSuffix = settings.oSuffix;
+            if (settings.noSeparatorOnFocus === true) {
+                settings.digitGroupSeparator = settings.oSep;
+                settings.currencySymbol = settings.oSign;
+                settings.suffixText = settings.oSuffix;
             }
 
-            if (settings.eDec !== null) {
-                settings.mDec = settings.oDec;
-                settings.aPad = settings.oPad;
-                settings.nBracket = settings.oBracket;
+            if (settings.decimalPlacesShownOnFocus !== null) {
+                settings.decimalPlacesOverride = settings.oDec;
+                settings.allowDecimalPadding = settings.oPad;
+                settings.negativeBracketsTypeOnBlur = settings.oBracket;
             }
 
             value = autoStrip(value, settings);
@@ -2601,7 +2627,7 @@ if (typeof define === 'function' && define.amd) {
                         value = value.toString();
                     }
 
-                    settings.mDec = (settings.scaleDivisor && settings.scaleDecimal) ? +settings.scaleDecimal : settings.mDec;
+                    settings.decimalPlacesOverride = (settings.scaleDivisor && settings.scaleDecimalPlaces) ? +settings.scaleDecimalPlaces : settings.decimalPlacesOverride;
                     value = autoRound(value, settings);
                     value = presentNumber(value, settings);
                 } else {
@@ -2615,7 +2641,7 @@ if (typeof define === 'function' && define.amd) {
                     value = settings.rawValue;
                 }
             } else {
-                if (settings.wEmpty === 'zero') {
+                if (settings.emptyInputBehavior === 'zero') {
                     settings.rawValue = '0';
                     value = autoRound('0', settings);
                 } else {
@@ -2700,7 +2726,7 @@ if (typeof define === 'function' && define.amd) {
             if (holder) {
                 const $settings = holder.settingsClone;
 
-                if ($settings.unSetOnSubmit) {
+                if ($settings.unformatOnSubmit) {
                     $this.val($settings.rawValue);
                 }
             }
@@ -2746,16 +2772,16 @@ if (typeof define === 'function' && define.amd) {
             /*
              * If the input value has been set by the dev, but not directly as an attribute in the html, then it takes
              * precedence and should get formatted on init (if this input value is a valid number and that the
-             * developer wants it formatted on init (cf. `settings.aForm`)).
+             * developer wants it formatted on init (cf. `settings.formatOnPageLoad`)).
              * Note; this is true whatever the developer has set for `data-an-default` in the html (asp.net users).
              *
-             * In other words : if `anDefault` is not null, it means the developer is trying to prevent postback problems.
+             * In other words : if `defaultValueOverride` is not null, it means the developer is trying to prevent postback problems.
              * But if `input.value` is set to a number, and `$this.attr('value')` is not set, then it means the dev has
              * changed the input value, and then it means we should not overwrite his own decision to do so.
-             * Hence, if `anDefault` is not null, but `input.value` is a number and `$this.attr('value')` is not set,
-             * we should ignore `anDefault` altogether.
+             * Hence, if `defaultValueOverride` is not null, but `input.value` is a number and `$this.attr('value')` is not set,
+             * we should ignore `defaultValueOverride` altogether.
              */
-            if (settings.aForm && currentValue !== '' && isUndefinedOrNullOrEmpty($this.attr('value'))) {
+            if (settings.formatOnPageLoad && currentValue !== '' && isUndefinedOrNullOrEmpty($this.attr('value'))) {
                 // Check if the `value` is valid or not
                 const testedCurrentValue = parseFloat(currentValue.replace(',', '.'));
                 //TODO Replace whatever locale character is used by a '.', and not only the comma ','
@@ -2774,26 +2800,26 @@ if (typeof define === 'function' && define.amd) {
                  *      example: <asp:TextBox runat="server" id="someID" text="1234.56" data-an-default="1234.56">
                  */
                 //TODO Replace whatever locale character is used by a '.', and not only the comma ',', based on the locale used by the user
-                if ((settings.anDefault !== null && settings.anDefault.toString() !== currentValue) ||
-                    (settings.anDefault === null && currentValue !== '' && currentValue !== $this.attr('value')) ||
+                if ((settings.defaultValueOverride !== null && settings.defaultValueOverride.toString() !== currentValue) ||
+                    (settings.defaultValueOverride === null && currentValue !== '' && currentValue !== $this.attr('value')) ||
                     (currentValue !== '' && $this.attr('type') === 'hidden' && !$.isNumeric(currentValue.replace(',', '.')))) {
-                    if ((settings.eDec !== null && settings.aStor) ||
-                        (settings.scaleDivisor && settings.aStor)) {
+                    if ((settings.decimalPlacesShownOnFocus !== null && settings.saveValueToSessionStorage) ||
+                        (settings.scaleDivisor && settings.saveValueToSessionStorage)) {
                         settings.rawValue = autoSave($this[0], settings, 'get');
                     }
 
-                    // If the eDec value should NOT be saved in sessionStorage
-                    if (!settings.aStor) {
+                    // If the decimalPlacesShownOnFocus value should NOT be saved in sessionStorage
+                    if (!settings.saveValueToSessionStorage) {
                         let toStrip;
 
-                        if (settings.nBracket !== null && settings.aNeg !== '') {
+                        if (settings.negativeBracketsTypeOnBlur !== null && settings.negativeSignCharacter !== '') {
                             settings.onOff = true;
                             toStrip = negativeBracket(currentValue, settings);
                         } else {
                             toStrip = currentValue;
                         }
 
-                        settings.rawValue = ((settings.pNeg === 's' || (settings.pSign === 's' && settings.pNeg !== 'p')) && settings.aNeg !== '' && contains(currentValue, '-'))?'-' + autoStrip(toStrip, settings):autoStrip(toStrip, settings);
+                        settings.rawValue = ((settings.negativePositiveSignPlacement === 's' || (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement !== 'p')) && settings.negativeSignCharacter !== '' && contains(currentValue, '-'))?'-' + autoStrip(toStrip, settings):autoStrip(toStrip, settings);
                     }
 
                     setValue = false;
@@ -2801,12 +2827,12 @@ if (typeof define === 'function' && define.amd) {
             }
 
             if (currentValue === '') {
-                switch (settings.wEmpty) {
+                switch (settings.emptyInputBehavior) {
                     case 'focus':
                         setValue = false;
                         break;
                     case 'always':
-                        $this.val(settings.aSign);
+                        $this.val(settings.currencySymbol);
                         setValue = false;
                         break;
                     case 'zero':
@@ -2822,8 +2848,8 @@ if (typeof define === 'function' && define.amd) {
         }
 
         if (isInArray($this.prop('tagName').toLowerCase(), settings.tagList) && $this.text() !== '') {
-            if (settings.anDefault !== null) {
-                if (settings.anDefault === $this.text()) {
+            if (settings.defaultValueOverride !== null) {
+                if (settings.defaultValueOverride === $this.text()) {
                     $this.autoNumeric('set', $this.text());
                 }
             } else {
@@ -2833,24 +2859,24 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Enhance the user experience by modifying the default `pNeg` option depending on `aSign` and `pSign`.
+     * Enhance the user experience by modifying the default `negativePositiveSignPlacement` option depending on `currencySymbol` and `currencySymbolPlacement`.
      *
-     * If the user has not set the placement of the negative sign (`pNeg`), but has set a currency symbol (`aSign`),
-     * then we modify the default value of `pNeg` in order to keep the resulting output logical by default :
-     * - "$-1,234.56" instead of "-$1,234.56" ({aSign: "$", pNeg: "r"})
-     * - "-1,234.56$" instead of "1,234.56-$" ({aSign: "$", pSign: "s", pNeg: "p"})
+     * If the user has not set the placement of the negative sign (`negativePositiveSignPlacement`), but has set a currency symbol (`currencySymbol`),
+     * then we modify the default value of `negativePositiveSignPlacement` in order to keep the resulting output logical by default :
+     * - "$-1,234.56" instead of "-$1,234.56" ({currencySymbol: "$", negativePositiveSignPlacement: "r"})
+     * - "-1,234.56$" instead of "1,234.56-$" ({currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "p"})
      *
      * @param {object} options
      * @param {object} settings
      */
     function correctPNegOption(options, settings) {
-        if (!isUndefined(options) && isUndefinedOrNullOrEmpty(options.pNeg) && options.aSign !== '') {
-            switch (settings.pSign) {
+        if (!isUndefined(options) && isUndefinedOrNullOrEmpty(options.negativePositiveSignPlacement) && options.currencySymbol !== '') {
+            switch (settings.currencySymbolPlacement) {
                 case 's':
-                    settings.pNeg = 'p';
+                    settings.negativePositiveSignPlacement = 'p';
                     break;
                 case 'p':
-                    settings.pNeg = 'r';
+                    settings.negativePositiveSignPlacement = 'r';
                     break;
                 default :
                 //
@@ -2859,38 +2885,38 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Analyze and save the vMin and vMax integer size for later uses
+     * Analyze and save the minimumValue and maximumValue integer size for later uses
      *
      * @param {object} settings
-     * @returns {{vMax: Array, vMin: Array}}
+     * @returns {{maximumValue: Array, minimumValue: Array}}
      */
     function calculateVMinAndVMaxIntegerSizes(settings) {
-        let [vMaxIntegerPart] = settings.vMax.toString().split('.');
-        let [vMinIntegerPart] = (!settings.vMin && settings.vMin !== 0)?[]:settings.vMin.toString().split('.');
-        vMaxIntegerPart = vMaxIntegerPart.replace('-', '');
-        vMinIntegerPart = vMinIntegerPart.replace('-', '');
+        let [maximumValueIntegerPart] = settings.maximumValue.toString().split('.');
+        let [minimumValueIntegerPart] = (!settings.minimumValue && settings.minimumValue !== 0)?[]:settings.minimumValue.toString().split('.');
+        maximumValueIntegerPart = maximumValueIntegerPart.replace('-', '');
+        minimumValueIntegerPart = minimumValueIntegerPart.replace('-', '');
 
-        settings.mIntPos = Math.max(vMaxIntegerPart.length, 1);
-        settings.mIntNeg = Math.max(vMinIntegerPart.length, 1);
+        settings.mIntPos = Math.max(maximumValueIntegerPart.length, 1);
+        settings.mIntNeg = Math.max(minimumValueIntegerPart.length, 1);
     }
 
     /**
-     * Modify `mDec` as needed
+     * Modify `decimalPlacesOverride` as needed
      *
      * @param {object} settings
      */
     function correctMDecOption(settings) {
-        if (!isNull(settings.scaleDivisor) && !isNull(settings.scaleDecimal)) {
+        if (!isNull(settings.scaleDivisor) && !isNull(settings.scaleDecimalPlaces)) {
             // Override the maximum number of decimal places with the one defined with the number of decimals to show when not in focus, if set
-            settings.mDec = settings.scaleDecimal;
+            settings.decimalPlacesOverride = settings.scaleDecimalPlaces;
         }
-        else if (isNull(settings.mDec)) {
-            settings.mDec = maximumVMinAndVMaxDecimalLength(settings.vMin, settings.vMax);
-            settings.oDec = String(settings.mDec);
+        else if (isNull(settings.decimalPlacesOverride)) {
+            settings.decimalPlacesOverride = maximumVMinAndVMaxDecimalLength(settings.minimumValue, settings.maximumValue);
+            settings.oDec = String(settings.decimalPlacesOverride);
         }
 
-        // Most calculus assume `mDec` is an integer, the following statement makes it clear (otherwise having it as a string leads to problems in rounding for instance)
-        settings.mDec = Number(settings.mDec);
+        // Most calculus assume `decimalPlacesOverride` is an integer, the following statement makes it clear (otherwise having it as a string leads to problems in rounding for instance)
+        settings.decimalPlacesOverride = Number(settings.decimalPlacesOverride);
     }
 
     /**
@@ -2899,11 +2925,11 @@ if (typeof define === 'function' && define.amd) {
      * @param {object} settings
      */
     function setsAlternativeDecimalSeparatorCharacter(settings) {
-        if (isNull(settings.altDec) && Number(settings.mDec) > 0) {
-            if (settings.aDec === '.' && settings.aSep !== ',') {
-                settings.altDec = ',';
-            } else if (settings.aDec === ',' && settings.aSep !== '.') {
-                settings.altDec = '.';
+        if (isNull(settings.decimalCharacterAlternative) && Number(settings.decimalPlacesOverride) > 0) {
+            if (settings.decimalCharacter === '.' && settings.digitGroupSeparator !== ',') {
+                settings.decimalCharacterAlternative = ',';
+            } else if (settings.decimalCharacter === ',' && settings.digitGroupSeparator !== '.') {
+                settings.decimalCharacterAlternative = '.';
             }
         }
     }
@@ -2914,14 +2940,14 @@ if (typeof define === 'function' && define.amd) {
      * @param {object} settings
      */
     function cachesUsualRegularExpressions(settings) {
-        const aNegReg = settings.aNeg?`([-\\${settings.aNeg}]?)`:'(-?)';
+        const aNegReg = settings.negativeSignCharacter?`([-\\${settings.negativeSignCharacter}]?)`:'(-?)';
         settings.aNegRegAutoStrip = aNegReg;
-        settings.skipFirstAutoStrip = new RegExp(`${aNegReg}[^-${(settings.aNeg?`\\${settings.aNeg}`:'')}\\${settings.aDec}\\d].*?(\\d|\\${settings.aDec}\\d)`);
-        settings.skipLastAutoStrip = new RegExp(`(\\d\\${settings.aDec}?)[^\\${settings.aDec}\\d]\\D*$`);
+        settings.skipFirstAutoStrip = new RegExp(`${aNegReg}[^-${(settings.negativeSignCharacter?`\\${settings.negativeSignCharacter}`:'')}\\${settings.decimalCharacter}\\d].*?(\\d|\\${settings.decimalCharacter}\\d)`);
+        settings.skipLastAutoStrip = new RegExp(`(\\d\\${settings.decimalCharacter}?)[^\\${settings.decimalCharacter}\\d]\\D*$`);
 
-        const allowed = `-0123456789\\${settings.aDec}`;
+        const allowed = `-0123456789\\${settings.decimalCharacter}`;
         settings.allowedAutoStrip = new RegExp(`[^${allowed}]`, 'gi');
-        settings.numRegAutoStrip = new RegExp(`${aNegReg}(?:\\${settings.aDec}?(\\d+\\${settings.aDec}\\d+)|(\\d*(?:\\${settings.aDec}\\d*)?))`);
+        settings.numRegAutoStrip = new RegExp(`${aNegReg}(?:\\${settings.decimalCharacter}?(\\d+\\${settings.decimalCharacter}\\d+)|(\\d*(?:\\${settings.decimalCharacter}\\d*)?))`);
 
         // Using this regex version `^${settings.aNegRegAutoStrip}0*(\\d|$)` entirely clear the input on blur
         settings.stripReg = new RegExp(`^${settings.aNegRegAutoStrip}0*(\\d)`);
@@ -2948,6 +2974,121 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * Convert the old settings options name to new ones.
+     *
+     * @param {object} options
+     */
+    function convertOldOptionsToNewOnes(options) {
+        //TODO Delete this function once the old options are not used anymore
+        const oldOptionsConverter = {
+            // Old option name, with their corresponding new option
+            aSep                         : 'digitGroupSeparator',
+            nSep                         : 'noSeparatorOnFocus',
+            dGroup                       : 'digitalGroupSpacing',
+            aDec                         : 'decimalCharacter',
+            altDec                       : 'decimalCharacterAlternative',
+            aSign                        : 'currencySymbol',
+            pSign                        : 'currencySymbolPlacement',
+            pNeg                         : 'negativePositiveSignPlacement',
+            aSuffix                      : 'suffixText',
+            oLimits                      : 'overrideMinMaxLimits',
+            vMax                         : 'maximumValue',
+            vMin                         : 'minimumValue',
+            mDec                         : 'decimalPlacesOverride',
+            eDec                         : 'decimalPlacesShownOnFocus',
+            scaleDecimal                 : 'scaleDecimalPlaces',
+            aStor                        : 'saveValueToSessionStorage',
+            mRound                       : 'roundingMethod',
+            aPad                         : 'allowDecimalPadding',
+            nBracket                     : 'negativeBracketsTypeOnBlur',
+            wEmpty                       : 'emptyInputBehavior',
+            lZero                        : 'leadingZero',
+            aForm                        : 'formatOnPageLoad',
+            sNumber                      : 'selectNumberOnly',
+            anDefault                    : 'defaultValueOverride',
+            unSetOnSubmit                : 'unformatOnSubmit',
+            outputType                   : 'outputFormat',
+            debug                        : 'showWarnings',
+            // Current options :
+            digitGroupSeparator          : true,
+            noSeparatorOnFocus           : true,
+            digitalGroupSpacing          : true,
+            decimalCharacter             : true,
+            decimalCharacterAlternative  : true,
+            currencySymbol               : true,
+            currencySymbolPlacement      : true,
+            negativePositiveSignPlacement: true,
+            suffixText                   : true,
+            overrideMinMaxLimits         : true,
+            maximumValue                 : true,
+            minimumValue                 : true,
+            decimalPlacesOverride        : true,
+            decimalPlacesShownOnFocus    : true,
+            scaleDivisor                 : true,
+            scaleDecimalPlaces           : true,
+            scaleSymbol                  : true,
+            saveValueToSessionStorage    : true,
+            roundingMethod               : true,
+            allowDecimalPadding          : true,
+            negativeBracketsTypeOnBlur   : true,
+            emptyInputBehavior           : true,
+            leadingZero                  : true,
+            formatOnPageLoad             : true,
+            selectNumberOnly             : true,
+            defaultValueOverride         : true,
+            unformatOnSubmit             : true,
+            outputFormat                 : true,
+            showWarnings                 : true,
+            //FIXME Find a way to exclude those internal data from the settings object (ideally by using another object, or better yet, class attributes) -->
+            onOff                : true,
+            runOnce              : true,
+            rawValue             : true,
+            trailingNegative     : true,
+            caretFix             : true,
+            throwInput           : true,
+            strip                : true,
+            tagList              : true,
+            negativeSignCharacter: true,
+            mIntPos              : true,
+            mIntNeg              : true,
+            oDec                 : true,
+            oPad                 : true,
+            oBracket             : true,
+            oSep                 : true,
+            oSign                : true,
+            oSuffix              : true,
+            aNegRegAutoStrip     : true,
+            skipFirstAutoStrip   : true,
+            skipLastAutoStrip    : true,
+            allowedAutoStrip     : true,
+            numRegAutoStrip      : true,
+            stripReg             : true,
+            holder               : true,
+        };
+
+        for (const option in options) {
+            if (options.hasOwnProperty(option)) {
+                if (oldOptionsConverter[option] === true) {
+                    // If the option is a 'new' option, we continue looping
+                    continue;
+                }
+
+                if (oldOptionsConverter.hasOwnProperty(option)) {
+                    // Else we have an 'old' option name
+                    warning(`You are using the deprecated option name '${option}'. Please use '${oldOptionsConverter[option]}' instead from now on. The old option name will be dropped soon.`, true);
+
+                    // Then we modify the initial option object to use the new options instead of the old ones
+                    options[oldOptionsConverter[option]] = options[option];
+                    delete options[option];
+                } else {
+                    // ...or the option name is unknown. This means there is a problem with the options object, therefore we throw an error.
+                    throwError(`Option name '${option}' is unknown. Please fix the options passed to autoNumeric`);
+                }
+            }
+        }
+    }
+
+    /**
      * Analyse the settings/options passed by the user, validate and clean them, then return them.
      * Note: This returns `null` if somehow the settings returned by jQuery is not an object.
      *
@@ -2959,6 +3100,11 @@ if (typeof define === 'function' && define.amd) {
     function getInitialSettings(options, $this, update = false) {
         // Attempt to grab "autoNumeric" settings. If they do not exist, it returns "undefined".
         let settings = $this.data('autoNumeric');
+
+        // If the user used old options, we convert them to new ones
+        if (update || !isNull(options)) {
+            convertOldOptionsToNewOnes(options);
+        }
 
         // If we couldn't grab any settings, create them from the default ones and combine them with the options passed
         if (update || isUndefined(settings)) {
@@ -2984,11 +3130,11 @@ if (typeof define === 'function' && define.amd) {
             // Modify the user settings to make them 'exploitable'
             transformOptionsValuesToDefaultTypes(settings);
 
-            // Improve the `pNeg` option if needed
+            // Improve the `negativePositiveSignPlacement` option if needed
             correctPNegOption(options, settings);
 
             // Set the negative sign if needed
-            settings.aNeg = settings.vMin < 0 ? '-' : '';
+            settings.negativeSignCharacter = settings.minimumValue < 0 ? '-' : '';
 
             // Additional changes to the settings object (from the original autoCode() function)
             runCallbacksFoundInTheSettingsObject($this, settings);
@@ -3000,7 +3146,7 @@ if (typeof define === 'function' && define.amd) {
             // Validate the settings
             validate(settings, false); // Throws if necessary
 
-            // Original settings saved for use when eDec, scaleDivisor & nSep options are being used
+            // Original settings saved for use when decimalPlacesShownOnFocus, scaleDivisor & noSeparatorOnFocus options are being used
             keepAnOriginalSettingsCopy(settings);
 
             // Save our new settings
@@ -3018,7 +3164,7 @@ if (typeof define === 'function' && define.amd) {
     const methods = {
         /**
          * Method to initiate autoNumeric and attach the settings (options can be passed as a parameter)
-         * The options passed as a parameter is an object that contains the settings (ie. {aSep: ".", aDec: ",", aSign: '€ '})
+         * The options passed as a parameter is an object that contains the settings (ie. {digitGroupSeparator: ".", decimalCharacter: ",", currencySymbol: '€ '})
          *
          * @example
          * $(someSelector).autoNumeric('init');            // initiate autoNumeric with defaults
@@ -3039,7 +3185,7 @@ if (typeof define === 'function' && define.amd) {
                 // Create the AutoNumericHolder object that store the field properties
                 const holder = getHolder($this, settings, false);
 
-                if (!settings.runOnce && settings.aForm) {
+                if (!settings.runOnce && settings.formatOnPageLoad) {
                     formatDefaultValueOnPageLoad(settings, $input, $this);
                 }
 
@@ -3099,7 +3245,7 @@ if (typeof define === 'function' && define.amd) {
         /**
          * Method that updates the autoNumeric settings.
          * It can be called multiple times if needed.
-         * The options passed as a parameter is an object that contains the settings (ie. {aSep: ".", aDec: ",", aSign: '€ '}).
+         * The options passed as a parameter is an object that contains the settings (ie. {digitGroupSeparator: ".", decimalCharacter: ",", currencySymbol: '€ '}).
          *
          * @usage $(someSelector).autoNumeric("update", {options}); // updates the settings
          */
@@ -3147,14 +3293,14 @@ if (typeof define === 'function' && define.amd) {
 
                 // Throws an error if the value being set is not numeric
                 if (!$.isNumeric(Number(value))) {
-                    warning(`The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`);
+                    warning(`The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`, settings.showWarnings);
                     return $this.val('');
                 }
 
                 if (value !== '') {
                     const [minTest, maxTest] = autoCheck(value, settings);
                     if (minTest && maxTest) {
-                        if ($input && (settings.eDec || settings.scaleDivisor)) {
+                        if ($input && (settings.decimalPlacesShownOnFocus || settings.scaleDivisor)) {
                             settings.rawValue = value;
                         }
 
@@ -3163,11 +3309,11 @@ if (typeof define === 'function' && define.amd) {
                             if (settings.scaleDivisor && !settings.onOff) {
                                 value = value / settings.scaleDivisor;
                                 value = value.toString();
-                                settings.mDec = (settings.scaleDecimal) ? settings.scaleDecimal : settings.mDec;
+                                settings.decimalPlacesOverride = (settings.scaleDecimalPlaces) ? settings.scaleDecimalPlaces : settings.decimalPlacesOverride;
                             }
 
                             value = autoRound(value, settings);
-                            if (settings.eDec === null && settings.scaleDivisor === null) {
+                            if (settings.decimalPlacesShownOnFocus === null && settings.scaleDivisor === null) {
                                 settings.rawValue = value;
                             }
 
@@ -3175,7 +3321,7 @@ if (typeof define === 'function' && define.amd) {
                             value = autoGroup(value, settings);
                         }
 
-                        if (settings.aStor && (settings.eDec || settings.scaleDivisor)) {
+                        if (settings.saveValueToSessionStorage && (settings.decimalPlacesShownOnFocus || settings.scaleDivisor)) {
                             autoSave($this[0], settings, 'set');
                         }
                     } else {
@@ -3191,7 +3337,7 @@ if (typeof define === 'function' && define.amd) {
                             $this.trigger('autoNumeric:maxExceeded');
                         }
 
-                        throwError(`The value [${attemptedValue}] being set falls outside of the vMin [${settings.vMin}] and vMax [${settings.vMax}] range set for this element`);
+                        throwError(`The value [${attemptedValue}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`);
 
                         return $this.val('');
                     }
@@ -3219,7 +3365,7 @@ if (typeof define === 'function' && define.amd) {
          * method to un-format inputs - handy to use right before form submission
          * $(someSelector).autoNumeric('unSet'); // no parameter accepted
          * by defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
-         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-", or even plain numbers => please see option "outputType" for more details
+         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-", or even plain numbers => please see option "outputFormat" for more details
          */
         unSet() {
             return $(this).each(function() {
@@ -3274,19 +3420,19 @@ if (typeof define === 'function' && define.amd) {
                 throwError(`The "<${$this.prop('tagName').toLowerCase()}>" tag is not supported by autoNumeric`);
             }
 
-            if (settings.eDec || settings.scaleDivisor) {
+            if (settings.decimalPlacesShownOnFocus || settings.scaleDivisor) {
                 value = settings.rawValue;
             } else {
-                if (!((/\d/).test(value) || Number(value) === 0) && settings.wEmpty === 'focus') {
+                if (!((/\d/).test(value) || Number(value) === 0) && settings.emptyInputBehavior === 'focus') {
                     return '';
                 }
 
-                if (value !== '' && settings.nBracket !== null) {
+                if (value !== '' && settings.negativeBracketsTypeOnBlur !== null) {
                     settings.onOff = true;
                     value = negativeBracket(value, settings);
                 }
 
-                if (settings.runOnce || settings.aForm === false) {
+                if (settings.runOnce || settings.formatOnPageLoad === false) {
                     value = autoStrip(value, settings);
                 }
 
@@ -3298,12 +3444,12 @@ if (typeof define === 'function' && define.amd) {
         },
 
         /**
-         * Returns the unformatted value, but following the `outputType` setting, which means the output can either be :
+         * Returns the unformatted value, but following the `outputFormat` setting, which means the output can either be :
          * - a string (that could or could not represent a number (ie. "12345,67-")), or
          * - a plain number (if the setting 'number' is used).
          *
          * By default the returned values are an ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period.
-         * Check the "outputType" option definition for more details.
+         * Check the "outputFormat" option definition for more details.
          *
          * @returns {*}
          */
@@ -3312,11 +3458,11 @@ if (typeof define === 'function' && define.amd) {
             let value = $this.autoNumeric('get');
             const settings = $this.data('autoNumeric');
 
-            if (Number(value) === 0 && settings.lZero !== 'keep') {
+            if (Number(value) === 0 && settings.leadingZero !== 'keep') {
                 value = '0';
             }
 
-            return toLocale(value, settings.outputType);
+            return toLocale(value, settings.outputFormat);
         },
 
         /**
@@ -3339,7 +3485,7 @@ if (typeof define === 'function' && define.amd) {
          *
          * It then loops through the string and un-formats the inputs with autoNumeric.
          * By defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
-         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" or plain numbers => please see option "outputType" for details
+         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" or plain numbers => please see option "outputFormat" for details
          */
         getString() {
             return _getStringOrArray(false, this);
@@ -3350,7 +3496,7 @@ if (typeof define === 'function' && define.amd) {
          *
          * It then loops through the string and un-formats the inputs with autoNumeric.
          * By defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
-         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" or plain numbers => please see option "outputType" for details
+         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" or plain numbers => please see option "outputFormat" for details
          */
         getArray() {
             return _getStringOrArray(true, this);
@@ -3359,7 +3505,7 @@ if (typeof define === 'function' && define.amd) {
         /**
          * The 'getSettings' function returns the object with autoNumeric settings for those who need to look under the hood
          * $(someSelector).autoNumeric('getSettings'); // no parameters accepted
-         * $(someSelector).autoNumeric('getSettings').aDec; // return the aDec setting as a string - ant valid setting can be used
+         * $(someSelector).autoNumeric('getSettings').decimalCharacter; // return the decimalCharacter setting as a string - ant valid setting can be used
          */
         getSettings() {
             return this.data('autoNumeric');
@@ -3410,11 +3556,11 @@ if (typeof define === 'function' && define.amd) {
         value = value.toString();
         value = fromLocale(value);
         if (Number(value) < 0) {
-            settings.aNeg = '-';
+            settings.negativeSignCharacter = '-';
         }
 
-        if (isNull(settings.mDec)) {
-            settings.mDec = maximumVMinAndVMaxDecimalLength(settings.vMin, settings.vMax);
+        if (isNull(settings.decimalPlacesOverride)) {
+            settings.decimalPlacesOverride = maximumVMinAndVMaxDecimalLength(settings.minimumValue, settings.maximumValue);
         }
 
         // Basic tests to check if the given value is valid
@@ -3422,7 +3568,7 @@ if (typeof define === 'function' && define.amd) {
         if (!minTest || !maxTest) {
             // Throw a custom event
             triggerEvent('autoFormat.autoNumeric', document, `Range test failed`);
-            throwError(`The value [${value}] being set falls outside of the vMin [${settings.vMin}] and vMax [${settings.vMax}] range set for this element`);
+            throwError(`The value [${value}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`);
         }
 
         // Everything is ok, proceed to rounding, formatting and grouping
@@ -3454,21 +3600,21 @@ if (typeof define === 'function' && define.amd) {
         }
 
         const settings = $.extend({}, defaultSettings, { strip: false }, options);
-        const allowed = `-0123456789\\${settings.aDec}`;
+        const allowed = `-0123456789\\${settings.decimalCharacter}`;
         const autoStrip = new RegExp(`[^${allowed}]`, 'gi');
         value = value.toString();
 
         if (value.charAt(0) === '-') {
-            settings.aNeg = '-';
-        } else if (settings.nBracket && settings.nBracket.split(',')[0] === value.charAt(0)) {
-            settings.aNeg = '-';
+            settings.negativeSignCharacter = '-';
+        } else if (settings.negativeBracketsTypeOnBlur && settings.negativeBracketsTypeOnBlur.split(',')[0] === value.charAt(0)) {
+            settings.negativeSignCharacter = '-';
             settings.onOff = true;
             value = negativeBracket(value, settings);
         }
 
         value = value.replace(autoStrip, '');
         value = value.replace(',', '.');
-        value = toLocale(value, settings.outputType);
+        value = toLocale(value, settings.outputFormat);
 
         return value;
     };
@@ -3487,10 +3633,15 @@ if (typeof define === 'function' && define.amd) {
      * @throws Error
      */
     validate = (userOptions, shouldExtendDefaultOptions = true) => {
-        const debug = true; // The error here must always be thrown, since a badly configured options object will lead to wrong results, if any.
+        const showWarnings = true; // The error here must always be thrown, since a badly configured options object will lead to wrong results, if any.
 
         if (isUndefinedOrNullOrEmpty(userOptions) || !isObject(userOptions) || isEmptyObj(userOptions)) {
             throwError(`The userOptions are invalid ; it should be a valid object, [${userOptions}] given.`);
+        }
+
+        // If the user used old options, we convert them to new ones
+        if (!isNull(userOptions)) {
+            convertOldOptionsToNewOnes(userOptions);
         }
 
         // The user can choose if the `userOptions` has already been extended with the default options, or not
@@ -3508,107 +3659,107 @@ if (typeof define === 'function' && define.amd) {
         const testPositiveFloatOrInteger = /^[0-9]+(\.?[0-9]+)?$/;
 
         // Then tests the options individually
-        if (!isInArray(options.aSep, [',', '.', ' ', ''])) {
-            throwError(`The thousand separator character option 'aSep' is invalid ; it should be ',', '.', ' ' or empty (''), [${options.aSep}] given.`);
+        if (!isInArray(options.digitGroupSeparator, [',', '.', ' ', ''])) {
+            throwError(`The thousand separator character option 'digitGroupSeparator' is invalid ; it should be ',', '.', ' ' or empty (''), [${options.digitGroupSeparator}] given.`);
         }
 
-        if (!isTrueOrFalseString(options.nSep) && !isBoolean(options.nSep)) {
-            throwError(`The 'nSep' option is invalid ; it should be either 'false' or 'true', [${options.nSep}] given.`);
+        if (!isTrueOrFalseString(options.noSeparatorOnFocus) && !isBoolean(options.noSeparatorOnFocus)) {
+            throwError(`The 'noSeparatorOnFocus' option is invalid ; it should be either 'false' or 'true', [${options.noSeparatorOnFocus}] given.`);
         }
 
-        if (!testPositiveInteger.test(options.dGroup)) { // isNaN(parseInt(options.dGroup)) //DEBUG
-            throwError(`The digital grouping for thousand separator option 'dGroup' is invalid ; it should be a positive integer, [${options.dGroup}] given.`);
+        if (!testPositiveInteger.test(options.digitalGroupSpacing)) { // isNaN(parseInt(options.digitalGroupSpacing)) //DEBUG
+            throwError(`The digital grouping for thousand separator option 'digitalGroupSpacing' is invalid ; it should be a positive integer, [${options.digitalGroupSpacing}] given.`);
         }
 
-        if (!isInArray(options.aDec, [',', '.'])) {
-            throwError(`The decimal separator character option 'aDec' is invalid ; it should be '.' or ',', [${options.aDec}] given.`);
+        if (!isInArray(options.decimalCharacter, [',', '.'])) {
+            throwError(`The decimal separator character option 'decimalCharacter' is invalid ; it should be '.' or ',', [${options.decimalCharacter}] given.`);
         }
 
         // Checks if the decimal and thousand characters are the same
-        if (options.aDec === options.aSep) {
-            throwError(`autoNumeric will not function properly when the decimal character 'aDec' [${options.aDec}] and the thousand separator 'aSep' [${options.aSep}] are the same character.`);
+        if (options.decimalCharacter === options.digitGroupSeparator) {
+            throwError(`autoNumeric will not function properly when the decimal character 'decimalCharacter' [${options.decimalCharacter}] and the thousand separator 'digitGroupSeparator' [${options.digitGroupSeparator}] are the same character.`);
         }
 
-        if (!isNull(options.altDec) && !isString(options.altDec)) {
-            throwError(`The alternate decimal separator character option 'altDec' is invalid ; it should be a string, [${options.altDec}] given.`);
+        if (!isNull(options.decimalCharacterAlternative) && !isString(options.decimalCharacterAlternative)) {
+            throwError(`The alternate decimal separator character option 'decimalCharacterAlternative' is invalid ; it should be a string, [${options.decimalCharacterAlternative}] given.`);
         }
 
-        if (options.aSign !== '' && !isString(options.aSign)) {
-            throwError(`The currency symbol option 'aSign' is invalid ; it should be a string, [${options.aSign}] given.`);
+        if (options.currencySymbol !== '' && !isString(options.currencySymbol)) {
+            throwError(`The currency symbol option 'currencySymbol' is invalid ; it should be a string, [${options.currencySymbol}] given.`);
         }
 
-        if (!isInArray(options.pSign, ['p', 's'])) {
-            throwError(`The placement of the currency sign option 'pSign' is invalid ; it should either be 'p' (prefix) or 's' (suffix), [${options.pSign}] given.`);
+        if (!isInArray(options.currencySymbolPlacement, ['p', 's'])) {
+            throwError(`The placement of the currency sign option 'currencySymbolPlacement' is invalid ; it should either be 'p' (prefix) or 's' (suffix), [${options.currencySymbolPlacement}] given.`);
         }
 
-        if (!isInArray(options.pNeg, ['p', 's', 'l', 'r'])) {
-            throwError(`The placement of the negative sign option 'pNeg' is invalid ; it should either be 'p' (prefix), 's' (suffix), 'l' (left) or 'r' (right), [${options.pNeg}] given.`);
+        if (!isInArray(options.negativePositiveSignPlacement, ['p', 's', 'l', 'r'])) {
+            throwError(`The placement of the negative sign option 'negativePositiveSignPlacement' is invalid ; it should either be 'p' (prefix), 's' (suffix), 'l' (left) or 'r' (right), [${options.negativePositiveSignPlacement}] given.`);
         }
 
-        if (!isString(options.aSuffix) || (options.aSuffix !== '' && (contains(options.aSuffix, '-') || testNumericalCharacters.test(options.aSuffix)))) {
-            throwError(`The additional suffix option 'aSuffix' is invalid ; it should not contains the negative sign '-' nor any numerical characters, [${options.aSuffix}] given.`);
+        if (!isString(options.suffixText) || (options.suffixText !== '' && (contains(options.suffixText, '-') || testNumericalCharacters.test(options.suffixText)))) {
+            throwError(`The additional suffix option 'suffixText' is invalid ; it should not contains the negative sign '-' nor any numerical characters, [${options.suffixText}] given.`);
         }
 
-        if (!isNull(options.oLimits) && !isInArray(options.oLimits, ['ceiling', 'floor', 'ignore'])) {
-            throwError(`The override min & max limits option 'oLimits' is invalid ; it should either be 'ceiling', 'floor' or 'ignore', [${options.oLimits}] given.`);
+        if (!isNull(options.overrideMinMaxLimits) && !isInArray(options.overrideMinMaxLimits, ['ceiling', 'floor', 'ignore'])) {
+            throwError(`The override min & max limits option 'overrideMinMaxLimits' is invalid ; it should either be 'ceiling', 'floor' or 'ignore', [${options.overrideMinMaxLimits}] given.`);
         }
 
-        if (!isString(options.vMax) || !testFloatOrIntegerAndPossibleNegativeSign.test(options.vMax)) {
-            throwError(`The maximum possible value option 'vMax' is invalid ; it should be a string that represents a positive or negative number, [${options.vMax}] given.`);
+        if (!isString(options.maximumValue) || !testFloatOrIntegerAndPossibleNegativeSign.test(options.maximumValue)) {
+            throwError(`The maximum possible value option 'maximumValue' is invalid ; it should be a string that represents a positive or negative number, [${options.maximumValue}] given.`);
         }
 
-        if (!isString(options.vMin) || !testFloatOrIntegerAndPossibleNegativeSign.test(options.vMin)) {
-            throwError(`The minimum possible value option 'vMin' is invalid ; it should be a string that represents a positive or negative number, [${options.vMin}] given.`);
+        if (!isString(options.minimumValue) || !testFloatOrIntegerAndPossibleNegativeSign.test(options.minimumValue)) {
+            throwError(`The minimum possible value option 'minimumValue' is invalid ; it should be a string that represents a positive or negative number, [${options.minimumValue}] given.`);
         }
 
-        if (parseFloat(options.vMin) > parseFloat(options.vMax)) {
-            throwError(`The minimum possible value option is greater than the maximum possible value option ; 'vMin' [${options.vMin}] should be smaller than 'vMax' [${options.vMax}].`);
+        if (parseFloat(options.minimumValue) > parseFloat(options.maximumValue)) {
+            throwError(`The minimum possible value option is greater than the maximum possible value option ; 'minimumValue' [${options.minimumValue}] should be smaller than 'maximumValue' [${options.maximumValue}].`);
         }
 
-        if (!(isNull(options.mDec) ||
-            (isInt(options.mDec) && options.mDec >= 0) || // If integer option
-            (isString(options.mDec) && testPositiveInteger.test(options.mDec)))  // If string option
+        if (!(isNull(options.decimalPlacesOverride) ||
+            (isInt(options.decimalPlacesOverride) && options.decimalPlacesOverride >= 0) || // If integer option
+            (isString(options.decimalPlacesOverride) && testPositiveInteger.test(options.decimalPlacesOverride)))  // If string option
         ) {
-            throwError(`The maximum number of decimal places option 'mDec' is invalid ; it should be a positive integer, [${options.mDec}] given.`);
+            throwError(`The maximum number of decimal places option 'decimalPlacesOverride' is invalid ; it should be a positive integer, [${options.decimalPlacesOverride}] given.`);
         }
 
-        // Write a warning message in the console if the number of decimal in vMin/vMax is overridden by mDec (and not if mDec is equal to the number of decimal used in vMin/vMax)
-        const vMinMaxDecimalPlaces = maximumVMinAndVMaxDecimalLength(options.vMin, options.vMax);
-        if (!isNull(options.mDec) &&
-            ((hasDecimals(options.vMin) || hasDecimals(options.vMax)) && vMinMaxDecimalPlaces !== Number(options.mDec))) {
-            warning(`Setting 'mDec' to [${options.mDec}] will override the decimals declared in 'vMin' [${options.vMin}] and 'vMax' [${options.vMax}].`, debug);
+        // Write a warning message in the console if the number of decimal in minimumValue/maximumValue is overridden by decimalPlacesOverride (and not if decimalPlacesOverride is equal to the number of decimal used in minimumValue/maximumValue)
+        const minimumValueMaxDecimalPlaces = maximumVMinAndVMaxDecimalLength(options.minimumValue, options.maximumValue);
+        if (!isNull(options.decimalPlacesOverride) &&
+            ((hasDecimals(options.minimumValue) || hasDecimals(options.maximumValue)) && minimumValueMaxDecimalPlaces !== Number(options.decimalPlacesOverride))) {
+            warning(`Setting 'decimalPlacesOverride' to [${options.decimalPlacesOverride}] will override the decimals declared in 'minimumValue' [${options.minimumValue}] and 'maximumValue' [${options.maximumValue}].`, showWarnings);
         }
 
-        if (!options.aPad && !isNull(options.mDec)) {
-            warning(`Setting 'aPad' to [false] will override the current 'mDec' setting [${options.mDec}].`, debug);
+        if (!options.allowDecimalPadding && !isNull(options.decimalPlacesOverride)) {
+            warning(`Setting 'allowDecimalPadding' to [false] will override the current 'decimalPlacesOverride' setting [${options.decimalPlacesOverride}].`, showWarnings);
         }
 
-        if (!isNull(options.eDec) && (!isString(options.eDec) || !testPositiveInteger.test(options.eDec))) {
-            throwError(`The number of expanded decimal places option 'eDec' is invalid ; it should be a positive integer, [${options.eDec}] given.`);
+        if (!isNull(options.decimalPlacesShownOnFocus) && (!isString(options.decimalPlacesShownOnFocus) || !testPositiveInteger.test(options.decimalPlacesShownOnFocus))) {
+            throwError(`The number of expanded decimal places option 'decimalPlacesShownOnFocus' is invalid ; it should be a positive integer, [${options.decimalPlacesShownOnFocus}] given.`);
         }
 
-        // Checks if the extended decimal places "eDec" is greater than the normal decimal places "mDec"
-        if (!isNull(options.eDec) && !isNull(options.mDec) && Number(options.mDec) < Number(options.eDec)) {
-            throwError(`autoNumeric will not function properly when the extended decimal places 'eDec' [${options.eDec}] is greater than the 'mDec' [${options.mDec}] value.`);
+        // Checks if the extended decimal places "decimalPlacesShownOnFocus" is greater than the normal decimal places "decimalPlacesOverride"
+        if (!isNull(options.decimalPlacesShownOnFocus) && !isNull(options.decimalPlacesOverride) && Number(options.decimalPlacesOverride) < Number(options.decimalPlacesShownOnFocus)) {
+            throwError(`autoNumeric will not function properly when the extended decimal places 'decimalPlacesShownOnFocus' [${options.decimalPlacesShownOnFocus}] is greater than the 'decimalPlacesOverride' [${options.decimalPlacesOverride}] value.`);
         }
 
         if (!isNull(options.scaleDivisor) && !testPositiveFloatOrInteger.test(options.scaleDivisor)) {
             throwError(`The scale divisor option 'scaleDivisor' is invalid ; it should be a positive number, preferably an integer, [${options.scaleDivisor}] given.`);
         }
 
-        if (!isNull(options.scaleDecimal) && !testPositiveInteger.test(options.scaleDecimal)) {
-            throwError(`The scale number of decimals option 'scaleDecimal' is invalid ; it should be a positive integer, [${options.scaleDecimal}] given.`);
+        if (!isNull(options.scaleDecimalPlaces) && !testPositiveInteger.test(options.scaleDecimalPlaces)) {
+            throwError(`The scale number of decimals option 'scaleDecimalPlaces' is invalid ; it should be a positive integer, [${options.scaleDecimalPlaces}] given.`);
         }
 
         if (!isNull(options.scaleSymbol) && !isString(options.scaleSymbol)) {
             throwError(`The scale symbol option 'scaleSymbol' is invalid ; it should be a string, [${options.scaleSymbol}] given.`);
         }
 
-        if (!isTrueOrFalseString(options.aStor) && !isBoolean(options.aStor)) {
-            throwError(`The save to session storage option 'aStor' is invalid ; it should be either 'false' or 'true', [${options.aStor}] given.`);
+        if (!isTrueOrFalseString(options.saveValueToSessionStorage) && !isBoolean(options.saveValueToSessionStorage)) {
+            throwError(`The save to session storage option 'saveValueToSessionStorage' is invalid ; it should be either 'false' or 'true', [${options.saveValueToSessionStorage}] given.`);
         }
 
-        if (!isInArray(options.mRound, [
+        if (!isInArray(options.roundingMethod, [
             'S',
             'A',
             's',
@@ -3623,42 +3774,42 @@ if (typeof define === 'function' && define.amd) {
             'U05',
             'D05',
         ])) {
-            throwError(`The rounding method option 'mRound' is invalid ; it should either be 'S', 'A', 's', 'a', 'B', 'U', 'D', 'C', 'F', 'N05', 'CHF', 'U05' or 'D05' (cf. documentation), [${options.mRound}] given.`);
+            throwError(`The rounding method option 'roundingMethod' is invalid ; it should either be 'S', 'A', 's', 'a', 'B', 'U', 'D', 'C', 'F', 'N05', 'CHF', 'U05' or 'D05' (cf. documentation), [${options.roundingMethod}] given.`);
         }
 
-        if (!isTrueOrFalseString(options.aPad) && !isBoolean(options.aPad)) {
-            throwError(`The control decimal padding option 'aPad' is invalid ; it should be either 'false' or 'true', [${options.aPad}] given.`);
+        if (!isTrueOrFalseString(options.allowDecimalPadding) && !isBoolean(options.allowDecimalPadding)) {
+            throwError(`The control decimal padding option 'allowDecimalPadding' is invalid ; it should be either 'false' or 'true', [${options.allowDecimalPadding}] given.`);
         }
 
-        if (!isNull(options.nBracket) && !isInArray(options.nBracket, ['(,)', '[,]', '<,>', '{,}'])) {
-            throwError(`The brackets for negative values option 'nBracket' is invalid ; it should either be '(,)', '[,]', '<,>' or '{,}', [${options.nBracket}] given.`);
+        if (!isNull(options.negativeBracketsTypeOnBlur) && !isInArray(options.negativeBracketsTypeOnBlur, ['(,)', '[,]', '<,>', '{,}'])) {
+            throwError(`The brackets for negative values option 'negativeBracketsTypeOnBlur' is invalid ; it should either be '(,)', '[,]', '<,>' or '{,}', [${options.negativeBracketsTypeOnBlur}] given.`);
         }
 
-        if (!isInArray(options.wEmpty, ['focus', 'press', 'always', 'zero'])) {
-            throwError(`The display on empty string option 'wEmpty' is invalid ; it should either be 'focus', 'press', 'always' or 'zero', [${options.wEmpty}] given.`);
+        if (!isInArray(options.emptyInputBehavior, ['focus', 'press', 'always', 'zero'])) {
+            throwError(`The display on empty string option 'emptyInputBehavior' is invalid ; it should either be 'focus', 'press', 'always' or 'zero', [${options.emptyInputBehavior}] given.`);
         }
 
-        if (!isInArray(options.lZero, ['allow', 'deny', 'keep'])) {
-            throwError(`The leading zero behavior option 'lZero' is invalid ; it should either be 'allow', 'deny' or 'keep', [${options.lZero}] given.`);
+        if (!isInArray(options.leadingZero, ['allow', 'deny', 'keep'])) {
+            throwError(`The leading zero behavior option 'leadingZero' is invalid ; it should either be 'allow', 'deny' or 'keep', [${options.leadingZero}] given.`);
         }
 
-        if (!isTrueOrFalseString(options.aForm) && !isBoolean(options.aForm)) {
-            throwError(`The format on initialization option 'aForm' is invalid ; it should be either 'false' or 'true', [${options.aForm}] given.`);
+        if (!isTrueOrFalseString(options.formatOnPageLoad) && !isBoolean(options.formatOnPageLoad)) {
+            throwError(`The format on initialization option 'formatOnPageLoad' is invalid ; it should be either 'false' or 'true', [${options.formatOnPageLoad}] given.`);
         }
 
-        if (!isTrueOrFalseString(options.sNumber) && !isBoolean(options.sNumber)) {
-            throwError(`The select number only option 'sNumber' is invalid ; it should be either 'false' or 'true', [${options.sNumber}] given.`);
+        if (!isTrueOrFalseString(options.selectNumberOnly) && !isBoolean(options.selectNumberOnly)) {
+            throwError(`The select number only option 'selectNumberOnly' is invalid ; it should be either 'false' or 'true', [${options.selectNumberOnly}] given.`);
         }
 
-        if (!isNull(options.anDefault) && (options.anDefault !== '' && !testFloatOrIntegerAndPossibleNegativeSign.test(options.anDefault))) {
-            throwError(`The unformatted default value option 'anDefault' is invalid ; it should be a string that represents a positive or negative number, [${options.anDefault}] given.`);
+        if (!isNull(options.defaultValueOverride) && (options.defaultValueOverride !== '' && !testFloatOrIntegerAndPossibleNegativeSign.test(options.defaultValueOverride))) {
+            throwError(`The unformatted default value option 'defaultValueOverride' is invalid ; it should be a string that represents a positive or negative number, [${options.defaultValueOverride}] given.`);
         }
 
-        if (!isTrueOrFalseString(options.unSetOnSubmit) && !isBoolean(options.unSetOnSubmit)) {
-            throwError(`The remove formatting on submit option 'unSetOnSubmit' is invalid ; it should be either 'false' or 'true', [${options.unSetOnSubmit}] given.`);
+        if (!isTrueOrFalseString(options.unformatOnSubmit) && !isBoolean(options.unformatOnSubmit)) {
+            throwError(`The remove formatting on submit option 'unformatOnSubmit' is invalid ; it should be either 'false' or 'true', [${options.unformatOnSubmit}] given.`);
         }
 
-        if (!isNull(options.outputType) && !isInArray(options.outputType, [
+        if (!isNull(options.outputFormat) && !isInArray(options.outputFormat, [
             'string',
             'number',
             '.',
@@ -3668,11 +3819,11 @@ if (typeof define === 'function' && define.amd) {
             '.-',
             ',-',
         ])) {
-            throwError(`The custom locale format option 'outputType' is invalid ; it should either be null, 'string', 'number', '.', '-.', ',', '-,', '.-' or ',-', [${options.outputType}] given.`);
+            throwError(`The custom locale format option 'outputFormat' is invalid ; it should either be null, 'string', 'number', '.', '-.', ',', '-,', '.-' or ',-', [${options.outputFormat}] given.`);
         }
 
-        if (!isTrueOrFalseString(options.debug) && !isBoolean(options.debug)) {
-            throwError(`The debug option 'debug' is invalid ; it should be either 'false' or 'true', [${options.debug}] given.`);
+        if (!isTrueOrFalseString(options.showWarnings) && !isBoolean(options.showWarnings)) {
+            throwError(`The debug option 'showWarnings' is invalid ; it should be either 'false' or 'true', [${options.showWarnings}] given.`);
         }
     };
 

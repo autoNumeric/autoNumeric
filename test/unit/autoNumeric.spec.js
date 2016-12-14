@@ -30,7 +30,7 @@
 /* eslint space-in-parens: 0 */
 /* eslint spaced-comment: 0 */
 // eslint-disable-next-line
-/* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach */
+/* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach, spyOn */
 
 import $ from '../../node_modules/jquery/dist/jquery';
 import an from '../../src/autoNumeric';
@@ -46,9 +46,30 @@ import an from '../../src/autoNumeric';
 
 //-----------------------------------------------------------------------------
 //---- Options & settings
-const autoNumericOptionsEuro       = { aSep: '.', aDec: ',', altDec: '.', aSign: ' €', pSign: 's', mRound: 'U' };
-const autoNumericOptionsEuroNumber = { aSep: '.', aDec: ',', altDec: '.', aSign: ' €', pSign: 's', mRound: 'U', outputType : 'number' };
-const autoNumericOptionsDollar     = { aSep: ',', aDec: '.',              aSign:  '$', pSign: 'p', mRound: 'U' };
+const autoNumericOptionsEuro = {
+    digitGroupSeparator        : '.',
+    decimalCharacter           : ',',
+    decimalCharacterAlternative: '.',
+    currencySymbol             : ' €',
+    currencySymbolPlacement    : 's',
+    roundingMethod             : 'U',
+};
+const autoNumericOptionsEuroNumber = {
+    digitGroupSeparator        : '.',
+    decimalCharacter           : ',',
+    decimalCharacterAlternative: '.',
+    currencySymbol             : ' €',
+    currencySymbolPlacement    : 's',
+    roundingMethod             : 'U',
+    outputFormat               : 'number',
+};
+const autoNumericOptionsDollar = {
+    digitGroupSeparator    : ',',
+    decimalCharacter       : '.',
+    currencySymbol         : '$',
+    currencySymbolPlacement: 'p',
+    roundingMethod         : 'U',
+};
 
 describe('The autoNumeric object', () => {
     let aNInput;
@@ -66,35 +87,35 @@ describe('The autoNumeric object', () => {
     });
 
     const defaultOption = {
-        aSep         : ',',
-        nSep         : false,
-        dGroup       : '3',
-        aDec         : '.',
-        altDec       : null,
-        aSign        : '',
-        pSign        : 'p',
-        pNeg         : 'l',
-        aSuffix      : '',
-        oLimits      : null,
-        vMax         : '9999999999999.99',
-        vMin         : '-9999999999999.99',
-        mDec         : null,
-        eDec         : null,
-        scaleDivisor : null,
-        scaleDecimal : null,
-        scaleSymbol  : null,
-        aStor        : false,
-        mRound       : 'S',
-        aPad         : true,
-        nBracket     : null,
-        wEmpty       : 'focus',
-        lZero        : 'deny',
-        aForm        : true,
-        sNumber      : false,
-        anDefault    : null,
-        unSetOnSubmit: false,
-        outputType   : null,
-        debug        : false,
+        digitGroupSeparator          : ',',
+        noSeparatorOnFocus           : false,
+        digitalGroupSpacing          : '3',
+        decimalCharacter             : '.',
+        decimalCharacterAlternative  : null,
+        currencySymbol               : '',
+        currencySymbolPlacement      : 'p',
+        negativePositiveSignPlacement: 'l',
+        suffixText                   : '',
+        overrideMinMaxLimits         : null,
+        maximumValue                 : '9999999999999.99',
+        minimumValue                 : '-9999999999999.99',
+        decimalPlacesOverride        : null,
+        decimalPlacesShownOnFocus    : null,
+        scaleDivisor                 : null,
+        scaleDecimalPlaces           : null,
+        scaleSymbol                  : null,
+        saveValueToSessionStorage    : false,
+        roundingMethod               : 'S',
+        allowDecimalPadding          : true,
+        negativeBracketsTypeOnBlur   : null,
+        emptyInputBehavior           : 'focus',
+        leadingZero                  : 'deny',
+        formatOnPageLoad             : true,
+        selectNumberOnly             : false,
+        defaultValueOverride         : null,
+        unformatOnSubmit             : false,
+        outputFormat                 : null,
+        showWarnings                 : true,
     };
 
     it('should return some default values', () => {
@@ -105,7 +126,7 @@ describe('The autoNumeric object', () => {
         const defaultSettings = an.getDefaultConfig();
         const aNInputSettings = aNInput.autoNumeric('getSettings');
         /* let i = 0;
-        for (let prop in defaultSettings) { //XXX This loop fails since the mDec default is overridden by vMax/vMin (cf. following test cases)
+        for (let prop in defaultSettings) { //XXX This loop fails since the decimalPlacesOverride default is overridden by maximumValue/minimumValue (cf. following test cases)
             i++;
             if (defaultSettings.hasOwnProperty(prop)) {
                 console.log(`${i}: Setting ${prop} = [${defaultSettings[prop]}][${aNInputSettings[prop]}]`); //DEBUG
@@ -113,90 +134,92 @@ describe('The autoNumeric object', () => {
             }
         } */
 
-        expect(defaultSettings.aSep         ).toEqual(aNInputSettings.aSep         );
-        expect(defaultSettings.nSep         ).toEqual(aNInputSettings.nSep         );
-        expect(defaultSettings.dGroup       ).toEqual(aNInputSettings.dGroup       );
-        expect(defaultSettings.aDec         ).toEqual(aNInputSettings.aDec         );
-        expect(defaultSettings.altDec       ).toEqual(aNInputSettings.altDec       );
-        expect(defaultSettings.aSign        ).toEqual(aNInputSettings.aSign        );
-        expect(defaultSettings.pSign        ).toEqual(aNInputSettings.pSign        );
+        expect(defaultSettings.digitGroupSeparator        ).toEqual(aNInputSettings.digitGroupSeparator        );
+        expect(defaultSettings.noSeparatorOnFocus         ).toEqual(aNInputSettings.noSeparatorOnFocus         );
+        expect(defaultSettings.digitalGroupSpacing        ).toEqual(aNInputSettings.digitalGroupSpacing        );
+        expect(defaultSettings.decimalCharacter           ).toEqual(aNInputSettings.decimalCharacter           );
+        expect(defaultSettings.decimalCharacterAlternative).toEqual(aNInputSettings.decimalCharacterAlternative);
+        expect(defaultSettings.currencySymbol             ).toEqual(aNInputSettings.currencySymbol             );
+        expect(defaultSettings.currencySymbolPlacement    ).toEqual(aNInputSettings.currencySymbolPlacement    );
 
-        // Special case for `pNeg`, see the related tests
-        expect(defaultSettings.pNeg         ).toEqual(aNInputSettings.pNeg         );
-        expect(defaultSettings.aSuffix      ).toEqual(aNInputSettings.aSuffix      );
-        expect(defaultSettings.oLimits      ).toEqual(aNInputSettings.oLimits      );
-        expect(defaultSettings.vMax         ).toEqual(aNInputSettings.vMax         );
-        expect(defaultSettings.vMin         ).toEqual(aNInputSettings.vMin         );
+        // Special case for `negativePositiveSignPlacement`, see the related tests
+        expect(defaultSettings.negativePositiveSignPlacement).toEqual(aNInputSettings.negativePositiveSignPlacement);
+        expect(defaultSettings.suffixText                   ).toEqual(aNInputSettings.suffixText                   );
+        expect(defaultSettings.overrideMinMaxLimits         ).toEqual(aNInputSettings.overrideMinMaxLimits         );
+        expect(defaultSettings.maximumValue                 ).toEqual(aNInputSettings.maximumValue                 );
+        expect(defaultSettings.minimumValue                 ).toEqual(aNInputSettings.minimumValue                 );
 
-        // Special case for 'mDec': when it's set to 'null' (which is the default), then its value is overwritten by the greater vMin or vMax number of decimals
-        const [, decimalPart] = aNInputSettings.vMin.split('.');
+        // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue number of decimals
+        const [, decimalPart] = aNInputSettings.minimumValue.split('.');
         let decimalPartLength = 0;
         if (decimalPart !== void(0)) {
             decimalPartLength = decimalPart.length;
         }
         expect(decimalPartLength).toEqual(2);
-        expect(aNInputSettings.mDec).toEqual(decimalPartLength);
+        expect(aNInputSettings.decimalPlacesOverride).toEqual(decimalPartLength);
 
-        expect(defaultSettings.eDec         ).toEqual(aNInputSettings.eDec         );
-        expect(defaultSettings.aScale       ).toEqual(aNInputSettings.aScale       );
-        expect(defaultSettings.aStor        ).toEqual(aNInputSettings.aStor        );
-        expect(defaultSettings.mRound       ).toEqual(aNInputSettings.mRound       );
-        expect(defaultSettings.aPad         ).toEqual(aNInputSettings.aPad         );
-        expect(defaultSettings.nBracket     ).toEqual(aNInputSettings.nBracket     );
-        expect(defaultSettings.wEmpty       ).toEqual(aNInputSettings.wEmpty       );
-        expect(defaultSettings.lZero        ).toEqual(aNInputSettings.lZero        );
-        expect(defaultSettings.aForm        ).toEqual(aNInputSettings.aForm        );
-        expect(defaultSettings.sNumber      ).toEqual(aNInputSettings.sNumber      );
-        expect(defaultSettings.anDefault    ).toEqual(aNInputSettings.anDefault    );
-        expect(defaultSettings.unSetOnSubmit).toEqual(aNInputSettings.unSetOnSubmit);
-        expect(defaultSettings.outputType   ).toEqual(aNInputSettings.outputType   );
-        expect(defaultSettings.debug        ).toEqual(aNInputSettings.debug        );
+        expect(defaultSettings.decimalPlacesShownOnFocus ).toEqual(aNInputSettings.decimalPlacesShownOnFocus );
+        expect(defaultSettings.scaleDivisor              ).toEqual(aNInputSettings.scaleDivisor              );
+        expect(defaultSettings.scaleDecimalPlaces        ).toEqual(aNInputSettings.scaleDecimalPlaces        );
+        expect(defaultSettings.scaleSymbol               ).toEqual(aNInputSettings.scaleSymbol               );
+        expect(defaultSettings.saveValueToSessionStorage ).toEqual(aNInputSettings.saveValueToSessionStorage );
+        expect(defaultSettings.roundingMethod            ).toEqual(aNInputSettings.roundingMethod            );
+        expect(defaultSettings.allowDecimalPadding       ).toEqual(aNInputSettings.allowDecimalPadding       );
+        expect(defaultSettings.negativeBracketsTypeOnBlur).toEqual(aNInputSettings.negativeBracketsTypeOnBlur);
+        expect(defaultSettings.emptyInputBehavior        ).toEqual(aNInputSettings.emptyInputBehavior        );
+        expect(defaultSettings.leadingZero               ).toEqual(aNInputSettings.leadingZero               );
+        expect(defaultSettings.formatOnPageLoad          ).toEqual(aNInputSettings.formatOnPageLoad          );
+        expect(defaultSettings.selectNumberOnly          ).toEqual(aNInputSettings.selectNumberOnly          );
+        expect(defaultSettings.defaultValueOverride      ).toEqual(aNInputSettings.defaultValueOverride      );
+        expect(defaultSettings.unformatOnSubmit          ).toEqual(aNInputSettings.unformatOnSubmit          );
+        expect(defaultSettings.outputFormat              ).toEqual(aNInputSettings.outputFormat              );
+        expect(defaultSettings.showWarnings              ).toEqual(aNInputSettings.showWarnings              );
     });
 
     it('should update the options values accordingly', () => {
-        aNInput.autoNumeric('update', { aSep: '.', aDec: ',', aSign: '€' });
+        aNInput.autoNumeric('update', { digitGroupSeparator: '.', decimalCharacter: ',', currencySymbol: '€' });
         const defaultSettings = an.getDefaultConfig();
         const aNInputSettings = aNInput.autoNumeric('getSettings');
 
-        expect(defaultSettings.aSep ).not.toEqual(aNInputSettings.aSep );
-        expect(defaultSettings.aDec ).not.toEqual(aNInputSettings.aDec );
-        expect(defaultSettings.aSign).not.toEqual(aNInputSettings.aSign);
-        expect(aNInputSettings.aSep ).toEqual('.');
-        expect(aNInputSettings.aDec ).toEqual(',');
-        expect(aNInputSettings.aSign).toEqual('€');
+        expect(defaultSettings.digitGroupSeparator).not.toEqual(aNInputSettings.digitGroupSeparator );
+        expect(defaultSettings.decimalCharacter   ).not.toEqual(aNInputSettings.decimalCharacter    );
+        expect(defaultSettings.currencySymbol     ).not.toEqual(aNInputSettings.currencySymbol      );
+        expect(aNInputSettings.digitGroupSeparator).toEqual('.');
+        expect(aNInputSettings.decimalCharacter   ).toEqual(',');
+        expect(aNInputSettings.currencySymbol     ).toEqual('€');
     });
 
-    describe('manages the pNeg configuration option specially', () => {
-        it(`this should set the pNeg differently based on the aSign and pSign values`, () => {
+    describe('manages the negativePositiveSignPlacement configuration option specially', () => {
+        it(`this should set the negativePositiveSignPlacement differently based on the currencySymbol and currencySymbolPlacement values`, () => {
             /*
-             * Special case for `pNeg`:
-             * If the user has not set the placement of the negative sign (`pNeg`), but has set a currency symbol (`aSign`),
-             * then the default value of `pNeg` is modified in order to keep the resulting output logical by default :
-             * - "$-1,234.56" instead of "-$1,234.56" ({aSign: "$", pNeg: "r"})
-             * - "-1,234.56$" instead of "1,234.56-$" ({aSign: "$", pSign: "s", pNeg: "p"})
+             * Special case for `negativePositiveSignPlacement`:
+             * If the user has not set the placement of the negative sign (`negativePositiveSignPlacement`), but has set a currency symbol (`currencySymbol`),
+             * then the default value of `negativePositiveSignPlacement` is modified in order to keep the resulting output logical by default :
+             * - "$-1,234.56" instead of "-$1,234.56" ({currencySymbol: "$", negativePositiveSignPlacement: "r"})
+             * - "-1,234.56$" instead of "1,234.56-$" ({currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "p"})
              */
 
-            // Case 1 : settings.pSign equals 's'
+            // Case 1 : settings.currencySymbolPlacement equals 's'
             // Initialization
             let newInput = document.createElement('input');
             document.body.appendChild(newInput);
-            let aNInput = $(newInput).autoNumeric('init', { aSign: '$', pSign: 's' }); // Initiate the autoNumeric input
+            let aNInput = $(newInput).autoNumeric('init', { currencySymbol: '$', currencySymbolPlacement: 's' }); // Initiate the autoNumeric input
             let aNInputSettings = aNInput.autoNumeric('getSettings');
 
-            expect(aNInputSettings.pNeg).toEqual('p');
+            expect(aNInputSettings.negativePositiveSignPlacement).toEqual('p');
 
             // Un-initialization
             aNInput.autoNumeric('destroy');
             document.body.removeChild(newInput);
 
-            // Case 2 : settings.pSign equals 'p'
+            // Case 2 : settings.currencySymbolPlacement equals 'p'
             // Initialization
             newInput = document.createElement('input');
             document.body.appendChild(newInput);
-            aNInput = $(newInput).autoNumeric('init', { aSign: '$', pSign: 'p' }); // Initiate the autoNumeric input
+            aNInput = $(newInput).autoNumeric('init', { currencySymbol: '$', currencySymbolPlacement: 'p' }); // Initiate the autoNumeric input
             aNInputSettings = aNInput.autoNumeric('getSettings');
 
-            expect(aNInputSettings.pNeg).toEqual('r');
+            expect(aNInputSettings.negativePositiveSignPlacement).toEqual('r');
 
             // Un-initialization
             aNInput.autoNumeric('destroy');
@@ -204,8 +227,8 @@ describe('The autoNumeric object', () => {
         });
     });
 
-    describe('manages the mDec configuration option specially', () => {
-        it('should set the default value for mDec', () => {
+    describe('manages the decimalPlacesOverride configuration option specially', () => {
+        it('should set the default value for decimalPlacesOverride', () => {
             // Setup
             const newInput = document.createElement('input');
             document.body.appendChild(newInput);
@@ -214,111 +237,111 @@ describe('The autoNumeric object', () => {
 
             //--------------- The tests
             // Default value overridden
-            let [, decimalPart] = localANInputSettings.vMin.split('.');
+            let [, decimalPart] = localANInputSettings.minimumValue.split('.');
             let decimalPartLength = 0;
             if (decimalPart !== void(0)) {
                 decimalPartLength = decimalPart.length;
             }
             expect(decimalPartLength).toEqual(2);
 
-            [, decimalPart] = localANInputSettings.vMax.split('.');
+            [, decimalPart] = localANInputSettings.maximumValue.split('.');
             decimalPartLength = 0;
             if (decimalPart !== void(0)) {
                 decimalPartLength = decimalPart.length;
             }
             expect(decimalPartLength).toEqual(2);
 
-            expect(localANInputSettings.mDec).toEqual(decimalPartLength); // Special case for 'mDec': when it's set to 'null' (which is the default), then its value is overwritten by the greater vMin or vMax decimal part
+            expect(localANInputSettings.decimalPlacesOverride).toEqual(decimalPartLength); // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue decimal part
 
             // Tear down
             localANInput.autoNumeric('destroy');
             document.body.removeChild(newInput);
         });
 
-        it('should set the default value for mDec when vMin and vMax have different decimal sizes, vMax being bigger', () => {
+        it('should set the default value for decimalPlacesOverride when minimumValue and maximumValue have different decimal sizes, maximumValue being bigger', () => {
             // Setup
             const newInput = document.createElement('input');
             document.body.appendChild(newInput);
-            const localANInput = $(newInput).autoNumeric('init', { vMin: '-99.99', vMax: '99.999' }); // Initiate the autoNumeric input
+            const localANInput = $(newInput).autoNumeric('init', { minimumValue: '-99.99', maximumValue: '99.999' }); // Initiate the autoNumeric input
             const localANInputSettings = localANInput.autoNumeric('getSettings');
 
             //--------------- The tests
             // Default value overridden
-            let [, decimalPart] = localANInputSettings.vMin.split('.');
-            let vMinDecimalPartLength = 0;
+            let [, decimalPart] = localANInputSettings.minimumValue.split('.');
+            let minimumValueDecimalPartLength = 0;
             if (decimalPart !== void(0)) {
-                vMinDecimalPartLength = decimalPart.length;
+                minimumValueDecimalPartLength = decimalPart.length;
             }
-            expect(vMinDecimalPartLength).toEqual(2);
+            expect(minimumValueDecimalPartLength).toEqual(2);
 
-            [, decimalPart] = localANInputSettings.vMax.split('.');
-            let vMaxDecimalPartLength = 0;
+            [, decimalPart] = localANInputSettings.maximumValue.split('.');
+            let maximumValueDecimalPartLength = 0;
             if (decimalPart !== void(0)) {
-                vMaxDecimalPartLength = decimalPart.length;
+                maximumValueDecimalPartLength = decimalPart.length;
             }
-            expect(vMaxDecimalPartLength).toEqual(3);
+            expect(maximumValueDecimalPartLength).toEqual(3);
 
-            expect(localANInputSettings.mDec).toEqual(Math.max(vMinDecimalPartLength, vMaxDecimalPartLength)); // Special case for 'mDec': when it's set to 'null' (which is the default), then its value is overwritten by the greater vMin or vMax decimal part
+            expect(localANInputSettings.decimalPlacesOverride).toEqual(Math.max(minimumValueDecimalPartLength, maximumValueDecimalPartLength)); // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue decimal part
 
             // Tear down
             localANInput.autoNumeric('destroy');
             document.body.removeChild(newInput);
         });
 
-        it('should set the default value for mDec when vMin and vMax have different decimal sizes, vMin being bigger', () => {
+        it('should set the default value for decimalPlacesOverride when minimumValue and maximumValue have different decimal sizes, minimumValue being bigger', () => {
             // Setup
             const newInput = document.createElement('input');
             document.body.appendChild(newInput);
-            const localANInput = $(newInput).autoNumeric('init', { vMin: '-99.999', vMax: '99.99' }); // Initiate the autoNumeric input
+            const localANInput = $(newInput).autoNumeric('init', { minimumValue: '-99.999', maximumValue: '99.99' }); // Initiate the autoNumeric input
             const localANInputSettings = localANInput.autoNumeric('getSettings');
 
             //--------------- The tests
             // Default value overridden
-            let [, decimalPart] = localANInputSettings.vMin.split('.');
-            let vMinDecimalPartLength = 0;
+            let [, decimalPart] = localANInputSettings.minimumValue.split('.');
+            let minimumValueDecimalPartLength = 0;
             if (decimalPart !== void(0)) {
-                vMinDecimalPartLength = decimalPart.length;
+                minimumValueDecimalPartLength = decimalPart.length;
             }
-            expect(vMinDecimalPartLength).toEqual(3);
+            expect(minimumValueDecimalPartLength).toEqual(3);
 
-            [, decimalPart] = localANInputSettings.vMax.split('.');
-            let vMaxDecimalPartLength = 0;
+            [, decimalPart] = localANInputSettings.maximumValue.split('.');
+            let maximumValueDecimalPartLength = 0;
             if (decimalPart !== void(0)) {
-                vMaxDecimalPartLength = decimalPart.length;
+                maximumValueDecimalPartLength = decimalPart.length;
             }
-            expect(vMaxDecimalPartLength).toEqual(2);
+            expect(maximumValueDecimalPartLength).toEqual(2);
 
-            expect(localANInputSettings.mDec).toEqual(Math.max(vMinDecimalPartLength, vMaxDecimalPartLength)); // Special case for 'mDec': when it's set to 'null' (which is the default), then its value is overwritten by the greater vMin or vMax decimal part
+            expect(localANInputSettings.decimalPlacesOverride).toEqual(Math.max(minimumValueDecimalPartLength, maximumValueDecimalPartLength)); // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue decimal part
 
             // Tear down
             localANInput.autoNumeric('destroy');
             document.body.removeChild(newInput);
         });
 
-        it(`should set the mDec value if it's not set to 'null', overwriting vMin and vMax settings`, () => {
+        it(`should set the decimalPlacesOverride value if it's not set to 'null', overwriting minimumValue and maximumValue settings`, () => {
             // Setup
             const newInput = document.createElement('input');
             document.body.appendChild(newInput);
-            const localANInput = $(newInput).autoNumeric('init', { vMin: '-99.999', vMax: '99.99', mDec: '4' }); // Initiate the autoNumeric input
+            const localANInput = $(newInput).autoNumeric('init', { minimumValue: '-99.999', maximumValue: '99.99', decimalPlacesOverride: '4' }); // Initiate the autoNumeric input
             const localANInputSettings = localANInput.autoNumeric('getSettings');
 
             //--------------- The tests
             // Default value overridden
-            let [, decimalPart] = localANInputSettings.vMin.split('.');
-            let vMinDecimalPartLength = 0;
+            let [, decimalPart] = localANInputSettings.minimumValue.split('.');
+            let minimumValueDecimalPartLength = 0;
             if (decimalPart !== void(0)) {
-                vMinDecimalPartLength = decimalPart.length;
+                minimumValueDecimalPartLength = decimalPart.length;
             }
-            expect(vMinDecimalPartLength).toEqual(3);
+            expect(minimumValueDecimalPartLength).toEqual(3);
 
-            [, decimalPart] = localANInputSettings.vMax.split('.');
-            let vMaxDecimalPartLength = 0;
+            [, decimalPart] = localANInputSettings.maximumValue.split('.');
+            let maximumValueDecimalPartLength = 0;
             if (decimalPart !== void(0)) {
-                vMaxDecimalPartLength = decimalPart.length;
+                maximumValueDecimalPartLength = decimalPart.length;
             }
-            expect(vMaxDecimalPartLength).toEqual(2);
+            expect(maximumValueDecimalPartLength).toEqual(2);
 
-            expect(localANInputSettings.mDec).toEqual(4); // Special case for 'mDec': when it's set to 'null' (which is the default), then its value is overwritten by the greater vMin or vMax decimal part, otherwise it takes precedence over vMin/vMax
+            expect(localANInputSettings.decimalPlacesOverride).toEqual(4); // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue decimal part, otherwise it takes precedence over minimumValue/maximumValue
 
             // Tear down
             localANInput.autoNumeric('destroy');
@@ -329,7 +352,7 @@ describe('The autoNumeric object', () => {
     xdescribe(`autoNumeric 'getSettings' options`, () => { //FIXME Correct those tests
         let aNInput;
         let newInput;
-        const anOptions = { aDec: ',', aSep: '.' };
+        const anOptions = { decimalCharacter: ',', digitGroupSeparator: '.' };
 
         beforeEach(() => { // Initialization
             newInput = document.createElement('input');
@@ -471,25 +494,25 @@ describe(`autoNumeric 'get' and 'getLocalized' methods`, () => {
     it('should return an unformatted value', () => {
         // Euros
         aNInput.autoNumeric('update', autoNumericOptionsEuro);
-        aNInput.autoNumeric('update', { outputType: ',-' });
+        aNInput.autoNumeric('update', { outputFormat: ',-' });
         aNInput.autoNumeric('set', 0);
         expect(aNInput.autoNumeric('get')).toEqual('0.00');
         expect(aNInput.autoNumeric('getLocalized')).toEqual('0');
-        aNInput.autoNumeric('update', { lZero: 'keep' });
+        aNInput.autoNumeric('update', { leadingZero: 'keep' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual('0,00');
 
         aNInput.autoNumeric('set', -42);
         expect(aNInput.autoNumeric('get')).toEqual('-42.00');
         expect(aNInput.autoNumeric('getLocalized')).toEqual('42,00-');
-        aNInput.autoNumeric('update', { outputType: '-,' });
+        aNInput.autoNumeric('update', { outputFormat: '-,' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual('-42,00');
-        aNInput.autoNumeric('update', { outputType: '.-' });
+        aNInput.autoNumeric('update', { outputFormat: '.-' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual('42.00-');
-        aNInput.autoNumeric('update', { outputType: null });
+        aNInput.autoNumeric('update', { outputFormat: null });
         expect(aNInput.autoNumeric('getLocalized')).toEqual('-42.00');
-        aNInput.autoNumeric('update', { outputType: 'number' });
+        aNInput.autoNumeric('update', { outputFormat: 'number' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual(-42);
-        aNInput.autoNumeric('update', { outputType: 'string' });
+        aNInput.autoNumeric('update', { outputFormat: 'string' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual('-42.00');
 
         aNInput.autoNumeric('set', 1234.56);
@@ -517,7 +540,7 @@ describe(`autoNumeric 'get' and 'getLocalized' methods`, () => {
             Number.MAX_SAFE_INTEGER = 9007199254740991;
         }
 
-        aNInput.autoNumeric('update', { vMax: '9007199254740991000000' });
+        aNInput.autoNumeric('update', { maximumValue: '9007199254740991000000' });
         aNInput.autoNumeric('set', Number.MAX_SAFE_INTEGER); // The exact highest safe integer
         expect(aNInput.autoNumeric('get')).toEqual(`${Number.MAX_SAFE_INTEGER}.00`);
         aNInput.autoNumeric('set', '9007199254740996'); // A bit higher than the biggest safest integer
@@ -529,10 +552,10 @@ describe(`autoNumeric 'get' and 'getLocalized' methods`, () => {
 });
 
 describe(`autoNumeric 'get' methods`, () => {
-    it(`should not return a negative value when inputting a positive one and vMin is equal to '0' (cf. issue #284)`, () => {
+    it(`should not return a negative value when inputting a positive one and minimumValue is equal to '0' (cf. issue #284)`, () => {
         const newInput = document.createElement('input');
         document.body.appendChild(newInput);
-        const aNInput = $(newInput).autoNumeric('init', { vMin: '0', vMax: '9999', mDec: '2' }); // Initiate the autoNumeric input
+        const aNInput = $(newInput).autoNumeric('init', { minimumValue: '0', maximumValue: '9999', decimalPlacesOverride: '2' }); // Initiate the autoNumeric input
 
 
         expect(aNInput.autoNumeric('get')).toEqual('0.00');
@@ -547,10 +570,10 @@ describe(`autoNumeric 'get' methods`, () => {
         document.body.removeChild(newInput);
     });
 
-    it(`should not return a negative value when inputting a positive one and vMin is superior to '0' (cf. issue #284)`, () => {
+    it(`should not return a negative value when inputting a positive one and minimumValue is superior to '0' (cf. issue #284)`, () => {
         const newInput = document.createElement('input');
         document.body.appendChild(newInput);
-        const aNInput = $(newInput).autoNumeric('init', { vMin: '1', vMax: '9999', mDec: '2' }); // Initiate the autoNumeric input
+        const aNInput = $(newInput).autoNumeric('init', { minimumValue: '1', maximumValue: '9999', decimalPlacesOverride: '2' }); // Initiate the autoNumeric input
 
 
         expect(aNInput.autoNumeric('get')).toEqual('0.00');
@@ -604,8 +627,8 @@ describe(`autoNumeric 'set' method`, () => {
         expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789,012.35');
     });
 
-    it('should respect the vMin and vMax settings', () => {
-        aNInput.autoNumeric('update', { vMin: '999999.99', vMax: '1111111111111.11' });
+    it('should respect the minimumValue and maximumValue settings', () => {
+        aNInput.autoNumeric('update', { minimumValue: '999999.99', maximumValue: '1111111111111.11' });
         expect(() => aNInput.autoNumeric('set', 999999.99)).not.toThrow();
         expect(() => aNInput.autoNumeric('set', 1111111111111.11)).not.toThrow();
 
@@ -659,7 +682,7 @@ describe(`autoNumeric 'getString' and 'getArray' methods`, () => {
         expect(input5.value).toEqual('not autoNumeric $1,234.567');
 
         // Initiate only 3 autoNumeric inputs
-        const anOptions = { aSep: '.', aDec: ',', aSign: '€ ' };
+        const anOptions = { digitGroupSeparator: '.', decimalCharacter: ',', currencySymbol: '€ ' };
         anInput1 = $(input1).autoNumeric('init', anOptions);
         anInput2 = $(input2).autoNumeric('init', anOptions);
         anInput3 = $(input3).autoNumeric('init', anOptions);
@@ -725,9 +748,9 @@ describe('Static autoNumeric functions', () => {
             expect($.fn.autoUnformat('$123.45')).toEqual('123.45');
             expect($.fn.autoUnformat('$0.00')).toEqual('0.00');
 
-            expect($.fn.autoUnformat('$1,234.56', { outputType : 'number' })).toEqual(1234.56);
-            expect($.fn.autoUnformat('$123.45', { outputType : 'number' })).toEqual(123.45);
-            expect($.fn.autoUnformat('$0.00', { outputType : 'number' })).toEqual(0);
+            expect($.fn.autoUnformat('$1,234.56', { outputFormat : 'number' })).toEqual(1234.56);
+            expect($.fn.autoUnformat('$123.45', { outputFormat : 'number' })).toEqual(123.45);
+            expect($.fn.autoUnformat('$0.00', { outputFormat : 'number' })).toEqual(0);
             expect($.fn.autoUnformat(null)).toEqual(null);
         });
 
@@ -749,12 +772,12 @@ describe('Static autoNumeric functions', () => {
             expect(an.unFormat('$123.45')).toEqual('123.45');
             expect(an.unFormat('$0.00')).toEqual('0.00');
 
-            expect(an.unFormat('$1,234.56', { outputType : 'number' })).toEqual(1234.56);
-            expect(an.unFormat('$123.45', { outputType : 'number' })).toEqual(123.45);
-            expect(an.unFormat('$0.00', { outputType : 'number' })).toEqual(0);
+            expect(an.unFormat('$1,234.56', { outputFormat : 'number' })).toEqual(1234.56);
+            expect(an.unFormat('$123.45', { outputFormat : 'number' })).toEqual(123.45);
+            expect(an.unFormat('$0.00', { outputFormat : 'number' })).toEqual(0);
             expect(an.unFormat(null)).toEqual(null);
-            expect(an.unFormat(1234.56, { outputType : 'number' })).toEqual(1234.56);
-            expect(an.unFormat(0, { outputType : 'number' })).toEqual(0);
+            expect(an.unFormat(1234.56, { outputFormat : 'number' })).toEqual(1234.56);
+            expect(an.unFormat(0, { outputFormat : 'number' })).toEqual(0);
         });
 
         it('with user options', () => {
@@ -834,102 +857,131 @@ describe('Static autoNumeric functions', () => {
     });
 
     describe('`validate` (without jQuery `$.fn`)', () => {
+        it('should validate any old setting name, while outputting a warning', () => {
+            const oldOptionObject = { aSep: ' ' };
+            // Test if a warning is written in the console
+            spyOn(console, 'warn');
+            expect(() => an.validate(oldOptionObject)).not.toThrow();
+            /* eslint no-console: 0 */
+            expect(console.warn).toHaveBeenCalled();
+
+            // We make sure that the initial option object is modified accordingly
+            expect(oldOptionObject).toEqual({ digitGroupSeparator: ' ' });
+        });
+
+        it('should validate multiple old setting names, while outputting as many warnings as needed', () => {
+            const oldOptionObject = { aSep: ' ', aDec: ',', altDec: '.', aSign: ' €' };
+            // Test if a warning is written in the console
+            spyOn(console, 'warn');
+            expect(() => an.validate(oldOptionObject)).not.toThrow();
+            /* eslint no-console: 0 */
+            expect(console.warn).toHaveBeenCalled();
+            expect(console.warn).toHaveBeenCalledTimes(4);
+
+            // We make sure that the initial option object is modified accordingly
+            expect(oldOptionObject).toEqual({ digitGroupSeparator: ' ', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €' });
+        });
+
+        it('should throw when using a unknown option name', () => {
+            expect(() => an.validate({ foobar: '.' })).toThrow();
+        });
+
         it('should validate', () => {
             expect(() => an.validate(autoNumericOptionsEuro)).not.toThrow();
             expect(() => an.validate(autoNumericOptionsDollar)).not.toThrow();
 
-            expect(() => an.validate({ aSep: ',' })).not.toThrow();
-            expect(() => an.validate({ aSep: '.',  aDec: ',' })).not.toThrow();
-            expect(() => an.validate({ aSep: ' ' })).not.toThrow();
-            expect(() => an.validate({ aSep: '' })).not.toThrow();
+            expect(() => an.validate({ digitGroupSeparator: ',' })).not.toThrow();
+            expect(() => an.validate({ digitGroupSeparator: '.',  decimalCharacter: ',' })).not.toThrow();
+            expect(() => an.validate({ digitGroupSeparator: ' ' })).not.toThrow();
+            expect(() => an.validate({ digitGroupSeparator: '' })).not.toThrow();
 
-            expect(() => an.validate({ nSep: false })).not.toThrow();
-            expect(() => an.validate({ nSep: true })).not.toThrow();
-            expect(() => an.validate({ nSep: 'false' })).not.toThrow();
-            expect(() => an.validate({ nSep: 'true' })).not.toThrow();
+            expect(() => an.validate({ noSeparatorOnFocus: false })).not.toThrow();
+            expect(() => an.validate({ noSeparatorOnFocus: true })).not.toThrow();
+            expect(() => an.validate({ noSeparatorOnFocus: 'false' })).not.toThrow();
+            expect(() => an.validate({ noSeparatorOnFocus: 'true' })).not.toThrow();
 
-            expect(() => an.validate({ dGroup: '2' })).not.toThrow();
-            expect(() => an.validate({ dGroup: '3' })).not.toThrow();
-            expect(() => an.validate({ dGroup: 4 })).not.toThrow();
+            expect(() => an.validate({ digitalGroupSpacing: '2' })).not.toThrow();
+            expect(() => an.validate({ digitalGroupSpacing: '3' })).not.toThrow();
+            expect(() => an.validate({ digitalGroupSpacing: 4 })).not.toThrow();
 
-            expect(() => an.validate({ aDec: ',', aSep: ' ' })).not.toThrow();
-            expect(() => an.validate({ aDec: '.' })).not.toThrow();
+            expect(() => an.validate({ decimalCharacter: ',', digitGroupSeparator: ' ' })).not.toThrow();
+            expect(() => an.validate({ decimalCharacter: '.' })).not.toThrow();
 
-            expect(() => an.validate({ altDec: null })).not.toThrow();
-            expect(() => an.validate({ altDec: 'longSeparator' })).not.toThrow();
+            expect(() => an.validate({ decimalCharacterAlternative: null })).not.toThrow();
+            expect(() => an.validate({ decimalCharacterAlternative: 'longSeparator' })).not.toThrow();
 
-            expect(() => an.validate({ aSign: ' €' })).not.toThrow();
-            expect(() => an.validate({ aSign: '' })).not.toThrow();
-            expect(() => an.validate({ aSign: 'foobar' })).not.toThrow();
+            expect(() => an.validate({ currencySymbol: ' €' })).not.toThrow();
+            expect(() => an.validate({ currencySymbol: '' })).not.toThrow();
+            expect(() => an.validate({ currencySymbol: 'foobar' })).not.toThrow();
 
-            expect(() => an.validate({ pSign: 'p' })).not.toThrow();
-            expect(() => an.validate({ pSign: 's' })).not.toThrow();
+            expect(() => an.validate({ currencySymbolPlacement: 'p' })).not.toThrow();
+            expect(() => an.validate({ currencySymbolPlacement: 's' })).not.toThrow();
 
-            expect(() => an.validate({ pNeg: 'p' })).not.toThrow();
-            expect(() => an.validate({ pNeg: 's' })).not.toThrow();
-            expect(() => an.validate({ pNeg: 'l' })).not.toThrow();
-            expect(() => an.validate({ pNeg: 'r' })).not.toThrow();
+            expect(() => an.validate({ negativePositiveSignPlacement: 'p' })).not.toThrow();
+            expect(() => an.validate({ negativePositiveSignPlacement: 's' })).not.toThrow();
+            expect(() => an.validate({ negativePositiveSignPlacement: 'l' })).not.toThrow();
+            expect(() => an.validate({ negativePositiveSignPlacement: 'r' })).not.toThrow();
 
-            expect(() => an.validate({ aSuffix: '' })).not.toThrow();
-            expect(() => an.validate({ aSuffix: 'foobar' })).not.toThrow();
-            expect(() => an.validate({ aSuffix: ' foobar' })).not.toThrow();
-            expect(() => an.validate({ aSuffix: 'foo bar' })).not.toThrow();
-            expect(() => an.validate({ aSuffix: 'foobar ' })).not.toThrow();
+            expect(() => an.validate({ suffixText: '' })).not.toThrow();
+            expect(() => an.validate({ suffixText: 'foobar' })).not.toThrow();
+            expect(() => an.validate({ suffixText: ' foobar' })).not.toThrow();
+            expect(() => an.validate({ suffixText: 'foo bar' })).not.toThrow();
+            expect(() => an.validate({ suffixText: 'foobar ' })).not.toThrow();
 
-            expect(() => an.validate({ oLimits: null })).not.toThrow();
-            expect(() => an.validate({ oLimits: 'ceiling' })).not.toThrow();
-            expect(() => an.validate({ oLimits: 'floor' })).not.toThrow();
-            expect(() => an.validate({ oLimits: 'ignore' })).not.toThrow();
+            expect(() => an.validate({ overrideMinMaxLimits: null })).not.toThrow();
+            expect(() => an.validate({ overrideMinMaxLimits: 'ceiling' })).not.toThrow();
+            expect(() => an.validate({ overrideMinMaxLimits: 'floor' })).not.toThrow();
+            expect(() => an.validate({ overrideMinMaxLimits: 'ignore' })).not.toThrow();
 
-            expect(() => an.validate({ vMax: '42' })).not.toThrow();
-            expect(() => an.validate({ vMax: '42.4' })).not.toThrow();
-            expect(() => an.validate({ vMax: '42.42' })).not.toThrow();
-            expect(() => an.validate({ vMax: '-42' })).not.toThrow();
-            expect(() => an.validate({ vMax: '-42.4' })).not.toThrow();
-            expect(() => an.validate({ vMax: '-42.42' })).not.toThrow();
-            expect(() => an.validate({ vMax: '9999999999999.99' })).not.toThrow();
-            expect(() => an.validate({ vMax: '-9999999999999.99' })).not.toThrow();
+            expect(() => an.validate({ maximumValue: '42' })).not.toThrow();
+            expect(() => an.validate({ maximumValue: '42.4' })).not.toThrow();
+            expect(() => an.validate({ maximumValue: '42.42' })).not.toThrow();
+            expect(() => an.validate({ maximumValue: '-42' })).not.toThrow();
+            expect(() => an.validate({ maximumValue: '-42.4' })).not.toThrow();
+            expect(() => an.validate({ maximumValue: '-42.42' })).not.toThrow();
+            expect(() => an.validate({ maximumValue: '9999999999999.99' })).not.toThrow();
+            expect(() => an.validate({ maximumValue: '-9999999999999.99' })).not.toThrow();
 
-            expect(() => an.validate({ vMin: '42' })).not.toThrow();
-            expect(() => an.validate({ vMin: '42.4' })).not.toThrow();
-            expect(() => an.validate({ vMin: '42.42' })).not.toThrow();
-            expect(() => an.validate({ vMin: '-42' })).not.toThrow();
-            expect(() => an.validate({ vMin: '-42.4' })).not.toThrow();
-            expect(() => an.validate({ vMin: '-42.42' })).not.toThrow();
-            expect(() => an.validate({ vMin: '9999999999999.99' })).not.toThrow();
-            expect(() => an.validate({ vMin: '-9999999999999.99' })).not.toThrow();
+            expect(() => an.validate({ minimumValue: '42' })).not.toThrow();
+            expect(() => an.validate({ minimumValue: '42.4' })).not.toThrow();
+            expect(() => an.validate({ minimumValue: '42.42' })).not.toThrow();
+            expect(() => an.validate({ minimumValue: '-42' })).not.toThrow();
+            expect(() => an.validate({ minimumValue: '-42.4' })).not.toThrow();
+            expect(() => an.validate({ minimumValue: '-42.42' })).not.toThrow();
+            expect(() => an.validate({ minimumValue: '9999999999999.99' })).not.toThrow();
+            expect(() => an.validate({ minimumValue: '-9999999999999.99' })).not.toThrow();
 
-            expect(() => an.validate({ vMin: '-10', vMax: '-5' })).not.toThrow();
-            expect(() => an.validate({ vMin: '-10', vMax:  '0' })).not.toThrow();
-            expect(() => an.validate({ vMin: '-10', vMax: '20' })).not.toThrow();
-            expect(() => an.validate({ vMin:   '0', vMax: '20' })).not.toThrow();
-            expect(() => an.validate({ vMin:  '10', vMax: '20' })).not.toThrow();
+            expect(() => an.validate({ minimumValue: '-10', maximumValue: '-5' })).not.toThrow();
+            expect(() => an.validate({ minimumValue: '-10', maximumValue:  '0' })).not.toThrow();
+            expect(() => an.validate({ minimumValue: '-10', maximumValue: '20' })).not.toThrow();
+            expect(() => an.validate({ minimumValue:   '0', maximumValue: '20' })).not.toThrow();
+            expect(() => an.validate({ minimumValue:  '10', maximumValue: '20' })).not.toThrow();
 
-            expect(() => an.validate({ mDec: null })).not.toThrow();
-            expect(() => an.validate({ mDec: '0' })).not.toThrow();
-            expect(() => an.validate({ mDec: '2' })).not.toThrow();
-            expect(() => an.validate({ mDec: '15' })).not.toThrow();
-            expect(() => an.validate({ mDec: 5 })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: null })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: '0' })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: '2' })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: '15' })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: 5 })).not.toThrow();
 
-            expect(() => an.validate({ aPad: false, mDec: '2' })).not.toThrow(); // This will output a warning
-            expect(() => an.validate({ mDec: '2', vMin: '0', vMax: '20' })).not.toThrow(); // This will output a warning
+            expect(() => an.validate({ allowDecimalPadding: false, decimalPlacesOverride: '2' })).not.toThrow(); // This will output a warning
+            expect(() => an.validate({ decimalPlacesOverride: '2', minimumValue: '0', maximumValue: '20' })).not.toThrow(); // This will output a warning
 
-            expect(() => an.validate({ eDec: null })).not.toThrow();
-            expect(() => an.validate({ eDec: '0' })).not.toThrow();
-            expect(() => an.validate({ eDec: '2' })).not.toThrow();
-            expect(() => an.validate({ eDec: '15' })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesShownOnFocus: null })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesShownOnFocus: '0' })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesShownOnFocus: '15' })).not.toThrow();
 
-            expect(() => an.validate({ mDec: '2', eDec: '2' })).not.toThrow();
-            expect(() => an.validate({ mDec: '3', eDec: '2' })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: '2', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
 
             expect(() => an.validate({ scaleDivisor: null })).not.toThrow();
             expect(() => an.validate({ scaleDivisor: '100' })).not.toThrow();
             expect(() => an.validate({ scaleDivisor: 100 })).not.toThrow();
             expect(() => an.validate({ scaleDivisor: 45.89 })).not.toThrow();
 
-            expect(() => an.validate({ scaleDecimal: null })).not.toThrow();
-            expect(() => an.validate({ scaleDecimal: 0 })).not.toThrow();
-            expect(() => an.validate({ scaleDecimal: 2 })).not.toThrow();
+            expect(() => an.validate({ scaleDecimalPlaces: null })).not.toThrow();
+            expect(() => an.validate({ scaleDecimalPlaces: 0 })).not.toThrow();
+            expect(() => an.validate({ scaleDecimalPlaces: 2 })).not.toThrow();
 
             expect(() => an.validate({ scaleSymbol: null })).not.toThrow();
             expect(() => an.validate({ scaleSymbol: '' })).not.toThrow();
@@ -938,83 +990,83 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ scaleSymbol: ' foobar' })).not.toThrow();
             expect(() => an.validate({ scaleSymbol: 'foobar ' })).not.toThrow();
 
-            expect(() => an.validate({ aStor: true })).not.toThrow();
-            expect(() => an.validate({ aStor: false })).not.toThrow();
-            expect(() => an.validate({ aStor: 'true' })).not.toThrow();
-            expect(() => an.validate({ aStor: 'false' })).not.toThrow();
+            expect(() => an.validate({ saveValueToSessionStorage: true })).not.toThrow();
+            expect(() => an.validate({ saveValueToSessionStorage: false })).not.toThrow();
+            expect(() => an.validate({ saveValueToSessionStorage: 'true' })).not.toThrow();
+            expect(() => an.validate({ saveValueToSessionStorage: 'false' })).not.toThrow();
 
-            expect(() => an.validate({ mRound: 'S' })).not.toThrow();
-            expect(() => an.validate({ mRound: 'A' })).not.toThrow();
-            expect(() => an.validate({ mRound: 's' })).not.toThrow();
-            expect(() => an.validate({ mRound: 'a' })).not.toThrow();
-            expect(() => an.validate({ mRound: 'B' })).not.toThrow();
-            expect(() => an.validate({ mRound: 'U' })).not.toThrow();
-            expect(() => an.validate({ mRound: 'D' })).not.toThrow();
-            expect(() => an.validate({ mRound: 'C' })).not.toThrow();
-            expect(() => an.validate({ mRound: 'F' })).not.toThrow();
-            expect(() => an.validate({ mRound: 'N05' })).not.toThrow();
-            expect(() => an.validate({ mRound: 'CHF' })).not.toThrow();
-            expect(() => an.validate({ mRound: 'U05' })).not.toThrow();
-            expect(() => an.validate({ mRound: 'D05' })).not.toThrow();
+            expect(() => an.validate({ roundingMethod: 'S' })).not.toThrow();
+            expect(() => an.validate({ roundingMethod: 'A' })).not.toThrow();
+            expect(() => an.validate({ roundingMethod: 's' })).not.toThrow();
+            expect(() => an.validate({ roundingMethod: 'a' })).not.toThrow();
+            expect(() => an.validate({ roundingMethod: 'B' })).not.toThrow();
+            expect(() => an.validate({ roundingMethod: 'U' })).not.toThrow();
+            expect(() => an.validate({ roundingMethod: 'D' })).not.toThrow();
+            expect(() => an.validate({ roundingMethod: 'C' })).not.toThrow();
+            expect(() => an.validate({ roundingMethod: 'F' })).not.toThrow();
+            expect(() => an.validate({ roundingMethod: 'N05' })).not.toThrow();
+            expect(() => an.validate({ roundingMethod: 'CHF' })).not.toThrow();
+            expect(() => an.validate({ roundingMethod: 'U05' })).not.toThrow();
+            expect(() => an.validate({ roundingMethod: 'D05' })).not.toThrow();
 
-            expect(() => an.validate({ aPad: true })).not.toThrow();
-            expect(() => an.validate({ aPad: false })).not.toThrow();
-            expect(() => an.validate({ aPad: 'true' })).not.toThrow();
-            expect(() => an.validate({ aPad: 'false' })).not.toThrow();
+            expect(() => an.validate({ allowDecimalPadding: true })).not.toThrow();
+            expect(() => an.validate({ allowDecimalPadding: false })).not.toThrow();
+            expect(() => an.validate({ allowDecimalPadding: 'true' })).not.toThrow();
+            expect(() => an.validate({ allowDecimalPadding: 'false' })).not.toThrow();
 
-            expect(() => an.validate({ nBracket: null })).not.toThrow();
-            expect(() => an.validate({ nBracket: '(,)' })).not.toThrow();
-            expect(() => an.validate({ nBracket: '[,]' })).not.toThrow();
-            expect(() => an.validate({ nBracket: '<,>' })).not.toThrow();
-            expect(() => an.validate({ nBracket: '{,}' })).not.toThrow();
+            expect(() => an.validate({ negativeBracketsTypeOnBlur: null })).not.toThrow();
+            expect(() => an.validate({ negativeBracketsTypeOnBlur: '(,)' })).not.toThrow();
+            expect(() => an.validate({ negativeBracketsTypeOnBlur: '[,]' })).not.toThrow();
+            expect(() => an.validate({ negativeBracketsTypeOnBlur: '<,>' })).not.toThrow();
+            expect(() => an.validate({ negativeBracketsTypeOnBlur: '{,}' })).not.toThrow();
 
-            expect(() => an.validate({ wEmpty: 'focus' })).not.toThrow();
-            expect(() => an.validate({ wEmpty: 'press' })).not.toThrow();
-            expect(() => an.validate({ wEmpty: 'always' })).not.toThrow();
-            expect(() => an.validate({ wEmpty: 'zero' })).not.toThrow();
+            expect(() => an.validate({ emptyInputBehavior: 'focus' })).not.toThrow();
+            expect(() => an.validate({ emptyInputBehavior: 'press' })).not.toThrow();
+            expect(() => an.validate({ emptyInputBehavior: 'always' })).not.toThrow();
+            expect(() => an.validate({ emptyInputBehavior: 'zero' })).not.toThrow();
 
-            expect(() => an.validate({ lZero: 'allow' })).not.toThrow();
-            expect(() => an.validate({ lZero: 'deny' })).not.toThrow();
-            expect(() => an.validate({ lZero: 'keep' })).not.toThrow();
+            expect(() => an.validate({ leadingZero: 'allow' })).not.toThrow();
+            expect(() => an.validate({ leadingZero: 'deny' })).not.toThrow();
+            expect(() => an.validate({ leadingZero: 'keep' })).not.toThrow();
 
-            expect(() => an.validate({ aForm: true })).not.toThrow();
-            expect(() => an.validate({ aForm: false })).not.toThrow();
-            expect(() => an.validate({ aForm: 'true' })).not.toThrow();
-            expect(() => an.validate({ aForm: 'false' })).not.toThrow();
+            expect(() => an.validate({ formatOnPageLoad: true })).not.toThrow();
+            expect(() => an.validate({ formatOnPageLoad: false })).not.toThrow();
+            expect(() => an.validate({ formatOnPageLoad: 'true' })).not.toThrow();
+            expect(() => an.validate({ formatOnPageLoad: 'false' })).not.toThrow();
 
-            expect(() => an.validate({ sNumber: true })).not.toThrow();
-            expect(() => an.validate({ sNumber: false })).not.toThrow();
-            expect(() => an.validate({ sNumber: 'true' })).not.toThrow();
-            expect(() => an.validate({ sNumber: 'false' })).not.toThrow();
+            expect(() => an.validate({ selectNumberOnly: true })).not.toThrow();
+            expect(() => an.validate({ selectNumberOnly: false })).not.toThrow();
+            expect(() => an.validate({ selectNumberOnly: 'true' })).not.toThrow();
+            expect(() => an.validate({ selectNumberOnly: 'false' })).not.toThrow();
 
-            expect(() => an.validate({ anDefault: null })).not.toThrow();
-            expect(() => an.validate({ anDefault: '' })).not.toThrow();
-            expect(() => an.validate({ anDefault: '42' })).not.toThrow();
-            expect(() => an.validate({ anDefault: '-42' })).not.toThrow();
-            expect(() => an.validate({ anDefault: '42.99' })).not.toThrow();
-            expect(() => an.validate({ anDefault: '-42.99' })).not.toThrow();
-            expect(() => an.validate({ anDefault: 5 })).not.toThrow();
-            expect(() => an.validate({ anDefault: -5 })).not.toThrow();
+            expect(() => an.validate({ defaultValueOverride: null })).not.toThrow();
+            expect(() => an.validate({ defaultValueOverride: '' })).not.toThrow();
+            expect(() => an.validate({ defaultValueOverride: '42' })).not.toThrow();
+            expect(() => an.validate({ defaultValueOverride: '-42' })).not.toThrow();
+            expect(() => an.validate({ defaultValueOverride: '42.99' })).not.toThrow();
+            expect(() => an.validate({ defaultValueOverride: '-42.99' })).not.toThrow();
+            expect(() => an.validate({ defaultValueOverride: 5 })).not.toThrow();
+            expect(() => an.validate({ defaultValueOverride: -5 })).not.toThrow();
 
-            expect(() => an.validate({ unSetOnSubmit: true })).not.toThrow();
-            expect(() => an.validate({ unSetOnSubmit: false })).not.toThrow();
-            expect(() => an.validate({ unSetOnSubmit: 'true' })).not.toThrow();
-            expect(() => an.validate({ unSetOnSubmit: 'false' })).not.toThrow();
+            expect(() => an.validate({ unformatOnSubmit: true })).not.toThrow();
+            expect(() => an.validate({ unformatOnSubmit: false })).not.toThrow();
+            expect(() => an.validate({ unformatOnSubmit: 'true' })).not.toThrow();
+            expect(() => an.validate({ unformatOnSubmit: 'false' })).not.toThrow();
 
-            expect(() => an.validate({ outputType: null })).not.toThrow();
-            expect(() => an.validate({ outputType: 'string' })).not.toThrow();
-            expect(() => an.validate({ outputType: 'number' })).not.toThrow();
-            expect(() => an.validate({ outputType: '.' })).not.toThrow();
-            expect(() => an.validate({ outputType: '-.' })).not.toThrow();
-            expect(() => an.validate({ outputType: ',' })).not.toThrow();
-            expect(() => an.validate({ outputType: '-,' })).not.toThrow();
-            expect(() => an.validate({ outputType: '.-' })).not.toThrow();
-            expect(() => an.validate({ outputType: ',-' })).not.toThrow();
+            expect(() => an.validate({ outputFormat: null })).not.toThrow();
+            expect(() => an.validate({ outputFormat: 'string' })).not.toThrow();
+            expect(() => an.validate({ outputFormat: 'number' })).not.toThrow();
+            expect(() => an.validate({ outputFormat: '.' })).not.toThrow();
+            expect(() => an.validate({ outputFormat: '-.' })).not.toThrow();
+            expect(() => an.validate({ outputFormat: ',' })).not.toThrow();
+            expect(() => an.validate({ outputFormat: '-,' })).not.toThrow();
+            expect(() => an.validate({ outputFormat: '.-' })).not.toThrow();
+            expect(() => an.validate({ outputFormat: ',-' })).not.toThrow();
 
-            expect(() => an.validate({ debug: true })).not.toThrow();
-            expect(() => an.validate({ debug: false })).not.toThrow();
-            expect(() => an.validate({ debug: 'true' })).not.toThrow();
-            expect(() => an.validate({ debug: 'false' })).not.toThrow();
+            expect(() => an.validate({ showWarnings: true })).not.toThrow();
+            expect(() => an.validate({ showWarnings: false })).not.toThrow();
+            expect(() => an.validate({ showWarnings: 'true' })).not.toThrow();
+            expect(() => an.validate({ showWarnings: 'false' })).not.toThrow();
         });
 
         it('should not validate', () => {
@@ -1024,205 +1076,205 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate('')).toThrow();
             expect(() => an.validate([])).toThrow();
             expect(() => an.validate({})).toThrow();
-            expect(() => an.validate([{ aSep: '.' }])).toThrow();
+            expect(() => an.validate([{ digitGroupSeparator: '.' }])).toThrow();
             expect(() => an.validate('foobar')).toThrow();
             expect(() => an.validate(42)).toThrow();
 
-            expect(() => an.validate({ aSep: '-' })).toThrow();
-            expect(() => an.validate({ aSep: 'a' })).toThrow();
-            expect(() => an.validate({ aSep: 42 })).toThrow();
-            expect(() => an.validate({ aSep: '.' })).toThrow(); // Since the default 'aDec' is '.' too
-            expect(() => an.validate({ aSep: true })).toThrow();
-            expect(() => an.validate({ aSep: null })).toThrow();
+            expect(() => an.validate({ digitGroupSeparator: '-' })).toThrow();
+            expect(() => an.validate({ digitGroupSeparator: 'a' })).toThrow();
+            expect(() => an.validate({ digitGroupSeparator: 42 })).toThrow();
+            expect(() => an.validate({ digitGroupSeparator: '.' })).toThrow(); // Since the default 'decimalCharacter' is '.' too
+            expect(() => an.validate({ digitGroupSeparator: true })).toThrow();
+            expect(() => an.validate({ digitGroupSeparator: null })).toThrow();
 
-            expect(() => an.validate({ nSep: 'foobar' })).toThrow();
-            expect(() => an.validate({ nSep: 42 })).toThrow();
-            expect(() => an.validate({ nSep: null })).toThrow();
+            expect(() => an.validate({ noSeparatorOnFocus: 'foobar' })).toThrow();
+            expect(() => an.validate({ noSeparatorOnFocus: 42 })).toThrow();
+            expect(() => an.validate({ noSeparatorOnFocus: null })).toThrow();
 
-            expect(() => an.validate({ dGroup: '37foo' })).toThrow();
-            expect(() => an.validate({ dGroup: null })).toThrow();
+            expect(() => an.validate({ digitalGroupSpacing: '37foo' })).toThrow();
+            expect(() => an.validate({ digitalGroupSpacing: null })).toThrow();
 
-            expect(() => an.validate({ aDec: 'foobar' })).toThrow();
-            expect(() => an.validate({ aDec: true })).toThrow();
-            expect(() => an.validate({ aDec: 42 })).toThrow();
-            expect(() => an.validate({ aDec: '.', aSep: '.' })).toThrow();
-            expect(() => an.validate({ aDec: ',', aSep: ',' })).toThrow();
+            expect(() => an.validate({ decimalCharacter: 'foobar' })).toThrow();
+            expect(() => an.validate({ decimalCharacter: true })).toThrow();
+            expect(() => an.validate({ decimalCharacter: 42 })).toThrow();
+            expect(() => an.validate({ decimalCharacter: '.', digitGroupSeparator: '.' })).toThrow();
+            expect(() => an.validate({ decimalCharacter: ',', digitGroupSeparator: ',' })).toThrow();
 
-            expect(() => an.validate({ altDec: 42 })).toThrow();
-            expect(() => an.validate({ altDec: true })).toThrow();
-            expect(() => an.validate({ altDec: ['foobar'] })).toThrow();
+            expect(() => an.validate({ decimalCharacterAlternative: 42 })).toThrow();
+            expect(() => an.validate({ decimalCharacterAlternative: true })).toThrow();
+            expect(() => an.validate({ decimalCharacterAlternative: ['foobar'] })).toThrow();
 
-            expect(() => an.validate({ aSign: [] })).toThrow();
-            expect(() => an.validate({ aSign: 42 })).toThrow();
-            expect(() => an.validate({ aSign: true })).toThrow();
-            expect(() => an.validate({ aSign: null })).toThrow();
+            expect(() => an.validate({ currencySymbol: [] })).toThrow();
+            expect(() => an.validate({ currencySymbol: 42 })).toThrow();
+            expect(() => an.validate({ currencySymbol: true })).toThrow();
+            expect(() => an.validate({ currencySymbol: null })).toThrow();
 
-            expect(() => an.validate({ pSign: ['s'] })).toThrow();
-            expect(() => an.validate({ pSign: 42 })).toThrow();
-            expect(() => an.validate({ pSign: true })).toThrow();
-            expect(() => an.validate({ pSign: null })).toThrow();
-            expect(() => an.validate({ pSign: 'foobar' })).toThrow();
+            expect(() => an.validate({ currencySymbolPlacement: ['s'] })).toThrow();
+            expect(() => an.validate({ currencySymbolPlacement: 42 })).toThrow();
+            expect(() => an.validate({ currencySymbolPlacement: true })).toThrow();
+            expect(() => an.validate({ currencySymbolPlacement: null })).toThrow();
+            expect(() => an.validate({ currencySymbolPlacement: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ pNeg: ['r'] })).toThrow();
-            expect(() => an.validate({ pNeg: 42 })).toThrow();
-            expect(() => an.validate({ pNeg: true })).toThrow();
-            expect(() => an.validate({ pNeg: null })).toThrow();
-            expect(() => an.validate({ pNeg: 'foobar' })).toThrow();
+            expect(() => an.validate({ negativePositiveSignPlacement: ['r'] })).toThrow();
+            expect(() => an.validate({ negativePositiveSignPlacement: 42 })).toThrow();
+            expect(() => an.validate({ negativePositiveSignPlacement: true })).toThrow();
+            expect(() => an.validate({ negativePositiveSignPlacement: null })).toThrow();
+            expect(() => an.validate({ negativePositiveSignPlacement: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ aSuffix: '-foobar' })).toThrow();
-            expect(() => an.validate({ aSuffix: 'foo-bar' })).toThrow();
-            expect(() => an.validate({ aSuffix: 'foo42bar' })).toThrow();
-            expect(() => an.validate({ aSuffix: '42foobar' })).toThrow();
-            expect(() => an.validate({ aSuffix: 'foobar42' })).toThrow();
-            expect(() => an.validate({ aSuffix: 42 })).toThrow();
-            expect(() => an.validate({ aSuffix: -42 })).toThrow();
-            expect(() => an.validate({ aSuffix: true })).toThrow();
-            expect(() => an.validate({ aSuffix: null })).toThrow();
+            expect(() => an.validate({ suffixText: '-foobar' })).toThrow();
+            expect(() => an.validate({ suffixText: 'foo-bar' })).toThrow();
+            expect(() => an.validate({ suffixText: 'foo42bar' })).toThrow();
+            expect(() => an.validate({ suffixText: '42foobar' })).toThrow();
+            expect(() => an.validate({ suffixText: 'foobar42' })).toThrow();
+            expect(() => an.validate({ suffixText: 42 })).toThrow();
+            expect(() => an.validate({ suffixText: -42 })).toThrow();
+            expect(() => an.validate({ suffixText: true })).toThrow();
+            expect(() => an.validate({ suffixText: null })).toThrow();
 
-            expect(() => an.validate({ oLimits: 'foobar' })).toThrow();
-            expect(() => an.validate({ oLimits: 42 })).toThrow();
-            expect(() => an.validate({ oLimits: true })).toThrow();
+            expect(() => an.validate({ overrideMinMaxLimits: 'foobar' })).toThrow();
+            expect(() => an.validate({ overrideMinMaxLimits: 42 })).toThrow();
+            expect(() => an.validate({ overrideMinMaxLimits: true })).toThrow();
 
-            expect(() => an.validate({ vMax: true })).toThrow();
-            expect(() => an.validate({ vMax: null })).toThrow();
-            expect(() => an.validate({ vMax: 42 })).toThrow();
-            expect(() => an.validate({ vMax: 42.42 })).toThrow();
-            expect(() => an.validate({ vMax: -42 })).toThrow();
-            expect(() => an.validate({ vMax: -42.42 })).toThrow();
-            expect(() => an.validate({ vMax: '42.' })).toThrow();
-            expect(() => an.validate({ vMax: '-42.' })).toThrow();
-            expect(() => an.validate({ vMax: '.42' })).toThrow();
-            expect(() => an.validate({ vMax: '-42foobar' })).toThrow();
-            expect(() => an.validate({ vMax: '9999999999999,99' })).toThrow();
-            expect(() => an.validate({ vMax: 'foobar' })).toThrow();
+            expect(() => an.validate({ maximumValue: true })).toThrow();
+            expect(() => an.validate({ maximumValue: null })).toThrow();
+            expect(() => an.validate({ maximumValue: 42 })).toThrow();
+            expect(() => an.validate({ maximumValue: 42.42 })).toThrow();
+            expect(() => an.validate({ maximumValue: -42 })).toThrow();
+            expect(() => an.validate({ maximumValue: -42.42 })).toThrow();
+            expect(() => an.validate({ maximumValue: '42.' })).toThrow();
+            expect(() => an.validate({ maximumValue: '-42.' })).toThrow();
+            expect(() => an.validate({ maximumValue: '.42' })).toThrow();
+            expect(() => an.validate({ maximumValue: '-42foobar' })).toThrow();
+            expect(() => an.validate({ maximumValue: '9999999999999,99' })).toThrow();
+            expect(() => an.validate({ maximumValue: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ vMin: true })).toThrow();
-            expect(() => an.validate({ vMin: null })).toThrow();
-            expect(() => an.validate({ vMin: 42 })).toThrow();
-            expect(() => an.validate({ vMin: 42.42 })).toThrow();
-            expect(() => an.validate({ vMin: -42 })).toThrow();
-            expect(() => an.validate({ vMin: -42.42 })).toThrow();
-            expect(() => an.validate({ vMin: '42.' })).toThrow();
-            expect(() => an.validate({ vMin: '-42.' })).toThrow();
-            expect(() => an.validate({ vMin: '.42' })).toThrow();
-            expect(() => an.validate({ vMin: '-42foobar' })).toThrow();
-            expect(() => an.validate({ vMin: '9999999999999,99' })).toThrow();
-            expect(() => an.validate({ vMin: 'foobar' })).toThrow();
+            expect(() => an.validate({ minimumValue: true })).toThrow();
+            expect(() => an.validate({ minimumValue: null })).toThrow();
+            expect(() => an.validate({ minimumValue: 42 })).toThrow();
+            expect(() => an.validate({ minimumValue: 42.42 })).toThrow();
+            expect(() => an.validate({ minimumValue: -42 })).toThrow();
+            expect(() => an.validate({ minimumValue: -42.42 })).toThrow();
+            expect(() => an.validate({ minimumValue: '42.' })).toThrow();
+            expect(() => an.validate({ minimumValue: '-42.' })).toThrow();
+            expect(() => an.validate({ minimumValue: '.42' })).toThrow();
+            expect(() => an.validate({ minimumValue: '-42foobar' })).toThrow();
+            expect(() => an.validate({ minimumValue: '9999999999999,99' })).toThrow();
+            expect(() => an.validate({ minimumValue: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ vMin: '20', vMax: '-10' })).toThrow();
-            expect(() => an.validate({ vMin: '-5', vMax: '-10' })).toThrow();
-            expect(() => an.validate({ vMin:  '0', vMax: '-10' })).toThrow();
-            expect(() => an.validate({ vMin: '20', vMax: '-10' })).toThrow();
-            expect(() => an.validate({ vMin: '20', vMax:   '0' })).toThrow();
-            expect(() => an.validate({ vMin: '20', vMax:  '10' })).toThrow();
+            expect(() => an.validate({ minimumValue: '20', maximumValue: '-10' })).toThrow();
+            expect(() => an.validate({ minimumValue: '-5', maximumValue: '-10' })).toThrow();
+            expect(() => an.validate({ minimumValue:  '0', maximumValue: '-10' })).toThrow();
+            expect(() => an.validate({ minimumValue: '20', maximumValue: '-10' })).toThrow();
+            expect(() => an.validate({ minimumValue: '20', maximumValue:   '0' })).toThrow();
+            expect(() => an.validate({ minimumValue: '20', maximumValue:  '10' })).toThrow();
 
-            expect(() => an.validate({ mDec: [] })).toThrow();
-            expect(() => an.validate({ mDec: true })).toThrow();
-            expect(() => an.validate({ mDec: 'foobar' })).toThrow();
-            expect(() => an.validate({ mDec: '22foobar' })).toThrow();
-            expect(() => an.validate({ mDec: '-5' })).toThrow();
-            expect(() => an.validate({ mDec: -5 })).toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: [] })).toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: true })).toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: 'foobar' })).toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: '22foobar' })).toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: '-5' })).toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: -5 })).toThrow();
 
-            expect(() => an.validate({ eDec: [] })).toThrow();
-            expect(() => an.validate({ eDec: true })).toThrow();
-            expect(() => an.validate({ eDec: 'foobar' })).toThrow();
-            expect(() => an.validate({ eDec: '22foobar' })).toThrow();
-            expect(() => an.validate({ eDec: '-5' })).toThrow();
-            expect(() => an.validate({ eDec: 5 })).toThrow();
-            expect(() => an.validate({ eDec: -5 })).toThrow();
+            expect(() => an.validate({ decimalPlacesShownOnFocus: [] })).toThrow();
+            expect(() => an.validate({ decimalPlacesShownOnFocus: true })).toThrow();
+            expect(() => an.validate({ decimalPlacesShownOnFocus: 'foobar' })).toThrow();
+            expect(() => an.validate({ decimalPlacesShownOnFocus: '22foobar' })).toThrow();
+            expect(() => an.validate({ decimalPlacesShownOnFocus: '-5' })).toThrow();
+            expect(() => an.validate({ decimalPlacesShownOnFocus: 5 })).toThrow();
+            expect(() => an.validate({ decimalPlacesShownOnFocus: -5 })).toThrow();
 
-            expect(() => an.validate({ mDec: '2', eDec: '3' })).toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: '2', decimalPlacesShownOnFocus: '3' })).toThrow();
 
             expect(() => an.validate({ scaleDivisor: 'foobar' })).toThrow();
             expect(() => an.validate({ scaleDivisor: true })).toThrow();
             expect(() => an.validate({ scaleDivisor: -1000 })).toThrow();
 
-            expect(() => an.validate({ scaleDecimal: -5 })).toThrow();
-            expect(() => an.validate({ scaleDecimal: 4.2 })).toThrow();
-            expect(() => an.validate({ scaleDecimal: 'foobar' })).toThrow();
-            expect(() => an.validate({ scaleDecimal: false })).toThrow();
+            expect(() => an.validate({ scaleDecimalPlaces: -5 })).toThrow();
+            expect(() => an.validate({ scaleDecimalPlaces: 4.2 })).toThrow();
+            expect(() => an.validate({ scaleDecimalPlaces: 'foobar' })).toThrow();
+            expect(() => an.validate({ scaleDecimalPlaces: false })).toThrow();
 
             expect(() => an.validate({ scaleSymbol: true })).toThrow();
             expect(() => an.validate({ scaleSymbol: 42 })).toThrow();
             expect(() => an.validate({ scaleSymbol: [] })).toThrow();
 
-            expect(() => an.validate({ aStor: 0 })).toThrow();
-            expect(() => an.validate({ aStor: 1 })).toThrow();
-            expect(() => an.validate({ aStor: '0' })).toThrow();
-            expect(() => an.validate({ aStor: '1' })).toThrow();
-            expect(() => an.validate({ aStor: 'foobar' })).toThrow();
+            expect(() => an.validate({ saveValueToSessionStorage: 0 })).toThrow();
+            expect(() => an.validate({ saveValueToSessionStorage: 1 })).toThrow();
+            expect(() => an.validate({ saveValueToSessionStorage: '0' })).toThrow();
+            expect(() => an.validate({ saveValueToSessionStorage: '1' })).toThrow();
+            expect(() => an.validate({ saveValueToSessionStorage: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ mRound: 0.5 })).toThrow();
-            expect(() => an.validate({ mRound: true })).toThrow();
-            expect(() => an.validate({ mRound: null })).toThrow();
-            expect(() => an.validate({ mRound: 'foobar' })).toThrow();
+            expect(() => an.validate({ roundingMethod: 0.5 })).toThrow();
+            expect(() => an.validate({ roundingMethod: true })).toThrow();
+            expect(() => an.validate({ roundingMethod: null })).toThrow();
+            expect(() => an.validate({ roundingMethod: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ aPad: 0 })).toThrow();
-            expect(() => an.validate({ aPad: 1 })).toThrow();
-            expect(() => an.validate({ aPad: '0' })).toThrow();
-            expect(() => an.validate({ aPad: '1' })).toThrow();
-            expect(() => an.validate({ aPad: 'foobar' })).toThrow();
+            expect(() => an.validate({ allowDecimalPadding: 0 })).toThrow();
+            expect(() => an.validate({ allowDecimalPadding: 1 })).toThrow();
+            expect(() => an.validate({ allowDecimalPadding: '0' })).toThrow();
+            expect(() => an.validate({ allowDecimalPadding: '1' })).toThrow();
+            expect(() => an.validate({ allowDecimalPadding: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ nBracket: [] })).toThrow();
-            expect(() => an.validate({ nBracket: true })).toThrow();
-            expect(() => an.validate({ nBracket: 'foobar' })).toThrow();
-            expect(() => an.validate({ nBracket: '22foobar' })).toThrow();
-            expect(() => an.validate({ nBracket: '-5' })).toThrow();
-            expect(() => an.validate({ nBracket: 5 })).toThrow();
-            expect(() => an.validate({ nBracket: -5 })).toThrow();
+            expect(() => an.validate({ negativeBracketsTypeOnBlur: [] })).toThrow();
+            expect(() => an.validate({ negativeBracketsTypeOnBlur: true })).toThrow();
+            expect(() => an.validate({ negativeBracketsTypeOnBlur: 'foobar' })).toThrow();
+            expect(() => an.validate({ negativeBracketsTypeOnBlur: '22foobar' })).toThrow();
+            expect(() => an.validate({ negativeBracketsTypeOnBlur: '-5' })).toThrow();
+            expect(() => an.validate({ negativeBracketsTypeOnBlur: 5 })).toThrow();
+            expect(() => an.validate({ negativeBracketsTypeOnBlur: -5 })).toThrow();
 
-            expect(() => an.validate({ wEmpty: [] })).toThrow();
-            expect(() => an.validate({ wEmpty: true })).toThrow();
-            expect(() => an.validate({ wEmpty: 'foobar' })).toThrow();
-            expect(() => an.validate({ wEmpty: '22foobar' })).toThrow();
-            expect(() => an.validate({ wEmpty: '-5' })).toThrow();
-            expect(() => an.validate({ wEmpty: 5 })).toThrow();
-            expect(() => an.validate({ wEmpty: -5 })).toThrow();
+            expect(() => an.validate({ emptyInputBehavior: [] })).toThrow();
+            expect(() => an.validate({ emptyInputBehavior: true })).toThrow();
+            expect(() => an.validate({ emptyInputBehavior: 'foobar' })).toThrow();
+            expect(() => an.validate({ emptyInputBehavior: '22foobar' })).toThrow();
+            expect(() => an.validate({ emptyInputBehavior: '-5' })).toThrow();
+            expect(() => an.validate({ emptyInputBehavior: 5 })).toThrow();
+            expect(() => an.validate({ emptyInputBehavior: -5 })).toThrow();
 
-            expect(() => an.validate({ lZero: [] })).toThrow();
-            expect(() => an.validate({ lZero: true })).toThrow();
-            expect(() => an.validate({ lZero: 'foobar' })).toThrow();
-            expect(() => an.validate({ lZero: '22foobar' })).toThrow();
-            expect(() => an.validate({ lZero: '-5' })).toThrow();
-            expect(() => an.validate({ lZero: 5 })).toThrow();
-            expect(() => an.validate({ lZero: -5 })).toThrow();
+            expect(() => an.validate({ leadingZero: [] })).toThrow();
+            expect(() => an.validate({ leadingZero: true })).toThrow();
+            expect(() => an.validate({ leadingZero: 'foobar' })).toThrow();
+            expect(() => an.validate({ leadingZero: '22foobar' })).toThrow();
+            expect(() => an.validate({ leadingZero: '-5' })).toThrow();
+            expect(() => an.validate({ leadingZero: 5 })).toThrow();
+            expect(() => an.validate({ leadingZero: -5 })).toThrow();
 
-            expect(() => an.validate({ aForm: 0 })).toThrow();
-            expect(() => an.validate({ aForm: 1 })).toThrow();
-            expect(() => an.validate({ aForm: '0' })).toThrow();
-            expect(() => an.validate({ aForm: '1' })).toThrow();
-            expect(() => an.validate({ aForm: 'foobar' })).toThrow();
+            expect(() => an.validate({ formatOnPageLoad: 0 })).toThrow();
+            expect(() => an.validate({ formatOnPageLoad: 1 })).toThrow();
+            expect(() => an.validate({ formatOnPageLoad: '0' })).toThrow();
+            expect(() => an.validate({ formatOnPageLoad: '1' })).toThrow();
+            expect(() => an.validate({ formatOnPageLoad: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ sNumber: 0 })).toThrow();
-            expect(() => an.validate({ sNumber: 1 })).toThrow();
-            expect(() => an.validate({ sNumber: '0' })).toThrow();
-            expect(() => an.validate({ sNumber: '1' })).toThrow();
-            expect(() => an.validate({ sNumber: 'foobar' })).toThrow();
+            expect(() => an.validate({ selectNumberOnly: 0 })).toThrow();
+            expect(() => an.validate({ selectNumberOnly: 1 })).toThrow();
+            expect(() => an.validate({ selectNumberOnly: '0' })).toThrow();
+            expect(() => an.validate({ selectNumberOnly: '1' })).toThrow();
+            expect(() => an.validate({ selectNumberOnly: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ anDefault: [] })).toThrow();
-            expect(() => an.validate({ anDefault: true })).toThrow();
-            expect(() => an.validate({ anDefault: 'foobar' })).toThrow();
-            expect(() => an.validate({ anDefault: '22foobar' })).toThrow();
+            expect(() => an.validate({ defaultValueOverride: [] })).toThrow();
+            expect(() => an.validate({ defaultValueOverride: true })).toThrow();
+            expect(() => an.validate({ defaultValueOverride: 'foobar' })).toThrow();
+            expect(() => an.validate({ defaultValueOverride: '22foobar' })).toThrow();
 
-            expect(() => an.validate({ unSetOnSubmit: 0 })).toThrow();
-            expect(() => an.validate({ unSetOnSubmit: 1 })).toThrow();
-            expect(() => an.validate({ unSetOnSubmit: '0' })).toThrow();
-            expect(() => an.validate({ unSetOnSubmit: '1' })).toThrow();
-            expect(() => an.validate({ unSetOnSubmit: 'foobar' })).toThrow();
+            expect(() => an.validate({ unformatOnSubmit: 0 })).toThrow();
+            expect(() => an.validate({ unformatOnSubmit: 1 })).toThrow();
+            expect(() => an.validate({ unformatOnSubmit: '0' })).toThrow();
+            expect(() => an.validate({ unformatOnSubmit: '1' })).toThrow();
+            expect(() => an.validate({ unformatOnSubmit: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ outputType: [] })).toThrow();
-            expect(() => an.validate({ outputType: true })).toThrow();
-            expect(() => an.validate({ outputType: 'foobar' })).toThrow();
-            expect(() => an.validate({ outputType: '22foobar' })).toThrow();
-            expect(() => an.validate({ outputType: '-5' })).toThrow();
-            expect(() => an.validate({ outputType: 5 })).toThrow();
-            expect(() => an.validate({ outputType: -5 })).toThrow();
+            expect(() => an.validate({ outputFormat: [] })).toThrow();
+            expect(() => an.validate({ outputFormat: true })).toThrow();
+            expect(() => an.validate({ outputFormat: 'foobar' })).toThrow();
+            expect(() => an.validate({ outputFormat: '22foobar' })).toThrow();
+            expect(() => an.validate({ outputFormat: '-5' })).toThrow();
+            expect(() => an.validate({ outputFormat: 5 })).toThrow();
+            expect(() => an.validate({ outputFormat: -5 })).toThrow();
 
-            expect(() => an.validate({ debug: 0 })).toThrow();
-            expect(() => an.validate({ debug: 1 })).toThrow();
-            expect(() => an.validate({ debug: '0' })).toThrow();
-            expect(() => an.validate({ debug: '1' })).toThrow();
-            expect(() => an.validate({ debug: 'foobar' })).toThrow();
+            expect(() => an.validate({ showWarnings: 0 })).toThrow();
+            expect(() => an.validate({ showWarnings: 1 })).toThrow();
+            expect(() => an.validate({ showWarnings: '0' })).toThrow();
+            expect(() => an.validate({ showWarnings: '1' })).toThrow();
+            expect(() => an.validate({ showWarnings: 'foobar' })).toThrow();
         });
     });
 });

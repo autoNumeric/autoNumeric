@@ -1,5 +1,43 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.9"
++ Rename the old options name to more explicit ones :
+
+| Old name         |          | New name |
+| :------------ | :------------ | :-----------:  |
+| aSep          | -> | digitGroupSeparator           |
+| nSep          | -> | noSeparatorOnFocus            |
+| dGroup        | -> | digitalGroupSpacing           |
+| aDec          | -> | decimalCharacter              |
+| altDec        | -> | decimalCharacterAlternative   |
+| aSign         | -> | currencySymbol                |
+| pSign         | -> | currencySymbolPlacement       |
+| pNeg          | -> | negativePositiveSignPlacement |
+| aSuffix       | -> | suffixText                    |
+| oLimits       | -> | overrideMinMaxLimits          |
+| vMax          | -> | maximumValue                  |
+| vMin          | -> | minimumValue                  |
+| mDec          | -> | decimalPlacesOverride         |
+| eDec          | -> | decimalPlacesShownOnFocus     |
+| scaleDecimal  | -> | scaleDecimalPlaces            |
+| aStor         | -> | saveValueToSessionStorage     |
+| mRound        | -> | roundingMethod                |
+| aPad          | -> | allowDecimalPadding           |
+| nBracket      | -> | negativeBracketsTypeOnBlur    |
+| wEmpty        | -> | emptyInputBehavior            |
+| lZero         | -> | leadingZero                   |
+| aForm         | -> | formatOnPageLoad              |
+| sNumber       | -> | selectNumberOnly              |
+| anDefault     | -> | defaultValueOverride          |
+| unSetOnSubmit | -> | unformatOnSubmit              |
+| outputType    | -> | outputFormat                  |
+| debug         | -> | showWarnings                  |
+
++ Add a `convertOldOptionsToNewOnes()` function that automatically convert old options to new ones, to ease the evolution to v2.*.
++ Update `typings.d.ts` accordingly
++ Update `README.md` accordingly
++ Complete the tests to make sure using old option names will output a warning about them being deprecated
+
 ### "2.0.0-beta.8"
 + Fix issue #292 where native input and change events are not sent correctly.
 + Add a `isNumber()` helper function to test if a value is a number, or a string representing a number.

@@ -322,7 +322,9 @@ describe('The autoNumeric object', () => {
             // Setup
             const newInput = document.createElement('input');
             document.body.appendChild(newInput);
+            spyOn(console, 'warn'); // The next statement will output a warning since we override the decimals places declared in minimumValue
             const localANInput = $(newInput).autoNumeric('init', { minimumValue: '-99.999', maximumValue: '99.99', decimalPlacesOverride: '4' }); // Initiate the autoNumeric input
+            expect(console.warn).toHaveBeenCalled();
             const localANInputSettings = localANInput.autoNumeric('getSettings');
 
             //--------------- The tests
@@ -555,8 +557,9 @@ describe(`autoNumeric 'get' methods`, () => {
     it(`should not return a negative value when inputting a positive one and minimumValue is equal to '0' (cf. issue #284)`, () => {
         const newInput = document.createElement('input');
         document.body.appendChild(newInput);
+        spyOn(console, 'warn');
         const aNInput = $(newInput).autoNumeric('init', { minimumValue: '0', maximumValue: '9999', decimalPlacesOverride: '2' }); // Initiate the autoNumeric input
-
+        expect(console.warn).toHaveBeenCalled();
 
         expect(aNInput.autoNumeric('get')).toEqual('0.00');
         aNInput.autoNumeric('set', 1234);
@@ -573,8 +576,9 @@ describe(`autoNumeric 'get' methods`, () => {
     it(`should not return a negative value when inputting a positive one and minimumValue is superior to '0' (cf. issue #284)`, () => {
         const newInput = document.createElement('input');
         document.body.appendChild(newInput);
+        spyOn(console, 'warn');
         const aNInput = $(newInput).autoNumeric('init', { minimumValue: '1', maximumValue: '9999', decimalPlacesOverride: '2' }); // Initiate the autoNumeric input
-
+        expect(console.warn).toHaveBeenCalled();
 
         expect(aNInput.autoNumeric('get')).toEqual('0.00');
         aNInput.autoNumeric('set', 1234);
@@ -958,13 +962,7 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ minimumValue:  '10', maximumValue: '20' })).not.toThrow();
 
             expect(() => an.validate({ decimalPlacesOverride: null })).not.toThrow();
-            expect(() => an.validate({ decimalPlacesOverride: '0' })).not.toThrow();
             expect(() => an.validate({ decimalPlacesOverride: '2' })).not.toThrow();
-            expect(() => an.validate({ decimalPlacesOverride: '15' })).not.toThrow();
-            expect(() => an.validate({ decimalPlacesOverride: 5 })).not.toThrow();
-
-            expect(() => an.validate({ allowDecimalPadding: false, decimalPlacesOverride: '2' })).not.toThrow(); // This will output a warning
-            expect(() => an.validate({ decimalPlacesOverride: '2', minimumValue: '0', maximumValue: '20' })).not.toThrow(); // This will output a warning
 
             expect(() => an.validate({ decimalPlacesShownOnFocus: null })).not.toThrow();
             expect(() => an.validate({ decimalPlacesShownOnFocus: '0' })).not.toThrow();
@@ -972,7 +970,6 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ decimalPlacesShownOnFocus: '15' })).not.toThrow();
 
             expect(() => an.validate({ decimalPlacesOverride: '2', decimalPlacesShownOnFocus: '2' })).not.toThrow();
-            expect(() => an.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
 
             expect(() => an.validate({ scaleDivisor: null })).not.toThrow();
             expect(() => an.validate({ scaleDivisor: '100' })).not.toThrow();
@@ -1067,6 +1064,20 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ showWarnings: false })).not.toThrow();
             expect(() => an.validate({ showWarnings: 'true' })).not.toThrow();
             expect(() => an.validate({ showWarnings: 'false' })).not.toThrow();
+        });
+
+        it('should validate, with warnings', () => {
+            spyOn(console, 'warn');
+            expect(() => an.validate({ decimalPlacesOverride: '0' })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: '15' })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: 5 })).not.toThrow();
+
+            expect(() => an.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: '2', minimumValue: '0', maximumValue: '20' })).not.toThrow(); // This will output a warning
+
+            expect(() => an.validate({ allowDecimalPadding: false, decimalPlacesOverride: '2' })).not.toThrow(); // This will output a warning
+            expect(console.warn).toHaveBeenCalled();
+            expect(console.warn).toHaveBeenCalledTimes(6);
         });
 
         it('should not validate', () => {

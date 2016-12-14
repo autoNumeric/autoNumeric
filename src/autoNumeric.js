@@ -640,10 +640,10 @@ if (typeof define === 'function' && define.amd) {
      * @param {string} str
      * @returns {boolean}
      */
-    function hasDecimals(str) {
-        const [, decimalPart] = str.split('.');
-        return !isUndefined(decimalPart);
-    }
+    // function hasDecimals(str) {
+    //     const [, decimalPart] = str.split('.');
+    //     return !isUndefined(decimalPart);
+    // }
 
     /**
      * Return the number of decimal places if the parameter is a string that represents a float number, and that number has a decimal part.
@@ -3729,9 +3729,8 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // Write a warning message in the console if the number of decimal in minimumValue/maximumValue is overridden by decimalPlacesOverride (and not if decimalPlacesOverride is equal to the number of decimal used in minimumValue/maximumValue)
-        const minimumValueMaxDecimalPlaces = maximumVMinAndVMaxDecimalLength(options.minimumValue, options.maximumValue);
-        if (!isNull(options.decimalPlacesOverride) &&
-            ((hasDecimals(options.minimumValue) || hasDecimals(options.maximumValue)) && minimumValueMaxDecimalPlaces !== Number(options.decimalPlacesOverride))) {
+        const vMinAndVMaxMaximumDecimalPlaces = maximumVMinAndVMaxDecimalLength(options.minimumValue, options.maximumValue);
+        if (!isNull(options.decimalPlacesOverride) && vMinAndVMaxMaximumDecimalPlaces !== Number(options.decimalPlacesOverride)) {
             warning(`Setting 'decimalPlacesOverride' to [${options.decimalPlacesOverride}] will override the decimals declared in 'minimumValue' [${options.minimumValue}] and 'maximumValue' [${options.maximumValue}].`, showWarnings);
         }
 

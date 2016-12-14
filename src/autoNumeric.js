@@ -1718,7 +1718,12 @@ if (typeof define === 'function' && define.amd) {
 
                 // Make sure when the user enter a '0' on the far left with a leading zero option set to 'deny', that the caret does not moves since the input is dropped (fix issue #283)
                 if (position === 1 && parts[0] === '0' && settingsClone.leadingZero === 'deny') {
-                    position = 0;
+                    // If the user enter `0`, then the caret is put on the right side of it (Fix issue #299)
+                    if (parts[1] === '') {
+                        position = 1;
+                    } else {
+                        position = 0;
+                    }
                 }
 
                 this.value = this.newValue;

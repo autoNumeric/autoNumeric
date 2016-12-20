@@ -1,5 +1,9 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.10"
++ fix issue #302 `leadingZero` option `deny`. Also allow temporary leading zeros to the right od the caret when a number is deleted to the left
++ fix issue #303 when focusing on an input having `currencySymbolPlacement` set as `p` (prefix)
+
 ### "2.0.0-beta.9"
 + Rename the old options name to more explicit ones :
 

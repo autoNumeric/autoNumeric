@@ -1,6 +1,8 @@
-/** * autoNumeric.js
- * @version      2.0-beta.11
- * @date         2016-12-21 UTC -06:00
+/**
+ *               autoNumeric.js
+ *
+ * @version      2.0-beta.12
+ * @date         2016-12-21 UTC 13:00
  *
  * @author       Bob Knothe
  * @contributors Sokolov Yura and other Github users, cf. AUTHORS.md.
@@ -3028,6 +3030,7 @@ if (typeof define === 'function' && define.amd) {
 
                 //XXX Here we have the result for the `truncate` option
                 if (holder.settings.onInvalidPaste === 'truncate') {
+                    //TODO If the user as defined a truncate callback and there are still some numbers (that will be dropped), then call this callback with the initial paste as well as the remaining numbers
                     result = lastGoodKnownResult;
                     break;
                 }
@@ -4168,8 +4171,6 @@ if (typeof define === 'function' && define.amd) {
      * @throws Error
      */
     validate = (userOptions, shouldExtendDefaultOptions = true) => {
-        const showWarnings = true; // The error here must always be thrown, since a badly configured options object will lead to wrong results, if any.
-
         if (isUndefinedOrNullOrEmpty(userOptions) || !isObject(userOptions) || isEmptyObj(userOptions)) {
             throwError(`The userOptions are invalid ; it should be a valid object, [${userOptions}] given.`);
         }
@@ -4187,6 +4188,12 @@ if (typeof define === 'function' && define.amd) {
             options = userOptions;
         }
 
+        // First things first, we test that the `showWarnings` option is valid
+        if (!isTrueOrFalseString(options.showWarnings) && !isBoolean(options.showWarnings)) {
+            throwError(`The debug option 'showWarnings' is invalid ; it should be either 'false' or 'true', [${options.showWarnings}] given.`);
+        }
+
+        // Define the regular expressions needed for the following tests
         const testPositiveInteger = /^[0-9]+$/;
         const testNumericalCharacters = /[0-9]+/;
         // const testFloatAndPossibleNegativeSign = /^-?[0-9]+(\.?[0-9]+)$/;
@@ -4261,11 +4268,11 @@ if (typeof define === 'function' && define.amd) {
         // Write a warning message in the console if the number of decimal in minimumValue/maximumValue is overridden by decimalPlacesOverride (and not if decimalPlacesOverride is equal to the number of decimal used in minimumValue/maximumValue)
         const vMinAndVMaxMaximumDecimalPlaces = maximumVMinAndVMaxDecimalLength(options.minimumValue, options.maximumValue);
         if (!isNull(options.decimalPlacesOverride) && vMinAndVMaxMaximumDecimalPlaces !== Number(options.decimalPlacesOverride)) {
-            warning(`Setting 'decimalPlacesOverride' to [${options.decimalPlacesOverride}] will override the decimals declared in 'minimumValue' [${options.minimumValue}] and 'maximumValue' [${options.maximumValue}].`, showWarnings);
+            warning(`Setting 'decimalPlacesOverride' to [${options.decimalPlacesOverride}] will override the decimals declared in 'minimumValue' [${options.minimumValue}] and 'maximumValue' [${options.maximumValue}].`, options.showWarnings);
         }
 
         if (!options.allowDecimalPadding && !isNull(options.decimalPlacesOverride)) {
-            warning(`Setting 'allowDecimalPadding' to [false] will override the current 'decimalPlacesOverride' setting [${options.decimalPlacesOverride}].`, showWarnings);
+            warning(`Setting 'allowDecimalPadding' to [false] will override the current 'decimalPlacesOverride' setting [${options.decimalPlacesOverride}].`, options.showWarnings);
         }
 
         if (!isNull(options.decimalPlacesShownOnFocus) && (!isString(options.decimalPlacesShownOnFocus) || !testPositiveInteger.test(options.decimalPlacesShownOnFocus))) {
@@ -4273,8 +4280,8 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // Checks if the extended decimal places "decimalPlacesShownOnFocus" is greater than the normal decimal places "decimalPlacesOverride"
-        if (!isNull(options.decimalPlacesShownOnFocus) && !isNull(options.decimalPlacesOverride) && Number(options.decimalPlacesOverride) < Number(options.decimalPlacesShownOnFocus)) {
-            throwError(`autoNumeric will not function properly when the extended decimal places 'decimalPlacesShownOnFocus' [${options.decimalPlacesShownOnFocus}] is greater than the 'decimalPlacesOverride' [${options.decimalPlacesOverride}] value.`);
+        if (!isNull(options.decimalPlacesShownOnFocus) && !isNull(options.decimalPlacesOverride) && Number(options.decimalPlacesOverride) > Number(options.decimalPlacesShownOnFocus)) {
+            warning(`The extended decimal places 'decimalPlacesShownOnFocus' [${options.decimalPlacesShownOnFocus}] should be greater than the 'decimalPlacesOverride' [${options.decimalPlacesOverride}] value. Currently, this will limit the ability of your client to manually change some of the decimal places. Do you really want to do that?`, options.showWarnings);
         }
 
         if (!isNull(options.scaleDivisor) && !testPositiveFloatOrInteger.test(options.scaleDivisor)) {
@@ -4364,10 +4371,6 @@ if (typeof define === 'function' && define.amd) {
             ',-',
         ])) {
             throwError(`The custom locale format option 'outputFormat' is invalid ; it should either be null, 'string', 'number', '.', '-.', ',', '-,', '.-' or ',-', [${options.outputFormat}] given.`);
-        }
-
-        if (!isTrueOrFalseString(options.showWarnings) && !isBoolean(options.showWarnings)) {
-            throwError(`The debug option 'showWarnings' is invalid ; it should be either 'false' or 'true', [${options.showWarnings}] given.`);
         }
 
         if (!isTrueOrFalseString(options.failOnUnknownOption) && !isBoolean(options.failOnUnknownOption)) {

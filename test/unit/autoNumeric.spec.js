@@ -366,6 +366,38 @@ describe('The autoNumeric object', () => {
             localANInput.autoNumeric('destroy');
             document.body.removeChild(newInput);
         });
+
+        it(`should set the decimalPlacesOverride value, and show a warning when setting a greater decimalPlacesShownOnFocus`, () => {
+            // Setup
+            const newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            spyOn(console, 'warn'); // The next statement will output a warning since decimalPlacesShownOnFocus is lower than decimalPlacesOverride
+            const localANInput = $(newInput).autoNumeric('init', { minimumValue: '-99.99', maximumValue: '99.99', decimalPlacesOverride: '5', decimalPlacesShownOnFocus: '3' }); // Initiate the autoNumeric input
+            expect(console.warn).toHaveBeenCalled();
+            const localANInputSettings = localANInput.autoNumeric('getSettings');
+
+            expect(localANInputSettings.decimalPlacesOverride).toEqual(5); // 'decimalPlacesOverride' is not overwritten by a greater decimalPlacesShownOnFocus
+
+            // Tear down
+            localANInput.autoNumeric('destroy');
+            document.body.removeChild(newInput);
+        });
+
+        it(`should set the decimalPlacesOverride value when decimalPlacesOverride is not defined, and show a warning when setting a greater decimalPlacesShownOnFocus`, () => {
+            // Setup
+            const newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            spyOn(console, 'warn'); // The next statement will output a warning since decimalPlacesShownOnFocus is lower than decimalPlacesOverride
+            const localANInput = $(newInput).autoNumeric('init', { minimumValue: '-99.9999', maximumValue: '99.9999', decimalPlacesShownOnFocus: '3' }); // Initiate the autoNumeric input
+            expect(console.warn).toHaveBeenCalled();
+            const localANInputSettings = localANInput.autoNumeric('getSettings');
+
+            expect(localANInputSettings.decimalPlacesOverride).toEqual(4); // 'decimalPlacesOverride' is not overwritten by a greater decimalPlacesShownOnFocus
+
+            // Tear down
+            localANInput.autoNumeric('destroy');
+            document.body.removeChild(newInput);
+        });
     });
 
     xdescribe(`autoNumeric 'getSettings' options`, () => { //FIXME Correct those tests
@@ -991,6 +1023,7 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ decimalPlacesShownOnFocus: '15' })).not.toThrow();
 
             expect(() => an.validate({ decimalPlacesOverride: '2', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: '2', decimalPlacesShownOnFocus: '3' })).not.toThrow();
 
             expect(() => an.validate({ scaleDivisor: null })).not.toThrow();
             expect(() => an.validate({ scaleDivisor: '100' })).not.toThrow();
@@ -1104,12 +1137,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ decimalPlacesOverride: '15' })).not.toThrow();
             expect(() => an.validate({ decimalPlacesOverride: 5 })).not.toThrow();
 
-            expect(() => an.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => an.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow(); // This will output 2 warnings
             expect(() => an.validate({ decimalPlacesOverride: '2', minimumValue: '0', maximumValue: '20' })).not.toThrow(); // This will output a warning
 
             expect(() => an.validate({ allowDecimalPadding: false, decimalPlacesOverride: '2' })).not.toThrow(); // This will output a warning
             expect(console.warn).toHaveBeenCalled();
-            expect(console.warn).toHaveBeenCalledTimes(6);
+            expect(console.warn).toHaveBeenCalledTimes(7);
         });
 
         it('should not validate', () => {
@@ -1226,8 +1259,6 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ decimalPlacesShownOnFocus: 5 })).toThrow();
             expect(() => an.validate({ decimalPlacesShownOnFocus: -5 })).toThrow();
 
-            expect(() => an.validate({ decimalPlacesOverride: '2', decimalPlacesShownOnFocus: '3' })).toThrow();
-
             expect(() => an.validate({ scaleDivisor: 'foobar' })).toThrow();
             expect(() => an.validate({ scaleDivisor: true })).toThrow();
             expect(() => an.validate({ scaleDivisor: -1000 })).toThrow();
@@ -1335,6 +1366,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ failOnUnknownOption: '0' })).toThrow();
             expect(() => an.validate({ failOnUnknownOption: '1' })).toThrow();
             expect(() => an.validate({ failOnUnknownOption: 'foobar' })).toThrow();
+        });
+
+        it('should only send a warning, and not throw', () => {
+            spyOn(console, 'warn');
+            expect(() => an.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(console.warn).toHaveBeenCalled();
         });
     });
 });

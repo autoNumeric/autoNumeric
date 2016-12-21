@@ -1,4 +1,3 @@
-/**
  * autoNumeric.js
  * @version      2.0-beta.10
  * @date         2016-12-21 UTC 06:00
@@ -42,6 +41,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
+
 
 /* global module, require, define */
 
@@ -608,7 +608,7 @@ if (typeof define === 'function' && define.amd) {
      * @returns {string|void|XML|*}
      */
     function preparePastedText(text, holder) {
-        return stripAllNonNumberCharacters(text, holder.settingsClone).replace(holder.settingsClone.decimalCharacter, '.');
+        return stripAllNonNumberCharacters(text, holder.settingsClone, true).replace(holder.settingsClone.decimalCharacter, '.'
     }
 
     /**
@@ -964,9 +964,12 @@ if (typeof define === 'function' && define.amd) {
      *
      * @param {string} s
      * @param {object} settings
+     * @param Boolean leftOrAll
      * @returns {string|*}
      */
-    function stripAllNonNumberCharacters(s, settings) {
+
+    function stripAllNonNumberCharacters(s, settings, leftOrAll) {
+
         if (settings.currencySymbol !== '') {
             // Remove currency sign
             s = s.replace(settings.currencySymbol, '');
@@ -1020,7 +1023,7 @@ if (typeof define === 'function' && define.amd) {
             s = `${nSign}${modifiedIntegerPart}${isUndefined(decimalPart)?'':settings.decimalCharacter + decimalPart}`;
         }
 
-        if ((settings.onOff && settings.leadingZero === 'deny') ||
+        if ((leftOrAll && settings.leadingZero === 'deny') ||
             (!settings.onOff && settings.leadingZero === 'allow')) {
             s = s.replace(settings.stripReg, '$1$2');
         }
@@ -1176,7 +1179,7 @@ if (typeof define === 'function' && define.amd) {
      */
     function autoGroup(inputValue, settings) {
         if (settings.strip) {
-            inputValue = stripAllNonNumberCharacters(inputValue, settings);
+            inputValue = stripAllNonNumberCharacters(inputValue, settings, false);
         }
 
         if (settings.trailingNegative && !contains(inputValue, '-')) {
@@ -1847,8 +1850,9 @@ if (typeof define === 'function' && define.amd) {
         _getBeforeAfterStripped() {
             const settingsClone = this.settingsClone;
             let [left, right] = this._getBeforeAfter();
-            left = stripAllNonNumberCharacters(left, this.settingsClone);
-            right = stripAllNonNumberCharacters(right, this.settingsClone);
+
+            left = stripAllNonNumberCharacters(left, this.settingsClone, true);
+            right = stripAllNonNumberCharacters(right, this.settingsClone, false);
 
             if (settingsClone.trailingNegative && !contains(left, '-')) {
                 left = '-' + left;
@@ -1867,18 +1871,26 @@ if (typeof define === 'function' && define.amd) {
             const settingsClone = this.settingsClone;
 
             // prevents multiple leading zeros from being entered
-            left = stripAllNonNumberCharacters(left, settingsClone);
+
+            left = stripAllNonNumberCharacters(left, settingsClone, true);
+            if (Number(left) === 0 && settingsClone.leadingZero === 'deny') {
+                if (right === '') {
+                    left = '';
+                } else {
+                    if (contains(left, '-')) {
+                        left = '-';
+                    } else {
+                        left = '';
+                    }
+                }
+            }          
 
             // if right is not empty and first character is not decimalCharacter,
-            right = stripAllNonNumberCharacters(right, settingsClone);
+            right = stripAllNonNumberCharacters(right, settingsClone, false);
+
             if (settingsClone.trailingNegative && !contains(left, '-')) {
                 left = '-' + left;
                 settingsClone.trailingNegative = false;
-            }
-            if ((left === '' || left === settingsClone.negativeSignCharacter) && settingsClone.leadingZero === 'deny') {
-                if (right > '') {
-                    right = right.replace(/^0*(\d)/, '$1');
-                }
             }
 
             // insert zero if has leading dot
@@ -1998,7 +2010,8 @@ if (typeof define === 'function' && define.amd) {
 
                 // try to strip pasted value first
                 delete this.valuePartsBeforePaste;
-                const modifiedLeftPart = left.substr(0, oldParts[0].length) + stripAllNonNumberCharacters(left.substr(oldParts[0].length), this.settingsClone);
+
+                const modifiedLeftPart = left.substr(0, oldParts[0].length) + stripAllNonNumberCharacters(left.substr(oldParts[0].length), this.settingsClone, true);
                 if (!this._setValueParts(modifiedLeftPart, right, 'paste')) {
                     this.value = oldParts.join('');
                     this._setPosition(oldParts[0].length, false);
@@ -2189,7 +2202,7 @@ if (typeof define === 'function' && define.amd) {
          */
         _processCharacterDeletion() {
             const settingsClone = this.settingsClone;
-            
+
             let left;
             let right;
 
@@ -2578,7 +2591,8 @@ if (typeof define === 'function' && define.amd) {
                 settings.currencySymbol = '';
                 settings.suffixText = '';
                 $this.autoNumeric('set', settings.rawValue);
-            } else if ((result = stripAllNonNumberCharacters(e.target.value, settings)) !== settings.rawValue) {
+
+            } else if ((result = stripAllNonNumberCharacters(e.target.value, settings, true)) !== settings.rawValue) {
                 $this.autoNumeric('set', result);
             }
 
@@ -2588,6 +2602,9 @@ if (typeof define === 'function' && define.amd) {
             const onEmpty = checkEmpty(holder.valueOnFocus, settings, true);
             if ((onEmpty !== null && onEmpty !== '') && settings.emptyInputBehavior === 'focus') {
                 $this.val(onEmpty);
+                if (onEmpty === settings.currencySymbol && settings.currencySymbolPlacement === 's') {
+                    setElementSelection(e.target, 0, 0);
+                }
             }
         }
     }
@@ -2817,7 +2834,8 @@ if (typeof define === 'function' && define.amd) {
                 settings.negativeBracketsTypeOnBlur = settings.oBracket;
             }
 
-            value = stripAllNonNumberCharacters(value, settings);
+            value = stripAllNonNumberCharacters(value, settings, true);
+
             if (value !== '') {
                 if (settings.trailingNegative) {
                     value = '-' + value;
@@ -3330,7 +3348,8 @@ if (typeof define === 'function' && define.amd) {
                             toStrip = currentValue;
                         }
 
-                        settings.rawValue = ((settings.negativePositiveSignPlacement === 's' || (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement !== 'p')) && settings.negativeSignCharacter !== '' && contains(currentValue, '-'))?'-' + stripAllNonNumberCharacters(toStrip, settings):stripAllNonNumberCharacters(toStrip, settings);
+                        settings.rawValue = ((settings.negativePositiveSignPlacement === 's' || (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement !== 'p')) && settings.negativeSignCharacter !== '' && contains(currentValue, '-'))?'-' + stripAllNonNumberCharacters(toStrip, settings, true):stripAllNonNumberCharacters(toStrip, settings, true);
+
                     }
 
                     setValue = false;
@@ -3947,7 +3966,9 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 if (settings.runOnce || settings.formatOnPageLoad === false) {
-                    value = stripAllNonNumberCharacters(value, settings);
+
+                    value = stripAllNonNumberCharacters(value, settings, true);
+
                 }
 
                 value = fixNumber(value, settings);

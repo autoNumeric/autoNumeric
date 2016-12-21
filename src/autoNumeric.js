@@ -329,6 +329,13 @@ const defaultSettings = {
      * Deprecated older option name : debug
      */
     showWarnings: true,
+
+    /*
+     * This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object.
+     * You should set that to 'TRUE' if you want to make sure you are only using 'pure' autoNumeric settings objects in your code.
+     * If you see uncaught errors in the console and your code starts to fail, this means somehow those options gets corrupted by another program.
+     */
+    failOnUnknownOption: false,
 };
 
 /**
@@ -3044,6 +3051,7 @@ if (typeof define === 'function' && define.amd) {
             unformatOnSubmit             : true,
             outputFormat                 : true,
             showWarnings                 : true,
+            failOnUnknownOption          : true,
             //FIXME Find a way to exclude those internal data from the settings object (ideally by using another object, or better yet, class attributes) -->
             onOff                : true,
             runOnce              : true,
@@ -3085,7 +3093,7 @@ if (typeof define === 'function' && define.amd) {
                     // Then we modify the initial option object to use the new options instead of the old ones
                     options[oldOptionsConverter[option]] = options[option];
                     delete options[option];
-                } else {
+                } else if (options.failOnUnknownOption) {
                     // ...or the option name is unknown. This means there is a problem with the options object, therefore we throw an error.
                     throwError(`Option name '${option}' is unknown. Please fix the options passed to autoNumeric`);
                 }
@@ -3828,6 +3836,10 @@ if (typeof define === 'function' && define.amd) {
 
         if (!isTrueOrFalseString(options.showWarnings) && !isBoolean(options.showWarnings)) {
             throwError(`The debug option 'showWarnings' is invalid ; it should be either 'false' or 'true', [${options.showWarnings}] given.`);
+        }
+
+        if (!isTrueOrFalseString(options.failOnUnknownOption) && !isBoolean(options.failOnUnknownOption)) {
+            throwError(`The debug option 'failOnUnknownOption' is invalid ; it should be either 'false' or 'true', [${options.failOnUnknownOption}] given.`);
         }
     };
 

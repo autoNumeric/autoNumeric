@@ -116,9 +116,25 @@ describe('The autoNumeric object', () => {
         unformatOnSubmit             : false,
         outputFormat                 : null,
         showWarnings                 : true,
+        failOnUnknownOption          : false,
     };
 
     it('should return some default values', () => {
+        // Test the options one by one, which makes it easier to spot the error
+        //XXX This loop is useful to spot the faulty options, since only those that are not equal to the default are shown
+        const defaultSettings = an.getDefaultConfig();
+        let i = 0;
+        for (const prop in defaultSettings) {
+            i++;
+            if (defaultSettings.hasOwnProperty(prop)) {
+                if (defaultSettings[prop] !== defaultOption[prop]) {
+                    console.log(`${i}: Setting ${prop} = [${defaultSettings[prop]}][${defaultOption[prop]}]`); //DEBUG
+                }
+                expect(defaultSettings[prop]).toEqual(defaultOption[prop]);
+            }
+        }
+
+        // Global test
         expect(an.getDefaultConfig()).toEqual(defaultOption);
     });
 
@@ -886,8 +902,12 @@ describe('Static autoNumeric functions', () => {
             expect(oldOptionObject).toEqual({ digitGroupSeparator: ' ', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €' });
         });
 
-        it('should throw when using a unknown option name', () => {
-            expect(() => an.validate({ foobar: '.' })).toThrow();
+        it('should throw when using a unknown option name, if `failOnUnknownOption` is set to `TRUE`', () => {
+            expect(() => an.validate({ failOnUnknownOption: true, foobar: '.' })).toThrow();
+        });
+
+        it('should not throw when using a unknown option name, if `failOnUnknownOption` is set to `FALSE`', () => {
+            expect(() => an.validate({ foobar: '.' })).not.toThrow();
         });
 
         it('should validate', () => {
@@ -1064,6 +1084,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ showWarnings: false })).not.toThrow();
             expect(() => an.validate({ showWarnings: 'true' })).not.toThrow();
             expect(() => an.validate({ showWarnings: 'false' })).not.toThrow();
+
+            expect(() => an.validate({ failOnUnknownOption: true })).not.toThrow();
+            expect(() => an.validate({ failOnUnknownOption: false })).not.toThrow();
+            expect(() => an.validate({ failOnUnknownOption: 'true' })).not.toThrow();
+            expect(() => an.validate({ failOnUnknownOption: 'false' })).not.toThrow();
         });
 
         it('should validate, with warnings', () => {
@@ -1286,6 +1311,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ showWarnings: '0' })).toThrow();
             expect(() => an.validate({ showWarnings: '1' })).toThrow();
             expect(() => an.validate({ showWarnings: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ failOnUnknownOption: 0 })).toThrow();
+            expect(() => an.validate({ failOnUnknownOption: 1 })).toThrow();
+            expect(() => an.validate({ failOnUnknownOption: '0' })).toThrow();
+            expect(() => an.validate({ failOnUnknownOption: '1' })).toThrow();
+            expect(() => an.validate({ failOnUnknownOption: 'foobar' })).toThrow();
         });
     });
 });

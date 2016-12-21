@@ -1,22 +1,33 @@
 interface AutoNumericOptions {
-  aSep?: string
-  aScale?: string
-  dGroup?: number
-  aDec?: string
-  eDec?: number
-  altDec?: string
-  aSign?: string
-  pSign?: "p" | "s"
-  vMin?: number
-  vMax?: number
-  mDec?: number
-  mRound?: "S" | "A" | "s" | "a" | "B" | "U" | "D" | "C" | "F" | "CHF"
-  aPad?: boolean
-  nBracket?: string
-  wEmpty?: "empty" | "zero" | "sign"
-  lZero?: "allow" | "deny" | "keep"
-  aForm?: boolean
-  anDefault?: string
+  digitGroupSeparator?: string
+  noSeparatorOnFocus?: boolean
+  digitalGroupSpacing?: number
+  decimalCharacter?: string
+  decimalCharacterAlternative?: string
+  currencySymbol?: string
+  currencySymbolPlacement?: "p" | "s"
+  negativePositiveSignPlacement?: "l" | "r" | "p" | "s"
+  suffixText?: string
+  overrideMinMaxLimits?: 'ceiling' | 'floor' | 'ignore'
+  maximumValue?: number
+  minimumValue?: number
+  decimalPlacesOverride?: number
+  decimalPlacesShownOnFocus?: number
+  scaleDivisor?: number
+  scaleDecimalPlaces?: number
+  scaleSymbol?: string
+  saveValueToSessionStorage?: boolean
+  roundingMethod?: "S" | "A" | "s" | "a" | "B" | "U" | "D" | "C" | "F" | "CHF"
+  allowDecimalPadding?: boolean
+  negativeBracketsTypeOnBlur?: string
+  emptyInputBehavior?: "focus" | "press" | "always" | "zero"
+  leadingZero?: "allow" | "deny" | "keep"
+  formatOnPageLoad?: boolean
+  selectNumberOnly?: boolean
+  defaultValueOverride?: string
+  unformatOnSubmit?: boolean
+  outputFormat?: string
+  showWarnings?: boolean
 }
 
 interface Serialized {
@@ -24,8 +35,7 @@ interface Serialized {
   value: string
 }
 
-type AutoNumericMethod = "init" | "destroy" | "update" | "set" | "get"
-  | "getString" | "getArray" | "getSettings"
+type AutoNumericMethod = "init" | "destroy" | "wipe" | "update" | "set" | "unSet" | "reSet" | "get" | "getLocalized" | "getFormatted" | "getString" | "getArray" | "getSettings"
 
 interface JQuery {
   autoNumeric(): JQuery

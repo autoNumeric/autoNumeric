@@ -1,6 +1,6 @@
- * autoNumeric.js
- * @version      2.0-beta.10
- * @date         2016-12-21 UTC 06:00
+/** * autoNumeric.js
+ * @version      2.0-beta.11
+ * @date         2016-12-21 UTC -06:00
  *
  * @author       Bob Knothe
  * @contributors Sokolov Yura and other Github users, cf. AUTHORS.md.
@@ -608,7 +608,7 @@ if (typeof define === 'function' && define.amd) {
      * @returns {string|void|XML|*}
      */
     function preparePastedText(text, holder) {
-        return stripAllNonNumberCharacters(text, holder.settingsClone, true).replace(holder.settingsClone.decimalCharacter, '.'
+        return stripAllNonNumberCharacters(text, holder.settingsClone, true).replace(holder.settingsClone.decimalCharacter, '.');
     }
 
     /**

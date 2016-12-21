@@ -105,6 +105,7 @@ describe('The autoNumeric object', () => {
         scaleDecimalPlaces           : null,
         scaleSymbol                  : null,
         saveValueToSessionStorage    : false,
+        onInvalidPaste               : 'error',
         roundingMethod               : 'S',
         allowDecimalPadding          : true,
         negativeBracketsTypeOnBlur   : null,
@@ -116,9 +117,25 @@ describe('The autoNumeric object', () => {
         unformatOnSubmit             : false,
         outputFormat                 : null,
         showWarnings                 : true,
+        failOnUnknownOption          : false,
     };
 
     it('should return some default values', () => {
+        // Test the options one by one, which makes it easier to spot the error
+        //XXX This loop is useful to spot the faulty options, since only those that are not equal to the default are shown
+        const defaultSettings = an.getDefaultConfig();
+        let i = 0;
+        for (const prop in defaultSettings) {
+            i++;
+            if (defaultSettings.hasOwnProperty(prop)) {
+                if (defaultSettings[prop] !== defaultOption[prop]) {
+                    console.log(`${i}: Setting ${prop} = [${defaultSettings[prop]}][${defaultOption[prop]}]`); //DEBUG
+                }
+                expect(defaultSettings[prop]).toEqual(defaultOption[prop]);
+            }
+        }
+
+        // Global test
         expect(an.getDefaultConfig()).toEqual(defaultOption);
     });
 
@@ -886,8 +903,12 @@ describe('Static autoNumeric functions', () => {
             expect(oldOptionObject).toEqual({ digitGroupSeparator: ' ', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €' });
         });
 
-        it('should throw when using a unknown option name', () => {
-            expect(() => an.validate({ foobar: '.' })).toThrow();
+        it('should throw when using a unknown option name, if `failOnUnknownOption` is set to `TRUE`', () => {
+            expect(() => an.validate({ failOnUnknownOption: true, foobar: '.' })).toThrow();
+        });
+
+        it('should not throw when using a unknown option name, if `failOnUnknownOption` is set to `FALSE`', () => {
+            expect(() => an.validate({ foobar: '.' })).not.toThrow();
         });
 
         it('should validate', () => {
@@ -992,6 +1013,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ saveValueToSessionStorage: 'true' })).not.toThrow();
             expect(() => an.validate({ saveValueToSessionStorage: 'false' })).not.toThrow();
 
+            expect(() => an.validate({ onInvalidPaste: 'error' })).not.toThrow();
+            expect(() => an.validate({ onInvalidPaste: 'ignore' })).not.toThrow();
+            expect(() => an.validate({ onInvalidPaste: 'clamp' })).not.toThrow();
+            expect(() => an.validate({ onInvalidPaste: 'truncate' })).not.toThrow();
+            expect(() => an.validate({ onInvalidPaste: 'replace' })).not.toThrow();
+
             expect(() => an.validate({ roundingMethod: 'S' })).not.toThrow();
             expect(() => an.validate({ roundingMethod: 'A' })).not.toThrow();
             expect(() => an.validate({ roundingMethod: 's' })).not.toThrow();
@@ -1064,6 +1091,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ showWarnings: false })).not.toThrow();
             expect(() => an.validate({ showWarnings: 'true' })).not.toThrow();
             expect(() => an.validate({ showWarnings: 'false' })).not.toThrow();
+
+            expect(() => an.validate({ failOnUnknownOption: true })).not.toThrow();
+            expect(() => an.validate({ failOnUnknownOption: false })).not.toThrow();
+            expect(() => an.validate({ failOnUnknownOption: 'true' })).not.toThrow();
+            expect(() => an.validate({ failOnUnknownOption: 'false' })).not.toThrow();
         });
 
         it('should validate, with warnings', () => {
@@ -1215,6 +1247,17 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ saveValueToSessionStorage: '1' })).toThrow();
             expect(() => an.validate({ saveValueToSessionStorage: 'foobar' })).toThrow();
 
+            expect(() => an.validate({ onInvalidPaste: 0 })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: 1 })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: -42 })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: '0' })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: '1' })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: 'foobar' })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: 0.5 })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: true })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: null })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: [] })).toThrow();
+
             expect(() => an.validate({ roundingMethod: 0.5 })).toThrow();
             expect(() => an.validate({ roundingMethod: true })).toThrow();
             expect(() => an.validate({ roundingMethod: null })).toThrow();
@@ -1286,6 +1329,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ showWarnings: '0' })).toThrow();
             expect(() => an.validate({ showWarnings: '1' })).toThrow();
             expect(() => an.validate({ showWarnings: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ failOnUnknownOption: 0 })).toThrow();
+            expect(() => an.validate({ failOnUnknownOption: 1 })).toThrow();
+            expect(() => an.validate({ failOnUnknownOption: '0' })).toThrow();
+            expect(() => an.validate({ failOnUnknownOption: '1' })).toThrow();
+            expect(() => an.validate({ failOnUnknownOption: 'foobar' })).toThrow();
         });
     });
 });

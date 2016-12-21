@@ -1,36 +1,47 @@
-/**
-* autoNumeric.js
-* @author: Bob Knothe
-* @contributors: Sokolov Yura and other Github users
-* @version: 2.0-beta.10 - 2016-12-20 UTC 20:00
-*
-* Created by Robert J. Knothe on 2009-08-09. Please report any bugs to https://github.com/BobKnothe/autoNumeric
-*
-* Copyright (c) 2009 Robert J. Knothe http://www.decorplanit.com/plugin/
-*
-* The MIT License (http://www.opensource.org/licenses/mit-license.php)
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sub license, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*/
+ * autoNumeric.js
+ * @version      2.0-beta.10
+ * @date         2016-12-21 UTC 06:00
+ *
+ * @author       Bob Knothe
+ * @contributors Sokolov Yura and other Github users, cf. AUTHORS.md.
+ * @copyright    2009 Robert J. Knothe http://www.decorplanit.com/plugin/
+ * @since        2009-08-09
+ *
+ * @summary      autoNumeric is a jQuery plugin that automatically formats currency
+ * (money) and numbers as-you-type in a form inputs. It supports most
+ * international numeric formats and currency signs including those used in
+ * Europe, North and South America, Asia, as well as India's' lakhs.
+ *
+ *               Note : Some functions are borrowed from big.js
+ * @link         https://github.com/MikeMcl/big.js/
+ *
+ * Please report any bugs to https://github.com/BobKnothe/autoNumeric
+ *
+ * @license      Released under the MIT License
+ * @link         http://www.opensource.org/licenses/mit-license.php
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sub license, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 
 /* global module, require, define */
 
@@ -230,6 +241,24 @@ const defaultSettings = {
      */
     saveValueToSessionStorage: false,
 
+    /*
+     * Manage how autoNumeric react when the user tries to paste an invalid number.
+     * - 'error'    : (This is the default behavior) The input value is not changed and an error is output in the console.
+     * - 'ignore'   : idem than 'error', but fail silently without outputting any error/warning in the console.
+     * - 'clamp'    : if the pasted value is either too small or too big regarding the minimumValue and maximumValue range, then the result is clamped to those limits.
+     * - 'truncate' : autoNumeric will insert as many pasted numbers it can at the initial caret/selection, until everything is pasted, or the range limit is hit.
+     *                The non-pasted numbers are dropped and therefore not used at all.
+     * - 'replace'  : autoNumeric will first insert as many pasted numbers it can at the initial caret/selection, then if the range limit is hit, it will try
+     *                to replace one by one the remaining initial numbers (on the right side of the caret) with the rest of the pasted numbers.
+     *
+     * Note 1 : A paste content starting with a negative sign '-' will be accepted anywhere in the input, and will set the resulting value as a negative number
+     * Note 2 : A paste content starting with a number will be accepted, even if the rest is gibberish (ie. '123foobar456').
+     *          Only the first number will be used (here '123').
+     * Note 3 : The paste event works with the `decimalPlacesShownOnFocus` option too.
+     */
+    //TODO Shouldn't we use `truncate` as the default value?
+    onInvalidPaste: 'error',
+
     /* method used for rounding
      * roundingMethod: "S", Round-Half-Up Symmetric (default)
      * roundingMethod: "A", Round-Half-Up Asymmetric
@@ -285,14 +314,13 @@ const defaultSettings = {
 
     /* Determine if the default value will be formatted on initialization.
      * true = automatically formats the default value on initialization
-     * false = will not format the default value
+     * false = will not format the default value on initialization
      * Deprecated older option name : aForm
      */
     formatOnPageLoad: true,
 
-    /* Determine if the select all keyboard command will select
-     * the complete input text or only the input numeric value
-     * if the currency symbol is between the numeric value and the negative sign only the numeric value will selected
+    /* Determine if the select all keyboard command will select the complete input text, or only the input numeric value
+     * Note : If the currency symbol is between the numeric value and the negative sign, only the numeric value will selected
      * Deprecated older option name : sNumber
      */
     selectNumberOnly: false,
@@ -325,10 +353,17 @@ const defaultSettings = {
 
     /* Error handling function
      * true => all warning are shown
-     * false => no warnings are shown, only the thown errors
+     * false => no warnings are shown, only the thrown errors
      * Deprecated older option name : debug
      */
     showWarnings: true,
+
+    /*
+     * This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object.
+     * You should set that to 'TRUE' if you want to make sure you are only using 'pure' autoNumeric settings objects in your code.
+     * If you see uncaught errors in the console and your code starts to fail, this means somehow those options gets corrupted by another program.
+     */
+    failOnUnknownOption: false,
 };
 
 /**
@@ -566,16 +601,6 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Return TRUE if the text given as a parameter is valid.
-     *
-     * @param text
-     * @returns {boolean}
-     */
-    function isValidPasteText(text) {
-        return text !== '' && !isNaN(text);
-    }
-
-    /**
      * Return the pasted text that will be used.
      *
      * @param text
@@ -583,7 +608,7 @@ if (typeof define === 'function' && define.amd) {
      * @returns {string|void|XML|*}
      */
     function preparePastedText(text, holder) {
-        return autoStrip(text, holder.settingsClone, true).replace(holder.settingsClone.decimalCharacter, '.');
+        return stripAllNonNumberCharacters(text, holder.settingsClone, true).replace(holder.settingsClone.decimalCharacter, '.'
     }
 
     /**
@@ -671,6 +696,177 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * Return TRUE if the given value (a number as a string) is within the range set in the settings `minimumValue` and `maximumValue`, FALSE otherwise.
+     *
+     * @param {string} value
+     * @param {object} parsedMinValue Parsed via the `parseStr()` function
+     * @param {object} parsedMaxValue Parsed via the `parseStr()` function
+     * @returns {boolean}
+     */
+    function checkIfInRange(value, parsedMinValue, parsedMaxValue) {
+        const parsedValue = parseStr(value);
+        return testMinMax(parsedMinValue, parsedValue) > -1 && testMinMax(parsedMaxValue, parsedValue) < 1;
+    }
+
+    /**
+     * Return TRUE if the given string contains a negative sign on the first character.
+     *
+     * @param {string} string A number represented by a string
+     * @returns {boolean}
+     */
+    function isNegative(string) {
+        return string.charAt(0) === '-';
+    }
+
+    /**
+     * Return the negative version of the value (represented as a string) given as a parameter.
+     *
+     * @param {string} value
+     * @returns {*}
+     */
+    function setRawNegativeSign(value) {
+        if (!isNegative(value)) {
+            return `-${value}`;
+        }
+
+        return value;
+    }
+
+    /**
+     * Insert a character or a string at the index given (0 being the far left side).
+     *
+     * @param str {String}
+     * @param char {String}
+     * @param caretPosition {int}
+     * @returns {string}
+     */
+    function insertCharAtPosition(str, char, caretPosition) {
+        return `${str.slice(0, caretPosition)}${char}${str.slice(caretPosition)}`;
+    }
+
+    /**
+     * Replace the character at the position `index` in the string `string` by the character(s) `newCharacter`.
+     *
+     * @param {string} string
+     * @param {int} index
+     * @param {string} newCharacter
+     * @returns {string}
+     */
+    function replaceCharAt(string, index, newCharacter) {
+        return `${string.substr(0, index)}${newCharacter}${string.substr(index + newCharacter.length)}`;
+    }
+
+    /**
+     * Return the value clamped to the nearest minimum/maximum value, as defined in the settings.
+     *
+     * @param {string|number} value
+     * @param {object} settings
+     * @returns {number}
+     */
+    function clampToRangeLimits(value, settings) {
+        //XXX This function always assume `settings.minimumValue` is lower than `settings.maximumValue`
+        return Math.max(settings.minimumValue, Math.min(settings.maximumValue, value));
+    }
+
+    /**
+     * Return the number of number or dot characters on the left side of the caret, in a formatted number.
+     *
+     * @param {string} formattedNumberString
+     * @param {int} caretPosition This must be a positive integer
+     * @param {string} decimalCharacter
+     * @returns {number}
+     */
+    function countNumberCharactersOnTheCaretLeftSide(formattedNumberString, caretPosition, decimalCharacter) {
+        // Here we count the dot and report it as a number character too, since it will 'stay' in the Javascript number when unformatted
+        const numberDotOrNegativeSign = new RegExp(`[0-9${decimalCharacter}-]`); // No need to escape the decimal character here, since it's in `[]`
+
+        let numberDotAndNegativeSignCount = 0;
+        for (let i = 0; i < caretPosition; i++) {
+            // Test if the character is a number, a dot or an hyphen. If it is, count it, otherwise ignore it
+            if (numberDotOrNegativeSign.test(formattedNumberString[i])) {
+                numberDotAndNegativeSignCount++;
+            }
+        }
+
+        return numberDotAndNegativeSignCount;
+    }
+
+    /**
+     * Walk the `formattedNumberString` from left to right, one char by one, counting the `formattedNumberStringIndex`.
+     * If the char is in the `rawNumberString` (starting at index 0), then `rawNumberStringIndex++`, and continue until
+     * there is no more characters in `rawNumberString`) or that `rawNumberStringIndex === caretPositionInRawValue`.
+     * When you stop, the `formattedNumberStringIndex` is the position where the caret should be set.
+     *
+     * @example
+     * 1234567|89.01   : position 7 (rawNumberString)
+     * 123.456.7|89,01 : position 9 (formattedNumberString)
+     *
+     * @param {string} rawNumberString
+     * @param {int} caretPositionInRawValue
+     * @param {string} formattedNumberString
+     * @param {string} decimalCharacter
+     * @returns {*}
+     */
+    function findCaretPositionInFormattedNumber(rawNumberString, caretPositionInRawValue, formattedNumberString, decimalCharacter) {
+        const formattedNumberStringSize = formattedNumberString.length;
+        const rawNumberStringSize = rawNumberString.length;
+
+        let formattedNumberStringIndex;
+        let rawNumberStringIndex = 0;
+        for (formattedNumberStringIndex = 0;
+             formattedNumberStringIndex < formattedNumberStringSize &&
+             rawNumberStringIndex < rawNumberStringSize &&
+             rawNumberStringIndex < caretPositionInRawValue;
+             formattedNumberStringIndex++) {
+            if (rawNumberString[rawNumberStringIndex] === formattedNumberString[formattedNumberStringIndex] ||
+                (rawNumberString[rawNumberStringIndex] === '.' && formattedNumberString[formattedNumberStringIndex] === decimalCharacter)) {
+                rawNumberStringIndex++;
+            }
+        }
+
+        return formattedNumberStringIndex;
+    }
+
+    /**
+     * Return the number of dot '.' in the given text.
+     *
+     * @param {string} text
+     * @returns {number}
+     */
+    function countDotsInText(text) {
+        return countCharInText('.', text);
+    }
+
+    /**
+     * Count the number of occurrence of the given character, in the given text.
+     *
+     * @param {string} character
+     * @param {string} text
+     * @returns {number}
+     */
+    function countCharInText(character, text) {
+        let charCounter = 0;
+        for (let i = 0; i < text.length; i++) {
+            if (text[i] === character) {
+                charCounter++;
+            }
+        }
+
+        return charCounter;
+    }
+
+    /**
+     * Return the index that can be used to set the caret position.
+     * This takes into account that the position is starting at '0', not 1.
+     *
+     * @param characterCount
+     * @returns {number}
+     */
+    function convertCharacterCountToIndexPosition(characterCount) {
+        return Math.max(characterCount, characterCount - 1);
+    }
+
+    /**
      * Cross browser routine for getting selected range/cursor position
      */
     function getElementSelection(that) {
@@ -694,7 +890,11 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Cross browser routine for setting selected range/cursor position
      */
-    function setElementSelection(that, start, end) {
+    function setElementSelection(that, start, end = null) {
+        if (isUndefinedOrNullOrEmpty(end)) {
+            end = start;
+        }
+
         if (isUndefined(that.selectionStart)) {
             that.focus();
             const range = that.createTextRange();
@@ -764,9 +964,12 @@ if (typeof define === 'function' && define.amd) {
      *
      * @param {string} s
      * @param {object} settings
+     * @param Boolean leftOrAll
      * @returns {string|*}
      */
-    function autoStrip(s, settings, leftOrAll) {
+
+    function stripAllNonNumberCharacters(s, settings, leftOrAll) {
+
         if (settings.currencySymbol !== '') {
             // Remove currency sign
             s = s.replace(settings.currencySymbol, '');
@@ -851,8 +1054,8 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * convert locale format to Javascript numeric string
-     * allows locale decimal separator to be a period or comma - no thousand separator allowed of currency signs allowed
+     * Convert locale format to Javascript numeric string
+     * Allows locale decimal separator to be a period or a comma - no thousand separator allowed of currency signs allowed
      * '1234.56'    OK
      * '-1234.56'   OK
      * '1234.56-'   OK
@@ -976,7 +1179,7 @@ if (typeof define === 'function' && define.amd) {
      */
     function autoGroup(inputValue, settings) {
         if (settings.strip) {
-            inputValue = autoStrip(inputValue, settings, false);
+            inputValue = stripAllNonNumberCharacters(inputValue, settings, false);
         }
 
         if (settings.trailingNegative && !contains(inputValue, '-')) {
@@ -1502,6 +1705,7 @@ if (typeof define === 'function' && define.amd) {
      * @param {object} settings
      */
     function keepAnOriginalSettingsCopy(settings) {
+        //TODO Rename the old option names to the new ones
         settings.oDec     = settings.decimalPlacesOverride;
         settings.oPad     = settings.allowDecimalPadding;
         settings.oBracket = settings.negativeBracketsTypeOnBlur;
@@ -1646,8 +1850,9 @@ if (typeof define === 'function' && define.amd) {
         _getBeforeAfterStripped() {
             const settingsClone = this.settingsClone;
             let [left, right] = this._getBeforeAfter();
-            left = autoStrip(left, this.settingsClone, true);
-            right = autoStrip(right, this.settingsClone, false);
+
+            left = stripAllNonNumberCharacters(left, this.settingsClone, true);
+            right = stripAllNonNumberCharacters(right, this.settingsClone, false);
 
             if (settingsClone.trailingNegative && !contains(left, '-')) {
                 left = '-' + left;
@@ -1666,18 +1871,23 @@ if (typeof define === 'function' && define.amd) {
             const settingsClone = this.settingsClone;
 
             // prevents multiple leading zeros from being entered
-            left = autoStrip(left, settingsClone, true);
+
+            left = stripAllNonNumberCharacters(left, settingsClone, true);
             if (Number(left) === 0 && settingsClone.leadingZero === 'deny') {
-                if (right === '' && left.indexOf('-') === -1) {
+                if (right === '') {
                     left = '';
+                } else {
+                    if (contains(left, '-')) {
+                        left = '-';
+                    } else {
+                        left = '';
+                    }
                 }
-                if (right !== '' && left.indexOf('-') !== -1) {
-                    left = '-';
-                }
-            }
+            }          
 
             // if right is not empty and first character is not decimalCharacter,
-            right = autoStrip(right, settingsClone, false);
+            right = stripAllNonNumberCharacters(right, settingsClone, false);
+
             if (settingsClone.trailingNegative && !contains(left, '-')) {
                 left = '-' + left;
                 settingsClone.trailingNegative = false;
@@ -1800,7 +2010,8 @@ if (typeof define === 'function' && define.amd) {
 
                 // try to strip pasted value first
                 delete this.valuePartsBeforePaste;
-                const modifiedLeftPart = left.substr(0, oldParts[0].length) + autoStrip(left.substr(oldParts[0].length), this.settingsClone, true);
+
+                const modifiedLeftPart = left.substr(0, oldParts[0].length) + stripAllNonNumberCharacters(left.substr(oldParts[0].length), this.settingsClone, true);
                 if (!this._setValueParts(modifiedLeftPart, right, 'paste')) {
                     this.value = oldParts.join('');
                     this._setPosition(oldParts[0].length, false);
@@ -2362,6 +2573,7 @@ if (typeof define === 'function' && define.amd) {
 
         if (e.type === 'focusin' || e.type === 'mouseenter' && !$this.is(':focus') && settings.emptyInputBehavior === 'focus') {
             settings.onOff = true;
+            //TODO Fix issue #303 : if (e.type === 'focusin' && no mouse click && fromTabKey) { setElementSelection(e.target, 0); }
 
             if (settings.negativeBracketsTypeOnBlur !== null && settings.negativeSignCharacter !== '') {
                 $this.val(negativeBracket(e.target.value, settings));
@@ -2379,7 +2591,8 @@ if (typeof define === 'function' && define.amd) {
                 settings.currencySymbol = '';
                 settings.suffixText = '';
                 $this.autoNumeric('set', settings.rawValue);
-            } else if ((result = autoStrip(e.target.value, settings, true)) !== settings.rawValue) {
+
+            } else if ((result = stripAllNonNumberCharacters(e.target.value, settings, true)) !== settings.rawValue) {
                 $this.autoNumeric('set', result);
             }
 
@@ -2621,7 +2834,8 @@ if (typeof define === 'function' && define.amd) {
                 settings.negativeBracketsTypeOnBlur = settings.oBracket;
             }
 
-            value = autoStrip(value, settings, true);
+            value = stripAllNonNumberCharacters(value, settings, true);
+
             if (value !== '') {
                 if (settings.trailingNegative) {
                     value = '-' + value;
@@ -2686,29 +2900,333 @@ if (typeof define === 'function' && define.amd) {
      * @returns {*}
      */
     function onPaste($this, holder, e) {
-        //FIXME When pasting '000' on a thousand group selection, the whole selection gets deleted, and only one '0' is pasted
+        //TODO Using ctrl+z after a paste should cancel it -> How would that affect other frameworks/component built with that feature in mind though?
+        //FIXME When pasting '000' on a thousand group selection, the whole selection gets deleted, and only one '0' is pasted (cf. issue #302)
         // The event is prevented by default, since otherwise the user would be able to paste invalid characters into the input
         e.preventDefault();
 
-        const oldRawValue = $this.autoNumeric('get');
-        const currentValue = e.target.value || '';
+        let rawPastedText = e.clipboardData.getData('text/plain');
+
+        // 0. Special case if the user has selected all the input text before pasting
+        const initialFormattedValue = e.target.value;
         const selectionStart = e.target.selectionStart || 0;
         const selectionEnd = e.target.selectionEnd || 0;
-        const prefix = currentValue.substring(0, selectionStart);
-        const suffix = currentValue.substring(selectionEnd, currentValue.length);
-        const pastedText = preparePastedText(e.clipboardData.getData('text/plain'), holder);
+        const selectionSize = selectionEnd - selectionStart;
+        let isAllInputTextSelected = false;
 
-        if (isValidPasteText(pastedText)) {
-            const newValue = preparePastedText(prefix + Number(pastedText).valueOf() + suffix, holder);
+        if (selectionSize === initialFormattedValue.length) {
+            isAllInputTextSelected = true;
+        }
 
-            if (isValidPasteText(newValue) && Number(oldRawValue).valueOf() !== Number(newValue).valueOf()) {
-                $this.autoNumeric('set', newValue);
-                // On a 'normal' non-autoNumeric input, an `input` event is sent when a paste is done. We mimic that.
-                triggerEvent('input', e.target);
-                //FIXME After a paste, the caret is put on the far right of the input, it should be set to something like `newCaretPosition = oldCaretPosition + pasteText.length;`, while taking into account the thousand separators, the decimal character, the negative sign/brackets, and the currency sign.
+        // 1. Check if the paste has a negative sign (only if it's the first character), and store that information for later use
+        const isPasteNegative = isNegative(rawPastedText);
+        if (isPasteNegative) {
+            // 1a. Remove the negative sign from the pasted text
+            rawPastedText = rawPastedText.slice(1, rawPastedText.length);
+        }
+        const rawPastedTextSize = rawPastedText.length; // This use the 'cleaned' paste text
+
+        // 2. Strip all thousand separators, brackets and currency sign, and convert the decimal character to a dot
+        const pastedText = preparePastedText(rawPastedText, holder);
+
+        // 3. Test if the paste is valid (only has numbers and eventually a decimal character). If it's not valid, stop here.
+        if (!isNumber(pastedText) || pastedText === '') {
+            if (holder.settings.onInvalidPaste === 'error') {
+                //TODO Should we send a warning instead of throwing an error?
+                throwError(`The pasted value '${rawPastedText}' is not a valid paste content.`);
             }
-        } else {
-            e.target.selectionStart = selectionEnd;
+
+            return;
+        }
+
+        // 4. Calculate the paste result
+        let caretPositionOnInitialTextAfterPasting;
+        let initialUnformattedNumber = $this.autoNumeric('get');
+        let isInitialValueNegative = isNegative(initialUnformattedNumber);
+        let isPasteNegativeAndInitialValueIsPositive;
+        let result;
+
+        // If the pasted content is negative, then the result will be negative too
+        if (isPasteNegative && !isInitialValueNegative) {
+            initialUnformattedNumber = `-${initialUnformattedNumber}`;
+            isInitialValueNegative = true;
+            isPasteNegativeAndInitialValueIsPositive = true;
+        }
+        else {
+            isPasteNegativeAndInitialValueIsPositive = false;
+        }
+
+        switch (holder.settings.onInvalidPaste) {
+            /* 4a. Truncate paste behavior:
+             * Insert as many numbers as possible on the right hand side of the caret from the pasted text content, until the input reach its range limit.
+             * If there is more characters in the clipboard once a limit is reached, drop the extraneous characters.
+             * Otherwise paste all the numbers in the clipboard.
+             * While doing so, we check if the result is within the minimum and maximum values allowed, and stop as soon as we encounter one of those.
+             *
+             * 4b. Replace paste behavior:
+             * Idem than the 'truncate' paste behavior, except that when a range limit is hit, we try to replace the subsequent initial numbers with the pasted ones, until we hit the range limit a second (and last) time, or we run out of numbers to paste
+             */
+            /* eslint no-case-declarations: 0 */
+            case 'truncate':
+            case 'replace':
+                const leftFormattedPart = initialFormattedValue.slice(0, selectionStart);
+                const rightFormattedPart = initialFormattedValue.slice(selectionEnd, initialFormattedValue.length);
+
+                if (selectionStart !== selectionEnd) {
+                    // a. If there is a selection, remove the selected part, and return the left and right part
+                    result = preparePastedText(leftFormattedPart + rightFormattedPart, holder);
+                } else {
+                    // b. Else if this is only one caret (and therefore no selection), then return the left and right part
+                    result = preparePastedText(initialFormattedValue, holder);
+                }
+
+                // Add back the negative sign if needed
+                if (isInitialValueNegative) {
+                    result = setRawNegativeSign(result);
+                }
+
+                // Build the unformatted result string
+                caretPositionOnInitialTextAfterPasting = convertCharacterCountToIndexPosition(countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, holder.settings.decimalCharacter));
+                if (isPasteNegativeAndInitialValueIsPositive) {
+                    // If the initial paste is negative and the initial value is not, then I must offset the caret position by one place to the right to take the additional hyphen into account
+                    caretPositionOnInitialTextAfterPasting++;
+                    //TODO Quid if the negative sign is not on the left (negativePositiveSignPlacement and currencySymbolPlacement)?
+                }
+
+                const leftPart = result.slice(0, caretPositionOnInitialTextAfterPasting);
+                const rightPart = result.slice(caretPositionOnInitialTextAfterPasting, result.length);
+                // -- Here, we are good to go to continue on the same basis
+
+                // c. Add numbers one by one at the caret position, while testing if the result is valid and within the range of the minimum and maximum value
+                //    Continue until you either run out of numbers to paste, or that you get out of the range limits
+                const minParse = parseStr(holder.settings.minimumValue);
+                const maxParse = parseStr(holder.settings.maximumValue);
+                let lastGoodKnownResult = result; // This is set as the default, in case we do not add even one number
+                let pastedTextIndex = 0;
+                let modifiedLeftPart = leftPart;
+
+                while (pastedTextIndex < pastedText.length) {
+                    // Modify the result with another pasted character
+                    modifiedLeftPart += pastedText[pastedTextIndex];
+                    result = modifiedLeftPart + rightPart;
+
+                    // Check the range limits
+                    if (!checkIfInRange(result, minParse, maxParse)) {
+                        // The result is out of the range limits, stop the loop here
+                        break;
+                    }
+
+                    // Save the last good known result
+                    lastGoodKnownResult = result;
+
+                    // Update the local variables for the next loop
+                    pastedTextIndex++;
+                }
+
+                // Update the last caret position where to insert a new number
+                caretPositionOnInitialTextAfterPasting += pastedTextIndex;
+
+                //XXX Here we have the result for the `truncate` option
+                if (holder.settings.onInvalidPaste === 'truncate') {
+                    result = lastGoodKnownResult;
+                    break;
+                }
+                //XXX ...else we need to continue modifying the result for the 'replace' option
+
+                // d. Until there are numbers to paste, replace the initial numbers one by one, and still do the range test.
+                //    Stop when you have no more numbers to paste, or if you are out of the range limits.
+                //    If you do get to the range limits, use the previous known good value within those limits.
+                //    Note: The numbers are replaced one by one, in the integer then decimal part, while ignoring the decimal character
+                //TODO What should happen if the user try to paste a decimal number? Should we override the current initial decimal character in favor of this new one? If we do, then we have to recalculate the vMin/vMax from the start in order to take into account this new decimal character position..
+                let lastGoodKnownResultIndex = caretPositionOnInitialTextAfterPasting;
+                const lastGoodKnownResultSize = lastGoodKnownResult.length;
+
+                while (pastedTextIndex < pastedText.length && lastGoodKnownResultIndex < lastGoodKnownResultSize) {
+                    if (lastGoodKnownResult[lastGoodKnownResultIndex] === '.') {
+                        // We skip the decimal character 'replacement'. That way, we do not change the decimal character position regarding the remaining numbers.
+                        lastGoodKnownResultIndex++;
+                        continue;
+                    }
+
+                    // This replace one character at a time
+                    result = replaceCharAt(lastGoodKnownResult, lastGoodKnownResultIndex, pastedText[pastedTextIndex]);
+
+                    // Check the range limits
+                    if (!checkIfInRange(result, minParse, maxParse)) {
+                        // The result is out of the range limits, stop the loop here
+                        break;
+                    }
+
+                    // Save the last good known result
+                    lastGoodKnownResult = result;
+
+                    // Update the local variables for the next loop
+                    pastedTextIndex++;
+                    lastGoodKnownResultIndex++;
+                }
+
+                // Update the last caret position where to insert a new number
+                caretPositionOnInitialTextAfterPasting = lastGoodKnownResultIndex;
+
+                result = lastGoodKnownResult;
+
+                break;
+            /* 4c. Normal paste behavior:
+             * Insert the pasted number inside the current unformatted text, at the right caret position or selection
+             */
+            case 'error':
+            case 'ignore':
+            case 'clamp':
+            default:
+                // Test if there is a selection in the input
+                if (selectionStart === selectionEnd) {
+                    // There is no selection, and this is the caret position : Insert the paste into the element.value at that caret position
+                    let indexWhereToInsertThePastedText = convertCharacterCountToIndexPosition(countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, holder.settings.decimalCharacter));
+                    if (isPasteNegativeAndInitialValueIsPositive) {
+                        // If the pasted value has a '-' sign, but the initial value does not, offset the index by one
+                        indexWhereToInsertThePastedText++;
+                    }
+
+                    result = insertCharAtPosition(initialUnformattedNumber, pastedText, indexWhereToInsertThePastedText);
+
+                    caretPositionOnInitialTextAfterPasting = indexWhereToInsertThePastedText + rawPastedTextSize - countDotsInText(rawPastedText); // I must not count the characters that have been removed from the pasted text (ie. '.')
+                } else {
+                    // There is a selection : replace the selection with the paste content
+                    const firstPart = e.target.value.slice(0, selectionStart);
+                    const lastPart = e.target.value.slice(selectionEnd, e.target.value.length);
+                    result = firstPart + pastedText + lastPart;
+
+                    // Finally, remove any unwanted non-number characters
+                    if (firstPart !== '' || lastPart !== '') {
+                        // If the whole input has been selected prior to pasting, then firstPart and lastPart are empty, hence we only use the pastedText variable, otherwise we remove the potential decimal character in the result variable
+                        result = preparePastedText(result, holder);
+                    }
+
+                    // Add back the negative sign if needed
+                    if (isInitialValueNegative) {
+                        result = setRawNegativeSign(result);
+                    }
+
+                    if (isAllInputTextSelected) {
+                        // Special case when all the input text is selected before pasting, which means we'll completely erase its content and paste only the clipboard content
+                        caretPositionOnInitialTextAfterPasting = result.length;
+                    } else {
+                        // Normal case
+                        let indexSelectionEndInRawValue = convertCharacterCountToIndexPosition(countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionEnd, holder.settings.decimalCharacter));
+
+                        if (isPasteNegativeAndInitialValueIsPositive) {
+                            // If the pasted value has a '-' sign, but the initial value does not, offset the index by one
+                            indexSelectionEndInRawValue++;
+                        }
+
+                        // Here I must not count the characters that have been removed from the pasted text (ie. '.'), or the thousand separators in the initial selected text
+                        const selectedText = e.target.value.slice(selectionStart, selectionEnd);
+                        caretPositionOnInitialTextAfterPasting = indexSelectionEndInRawValue - selectionSize + countCharInText(holder.settings.digitGroupSeparator, selectedText) + rawPastedTextSize - countDotsInText(rawPastedText);
+                    }
+                }
+        }
+
+        // 5. Check if the result is a valid number, if not, drop the paste and do nothing.
+        if (!isNumber(result) || result === '') {
+            if (holder.settings.onInvalidPaste === 'error') {
+                throwError(`The pasted value '${rawPastedText}' would result into an invalid content '${result}'.`); //TODO Should we send a warning instead of throwing an error?
+                //TODO This is not DRY ; refactor with above
+            }
+            return;
+        }
+
+        // 6. If it's a valid number, check if it falls inside the minimum and maximum value. If this fails, modify the value following this procedure :
+        /*
+         * If 'error' (this is the default) :
+         *      - Normal paste behavior.
+         *      - Try to set the new value, if it fails, then throw an error in the console.
+         *      - Do not change the input value, do not change the current selection.
+         * If 'ignore' :
+         *      - Normal paste behavior.
+         *      - Try to set the new value, if it fails, do nothing more.
+         *      - Do not change the input value, do not change the current selection.
+         * If 'clamp' :
+         *      - Normal paste behavior.
+         *      - Try to set the new value, if it fails, set the value to the minimum or maximum limit, whichever is closest to the
+         *        paste result.
+         *      - Change the caret position to be positioned on the left hand side of the decimal character.
+         * If 'truncate' :
+         *      - Truncate paste behavior.
+         *      - Try to set the new value, until it fails (if the result is out of the min and max value limits).
+         *      - Drop the remaining non-pasted numbers, and keep the last known non-failing result.
+         *      - Change the caret position to be positioned after the last pasted character.
+         * If 'replace' :
+         *      - Replace paste behavior.
+         *      - Try to set the new value, until it fails (if the result is out of the min and max value limits).
+          *     - Then try to replace as many numbers as possible with the pasted ones. Once it fails, keep the last known non-failing result.
+         *      - Change the caret position to be positioned after the last pasted character.
+         */
+        let valueHasBeenSet = false;
+        let valueHasBeenClamped = false;
+        try {
+            $this.autoNumeric('set', result);
+            valueHasBeenSet = true;
+        }
+        catch (error) {
+            let clampedValue;
+            switch (holder.settings.onInvalidPaste) {
+                case 'clamp':
+                    clampedValue = clampToRangeLimits(result, holder.settings);
+                    try {
+                        $this.autoNumeric('set', clampedValue);
+                    }
+                    catch (error) {
+                        throwError(`Fatal error: Unable to set the clamped value '${clampedValue}'.`);
+                    }
+
+                    valueHasBeenClamped = true;
+                    valueHasBeenSet = true;
+                    result = clampedValue; // This is used only for setting the caret position later
+                    break;
+                case 'error':
+                case 'truncate':
+                case 'replace':
+                    // Throw an error message
+                    throwError(`The pasted value '${rawPastedText}' results in a value '${result}' that is outside of the minimum [${holder.settings.minimumValue}] and maximum [${holder.settings.maximumValue}] value range.`);
+                    // falls through
+                case 'ignore':
+                    // Do nothing
+                    // falls through
+                default :
+                    return; // ...and nothing else should be changed
+            }
+        }
+
+        // 7. Then lastly, set the caret position at the right logical place
+        let caretPositionInFormattedNumber;
+        if (valueHasBeenSet) {
+            switch (holder.settings.onInvalidPaste) {
+                case 'clamp':
+                    if (valueHasBeenClamped) {
+                        if (holder.settings.currencySymbolPlacement === 's') {
+                            setElementSelection(e.target, e.target.value.length - holder.settings.currencySymbol.length); // This puts the caret on the right of the last decimal place
+                        } else {
+                            setElementSelection(e.target, e.target.value.length); // ..and this on the far right
+                        }
+
+                        break;
+                    } // else if the value has not been clamped, the default behavior is used...
+                    // falls through
+                case 'error':
+                case 'ignore':
+                case 'truncate':
+                case 'replace':
+                default :
+                    // Whenever one or multiple characters are pasted, this means we have to manage the potential thousand separators that could be added by the formatting
+                    caretPositionInFormattedNumber = findCaretPositionInFormattedNumber(result, caretPositionOnInitialTextAfterPasting, e.target.value, holder.settings.decimalCharacter);
+                    setElementSelection(e.target, caretPositionInFormattedNumber);
+            }
+        }
+
+        // 8. We make sure we send an input event only if the result is different than the initial value before the paste
+        if (valueHasBeenSet && initialFormattedValue !== e.target.value) {
+            // On a 'normal' non-autoNumeric input, an `input` event is sent when a paste is done. We mimic that.
+            triggerEvent('input', e.target);
         }
     }
 
@@ -2830,7 +3348,8 @@ if (typeof define === 'function' && define.amd) {
                             toStrip = currentValue;
                         }
 
-                        settings.rawValue = ((settings.negativePositiveSignPlacement === 's' || (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement !== 'p')) && settings.negativeSignCharacter !== '' && contains(currentValue, '-'))?'-' + autoStrip(toStrip, settings, true):autoStrip(toStrip, settings, true);
+                        settings.rawValue = ((settings.negativePositiveSignPlacement === 's' || (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement !== 'p')) && settings.negativeSignCharacter !== '' && contains(currentValue, '-'))?'-' + stripAllNonNumberCharacters(toStrip, settings, true):stripAllNonNumberCharacters(toStrip, settings, true);
+
                     }
 
                     setValue = false;
@@ -2881,6 +3400,7 @@ if (typeof define === 'function' && define.amd) {
      * @param {object} settings
      */
     function correctPNegOption(options, settings) {
+        //TODO Merge the options and settings parameter to use only `settings`
         if (!isUndefined(options) && isUndefinedOrNullOrEmpty(options.negativePositiveSignPlacement) && options.currencySymbol !== '') {
             switch (settings.currencySymbolPlacement) {
                 case 's':
@@ -2923,8 +3443,8 @@ if (typeof define === 'function' && define.amd) {
         }
         else if (isNull(settings.decimalPlacesOverride)) {
             settings.decimalPlacesOverride = maximumVMinAndVMaxDecimalLength(settings.minimumValue, settings.maximumValue);
-            settings.oDec = String(settings.decimalPlacesOverride);
         }
+        settings.oDec = String(settings.decimalPlacesOverride);
 
         // Most calculus assume `decimalPlacesOverride` is an integer, the following statement makes it clear (otherwise having it as a string leads to problems in rounding for instance)
         settings.decimalPlacesOverride = Number(settings.decimalPlacesOverride);
@@ -2946,7 +3466,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Caches regular expressions for autoStrip
+     * Caches regular expressions for stripAllNonNumberCharacters
      *
      * @param {object} settings
      */
@@ -3039,6 +3559,7 @@ if (typeof define === 'function' && define.amd) {
             scaleDecimalPlaces           : true,
             scaleSymbol                  : true,
             saveValueToSessionStorage    : true,
+            onInvalidPaste               : true,
             roundingMethod               : true,
             allowDecimalPadding          : true,
             negativeBracketsTypeOnBlur   : true,
@@ -3050,6 +3571,7 @@ if (typeof define === 'function' && define.amd) {
             unformatOnSubmit             : true,
             outputFormat                 : true,
             showWarnings                 : true,
+            failOnUnknownOption          : true,
             //FIXME Find a way to exclude those internal data from the settings object (ideally by using another object, or better yet, class attributes) -->
             onOff                : true,
             runOnce              : true,
@@ -3091,7 +3613,7 @@ if (typeof define === 'function' && define.amd) {
                     // Then we modify the initial option object to use the new options instead of the old ones
                     options[oldOptionsConverter[option]] = options[option];
                     delete options[option];
-                } else {
+                } else if (options.failOnUnknownOption) {
                     // ...or the option name is unknown. This means there is a problem with the options object, therefore we throw an error.
                     throwError(`Option name '${option}' is unknown. Please fix the options passed to autoNumeric`);
                 }
@@ -3117,12 +3639,12 @@ if (typeof define === 'function' && define.amd) {
             convertOldOptionsToNewOnes(options);
         }
 
-        // If we couldn't grab any settings, create them from the default ones and combine them with the options passed
         if (update || isUndefined(settings)) {
             if (update) {
                 // The settings are updated
                 settings = $.extend(settings, options);
             } else {
+                // If we couldn't grab any settings create them from the default ones and combine them with the options passed
                 // The settings are generated for the first time
                 // Attempt to grab HTML5 data, if it doesn't exist, we'll get "undefined"
                 const tagData = $this.data();
@@ -3444,7 +3966,9 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 if (settings.runOnce || settings.formatOnPageLoad === false) {
-                    value = autoStrip(value, settings, true);
+
+                    value = stripAllNonNumberCharacters(value, settings, true);
+
                 }
 
                 value = fixNumber(value, settings);
@@ -3769,6 +4293,16 @@ if (typeof define === 'function' && define.amd) {
             throwError(`The save to session storage option 'saveValueToSessionStorage' is invalid ; it should be either 'false' or 'true', [${options.saveValueToSessionStorage}] given.`);
         }
 
+        if (!isInArray(options.onInvalidPaste, [
+            'error',
+            'ignore',
+            'clamp',
+            'truncate',
+            'replace',
+        ])) {
+            throwError(`The paste behavior option 'onInvalidPaste' is invalid ; it should either be 'error', 'ignore', 'clamp', 'truncate' or 'replace' (cf. documentation), [${options.onInvalidPaste}] given.`);
+        }
+
         if (!isInArray(options.roundingMethod, [
             'S',
             'A',
@@ -3834,6 +4368,10 @@ if (typeof define === 'function' && define.amd) {
 
         if (!isTrueOrFalseString(options.showWarnings) && !isBoolean(options.showWarnings)) {
             throwError(`The debug option 'showWarnings' is invalid ; it should be either 'false' or 'true', [${options.showWarnings}] given.`);
+        }
+
+        if (!isTrueOrFalseString(options.failOnUnknownOption) && !isBoolean(options.failOnUnknownOption)) {
+            throwError(`The debug option 'failOnUnknownOption' is invalid ; it should be either 'false' or 'true', [${options.failOnUnknownOption}] given.`);
         }
     };
 

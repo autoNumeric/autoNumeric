@@ -105,6 +105,7 @@ describe('The autoNumeric object', () => {
         scaleDecimalPlaces           : null,
         scaleSymbol                  : null,
         saveValueToSessionStorage    : false,
+        onInvalidPaste               : 'error',
         roundingMethod               : 'S',
         allowDecimalPadding          : true,
         negativeBracketsTypeOnBlur   : null,
@@ -1012,6 +1013,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ saveValueToSessionStorage: 'true' })).not.toThrow();
             expect(() => an.validate({ saveValueToSessionStorage: 'false' })).not.toThrow();
 
+            expect(() => an.validate({ onInvalidPaste: 'error' })).not.toThrow();
+            expect(() => an.validate({ onInvalidPaste: 'ignore' })).not.toThrow();
+            expect(() => an.validate({ onInvalidPaste: 'clamp' })).not.toThrow();
+            expect(() => an.validate({ onInvalidPaste: 'truncate' })).not.toThrow();
+            expect(() => an.validate({ onInvalidPaste: 'replace' })).not.toThrow();
+
             expect(() => an.validate({ roundingMethod: 'S' })).not.toThrow();
             expect(() => an.validate({ roundingMethod: 'A' })).not.toThrow();
             expect(() => an.validate({ roundingMethod: 's' })).not.toThrow();
@@ -1239,6 +1246,17 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ saveValueToSessionStorage: '0' })).toThrow();
             expect(() => an.validate({ saveValueToSessionStorage: '1' })).toThrow();
             expect(() => an.validate({ saveValueToSessionStorage: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ onInvalidPaste: 0 })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: 1 })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: -42 })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: '0' })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: '1' })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: 'foobar' })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: 0.5 })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: true })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: null })).toThrow();
+            expect(() => an.validate({ onInvalidPaste: [] })).toThrow();
 
             expect(() => an.validate({ roundingMethod: 0.5 })).toThrow();
             expect(() => an.validate({ roundingMethod: true })).toThrow();

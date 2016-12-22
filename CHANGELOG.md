@@ -1,5 +1,24 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.13"
++ Fix issue #228 Do not modify the current selection when trying to input an invalid character
++ Mass rename functions to gives them a more explicit name :
+
+| Old name                    |          | New name |
+| :---------------- | :------------ | :-----------:  |
+| autoCheck()       | -> | checkIfInRangeWithOverrideOption()                       |
+| autoRound()       | -> | roundValue()                                             |
+| autoGroup()       | -> | addGroupSeparators()                                     |
+| fixNumber()       | -> | modifyNegativeSignAndDecimalCharacterForRawValue()       |
+| presentNumber()   | -> | modifyNegativeSignAndDecimalCharacterForFormattedValue() |
+| negativeBracket() | -> | toggleNegativeBracket()                                  |
+| autoGet()         | -> | getCurrentElement()                                      |
+| getHolder()       | -> | getAutoNumericHolder()                                   |
+| autoSave()        | -> | saveValueToPersistentStorage()                           |
+| _setPosition()    | -> | _setCaretPosition()                                      |
+| _signPosition()   | -> | _getSignPosition()                                       |
+| _formatQuick()    | -> | _formatValue()                                           |
+
 ### "2.0.0-beta.12"
 + Modify the `validate()` function to show a warning when `decimalPlacesOverride` is greater than `decimalPlacesShownOnFocus`.
 + Implement feature request #183 that manage invalid results when trying to paste any number. This adds the `onInvalidPaste` option that can accept the `error`, `ignore`, `clamp`, `truncate` and `replace` value.

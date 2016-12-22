@@ -2625,7 +2625,7 @@ if (typeof define === 'function' && define.amd) {
             const formFields = $this.serializeArray();
 
             $.each(formFields, (i, field) => {
-                const scElement = $.inArray(i, scIndex);
+                const scElement = scIndex.indexOf(i);
 
                 if (scElement > -1 && aiIndex[scElement] > -1) {
                     const testInput = $(`form:eq(${formIndex}) input:eq(${aiIndex[scElement]})`);
@@ -2646,7 +2646,7 @@ if (typeof define === 'function' && define.amd) {
 
             $.each(formParts, i => {
                 const [inputName, inputValue] = formParts[i].split('=');
-                const scElement = $.inArray(i, scIndex);
+                const scElement = scIndex.indexOf(i);
 
                 // If the current element is a valid element
                 if (scElement > -1 && aiIndex[scElement] > -1) {
@@ -3432,7 +3432,7 @@ if (typeof define === 'function' && define.amd) {
                 //TODO Replace whatever locale character is used by a '.', and not only the comma ',', based on the locale used by the user
                 if ((settings.defaultValueOverride !== null && settings.defaultValueOverride.toString() !== currentValue) ||
                     (settings.defaultValueOverride === null && currentValue !== '' && currentValue !== $this.attr('value')) ||
-                    (currentValue !== '' && $this.attr('type') === 'hidden' && !$.isNumeric(currentValue.replace(',', '.')))) {
+                    (currentValue !== '' && $this.attr('type') === 'hidden' && !isNumber(currentValue.replace(',', '.')))) {
                     if ((settings.decimalPlacesShownOnFocus !== null && settings.saveValueToSessionStorage) ||
                         (settings.scaleDivisor && settings.saveValueToSessionStorage)) {
                         settings.rawValue = saveValueToPersistentStorage($this[0], settings, 'get');
@@ -3936,7 +3936,7 @@ if (typeof define === 'function' && define.amd) {
                 value = fromLocale(value);
 
                 // Throws an error if the value being set is not numeric
-                if (!$.isNumeric(Number(value))) {
+                if (!isNumber(Number(value))) {
                     warning(`The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`, settings.showWarnings);
                     return $this.val('');
                 }

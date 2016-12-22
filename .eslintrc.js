@@ -216,8 +216,21 @@ module.exports = {
         // allow debugger during development
         'no-debugger': (process.env.NODE_ENV === 'production')?2:0,
 
+        "valid-jsdoc": [
+            "error", {
+                "prefer"                  : {
+                    "arg"     : "param",
+                    "argument": "param",
+                    "class"   : "constructor",
+                    "return"  : "returns",
+                    "virtual" : "abstract",
+                },
+                "requireReturn"           : false,
+                "requireParamDescription" : false, //TODO Ideally, this should be set to true
+                "requireReturnDescription": false, //TODO Ideally, this should be set to true
+            }
+        ],
         //TODO This should really be enabled by default :
-        // "valid-jsdoc": "error",
         /*"wrap-iife": [
             "error",
             "inside"

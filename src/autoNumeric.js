@@ -2557,8 +2557,12 @@ if (typeof define === 'function' && define.amd) {
                 }
             }
 
-            this.that.value = value;
-            this._setPosition(position);
+            // Only update the value if it has changed. This prevents modifying the selection, if any.
+            if (value !== this.that.value) {
+                this.that.value = value;
+                this._setPosition(position);
+            }
+
             this.formatted = true;
         }
     }

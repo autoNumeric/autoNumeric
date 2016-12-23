@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.14"
++ Fix issue #306 when { leadingZero: 'deny' } and proper caret placement
+
 ### "2.0.0-beta.13"
 + Fix issue #228 Do not modify the current selection when trying to input an invalid character
 + Mass rename functions to gives them a more explicit name :

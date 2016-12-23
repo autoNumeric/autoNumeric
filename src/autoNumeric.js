@@ -1,11 +1,11 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0-beta.13
- * @date         2016-12-22 UTC 07:00
+ * @version      2.0-beta.14
+ * @date         2016-12-23 UTC 14:00
  *
  * @author       Bob Knothe
- * @contributors Sokolov Yura and other Github users, cf. AUTHORS.md.
+ * @contributors Alexandre Bonneau, Sokolov Yura and other Github users, cf. AUTHORS.md.
  * @copyright    2009 Robert J. Knothe http://www.decorplanit.com/plugin/
  * @since        2009-08-09
  *
@@ -1929,7 +1929,10 @@ if (typeof define === 'function' && define.amd) {
             const settingsClone = this.settingsClone;
             let [left, right] = this._getLeftAndRightPartAroundTheSelection();
 
-            left = stripAllNonNumberCharacters(left, this.settingsClone, true);
+            // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
+            const stripZeros = (this.kdCode === keyCode.Hyphen && Number(left) === 0) ? false : true;
+            left = stripAllNonNumberCharacters(left, this.settingsClone, stripZeros);
+
             right = stripAllNonNumberCharacters(right, this.settingsClone, false);
 
             if (settingsClone.trailingNegative && !contains(left, '-')) {
@@ -1953,22 +1956,17 @@ if (typeof define === 'function' && define.amd) {
         _normalizeParts(left, right) {
             const settingsClone = this.settingsClone;
 
-            // Prevents multiple leading zeros from being entered
-            left = stripAllNonNumberCharacters(left, settingsClone, true);
-            if (Number(left) === 0 && settingsClone.leadingZero === 'deny') {
-                if (right === '') {
-                    left = '';
-                } else {
-                    if (contains(left, '-')) {
-                        left = '-';
-                    } else {
-                        left = '';
-                    }
-                }
-            }          
+            // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
+            const stripZeros = (this.kdCode === keyCode.Hyphen && Number(left) === 0) ? false : true;
+            left = stripAllNonNumberCharacters(left, settingsClone, stripZeros);
 
             // If right is not empty and first character is not decimalCharacter
             right = stripAllNonNumberCharacters(right, settingsClone, false);
+
+            // Prevents multiple leading zeros from being entered
+            if (settingsClone.leadingZero === 'deny' && this.kdCode === 48 && Number(left) === 0 && !contains(left, settingsClone.decimalCharacter)  && right !== '') {
+                left = left.substring(0, left.length - 1);
+            }
 
             if (settingsClone.trailingNegative && !contains(left, '-')) {
                 left = '-' + left;
@@ -2552,7 +2550,7 @@ if (typeof define === 'function' && define.amd) {
             }
 
             // Only update the value if it has changed. This prevents modifying the selection, if any.
-            if (value !== this.that.value) {
+            if (value !== this.that.value || value === this.that.value && eventKeyCode === keyCode.num0) {
                 this.that.value = value;
                 this._setCaretPosition(position);
             }

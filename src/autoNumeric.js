@@ -103,7 +103,7 @@ const defaultSettings = {
     /* Allowed thousand separator characters
      * comma = ","
      * period "full stop" = "."
-     * apostrophe is escaped = "\""
+     * quote = "'"
      * space = " "
      * none = ""
      * NOTE: do not use numeric characters
@@ -3046,7 +3046,13 @@ if (typeof define === 'function' && define.amd) {
 
         // 4. Calculate the paste result
         let caretPositionOnInitialTextAfterPasting;
-        let initialUnformattedNumber = $this.autoNumeric('get');
+        let initialUnformattedNumber;
+        if (e.target.value === '') {
+            // autoNumeric 'get' returns '0.00' if the input is empty, hence we need to store the 'real' empty initial value when needed
+            initialUnformattedNumber = '';
+        } else {
+            initialUnformattedNumber = $this.autoNumeric('get');
+        }
         let isInitialValueNegative = isNegative(initialUnformattedNumber);
         let isPasteNegativeAndInitialValueIsPositive;
         let result;
@@ -4343,15 +4349,15 @@ if (typeof define === 'function' && define.amd) {
         const testPositiveFloatOrInteger = /^[0-9]+(\.?[0-9]+)?$/;
 
         // Then tests the options individually
-        if (!isInArray(options.digitGroupSeparator, [',', '.', ' ', ''])) {
-            throwError(`The thousand separator character option 'digitGroupSeparator' is invalid ; it should be ',', '.', ' ' or empty (''), [${options.digitGroupSeparator}] given.`);
+        if (!isInArray(options.digitGroupSeparator, [',', '.', ' ', '', "'"])) {
+            throwError(`The thousand separator character option 'digitGroupSeparator' is invalid ; it should be ',', '.', ' ', "'" or empty (''), [${options.digitGroupSeparator}] given.`);
         }
 
         if (!isTrueOrFalseString(options.noSeparatorOnFocus) && !isBoolean(options.noSeparatorOnFocus)) {
             throwError(`The 'noSeparatorOnFocus' option is invalid ; it should be either 'false' or 'true', [${options.noSeparatorOnFocus}] given.`);
         }
 
-        if (!testPositiveInteger.test(options.digitalGroupSpacing)) { // isNaN(parseInt(options.digitalGroupSpacing)) //DEBUG
+        if (!testPositiveInteger.test(options.digitalGroupSpacing)) {
             throwError(`The digital grouping for thousand separator option 'digitalGroupSpacing' is invalid ; it should be a positive integer, [${options.digitalGroupSpacing}] given.`);
         }
 

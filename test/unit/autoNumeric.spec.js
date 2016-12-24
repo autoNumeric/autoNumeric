@@ -950,6 +950,7 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ digitGroupSeparator: ',' })).not.toThrow();
             expect(() => an.validate({ digitGroupSeparator: '.',  decimalCharacter: ',' })).not.toThrow();
             expect(() => an.validate({ digitGroupSeparator: ' ' })).not.toThrow();
+            expect(() => an.validate({ digitGroupSeparator: "'" })).not.toThrow();
             expect(() => an.validate({ digitGroupSeparator: '' })).not.toThrow();
 
             expect(() => an.validate({ noSeparatorOnFocus: false })).not.toThrow();
@@ -1157,6 +1158,7 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate(42)).toThrow();
 
             expect(() => an.validate({ digitGroupSeparator: '-' })).toThrow();
+            expect(() => an.validate({ digitGroupSeparator: '"' })).toThrow();
             expect(() => an.validate({ digitGroupSeparator: 'a' })).toThrow();
             expect(() => an.validate({ digitGroupSeparator: 42 })).toThrow();
             expect(() => an.validate({ digitGroupSeparator: '.' })).toThrow(); // Since the default 'decimalCharacter' is '.' too

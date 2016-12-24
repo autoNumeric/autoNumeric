@@ -2623,7 +2623,7 @@ if (typeof define === 'function' && define.amd) {
             const formFields = $this.serializeArray();
 
             $.each(formFields, (i, field) => {
-                const scElement = $.inArray(i, scIndex);
+                const scElement = scIndex.indexOf(i);
 
                 if (scElement > -1 && aiIndex[scElement] > -1) {
                     const testInput = $(`form:eq(${formIndex}) input:eq(${aiIndex[scElement]})`);
@@ -2644,7 +2644,7 @@ if (typeof define === 'function' && define.amd) {
 
             $.each(formParts, i => {
                 const [inputName, inputValue] = formParts[i].split('=');
-                const scElement = $.inArray(i, scIndex);
+                const scElement = scIndex.indexOf(i);
 
                 // If the current element is a valid element
                 if (scElement > -1 && aiIndex[scElement] > -1) {
@@ -2757,6 +2757,7 @@ if (typeof define === 'function' && define.amd) {
     function onKeydown(holder, e) {
         //TODO Create a function that retrieve the element value (either by using `e.target.value` when the element is an <input>, or by using `element.textContent` when the element as its `contenteditable` set to true)
         const currentKeyCode = key(e); // The key being used
+        holder.initialValueOnKeydown = e.target.value; // This is needed in `onKeyup()` to check if the value as changed during the key press
 
         if (holder.that.readOnly) {
             holder.processed = true;
@@ -2901,6 +2902,11 @@ if (typeof define === 'function' && define.amd) {
 
         if (!holder.formatted) {
             holder._formatValue(e);
+        }
+
+        // If the input value has changed during the key press event chain, an event is sent to alert that a formatting has been done (cf. Issue #187)
+        if (e.target.value !== holder.initialValueOnKeydown) {
+            triggerEvent('autoNumeric:formatted', e.target);
         }
     }
 
@@ -3339,7 +3345,7 @@ if (typeof define === 'function' && define.amd) {
     function onBlur(holder, e) {
         if (e.target.value !== holder.valueOnFocus) {
             triggerEvent('change', e.target);
-            // e.preventDefault(); // ...and immediately prevent the browser to send a second change event (that somehow gets picked up by jQuery, but not by `addEventListener()` //FIXME KNOWN BUG : This does not prevent the second change event to be picked up by jQuery
+            // e.preventDefault(); // ...and immediately prevent the browser to send a second change event (that somehow gets picked up by jQuery, but not by `addEventListener()` //FIXME KNOWN BUG : This does not prevent the second change event to be picked up by jQuery, which adds '.00' at the end of an integer
         }
     }
 
@@ -3430,7 +3436,7 @@ if (typeof define === 'function' && define.amd) {
                 //TODO Replace whatever locale character is used by a '.', and not only the comma ',', based on the locale used by the user
                 if ((settings.defaultValueOverride !== null && settings.defaultValueOverride.toString() !== currentValue) ||
                     (settings.defaultValueOverride === null && currentValue !== '' && currentValue !== $this.attr('value')) ||
-                    (currentValue !== '' && $this.attr('type') === 'hidden' && !$.isNumeric(currentValue.replace(',', '.')))) {
+                    (currentValue !== '' && $this.attr('type') === 'hidden' && !isNumber(currentValue.replace(',', '.')))) {
                     if ((settings.decimalPlacesShownOnFocus !== null && settings.saveValueToSessionStorage) ||
                         (settings.scaleDivisor && settings.saveValueToSessionStorage)) {
                         settings.rawValue = saveValueToPersistentStorage($this[0], settings, 'get');
@@ -3934,7 +3940,7 @@ if (typeof define === 'function' && define.amd) {
                 value = fromLocale(value);
 
                 // Throws an error if the value being set is not numeric
-                if (!$.isNumeric(Number(value))) {
+                if (!isNumber(Number(value))) {
                     warning(`The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`, settings.showWarnings);
                     return $this.val('');
                 }

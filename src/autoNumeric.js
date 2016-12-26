@@ -2,7 +2,7 @@
  *               autoNumeric.js
  *
  * @version      2.0-beta.14
- * @date         2016-12-23 UTC 14:00
+ * @date         2016-12-26 UTC 14:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and other Github users, cf. AUTHORS.md.
@@ -1930,7 +1930,10 @@ if (typeof define === 'function' && define.amd) {
             let [left, right] = this._getLeftAndRightPartAroundTheSelection();
 
             // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
-            const stripZeros = (this.kdCode === keyCode.Hyphen && Number(left) === 0) ? false : true;
+            let stripZeros = true;
+            if (this.kdCode === keyCode.Hyphen && Number(left) === 0) {
+                stripZeros = false;
+            }
             left = stripAllNonNumberCharacters(left, this.settingsClone, stripZeros);
 
             right = stripAllNonNumberCharacters(right, this.settingsClone, false);
@@ -1957,7 +1960,10 @@ if (typeof define === 'function' && define.amd) {
             const settingsClone = this.settingsClone;
 
             // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
-            const stripZeros = (this.kdCode === keyCode.Hyphen && Number(left) === 0) ? false : true;
+            let stripZeros = true;
+            if (this.kdCode === keyCode.Hyphen && Number(left) === 0) {
+                stripZeros = false;
+            }
             left = stripAllNonNumberCharacters(left, settingsClone, stripZeros);
 
             // If right is not empty and first character is not decimalCharacter
@@ -2550,7 +2556,8 @@ if (typeof define === 'function' && define.amd) {
             }
 
             // Only update the value if it has changed. This prevents modifying the selection, if any.
-            if (value !== this.that.value || value === this.that.value && eventKeyCode === keyCode.num0) {
+            if (value !== this.that.value ||
+                value === this.that.value && (key(e) === keyCode.num0 || key(e) === keyCode.numpad0)) {
                 this.that.value = value;
                 this._setCaretPosition(position);
             }

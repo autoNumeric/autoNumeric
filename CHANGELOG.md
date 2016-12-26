@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.15"
++ Fix FireFox on issue #306 that allows the caret to move right when all zero present in the decimals
+
 ### "2.0.0-beta.14"
 + Fix issue #306 when { leadingZero: 'deny' } and proper caret placement
 

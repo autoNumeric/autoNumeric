@@ -442,18 +442,19 @@ describe('The autoNumeric object', () => {
 
     it('should recognize only a specific list of methods', () => {
         // The 'init' method is implicit tested since we use that to setup those tests
-        expect(() => aNInput.autoNumeric('wipe')).not.toThrow();
-        expect(() => aNInput.autoNumeric('update', {})).not.toThrow();
+        expect(() => aNInput.autoNumeric('get')).not.toThrow();
+        expect(() => aNInput.autoNumeric('getArray')).not.toThrow();
+        expect(() => aNInput.autoNumeric('getFormatted')).not.toThrow();
+        expect(() => aNInput.autoNumeric('getLocalized')).not.toThrow();
+        expect(() => aNInput.autoNumeric('getNumber')).not.toThrow();
+        expect(() => aNInput.autoNumeric('getSettings')).not.toThrow();
+        expect(() => aNInput.autoNumeric('getString')).not.toThrow();
+        expect(() => aNInput.autoNumeric('reSet')).not.toThrow();
         expect(() => aNInput.autoNumeric('set', 1234)).not.toThrow();
         expect(() => aNInput.autoNumeric('set', 1234.56)).not.toThrow();
+        expect(() => aNInput.autoNumeric('update', {})).not.toThrow();
         expect(() => aNInput.autoNumeric('unSet')).not.toThrow();
-        expect(() => aNInput.autoNumeric('reSet')).not.toThrow();
-        expect(() => aNInput.autoNumeric('get')).not.toThrow();
-        expect(() => aNInput.autoNumeric('getLocalized')).not.toThrow();
-        expect(() => aNInput.autoNumeric('getFormatted')).not.toThrow();
-        expect(() => aNInput.autoNumeric('getString')).not.toThrow();
-        expect(() => aNInput.autoNumeric('getArray')).not.toThrow();
-        expect(() => aNInput.autoNumeric('getSettings')).not.toThrow();
+        expect(() => aNInput.autoNumeric('wipe')).not.toThrow();
         expect(() => aNInput.autoNumeric('_getStringOrArray')).toThrow(); //This is a private function only
 
         expect(() => aNInput.autoNumeric('destroy')).not.toThrow(); //Special case that needs to be done at the end of this test suite
@@ -527,7 +528,7 @@ describe(`autoNumeric 'init' method`, () => {
     });
 });
 
-describe(`autoNumeric 'get' and 'getLocalized' methods`, () => {
+describe(`autoNumeric 'get', 'getLocalized' and 'getNumber' methods`, () => {
     let aNInput;
     let newInput;
 
@@ -549,39 +550,54 @@ describe(`autoNumeric 'get' and 'getLocalized' methods`, () => {
         aNInput.autoNumeric('set', 0);
         expect(aNInput.autoNumeric('get')).toEqual('0.00');
         expect(aNInput.autoNumeric('getLocalized')).toEqual('0');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(0);
         aNInput.autoNumeric('update', { leadingZero: 'keep' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual('0,00');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(0);
 
         aNInput.autoNumeric('set', -42);
         expect(aNInput.autoNumeric('get')).toEqual('-42.00');
         expect(aNInput.autoNumeric('getLocalized')).toEqual('42,00-');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
         aNInput.autoNumeric('update', { outputFormat: '-,' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual('-42,00');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
         aNInput.autoNumeric('update', { outputFormat: '.-' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual('42.00-');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
         aNInput.autoNumeric('update', { outputFormat: null });
         expect(aNInput.autoNumeric('getLocalized')).toEqual('-42.00');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
         aNInput.autoNumeric('update', { outputFormat: 'number' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual(-42);
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
         aNInput.autoNumeric('update', { outputFormat: 'string' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual('-42.00');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
 
         aNInput.autoNumeric('set', 1234.56);
         expect(aNInput.autoNumeric('get')).toEqual('1234.56');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(1234.56);
         aNInput.autoNumeric('set', 6789012.345);
         expect(aNInput.autoNumeric('get')).toEqual('6789012.35'); // Rounding happens here
+        expect(aNInput.autoNumeric('getNumber')).toEqual(6789012.35);
 
         // Dollars
         aNInput.autoNumeric('update', autoNumericOptionsDollar);
         expect(aNInput.autoNumeric('get')).toEqual('6789012.35'); // First check if updating the options changed the results accordingly
+        expect(aNInput.autoNumeric('getNumber')).toEqual(6789012.35);
         aNInput.autoNumeric('set', 1234.56);
         expect(aNInput.autoNumeric('get')).toEqual('1234.56');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(1234.56);
         aNInput.autoNumeric('set', 6789012.345);
         expect(aNInput.autoNumeric('get')).toEqual('6789012.35');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(6789012.35);
         aNInput.autoNumeric('set', 0);
         expect(aNInput.autoNumeric('get')).toEqual('0.00');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(0);
         aNInput.autoNumeric('set', -42);
         expect(aNInput.autoNumeric('get')).toEqual('-42.00');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
     });
 
     it('should return an unformatted value even if the number is bigger than Number.MAX_SAFE_INTEGER', () => {

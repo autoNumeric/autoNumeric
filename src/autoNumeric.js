@@ -4138,6 +4138,18 @@ if (typeof define === 'function' && define.amd) {
         },
 
         /**
+         * Return the input unformatted value as a number.
+         *
+         * @returns {number}
+         */
+        getNumber() {
+            const $this = getCurrentElement(this);
+            const value = $this.autoNumeric('get');
+
+            return toLocale(value, 'number');
+        },
+
+        /**
          * Return the current formatted value of the autoNumeric element.
          * @usage aNInput.autoNumeric('getFormatted'))
          *
@@ -4616,4 +4628,7 @@ export default {
     //update       : an.update(options, input)
     //wipe         : an.wipe(input)
     //destroy      : an.destroy(input)
+
+    //raw          : an.raw(input) // Return the unformatted value as a string
+    //number       : an.number(input) // Return the unformatted value as a number (Warning: This can lead to precision problems with big numbers)
 };

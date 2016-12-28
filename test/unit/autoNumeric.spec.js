@@ -1376,6 +1376,25 @@ describe('Static autoNumeric functions', () => {
             expect(console.warn).toHaveBeenCalled();
         });
     });
+
+    // Basic test (that are copied from the non-jQuery ones) just to test that the jQuery version is called correctly
+    describe('`validate` (with jQuery `$.fn`)', () => {
+        it('should validate', () => {
+            expect(() => $.fn.autoValidate(autoNumericOptionsEuro)).not.toThrow();
+            expect(() => $.fn.autoValidate(autoNumericOptionsDollar)).not.toThrow();
+
+            expect(() => $.fn.autoValidate({ digitGroupSeparator: ',' })).not.toThrow();
+            expect(() => $.fn.autoValidate({ digitGroupSeparator: '.',  decimalCharacter: ',' })).not.toThrow();
+        });
+
+        it('should not validate', () => {
+            expect(() => $.fn.autoValidate(0)).toThrow();
+            expect(() => $.fn.autoValidate(undefined)).toThrow();
+
+            expect(() => $.fn.autoValidate({ digitGroupSeparator: '-' })).toThrow();
+            expect(() => $.fn.autoValidate({ digitGroupSeparator: '"' })).toThrow();
+        });
+    });
 });
 
 //TODO Complete the tests with user interactions tests

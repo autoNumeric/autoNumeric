@@ -4533,7 +4533,7 @@ if (typeof define === 'function' && define.amd) {
         }
     };
 
-    $.fn.validate = validate;
+    $.fn.autoValidate = validate;
 
     /**
      * Return TRUE is the settings/options are valid, FALSE otherwise.

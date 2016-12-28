@@ -1,11 +1,43 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.15"
++ Fix FireFox on issue #306 that allows the caret to move right when all zero present in the decimals
+
+### "2.0.0-beta.14"
++ Fix issue #306 when { leadingZero: 'deny' } and proper caret placement
+
+### "2.0.0-beta.13"
++ Fix issue #228 Do not modify the current selection when trying to input an invalid character
++ Mass rename functions to gives them a more explicit name :
+
+| Old name                    |          | New name |
+| :---------------- | :------------ | :-----------:  |
+| autoCheck()       | -> | checkIfInRangeWithOverrideOption()                       |
+| autoRound()       | -> | roundValue()                                             |
+| autoGroup()       | -> | addGroupSeparators()                                     |
+| fixNumber()       | -> | modifyNegativeSignAndDecimalCharacterForRawValue()       |
+| presentNumber()   | -> | modifyNegativeSignAndDecimalCharacterForFormattedValue() |
+| negativeBracket() | -> | toggleNegativeBracket()                                  |
+| autoGet()         | -> | getCurrentElement()                                      |
+| getHolder()       | -> | getAutoNumericHolder()                                   |
+| autoSave()        | -> | saveValueToPersistentStorage()                           |
+| _setPosition()    | -> | _setCaretPosition()                                      |
+| _signPosition()   | -> | _getSignPosition()                                       |
+| _formatQuick()    | -> | _formatValue()                                           |
+
+### "2.0.0-beta.12"
++ Modify the `validate()` function to show a warning when `decimalPlacesOverride` is greater than `decimalPlacesShownOnFocus`.
++ Implement feature request #183 that manage invalid results when trying to paste any number. This adds the `onInvalidPaste` option that can accept the `error`, `ignore`, `clamp`, `truncate` and `replace` value.
++ Rename `autoStrip()` to `stripAllNonNumberCharacters()`.
++ Upgrade the `setElementSelection()` function so that it can accept only one caret position.
++ Add a `failOnUnknownOption` option which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object.
+
 ### "2.0.0-beta.11"
-+ fix typos on beginning comment and line 612
++ Fix typos and missing characters that prevented building the library.
 
 ### "2.0.0-beta.10"
-+ fix issue #302 `leadingZero` option `deny` does not function correctly and deletes some of the zero to the right of the caret
-+ Fix issue #302 When focusing on an input having `currencySymbolPlacement` set as `p` (prefix)
++ Fix issue #302 `leadingZero` option `deny` does not function correctly and deletes some of the zero to the right of the caret
++ Fix issue #303 When focusing on an input having `currencySymbolPlacement` set as `p` (prefix)
 
 ### "2.0.0-beta.9"
 + Rename the old options name to more explicit ones :

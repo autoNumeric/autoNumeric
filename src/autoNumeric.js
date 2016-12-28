@@ -1,9 +1,11 @@
-/** * autoNumeric.js
- * @version      2.0-beta.11
- * @date         2016-12-21 UTC -06:00
+/**
+ *               autoNumeric.js
+ *
+ * @version      2.0-beta.14
+ * @date         2016-12-26 UTC 14:00
  *
  * @author       Bob Knothe
- * @contributors Sokolov Yura and other Github users, cf. AUTHORS.md.
+ * @contributors Alexandre Bonneau, Sokolov Yura and other Github users, cf. AUTHORS.md.
  * @copyright    2009 Robert J. Knothe http://www.decorplanit.com/plugin/
  * @since        2009-08-09
  *
@@ -101,7 +103,7 @@ const defaultSettings = {
     /* Allowed thousand separator characters
      * comma = ","
      * period "full stop" = "."
-     * apostrophe is escaped = "\""
+     * quote = "'"
      * space = " "
      * none = ""
      * NOTE: do not use numeric characters
@@ -493,8 +495,8 @@ if (typeof define === 'function' && define.amd) {
      * Return TRUE if the `value` is null
      *
      * @static
-     * @param {*} value
-     * @returns {boolean}
+     * @param {*} value The value to test
+     * @returns {boolean} Return TRUE if the `value` is null, FALSE otherwise
      */
     function isNull(value) {
         return value === null;
@@ -504,8 +506,8 @@ if (typeof define === 'function' && define.amd) {
      * Return TRUE if the `value` is undefined
      *
      * @static
-     * @param {*} value
-     * @returns {boolean}
+     * @param {*} value The value to test
+     * @returns {boolean} Return TRUE if the `value` is undefined, FALSE otherwise
      */
     function isUndefined(value) {
         return value === void(0);
@@ -546,7 +548,7 @@ if (typeof define === 'function' && define.amd) {
      * Return TRUE if the parameter is a string 'true' or 'false'
      *
      * This function accepts any cases for those strings.
-     * @param value
+     * @param {string} value
      * @returns {boolean}
      */
     function isTrueOrFalseString(value) {
@@ -603,8 +605,8 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Return the pasted text that will be used.
      *
-     * @param text
-     * @param holder
+     * @param {string} text
+     * @param {AutoNumericHolder} holder
      * @returns {string|void|XML|*}
      */
     function preparePastedText(text, holder) {
@@ -630,8 +632,8 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Return TRUE if the `needle` is in the array
      *
-     * @param {Array} array
      * @param {*} needle
+     * @param {Array} array
      * @returns {boolean}
      */
     function isInArray(needle, array) {
@@ -688,7 +690,7 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Return the code for the key used to generate the given event.
      *
-     * @param event
+     * @param {Event} event
      * @returns {string|Number}
      */
     function key(event) {
@@ -735,9 +737,9 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Insert a character or a string at the index given (0 being the far left side).
      *
-     * @param str {String}
-     * @param char {String}
-     * @param caretPosition {int}
+     * @param {string} str
+     * @param {string} char
+     * @param {int} caretPosition
      * @returns {string}
      */
     function insertCharAtPosition(str, char, caretPosition) {
@@ -859,7 +861,7 @@ if (typeof define === 'function' && define.amd) {
      * Return the index that can be used to set the caret position.
      * This takes into account that the position is starting at '0', not 1.
      *
-     * @param characterCount
+     * @param {int} characterCount
      * @returns {number}
      */
     function convertCharacterCountToIndexPosition(characterCount) {
@@ -868,6 +870,9 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Cross browser routine for getting selected range/cursor position
+     *
+     * @param {HTMLElement|EventTarget} that
+     * @returns {{}}
      */
     function getElementSelection(that) {
         const position = {};
@@ -889,6 +894,10 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Cross browser routine for setting selected range/cursor position
+     *
+     * @param {HTMLElement|EventTarget} that
+     * @param {int} start
+     * @param {int|null} end
      */
     function setElementSelection(that, start, end = null) {
         if (isUndefinedOrNullOrEmpty(end)) {
@@ -937,7 +946,7 @@ if (typeof define === 'function' && define.amd) {
      * Any parameter could be a callback:
      * - a function, which invoked with jQuery element, parameters and this parameter name and returns parameter value
      * - a name of function, attached to $(selector).autoNumeric.functionName(){} - which was called previously
-     * @param $this
+     * @param {object} $this jQuery-selected DOM element
      * @param {object} settings
      */
     function runCallbacksFoundInTheSettingsObject($this, settings) {
@@ -954,22 +963,25 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Determine the maximum decimal length from the minimumValue and maximumValue settings
+     *
+     * @param {string} minimumValue
+     * @param {string} maximumValue
+     * @returns {number}
      */
     function maximumVMinAndVMaxDecimalLength(minimumValue, maximumValue) {
         return Math.max(decimalPlaces(minimumValue), decimalPlaces(maximumValue));
     }
 
     /**
-     * Strip all unwanted characters and leave only a number alert
+     * Strip all unwanted non-number characters and leave only a number alert
      *
      * @param {string} s
      * @param {object} settings
-     * @param Boolean leftOrAll
+     * @param {boolean} leftOrAll
      * @returns {string|*}
      */
 
     function stripAllNonNumberCharacters(s, settings, leftOrAll) {
-
         if (settings.currencySymbol !== '') {
             // Remove currency sign
             s = s.replace(settings.currencySymbol, '');
@@ -1032,13 +1044,14 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Places or removes brackets on negative values
+     * Sets or removes brackets on negative values, depending on the focus state.
+     * The focus state is 'stored' in the settings object under the `settings.onOff` attribute. //TODO Use another object to keep track of internal data that are not settings
      *
      * @param {string} s
      * @param {object} settings
      * @returns {*}
      */
-    function negativeBracket(s, settings) {
+    function toggleNegativeBracket(s, settings) {
         if ((settings.currencySymbolPlacement === 'p' && settings.negativePositiveSignPlacement === 'l') || (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement === 'p')) {
             const [firstBracket, lastBracket] = settings.negativeBracketsTypeOnBlur.split(',');
             if (!settings.onOff) {
@@ -1062,6 +1075,9 @@ if (typeof define === 'function' && define.amd) {
      * '1234,56'    OK
      * '-1234,56'   OK
      * '1234,56-'   OK
+     *
+     * @param {string} s
+     * @returns {string|void|XML|*}
      */
     function fromLocale(s) {
         s = s.replace(',', '.');
@@ -1076,6 +1092,10 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Converts the ISO numeric string to the locale decimal and minus sign placement.
      * See the "outputFormat" option definition for more details.
+     *
+     * @param {string|null} value
+     * @param {string} locale
+     * @returns {*}
      */
     function toLocale(value, locale) {
         if (isNull(locale) || locale === 'string') {
@@ -1111,13 +1131,13 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Prepare number string to be converted to real number
+     * Modify the negative sign and the decimal character of the given string value to an hyphen (-) and a dot (.) in order to make that value 'typecastable' to a real number.
      *
      * @param {string} s
      * @param {object} settings
-     * @returns {*}
+     * @returns {string}
      */
-    function fixNumber(s, settings) {
+    function modifyNegativeSignAndDecimalCharacterForRawValue(s, settings) {
         if (settings.decimalCharacter !== '.') {
             s = s.replace(settings.decimalCharacter, '.');
         }
@@ -1133,13 +1153,13 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Prepare real number to be converted to our format
+     * Modify the negative sign and the decimal character to use those defined in the settings.
      *
      * @param {string} s
      * @param {object} settings
-     * @returns {*}
+     * @returns {string}
      */
-    function presentNumber(s, settings) {
+    function modifyNegativeSignAndDecimalCharacterForFormattedValue(s, settings) {
         if (settings.negativeSignCharacter !== '-' && settings.negativeSignCharacter !== '') {
             s = s.replace('-', settings.negativeSignCharacter);
         }
@@ -1152,6 +1172,7 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Private function to check for empty value
+     * //TODO Modify this function so that it return either TRUE or FALSE if the value is empty. Then create another function to return the input value if it's not empty.
      *
      * @param {string} inputValue
      * @param {object} settings
@@ -1171,13 +1192,13 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Private function that formats our number
+     * Modify the input value by adding the group separators, as defined in the settings.
      *
      * @param {string} inputValue
      * @param {object} settings
      * @returns {*}
      */
-    function autoGroup(inputValue, settings) {
+    function addGroupSeparators(inputValue, settings) {
         if (settings.strip) {
             inputValue = stripAllNonNumberCharacters(inputValue, settings, false);
         }
@@ -1279,7 +1300,7 @@ if (typeof define === 'function' && define.amd) {
 
         // Removes the negative sign and places brackets
         if (settings.negativeBracketsTypeOnBlur !== null && (settings.rawValue < 0 || inputValue.charAt(0) === '-')) {
-            inputValue = negativeBracket(inputValue, settings);
+            inputValue = toggleNegativeBracket(inputValue, settings);
         }
         settings.trailingNegative = false;
 
@@ -1290,12 +1311,12 @@ if (typeof define === 'function' && define.amd) {
      * Truncate not needed zeros
      *
      * @param {string} roundedInputValue
-     * @param rDec
+     * @param {int} temporaryDecimalPlacesOverride
      * @returns {void|XML|string|*}
      */
-    function truncateZeros(roundedInputValue, rDec) {
+    function truncateZeros(roundedInputValue, temporaryDecimalPlacesOverride) {
         let regex;
-        switch (rDec) {
+        switch (temporaryDecimalPlacesOverride) {
             case 0:
                 // Prevents padding - removes trailing zeros until the first significant digit is encountered
                 regex = /(\.(?:\d*[1-9])?)0*$/;
@@ -1306,12 +1327,12 @@ if (typeof define === 'function' && define.amd) {
                 break;
             default :
                 // Removes access zeros to the decimalPlacesOverride length when allowDecimalPadding is set to true
-                regex = new RegExp(`(\\.\\d{${rDec}}(?:\\d*[1-9])?)0*`);
+                regex = new RegExp(`(\\.\\d{${temporaryDecimalPlacesOverride}}(?:\\d*[1-9])?)0*`);
         }
 
         // If there are no decimal places, we don't need a decimal point at the end
         roundedInputValue = roundedInputValue.replace(regex, '$1');
-        if (rDec === 0) {
+        if (temporaryDecimalPlacesOverride === 0) {
             roundedInputValue = roundedInputValue.replace(/\.$/, '');
         }
 
@@ -1319,16 +1340,16 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * round number after setting by pasting or $().autoNumericSet()
-     * private function for round the number
-     * please note this handled as text - JavaScript math function can return inaccurate values
-     * also this offers multiple rounding methods that are not easily accomplished in JavaScript
+     * Round the input value using the rounding method defined in the settings.
+     * This function accepts multiple rounding methods. See the documentation for more details about those.
+     *
+     * Note : This is handled as text since JavaScript math function can return inaccurate values.
      *
      * @param {string} inputValue
      * @param {object} settings
      * @returns {*}
      */
-    function autoRound(inputValue, settings) { // value to string
+    function roundValue(inputValue, settings) {
         inputValue = (inputValue === '') ? '0' : inputValue.toString();
         if (settings.roundingMethod === 'N05' || settings.roundingMethod === 'CHF' || settings.roundingMethod === 'U05' || settings.roundingMethod === 'D05') {
             switch (settings.roundingMethod) {
@@ -1356,13 +1377,13 @@ if (typeof define === 'function' && define.amd) {
         let ivRounded = '';
         let i = 0;
         let nSign = '';
-        let rDec;
+        let temporaryDecimalPlacesOverride;
 
         // sets the truncate zero method
         if (settings.allowDecimalPadding) {
-            rDec = settings.decimalPlacesOverride;
+            temporaryDecimalPlacesOverride = settings.decimalPlacesOverride;
         } else {
-            rDec = 0;
+            temporaryDecimalPlacesOverride = 0;
         }
 
         // Checks if the inputValue (input Value) is a negative value
@@ -1401,20 +1422,20 @@ if (typeof define === 'function' && define.amd) {
         if (cDec <= settings.decimalPlacesOverride) {
             // Check if we need to pad with zeros
             ivRounded = inputValue;
-            if (cDec < rDec) {
+            if (cDec < temporaryDecimalPlacesOverride) {
                 if (inputValueHasADot) {
                     ivRounded += settings.decimalCharacter;
                 }
 
                 let zeros = '000000';
-                while (cDec < rDec) {
-                    zeros = zeros.substring(0, rDec - cDec);
+                while (cDec < temporaryDecimalPlacesOverride) {
+                    zeros = zeros.substring(0, temporaryDecimalPlacesOverride - cDec);
                     ivRounded += zeros;
                     cDec += zeros.length;
                 }
-            } else if (cDec > rDec) {
-                ivRounded = truncateZeros(ivRounded, rDec);
-            } else if (cDec === 0 && rDec === 0) {
+            } else if (cDec > temporaryDecimalPlacesOverride) {
+                ivRounded = truncateZeros(ivRounded, temporaryDecimalPlacesOverride);
+            } else if (cDec === 0 && temporaryDecimalPlacesOverride === 0) {
                 ivRounded = ivRounded.replace(/\.$/, '');
             }
 
@@ -1463,32 +1484,30 @@ if (typeof define === 'function' && define.amd) {
         ivArray = ivArray.slice(0, rLength + 1);
 
         // Return the rounded value
-        ivRounded = truncateZeros(ivArray.join(''), rDec);
+        ivRounded = truncateZeros(ivArray.join(''), temporaryDecimalPlacesOverride);
 
         return (Number(ivRounded) === 0) ? ivRounded : nSign + ivRounded;
     }
 
     /**
-     * Truncates the decimal part of a number
+     * Truncates the decimal part of a number.
      *
      * @param {string} s
      * @param {object} settings
-     * @param {string} paste
+     * @param {boolean} isPaste
      * @returns {*}
      */
-    function truncateDecimal(s, settings, paste) {
-        const decimalCharacter = settings.decimalCharacter;
-        const decimalPlacesOverride = settings.decimalPlacesOverride;
-        s = (paste === 'paste') ? autoRound(s, settings) : s;
+    function truncateDecimal(s, settings, isPaste) {
+        s = (isPaste) ? roundValue(s, settings) : s;
 
-        if (decimalCharacter && decimalPlacesOverride) {
-            const [integerPart, decimalPart] = s.split(decimalCharacter);
+        if (settings.decimalCharacter && settings.decimalPlacesOverride) {
+            const [integerPart, decimalPart] = s.split(settings.decimalCharacter);
 
             // truncate decimal part to satisfying length since we would round it anyway
-            if (decimalPart && decimalPart.length > decimalPlacesOverride) {
-                if (decimalPlacesOverride > 0) {
-                    const modifiedDecimalPart = decimalPart.substring(0, decimalPlacesOverride);
-                    s = `${integerPart}${decimalCharacter}${modifiedDecimalPart}`;
+            if (decimalPart && decimalPart.length > settings.decimalPlacesOverride) {
+                if (settings.decimalPlacesOverride > 0) {
+                    const modifiedDecimalPart = decimalPart.substring(0, settings.decimalPlacesOverride);
+                    s = `${integerPart}${settings.decimalCharacter}${modifiedDecimalPart}`;
                 } else {
                     s = integerPart;
                 }
@@ -1499,13 +1518,16 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Function to parse minimumValue, maximumValue & the input value to prepare for testing to determine if the value falls within the min / max range
-     * Return an object example: minimumValue: "999999999999999.99" returns the following "{s: -1, e: 12, c: Array[15]}"
-     * This function is adapted from Big.js https://github.com/MikeMcl/big.js/
-     * Many thanks to Mike
+     * Function to parse minimumValue, maximumValue & the input value to prepare for testing to determine if the value falls within the min / max range.
+     * Return an object example: minimumValue: "999999999999999.99" returns the following "{s: -1, e: 12, c: Array[15]}".
+     *
+     * This function is adapted from Big.js https://github.com/MikeMcl/big.js/. Many thanks to Mike.
+     *
+     * @param {number|string} n A numeric value.
+     * @returns {{}}
      */
     function parseStr(n) {
-        const x = {};
+        const x = {}; // A Big number instance.
         let e;
         let i;
         let nL;
@@ -1566,10 +1588,14 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Function to test if the input value falls with the Min / Max settings
-     * This uses the parsed strings for the above parseStr function
-     * This function is adapted from Big.js https://github.com/MikeMcl/big.js/
-     * Many thanks to Mike
+     * Function to test if the input value falls with the Min / Max settings.
+     * This uses the parsed strings for the above parseStr function.
+     *
+     * This function is adapted from Big.js https://github.com/MikeMcl/big.js/. Many thanks to Mike.
+     *
+     * @param {object} y Big number instance
+     * @param {object} x Big number instance
+     * @returns {*}
      */
     function testMinMax(y, x) {
         const xc = x.c;
@@ -1632,7 +1658,7 @@ if (typeof define === 'function' && define.amd) {
      * @param {object} settings
      * @returns {*}
      */
-    function autoCheck(s, settings) {
+    function checkIfInRangeWithOverrideOption(s, settings) {
         s = s.toString();
         s = s.replace(',', '.');
         const minParse = parseStr(settings.minimumValue);
@@ -1658,40 +1684,43 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * thanks to Anthony & Evan C
+     * Thanks to Anthony & Evan C
+     *
+     * @param {Element|string} element
+     * @returns {*|jQuery|HTMLElement}
      */
-    function autoGet(obj) {
+    function getCurrentElement(element) {
         /*
          * If the parameter is a string (and therefore is a CSS selector), then we need to modify this string in order
          * for jQuery to be able to parse the selector correctly.
          * cf. http://learn.jquery.com/using-jquery-core/faq/how-do-i-select-an-element-by-an-id-that-has-characters-used-in-css-notation/
          */
-        if (isString(obj)) {
+        if (isString(element)) {
             //TODO This block is apparently never entered. We should remove it after making sure that's 100% the case
-            obj = `#${obj.replace(/(:|\.|\[|]|,|=)/g, '\\$1')}`;
+            element = `#${element.replace(/(:|\.|\[|]|,|=)/g, '\\$1')}`;
         }
 
-        return $(obj);
+        return $(element);
     }
 
     /**
      * Function that attach the autoNumeric field properties to the DOM element via an AutoNumericHolder object.
      *
-     * @param $that
+     * @param {object} $this jQuery-selected DOM element
      * @param {object} settings
      * @param {boolean} update
      * @returns {*}
      */
-    function getHolder($that, settings, update = false) {
-        let data = $that.data('autoNumeric');
+    function getAutoNumericHolder($this, settings, update = false) {
+        let data = $this.data('autoNumeric');
         if (!data) {
             data = {};
-            $that.data('autoNumeric', data);
+            $this.data('autoNumeric', data);
         }
 
         let holder = data.holder;
         if (update || (isUndefined(holder) && settings)) {
-            holder = new AutoNumericHolder($that.get(0), settings);
+            holder = new AutoNumericHolder($this.get(0), settings);
             data.holder = holder;
         }
 
@@ -1715,8 +1744,11 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * original settings saved for use when decimalPlacesShownOnFocus & noSeparatorOnFocus options are being used
-     * taken from Quirksmode
+     * Original settings saved for use when `decimalPlacesShownOnFocus` & `noSeparatorOnFocus` options are being used.
+     * This is taken from Quirksmode.
+     *
+     * @param {string} name
+     * @returns {*}
      */
     function readCookie(name) {
         const nameEQ = name + '=';
@@ -1736,7 +1768,10 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Test if sessionStorage is supported - taken from modernizr
+     * Test if sessionStorage is supported.
+     * This is taken from Modernizr.
+     *
+     * @returns {boolean}
      */
     function storageTest() {
         const mod = 'modernizr';
@@ -1750,17 +1785,22 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * creates or removes sessionStorage or cookie depending on browser support
+     * Creates or removes sessionStorage or cookie depending on what the browser is supporting.
+     *
+     * @param {Element|EventTarget} element
+     * @param {object} settings
+     * @param {string} action
+     * @returns {*}
      */
-    function autoSave(element, settings, toDo) {
+    function saveValueToPersistentStorage(element, settings, action) {
         if (settings.saveValueToSessionStorage) {
             const storedName = (element.name !== '' && !isUndefined(element.name)) ?`AUTO_${decodeURIComponent(element.name)}` :`AUTO_${element.id}`;
             let date;
             let expires;
 
-            // sets cookie for browser that do not support sessionStorage IE 6 & IE 7
+            // Sets cookie for browser that do not support sessionStorage IE 6 & IE 7
             if (storageTest() === false) {
-                switch (toDo) {
+                switch (action) {
                     case 'set':
                         document.cookie = `${storedName}=${settings.rawValue}; expires= ; path=/`;
                         break;
@@ -1774,7 +1814,7 @@ if (typeof define === 'function' && define.amd) {
                         return readCookie(storedName);
                 }
             } else {
-                switch (toDo) {
+                switch (action) {
                     case 'set':
                         sessionStorage.setItem(storedName, settings.rawValue);
                         break;
@@ -1807,13 +1847,19 @@ if (typeof define === 'function' && define.amd) {
             this.value = that.value;
         }
 
+        /**
+         * Update the current value, key states (Ctrl, Shift and Command keys), selection and some other keycodes.
+         *
+         * @param {Event} e
+         * @private
+         */
         _updateFieldProperties(e) {
             this.value = this.that.value;
             this.ctrlKey = e.ctrlKey;
             this.cmdKey = e.metaKey;
             this.shiftKey = e.shiftKey;
 
-            // keypress event overwrites meaningful value of e.keyCode
+            // Keypress event overwrites meaningful value of e.keyCode
             this.selection = getElementSelection(this.that);
             if (e.type === 'keydown' || e.type === 'keyup') {
                 this.kdCode = e.keyCode;
@@ -1821,24 +1867,49 @@ if (typeof define === 'function' && define.amd) {
             this.which = e.which;
         }
 
+        /**
+         * Set the text selection inside the input with the given start and end position.
+         *
+         * @param {int} start
+         * @param {int} end
+         * @param {undefined|boolean} setReal
+         * @private
+         */
         _setSelection(start, end, setReal) {
+            //TODO Modify setReal to be more explicit (and a boolean)
             start = Math.max(start, 0);
-            end = Math.min(end, this.that.value.length);
+            end = Math.min(end, this.that.value.length); //TODO Replace `this.that.value.length` with `this.value.length`
             this.selection = {
                 start,
                 end,
                 length: end - start,
             };
+
             if (isUndefined(setReal) || setReal) {
                 setElementSelection(this.that, start, end);
             }
         }
 
-        _setPosition(pos, setReal) {
+        /**
+         * Set the caret position inside the input at the given position.
+         *
+         * @param {int} pos
+         * @param {undefined|boolean} setReal
+         * @private
+         */
+        _setCaretPosition(pos, setReal) {
+            //TODO Modify setReal to be more explicit (and a boolean)
             this._setSelection(pos, pos, setReal);
         }
 
-        _getBeforeAfter() {
+        /**
+         * Return an array containing the string parts located on the left and right side of the caret or selection.
+         * Those parts are left 'untouched', ie. formatted by autoNumeric.
+         *
+         * @returns {[string, string]} The parts on the left and right of the caret or selection
+         * @private
+         */
+        _getLeftAndRightPartAroundTheSelection() {
             const value = this.value;
             //FIXME `this.selection` can sometimes be undefined, found why and fix it
             const left = value.substring(0, this.selection.start);
@@ -1847,11 +1918,24 @@ if (typeof define === 'function' && define.amd) {
             return [left, right];
         }
 
-        _getBeforeAfterStripped() {
+        /**
+         * Return an array containing the string parts located on the left and right side of the caret or selection.
+         * Those parts are unformatted (stripped) of any non-numbers characters.
+         *
+         * @returns {[string, string]} The parts on the left and right of the caret or selection, unformatted.
+         * @private
+         */
+        _getUnformattedLeftAndRightPartAroundTheSelection() {
             const settingsClone = this.settingsClone;
-            let [left, right] = this._getBeforeAfter();
+            let [left, right] = this._getLeftAndRightPartAroundTheSelection();
 
-            left = stripAllNonNumberCharacters(left, this.settingsClone, true);
+            // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
+            let stripZeros = true;
+            if (this.kdCode === keyCode.Hyphen && Number(left) === 0) {
+                stripZeros = false;
+            }
+            left = stripAllNonNumberCharacters(left, this.settingsClone, stripZeros);
+
             right = stripAllNonNumberCharacters(right, this.settingsClone, false);
 
             if (settingsClone.trailingNegative && !contains(left, '-')) {
@@ -1865,35 +1949,37 @@ if (typeof define === 'function' && define.amd) {
         }
 
         /**
-         * strip parts from excess characters and leading zeroes
+         * Strip parts from excess characters and leading zeros.
+         *
+         * @param {string} left
+         * @param {string} right
+         * @returns {[*,*]}
+         * @private
          */
         _normalizeParts(left, right) {
             const settingsClone = this.settingsClone;
 
-            // prevents multiple leading zeros from being entered
+            // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
+            let stripZeros = true;
+            if (this.kdCode === keyCode.Hyphen && Number(left) === 0) {
+                stripZeros = false;
+            }
+            left = stripAllNonNumberCharacters(left, settingsClone, stripZeros);
 
-            left = stripAllNonNumberCharacters(left, settingsClone, true);
-            if (Number(left) === 0 && settingsClone.leadingZero === 'deny') {
-                if (right === '') {
-                    left = '';
-                } else {
-                    if (contains(left, '-')) {
-                        left = '-';
-                    } else {
-                        left = '';
-                    }
-                }
-            }          
-
-            // if right is not empty and first character is not decimalCharacter,
+            // If right is not empty and first character is not decimalCharacter
             right = stripAllNonNumberCharacters(right, settingsClone, false);
+
+            // Prevents multiple leading zeros from being entered
+            if (settingsClone.leadingZero === 'deny' && this.kdCode === 48 && Number(left) === 0 && !contains(left, settingsClone.decimalCharacter)  && right !== '') {
+                left = left.substring(0, left.length - 1);
+            }
 
             if (settingsClone.trailingNegative && !contains(left, '-')) {
                 left = '-' + left;
                 settingsClone.trailingNegative = false;
             }
 
-            // insert zero if has leading dot
+            // Insert zero if has leading dot
             this.newValue = left + right;
             if (settingsClone.decimalCharacter) {
                 const m = this.newValue.match(new RegExp(`^${settingsClone.aNegRegAutoStrip}\\${settingsClone.decimalCharacter}`));
@@ -1907,17 +1993,23 @@ if (typeof define === 'function' && define.amd) {
         }
 
         /**
-         * Set part of number to value while keeping the cursor position
+         * Set part of number to value while keeping the cursor position. //TODO What about the cursor selection?
+         *
+         * @param {string} left
+         * @param {string} right
+         * @param {boolean} isPaste
+         * @returns {boolean}
+         * @private
          */
-        _setValueParts(left, right, advent) {
+        _setValueParts(left, right, isPaste = false) {
             const settingsClone = this.settingsClone;
             const parts = this._normalizeParts(left, right);
-            const [minTest, maxTest] = autoCheck(this.newValue, settingsClone);
+            const [minTest, maxTest] = checkIfInRangeWithOverrideOption(this.newValue, settingsClone);
             let position = parts[0].length;
             this.newValue = parts.join('');
 
             if (minTest && maxTest) {
-                this.newValue = truncateDecimal(this.newValue, settingsClone, advent);
+                this.newValue = truncateDecimal(this.newValue, settingsClone, isPaste);
                 const testValue = (contains(this.newValue, ',')) ? this.newValue.replace(',', '.') : this.newValue;
                 if (testValue === '' || testValue === settingsClone.negativeSignCharacter) {
                     settingsClone.rawValue = '';
@@ -1940,7 +2032,7 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 this.value = this.newValue;
-                this._setPosition(position, false);
+                this._setCaretPosition(position, false);
 
                 return true;
             }
@@ -1955,10 +2047,12 @@ if (typeof define === 'function' && define.amd) {
         }
 
         /**
-         * helper function for _expandSelectionOnSign
-         * returns sign position of a formatted value
+         * Helper function for `_expandSelectionOnSign()`.
+         *
+         * @returns {*} Sign position of a formatted value
+         * @private
          */
-        _signPosition() {
+        _getSignPosition() {
             const settingsClone = this.settingsClone;
             const currencySymbol = settingsClone.currencySymbol;
             const that = this.that;
@@ -1979,9 +2073,14 @@ if (typeof define === 'function' && define.amd) {
         /**
          * Expands selection to cover whole sign
          * Prevents partial deletion/copying/overwriting of a sign
+         *
+         * @param {undefined|boolean} setReal
+         * @private
          */
         _expandSelectionOnSign(setReal) {
-            const signPosition = this._signPosition();
+            //TODO Modify setReal to be more explicit (and a boolean only)
+            //TODO Use array destructuring here to set signPosition to more explicit variables
+            const signPosition = this._getSignPosition();
             const selection = this.selection;
 
             // If selection catches something except sign and catches only space from sign
@@ -2001,58 +2100,56 @@ if (typeof define === 'function' && define.amd) {
         }
 
         /**
-         * try to strip pasted value to digits
+         * Try to strip pasted value to digits
          */
         _checkPaste() {
             if (!isUndefined(this.valuePartsBeforePaste)) {
                 const oldParts = this.valuePartsBeforePaste;
-                const [left, right] = this._getBeforeAfter();
+                const [left, right] = this._getLeftAndRightPartAroundTheSelection();
 
                 // try to strip pasted value first
                 delete this.valuePartsBeforePaste;
 
                 const modifiedLeftPart = left.substr(0, oldParts[0].length) + stripAllNonNumberCharacters(left.substr(oldParts[0].length), this.settingsClone, true);
-                if (!this._setValueParts(modifiedLeftPart, right, 'paste')) {
+                if (!this._setValueParts(modifiedLeftPart, right, true)) {
                     this.value = oldParts.join('');
-                    this._setPosition(oldParts[0].length, false);
+                    this._setCaretPosition(oldParts[0].length, false);
                 }
             }
         }
 
         /**
-         * Process pasting, cursor moving and skipping of not interesting keys
-         * If returns true, further processing is not performed
+         * Process pasting, cursor moving and skipping of not interesting keys.
+         * If this function returns TRUE, then further processing is not performed.
+         *
+         * @param {Event} e
+         * @returns {boolean}
+         * @private
          */
         _skipAlways(e) {
-            const kdCode = this.kdCode;
-            const which = this.which;
-            const ctrlKey = this.ctrlKey;
-            const cmdKey = this.cmdKey;
-
-            // catch the ctrl up on ctrl-v
-            const shiftKey = this.shiftKey;
-            if (((ctrlKey || cmdKey) && e.type === 'keyup' && !isUndefined(this.valuePartsBeforePaste)) || (shiftKey && kdCode === keyCode.Insert)) {
+            // Catch the ctrl up on ctrl-v
+            if (((this.ctrlKey || this.cmdKey) && e.type === 'keyup' && !isUndefined(this.valuePartsBeforePaste)) || (this.shiftKey && this.kdCode === keyCode.Insert)) {
                 this._checkPaste();
                 return false;
             }
 
-            // skip Fx keys, windows keys, other special keys
-            if ((kdCode >= keyCode.F1 && kdCode <= keyCode.F12) ||
-                (kdCode >= keyCode.Windows && kdCode <= keyCode.RightClick) ||
-                (kdCode >= keyCode.Tab && kdCode < keyCode.Space) ||
-                (kdCode < keyCode.Backspace &&
-                (which === 0 || which === kdCode)) ||
-                kdCode === keyCode.NumLock ||
-                kdCode === keyCode.ScrollLock ||
-                kdCode === keyCode.Insert ||
-                kdCode === keyCode.Command) {
+            // Skip all function keys (F1-F12), Windows keys, tab and other special keys
+            if ((this.kdCode >= keyCode.F1 && this.kdCode <= keyCode.F12) ||
+                (this.kdCode >= keyCode.Windows && this.kdCode <= keyCode.RightClick) ||
+                (this.kdCode >= keyCode.Tab && this.kdCode < keyCode.Space) ||
+                (this.kdCode < keyCode.Backspace &&
+                (this.which === 0 || this.which === this.kdCode)) ||
+                this.kdCode === keyCode.NumLock ||
+                this.kdCode === keyCode.ScrollLock ||
+                this.kdCode === keyCode.Insert ||
+                this.kdCode === keyCode.Command) {
                 return true;
             }
 
-            // if select all (a)
-            if ((ctrlKey || cmdKey) && kdCode === keyCode.a) {
+            // If a "Select all" keyboard shortcut is detected (ctrl + a)
+            if ((this.ctrlKey || this.cmdKey) && this.kdCode === keyCode.a) {
                 if (this.settings.selectNumberOnly) {
-                    // preventDefault is used here to prevent the browser to first select all the input text (including the currency sign), otherwise we would see that whole selection first in a flash, then the selection with only the number part without the currency sign.
+                    // `preventDefault()` is used here to prevent the browser to first select all the input text (including the currency sign), otherwise we would see that whole selection first in a flash, then the selection with only the number part without the currency sign.
                     e.preventDefault();
                     const valueLen = this.that.value.length;
                     const currencySymbolLen = this.settings.currencySymbol.length;
@@ -2090,53 +2187,58 @@ if (typeof define === 'function' && define.amd) {
                 return true;
             }
 
-            // if copy (c)
-            if ((ctrlKey || cmdKey) && (kdCode === keyCode.c || kdCode === keyCode.v || kdCode === keyCode.x)) {
+            // If a "Copy", "Paste" or "Cut" keyboard shortcut is detected (respectively 'ctrl + c', 'ctrl + v' or 'ctrl + x')
+            if ((this.ctrlKey || this.cmdKey) && (this.kdCode === keyCode.c || this.kdCode === keyCode.v || this.kdCode === keyCode.x)) {
                 if (e.type === 'keydown') {
                     this._expandSelectionOnSign();
                 }
 
                 // try to prevent wrong paste
-                if (kdCode === keyCode.v || kdCode === keyCode.Insert) {
+                if (this.kdCode === keyCode.v || this.kdCode === keyCode.Insert) {
                     if (e.type === 'keydown' || e.type === 'keypress') {
                         if (isUndefined(this.valuePartsBeforePaste)) {
-                            this.valuePartsBeforePaste = this._getBeforeAfter();
+                            this.valuePartsBeforePaste = this._getLeftAndRightPartAroundTheSelection();
                         }
                     } else {
                         this._checkPaste();
                     }
                 }
 
-                return e.type === 'keydown' || e.type === 'keypress' || kdCode === keyCode.c;
+                return e.type === 'keydown' || e.type === 'keypress' || this.kdCode === keyCode.c;
             }
 
-            if (ctrlKey || cmdKey) {
+            if (this.ctrlKey || this.cmdKey) {
                 return true;
             }
 
             // jump over thousand separator
-            if (kdCode === keyCode.LeftArrow || kdCode === keyCode.RightArrow) {
+            if (this.kdCode === keyCode.LeftArrow || this.kdCode === keyCode.RightArrow) {
                 const digitGroupSeparator = this.settingsClone.digitGroupSeparator;
                 const decimalCharacter = this.settingsClone.decimalCharacter;
                 const startJump = this.selection.start;
                 const value = this.that.value;
                 if (e.type === 'keydown' && !this.shiftKey) {
-                    if (kdCode === keyCode.LeftArrow && (value.charAt(startJump - 2) === digitGroupSeparator || value.charAt(startJump - 2) === decimalCharacter)) {
-                        this._setPosition(startJump - 1);
-                    } else if (kdCode === keyCode.RightArrow && (value.charAt(startJump + 1) === digitGroupSeparator || value.charAt(startJump + 1) === decimalCharacter)) {
-                        this._setPosition(startJump + 1);
+                    if (this.kdCode === keyCode.LeftArrow && (value.charAt(startJump - 2) === digitGroupSeparator || value.charAt(startJump - 2) === decimalCharacter)) {
+                        this._setCaretPosition(startJump - 1);
+                    } else if (this.kdCode === keyCode.RightArrow && (value.charAt(startJump + 1) === digitGroupSeparator || value.charAt(startJump + 1) === decimalCharacter)) {
+                        this._setCaretPosition(startJump + 1);
                     }
                 }
                 return true;
             }
 
-            return kdCode >= keyCode.PageDown && kdCode <= keyCode.DownArrow;
+            return this.kdCode >= keyCode.PageDown && this.kdCode <= keyCode.DownArrow;
         }
 
         /**
-         * process deletion of characters when the minus sign is to the right of the numeric characters
+         * Process deletion of characters when the minus sign is to the right of the numeric characters.
+         *
+         * @param {string} left The part on the left of the caret or selection
+         * @param {string} right The part on the right of the caret or selection
+         * @returns {[string, string]}
+         * @private
          */
-        _processTrailing([left, right]) {
+        _processCharacterDeletionIfTrailingNegativeSign([left, right]) {
             const settingsClone = this.settingsClone;
             if (settingsClone.currencySymbolPlacement === 'p' && settingsClone.negativePositiveSignPlacement === 's') {
                 if (this.kdCode === 8) {
@@ -2207,7 +2309,7 @@ if (typeof define === 'function' && define.amd) {
             let right;
 
             if (!this.selection.length) {
-                [left, right] = this._getBeforeAfterStripped();
+                [left, right] = this._getUnformattedLeftAndRightPartAroundTheSelection();
                 if (left === '' && right === '') {
                     settingsClone.throwInput = false;
                 }
@@ -2215,7 +2317,7 @@ if (typeof define === 'function' && define.amd) {
                 if (((settingsClone.currencySymbolPlacement === 'p' && settingsClone.negativePositiveSignPlacement === 's') ||
                      (settingsClone.currencySymbolPlacement === 's' && (settingsClone.negativePositiveSignPlacement === 'l' || settingsClone.negativePositiveSignPlacement === 'r'))) &&
                      contains(this.value, '-')) {
-                    [left, right] = this._processTrailing([left, right]);
+                    [left, right] = this._processCharacterDeletionIfTrailingNegativeSign([left, right]);
                 } else {
                     if (this.kdCode === keyCode.Backspace) {
                         left = left.substring(0, left.length - 1);
@@ -2225,7 +2327,7 @@ if (typeof define === 'function' && define.amd) {
                 }
             } else {
                 this._expandSelectionOnSign(false);
-                [left, right] = this._getBeforeAfterStripped();
+                [left, right] = this._getUnformattedLeftAndRightPartAroundTheSelection();
             }
 
             this._setValueParts(left, right);
@@ -2233,14 +2335,15 @@ if (typeof define === 'function' && define.amd) {
 
         /**
          * This function decides if the key pressed should be dropped or accepted, and modify the value 'on-the-fly' accordingly.
-         * Returns TRUE if a processing is performed.
+         * Returns TRUE if the keycode is allowed.
+         * This functions also modify the value on-the-fly. //FIXME This should use another function in order to separate the test and the modification
          *
-         * @returns {boolean} //FIXME This always returns TRUE
+         * @returns {boolean}
          */
         _processCharacterInsertion() {
             const settingsClone = this.settingsClone;
             const cCode = String.fromCharCode(this.which);
-            let [left, right] = this._getBeforeAfterStripped();
+            let [left, right] = this._getUnformattedLeftAndRightPartAroundTheSelection();
             settingsClone.throwInput = true;
 
             // Start rules when the decimal character key is pressed always use numeric pad dot to insert decimal separator
@@ -2270,7 +2373,7 @@ if (typeof define === 'function' && define.amd) {
                     right = right.substr(1);
                 }
 
-                this._setValueParts(left + settingsClone.decimalCharacter, right, null);
+                this._setValueParts(left + settingsClone.decimalCharacter, right);
 
                 return true;
             }
@@ -2308,7 +2411,7 @@ if (typeof define === 'function' && define.amd) {
                     }
                 }
 
-                this._setValueParts(left, right, null);
+                this._setValueParts(left, right);
 
                 return true;
             }
@@ -2324,7 +2427,7 @@ if (typeof define === 'function' && define.amd) {
                     left = settingsClone.negativeSignCharacter + left;
                 }
 
-                this._setValueParts(left + cCode, right, null);
+                this._setValueParts(left + cCode, right);
 
                 return true;
             }
@@ -2332,17 +2435,20 @@ if (typeof define === 'function' && define.amd) {
             // Prevent any other character
             settingsClone.throwInput = false;
 
-            return true;
+            return false;
         }
 
         /**
          * Formatting of just processed value while keeping the cursor position
+         *
+         * @param {Event} e
+         * @private
          */
-        _formatQuick(e) {
+        _formatValue(e) {
             const settingsClone = this.settingsClone;
             const leftLength = this.value;
             const eventKeyCode = e.keyCode;
-            let [left] = this._getBeforeAfterStripped();
+            let [left] = this._getUnformattedLeftAndRightPartAroundTheSelection();
 
             // No grouping separator and no currency sign
             if ((settingsClone.digitGroupSeparator  === '' || (settingsClone.digitGroupSeparator !== ''  && !contains(leftLength, settingsClone.digitGroupSeparator))) &&
@@ -2368,7 +2474,7 @@ if (typeof define === 'function' && define.amd) {
                 left = nSign + left;
             }
 
-            const value = autoGroup(this.value, this.settingsClone);
+            const value = addGroupSeparators(this.value, this.settingsClone);
             let position = value.length;
             if (value) {
                 // Prepare regexp which searches for cursor position from unformatted left part
@@ -2449,9 +2555,14 @@ if (typeof define === 'function' && define.amd) {
                 }
             }
 
-            this.that.value = value;
-            this._setPosition(position);
-            this.formatted = true;
+            // Only update the value if it has changed. This prevents modifying the selection, if any.
+            if (value !== this.that.value ||
+                value === this.that.value && (key(e) === keyCode.num0 || key(e) === keyCode.numpad0)) {
+                this.that.value = value;
+                this._setCaretPosition(position);
+            }
+
+            this.formatted = true; //TODO Rename `this.formatted` to `this._formatExecuted`, since it's possible this function does not need to format anything (in the case where the keycode is dropped for instance)
         }
     }
 
@@ -2466,12 +2577,12 @@ if (typeof define === 'function' && define.amd) {
      * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-", or even plain numbers => please see option "outputFormat" for more details
      *
      * @param {boolean} getArrayBehavior - If set to TRUE, then this function behave like `getArray()`, otherwise if set to FALSE, it behave like `getString()`
-     * @param that - A reference to the current DOM element
+     * @param {HTMLElement} that - A reference to the current DOM element
      * @returns {*}
      * @private
      */
     function _getStringOrArray(getArrayBehavior = true, that) {
-        const $this = autoGet(that);
+        const $this = getCurrentElement(that);
         const formIndex = $('form').index($this);
         const allFormElements = $(`form:eq(${formIndex})`)[0];
         const aiIndex = [];
@@ -2519,7 +2630,7 @@ if (typeof define === 'function' && define.amd) {
             const formFields = $this.serializeArray();
 
             $.each(formFields, (i, field) => {
-                const scElement = $.inArray(i, scIndex);
+                const scElement = scIndex.indexOf(i);
 
                 if (scElement > -1 && aiIndex[scElement] > -1) {
                     const testInput = $(`form:eq(${formIndex}) input:eq(${aiIndex[scElement]})`);
@@ -2540,7 +2651,7 @@ if (typeof define === 'function' && define.amd) {
 
             $.each(formParts, i => {
                 const [inputName, inputValue] = formParts[i].split('=');
-                const scElement = $.inArray(i, scIndex);
+                const scElement = scIndex.indexOf(i);
 
                 // If the current element is a valid element
                 if (scElement > -1 && aiIndex[scElement] > -1) {
@@ -2563,10 +2674,9 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Handler for 'focusin' events
      *
-     * @param $this
+     * @param {object} $this jQuery-selected DOM element
      * @param {AutoNumericHolder} holder
      * @param {Event} e
-     * @returns {*}
      */
     function onFocusInAndMouseEnter($this, holder, e) {
         const settings = holder.settingsClone;
@@ -2576,7 +2686,7 @@ if (typeof define === 'function' && define.amd) {
             //TODO Fix issue #303 : if (e.type === 'focusin' && no mouse click && fromTabKey) { setElementSelection(e.target, 0); }
 
             if (settings.negativeBracketsTypeOnBlur !== null && settings.negativeSignCharacter !== '') {
-                $this.val(negativeBracket(e.target.value, settings));
+                $this.val(toggleNegativeBracket(e.target.value, settings));
             }
 
             let result;
@@ -2591,7 +2701,6 @@ if (typeof define === 'function' && define.amd) {
                 settings.currencySymbol = '';
                 settings.suffixText = '';
                 $this.autoNumeric('set', settings.rawValue);
-
             } else if ((result = stripAllNonNumberCharacters(e.target.value, settings, true)) !== settings.rawValue) {
                 $this.autoNumeric('set', result);
             }
@@ -2651,11 +2760,11 @@ if (typeof define === 'function' && define.amd) {
      *
      * @param {AutoNumericHolder} holder
      * @param {Event} e
-     * @returns {*}
      */
     function onKeydown(holder, e) {
         //TODO Create a function that retrieve the element value (either by using `e.target.value` when the element is an <input>, or by using `element.textContent` when the element as its `contenteditable` set to true)
         const currentKeyCode = key(e); // The key being used
+        holder.initialValueOnKeydown = e.target.value; // This is needed in `onKeyup()` to check if the value as changed during the key press
 
         if (holder.that.readOnly) {
             holder.processed = true;
@@ -2683,7 +2792,7 @@ if (typeof define === 'function' && define.amd) {
         if (currentKeyCode === keyCode.Backspace || currentKeyCode === keyCode.Delete) {
             holder._processCharacterDeletion(); // Because backspace and delete only triggers keydown and keyup events, not keypress
             holder.processed = true;
-            holder._formatQuick(e);
+            holder._formatValue(e);
 
             // If and only if the resulting value has changed after that backspace/delete, then we have to send an 'input' event like browsers normally do.
             if ((e.target.value !== holder.lastVal) && holder.settingsClone.throwInput) {
@@ -2708,7 +2817,6 @@ if (typeof define === 'function' && define.amd) {
      *
      * @param {AutoNumericHolder} holder
      * @param {Event} e
-     * @returns {*}
      */
     function onKeypress(holder, e) {
         const currentKeyCode = key(e); // The key being used
@@ -2733,9 +2841,9 @@ if (typeof define === 'function' && define.amd) {
             return;
         }
 
-        //FIXME `_processCharacterInsertion()` always returns TRUE, which means `holder.formatted = false;` at the end is NEVER called.
-        if (holder._processCharacterInsertion()) {
-            holder._formatQuick(e);
+        const isCharacterInsertionAllowed = holder._processCharacterInsertion();
+        if (isCharacterInsertionAllowed) {
+            holder._formatValue(e);
             if ((e.target.value !== holder.lastVal) && holder.settingsClone.throwInput) {
                 // Throws input event on adding a character
                 triggerEvent('input', e.target);
@@ -2752,6 +2860,8 @@ if (typeof define === 'function' && define.amd) {
             return;
         }
 
+        e.preventDefault();
+
         holder.formatted = false;
     }
 
@@ -2762,7 +2872,6 @@ if (typeof define === 'function' && define.amd) {
      * @param {AutoNumericHolder} holder
      * @param {object} settings
      * @param {Event} e
-     * @returns {*}
      */
     function onKeyup(holder, settings, e) {
         const currentKeyCode = key(e); // The key being used
@@ -2795,21 +2904,25 @@ if (typeof define === 'function' && define.amd) {
 
         // Saves the extended decimal to preserve the data when navigating away from the page
         if (holder.settingsClone.decimalPlacesShownOnFocus !== null && holder.settingsClone.saveValueToSessionStorage) {
-            autoSave(e.target, settings, 'set');
+            saveValueToPersistentStorage(e.target, settings, 'set');
         }
 
         if (!holder.formatted) {
-            holder._formatQuick(e);
+            holder._formatValue(e);
+        }
+
+        // If the input value has changed during the key press event chain, an event is sent to alert that a formatting has been done (cf. Issue #187)
+        if (e.target.value !== holder.initialValueOnKeydown) {
+            triggerEvent('autoNumeric:formatted', e.target);
         }
     }
 
     /**
      * Handler for 'focusout' events
      *
-     * @param $this
+     * @param {object} $this jQuery-selected DOM element
      * @param {AutoNumericHolder} holder
      * @param {Event} e
-     * @returns {*}
      */
     function onFocusOutAndMouseLeave($this, holder, e) {
         if (!$this.is(':focus')) {
@@ -2819,7 +2932,7 @@ if (typeof define === 'function' && define.amd) {
             settings.onOff = false;
 
             if (settings.saveValueToSessionStorage) {
-                autoSave(e.target, settings, 'set');
+                saveValueToPersistentStorage(e.target, settings, 'set');
             }
 
             if (settings.noSeparatorOnFocus === true) {
@@ -2842,9 +2955,9 @@ if (typeof define === 'function' && define.amd) {
                     settings.trailingNegative = false;
                 }
 
-                const [minTest, maxTest] = autoCheck(value, settings);
+                const [minTest, maxTest] = checkIfInRangeWithOverrideOption(value, settings);
                 if (checkEmpty(value, settings, false) === null && minTest && maxTest) {
-                    value = fixNumber(value, settings);
+                    value = modifyNegativeSignAndDecimalCharacterForRawValue(value, settings);
                     settings.rawValue = value;
 
                     if (settings.scaleDivisor) {
@@ -2853,8 +2966,8 @@ if (typeof define === 'function' && define.amd) {
                     }
 
                     settings.decimalPlacesOverride = (settings.scaleDivisor && settings.scaleDecimalPlaces) ? +settings.scaleDecimalPlaces : settings.decimalPlacesOverride;
-                    value = autoRound(value, settings);
-                    value = presentNumber(value, settings);
+                    value = roundValue(value, settings);
+                    value = modifyNegativeSignAndDecimalCharacterForFormattedValue(value, settings);
                 } else {
                     if (!minTest) {
                         $this.trigger('autoNumeric:minExceeded');
@@ -2868,7 +2981,7 @@ if (typeof define === 'function' && define.amd) {
             } else {
                 if (settings.emptyInputBehavior === 'zero') {
                     settings.rawValue = '0';
-                    value = autoRound('0', settings);
+                    value = roundValue('0', settings);
                 } else {
                     settings.rawValue = '';
                 }
@@ -2876,7 +2989,7 @@ if (typeof define === 'function' && define.amd) {
 
             let groupedValue = checkEmpty(value, settings, false);
             if (groupedValue === null) {
-                groupedValue = autoGroup(value, settings);
+                groupedValue = addGroupSeparators(value, settings);
             }
 
             if (groupedValue !== origValue) {
@@ -2894,10 +3007,9 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Handler for 'paste' events
      *
-     * @param $this
+     * @param {object} $this jQuery-selected DOM element
      * @param {AutoNumericHolder} holder
      * @param {Event} e
-     * @returns {*}
      */
     function onPaste($this, holder, e) {
         //TODO Using ctrl+z after a paste should cancel it -> How would that affect other frameworks/component built with that feature in mind though?
@@ -2941,7 +3053,13 @@ if (typeof define === 'function' && define.amd) {
 
         // 4. Calculate the paste result
         let caretPositionOnInitialTextAfterPasting;
-        let initialUnformattedNumber = $this.autoNumeric('get');
+        let initialUnformattedNumber;
+        if (e.target.value === '') {
+            // autoNumeric 'get' returns '0.00' if the input is empty, hence we need to store the 'real' empty initial value when needed
+            initialUnformattedNumber = '';
+        } else {
+            initialUnformattedNumber = $this.autoNumeric('get');
+        }
         let isInitialValueNegative = isNegative(initialUnformattedNumber);
         let isPasteNegativeAndInitialValueIsPositive;
         let result;
@@ -3028,6 +3146,7 @@ if (typeof define === 'function' && define.amd) {
 
                 //XXX Here we have the result for the `truncate` option
                 if (holder.settings.onInvalidPaste === 'truncate') {
+                    //TODO If the user as defined a truncate callback and there are still some numbers (that will be dropped), then call this callback with the initial paste as well as the remaining numbers
                     result = lastGoodKnownResult;
                     break;
                 }
@@ -3239,16 +3358,15 @@ if (typeof define === 'function' && define.amd) {
     function onBlur(holder, e) {
         if (e.target.value !== holder.valueOnFocus) {
             triggerEvent('change', e.target);
-            // e.preventDefault(); // ...and immediately prevent the browser to send a second change event (that somehow gets picked up by jQuery, but not by `addEventListener()` //FIXME KNOWN BUG : This does not prevent the second change event to be picked up by jQuery
+            // e.preventDefault(); // ...and immediately prevent the browser to send a second change event (that somehow gets picked up by jQuery, but not by `addEventListener()` //FIXME KNOWN BUG : This does not prevent the second change event to be picked up by jQuery, which adds '.00' at the end of an integer
         }
     }
 
     /**
      * Handler for 'submit' events
      *
-     * @param $this
+     * @param {object} $this jQuery-selected DOM element
      * @param {AutoNumericHolder} holder
-     * @returns {*}
      */
     function onSubmit($this, holder) {
         $this.closest('form').on('submit.autoNumeric', () => {
@@ -3265,7 +3383,7 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Return the jQuery selected input if the tag and type are supported by autoNumeric.
      *
-     * @param $this
+     * @param {object} $this jQuery-selected DOM element
      * @returns {boolean|*}
      */
     function getInputIfSupportedTagAndType($this) {
@@ -3289,9 +3407,9 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Routine to format the default value on page load
      *
-     * @param settings
-     * @param $input
-     * @param $this
+     * @param {object} settings
+     * @param {object} $input jQuery-selected <input> element
+     * @param {object} $this jQuery-selected DOM element
      */
     function formatDefaultValueOnPageLoad(settings, $input, $this) {
         let setValue = true;
@@ -3331,10 +3449,10 @@ if (typeof define === 'function' && define.amd) {
                 //TODO Replace whatever locale character is used by a '.', and not only the comma ',', based on the locale used by the user
                 if ((settings.defaultValueOverride !== null && settings.defaultValueOverride.toString() !== currentValue) ||
                     (settings.defaultValueOverride === null && currentValue !== '' && currentValue !== $this.attr('value')) ||
-                    (currentValue !== '' && $this.attr('type') === 'hidden' && !$.isNumeric(currentValue.replace(',', '.')))) {
+                    (currentValue !== '' && $this.attr('type') === 'hidden' && !isNumber(currentValue.replace(',', '.')))) {
                     if ((settings.decimalPlacesShownOnFocus !== null && settings.saveValueToSessionStorage) ||
                         (settings.scaleDivisor && settings.saveValueToSessionStorage)) {
-                        settings.rawValue = autoSave($this[0], settings, 'get');
+                        settings.rawValue = saveValueToPersistentStorage($this[0], settings, 'get');
                     }
 
                     // If the decimalPlacesShownOnFocus value should NOT be saved in sessionStorage
@@ -3343,13 +3461,12 @@ if (typeof define === 'function' && define.amd) {
 
                         if (settings.negativeBracketsTypeOnBlur !== null && settings.negativeSignCharacter !== '') {
                             settings.onOff = true;
-                            toStrip = negativeBracket(currentValue, settings);
+                            toStrip = toggleNegativeBracket(currentValue, settings);
                         } else {
                             toStrip = currentValue;
                         }
 
                         settings.rawValue = ((settings.negativePositiveSignPlacement === 's' || (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement !== 'p')) && settings.negativeSignCharacter !== '' && contains(currentValue, '-'))?'-' + stripAllNonNumberCharacters(toStrip, settings, true):stripAllNonNumberCharacters(toStrip, settings, true);
-
                     }
 
                     setValue = false;
@@ -3419,7 +3536,6 @@ if (typeof define === 'function' && define.amd) {
      * Analyze and save the minimumValue and maximumValue integer size for later uses
      *
      * @param {object} settings
-     * @returns {{maximumValue: Array, minimumValue: Array}}
      */
     function calculateVMinAndVMaxIntegerSizes(settings) {
         let [maximumValueIntegerPart] = settings.maximumValue.toString().split('.');
@@ -3626,7 +3742,7 @@ if (typeof define === 'function' && define.amd) {
      * Note: This returns `null` if somehow the settings returned by jQuery is not an object.
      *
      * @param {object} options
-     * @param $this
+     * @param {object} $this jQuery-selected DOM element
      * @param {boolean} update - If TRUE, then the settings already exists and this function only updates them instead of recreating them from scratch
      * @returns {object|null}
      */
@@ -3700,10 +3816,13 @@ if (typeof define === 'function' && define.amd) {
          * The options passed as a parameter is an object that contains the settings (ie. {digitGroupSeparator: ".", decimalCharacter: ",", currencySymbol: '€ '})
          *
          * @example
-         * $(someSelector).autoNumeric('init');            // initiate autoNumeric with defaults
-         * $(someSelector).autoNumeric();                  // initiate autoNumeric with defaults
-         * $(someSelector).autoNumeric('init', {options}); // initiate autoNumeric with options
-         * $(someSelector).autoNumeric({options});         // initiate autoNumeric with options
+         * $(someSelector).autoNumeric('init');            // Initiate autoNumeric with defaults
+         * $(someSelector).autoNumeric();                  // Initiate autoNumeric with defaults
+         * $(someSelector).autoNumeric('init', {options}); // Initiate autoNumeric with options
+         * $(someSelector).autoNumeric({options});         // Initiate autoNumeric with options
+         *
+         * @param {object} options
+         * @returns {*|{statements, branches, lines, functions, excludes, overrides}|{statements, branches, lines, functions, excludes}|{statements, lines, branches, functions, excludes}}
          */
         init(options) {
             return this.each(function() {
@@ -3716,7 +3835,7 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 // Create the AutoNumericHolder object that store the field properties
-                const holder = getHolder($this, settings, false);
+                const holder = getAutoNumericHolder($this, settings, false);
 
                 if (!settings.runOnce && settings.formatOnPageLoad) {
                     formatDefaultValueOnPageLoad(settings, $input, $this);
@@ -3741,17 +3860,20 @@ if (typeof define === 'function' && define.amd) {
         },
 
         /**
-         * method to remove settings and stop autoNumeric() - does not remove the formatting
-         * $(someSelector).autoNumeric("destroy"); // destroys autoNumeric
-         * no parameters accepted
+         * Method to stop and remove autoNumeric for the current element.
+         * Note: this does not remove the formatting.
+         *
+         * @example $(someSelector).autoNumeric("destroy"); // Destroys autoNumeric on this selected element
+         *
+         * @returns {*|jQuery}
          */
         destroy() {
             return $(this).each(function() {
-                const $this = autoGet(this);
+                const $this = getCurrentElement(this);
                 const settings = $this.data('autoNumeric');
                 if (typeof settings === 'object') {
                     $this.val('');
-                    autoSave($this[0], settings, 'wipe');
+                    saveValueToPersistentStorage($this[0], settings, 'wipe');
                     $this.removeData('autoNumeric');
                     $this.off('.autoNumeric');
                 }
@@ -3759,18 +3881,20 @@ if (typeof define === 'function' && define.amd) {
         },
 
         /**
-         * method to clear the value and sessionStorage or cookie depending on browser supports
-         * $(someSelector).autoNumeric("wipe"); // removes session storage and cookies from memory
-         * no parameters accepted
+         * Method to clear the value from sessionStorage (or cookie, depending on browser supports).
+         *
+         * @example $(someSelector).autoNumeric("wipe"); // Removes session storage and cookies from memory
+         *
+         * @returns {*|jQuery}
          */
         wipe() {
             return $(this).each(function() {
-                const $this = autoGet(this);
+                const $this = getCurrentElement(this);
                 const settings = $this.data('autoNumeric');
                 if (typeof settings === 'object') {
                     $this.val('');
                     settings.rawValue = '';
-                    autoSave($this[0], settings, 'wipe');
+                    saveValueToPersistentStorage($this[0], settings, 'wipe');
                 }
             });
         },
@@ -3780,16 +3904,19 @@ if (typeof define === 'function' && define.amd) {
          * It can be called multiple times if needed.
          * The options passed as a parameter is an object that contains the settings (ie. {digitGroupSeparator: ".", decimalCharacter: ",", currencySymbol: '€ '}).
          *
-         * @usage $(someSelector).autoNumeric("update", {options}); // updates the settings
+         * @example $(someSelector).autoNumeric("update", {options}); // Updates the settings
+         *
+         * @param {object} options
+         * @returns {*|jQuery}
          */
         update(options) {
             return $(this).each(function() {
-                const $this = autoGet(this);
+                const $this = getCurrentElement(this);
                 const strip = $this.autoNumeric('get');
                 const settings = getInitialSettings(options, $this, true);
 
                 // Update the AutoNumericHolder object that store the field properties
-                getHolder($this, settings, true);
+                getAutoNumericHolder($this, settings, true);
 
                 if ($this.val() !== '' || $this.text() !== '') {
                     return $this.autoNumeric('set', strip);
@@ -3799,9 +3926,10 @@ if (typeof define === 'function' && define.amd) {
 
         /**
          * Method to format the value passed as a parameter.
-         * $(someSelector).autoNumeric('set', 'value'); // formats the value being passed as the second parameter
          * If the value is passed as a string, it can be an integer '1234' or a double '1234.56789'
          * and must contain only numbers and one decimal (period) character
+         *
+         * @example $(someSelector).autoNumeric('set', 'value'); // Formats the value being passed as the second parameter
          *
          * @param {*} newValue
          * @returns {*|jQuery}
@@ -3813,7 +3941,7 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 //TODO This looks a lot like `getInputIfSupportedTagAndType()`. Is that necessary? Can the input element be changed since autoNumeric has been initialized?
-                const $this = autoGet(this);
+                const $this = getCurrentElement(this);
                 const settings = $this.data('autoNumeric');
                 const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
                 let value = newValue.toString();
@@ -3825,13 +3953,13 @@ if (typeof define === 'function' && define.amd) {
                 value = fromLocale(value);
 
                 // Throws an error if the value being set is not numeric
-                if (!$.isNumeric(Number(value))) {
+                if (!isNumber(Number(value))) {
                     warning(`The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`, settings.showWarnings);
                     return $this.val('');
                 }
 
                 if (value !== '') {
-                    const [minTest, maxTest] = autoCheck(value, settings);
+                    const [minTest, maxTest] = checkIfInRangeWithOverrideOption(value, settings);
                     if (minTest && maxTest) {
                         if ($input && (settings.decimalPlacesShownOnFocus || settings.scaleDivisor)) {
                             settings.rawValue = value;
@@ -3845,21 +3973,21 @@ if (typeof define === 'function' && define.amd) {
                                 settings.decimalPlacesOverride = (settings.scaleDecimalPlaces) ? settings.scaleDecimalPlaces : settings.decimalPlacesOverride;
                             }
 
-                            value = autoRound(value, settings);
+                            value = roundValue(value, settings);
                             if (settings.decimalPlacesShownOnFocus === null && settings.scaleDivisor === null) {
                                 settings.rawValue = value;
                             }
 
-                            value = presentNumber(value, settings);
-                            value = autoGroup(value, settings);
+                            value = modifyNegativeSignAndDecimalCharacterForFormattedValue(value, settings);
+                            value = addGroupSeparators(value, settings);
                         }
 
                         if (settings.saveValueToSessionStorage && (settings.decimalPlacesShownOnFocus || settings.scaleDivisor)) {
-                            autoSave($this[0], settings, 'set');
+                            saveValueToPersistentStorage($this[0], settings, 'set');
                         }
                     } else {
                         settings.rawValue = '';
-                        autoSave($this[0], settings, 'wipe');
+                        saveValueToPersistentStorage($this[0], settings, 'wipe');
                         const attemptedValue = value;
                         value = '';
                         if (!minTest) {
@@ -3895,14 +4023,20 @@ if (typeof define === 'function' && define.amd) {
         },
 
         /**
-         * method to un-format inputs - handy to use right before form submission
-         * $(someSelector).autoNumeric('unSet'); // no parameter accepted
-         * by defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
-         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-", or even plain numbers => please see option "outputFormat" for more details
+         * Method to un-format inputs.
+         * This is handy to use right before form submission.
+         *
+         * By default, values are returned as ISO numeric strings (ie. "1234.56" or "-1234.56"), where the decimal character is a period.
+         * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-", or even plain numbers.
+         * Please see option "outputFormat" for more details
+         *
+         * @example $(someSelector).autoNumeric('unSet');
+         *
+         * @returns {*|jQuery}
          */
         unSet() {
             return $(this).each(function() {
-                const $this = autoGet(this);
+                const $this = getCurrentElement(this);
                 const settings = $this.data('autoNumeric');
                 if (typeof settings === 'object') {
                     settings.onOff = true;
@@ -3912,13 +4046,18 @@ if (typeof define === 'function' && define.amd) {
         },
 
         /**
-         * method to re-format inputs - handy to use right after form submission
-         * $(someSelector).autoNumeric('reSet'); // no parameters accepted
-         * this is called after the 'unSet' method to reformat the input
+         * Method to re-format inputs.
+         * This is handy to use right after form submission.
+         *
+         * This is called after the 'unSet' method to reformat the input
+         *
+         * @example $(someSelector).autoNumeric('reSet');
+         *
+         * @returns {*|jQuery}
          */
         reSet() {
             return $(this).each(function() {
-                const $this = autoGet(this);
+                const $this = getCurrentElement(this);
                 const settings = $this.data('autoNumeric');
                 if (typeof settings === 'object') {
                     $this.autoNumeric('set', $this.val());
@@ -3935,12 +4074,12 @@ if (typeof define === 'function' && define.amd) {
          */
         get() {
             //TODO Why would we need to get a new reference to $this since it has been done in `init()`?
-            const $this = autoGet(this);
+            const $this = getCurrentElement(this);
             //TODO This looks a lot like `getInputIfSupportedTagAndType()`. Is that necessary? Can the input element be changed since autoNumeric has been initialized?
             const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
             const settings = $this.data('autoNumeric');
             if (typeof settings !== 'object') {
-                throwError(`Initializing autoNumeric is required prior to calling the "get" method`);
+                throwError(`Initializing autoNumeric is required prior to calling the "get" method.`);
             }
 
             // determine the element type then use .eq(0) selector to grab the value of the first element in selector
@@ -3962,16 +4101,14 @@ if (typeof define === 'function' && define.amd) {
 
                 if (value !== '' && settings.negativeBracketsTypeOnBlur !== null) {
                     settings.onOff = true;
-                    value = negativeBracket(value, settings);
+                    value = toggleNegativeBracket(value, settings);
                 }
 
                 if (settings.runOnce || settings.formatOnPageLoad === false) {
-
                     value = stripAllNonNumberCharacters(value, settings, true);
-
                 }
 
-                value = fixNumber(value, settings);
+                value = modifyNegativeSignAndDecimalCharacterForRawValue(value, settings);
             }
 
             // Always return a numeric string
@@ -3989,7 +4126,7 @@ if (typeof define === 'function' && define.amd) {
          * @returns {*}
          */
         getLocalized() {
-            const $this = autoGet(this);
+            const $this = getCurrentElement(this);
             let value = $this.autoNumeric('get');
             const settings = $this.data('autoNumeric');
 
@@ -4021,6 +4158,8 @@ if (typeof define === 'function' && define.amd) {
          * It then loops through the string and un-formats the inputs with autoNumeric.
          * By defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
          * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" or plain numbers => please see option "outputFormat" for details
+         *
+         * @returns {string}
          */
         getString() {
             return _getStringOrArray(false, this);
@@ -4032,17 +4171,24 @@ if (typeof define === 'function' && define.amd) {
          * It then loops through the string and un-formats the inputs with autoNumeric.
          * By defaults values returned as ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period
          * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-" or plain numbers => please see option "outputFormat" for details
+         *
+         * @returns {{}|[]}
          */
         getArray() {
             return _getStringOrArray(true, this);
         },
 
         /**
-         * The 'getSettings' function returns the object with autoNumeric settings for those who need to look under the hood
-         * $(someSelector).autoNumeric('getSettings'); // no parameters accepted
-         * $(someSelector).autoNumeric('getSettings').decimalCharacter; // return the decimalCharacter setting as a string - ant valid setting can be used
+         * The 'getSettings' function returns an object containing all the current autoNumeric settings.
+         *
+         * @example
+         * $(someSelector).autoNumeric('getSettings');
+         * $(someSelector).autoNumeric('getSettings').decimalCharacter; // Return the decimalCharacter setting as a string - any valid option name can be used
+         *
+         * @returns {object}
          */
         getSettings() {
+            //TODO Add an option argument `optionName` to this function so that it return only the value of that option, not the entire settings object
             return this.data('autoNumeric');
         },
     };
@@ -4050,6 +4196,10 @@ if (typeof define === 'function' && define.amd) {
     /**
      * The autoNumeric function accepts methods names (in string format) and those method parameters if needed.
      * It initialize autoNumeric on the given element.
+     *
+     * @param {string} method The method name (ie. 'set', 'get', etc.)
+     * @param {*} args
+     * @returns {*}
      */
     $.fn.autoNumeric = function(method, ...args) {
         if (methods[method]) {
@@ -4067,14 +4217,18 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Return the default autoNumeric settings.
      *
-     * @return {object}
+     * @returns {object}
      */
     getDefaultConfig = () => defaultSettings;
 
     $.fn.autoNumeric.defaults = defaultSettings; // Make those settings public via jQuery too.
 
     /**
-     * Public function that allows formatting without an element trigger
+     * Public function that allows formatting without an element trigger.
+     *
+     * @param {number} value
+     * @param {object} options
+     * @returns {*}
      */
     autoFormat = (value, options) => {
         if (isUndefined(value) || value === null) {
@@ -4088,36 +4242,40 @@ if (typeof define === 'function' && define.amd) {
 
         // Initiate a very basic settings object
         const settings = $.extend({}, defaultSettings, { strip: false }, options);
-        value = value.toString();
-        value = fromLocale(value);
-        if (Number(value) < 0) {
+        if (value < 0) {
             settings.negativeSignCharacter = '-';
         }
+        let valueString = value.toString();
+        valueString = fromLocale(valueString);
 
         if (isNull(settings.decimalPlacesOverride)) {
             settings.decimalPlacesOverride = maximumVMinAndVMaxDecimalLength(settings.minimumValue, settings.maximumValue);
         }
 
-        // Basic tests to check if the given value is valid
-        const [minTest, maxTest] = autoCheck(value, settings);
+        // Basic tests to check if the given valueString is valid
+        const [minTest, maxTest] = checkIfInRangeWithOverrideOption(valueString, settings);
         if (!minTest || !maxTest) {
             // Throw a custom event
             triggerEvent('autoFormat.autoNumeric', document, `Range test failed`);
-            throwError(`The value [${value}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`);
+            throwError(`The value [${valueString}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`);
         }
 
         // Everything is ok, proceed to rounding, formatting and grouping
-        value = autoRound(value, settings);
-        value = presentNumber(value, settings);
-        value = autoGroup(value, settings);
+        valueString = roundValue(valueString, settings);
+        valueString = modifyNegativeSignAndDecimalCharacterForFormattedValue(valueString, settings);
+        valueString = addGroupSeparators(valueString, settings);
 
-        return value;
+        return valueString;
     };
 
     $.fn.autoFormat = autoFormat; // The jQuery export
 
     /**
-     * Public function that allows unformatting without an element
+     * Public function that allows unformatting without an element.
+     *
+     * @param {string|number} value
+     * @param {object} options
+     * @returns {*}
      */
     autoUnFormat = (value, options) => {
         if (isUndefined(value) || value === null) {
@@ -4144,7 +4302,7 @@ if (typeof define === 'function' && define.amd) {
         } else if (settings.negativeBracketsTypeOnBlur && settings.negativeBracketsTypeOnBlur.split(',')[0] === value.charAt(0)) {
             settings.negativeSignCharacter = '-';
             settings.onOff = true;
-            value = negativeBracket(value, settings);
+            value = toggleNegativeBracket(value, settings);
         }
 
         value = value.replace(autoStrip, '');
@@ -4168,8 +4326,6 @@ if (typeof define === 'function' && define.amd) {
      * @throws Error
      */
     validate = (userOptions, shouldExtendDefaultOptions = true) => {
-        const showWarnings = true; // The error here must always be thrown, since a badly configured options object will lead to wrong results, if any.
-
         if (isUndefinedOrNullOrEmpty(userOptions) || !isObject(userOptions) || isEmptyObj(userOptions)) {
             throwError(`The userOptions are invalid ; it should be a valid object, [${userOptions}] given.`);
         }
@@ -4187,6 +4343,12 @@ if (typeof define === 'function' && define.amd) {
             options = userOptions;
         }
 
+        // First things first, we test that the `showWarnings` option is valid
+        if (!isTrueOrFalseString(options.showWarnings) && !isBoolean(options.showWarnings)) {
+            throwError(`The debug option 'showWarnings' is invalid ; it should be either 'false' or 'true', [${options.showWarnings}] given.`);
+        }
+
+        // Define the regular expressions needed for the following tests
         const testPositiveInteger = /^[0-9]+$/;
         const testNumericalCharacters = /[0-9]+/;
         // const testFloatAndPossibleNegativeSign = /^-?[0-9]+(\.?[0-9]+)$/;
@@ -4194,15 +4356,15 @@ if (typeof define === 'function' && define.amd) {
         const testPositiveFloatOrInteger = /^[0-9]+(\.?[0-9]+)?$/;
 
         // Then tests the options individually
-        if (!isInArray(options.digitGroupSeparator, [',', '.', ' ', ''])) {
-            throwError(`The thousand separator character option 'digitGroupSeparator' is invalid ; it should be ',', '.', ' ' or empty (''), [${options.digitGroupSeparator}] given.`);
+        if (!isInArray(options.digitGroupSeparator, [',', '.', ' ', '', "'"])) {
+            throwError(`The thousand separator character option 'digitGroupSeparator' is invalid ; it should be ',', '.', ' ', "'" or empty (''), [${options.digitGroupSeparator}] given.`);
         }
 
         if (!isTrueOrFalseString(options.noSeparatorOnFocus) && !isBoolean(options.noSeparatorOnFocus)) {
             throwError(`The 'noSeparatorOnFocus' option is invalid ; it should be either 'false' or 'true', [${options.noSeparatorOnFocus}] given.`);
         }
 
-        if (!testPositiveInteger.test(options.digitalGroupSpacing)) { // isNaN(parseInt(options.digitalGroupSpacing)) //DEBUG
+        if (!testPositiveInteger.test(options.digitalGroupSpacing)) {
             throwError(`The digital grouping for thousand separator option 'digitalGroupSpacing' is invalid ; it should be a positive integer, [${options.digitalGroupSpacing}] given.`);
         }
 
@@ -4261,11 +4423,11 @@ if (typeof define === 'function' && define.amd) {
         // Write a warning message in the console if the number of decimal in minimumValue/maximumValue is overridden by decimalPlacesOverride (and not if decimalPlacesOverride is equal to the number of decimal used in minimumValue/maximumValue)
         const vMinAndVMaxMaximumDecimalPlaces = maximumVMinAndVMaxDecimalLength(options.minimumValue, options.maximumValue);
         if (!isNull(options.decimalPlacesOverride) && vMinAndVMaxMaximumDecimalPlaces !== Number(options.decimalPlacesOverride)) {
-            warning(`Setting 'decimalPlacesOverride' to [${options.decimalPlacesOverride}] will override the decimals declared in 'minimumValue' [${options.minimumValue}] and 'maximumValue' [${options.maximumValue}].`, showWarnings);
+            warning(`Setting 'decimalPlacesOverride' to [${options.decimalPlacesOverride}] will override the decimals declared in 'minimumValue' [${options.minimumValue}] and 'maximumValue' [${options.maximumValue}].`, options.showWarnings);
         }
 
         if (!options.allowDecimalPadding && !isNull(options.decimalPlacesOverride)) {
-            warning(`Setting 'allowDecimalPadding' to [false] will override the current 'decimalPlacesOverride' setting [${options.decimalPlacesOverride}].`, showWarnings);
+            warning(`Setting 'allowDecimalPadding' to [false] will override the current 'decimalPlacesOverride' setting [${options.decimalPlacesOverride}].`, options.showWarnings);
         }
 
         if (!isNull(options.decimalPlacesShownOnFocus) && (!isString(options.decimalPlacesShownOnFocus) || !testPositiveInteger.test(options.decimalPlacesShownOnFocus))) {
@@ -4273,8 +4435,8 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // Checks if the extended decimal places "decimalPlacesShownOnFocus" is greater than the normal decimal places "decimalPlacesOverride"
-        if (!isNull(options.decimalPlacesShownOnFocus) && !isNull(options.decimalPlacesOverride) && Number(options.decimalPlacesOverride) < Number(options.decimalPlacesShownOnFocus)) {
-            throwError(`autoNumeric will not function properly when the extended decimal places 'decimalPlacesShownOnFocus' [${options.decimalPlacesShownOnFocus}] is greater than the 'decimalPlacesOverride' [${options.decimalPlacesOverride}] value.`);
+        if (!isNull(options.decimalPlacesShownOnFocus) && !isNull(options.decimalPlacesOverride) && Number(options.decimalPlacesOverride) > Number(options.decimalPlacesShownOnFocus)) {
+            warning(`The extended decimal places 'decimalPlacesShownOnFocus' [${options.decimalPlacesShownOnFocus}] should be greater than the 'decimalPlacesOverride' [${options.decimalPlacesOverride}] value. Currently, this will limit the ability of your client to manually change some of the decimal places. Do you really want to do that?`, options.showWarnings);
         }
 
         if (!isNull(options.scaleDivisor) && !testPositiveFloatOrInteger.test(options.scaleDivisor)) {
@@ -4364,10 +4526,6 @@ if (typeof define === 'function' && define.amd) {
             ',-',
         ])) {
             throwError(`The custom locale format option 'outputFormat' is invalid ; it should either be null, 'string', 'number', '.', '-.', ',', '-,', '.-' or ',-', [${options.outputFormat}] given.`);
-        }
-
-        if (!isTrueOrFalseString(options.showWarnings) && !isBoolean(options.showWarnings)) {
-            throwError(`The debug option 'showWarnings' is invalid ; it should be either 'false' or 'true', [${options.showWarnings}] given.`);
         }
 
         if (!isTrueOrFalseString(options.failOnUnknownOption) && !isBoolean(options.failOnUnknownOption)) {

@@ -2,6 +2,18 @@
 
 ### "2.0.0-beta.15"
 + Fix FireFox on issue #306 that allows the caret to move right when all zero present in the decimals
++ Fix issue #318 `this.selection` can be uninitialized if you focus on an input via the `Tab` key.
++ Add the `keyName` object that list the key values as defined is the KeyboardEvent Key_Values.
++ Rename the `key()` function to `keyCodeNumber()`.
++ Split `_updateFieldProperties()` into `_updateAutoNumericHolderProperties()` and `_updateAutoNumericHolderEventKeycode()`.
++ `_updateAutoNumericHolderProperties()` only update the value and selection in each event handler, and resets the 'processed' and 'formatted' states.
++ `_updateAutoNumericHolderEventKeycode()` is called only once on `keypress`, and set the event keyCode into the AutoNumericHolder object.
++ Remove the need to save `this.ctrlKey`, `this.cmdKey` and `this.shiftKey` three times on each key stroke.
++ Rename `this.kdCode` into `this.eventKeyCode`, and use that variable globally in the AutoNumericHolder object.
++ Fix `_normalizeParts()` so that a '0' entered via the numpad is managed as well.
++ Complete the substitution of magic numbers with `keyCode` values.
++ Modify `_processCharacterInsertion()` so that it take the event as an argument, and therefore can directly use `e.key`.
++ Simplify `_formatValue()` tests.
 
 ### "2.0.0-beta.14"
 + Fix issue #306 when { leadingZero: 'deny' } and proper caret placement
@@ -422,14 +434,12 @@
 #### version on 1.8.3
 
 + Added input[type=hidden] support - this was done mainly for backward compatibility.
-
 + The "get" method now returns a numeric string - this also was done for backward compatibility.
 
 
 #### Version 1.8.2
 
 + Allowed dGroup settings to be passed as a numeric value or text representing a numeric value
-
 + Allows input fields without type that defaults to type text - Thanks Mathieu DEMONT
 
 
@@ -441,29 +451,16 @@
 #### Version 1.8.0
 
 + autoNumeric() 1.8.0 is not compatible with earlier versions but I believe you will find version 1.8.0's new functionality and ease of use worth the effort to convert.
-
 + Changed autoNumeric structure to conform to jQuery's recommended plugin development.
-
 + Created a single namespace and added multiple methods.
-
 + Added HTML 5 data support and eliminated the metadata plugin dependency.
-
 + Added support for the following elements: 'DD', 'DT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'input', 'LABEL', 'P', 'SPAN', 'TD', 'TH'.
-
 + Changed the settings loading order to defaults, HTML5 data then options. Now the defaults settings are overridden by HTML5 data and options overrides both defaults & HTML5 data.
-
 + Added "lZero" to the settings to control leading zero behavior.
-
 + Added "nBracket" to the settings which controls if negative values are display with brackets.
-
 + Changed the callback feature to accept functions only.
-
 + Improved the 'aForm' behavior that allows values to be automatically formatted on page ready.
-
 + Fixed the issue for numbers that are less than 1 and greater than -1 and have six or more decimal places.
-
 + Fixed 'crtl' + 'a' (select all) and 'ctrl' + 'c' (copy) combined key events.
-
 + Fixed a IE & FF bug on readonly attribute.
-
 + General code clean up

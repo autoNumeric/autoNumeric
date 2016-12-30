@@ -231,6 +231,7 @@ module.exports = {
             }
         ],
         //TODO This should really be enabled by default :
+        // 'no-invalid-this': "error",
         /*"wrap-iife": [
             "error",
             "inside"
@@ -242,9 +243,9 @@ module.exports = {
                 "onlyEquality": true,
             },
         ],*/
-	// "no-param-reassign": "error",
-	// "import/prefer-default-export" : "error",
-	// "import/first" : "error",
-	// "import/no-webpack-loader-syntax" : "error",
+        // "no-param-reassign"              : "error",
+        // "import/prefer-default-export"   : "error",
+        // "import/first"                   : "error",
+        // "import/no-webpack-loader-syntax": "error",
     }
 };

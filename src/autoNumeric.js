@@ -1,11 +1,12 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0-beta.14
- * @date         2016-12-26 UTC 14:00
+ * @version      2.0-beta.15
+ * @date         2016-12-27 UTC 14:00
  *
  * @author       Bob Knothe
- * @contributors Alexandre Bonneau, Sokolov Yura and other Github users, cf. AUTHORS.md.
+ * @contributors Alexandre Bonneau, Sokolov Yura and other Github users,
+ *               cf. AUTHORS.md.
  * @copyright    2009 Robert J. Knothe http://www.decorplanit.com/plugin/
  * @since        2009-08-09
  *
@@ -370,6 +371,8 @@ const defaultSettings = {
 
 /**
  * Wrapper variable that hold named keyboard keys with their respective keyCode as seen in DOM events.
+ * //TODO Replace every call to this object with a call to `keyName`
+ * @deprecated
  */
 const keyCode = {
     Backspace:      8,
@@ -475,6 +478,179 @@ const keyCode = {
     Command:        224,
 };
 
+/**
+ * Wrapper variable that hold named keyboard keys with their respective key name (as set in KeyboardEvent.key).
+ * Those names are listed here :
+ * @link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
+ */
+const keyName = {
+    // Special values
+    Unidentified:   'Unidentified',
+
+    // Modifier keys
+    Alt:            'Alt',
+    AltGr:          'AltGraph',
+    CapsLock:       'CapsLock', // Under Chrome, e.key is empty for CapsLock
+    Ctrl:           'Control',
+    Fn:             'Fn',
+    FnLock:         'FnLock',
+    Hyper:          'Hyper', // 'OS' under Firefox
+    Meta:           'Meta', // The Windows, Command or ⌘ key // 'OS' under Firefox and IE9
+    Windows:        'Meta', // This is a non-official key name
+    Command:        'Meta', // This is a non-official key name
+    NumLock:        'NumLock',
+    ScrollLock:     'ScrollLock',
+    Shift:          'Shift',
+    Super:          'Super', // 'OS' under Firefox
+    Symbol:         'Symbol',
+    SymbolLock:     'SymbolLock',
+
+    // Whitespace keys
+    Enter:          'Enter',
+    Tab:            'Tab',
+    Space:          ' ', // 'Spacebar' for Firefox <37, and IE9
+
+    // Navigation keys
+    DownArrow:      'ArrowDown', // 'Down' for Firefox <=36, and IE9
+    LeftArrow:      'ArrowLeft', // 'Left' for Firefox <=36, and IE9
+    RightArrow:     'ArrowRight', // 'Right' for Firefox <=36, and IE9
+    UpArrow:        'ArrowUp', // 'Up' for Firefox <=36, and IE9
+    End:            'End',
+    Home:           'Home',
+    PageDown:       'PageDown',
+    PageUp:         'PageUp',
+
+    // Editing keys
+    Backspace:      'Backspace',
+    Clear:          'Clear',
+    Copy:           'Copy',
+    CrSel:          'CrSel', // 'Crsel' for Firefox <=36, and IE9
+    Cut:            'Cut',
+    Delete:         'Delete', // 'Del' for Firefox <=36, and IE9
+    EraseEof:       'EraseEof',
+    ExSel:          'ExSel', // 'Exsel' for Firefox <=36, and IE9
+    Insert:         'Insert',
+    Paste:          'Paste',
+    Redo:           'Redo',
+    Undo:           'Undo',
+
+    // UI keys
+    Accept:         'Accept',
+    Again:          'Again',
+    Attn:           'Attn', // 'Unidentified' for Firefox, Chrome, and IE9 ('KanaMode' when using the Japanese keyboard layout)
+    Cancel:         'Cancel',
+    ContextMenu:    'ContextMenu', // 'Apps' for Firefox <=36, and IE9
+    Esc:            'Escape', // 'Esc' for Firefox <=36, and IE9
+    Execute:        'Execute',
+    Find:           'Find',
+    Finish:         'Finish', // 'Unidentified' for Firefox, Chrome, and IE9 ('Katakana' when using the Japanese keyboard layout)
+    Help:           'Help',
+    Pause:          'Pause',
+    Play:           'Play',
+    Props:          'Props',
+    Select:         'Select',
+    ZoomIn:         'ZoomIn',
+    ZoomOut:        'ZoomOut',
+
+    // Device keys
+    BrightnessDown: 'BrightnessDown',
+    BrightnessUp:   'BrightnessUp',
+    Eject:          'Eject',
+    LogOff:         'LogOff',
+    Power:          'Power',
+    PowerOff:       'PowerOff',
+    PrintScreen:    'PrintScreen',
+    Hibernate:      'Hibernate', // 'Unidentified' for Firefox <=37
+    Standby:        'Standby', // 'Unidentified' for Firefox <=36, and IE9
+    WakeUp:         'WakeUp',
+
+    // IME and composition keys
+    Compose:        'Compose',
+    Dead:           'Dead',
+
+    // Function keys
+    F1:             'F1',
+    F2:             'F2',
+    F3:             'F3',
+    F4:             'F4',
+    F5:             'F5',
+    F6:             'F6',
+    F7:             'F7',
+    F8:             'F8',
+    F9:             'F9',
+    F10:            'F10',
+    F11:            'F11',
+    F12:            'F12',
+
+    // Document keys
+    Print:          'Print',
+
+    // 'Normal' keys
+    num0:           '0',
+    num1:           '1',
+    num2:           '2',
+    num3:           '3',
+    num4:           '4',
+    num5:           '5',
+    num6:           '6',
+    num7:           '7',
+    num8:           '8',
+    num9:           '9',
+    numpad0:        '0',
+    numpad1:        '1',
+    numpad2:        '2',
+    numpad3:        '3',
+    numpad4:        '4',
+    numpad5:        '5',
+    numpad6:        '6',
+    numpad7:        '7',
+    numpad8:        '8',
+    numpad9:        '9',
+    a:              'a',
+    b:              'b',
+    c:              'c',
+    d:              'd',
+    e:              'e',
+    f:              'f',
+    g:              'g',
+    h:              'h',
+    i:              'i',
+    j:              'j',
+    k:              'k',
+    l:              'l',
+    m:              'm',
+    n:              'n',
+    o:              'o',
+    p:              'p',
+    q:              'q',
+    r:              'r',
+    s:              's',
+    t:              't',
+    u:              'u',
+    v:              'v',
+    w:              'w',
+    x:              'x',
+    y:              'y',
+    z:              'z',
+    MultiplyNumpad: '*',
+    PlusNumpad:     '+',
+    MinusNumpad:    '-',
+    DotNumpad:      '.',
+    SlashNumpad:    '/',
+    Semicolon:      ';',
+    Equal:          '=',
+    Comma:          ',',
+    Hyphen:         '-',
+    Minus:          '-',
+    Plus:           '+',
+    Dot:            '.',
+    Slash:          '/',
+    Backquote:      '`',
+    LeftBracket:    '[',
+    RightBracket:   ']',
+    Backslash:      '\\',
+    Quote:          "'",
+};
 
 (function(factory) {
     //TODO This surely can be improved by letting webpack take care of generating this UMD part
@@ -693,7 +869,8 @@ if (typeof define === 'function' && define.amd) {
      * @param {Event} event
      * @returns {string|Number}
      */
-    function key(event) {
+    function keyCodeNumber(event) {
+        // `event.keyCode` and `event.which` are deprecated, `KeyboardEvent.key` (https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) must be used now
         return (typeof event.which === 'undefined')?event.keyCode:event.which;
     }
 
@@ -1848,23 +2025,39 @@ if (typeof define === 'function' && define.amd) {
         }
 
         /**
-         * Update the current value, key states (Ctrl, Shift and Command keys), selection and some other keycodes.
+         * Update the value and the selection values inside the AutoNumericHolder object.
+         * This keeps tracks of the input value, as well as the current selection.
+         * This also resets the 'processed' and 'formatted' state.
+         *
+         * Note : Those two can change between the keydown, keypress and keyup events, that's why
+         *        this function is called on each event handler.
+         *
+         * @private
+         */
+        _updateAutoNumericHolderProperties() {
+            this.value = this.that.value;
+            this.selection = getElementSelection(this.that);
+            this.processed = false;
+            this.formatted = false;
+        }
+
+        /**
+         * Update the keycode of the key that triggered the given event.
+         * Note : e.which is sometimes different than e.keyCode during the keypress event, when entering a printable character key (ie. 't'). `e.which` equals 0 for non-printable characters.
+         *
+         * //TODO Switch to the non-deprecated e.key attribute, instead of inconsistant e.which and e.keyCode.
+         * e.key describe the key name used to trigger the event.
+         * e.keyCode being deprecated : https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
+             * How e.key works : https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
+         * The key list is described here
+         * @link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
          *
          * @param {Event} e
          * @private
          */
-        _updateFieldProperties(e) {
-            this.value = this.that.value;
-            this.ctrlKey = e.ctrlKey;
-            this.cmdKey = e.metaKey;
-            this.shiftKey = e.shiftKey;
-
-            // Keypress event overwrites meaningful value of e.keyCode
-            this.selection = getElementSelection(this.that);
-            if (e.type === 'keydown' || e.type === 'keyup') {
-                this.kdCode = e.keyCode;
-            }
-            this.which = e.which;
+        _updateAutoNumericHolderEventKeycode(e) {
+            // Note: the keypress event overwrites meaningful value of e.keyCode, hence we do not update that value on 'keypress'
+            this.eventKeyCode = keyCodeNumber(e);
         }
 
         /**
@@ -1911,7 +2104,6 @@ if (typeof define === 'function' && define.amd) {
          */
         _getLeftAndRightPartAroundTheSelection() {
             const value = this.value;
-            //FIXME `this.selection` can sometimes be undefined, found why and fix it
             const left = value.substring(0, this.selection.start);
             const right = value.substring(this.selection.end, value.length);
 
@@ -1931,7 +2123,7 @@ if (typeof define === 'function' && define.amd) {
 
             // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
             let stripZeros = true;
-            if (this.kdCode === keyCode.Hyphen && Number(left) === 0) {
+            if (this.eventKeyCode === keyCode.Hyphen && Number(left) === 0) {
                 stripZeros = false;
             }
             left = stripAllNonNumberCharacters(left, this.settingsClone, stripZeros);
@@ -1961,7 +2153,7 @@ if (typeof define === 'function' && define.amd) {
 
             // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
             let stripZeros = true;
-            if (this.kdCode === keyCode.Hyphen && Number(left) === 0) {
+            if (this.eventKeyCode === keyCode.Hyphen && Number(left) === 0) {
                 stripZeros = false;
             }
             left = stripAllNonNumberCharacters(left, settingsClone, stripZeros);
@@ -1970,7 +2162,10 @@ if (typeof define === 'function' && define.amd) {
             right = stripAllNonNumberCharacters(right, settingsClone, false);
 
             // Prevents multiple leading zeros from being entered
-            if (settingsClone.leadingZero === 'deny' && this.kdCode === 48 && Number(left) === 0 && !contains(left, settingsClone.decimalCharacter)  && right !== '') {
+            if (settingsClone.leadingZero === 'deny' &&
+                (this.eventKeyCode === keyCode.num0 || this.eventKeyCode === keyCode.numpad0) &&
+                Number(left) === 0 &&
+                !contains(left, settingsClone.decimalCharacter)  && right !== '') {
                 left = left.substring(0, left.length - 1);
             }
 
@@ -2107,7 +2302,7 @@ if (typeof define === 'function' && define.amd) {
                 const oldParts = this.valuePartsBeforePaste;
                 const [left, right] = this._getLeftAndRightPartAroundTheSelection();
 
-                // try to strip pasted value first
+                // Try to strip the pasted value first
                 delete this.valuePartsBeforePaste;
 
                 const modifiedLeftPart = left.substr(0, oldParts[0].length) + stripAllNonNumberCharacters(left.substr(oldParts[0].length), this.settingsClone, true);
@@ -2128,26 +2323,28 @@ if (typeof define === 'function' && define.amd) {
          */
         _skipAlways(e) {
             // Catch the ctrl up on ctrl-v
-            if (((this.ctrlKey || this.cmdKey) && e.type === 'keyup' && !isUndefined(this.valuePartsBeforePaste)) || (this.shiftKey && this.kdCode === keyCode.Insert)) {
+            if (((e.ctrlKey || e.metaKey) && e.type === 'keyup' && !isUndefined(this.valuePartsBeforePaste)) || (e.shiftKey && this.eventKeyCode === keyCode.Insert)) {
+                //TODO Move this test inside the `onKeyup` handler
                 this._checkPaste();
                 return false;
             }
 
             // Skip all function keys (F1-F12), Windows keys, tab and other special keys
-            if ((this.kdCode >= keyCode.F1 && this.kdCode <= keyCode.F12) ||
-                (this.kdCode >= keyCode.Windows && this.kdCode <= keyCode.RightClick) ||
-                (this.kdCode >= keyCode.Tab && this.kdCode < keyCode.Space) ||
-                (this.kdCode < keyCode.Backspace &&
-                (this.which === 0 || this.which === this.kdCode)) ||
-                this.kdCode === keyCode.NumLock ||
-                this.kdCode === keyCode.ScrollLock ||
-                this.kdCode === keyCode.Insert ||
-                this.kdCode === keyCode.Command) {
+            if ((this.eventKeyCode >= keyCode.F1 && this.eventKeyCode <= keyCode.F12) ||
+                (this.eventKeyCode >= keyCode.Windows && this.eventKeyCode <= keyCode.RightClick) ||
+                (this.eventKeyCode >= keyCode.Tab && this.eventKeyCode < keyCode.Space) ||
+                // `e.which` is sometimes different than `this.eventKeyCode` during the keypress event when entering a printable character key (ie. 't'). Also, `e.which` equals 0 for non-printable characters.
+                (this.eventKeyCode < keyCode.Backspace &&
+                (e.which === 0 || e.which === this.eventKeyCode)) ||
+                this.eventKeyCode === keyCode.NumLock ||
+                this.eventKeyCode === keyCode.ScrollLock ||
+                this.eventKeyCode === keyCode.Insert ||
+                this.eventKeyCode === keyCode.Command) {
                 return true;
             }
 
             // If a "Select all" keyboard shortcut is detected (ctrl + a)
-            if ((this.ctrlKey || this.cmdKey) && this.kdCode === keyCode.a) {
+            if ((e.ctrlKey || e.metaKey) && this.eventKeyCode === keyCode.a) {
                 if (this.settings.selectNumberOnly) {
                     // `preventDefault()` is used here to prevent the browser to first select all the input text (including the currency sign), otherwise we would see that whole selection first in a flash, then the selection with only the number part without the currency sign.
                     e.preventDefault();
@@ -2188,13 +2385,13 @@ if (typeof define === 'function' && define.amd) {
             }
 
             // If a "Copy", "Paste" or "Cut" keyboard shortcut is detected (respectively 'ctrl + c', 'ctrl + v' or 'ctrl + x')
-            if ((this.ctrlKey || this.cmdKey) && (this.kdCode === keyCode.c || this.kdCode === keyCode.v || this.kdCode === keyCode.x)) {
+            if ((e.ctrlKey || e.metaKey) && (this.eventKeyCode === keyCode.c || this.eventKeyCode === keyCode.v || this.eventKeyCode === keyCode.x)) {
                 if (e.type === 'keydown') {
                     this._expandSelectionOnSign();
                 }
 
-                // try to prevent wrong paste
-                if (this.kdCode === keyCode.v || this.kdCode === keyCode.Insert) {
+                // Try to prevent wrong paste
+                if (this.eventKeyCode === keyCode.v || this.eventKeyCode === keyCode.Insert) {
                     if (e.type === 'keydown' || e.type === 'keypress') {
                         if (isUndefined(this.valuePartsBeforePaste)) {
                             this.valuePartsBeforePaste = this._getLeftAndRightPartAroundTheSelection();
@@ -2204,30 +2401,31 @@ if (typeof define === 'function' && define.amd) {
                     }
                 }
 
-                return e.type === 'keydown' || e.type === 'keypress' || this.kdCode === keyCode.c;
+                return e.type === 'keydown' || e.type === 'keypress' || this.eventKeyCode === keyCode.c;
             }
 
-            if (this.ctrlKey || this.cmdKey) {
+            if (e.ctrlKey || e.metaKey) {
                 return true;
             }
 
-            // jump over thousand separator
-            if (this.kdCode === keyCode.LeftArrow || this.kdCode === keyCode.RightArrow) {
-                const digitGroupSeparator = this.settingsClone.digitGroupSeparator;
-                const decimalCharacter = this.settingsClone.decimalCharacter;
-                const startJump = this.selection.start;
-                const value = this.that.value;
-                if (e.type === 'keydown' && !this.shiftKey) {
-                    if (this.kdCode === keyCode.LeftArrow && (value.charAt(startJump - 2) === digitGroupSeparator || value.charAt(startJump - 2) === decimalCharacter)) {
-                        this._setCaretPosition(startJump - 1);
-                    } else if (this.kdCode === keyCode.RightArrow && (value.charAt(startJump + 1) === digitGroupSeparator || value.charAt(startJump + 1) === decimalCharacter)) {
-                        this._setCaretPosition(startJump + 1);
+            // Jump over thousand separator
+            //TODO Move this test inside the `onKeydown` handler
+            if (this.eventKeyCode === keyCode.LeftArrow || this.eventKeyCode === keyCode.RightArrow) {
+                if (e.type === 'keydown' && !e.shiftKey) {
+                    if (this.eventKeyCode === keyCode.LeftArrow &&
+                        (this.that.value.charAt(this.selection.start - 2) === this.settingsClone.digitGroupSeparator ||
+                        this.that.value.charAt(this.selection.start - 2) === this.settingsClone.decimalCharacter)) {
+                        this._setCaretPosition(this.selection.start - 1);
+                    } else if (this.eventKeyCode === keyCode.RightArrow &&
+                        (this.that.value.charAt(this.selection.start + 1) === this.settingsClone.digitGroupSeparator ||
+                        this.that.value.charAt(this.selection.start + 1) === this.settingsClone.decimalCharacter)) {
+                        this._setCaretPosition(this.selection.start + 1);
                     }
                 }
                 return true;
             }
 
-            return this.kdCode >= keyCode.PageDown && this.kdCode <= keyCode.DownArrow;
+            return this.eventKeyCode >= keyCode.PageDown && this.eventKeyCode <= keyCode.DownArrow;
         }
 
         /**
@@ -2241,7 +2439,7 @@ if (typeof define === 'function' && define.amd) {
         _processCharacterDeletionIfTrailingNegativeSign([left, right]) {
             const settingsClone = this.settingsClone;
             if (settingsClone.currencySymbolPlacement === 'p' && settingsClone.negativePositiveSignPlacement === 's') {
-                if (this.kdCode === 8) {
+                if (this.eventKeyCode === keyCode.Backspace) {
                     settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.suffixText) && settingsClone.suffixText !== '');
                     if (this.value.charAt(this.selection.start - 1) === '-') {
                         left = left.substring(1);
@@ -2259,9 +2457,10 @@ if (typeof define === 'function' && define.amd) {
                 }
             }
 
+            //TODO Merge the two following 'if' blocks into one `if (settingsClone.currencySymbolPlacement === 's') {` and a switch on settingsClone.negativePositiveSignPlacement
             if (settingsClone.currencySymbolPlacement === 's' && settingsClone.negativePositiveSignPlacement === 'l') {
                 settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.negativeSignCharacter) + settingsClone.negativeSignCharacter.length);
-                if (this.kdCode === 8) {
+                if (this.eventKeyCode === keyCode.Backspace) {
                     if (this.selection.start === (this.value.indexOf(settingsClone.negativeSignCharacter) + settingsClone.negativeSignCharacter.length) && contains(this.value, settingsClone.negativeSignCharacter)) {
                         left = left.substring(1);
                     } else if (left !== '-' && ((this.selection.start <= this.value.indexOf(settingsClone.negativeSignCharacter)) || !contains(this.value, settingsClone.negativeSignCharacter))) {
@@ -2279,7 +2478,7 @@ if (typeof define === 'function' && define.amd) {
 
             if (settingsClone.currencySymbolPlacement === 's' && settingsClone.negativePositiveSignPlacement === 'r') {
                 settingsClone.caretFix = (this.selection.start >= this.value.indexOf(settingsClone.negativeSignCharacter) + settingsClone.negativeSignCharacter.length);
-                if (this.kdCode === 8) {
+                if (this.eventKeyCode === keyCode.Backspace) {
                     if (this.selection.start === (this.value.indexOf(settingsClone.negativeSignCharacter) + settingsClone.negativeSignCharacter.length)) {
                         left = left.substring(1);
                     } else if (left !== '-' && this.selection.start <= (this.value.indexOf(settingsClone.negativeSignCharacter) - settingsClone.currencySymbol.length)) {
@@ -2316,10 +2515,10 @@ if (typeof define === 'function' && define.amd) {
 
                 if (((settingsClone.currencySymbolPlacement === 'p' && settingsClone.negativePositiveSignPlacement === 's') ||
                      (settingsClone.currencySymbolPlacement === 's' && (settingsClone.negativePositiveSignPlacement === 'l' || settingsClone.negativePositiveSignPlacement === 'r'))) &&
-                     contains(this.value, '-')) {
+                     contains(this.value, '-')) { //TODO Change `this.value` to `this.that.value`?
                     [left, right] = this._processCharacterDeletionIfTrailingNegativeSign([left, right]);
                 } else {
-                    if (this.kdCode === keyCode.Backspace) {
+                    if (this.eventKeyCode === keyCode.Backspace) {
                         left = left.substring(0, left.length - 1);
                     } else {
                         right = right.substring(1, right.length);
@@ -2338,19 +2537,19 @@ if (typeof define === 'function' && define.amd) {
          * Returns TRUE if the keycode is allowed.
          * This functions also modify the value on-the-fly. //FIXME This should use another function in order to separate the test and the modification
          *
+         * @param {Event} e
          * @returns {boolean}
          */
-        _processCharacterInsertion() {
+        _processCharacterInsertion(e) {
             const settingsClone = this.settingsClone;
-            const cCode = String.fromCharCode(this.which);
             let [left, right] = this._getUnformattedLeftAndRightPartAroundTheSelection();
             settingsClone.throwInput = true;
 
             // Start rules when the decimal character key is pressed always use numeric pad dot to insert decimal separator
             // Do not allow decimal character if no decimal part allowed
-            if (cCode === settingsClone.decimalCharacter ||
-                (settingsClone.decimalCharacterAlternative && cCode === settingsClone.decimalCharacterAlternative) ||
-                ((cCode === '.' || cCode === ',') && this.kdCode === keyCode.DotNumpad)) {
+            if (e.key === settingsClone.decimalCharacter ||
+                (settingsClone.decimalCharacterAlternative && e.key === settingsClone.decimalCharacterAlternative) ||
+                ((e.key === '.' || e.key === ',') && this.eventKeyCode === keyCode.DotNumpad)) {
                 if (!settingsClone.decimalPlacesOverride || !settingsClone.decimalCharacter) {
                     return true;
                 }
@@ -2379,7 +2578,7 @@ if (typeof define === 'function' && define.amd) {
             }
 
             // Prevent minus if not allowed
-            if ((cCode === '-' || cCode === '+') && settingsClone.negativeSignCharacter === '-') {
+            if ((e.key === '-' || e.key === '+') && settingsClone.negativeSignCharacter === '-') {
                 if (!settingsClone) {
                     return true;
                 }
@@ -2395,7 +2594,7 @@ if (typeof define === 'function' && define.amd) {
                     if (left.charAt(0) === '-' || contains(left, settingsClone.negativeSignCharacter)) {
                         left = left.substring(1, left.length);
                     } else {
-                        left = (cCode === '-') ? settingsClone.negativeSignCharacter + left : left;
+                        left = (e.key === '-') ? settingsClone.negativeSignCharacter + left : left;
                     }
                 } else {
                     if (left === '' && contains(right, settingsClone.negativeSignCharacter)) {
@@ -2407,7 +2606,7 @@ if (typeof define === 'function' && define.amd) {
                     if (left.charAt(0) === settingsClone.negativeSignCharacter) {
                         left = left.substring(1, left.length);
                     } else {
-                        left = (cCode === '-') ? settingsClone.negativeSignCharacter + left : left;
+                        left = (e.key === '-') ? settingsClone.negativeSignCharacter + left : left;
                     }
                 }
 
@@ -2416,18 +2615,19 @@ if (typeof define === 'function' && define.amd) {
                 return true;
             }
 
-            // If try to insert digit before minus
-            if (cCode >= '0' && cCode <= '9') {
+            // If the user tries to insert digit before minus sign
+            const eventNumber = Number(e.key);
+            if (eventNumber >= 0 && eventNumber <= 9) {
                 if (settingsClone.negativeSignCharacter && left === '' && contains(right, settingsClone.negativeSignCharacter)) {
                     left = settingsClone.negativeSignCharacter;
                     right = right.substring(1, right.length);
                 }
 
-                if (settingsClone.maximumValue <= 0 && settingsClone.minimumValue < settingsClone.maximumValue && !contains(this.value, settingsClone.negativeSignCharacter) && cCode !== '0') {
+                if (settingsClone.maximumValue <= 0 && settingsClone.minimumValue < settingsClone.maximumValue && !contains(this.value, settingsClone.negativeSignCharacter) && e.key !== '0') {
                     left = settingsClone.negativeSignCharacter + left;
                 }
 
-                this._setValueParts(left + cCode, right);
+                this._setValueParts(left + e.key, right);
 
                 return true;
             }
@@ -2447,7 +2647,6 @@ if (typeof define === 'function' && define.amd) {
         _formatValue(e) {
             const settingsClone = this.settingsClone;
             const leftLength = this.value;
-            const eventKeyCode = e.keyCode;
             let [left] = this._getUnformattedLeftAndRightPartAroundTheSelection();
 
             // No grouping separator and no currency sign
@@ -2485,8 +2684,7 @@ if (typeof define === 'function' && define.amd) {
                     leftAr[0] === '-' && settingsClone.negativeSignCharacter !== '') {
                     leftAr.shift();
 
-                    if ((eventKeyCode === keyCode.Backspace || this.kdCode === keyCode.Backspace ||
-                        eventKeyCode === keyCode.Delete || this.kdCode === keyCode.Delete) &&
+                    if ((this.eventKeyCode === keyCode.Backspace || this.eventKeyCode === keyCode.Delete) &&
                         settingsClone.caretFix) {
                         if (settingsClone.currencySymbolPlacement === 's' && settingsClone.negativePositiveSignPlacement === 'l') {
                             leftAr.push('-');
@@ -2511,7 +2709,7 @@ if (typeof define === 'function' && define.amd) {
                                 }
                             });
 
-                            if (eventKeyCode === keyCode.Backspace || this.kdCode === keyCode.Backspace) {
+                            if (this.eventKeyCode === keyCode.Backspace) {
                                 escapedParts.push('-');
                             }
 
@@ -2557,7 +2755,7 @@ if (typeof define === 'function' && define.amd) {
 
             // Only update the value if it has changed. This prevents modifying the selection, if any.
             if (value !== this.that.value ||
-                value === this.that.value && (key(e) === keyCode.num0 || key(e) === keyCode.numpad0)) {
+                value === this.that.value && (this.eventKeyCode === keyCode.num0 || this.eventKeyCode === keyCode.numpad0)) {
                 this.that.value = value;
                 this._setCaretPosition(position);
             }
@@ -2683,13 +2881,13 @@ if (typeof define === 'function' && define.amd) {
 
         if (e.type === 'focusin' || e.type === 'mouseenter' && !$this.is(':focus') && settings.emptyInputBehavior === 'focus') {
             settings.onOff = true;
-            //TODO Fix issue #303 : if (e.type === 'focusin' && no mouse click && fromTabKey) { setElementSelection(e.target, 0); }
 
             if (settings.negativeBracketsTypeOnBlur !== null && settings.negativeSignCharacter !== '') {
                 $this.val(toggleNegativeBracket(e.target.value, settings));
             }
 
             let result;
+            //TODO Do not repeat yourself with the `$this.autoNumeric('set', settings.rawValue);` line
             if (settings.decimalPlacesShownOnFocus) {
                 settings.decimalPlacesOverride = settings.decimalPlacesShownOnFocus;
                 $this.autoNumeric('set', settings.rawValue);
@@ -2763,7 +2961,7 @@ if (typeof define === 'function' && define.amd) {
      */
     function onKeydown(holder, e) {
         //TODO Create a function that retrieve the element value (either by using `e.target.value` when the element is an <input>, or by using `element.textContent` when the element as its `contenteditable` set to true)
-        const currentKeyCode = key(e); // The key being used
+        holder._updateAutoNumericHolderEventKeycode(e);
         holder.initialValueOnKeydown = e.target.value; // This is needed in `onKeyup()` to check if the value as changed during the key press
 
         if (holder.that.readOnly) {
@@ -2773,14 +2971,12 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // The "enter" key throws a `change` event if the value has changed since the `focus` event
-        if (e.keyCode === keyCode.Enter && holder.valueOnFocus !== e.target.value) {
+        if (holder.eventKeyCode === keyCode.Enter && holder.valueOnFocus !== e.target.value) {
             triggerEvent('change', e.target);
             holder.valueOnFocus = e.target.value;
         }
 
-        holder._updateFieldProperties(e); //FIXME This is called 2 to 3 times
-        holder.processed = false;
-        holder.formatted = false;
+        holder._updateAutoNumericHolderProperties(e);
 
         if (holder._skipAlways(e)) {
             holder.processed = true;
@@ -2789,7 +2985,7 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // Check if the key is a delete/backspace key
-        if (currentKeyCode === keyCode.Backspace || currentKeyCode === keyCode.Delete) {
+        if (holder.eventKeyCode === keyCode.Backspace || holder.eventKeyCode === keyCode.Delete) {
             holder._processCharacterDeletion(); // Because backspace and delete only triggers keydown and keyup events, not keypress
             holder.processed = true;
             holder._formatValue(e);
@@ -2819,17 +3015,13 @@ if (typeof define === 'function' && define.amd) {
      * @param {Event} e
      */
     function onKeypress(holder, e) {
-        const currentKeyCode = key(e); // The key being used
-
-        // Firefox fix for Shift && insert paste event
-        if (e.shiftKey && currentKeyCode === keyCode.Insert) {
+        // Firefox generate a 'keypress' event (e.keyCode === 0) for the keys that do not print a character (ie. 'Insert', 'Delete', 'Fn' keys, 'PageUp', 'PageDown' etc.). 'Shift' on the other hand does not generate a keypress event.
+        if (e.key === keyName.Insert) {
             return;
         }
 
         const processed = holder.processed;
-        holder._updateFieldProperties(e); //FIXME This is called 2 to 3 times
-        holder.processed = false;
-        holder.formatted = false;
+        holder._updateAutoNumericHolderProperties(e);
 
         if (holder._skipAlways(e)) {
             return;
@@ -2841,7 +3033,7 @@ if (typeof define === 'function' && define.amd) {
             return;
         }
 
-        const isCharacterInsertionAllowed = holder._processCharacterInsertion();
+        const isCharacterInsertionAllowed = holder._processCharacterInsertion(e);
         if (isCharacterInsertionAllowed) {
             holder._formatValue(e);
             if ((e.target.value !== holder.lastVal) && holder.settingsClone.throwInput) {
@@ -2874,11 +3066,7 @@ if (typeof define === 'function' && define.amd) {
      * @param {Event} e
      */
     function onKeyup(holder, settings, e) {
-        const currentKeyCode = key(e); // The key being used
-
-        holder._updateFieldProperties(e); //FIXME This is called 2 to 3 times
-        holder.processed = false;
-        holder.formatted = false;
+        holder._updateAutoNumericHolderProperties(e);
 
         const skip = holder._skipAlways(e);
         delete holder.valuePartsBeforePaste;
@@ -2893,7 +3081,7 @@ if (typeof define === 'function' && define.amd) {
             } else {
                 setElementSelection(e.target, holder.settingsClone.currencySymbol.length, holder.settingsClone.currencySymbol.length);
             }
-        } else if (currentKeyCode === keyCode.Tab) {
+        } else if (holder.eventKeyCode === keyCode.Tab) {
             setElementSelection(e.target, 0, e.target.value.length);
         }
 

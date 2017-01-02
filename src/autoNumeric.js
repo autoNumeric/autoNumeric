@@ -1,8 +1,8 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0-beta.15
- * @date         2016-12-27 UTC 14:00
+ * @version      2.0-beta.16
+ * @date         2017-01-01 UTC 22:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and other Github users,
@@ -292,8 +292,12 @@ const defaultSettings = {
     /* Adds brackets on negative values (ie. transforms '-$ 999.99' to '(999.99)')
      * Those brackets are visible only when the field does NOT have the focus.
      * The left and right symbols should be enclosed in quotes and separated by a comma
-     * negativeBracketsTypeOnBlur: null - (default)
-     * negativeBracketsTypeOnBlur: '(,)', negativeBracketsTypeOnBlur: '[,]', negativeBracketsTypeOnBlur: '<,>' or negativeBracketsTypeOnBlur: '{,}'
+     * This option can be of the following values :
+     * null, // This is the default value, which deactivate this feature
+     * '(,)',
+     * '[,]',
+     * '<,>' or
+     * '{,}'
      * Deprecated older option name : nBracket
      */
     negativeBracketsTypeOnBlur: null,
@@ -1150,15 +1154,17 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Strip all unwanted non-number characters and leave only a number alert
+     * Strip all unwanted non-number characters.
+     * This keeps the numbers, the negative sign as well as the custom decimal character.
      *
      * @param {string} s
      * @param {object} settings
      * @param {boolean} leftOrAll
      * @returns {string|*}
      */
-
     function stripAllNonNumberCharacters(s, settings, leftOrAll) {
+        //TODO This function is called 10 times (sic!) on each key input, couldn't we lower that number? cf. issue #325
+        //TODO Refactor this with `convertToNumericString()` if possible?
         if (settings.currencySymbol !== '') {
             // Remove currency sign
             s = s.replace(settings.currencySymbol, '');
@@ -1213,7 +1219,7 @@ if (typeof define === 'function' && define.amd) {
         }
 
         if ((leftOrAll && settings.leadingZero === 'deny') ||
-            (!settings.onOff && settings.leadingZero === 'allow')) {
+            (!settings.hasFocus && settings.leadingZero === 'allow')) {
             s = s.replace(settings.stripReg, '$1$2');
         }
 
@@ -1222,19 +1228,25 @@ if (typeof define === 'function' && define.amd) {
 
     /**
      * Sets or removes brackets on negative values, depending on the focus state.
-     * The focus state is 'stored' in the settings object under the `settings.onOff` attribute. //TODO Use another object to keep track of internal data that are not settings
+     * The focus state is 'stored' in the settings object under the `settings.hasFocus` attribute.
+     * //TODO Use another object to keep track of internal data that are not settings
      *
      * @param {string} s
      * @param {object} settings
      * @returns {*}
      */
     function toggleNegativeBracket(s, settings) {
-        if ((settings.currencySymbolPlacement === 'p' && settings.negativePositiveSignPlacement === 'l') || (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement === 'p')) {
+        if ((settings.currencySymbolPlacement === 'p' && settings.negativePositiveSignPlacement === 'l') ||
+            (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement === 'p')) {
+            //TODO Split the first and last bracket only once during the settings initialization
             const [firstBracket, lastBracket] = settings.negativeBracketsTypeOnBlur.split(',');
-            if (!settings.onOff) {
+            if (!settings.hasFocus) {
+                // Add brackets
                 s = s.replace(settings.negativeSignCharacter, '');
                 s = firstBracket + s + lastBracket;
-            } else if (settings.onOff && s.charAt(0) === firstBracket) {
+            } else if (settings.hasFocus && s.charAt(0) === firstBracket) {
+                // Remove brackets
+                //TODO Quid if the negative sign is not on the left, shouldn't we replace the '-' sign at the right place?
                 s = s.replace(firstBracket, settings.negativeSignCharacter);
                 s = s.replace(lastBracket, '');
             }
@@ -1244,20 +1256,28 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Convert locale format to Javascript numeric string
-     * Allows locale decimal separator to be a period or a comma - no thousand separator allowed of currency signs allowed
-     * '1234.56'    OK
-     * '-1234.56'   OK
-     * '1234.56-'   OK
-     * '1234,56'    OK
-     * '-1234,56'   OK
-     * '1234,56-'   OK
+     * Return a number as a numeric string that can be typecast to a Number that Javascript will understand.
+     *
+     * This function return the given string by stripping the currency sign (currencySymbol), the grouping separators (digitalGroupSpacing) and by replacing the decimal character (decimalCharacter) by a dot.
+     * Lastly, it also put the negative sign back to its normal position if needed.
      *
      * @param {string} s
+     * @param {object} settings
      * @returns {string|void|XML|*}
      */
-    function fromLocale(s) {
-        s = s.replace(',', '.');
+    function convertToNumericString(s, settings) {
+        // Remove the currency symbol
+        s = s.replace(settings.currencySymbol, '');
+
+        // Remove the grouping separators (thousands separators usually)
+        s = s.replace(settings.digitGroupSeparator, '');
+
+        // Replace the decimal character by a dot
+        if (settings.decimalCharacter !== '.') {
+            s = s.replace(settings.decimalCharacter, '.');
+        }
+
+        // Move the trailing negative sign to the right position, if any
         if (contains(s, '-') && s.lastIndexOf('-') === s.length - 1) {
             s = s.replace('-', '');
             s = '-' + s;
@@ -1380,6 +1400,7 @@ if (typeof define === 'function' && define.amd) {
             inputValue = stripAllNonNumberCharacters(inputValue, settings, false);
         }
 
+        //TODO This function `addGroupSeparators()` add group separators. Adding the negative sign as well is out of its scope. Move that to another function.
         if (settings.trailingNegative && !contains(inputValue, '-')) {
             inputValue = '-' + inputValue;
         }
@@ -2127,7 +2148,6 @@ if (typeof define === 'function' && define.amd) {
                 stripZeros = false;
             }
             left = stripAllNonNumberCharacters(left, this.settingsClone, stripZeros);
-
             right = stripAllNonNumberCharacters(right, this.settingsClone, false);
 
             if (settingsClone.trailingNegative && !contains(left, '-')) {
@@ -2156,6 +2176,7 @@ if (typeof define === 'function' && define.amd) {
             if (this.eventKeyCode === keyCode.Hyphen && Number(left) === 0) {
                 stripZeros = false;
             }
+            //TODO Refactor this duplicated code with `_getUnformattedLeftAndRightPartAroundTheSelection()`
             left = stripAllNonNumberCharacters(left, settingsClone, stripZeros);
 
             // If right is not empty and first character is not decimalCharacter
@@ -2880,7 +2901,7 @@ if (typeof define === 'function' && define.amd) {
         const settings = holder.settingsClone;
 
         if (e.type === 'focusin' || e.type === 'mouseenter' && !$this.is(':focus') && settings.emptyInputBehavior === 'focus') {
-            settings.onOff = true;
+            settings.hasFocus = true;
 
             if (settings.negativeBracketsTypeOnBlur !== null && settings.negativeSignCharacter !== '') {
                 $this.val(toggleNegativeBracket(e.target.value, settings));
@@ -2899,8 +2920,11 @@ if (typeof define === 'function' && define.amd) {
                 settings.currencySymbol = '';
                 settings.suffixText = '';
                 $this.autoNumeric('set', settings.rawValue);
-            } else if ((result = stripAllNonNumberCharacters(e.target.value, settings, true)) !== settings.rawValue) {
-                $this.autoNumeric('set', result);
+            } else {
+                result = stripAllNonNumberCharacters(e.target.value, settings, true);
+                if (result !== settings.rawValue) {
+                    $this.autoNumeric('set', result);
+                }
             }
 
             // In order to send a 'native' change event when blurring the input, we need to first store the initial input value on focus.
@@ -3117,7 +3141,7 @@ if (typeof define === 'function' && define.amd) {
             let value = e.target.value;
             const origValue = value;
             const settings = holder.settingsClone;
-            settings.onOff = false;
+            settings.hasFocus = false;
 
             if (settings.saveValueToSessionStorage) {
                 saveValueToPersistentStorage(e.target, settings, 'set');
@@ -3593,7 +3617,8 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Routine to format the default value on page load
+     * Formats the default value on page load.
+     * This is called only if the `formatOnPageLoad` option is set to `true`.
      *
      * @param {object} settings
      * @param {object} $input jQuery-selected <input> element
@@ -3616,12 +3641,11 @@ if (typeof define === 'function' && define.amd) {
              * Hence, if `defaultValueOverride` is not null, but `input.value` is a number and `$this.attr('value')` is not set,
              * we should ignore `defaultValueOverride` altogether.
              */
+            const unLocalizedCurrentValue = toNumericValue(currentValue, settings); // This allows to use a localized value on startup
             if (settings.formatOnPageLoad && currentValue !== '' && isUndefinedOrNullOrEmpty($this.attr('value'))) {
                 // Check if the `value` is valid or not
-                const testedCurrentValue = parseFloat(currentValue.replace(',', '.'));
-                //TODO Replace whatever locale character is used by a '.', and not only the comma ','
-                if (!isNaN(testedCurrentValue) && Infinity !== testedCurrentValue) {
-                    $this.autoNumeric('set', testedCurrentValue);
+                if (!isNaN(unLocalizedCurrentValue) && Infinity !== unLocalizedCurrentValue) {
+                    $this.autoNumeric('set', unLocalizedCurrentValue);
                     setValue = false;
                 } else {
                     // If not, inform the developer that nothing usable has been provided
@@ -3634,10 +3658,9 @@ if (typeof define === 'function' && define.amd) {
                  *      The following HTML data attribute is REQUIRED (data-an-default="same value as the value attribute")
                  *      example: <asp:TextBox runat="server" id="someID" text="1234.56" data-an-default="1234.56">
                  */
-                //TODO Replace whatever locale character is used by a '.', and not only the comma ',', based on the locale used by the user
                 if ((settings.defaultValueOverride !== null && settings.defaultValueOverride.toString() !== currentValue) ||
                     (settings.defaultValueOverride === null && currentValue !== '' && currentValue !== $this.attr('value')) ||
-                    (currentValue !== '' && $this.attr('type') === 'hidden' && !isNumber(currentValue.replace(',', '.')))) {
+                    (currentValue !== '' && $this.attr('type') === 'hidden' && !isNumber(unLocalizedCurrentValue))) {
                     if ((settings.decimalPlacesShownOnFocus !== null && settings.saveValueToSessionStorage) ||
                         (settings.scaleDivisor && settings.saveValueToSessionStorage)) {
                         settings.rawValue = saveValueToPersistentStorage($this[0], settings, 'get');
@@ -3648,7 +3671,7 @@ if (typeof define === 'function' && define.amd) {
                         let toStrip;
 
                         if (settings.negativeBracketsTypeOnBlur !== null && settings.negativeSignCharacter !== '') {
-                            settings.onOff = true;
+                            settings.hasFocus = true;
                             toStrip = toggleNegativeBracket(currentValue, settings);
                         } else {
                             toStrip = currentValue;
@@ -3877,7 +3900,7 @@ if (typeof define === 'function' && define.amd) {
             showWarnings                 : true,
             failOnUnknownOption          : true,
             //FIXME Find a way to exclude those internal data from the settings object (ideally by using another object, or better yet, class attributes) -->
-            onOff                : true,
+            hasFocus             : true,
             runOnce              : true,
             rawValue             : true,
             trailingNegative     : true,
@@ -3953,7 +3976,7 @@ if (typeof define === 'function' && define.amd) {
                 // Attempt to grab HTML5 data, if it doesn't exist, we'll get "undefined"
                 const tagData = $this.data();
                 settings = $.extend({}, defaultSettings, tagData, options, {
-                    onOff           : false,
+                    hasFocus        : false,
                     runOnce         : false,
                     rawValue        : '',
                     trailingNegative: false,
@@ -3993,6 +4016,39 @@ if (typeof define === 'function' && define.amd) {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Convert the `value` parameter that can either be :
+     * - a real number,
+     * - a string representing a real number, or
+     * - a string representing a localized number (with specific group separators and decimal character),
+     * ...to a string representing a real 'javascript' number (ie. '1234' or '1234.567').
+     *
+     * This function returns `NaN` if such conversion fails.
+     *
+     * @param {int|float|string} value
+     * @param {object} settings
+     * @returns {string|NaN}
+     */
+    function toNumericValue(value, settings) {
+        let result;
+        if (isNumber(Number(value))) {
+            // The value has either already been stripped, or a 'real' javascript number is passed as a parameter
+            result = value;
+        } else {
+            // Else if it's a string that `Number()` cannot typecast, then we try to convert the localized numeric string to a numeric one
+            // Convert the value to a numeric string, stripping unnecessary characters in the process
+            result = convertToNumericString(value.toString(), settings);
+
+            // If the result is still not a numeric string, then we throw a warning
+            if (!isNumber(Number(result))) {
+                warning(`The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`, settings.showWarnings);
+                result = NaN;
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -4099,13 +4155,17 @@ if (typeof define === 'function' && define.amd) {
          */
         update(options) {
             return $(this).each(function() {
+                // Retrieve the current unformatted input value
                 const $this = getCurrentElement(this);
                 const strip = $this.autoNumeric('get');
+
+                // Update the settings
                 const settings = getInitialSettings(options, $this, true);
 
                 // Update the AutoNumericHolder object that store the field properties
                 getAutoNumericHolder($this, settings, true);
 
+                // Reformat the input value with the new settings
                 if ($this.val() !== '' || $this.text() !== '') {
                     return $this.autoNumeric('set', strip);
                 }
@@ -4117,7 +4177,7 @@ if (typeof define === 'function' && define.amd) {
          * If the value is passed as a string, it can be an integer '1234' or a double '1234.56789'
          * and must contain only numbers and one decimal (period) character
          *
-         * @example $(someSelector).autoNumeric('set', 'value'); // Formats the value being passed as the second parameter
+         * @example $(someSelector).autoNumeric('set', '12345.67'); // Formats the value being passed as the second parameter
          *
          * @param {*} newValue
          * @returns {*|jQuery}
@@ -4132,17 +4192,12 @@ if (typeof define === 'function' && define.amd) {
                 const $this = getCurrentElement(this);
                 const settings = $this.data('autoNumeric');
                 const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
-                let value = newValue.toString();
                 if (typeof settings !== 'object') {
-                    throwError(`Initializing autoNumeric is required prior to calling the "set" method`);
+                    throwError(`Initializing autoNumeric is required prior to calling the "set" method.`);
                 }
 
-                // allows locale decimal separator to be a comma - no thousand separator allowed
-                value = fromLocale(value);
-
-                // Throws an error if the value being set is not numeric
-                if (!isNumber(Number(value))) {
-                    warning(`The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`, settings.showWarnings);
+                let value = toNumericValue(newValue, settings);
+                if (isNaN(value)) {
                     return $this.val('');
                 }
 
@@ -4155,7 +4210,7 @@ if (typeof define === 'function' && define.amd) {
 
                         // checks if the value falls within the min max range
                         if ($input || isInArray($this.prop('tagName').toLowerCase(), settings.tagList)) {
-                            if (settings.scaleDivisor && !settings.onOff) {
+                            if (settings.scaleDivisor && !settings.hasFocus) {
                                 value = value / settings.scaleDivisor;
                                 value = value.toString();
                                 settings.decimalPlacesOverride = (settings.scaleDecimalPlaces) ? settings.scaleDecimalPlaces : settings.decimalPlacesOverride;
@@ -4194,7 +4249,7 @@ if (typeof define === 'function' && define.amd) {
                     return $this.val('');
                 }
 
-                if (!settings.onOff && settings.scaleSymbol) {
+                if (!settings.hasFocus && settings.scaleSymbol) {
                     value = value + settings.scaleSymbol;
                 }
 
@@ -4227,7 +4282,7 @@ if (typeof define === 'function' && define.amd) {
                 const $this = getCurrentElement(this);
                 const settings = $this.data('autoNumeric');
                 if (typeof settings === 'object') {
-                    settings.onOff = true;
+                    settings.hasFocus = true;
                     $this.val($this.autoNumeric('getLocalized'));
                 }
             });
@@ -4288,7 +4343,7 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 if (value !== '' && settings.negativeBracketsTypeOnBlur !== null) {
-                    settings.onOff = true;
+                    settings.hasFocus = true;
                     value = toggleNegativeBracket(value, settings);
                 }
 
@@ -4426,18 +4481,17 @@ if (typeof define === 'function' && define.amd) {
     /**
      * Public function that allows formatting without an element trigger.
      *
-     * @param {number} value
-     * @param {object} options
+     * @param {number|string} value A number, or a string that represent a javascript number
+     * @param {object|null} options
      * @returns {*}
      */
-    autoFormat = (value, options) => {
+    autoFormat = (value, options = null) => {
         if (isUndefined(value) || value === null) {
             return null;
         }
 
-        // Check the validity of the `value` parameter
-        if (!isNumber(value)) {
-            throwError(`A number is needed to be able to format it, [${value}] given.`);
+        if (!isString(value) && !isNumber(value)) {
+            throwError(`The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`);
         }
 
         // Initiate a very basic settings object
@@ -4445,11 +4499,16 @@ if (typeof define === 'function' && define.amd) {
         if (value < 0) {
             settings.negativeSignCharacter = '-';
         }
-        let valueString = value.toString();
-        valueString = fromLocale(valueString);
 
         if (isNull(settings.decimalPlacesOverride)) {
             settings.decimalPlacesOverride = maximumVMinAndVMaxDecimalLength(settings.minimumValue, settings.maximumValue);
+        }
+
+        // Check the validity of the `value` parameter
+        // Convert the value to a numeric string, stripping unnecessary characters in the process
+        let valueString = toNumericValue(value, settings);
+        if (isNaN(valueString)) {
+            throwError(`The value [${valueString}] that you are trying to format is not a recognized number.`);
         }
 
         // Basic tests to check if the given valueString is valid
@@ -4501,7 +4560,7 @@ if (typeof define === 'function' && define.amd) {
             settings.negativeSignCharacter = '-';
         } else if (settings.negativeBracketsTypeOnBlur && settings.negativeBracketsTypeOnBlur.split(',')[0] === value.charAt(0)) {
             settings.negativeSignCharacter = '-';
-            settings.onOff = true;
+            settings.hasFocus = true;
             value = toggleNegativeBracket(value, settings);
         }
 
@@ -4556,8 +4615,19 @@ if (typeof define === 'function' && define.amd) {
         const testPositiveFloatOrInteger = /^[0-9]+(\.?[0-9]+)?$/;
 
         // Then tests the options individually
-        if (!isInArray(options.digitGroupSeparator, [',', '.', ' ', '', "'"])) {
-            throwError(`The thousand separator character option 'digitGroupSeparator' is invalid ; it should be ',', '.', ' ', "'" or empty (''), [${options.digitGroupSeparator}] given.`);
+        if (!isInArray(options.digitGroupSeparator, [
+            ',',      // Comma
+            '.',      // Dot
+            ' ',      // Normal space
+            '\u2009', // Thin-space
+            '\u202f', // Narrow no-break space
+            '\u00a0', // No-break space
+            '',       // No separator
+            "'",      // Apostrophe
+            '٬',      // Arabic thousands separator
+            '˙',      // Dot above
+        ])) {
+            throwError(`The thousand separator character option 'digitGroupSeparator' is invalid ; it should be ',', '.', '٬', '˙', "'", ' ', '\u2009', '\u202f', '\u00a0' or empty (''), [${options.digitGroupSeparator}] given.`);
         }
 
         if (!isTrueOrFalseString(options.noSeparatorOnFocus) && !isBoolean(options.noSeparatorOnFocus)) {
@@ -4568,8 +4638,14 @@ if (typeof define === 'function' && define.amd) {
             throwError(`The digital grouping for thousand separator option 'digitalGroupSpacing' is invalid ; it should be a positive integer, [${options.digitalGroupSpacing}] given.`);
         }
 
-        if (!isInArray(options.decimalCharacter, [',', '.'])) {
-            throwError(`The decimal separator character option 'decimalCharacter' is invalid ; it should be '.' or ',', [${options.decimalCharacter}] given.`);
+        if (!isInArray(options.decimalCharacter, [
+            ',', // Comma
+            '.', // Dot
+            '·', // Middle-dot
+            '٫', // Arabic decimal separator
+            '⎖', // Decimal separator key symbol
+        ])) {
+            throwError(`The decimal separator character option 'decimalCharacter' is invalid ; it should be '.', ',', '·', '⎖' or '٫', [${options.decimalCharacter}] given.`);
         }
 
         // Checks if the decimal and thousand characters are the same

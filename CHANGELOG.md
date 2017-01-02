@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.16"
++ Fix issue #321 Allows more international decimal characters and grouping separators.
+
 ### "2.0.0-beta.15"
 + Fix FireFox on issue #306 that allows the caret to move right when all zero present in the decimals
 + Fix issue #318 `this.selection` can be uninitialized if you focus on an input via the `Tab` key.

@@ -892,6 +892,8 @@ describe('Static autoNumeric functions', () => {
             expect(an.format(1234.56)).toEqual('1,234.56');
             expect(an.format('1234.56')).toEqual('1,234.56');
             expect(an.format(123.45)).toEqual('123.45');
+            expect(an.format('1234,56')).toEqual('123,456.00'); // By default, ',' is a group separator, which gets removed
+            expect(an.format('1.234,56')).toEqual('1.23'); // By default, '.' is the decimal separator
             expect(an.format(0)).toEqual('0.00');
             expect(an.format(null)).toEqual(null);
             expect(an.format(undefined)).toEqual(null);
@@ -899,22 +901,39 @@ describe('Static autoNumeric functions', () => {
 
         it('with user options', () => {
             expect(an.format(1234.56, autoNumericOptionsEuro)).toEqual('1.234,56 €');
+            expect(an.format('1.234,56 €', autoNumericOptionsEuro)).toEqual('1.234,56 €');
             expect(an.format('1234.56', autoNumericOptionsEuro)).toEqual('1.234,56 €');
             expect(an.format(123.45, autoNumericOptionsEuro)).toEqual('123,45 €');
+            expect(an.format('123,45 €', autoNumericOptionsEuro)).toEqual('123,45 €');
             expect(an.format(0, autoNumericOptionsEuro)).toEqual('0,00 €');
+
+            expect(an.format(1234.56, autoNumericOptionsDollar)).toEqual('$1,234.56');
+            expect(an.format(123.45, autoNumericOptionsDollar)).toEqual('$123.45');
+            expect(an.format('$1,234.56', autoNumericOptionsDollar)).toEqual('$1,234.56');
+            expect(an.format('$123.45', autoNumericOptionsDollar)).toEqual('$123.45');
+
             expect(an.format(null, autoNumericOptionsEuro)).toEqual(null);
             expect(an.format(undefined, autoNumericOptionsEuro)).toEqual(null);
         });
     });
 
     it('`format` should fail formatting wrong parameters', () => {
+        spyOn(console, 'warn');
         expect(() => an.format('foobar')).toThrow();
         expect(() => an.format([1234])).toThrow();
-        expect(() => an.format('1234,56')).toThrow();
-        expect(() => an.format('1.234,56')).toThrow();
         expect(() => an.format({})).toThrow();
         expect(() => an.format({ val: 1234 })).toThrow();
         expect(() => an.format([])).toThrow();
+        expect(console.warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('`format` should fail when trying to format a localized string with the wrong options', () => {
+        spyOn(console, 'warn');
+        expect(() => an.format('$1,234.56', autoNumericOptionsEuro)).toThrow();
+        expect(() => an.format('$123.45', autoNumericOptionsEuro)).toThrow();
+        expect(() => an.format('1.234,56 €', autoNumericOptionsDollar)).toThrow();
+        expect(() => an.format('123,45 €', autoNumericOptionsDollar)).toThrow();
+        expect(console.warn).toHaveBeenCalledTimes(4);
     });
 
     it('`unFormat` should fail unformatting wrong parameters', () => {
@@ -966,8 +985,13 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ digitGroupSeparator: ',' })).not.toThrow();
             expect(() => an.validate({ digitGroupSeparator: '.',  decimalCharacter: ',' })).not.toThrow();
             expect(() => an.validate({ digitGroupSeparator: ' ' })).not.toThrow();
-            expect(() => an.validate({ digitGroupSeparator: "'" })).not.toThrow();
+            expect(() => an.validate({ digitGroupSeparator: '\u2009' })).not.toThrow(); // Thin-space
+            expect(() => an.validate({ digitGroupSeparator: '\u202f' })).not.toThrow(); // Narrow no-break space
+            expect(() => an.validate({ digitGroupSeparator: '\u00a0' })).not.toThrow(); // No-break space
             expect(() => an.validate({ digitGroupSeparator: '' })).not.toThrow();
+            expect(() => an.validate({ digitGroupSeparator: "'" })).not.toThrow();
+            expect(() => an.validate({ digitGroupSeparator: '٬' })).not.toThrow();
+            expect(() => an.validate({ digitGroupSeparator: '˙' })).not.toThrow();
 
             expect(() => an.validate({ noSeparatorOnFocus: false })).not.toThrow();
             expect(() => an.validate({ noSeparatorOnFocus: true })).not.toThrow();
@@ -980,6 +1004,9 @@ describe('Static autoNumeric functions', () => {
 
             expect(() => an.validate({ decimalCharacter: ',', digitGroupSeparator: ' ' })).not.toThrow();
             expect(() => an.validate({ decimalCharacter: '.' })).not.toThrow();
+            expect(() => an.validate({ decimalCharacter: '·' })).not.toThrow();
+            expect(() => an.validate({ decimalCharacter: '٫' })).not.toThrow();
+            expect(() => an.validate({ decimalCharacter: '⎖' })).not.toThrow();
 
             expect(() => an.validate({ decimalCharacterAlternative: null })).not.toThrow();
             expect(() => an.validate({ decimalCharacterAlternative: 'longSeparator' })).not.toThrow();

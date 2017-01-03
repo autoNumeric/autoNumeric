@@ -1,8 +1,8 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0-beta.16
- * @date         2017-01-01 UTC 22:00
+ * @version      2.0-beta.17
+ * @date         2017-01-03 UTC 14:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and other Github users,
@@ -658,16 +658,16 @@ const keyName = {
 
 (function(factory) {
     //TODO This surely can be improved by letting webpack take care of generating this UMD part
-if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module.
-    define(['jquery'], factory);
-} else if (typeof module === 'object' && module.exports) {
-    // Node/CommonJS
-    module.exports = factory(require('jquery'));
-} else {
-    // Browser globals
-    factory(window.jQuery);
-}
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['jquery'], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        // Node/CommonJS
+        module.exports = factory(require('jquery'));
+    } else {
+        // Browser globals
+        factory(window.jQuery);
+    }
 }($ => {
     // Helper functions
 
@@ -1456,6 +1456,8 @@ if (typeof define === 'function' && define.amd) {
             inputValue = integerPart;
         }
 
+        settings.trailingNegative = false;
+
         if (settings.currencySymbolPlacement === 'p') {
             if (isNegative) {
                 switch (settings.negativePositiveSignPlacement) {
@@ -1467,9 +1469,10 @@ if (typeof define === 'function' && define.amd) {
                         break;
                     case 's':
                         inputValue = settings.currencySymbol + inputValue + settings.negativeSignCharacter;
+                        settings.trailingNegative = true;
                         break;
                     default :
-                        //
+                    //
                 }
             } else {
                 inputValue = settings.currencySymbol + inputValue;
@@ -1481,9 +1484,11 @@ if (typeof define === 'function' && define.amd) {
                 switch (settings.negativePositiveSignPlacement) {
                     case 'r':
                         inputValue = inputValue + settings.currencySymbol + settings.negativeSignCharacter;
+                        settings.trailingNegative = true;
                         break;
                     case 'l':
                         inputValue = inputValue + settings.negativeSignCharacter + settings.currencySymbol;
+                        settings.trailingNegative = true;
                         break;
                     case 'p':
                         inputValue = settings.negativeSignCharacter + inputValue + settings.currencySymbol;
@@ -1500,7 +1505,6 @@ if (typeof define === 'function' && define.amd) {
         if (settings.negativeBracketsTypeOnBlur !== null && (settings.rawValue < 0 || inputValue.charAt(0) === '-')) {
             inputValue = toggleNegativeBracket(inputValue, settings);
         }
-        settings.trailingNegative = false;
 
         return inputValue + settings.suffixText;
     }
@@ -1983,6 +1987,34 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * properly formats the string to a numeric when leadingZero does not 'keep'.
+     *
+     * @param {string} value
+     * @param {object} settings
+     * @returns {string}
+     */
+    function cleanLeadingTrailingZeros(value, settings) {
+        // return '0' if the value is zero
+        if (Number(value) === 0 && settings.leadingZero !== 'keep') {
+            return '0';
+        }
+
+        if (settings.leadingZero !== 'keep') {
+            // trim leading zero's - leaves one zero to the left of the decimal point
+            value = value.replace(/^(-)?0+(?=\d)/g,'$1');
+
+            if (contains(value, '.')) {
+                // trims trailing zeros after the decimal point
+                value = value.replace(/(\.[0-9]*?)0+$/, '$1');
+            }
+        }
+        // strips trailing decimal point.
+        value = value.replace(/\.$/, '');
+
+        return value;
+    }
+
+    /**
      * Creates or removes sessionStorage or cookie depending on what the browser is supporting.
      *
      * @param {Element|EventTarget} element
@@ -2069,7 +2101,7 @@ if (typeof define === 'function' && define.amd) {
          * //TODO Switch to the non-deprecated e.key attribute, instead of inconsistant e.which and e.keyCode.
          * e.key describe the key name used to trigger the event.
          * e.keyCode being deprecated : https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
-             * How e.key works : https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
+         * How e.key works : https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
          * The key list is described here
          * @link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
          *
@@ -2141,10 +2173,12 @@ if (typeof define === 'function' && define.amd) {
         _getUnformattedLeftAndRightPartAroundTheSelection() {
             const settingsClone = this.settingsClone;
             let [left, right] = this._getLeftAndRightPartAroundTheSelection();
-
+            if (left === '' && right === '') {
+                settingsClone.trailingNegative = false;
+            }
             // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
             let stripZeros = true;
-            if (this.eventKeyCode === keyCode.Hyphen && Number(left) === 0) {
+            if (this.kdCode === keyCode.Hyphen && Number(left) === 0) {
                 stripZeros = false;
             }
             left = stripAllNonNumberCharacters(left, this.settingsClone, stripZeros);
@@ -2153,9 +2187,8 @@ if (typeof define === 'function' && define.amd) {
             if (settingsClone.trailingNegative && !contains(left, '-')) {
                 left = '-' + left;
                 right = (right === '-') ? '' : right;
+                settingsClone.trailingNegative = false;
             }
-
-            settingsClone.trailingNegative = false;
 
             return [left, right];
         }
@@ -2173,10 +2206,9 @@ if (typeof define === 'function' && define.amd) {
 
             // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
             let stripZeros = true;
-            if (this.eventKeyCode === keyCode.Hyphen && Number(left) === 0) {
+            if (this.kdCode === keyCode.Hyphen && Number(left) === 0) {
                 stripZeros = false;
             }
-            //TODO Refactor this duplicated code with `_getUnformattedLeftAndRightPartAroundTheSelection()`
             left = stripAllNonNumberCharacters(left, settingsClone, stripZeros);
 
             // If right is not empty and first character is not decimalCharacter
@@ -2228,9 +2260,9 @@ if (typeof define === 'function' && define.amd) {
                 this.newValue = truncateDecimal(this.newValue, settingsClone, isPaste);
                 const testValue = (contains(this.newValue, ',')) ? this.newValue.replace(',', '.') : this.newValue;
                 if (testValue === '' || testValue === settingsClone.negativeSignCharacter) {
-                    settingsClone.rawValue = '';
+                    settingsClone.rawValue = (settingsClone.emptyInputBehavior === 'zero') ? '0' : '';
                 } else {
-                    settingsClone.rawValue = testValue;
+                    settingsClone.rawValue = cleanLeadingTrailingZeros(testValue, settingsClone);
                 }
 
                 if (position > this.newValue.length) {
@@ -2240,7 +2272,7 @@ if (typeof define === 'function' && define.amd) {
                 // Make sure when the user enter a '0' on the far left with a leading zero option set to 'deny', that the caret does not moves since the input is dropped (fix issue #283)
                 if (position === 1 && parts[0] === '0' && settingsClone.leadingZero === 'deny') {
                     // If the user enter `0`, then the caret is put on the right side of it (Fix issue #299)
-                    if (parts[1] === '') {
+                    if (parts[1] === '' || parts[0] === '0' && parts[1] !== '') {
                         position = 1;
                     } else {
                         position = 0;
@@ -2535,8 +2567,8 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 if (((settingsClone.currencySymbolPlacement === 'p' && settingsClone.negativePositiveSignPlacement === 's') ||
-                     (settingsClone.currencySymbolPlacement === 's' && (settingsClone.negativePositiveSignPlacement === 'l' || settingsClone.negativePositiveSignPlacement === 'r'))) &&
-                     contains(this.value, '-')) { //TODO Change `this.value` to `this.that.value`?
+                    (settingsClone.currencySymbolPlacement === 's' && (settingsClone.negativePositiveSignPlacement === 'l' || settingsClone.negativePositiveSignPlacement === 'r'))) &&
+                    contains(this.value, '-')) { //TODO Change `this.value` to `this.that.value`?
                     [left, right] = this._processCharacterDeletionIfTrailingNegativeSign([left, right]);
                 } else {
                     if (this.eventKeyCode === keyCode.Backspace) {
@@ -2906,9 +2938,13 @@ if (typeof define === 'function' && define.amd) {
             if (settings.negativeBracketsTypeOnBlur !== null && settings.negativeSignCharacter !== '') {
                 $this.val(toggleNegativeBracket(e.target.value, settings));
             }
-
-            let result;
-            //TODO Do not repeat yourself with the `$this.autoNumeric('set', settings.rawValue);` line
+            // clean the value to compare to rawValue
+            let result = stripAllNonNumberCharacters(e.target.value, settings, true);
+            result = convertToNumericString(result, settings);
+            result = cleanLeadingTrailingZeros(result, settings);
+            if (settings.trailingNegative) {
+                result = '-' + result;
+            }
             if (settings.decimalPlacesShownOnFocus) {
                 settings.decimalPlacesOverride = settings.decimalPlacesShownOnFocus;
                 $this.autoNumeric('set', settings.rawValue);
@@ -2920,11 +2956,8 @@ if (typeof define === 'function' && define.amd) {
                 settings.currencySymbol = '';
                 settings.suffixText = '';
                 $this.autoNumeric('set', settings.rawValue);
-            } else {
-                result = stripAllNonNumberCharacters(e.target.value, settings, true);
-                if (result !== settings.rawValue) {
-                    $this.autoNumeric('set', result);
-                }
+            } else if (result !== settings.rawValue) {
+                $this.autoNumeric('set', result);
             }
 
             // In order to send a 'native' change event when blurring the input, we need to first store the initial input value on focus.
@@ -3066,7 +3099,12 @@ if (typeof define === 'function' && define.amd) {
                 e.preventDefault(); // ...and immediately prevent the browser to add a second character
             }
             else {
-                // If the value has not changed, we do not allow the input event to be sent
+                if ((e.key === holder.settings.decimalCharacter || e.key === holder.settings.decimalCharacterAlternative) &&
+                    (getElementSelection(e.target).start === getElementSelection(e.target).end) &&
+                    getElementSelection(e.target).start === e.target.value.indexOf(holder.settings.decimalCharacter)) {
+                    const position = getElementSelection(e.target).start + 1;
+                    setElementSelection(e.target, position, position);
+                }
                 e.preventDefault();
             }
 
@@ -3162,7 +3200,7 @@ if (typeof define === 'function' && define.amd) {
             value = stripAllNonNumberCharacters(value, settings, true);
 
             if (value !== '') {
-                if (settings.trailingNegative) {
+                if (settings.trailingNegative && !contains(value, '-')) {
                     value = '-' + value;
                     settings.trailingNegative = false;
                 }
@@ -3170,7 +3208,7 @@ if (typeof define === 'function' && define.amd) {
                 const [minTest, maxTest] = checkIfInRangeWithOverrideOption(value, settings);
                 if (checkEmpty(value, settings, false) === null && minTest && maxTest) {
                     value = modifyNegativeSignAndDecimalCharacterForRawValue(value, settings);
-                    settings.rawValue = value;
+                    settings.rawValue = cleanLeadingTrailingZeros(value, settings);
 
                     if (settings.scaleDivisor) {
                         value = value / settings.scaleDivisor;
@@ -3489,7 +3527,7 @@ if (typeof define === 'function' && define.amd) {
          * If 'replace' :
          *      - Replace paste behavior.
          *      - Try to set the new value, until it fails (if the result is out of the min and max value limits).
-          *     - Then try to replace as many numbers as possible with the pasted ones. Once it fails, keep the last known non-failing result.
+         *     - Then try to replace as many numbers as possible with the pasted ones. Once it fails, keep the last known non-failing result.
          *      - Change the caret position to be positioned after the last pasted character.
          */
         let valueHasBeenSet = false;
@@ -3519,10 +3557,10 @@ if (typeof define === 'function' && define.amd) {
                 case 'replace':
                     // Throw an error message
                     throwError(`The pasted value '${rawPastedText}' results in a value '${result}' that is outside of the minimum [${holder.settings.minimumValue}] and maximum [${holder.settings.maximumValue}] value range.`);
-                    // falls through
+                // falls through
                 case 'ignore':
-                    // Do nothing
-                    // falls through
+                // Do nothing
+                // falls through
                 default :
                     return; // ...and nothing else should be changed
             }
@@ -3542,7 +3580,7 @@ if (typeof define === 'function' && define.amd) {
 
                         break;
                     } // else if the value has not been clamped, the default behavior is used...
-                    // falls through
+                // falls through
                 case 'error':
                 case 'ignore':
                 case 'truncate':
@@ -4204,22 +4242,36 @@ if (typeof define === 'function' && define.amd) {
                 if (value !== '') {
                     const [minTest, maxTest] = checkIfInRangeWithOverrideOption(value, settings);
                     if (minTest && maxTest) {
-                        if ($input && (settings.decimalPlacesShownOnFocus || settings.scaleDivisor)) {
-                            settings.rawValue = value;
-                        }
-
-                        // checks if the value falls within the min max range
                         if ($input || isInArray($this.prop('tagName').toLowerCase(), settings.tagList)) {
-                            if (settings.scaleDivisor && !settings.hasFocus) {
+                            // to ensure rounding does not happen twice
+                            let hasBeenRounded = false;
+
+                            // rounds the the extended decimal places
+                            if (settings.decimalPlacesShownOnFocus) {
+                                const tempDecimal = settings.decimalPlacesOverride;
+                                settings.decimalPlacesOverride = settings.decimalPlacesShownOnFocus;
+                                value = roundValue(value, settings);
+                                hasBeenRounded = true;
+                                settings.decimalPlacesOverride = tempDecimal;
+                            }
+
+                            if (settings.scaleDivisor && !settings.onOff) {
+                                value = toNumericValue(value, settings);
                                 value = value / settings.scaleDivisor;
                                 value = value.toString();
-                                settings.decimalPlacesOverride = (settings.scaleDecimalPlaces) ? settings.scaleDecimalPlaces : settings.decimalPlacesOverride;
+                                if (settings.scaleDecimalPlaces) {
+                                    const tempDecimal = settings.decimalPlacesOverride;
+                                    settings.decimalPlacesOverride = settings.scaleDecimalPlaces;
+                                    value = roundValue(value, settings);
+                                    hasBeenRounded = true;
+                                    settings.decimalPlacesOverride = tempDecimal;
+                                }
                             }
+                            // rounds if has not been done
+                            value = (hasBeenRounded) ? value : value = roundValue(value, settings);
 
-                            value = roundValue(value, settings);
-                            if (settings.decimalPlacesShownOnFocus === null && settings.scaleDivisor === null) {
-                                settings.rawValue = value;
-                            }
+                            // stores rawValue including the decimalPlacesShownOnFocus
+                            settings.rawValue = cleanLeadingTrailingZeros(value, settings);
 
                             value = modifyNegativeSignAndDecimalCharacterForFormattedValue(value, settings);
                             value = addGroupSeparators(value, settings);
@@ -4338,7 +4390,10 @@ if (typeof define === 'function' && define.amd) {
             if (settings.decimalPlacesShownOnFocus || settings.scaleDivisor) {
                 value = settings.rawValue;
             } else {
-                if (!((/\d/).test(value) || Number(value) === 0) && settings.emptyInputBehavior === 'focus') {
+                // tests for negative symbol
+                const isNegative = contains(value, '-');
+                const isZero = Number(value) === 0;
+                if (!((/\d/).test(value) || isZero) && settings.emptyInputBehavior === 'focus') {
                     return '';
                 }
 
@@ -4348,10 +4403,17 @@ if (typeof define === 'function' && define.amd) {
                 }
 
                 if (settings.runOnce || settings.formatOnPageLoad === false) {
+                    // this strips trailing negative symbol
                     value = stripAllNonNumberCharacters(value, settings, true);
-                }
+                    // trims leading and trailing zeros when leadingZero does NOT equal "keep".
+                    value = cleanLeadingTrailingZeros(value, settings);
 
-                value = modifyNegativeSignAndDecimalCharacterForRawValue(value, settings);
+                    // this places the negative symbol in front on trailing negative
+                    if (settings.trailingNegative && isNegative && !contains(value, '-') && Number(value) !== 0) {
+                        value = '-' + value;
+                    }
+                }
+                value = (value !== '' || value === '' && settings.emptyInputBehavior === 'zero') ? modifyNegativeSignAndDecimalCharacterForRawValue(value, settings) : value;
             }
 
             // Always return a numeric string
@@ -4616,17 +4678,17 @@ if (typeof define === 'function' && define.amd) {
 
         // Then tests the options individually
         if (!isInArray(options.digitGroupSeparator, [
-            ',',      // Comma
-            '.',      // Dot
-            ' ',      // Normal space
-            '\u2009', // Thin-space
-            '\u202f', // Narrow no-break space
-            '\u00a0', // No-break space
-            '',       // No separator
-            "'",      // Apostrophe
-            '٬',      // Arabic thousands separator
-            '˙',      // Dot above
-        ])) {
+                ',',      // Comma
+                '.',      // Dot
+                ' ',      // Normal space
+                '\u2009', // Thin-space
+                '\u202f', // Narrow no-break space
+                '\u00a0', // No-break space
+                '',       // No separator
+                "'",      // Apostrophe
+                '٬',      // Arabic thousands separator
+                '˙',      // Dot above
+            ])) {
             throwError(`The thousand separator character option 'digitGroupSeparator' is invalid ; it should be ',', '.', '٬', '˙', "'", ' ', '\u2009', '\u202f', '\u00a0' or empty (''), [${options.digitGroupSeparator}] given.`);
         }
 
@@ -4639,12 +4701,12 @@ if (typeof define === 'function' && define.amd) {
         }
 
         if (!isInArray(options.decimalCharacter, [
-            ',', // Comma
-            '.', // Dot
-            '·', // Middle-dot
-            '٫', // Arabic decimal separator
-            '⎖', // Decimal separator key symbol
-        ])) {
+                ',', // Comma
+                '.', // Dot
+                '·', // Middle-dot
+                '٫', // Arabic decimal separator
+                '⎖', // Decimal separator key symbol
+            ])) {
             throwError(`The decimal separator character option 'decimalCharacter' is invalid ; it should be '.', ',', '·', '⎖' or '٫', [${options.decimalCharacter}] given.`);
         }
 
@@ -4732,30 +4794,30 @@ if (typeof define === 'function' && define.amd) {
         }
 
         if (!isInArray(options.onInvalidPaste, [
-            'error',
-            'ignore',
-            'clamp',
-            'truncate',
-            'replace',
-        ])) {
+                'error',
+                'ignore',
+                'clamp',
+                'truncate',
+                'replace',
+            ])) {
             throwError(`The paste behavior option 'onInvalidPaste' is invalid ; it should either be 'error', 'ignore', 'clamp', 'truncate' or 'replace' (cf. documentation), [${options.onInvalidPaste}] given.`);
         }
 
         if (!isInArray(options.roundingMethod, [
-            'S',
-            'A',
-            's',
-            'a',
-            'B',
-            'U',
-            'D',
-            'C',
-            'F',
-            'N05',
-            'CHF',
-            'U05',
-            'D05',
-        ])) {
+                'S',
+                'A',
+                's',
+                'a',
+                'B',
+                'U',
+                'D',
+                'C',
+                'F',
+                'N05',
+                'CHF',
+                'U05',
+                'D05',
+            ])) {
             throwError(`The rounding method option 'roundingMethod' is invalid ; it should either be 'S', 'A', 's', 'a', 'B', 'U', 'D', 'C', 'F', 'N05', 'CHF', 'U05' or 'D05' (cf. documentation), [${options.roundingMethod}] given.`);
         }
 
@@ -4792,15 +4854,15 @@ if (typeof define === 'function' && define.amd) {
         }
 
         if (!isNull(options.outputFormat) && !isInArray(options.outputFormat, [
-            'string',
-            'number',
-            '.',
-            '-.',
-            ',',
-            '-,',
-            '.-',
-            ',-',
-        ])) {
+                'string',
+                'number',
+                '.',
+                '-.',
+                ',',
+                '-,',
+                '.-',
+                ',-',
+            ])) {
             throwError(`The custom locale format option 'outputFormat' is invalid ; it should either be null, 'string', 'number', '.', '-.', ',', '-,', '.-' or ',-', [${options.outputFormat}] given.`);
         }
 

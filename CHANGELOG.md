@@ -1,5 +1,10 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.17"
++ Fix issue #317 allow jumping over the decimal character when the caret is just left of the decimal character and the user enters the decimal character
++ Fix issue #319 so the 'get' method returns a negative value when there is a trailing negative sign.
++ Fix issue #327 so the entire content is selected when tabbing in. 
+
 ### "2.0.0-beta.16"
 + Fix issue #321 Allows more international decimal characters and grouping separators.
 

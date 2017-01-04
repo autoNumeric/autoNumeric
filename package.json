@@ -63,6 +63,9 @@
     "clean": "npm run clean:build && npm run clean:coverage && npm run clean:log",
     "lint": "eslint --ext .js src test/unit test/e2e",
     "test:unit": "QT_QPA_PLATFORM='' ./node_modules/karma/bin/karma start karma.conf.js --single-run",
+    "test:unitp": "QT_QPA_PLATFORM='' ./node_modules/karma/bin/karma start karma.conf.js --single-run --browsers PhantomJS",
+    "test:unitf": "QT_QPA_PLATFORM='' ./node_modules/karma/bin/karma start karma.conf.js --single-run --browsers Firefox",
+    "test:unitc": "QT_QPA_PLATFORM='' ./node_modules/karma/bin/karma start karma.conf.js --single-run --browsers Chrome",
     "test:e2e": "node test/e2e/runner.js",
     "test": "npm run test:unit && npm run test:e2e"
   },

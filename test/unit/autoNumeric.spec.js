@@ -609,12 +609,12 @@ describe(`autoNumeric 'get', 'getLocalized' and 'getNumber' methods`, () => {
 
         aNInput.autoNumeric('update', { maximumValue: '9007199254740991000000' });
         aNInput.autoNumeric('set', Number.MAX_SAFE_INTEGER); // The exact highest safe integer
-        expect(aNInput.autoNumeric('get')).toEqual(`${Number.MAX_SAFE_INTEGER}.00`);
+        expect(aNInput.autoNumeric('get')).toEqual(`${Number.MAX_SAFE_INTEGER}`);
         aNInput.autoNumeric('set', '9007199254740996'); // A bit higher than the biggest safest integer
-        expect(aNInput.autoNumeric('get')).toEqual('9007199254740996.00');
+        expect(aNInput.autoNumeric('get')).toEqual('9007199254740996');
         // Add a test where the user set a very big number (bigger than Number.MAX_SAFE_INTEGER), and check if `get` return the correct number
         aNInput.autoNumeric('set', '9007199254740991000000'); // A very big number
-        expect(aNInput.autoNumeric('get')).toEqual('9007199254740991000000.00');
+        expect(aNInput.autoNumeric('get')).toEqual('9007199254740991000000');
     });
 });
 
@@ -626,13 +626,13 @@ describe(`autoNumeric 'get' methods`, () => {
         const aNInput = $(newInput).autoNumeric('init', { minimumValue: '0', maximumValue: '9999', decimalPlacesOverride: '2' }); // Initiate the autoNumeric input
         expect(console.warn).toHaveBeenCalled();
 
-        expect(aNInput.autoNumeric('get')).toEqual('0.00');
+        expect(aNInput.autoNumeric('get')).toEqual('0');
         aNInput.autoNumeric('set', 1234);
-        expect(aNInput.autoNumeric('get')).toEqual('1234.00');
+        expect(aNInput.autoNumeric('get')).toEqual('1234');
         aNInput.autoNumeric('set', 0);
-        expect(aNInput.autoNumeric('get')).toEqual('0.00');
+        expect(aNInput.autoNumeric('get')).toEqual('0');
         aNInput.autoNumeric('set', -0);
-        expect(aNInput.autoNumeric('get')).toEqual('0.00');
+        expect(aNInput.autoNumeric('get')).toEqual('0');
 
         aNInput.autoNumeric('destroy');
         document.body.removeChild(newInput);
@@ -645,9 +645,9 @@ describe(`autoNumeric 'get' methods`, () => {
         const aNInput = $(newInput).autoNumeric('init', { minimumValue: '1', maximumValue: '9999', decimalPlacesOverride: '2' }); // Initiate the autoNumeric input
         expect(console.warn).toHaveBeenCalled();
 
-        expect(aNInput.autoNumeric('get')).toEqual('0.00');
+        expect(aNInput.autoNumeric('get')).toEqual('0');
         aNInput.autoNumeric('set', 1234);
-        expect(aNInput.autoNumeric('get')).toEqual('1234.00');
+        expect(aNInput.autoNumeric('get')).toEqual('1234');
 
         aNInput.autoNumeric('destroy');
         document.body.removeChild(newInput);

@@ -34,6 +34,7 @@ If you want to change the `src/autoNumeric.js` file, you'll need to build the ES
 
 ###  Getting started:
 
+**Note**: For integration into rails projects, see [autonumeric-rails](https://github.com/randoum/autonumeric-rails)
 
 Include jQuery and autoNumeric js-files in your header. No other files or library are required.
 

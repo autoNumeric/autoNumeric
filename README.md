@@ -234,7 +234,10 @@ Currently, autoNumeric depends on jQuery (which is pretty logical since it's a j
 Some work is [in progress](https://github.com/BobKnothe/autoNumeric/issues/244) to provide a jQuery-free version of autoNumeric.
 
 ## Older versions
-The previous stable autoNumeric version v1.9.46 can be found [here](https://github.com/BobKnothe/autoNumeric/releases/tag/1.9.46). 
+The previous stable autoNumeric version v1.9.46 can be found [here](https://github.com/BobKnothe/autoNumeric/releases/tag/1.9.46).
+
+## Related projects
+
 
 ## Documentation
 A more detailed documentation can be found in the [Documentation](Documentation.md) file.<br>

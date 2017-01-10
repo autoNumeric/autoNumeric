@@ -94,7 +94,7 @@ describe('The autoNumeric object', () => {
         decimalCharacterAlternative  : null,
         currencySymbol               : '',
         currencySymbolPlacement      : 'p',
-        negativePositiveSignPlacement: 'l',
+        negativePositiveSignPlacement: null,
         suffixText                   : '',
         overrideMinMaxLimits         : null,
         maximumValue                 : '9999999999999.99',
@@ -160,7 +160,7 @@ describe('The autoNumeric object', () => {
         expect(defaultSettings.currencySymbolPlacement    ).toEqual(aNInputSettings.currencySymbolPlacement    );
 
         // Special case for `negativePositiveSignPlacement`, see the related tests
-        expect(defaultSettings.negativePositiveSignPlacement).toEqual(aNInputSettings.negativePositiveSignPlacement);
+        // expect(defaultSettings.negativePositiveSignPlacement).toEqual(aNInputSettings.negativePositiveSignPlacement);
         expect(defaultSettings.suffixText                   ).toEqual(aNInputSettings.suffixText                   );
         expect(defaultSettings.overrideMinMaxLimits         ).toEqual(aNInputSettings.overrideMinMaxLimits         );
         expect(defaultSettings.maximumValue                 ).toEqual(aNInputSettings.maximumValue                 );
@@ -207,40 +207,62 @@ describe('The autoNumeric object', () => {
     });
 
     describe('manages the negativePositiveSignPlacement configuration option specially', () => {
-        it(`this should set the negativePositiveSignPlacement differently based on the currencySymbol and currencySymbolPlacement values`, () => {
-            /*
-             * Special case for `negativePositiveSignPlacement`:
-             * If the user has not set the placement of the negative sign (`negativePositiveSignPlacement`), but has set a currency symbol (`currencySymbol`),
-             * then the default value of `negativePositiveSignPlacement` is modified in order to keep the resulting output logical by default :
-             * - "$-1,234.56" instead of "-$1,234.56" ({currencySymbol: "$", negativePositiveSignPlacement: "r"})
-             * - "-1,234.56$" instead of "1,234.56-$" ({currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "p"})
-             */
+        let aNInput;
+        let newInput;
 
-            // Case 1 : settings.currencySymbolPlacement equals 's'
-            // Initialization
-            let newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            let aNInput = $(newInput).autoNumeric('init', { currencySymbol: '$', currencySymbolPlacement: 's' }); // Initiate the autoNumeric input
-            let aNInputSettings = aNInput.autoNumeric('getSettings');
-
-            expect(aNInputSettings.negativePositiveSignPlacement).toEqual('p');
-
-            // Un-initialization
-            aNInput.autoNumeric('destroy');
-            document.body.removeChild(newInput);
-
-            // Case 2 : settings.currencySymbolPlacement equals 'p'
-            // Initialization
+        beforeEach(() => { // Initialization
             newInput = document.createElement('input');
             document.body.appendChild(newInput);
-            aNInput = $(newInput).autoNumeric('init', { currencySymbol: '$', currencySymbolPlacement: 'p' }); // Initiate the autoNumeric input
-            aNInputSettings = aNInput.autoNumeric('getSettings');
+        });
 
-            expect(aNInputSettings.negativePositiveSignPlacement).toEqual('r');
-
-            // Un-initialization
+        afterEach(() => { // Un-initialization
             aNInput.autoNumeric('destroy');
             document.body.removeChild(newInput);
+        });
+
+        /*
+         * Special case for `negativePositiveSignPlacement`:
+         * If the user has not set the placement of the negative sign (`negativePositiveSignPlacement`), but has set a currency symbol (`currencySymbol`),
+         * then the default value of `negativePositiveSignPlacement` is modified in order to keep the resulting output logical by default :
+         * - "$-1,234.56" instead of "-$1,234.56" ({currencySymbol: "$", negativePositiveSignPlacement: "r"})
+         * - "-1,234.56$" instead of "1,234.56-$" ({currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "p"})
+         */
+        it(`this should set the negativePositiveSignPlacement differently based on the currencySymbol and currencySymbolPlacement (s) values`, () => {
+            // Case 1 : settings.currencySymbolPlacement equals 's'
+            aNInput = $(newInput).autoNumeric('init', { currencySymbol: '$', currencySymbolPlacement: 's' }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.autoNumeric('getSettings');
+
+            expect(aNInputSettings.negativePositiveSignPlacement).toEqual('p');
+        });
+
+        it(`this should set the negativePositiveSignPlacement differently based on the currencySymbol and currencySymbolPlacement (p) values`, () => {
+            // Case 2 : settings.currencySymbolPlacement equals 'p'
+            aNInput = $(newInput).autoNumeric('init', { currencySymbol: '$', currencySymbolPlacement: 'p' }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.autoNumeric('getSettings');
+
+            expect(aNInputSettings.negativePositiveSignPlacement).toEqual('l');
+        });
+
+        /*
+         * Default cases
+         */
+        it(`this should set the default negativePositiveSignPlacement value if it's not set by the user, to -1,234.56`, () => {
+            aNInput = $(newInput).autoNumeric('init', { negativePositiveSignPlacement : null }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.autoNumeric('getSettings');
+
+            expect(aNInputSettings.currencySymbol).toEqual('');
+            expect(aNInputSettings.currencySymbolPlacement).toEqual('p');
+            expect(aNInputSettings.negativePositiveSignPlacement).toEqual('l');
+        });
+
+
+        it(`this should set the default negativePositiveSignPlacement value if it's not set by the user, to -$1,234.56`, () => {
+            aNInput = $(newInput).autoNumeric('init', { currencySymbol: '$', negativePositiveSignPlacement : null }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.autoNumeric('getSettings');
+
+            expect(aNInputSettings.currencySymbol).toEqual('$');
+            expect(aNInputSettings.currencySymbolPlacement).toEqual('p');
+            expect(aNInputSettings.negativePositiveSignPlacement).toEqual('l');
         });
     });
 
@@ -543,39 +565,94 @@ describe(`autoNumeric 'get', 'getLocalized' and 'getNumber' methods`, () => {
         document.body.removeChild(newInput);
     });
 
-    it('should return an unformatted value', () => {
-        // Euros
-        aNInput.autoNumeric('update', autoNumericOptionsEuro);
-        aNInput.autoNumeric('update', { outputFormat: ',-' });
+
+    it('should return an unformatted value, (without having any option specified)', () => {
+        // With an integer
         aNInput.autoNumeric('set', 0);
-        expect(aNInput.autoNumeric('get')).toEqual('0.00');
+        expect(aNInput.autoNumeric('get')).toEqual('0');
         expect(aNInput.autoNumeric('getLocalized')).toEqual('0');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(0);
-        aNInput.autoNumeric('update', { leadingZero: 'keep' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('0,00');
         expect(aNInput.autoNumeric('getNumber')).toEqual(0);
 
         aNInput.autoNumeric('set', -42);
-        expect(aNInput.autoNumeric('get')).toEqual('-42.00');
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('42,00-');
+        expect(aNInput.autoNumeric('get')).toEqual('-42');
+        aNInput.autoNumeric('update', { outputFormat: ',-' });
+        expect(aNInput.autoNumeric('get')).toEqual('-42');
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('42-');
         expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
         aNInput.autoNumeric('update', { outputFormat: '-,' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42,00');
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42');
         expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
         aNInput.autoNumeric('update', { outputFormat: '.-' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('42.00-');
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('42-');
         expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
         aNInput.autoNumeric('update', { outputFormat: null });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42.00');
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42');
         expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
         aNInput.autoNumeric('update', { outputFormat: 'number' });
         expect(aNInput.autoNumeric('getLocalized')).toEqual(-42);
         expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
         aNInput.autoNumeric('update', { outputFormat: 'string' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42.00');
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42');
         expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
 
-        aNInput.autoNumeric('set', 1234.56);
+        // With a float
+        aNInput.autoNumeric('set', -42.76);
+        expect(aNInput.autoNumeric('get')).toEqual('-42.76');
+        aNInput.autoNumeric('update', { outputFormat: ',-' });
+        expect(aNInput.autoNumeric('get')).toEqual('-42.76');
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('42,76-');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42.76);
+
+        aNInput.autoNumeric('update', { outputFormat: '-,' });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42,76');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42.76);
+        aNInput.autoNumeric('update', { outputFormat: '.-' });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('42.76-');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42.76);
+        aNInput.autoNumeric('update', { outputFormat: null });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42.76');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42.76);
+        aNInput.autoNumeric('update', { outputFormat: 'number' });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual(-42.76);
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42.76);
+        aNInput.autoNumeric('update', { outputFormat: 'string' });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42.76');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42.76);
+    });
+
+    it('should return an unformatted value (with some options set)', () => {
+        // Euros
+        aNInput.autoNumeric('update', autoNumericOptionsEuro);
+        aNInput.autoNumeric('update', { outputFormat: ',-' });
+        aNInput.autoNumeric('set', 0);
+        expect(aNInput.autoNumeric('get')).toEqual('0');
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('0');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(0);
+        aNInput.autoNumeric('update', { leadingZero: 'keep' });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('0');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(0);
+
+        aNInput.autoNumeric('set', -42);
+        expect(aNInput.autoNumeric('get')).toEqual('-42');
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('42-');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
+        aNInput.autoNumeric('update', { outputFormat: '-,' });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
+        aNInput.autoNumeric('update', { outputFormat: '.-' });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('42-');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
+        aNInput.autoNumeric('update', { outputFormat: null });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
+        aNInput.autoNumeric('update', { outputFormat: 'number' });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual(-42);
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
+        aNInput.autoNumeric('update', { outputFormat: 'string' });
+        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
+
+        aNInput.autoNumeric('set', 1234.56); // Here I also test that setting a positive value after a negative one works ok
         expect(aNInput.autoNumeric('get')).toEqual('1234.56');
         expect(aNInput.autoNumeric('getNumber')).toEqual(1234.56);
         aNInput.autoNumeric('set', 6789012.345);
@@ -593,10 +670,10 @@ describe(`autoNumeric 'get', 'getLocalized' and 'getNumber' methods`, () => {
         expect(aNInput.autoNumeric('get')).toEqual('6789012.35');
         expect(aNInput.autoNumeric('getNumber')).toEqual(6789012.35);
         aNInput.autoNumeric('set', 0);
-        expect(aNInput.autoNumeric('get')).toEqual('0.00');
+        expect(aNInput.autoNumeric('get')).toEqual('0');
         expect(aNInput.autoNumeric('getNumber')).toEqual(0);
         aNInput.autoNumeric('set', -42);
-        expect(aNInput.autoNumeric('get')).toEqual('-42.00');
+        expect(aNInput.autoNumeric('get')).toEqual('-42');
         expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
     });
 
@@ -1022,6 +1099,7 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ negativePositiveSignPlacement: 's' })).not.toThrow();
             expect(() => an.validate({ negativePositiveSignPlacement: 'l' })).not.toThrow();
             expect(() => an.validate({ negativePositiveSignPlacement: 'r' })).not.toThrow();
+            expect(() => an.validate({ negativePositiveSignPlacement: null })).not.toThrow();
 
             expect(() => an.validate({ suffixText: '' })).not.toThrow();
             expect(() => an.validate({ suffixText: 'foobar' })).not.toThrow();
@@ -1239,7 +1317,6 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ negativePositiveSignPlacement: ['r'] })).toThrow();
             expect(() => an.validate({ negativePositiveSignPlacement: 42 })).toThrow();
             expect(() => an.validate({ negativePositiveSignPlacement: true })).toThrow();
-            expect(() => an.validate({ negativePositiveSignPlacement: null })).toThrow();
             expect(() => an.validate({ negativePositiveSignPlacement: 'foobar' })).toThrow();
 
             expect(() => an.validate({ suffixText: '-foobar' })).toThrow();

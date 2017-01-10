@@ -2002,6 +2002,11 @@ if (typeof define === 'function' && define.amd) {
      * @returns {string}
      */
     function cleanLeadingTrailingZeros(value, settings) {
+        // Return the empty string is the value is already empty. This prevent converting that value to '0'.
+        if (value === '') {
+            return '';
+        }
+        
         // Return '0' if the value is zero
         if (Number(value) === 0 && settings.leadingZero !== 'keep') {
             return '0';
@@ -2971,6 +2976,7 @@ if (typeof define === 'function' && define.amd) {
             if (settings.negativeBracketsTypeOnBlur !== null && settings.negativeSignCharacter !== '') {
                 $this.val(toggleNegativeBracket(e.target.value, settings));
             }
+
             // clean the value to compare to rawValue
             let result = stripAllNonNumberCharacters(e.target.value, settings, true);
             result = convertToNumericString(result, settings);
@@ -2978,6 +2984,7 @@ if (typeof define === 'function' && define.amd) {
             if (settings.trailingNegative) {
                 result = '-' + result;
             }
+
             if (settings.decimalPlacesShownOnFocus) {
                 settings.decimalPlacesOverride = settings.decimalPlacesShownOnFocus;
                 $this.autoNumeric('set', settings.rawValue);

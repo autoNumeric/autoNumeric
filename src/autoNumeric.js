@@ -1,8 +1,8 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0-beta.17
- * @date         2017-01-03 UTC 14:00
+ * @version      2.0-beta.18
+ * @date         2017-01-10 UTC 01:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and other Github users,
@@ -95,9 +95,9 @@ const allowedTagList = [
 ];
 
 /**
- * Defaults options are public - these can be overridden by the following:
- * - HTML5 data attributes
- * - Options passed by the 'init' or 'update' methods
+ * Defaults options are public - these can be overridden by the following method:
+ * - HTML5 data attributes (ie. `<input type="text" data-currency-symbol=" €">`)
+ * - Options passed by the 'init' or 'update' methods (ie. `aNInput.autoNumeric('update', { currencySymbol: ' €' });`)
  * - Use jQuery's `$.extend` method for global changes - also a great way to pass ASP.NET current culture settings
  */
 const defaultSettings = {
@@ -112,7 +112,7 @@ const defaultSettings = {
      */
     digitGroupSeparator: ',',
 
-    /* When true => removes the thousand separator, currency symbol & suffix "focusin"
+    /* Remove the thousand separator on focus, currency symbol and suffix on focus
      * example if the input value "$ 1,999.88 suffix"
      * on "focusin" it becomes "1999.88" and back to "$ 1,999.88 suffix" on focus out.
      * Deprecated older option name : nSep
@@ -155,20 +155,22 @@ const defaultSettings = {
      * for suffix currencySymbolPlacement: "s"
      * Deprecated older option name : pSign
      */
+    //TODO Rename the options to more explicit names ('p' => 'prefix', etc.)
     currencySymbolPlacement: 'p',
 
-    /* Placement of negative sign relative to the currencySymbol option l=left, r=right, p=prefix & s=suffix
+    /* Placement of negative/positive sign relative to the currencySymbol option l=left, r=right, p=prefix & s=suffix
      * -1,234.56  => default no options required
-     * -$1,234.56 => {currencySymbol: "$"}
-     * $-1,234.56 => {currencySymbol: "$", negativePositiveSignPlacement: "r"}
-     * -1,234.56$ => {currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "p"}
+     * -$1,234.56 => {currencySymbol: "$"} or {currencySymbol: "$", negativePositiveSignPlacement: "l"}
+     * $-1,234.56 => {currencySymbol: "$", negativePositiveSignPlacement: "r"} // Default if negativePositiveSignPlacement is 'null' and currencySymbol is not empty
+     * -1,234.56$ => {currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "p"} // Default if negativePositiveSignPlacement is 'null' and currencySymbol is not empty
      * 1,234.56-  => {negativePositiveSignPlacement: "s"}
      * $1,234.56- => {currencySymbol: "$", negativePositiveSignPlacement: "s"}
      * 1,234.56-$ => {currencySymbol: "$", currencySymbolPlacement: "s"}
      * 1,234.56$- => {currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "r"}
      * Deprecated older option name : pNeg
      */
-    negativePositiveSignPlacement: 'l',
+    //TODO Rename the options to more explicit names ('p' => 'prefix', etc.)
+    negativePositiveSignPlacement: null,
 
     /* Additional suffix
      * Must be in quotes suffixText: 'gross', a space is allowed suffixText: ' dollars'
@@ -277,9 +279,10 @@ const defaultSettings = {
      * roundingMethod: "D05" Rounds down to next .05
      * Deprecated older option name : mRound
      */
+    //TODO Rename the options to more explicit names ('S' => 'RoundHalfUpSymmetric', etc.)
     roundingMethod: 'S',
 
-    /* Controls decimal padding
+    /* Allow padding the decimal places with zeros
      * allowDecimalPadding: true - always Pad decimals with zeros
      * allowDecimalPadding: false - does not pad with zeros.
      * Note: setting allowDecimalPadding to 'false' will override the 'decimalPlacesOverride' setting.
@@ -300,6 +303,7 @@ const defaultSettings = {
      * '{,}'
      * Deprecated older option name : nBracket
      */
+    //TODO Rename the options to more explicit names ('(,)' => 'parentheses', etc.)
     negativeBracketsTypeOnBlur: null,
 
     /* Displayed on empty string ""
@@ -358,7 +362,8 @@ const defaultSettings = {
      */
     outputFormat: null,
 
-    /* Error handling function
+    /* Defines if warnings should be shown
+     * Error handling function
      * true => all warning are shown
      * false => no warnings are shown, only the thrown errors
      * Deprecated older option name : debug
@@ -658,16 +663,16 @@ const keyName = {
 
 (function(factory) {
     //TODO This surely can be improved by letting webpack take care of generating this UMD part
-    if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(['jquery'], factory);
-    } else if (typeof module === 'object' && module.exports) {
-        // Node/CommonJS
-        module.exports = factory(require('jquery'));
-    } else {
-        // Browser globals
-        factory(window.jQuery);
-    }
+if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['jquery'], factory);
+} else if (typeof module === 'object' && module.exports) {
+    // Node/CommonJS
+    module.exports = factory(require('jquery'));
+} else {
+    // Browser globals
+    factory(window.jQuery);
+}
 }($ => {
     // Helper functions
 
@@ -1179,7 +1184,10 @@ const keyName = {
         // First replace anything before digits
         s = s.replace(settings.skipFirstAutoStrip, '$1$2');
 
-        if ((settings.negativePositiveSignPlacement === 's' || (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement !== 'p')) && contains(s, '-') && s !== '') {
+        if ((settings.negativePositiveSignPlacement === 's' ||
+            (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement !== 'p')) &&
+            contains(s, '-') &&
+            s !== '') {
             settings.trailingNegative = true;
         }
 
@@ -1342,8 +1350,8 @@ const keyName = {
             s = s.replace(settings.negativeSignCharacter, '-');
         }
         if (!s.match(/\d/)) {
-            // The default value returned by `get` is formatted with decimals
-            s += '0.00';
+            // The default value returned by `get` is not formatted with decimals
+            s += '0';
         }
 
         return s;
@@ -1994,24 +2002,49 @@ const keyName = {
      * @returns {string}
      */
     function cleanLeadingTrailingZeros(value, settings) {
-        // return '0' if the value is zero
+        // Return '0' if the value is zero
         if (Number(value) === 0 && settings.leadingZero !== 'keep') {
             return '0';
         }
 
         if (settings.leadingZero !== 'keep') {
-            // trim leading zero's - leaves one zero to the left of the decimal point
+            // Trim leading zero's - leaves one zero to the left of the decimal point
             value = value.replace(/^(-)?0+(?=\d)/g,'$1');
 
+            //TODO remove this from that function and use `trimPaddedZerosFromDecimalPlaces()` instead. Also create a new `trailingZero` option.
             if (contains(value, '.')) {
-                // trims trailing zeros after the decimal point
+                // Trims trailing zeros after the decimal point
                 value = value.replace(/(\.[0-9]*?)0+$/, '$1');
             }
         }
-        // strips trailing decimal point.
+        // Strips trailing decimal point
         value = value.replace(/\.$/, '');
 
         return value;
+    }
+
+    /**
+     * Remove the trailing zeros in the decimal part of a number.
+     *
+     * @param {string} numericString
+     * @returns {*}
+     */
+    function trimPaddedZerosFromDecimalPlaces(numericString) {
+        const [integerPart, decimalPart] = numericString.split('.');
+        if (isUndefinedOrNullOrEmpty(decimalPart)) {
+            return integerPart;
+        }
+
+        const trimmedDecimalPart = decimalPart.replace(/0+$/g, '');
+
+        let result;
+        if (trimmedDecimalPart === '') {
+            result = integerPart;
+        } else {
+            result = `${integerPart}.${trimmedDecimalPart}`;
+        }
+
+        return result;
     }
 
     /**
@@ -3762,22 +3795,25 @@ const keyName = {
      * - "$-1,234.56" instead of "-$1,234.56" ({currencySymbol: "$", negativePositiveSignPlacement: "r"})
      * - "-1,234.56$" instead of "1,234.56-$" ({currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "p"})
      *
-     * @param {object} options
      * @param {object} settings
      */
-    function correctPNegOption(options, settings) {
-        //TODO Merge the options and settings parameter to use only `settings`
-        if (!isUndefined(options) && isUndefinedOrNullOrEmpty(options.negativePositiveSignPlacement) && options.currencySymbol !== '') {
+    function correctNegativePositiveSignPlacementOption(settings) {
+        if (!isUndefined(settings) &&
+            isUndefinedOrNullOrEmpty(settings.negativePositiveSignPlacement) &&
+            !isUndefinedOrNullOrEmpty(settings.currencySymbol)) {
             switch (settings.currencySymbolPlacement) {
                 case 's':
-                    settings.negativePositiveSignPlacement = 'p';
+                    settings.negativePositiveSignPlacement = 'p'; // Default -1,234.56 €
                     break;
                 case 'p':
-                    settings.negativePositiveSignPlacement = 'r';
+                    settings.negativePositiveSignPlacement = 'l'; // Default -$1,234.56
                     break;
                 default :
                 //
             }
+        } else {
+            // Sets the default value if `negativePositiveSignPlacement` is `null`
+            settings.negativePositiveSignPlacement = 'l';
         }
     }
 
@@ -3801,7 +3837,7 @@ const keyName = {
      *
      * @param {object} settings
      */
-    function correctMDecOption(settings) {
+    function correctDecimalPlacesOverrideOption(settings) {
         if (!isNull(settings.scaleDivisor) && !isNull(settings.scaleDecimalPlaces)) {
             // Override the maximum number of decimal places with the one defined with the number of decimals to show when not in focus, if set
             settings.decimalPlacesOverride = settings.scaleDecimalPlaces;
@@ -4009,9 +4045,9 @@ const keyName = {
                 // The settings are updated
                 settings = $.extend(settings, options);
             } else {
-                // If we couldn't grab any settings create them from the default ones and combine them with the options passed
+                // If we couldn't grab any settings, create them from the default ones and combine them with the options passed
                 // The settings are generated for the first time
-                // Attempt to grab HTML5 data, if it doesn't exist, we'll get "undefined"
+                // This also attempt to grab the HTML5 data. If it doesn't exist, we'll get "undefined"
                 const tagData = $this.data();
                 settings = $.extend({}, defaultSettings, tagData, options, {
                     hasFocus        : false,
@@ -4029,7 +4065,7 @@ const keyName = {
             transformOptionsValuesToDefaultTypes(settings);
 
             // Improve the `negativePositiveSignPlacement` option if needed
-            correctPNegOption(options, settings);
+            correctNegativePositiveSignPlacementOption(settings);
 
             // Set the negative sign if needed
             settings.negativeSignCharacter = settings.minimumValue < 0 ? '-' : '';
@@ -4037,7 +4073,7 @@ const keyName = {
             // Additional changes to the settings object (from the original autoCode() function)
             runCallbacksFoundInTheSettingsObject($this, settings);
             calculateVMinAndVMaxIntegerSizes(settings);
-            correctMDecOption(settings);
+            correctDecimalPlacesOverrideOption(settings);
             setsAlternativeDecimalSeparatorCharacter(settings);
             cachesUsualRegularExpressions(settings);
 
@@ -4094,7 +4130,7 @@ const keyName = {
      */
     const methods = {
         /**
-         * Method to initiate autoNumeric and attach the settings (options can be passed as a parameter)
+         * Method to initialize autoNumeric and attach the settings (options can be passed as a parameter)
          * The options passed as a parameter is an object that contains the settings (ie. {digitGroupSeparator: ".", decimalCharacter: ",", currencySymbol: '€ '})
          *
          * @example
@@ -4229,10 +4265,13 @@ const keyName = {
                 //TODO This looks a lot like `getInputIfSupportedTagAndType()`. Is that necessary? Can the input element be changed since autoNumeric has been initialized?
                 const $this = getCurrentElement(this);
                 const settings = $this.data('autoNumeric');
-                const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
                 if (typeof settings !== 'object') {
                     throwError(`Initializing autoNumeric is required prior to calling the "set" method.`);
                 }
+                // Reset the trailing negative settings, since it's possible the previous value was negative, but not the newly set one
+                settings.trailingNegative = false;
+
+                const $input = $this.is('input[type=text], input[type=hidden], input[type=tel], input:not([type])');
 
                 let value = toNumericValue(newValue, settings);
                 if (isNaN(value)) {
@@ -4403,21 +4442,25 @@ const keyName = {
                 }
 
                 if (settings.runOnce || settings.formatOnPageLoad === false) {
-                    // this strips trailing negative symbol
+                    // Strips trailing negative symbol
                     value = stripAllNonNumberCharacters(value, settings, true);
-                    // trims leading and trailing zeros when leadingZero does NOT equal "keep".
+                    // Trims leading and trailing zeros when leadingZero does NOT equal "keep".
                     value = cleanLeadingTrailingZeros(value, settings);
 
-                    // this places the negative symbol in front on trailing negative
-                    if (settings.trailingNegative && isNegative && !contains(value, '-') && Number(value) !== 0) {
+                    // Places the negative symbol in front of the trailing negative
+                    if (settings.trailingNegative && isNegative && !contains(value, '-') && !isZero) {
                         value = '-' + value;
                     }
                 }
-                value = (value !== '' || value === '' && settings.emptyInputBehavior === 'zero') ? modifyNegativeSignAndDecimalCharacterForRawValue(value, settings) : value;
+
+                if (value !== '' || value === '' && settings.emptyInputBehavior === 'zero') {
+                    value = modifyNegativeSignAndDecimalCharacterForRawValue(value, settings);
+                }
             }
 
             // Always return a numeric string
-            return value;
+            // This gets rid of the trailing zeros in the decimal places since `get` does not pad decimals
+            return trimPaddedZerosFromDecimalPlaces(value);
         },
 
         /**
@@ -4427,6 +4470,8 @@ const keyName = {
          *
          * By default the returned values are an ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period.
          * Check the "outputFormat" option definition for more details.
+         *
+         * @usage $(someSelector).autoNumeric('getLocalized');
          *
          * @returns {*}
          */
@@ -4443,7 +4488,9 @@ const keyName = {
         },
 
         /**
-         * Return the input unformatted value as a number.
+         * Return the input unformatted value as a real Javascript number.
+         *
+         * @usage $(someSelector).autoNumeric('getNumber');
          *
          * @returns {number}
          */
@@ -4678,17 +4725,17 @@ const keyName = {
 
         // Then tests the options individually
         if (!isInArray(options.digitGroupSeparator, [
-                ',',      // Comma
-                '.',      // Dot
-                ' ',      // Normal space
-                '\u2009', // Thin-space
-                '\u202f', // Narrow no-break space
-                '\u00a0', // No-break space
-                '',       // No separator
-                "'",      // Apostrophe
-                '٬',      // Arabic thousands separator
-                '˙',      // Dot above
-            ])) {
+            ',',      // Comma
+            '.',      // Dot
+            ' ',      // Normal space
+            '\u2009', // Thin-space
+            '\u202f', // Narrow no-break space
+            '\u00a0', // No-break space
+            '',       // No separator
+            "'",      // Apostrophe
+            '٬',      // Arabic thousands separator
+            '˙',      // Dot above
+        ])) {
             throwError(`The thousand separator character option 'digitGroupSeparator' is invalid ; it should be ',', '.', '٬', '˙', "'", ' ', '\u2009', '\u202f', '\u00a0' or empty (''), [${options.digitGroupSeparator}] given.`);
         }
 
@@ -4701,12 +4748,12 @@ const keyName = {
         }
 
         if (!isInArray(options.decimalCharacter, [
-                ',', // Comma
-                '.', // Dot
-                '·', // Middle-dot
-                '٫', // Arabic decimal separator
-                '⎖', // Decimal separator key symbol
-            ])) {
+            ',', // Comma
+            '.', // Dot
+            '·', // Middle-dot
+            '٫', // Arabic decimal separator
+            '⎖', // Decimal separator key symbol
+        ])) {
             throwError(`The decimal separator character option 'decimalCharacter' is invalid ; it should be '.', ',', '·', '⎖' or '٫', [${options.decimalCharacter}] given.`);
         }
 
@@ -4727,8 +4774,8 @@ const keyName = {
             throwError(`The placement of the currency sign option 'currencySymbolPlacement' is invalid ; it should either be 'p' (prefix) or 's' (suffix), [${options.currencySymbolPlacement}] given.`);
         }
 
-        if (!isInArray(options.negativePositiveSignPlacement, ['p', 's', 'l', 'r'])) {
-            throwError(`The placement of the negative sign option 'negativePositiveSignPlacement' is invalid ; it should either be 'p' (prefix), 's' (suffix), 'l' (left) or 'r' (right), [${options.negativePositiveSignPlacement}] given.`);
+        if (!isInArray(options.negativePositiveSignPlacement, ['p', 's', 'l', 'r', null])) {
+            throwError(`The placement of the negative sign option 'negativePositiveSignPlacement' is invalid ; it should either be 'p' (prefix), 's' (suffix), 'l' (left), 'r' (right) or 'null', [${options.negativePositiveSignPlacement}] given.`);
         }
 
         if (!isString(options.suffixText) || (options.suffixText !== '' && (contains(options.suffixText, '-') || testNumericalCharacters.test(options.suffixText)))) {
@@ -4794,30 +4841,30 @@ const keyName = {
         }
 
         if (!isInArray(options.onInvalidPaste, [
-                'error',
-                'ignore',
-                'clamp',
-                'truncate',
-                'replace',
-            ])) {
+            'error',
+            'ignore',
+            'clamp',
+            'truncate',
+            'replace',
+        ])) {
             throwError(`The paste behavior option 'onInvalidPaste' is invalid ; it should either be 'error', 'ignore', 'clamp', 'truncate' or 'replace' (cf. documentation), [${options.onInvalidPaste}] given.`);
         }
 
         if (!isInArray(options.roundingMethod, [
-                'S',
-                'A',
-                's',
-                'a',
-                'B',
-                'U',
-                'D',
-                'C',
-                'F',
-                'N05',
-                'CHF',
-                'U05',
-                'D05',
-            ])) {
+            'S',
+            'A',
+            's',
+            'a',
+            'B',
+            'U',
+            'D',
+            'C',
+            'F',
+            'N05',
+            'CHF',
+            'U05',
+            'D05',
+        ])) {
             throwError(`The rounding method option 'roundingMethod' is invalid ; it should either be 'S', 'A', 's', 'a', 'B', 'U', 'D', 'C', 'F', 'N05', 'CHF', 'U05' or 'D05' (cf. documentation), [${options.roundingMethod}] given.`);
         }
 
@@ -4854,15 +4901,15 @@ const keyName = {
         }
 
         if (!isNull(options.outputFormat) && !isInArray(options.outputFormat, [
-                'string',
-                'number',
-                '.',
-                '-.',
-                ',',
-                '-,',
-                '.-',
-                ',-',
-            ])) {
+            'string',
+            'number',
+            '.',
+            '-.',
+            ',',
+            '-,',
+            '.-',
+            ',-',
+        ])) {
             throwError(`The custom locale format option 'outputFormat' is invalid ; it should either be null, 'string', 'number', '.', '-.', ',', '-,', '.-' or ',-', [${options.outputFormat}] given.`);
         }
 
@@ -4939,7 +4986,7 @@ export default {
     unFormat: autoUnFormat,
     getDefaultConfig,
     validate, // an.validate(options) : throws if necessary
-    areSettingsValid, //an.areSettingsValid(options) : return true or false //TODO Is this redundant? Should we let the developers wrap each autoNumeric.validate() calls in try/catch block? Or should we just facilitate their life by doing it already?
+    areSettingsValid, // an.areSettingsValid(options) : return true or false //TODO Is this redundant? Should we let the developers wrap each autoNumeric.validate() calls in try/catch block? Or should we just facilitate their life by doing it already?
 
     //TODO Complete the interface with functions having the following signatures :
     //init         : an.init(options, input)

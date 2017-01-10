@@ -1,7 +1,8 @@
 ### Change log for autoNumeric:
 
 ### "2.0.0-beta.18"
-+ Fix issue #330 The `negativePositiveSignPlacement` option can be ignored in some cases         
++ Fix issue #330 The `negativePositiveSignPlacement` option can be ignored in some cases
++ Fix issue #339 `get` returns `'0'` when the input is empty even if `emptyInputBehavior` is not equal to `'zero'`
 
 ### "2.0.0-beta.17"
 + Fix issue #317 allow jumping over the decimal character when the caret is just left of the decimal character and the user enters the decimal character

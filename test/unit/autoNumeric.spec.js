@@ -696,6 +696,22 @@ describe(`autoNumeric 'get', 'getLocalized' and 'getNumber' methods`, () => {
 });
 
 describe(`autoNumeric 'get' methods`, () => {
+    it(`should return an empty string as the default value`, () => {
+        const newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+        const aNInput = $(newInput).autoNumeric('init'); // Initiate the autoNumeric input
+
+        expect(aNInput.autoNumeric('get')).toEqual('');
+    });
+
+    it(`should return '0' as the default value`, () => {
+        const newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+        const aNInput = $(newInput).autoNumeric('init', { emptyInputBehavior : 'zero' }); // Initiate the autoNumeric input
+
+        expect(aNInput.autoNumeric('get')).toEqual('0');
+    });
+
     it(`should not return a negative value when inputting a positive one and minimumValue is equal to '0' (cf. issue #284)`, () => {
         const newInput = document.createElement('input');
         document.body.appendChild(newInput);
@@ -703,7 +719,7 @@ describe(`autoNumeric 'get' methods`, () => {
         const aNInput = $(newInput).autoNumeric('init', { minimumValue: '0', maximumValue: '9999', decimalPlacesOverride: '2' }); // Initiate the autoNumeric input
         expect(console.warn).toHaveBeenCalled();
 
-        expect(aNInput.autoNumeric('get')).toEqual('0');
+        expect(aNInput.autoNumeric('get')).toEqual('');
         aNInput.autoNumeric('set', 1234);
         expect(aNInput.autoNumeric('get')).toEqual('1234');
         aNInput.autoNumeric('set', 0);
@@ -722,7 +738,7 @@ describe(`autoNumeric 'get' methods`, () => {
         const aNInput = $(newInput).autoNumeric('init', { minimumValue: '1', maximumValue: '9999', decimalPlacesOverride: '2' }); // Initiate the autoNumeric input
         expect(console.warn).toHaveBeenCalled();
 
-        expect(aNInput.autoNumeric('get')).toEqual('0');
+        expect(aNInput.autoNumeric('get')).toEqual('');
         aNInput.autoNumeric('set', 1234);
         expect(aNInput.autoNumeric('get')).toEqual('1234');
 

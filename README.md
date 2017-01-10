@@ -148,13 +148,13 @@ autoNumeric provides numerous methods to access and modify the input value, form
 | `getDefaultConfig` | Return the default autoNumeric settings | `an.getDefaultConfig` |
 | `format` | Format the given value without needing to initialize an autoNumeric input first | `an.format('1234.56', {options})` |
 | `unFormat` | Unformat the given value without needing to initialize an autoNumeric input first | `an.unFormat('1.234,56 €', {options})` |
-| `validate` |  | `an.validate({options})` |
-| `areSettingsValid` |  | `an.areSettingsValid({options})` |
+| `validate` | Check if the given option object is valid, and that each option is valid as well. This throws an error if it's not. | `an.validate({options})` |
+| `areSettingsValid` | Return true in the settings are valid | `an.areSettingsValid({options})` |
 
 *Work is ongoing to export all the current jQuery-only methods into the ES6 module.*
 
 ## Questions
-For questions and support please use the [Gitter chat room](https://gitter.im/autoNumeric/Lobby) or IRC on Freenode #autoNumeric. The issue list of this repo is **exclusively** for bug reports and feature requests.
+For questions and support please use the [Gitter chat room](https://gitter.im/autoNumeric/Lobby) or IRC on Freenode #autoNumeric.<br>The issue list of this repo is **exclusively** for bug reports and feature requests.
 
 ****
 
@@ -162,23 +162,23 @@ For questions and support please use the [Gitter chat room](https://gitter.im/au
 Contributors and pull requests are welcome.<br>Feel free to contact us for any questions.
 
 ### Get the source
-```shell
+```sh
 # git clone -b next https://github.com/BobKnothe/autoNumeric.git
 // or the following if you are authentified on github :
 // `git clone -b next git@github.com:BobKnothe/autoNumeric.git`
 ```
 
 ### Make your changes
-```shell
+```sh
 # cd autoNumeric
 ```
 First things first, in order to be able to compile the ES6 source to something that can be interpreted by the browsers, and get the tools (linter, test runners, etc.) used by the developers, you need to install them by doing :
-```shell
+```sh
 # npm install
 ```
 
 Once you made your changes, you can build the library with :
-```shell
+```sh
 # npm run build
 ```
 This will generate the `autoNumeric.js` and `autoNumeric.min.js` in the `dist` folder, that you'll then be able to use in the browsers.
@@ -194,7 +194,7 @@ We strive to keep the tests green at all times. Hence whenever you change the so
 ##### How to test?
 Tests **must always be green** before pushing. Any commit that make the tests fails will be ignored.
 To run the tests, you have multiple options :
-```shell
+```sh
 // Run unit testing as well as end-to-end testing
 # npm run test
 
@@ -212,11 +212,11 @@ To run the tests, you have multiple options :
 
 ##### How to lint?
 Linting allow us to keep a coherent code style in all the source files. In order to check that everything is ok, run :
-```shell
+```sh
 # npm run lint
 ```
 If any errors are shown, you can try to automatically correct them by running :
-```shell
+```sh
 // Use the path of the faulty file there :
 # ./node_modules/eslint/bin/eslint.js --fix src/autoNumeric.js
 ```

@@ -62,6 +62,8 @@ $(document).ready(function() {
 
 You're done!
 
+**Note**: For integration into rails projects, use [autonumeric-rails](https://github.com/randoum/autonumeric-rails)
+
 ### On which elements can it be used?
 Here are the following supported input types:
 - `text`,
@@ -237,7 +239,7 @@ Some work is [in progress](https://github.com/BobKnothe/autoNumeric/issues/244) 
 The previous stable autoNumeric version v1.9.46 can be found [here](https://github.com/BobKnothe/autoNumeric/releases/tag/1.9.46).
 
 ## Related projects
-
+[autonumeric-rails](https://github.com/randoum/autonumeric-rails) integration in rails project with unobtrusive JavaScript
 
 ## Documentation
 A more detailed documentation can be found in the [Documentation](Documentation.md) file.<br>

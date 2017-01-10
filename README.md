@@ -237,7 +237,7 @@ Some work is [in progress](https://github.com/BobKnothe/autoNumeric/issues/244) 
 The previous stable autoNumeric version v1.9.46 can be found [here](https://github.com/BobKnothe/autoNumeric/releases/tag/1.9.46).
 
 ## Related projects
-
+For integration into [Rails](http://rubyonrails.org/) projects, you can use the [autonumeric-rails](https://github.com/randoum/autonumeric-rails) project.
 
 ## Documentation
 A more detailed documentation can be found in the [Documentation](Documentation.md) file.<br>

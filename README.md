@@ -48,7 +48,7 @@ Simply include jQuery and autoNumeric (in that order) in your html header tag.<b
 <script src="autoNumeric.js" type="text/javascript"></script>
 ```
 
-Initialize autoNumeric and pass any options :
+Initialize autoNumeric with or without options :
 
 ```javascript
 $(document).ready(function() {
@@ -115,7 +115,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | `showWarnings`| Defines if warnings should be shown | `true` |
 | `failOnUnknownOption `| This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object. | `false` |
 
-For more detail on how to use each options, please take a look at the detailled comments in the source code for the `defaultSettings` object.
+For more detail on how to use each options, please take a look at the detailed comments in the source code for the `defaultSettings` object.
 
 ## Methods
 autoNumeric provides numerous methods to access and modify the input value, formatted or unformatted, at any point in time.
@@ -145,7 +145,7 @@ autoNumeric provides numerous methods to access and modify the input value, form
 #### ES6 Module calls
 | Method           | Description | Call example |
 | :---------------- | :-----------:  | :-----------:  |
-| `getDefaultConfig` | Return the default autoNumeric settings | `an.getDefaultConfig` |
+| `getDefaultConfig` | Return the default autoNumeric settings | `an.getDefaultConfig()` |
 | `format` | Format the given value without needing to initialize an autoNumeric input first | `an.format('1234.56', {options})` |
 | `unFormat` | Unformat the given value without needing to initialize an autoNumeric input first | `an.unFormat('1.234,56 €', {options})` |
 | `validate` | Check if the given option object is valid, and that each option is valid as well. This throws an error if it's not. | `an.validate({options})` |

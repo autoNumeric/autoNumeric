@@ -1,7 +1,7 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0-beta.18
+ * @version      2.0-beta.19
  * @date         2017-01-10 UTC 01:00
  *
  * @author       Bob Knothe
@@ -10,10 +10,8 @@
  * @copyright    2009 Robert J. Knothe http://www.decorplanit.com/plugin/
  * @since        2009-08-09
  *
- * @summary      autoNumeric is a jQuery plugin that automatically formats currency
- * (money) and numbers as-you-type in a form inputs. It supports most
- * international numeric formats and currency signs including those used in
- * Europe, North and South America, Asia, as well as India's' lakhs.
+ * @summary      autoNumeric is a library that provides live as-you-type
+ *               formatting for international numbers and currencies.
  *
  *               Note : Some functions are borrowed from big.js
  * @link         https://github.com/MikeMcl/big.js/
@@ -101,13 +99,17 @@ const allowedTagList = [
  * - Use jQuery's `$.extend` method for global changes - also a great way to pass ASP.NET current culture settings
  */
 const defaultSettings = {
-    /* Allowed thousand separator characters
-     * comma = ","
-     * period "full stop" = "."
-     * quote = "'"
-     * space = " "
-     * none = ""
-     * NOTE: do not use numeric characters
+    /* Allowed thousand grouping separator characters :
+     * ','      // Comma
+     * '.'      // Dot
+     * ' '      // Normal space
+     * '\u2009' // Thin-space
+     * '\u202f' // Narrow no-break space
+     * '\u00a0' // No-break space
+     * ''       // No separator
+     * "'"      // Apostrophe
+     * '٬'      // Arabic thousands separator
+     * '˙'      // Dot above
      * Deprecated older option name : aSep
      */
     digitGroupSeparator: ',',
@@ -128,16 +130,19 @@ const defaultSettings = {
      */
     digitalGroupSpacing: '3',
 
-    /* Allowed decimal separator characters
-     * period "full stop" = "."
-     * comma = ","
+    /* Allowed decimal separator characters :
+     * ',' : Comma
+     * '.' : Dot
+     * '·' : Middle-dot
+     * '٫' : Arabic decimal separator
+     * '⎖' : Decimal separator key symbol
      * Deprecated older option name : aDec
      */
     decimalCharacter: '.',
 
-    /* Allow to declare alternative decimal separator which is automatically replaced by decimalCharacter
-     * developed for countries the use a comma "," as the decimal character
-     * and have keyboards\numeric pads that have a period 'full stop' as the decimal characters (Spain is an example)
+    /* Allow to declare an alternative decimal separator which is automatically replaced by `decimalCharacter` when typed.
+     * This is used by countries that use a comma "," as the decimal character and have keyboards\numeric pads that have
+     * a period 'full stop' as the decimal characters (France or Spain for instance).
      * Deprecated older option name : altDec
      */
     decimalCharacterAlternative: null,
@@ -1291,6 +1296,12 @@ if (typeof define === 'function' && define.amd) {
             s = '-' + s;
         }
 
+        // Convert any arabic numbers to latin ones
+        const temp = arabicToLatinNumbers(s, true, false, false);
+        if (!isNaN(temp)) {
+            s = temp.toString();
+        }
+
         return s;
     }
 
@@ -2006,7 +2017,7 @@ if (typeof define === 'function' && define.amd) {
         if (value === '') {
             return '';
         }
-        
+
         // Return '0' if the value is zero
         if (Number(value) === 0 && settings.leadingZero !== 'keep') {
             return '0';
@@ -3329,7 +3340,10 @@ if (typeof define === 'function' && define.amd) {
         const rawPastedTextSize = rawPastedText.length; // This use the 'cleaned' paste text
 
         // 2. Strip all thousand separators, brackets and currency sign, and convert the decimal character to a dot
-        const pastedText = preparePastedText(rawPastedText, holder);
+        const untranslatedPastedText = preparePastedText(rawPastedText, holder);
+
+        // Allow pasting arabic numbers
+        const pastedText = arabicToLatinNumbers(untranslatedPastedText, false, false, false);
 
         // 3. Test if the paste is valid (only has numbers and eventually a decimal character). If it's not valid, stop here.
         if (!isNumber(pastedText) || pastedText === '') {
@@ -4944,6 +4958,49 @@ if (typeof define === 'function' && define.amd) {
 
         return isValid;
     };
+
+    /**
+     * Take an arabic number as a string and return a javascript number.
+     * By default, this function does not try to convert the arabic decimal and thousand separator characters.
+     * This returns `NaN` is the conversion is not possible.
+     * Based on http://stackoverflow.com/a/17025392/2834898
+     *
+     * @param {string} arabicNumbers
+     * @param {boolean} returnANumber If `true`, return a Number, otherwise return a String
+     * @param {boolean} parseDecimalCharacter
+     * @param {boolean} parseThousandSeparator
+     * @returns {string|number|NaN}
+     */
+    function arabicToLatinNumbers(arabicNumbers, returnANumber = true, parseDecimalCharacter = false, parseThousandSeparator = false) {
+        let result = arabicNumbers.toString();
+        if (result === '') {
+            return arabicNumbers;
+        }
+
+        if (parseDecimalCharacter) {
+            result = result.replace(/٫/, '.'); // Decimal character
+        }
+
+        if (parseThousandSeparator) {
+            result = result.replace(/٬/g, ''); // Thousand separator
+        }
+
+        // Replace the numbers only
+        result = result.replace(/[٠١٢٣٤٥٦٧٨٩]/g, d => d.charCodeAt(0) - 1632) // Arabic numbers
+                       .replace(/[۰۱۲۳۴۵۶۷۸۹]/g, d => d.charCodeAt(0) - 1776); // Persian numbers
+
+        // `NaN` has precedence over the string `'NaN'`
+        const resultAsNumber = Number(result);
+        if (isNaN(resultAsNumber)) {
+            return resultAsNumber;
+        }
+
+        if (returnANumber) {
+            result = resultAsNumber;
+        }
+
+        return result;
+    }
 
     /**
      * Create a custom event and immediately sent it from the given element.

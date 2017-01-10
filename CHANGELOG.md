@@ -1,5 +1,10 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.19"
++ Allow using `set` with Arabic and Persian numbers (ie. `aNInput.autoNumeric('set', '١٠٢٣٤٥٦٧.٨٩');`)
++ Allow using Arabic and Persian numbers (used in Arabic languages) in the html `value` attribute
++ Allow pasting Arabic and Persian numbers (that will get converted to latin numbers on the fly)
+
 ### "2.0.0-beta.18"
 + Fix issue #330 The `negativePositiveSignPlacement` option can be ignored in some cases
 + Fix issue #339 `get` returns `'0'` when the input is empty even if `emptyInputBehavior` is not equal to `'zero'`
@@ -10,7 +15,9 @@
 + Fix issue #327 so the entire content is selected when tabbing in. 
 
 ### "2.0.0-beta.16"
-+ Fix issue #321 Allows more international decimal characters and grouping separators.
++ Fix issue #321 Allows more international decimal characters and grouping separators :
+ + Allowed grouping separator : `','`, `'.'`, `'٬'`, `'˙'`, `"'"`, `' '`, `'\u2009'`, `'\u202f'`, `'\u00a0'` and `''`
+ + Allowed decimal characters : `'.'`, `','`, `'·'`, `'⎖'` and `'٫'`
 
 ### "2.0.0-beta.15"
 + Fix FireFox on issue #306 that allows the caret to move right when all zero present in the decimals

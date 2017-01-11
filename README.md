@@ -51,14 +51,16 @@ Simply include jQuery and autoNumeric (in that order) in your html header tag.<b
 Initialize autoNumeric with or without options :
 
 ```javascript
-$(document).ready(function() {
-   $(selector).autoNumeric('init'); //autoNumeric with defaults
-});
+// autoNumeric with the defaults options
+$(selector).autoNumeric('init');
 
-$(document).ready(function() {
-   $(selector).autoNumeric('init', { options }); //autoNumeric with options being passed
-});
+// autoNumeric with specific options being passed
+$(selector).autoNumeric('init', { options }); 
+
+// autoNumeric with pre-defined language options being passed
+$(selector).autoNumeric('init', $.fn.autoNumeric.lang.French);
 ```
+*(See the available language list [here](#predefined-language-options))*
 
 You're done!
 
@@ -117,6 +119,30 @@ Multiple options allow you to customize precisely how a form input will format y
 
 For more detail on how to use each options, please take a look at the detailed comments in the source code for the `defaultSettings` object.
 
+#### Predefined language options
+Sometime you do not want to have to configure every single aspect of your format, specially if it's a common one.<br>Hence, we provide multiple default options for the most common currencies.
+
+You can use those pre-defined language option like so :
+```js
+// ES6 way
+$(selector).autoNumeric('init', an.getLanguages().French);
+
+// jQuery way
+$(selector).autoNumeric('init', $.fn.autoNumeric.lang.French);
+```
+
+Currently, the predefined options are :
+
+| Option name       |
+| :---------------- |
+| `French` |
+| `NorthAmerican` |
+| `British` |
+| `Swiss` |
+| `Japanese` |
+
+If you feel a common currency option is missing, please create a pull request and we'll add it!
+
 ## Methods
 autoNumeric provides numerous methods to access and modify the input value, formatted or unformatted, at any point in time.
 <br>It does so by either providing access to those methods via the jQuery wrapper, or directly from the autoNumeric ES6 module.
@@ -138,6 +164,7 @@ autoNumeric provides numerous methods to access and modify the input value, form
 | `getString` | Serialize the whole form input array into a String | `$(someSelector).autoNumeric('getString');` |
 | `getArray` | Serialize the whole form input array into an Array | `$(someSelector).autoNumeric('getArray');` |
 | `defaults` | Return the default autoNumeric settings | `$.fn.autoNumeric.defaults` |
+| `lang` | Return all the predefined language options in one object | `$.fn.autoNumeric.lang` |
 | `autoFormat` | cf. ES6 Module calls | `$(someSelector).autoFormat('1234.56', {options});` |
 | `autoUnFormat` | cf. ES6 Module calls | `$(someSelector).autoUnFormat('1.234,56 €', {options});` |
 | `autoValidate` | cf. ES6 Module calls | `$(someSelector).autoValidate({options});` |
@@ -146,6 +173,7 @@ autoNumeric provides numerous methods to access and modify the input value, form
 | Method           | Description | Call example |
 | :---------------- | :-----------:  | :-----------:  |
 | `getDefaultConfig` | Return the default autoNumeric settings | `an.getDefaultConfig()` |
+| `getLanguages` | Return all the predefined language options in one object | `an.getLanguages()` |
 | `format` | Format the given value without needing to initialize an autoNumeric input first | `an.format('1234.56', {options})` |
 | `unFormat` | Unformat the given value without needing to initialize an autoNumeric input first | `an.unFormat('1.234,56 €', {options})` |
 | `validate` | Check if the given option object is valid, and that each option is valid as well. This throws an error if it's not. | `an.validate({options})` |

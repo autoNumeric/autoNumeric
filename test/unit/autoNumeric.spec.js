@@ -139,6 +139,55 @@ describe('The autoNumeric object', () => {
         expect(an.getDefaultConfig()).toEqual(defaultOption);
     });
 
+    it('should return the predefined language options', () => {
+        const defaultLanguageOption = {
+            French       : { // Français
+                selectNumberOnly           : true,
+                digitGroupSeparator        : '.',
+                decimalCharacter           : ',',
+                decimalCharacterAlternative: '.',
+                currencySymbol             : '\u202f€',
+                currencySymbolPlacement    : 's',
+                roundingMethod             : 'U',
+                leadingZero                : 'deny',
+                minimumValue               : '-999999999999.99',
+                maximumValue               : '999999999999.99',
+            },
+            NorthAmerican: {
+                selectNumberOnly       : true,
+                digitGroupSeparator    : ',',
+                decimalCharacter       : '.',
+                currencySymbol         : '$',
+                currencySymbolPlacement: 'p',
+                roundingMethod         : 'U',
+                leadingZero            : 'deny',
+                minimumValue           : '-999999999999.99',
+                maximumValue           : '999999999999.99',
+            },
+        };
+
+        // Test the options one by one, which makes it easier to spot the error
+        //XXX This loop is useful to spot the faulty options, since only those that are not equal to the default are shown
+        const predefinedLanguages = an.getLanguages();
+        let i = 0;
+        for (const lang in defaultLanguageOption) { //XXX Here I test only this language subset
+            i++;
+            if (predefinedLanguages.hasOwnProperty(lang)) {
+                for (const prop in predefinedLanguages[lang]) {
+                    if (predefinedLanguages[lang].hasOwnProperty(prop)) {
+                        if (predefinedLanguages[lang][prop] !== defaultLanguageOption[lang][prop]) {
+                            console.log(`${i}: Setting ${prop} = [${predefinedLanguages[lang][prop]}][${defaultLanguageOption[lang][prop]}]`); //DEBUG
+                        }
+                        expect(predefinedLanguages[lang][prop]).toEqual(defaultLanguageOption[lang][prop]);
+                    }
+                }
+            }
+        }
+
+        // Global test
+        // expect(an.getLanguages()).toEqual(defaultLanguageOption); //XXX Here I test only a language subset, not all language options
+    });
+
     it('should be initiated with the default values', () => {
         const defaultSettings = an.getDefaultConfig();
         const aNInputSettings = aNInput.autoNumeric('getSettings');
@@ -528,6 +577,53 @@ describe('The autoNumeric object', () => {
         expect(() => aNInput.autoNumeric(-10)).toThrow();
         expect(() => aNInput.autoNumeric('foobar')).toThrow();
         expect(() => aNInput.autoNumeric('foobar')).toThrowError('Method "foobar" is not supported by autoNumeric');
+    });
+});
+
+describe(`autoNumeric 'init' method should init with predefined options`, () => {
+    let aNInput;
+    let newInput;
+
+    it('with French', () => {
+        newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+        aNInput = $(newInput).autoNumeric('init', $.fn.autoNumeric.lang.French); // Initiate the autoNumeric input
+
+        aNInput.autoNumeric('set', '1234567.89');
+        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(1234567.89);
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('1.234.567,89\u202f€');
+
+        aNInput.autoNumeric('destroy');
+        document.body.removeChild(newInput);
+    });
+
+    it('with North American', () => {
+        newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+        aNInput = $(newInput).autoNumeric('init', $.fn.autoNumeric.lang.NorthAmerican); // Initiate the autoNumeric input
+
+        aNInput.autoNumeric('set', '1234567.89');
+        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(1234567.89);
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('$1,234,567.89');
+
+        aNInput.autoNumeric('destroy');
+        document.body.removeChild(newInput);
+    });
+
+    it('with Japanese', () => {
+        newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+        aNInput = $(newInput).autoNumeric('init', $.fn.autoNumeric.lang.Japanese); // Initiate the autoNumeric input
+
+        aNInput.autoNumeric('set', '1234567.89');
+        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
+        expect(aNInput.autoNumeric('getNumber')).toEqual(1234567.89);
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('¥1,234,567.89');
+
+        aNInput.autoNumeric('destroy');
+        document.body.removeChild(newInput);
     });
 });
 
@@ -1051,6 +1147,12 @@ describe('Static autoNumeric functions', () => {
 
             // Giving an unformatted value should return the same unformatted value, whatever the options passed as a parameter
             expect(an.unFormat(1234.56, autoNumericOptionsEuro)).toEqual(1234.56);
+        });
+
+        it('should only send a warning, and not throw', () => {
+            spyOn(console, 'warn');
+            expect(() => an.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(console.warn).toHaveBeenCalled();
         });
     });
 

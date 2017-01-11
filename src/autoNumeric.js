@@ -1,7 +1,7 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0-beta.19
+ * @version      2.0-beta.20
  * @date         2017-01-10 UTC 01:00
  *
  * @author       Bob Knothe
@@ -50,6 +50,7 @@
 let autoFormat;
 let autoUnFormat;
 let getDefaultConfig;
+let getLanguages;
 let validate;
 let areSettingsValid;
 
@@ -666,6 +667,78 @@ const keyName = {
     Quote:          "'",
 };
 
+const defaultMinimumValue     = '-999999999999.99';
+const defaultMaximumValue     = '999999999999.99';
+const defaultRoundingMethod   = 'U';
+const defaultLeadingZero      = 'deny';
+const defaultSelectNumberOnly = true;
+
+/**
+ * Predefined options for the most common languages
+ */
+const languageOption = {
+    French: { // Français
+        digitGroupSeparator        : '.', // or '\u202f'
+        decimalCharacter           : ',',
+        decimalCharacterAlternative: '.',
+        currencySymbol             : '\u202f€',
+        currencySymbolPlacement    : 's',
+        selectNumberOnly           : defaultSelectNumberOnly,
+        roundingMethod             : defaultRoundingMethod,
+        leadingZero                : defaultLeadingZero,
+        minimumValue               : defaultMinimumValue,
+        maximumValue               : defaultMaximumValue,
+    },
+    NorthAmerican: {
+        digitGroupSeparator    : ',',
+        decimalCharacter       : '.',
+        currencySymbol         : '$',
+        currencySymbolPlacement: 'p',
+        selectNumberOnly       : defaultSelectNumberOnly,
+        roundingMethod         : defaultRoundingMethod,
+        leadingZero            : defaultLeadingZero,
+        minimumValue           : defaultMinimumValue,
+        maximumValue           : defaultMaximumValue,
+    },
+    British: {
+        digitGroupSeparator    : ',',
+        decimalCharacter       : '.',
+        currencySymbol         : '£',
+        currencySymbolPlacement: 'p',
+        selectNumberOnly       : defaultSelectNumberOnly,
+        roundingMethod         : defaultRoundingMethod,
+        leadingZero            : defaultLeadingZero,
+        minimumValue           : defaultMinimumValue,
+        maximumValue           : defaultMaximumValue,
+    },
+    Swiss: { // Suisse
+        digitGroupSeparator    : `'`,
+        decimalCharacter       : '.',
+        currencySymbol         : '\u202fCHF',
+        currencySymbolPlacement: 's',
+        selectNumberOnly       : defaultSelectNumberOnly,
+        roundingMethod         : defaultRoundingMethod,
+        leadingZero            : defaultLeadingZero,
+        minimumValue           : defaultMinimumValue,
+        maximumValue           : defaultMaximumValue,
+    },
+    Japanese: { // 日本語
+        digitGroupSeparator    : ',',
+        decimalCharacter       : '.',
+        currencySymbol         : '¥',
+        currencySymbolPlacement: 'p',
+        selectNumberOnly       : defaultSelectNumberOnly,
+        roundingMethod         : defaultRoundingMethod,
+        leadingZero            : defaultLeadingZero,
+        minimumValue           : defaultMinimumValue,
+        maximumValue           : defaultMaximumValue,
+    },
+};
+languageOption.Spanish = languageOption.French; // Español (idem French)
+
+/**
+ * UMD structure
+ */
 (function(factory) {
     //TODO This surely can be improved by letting webpack take care of generating this UMD part
 if (typeof define === 'function' && define.amd) {
@@ -3893,17 +3966,28 @@ if (typeof define === 'function' && define.amd) {
      * @param {object} settings
      */
     function cachesUsualRegularExpressions(settings) {
+        const allNumbersReg = '[0-9]';
+        const noAllNumbersReg = '[^0-9]';
+
+        // Test if there is a negative character in the string
         const aNegReg = settings.negativeSignCharacter?`([-\\${settings.negativeSignCharacter}]?)`:'(-?)';
         settings.aNegRegAutoStrip = aNegReg;
-        settings.skipFirstAutoStrip = new RegExp(`${aNegReg}[^-${(settings.negativeSignCharacter?`\\${settings.negativeSignCharacter}`:'')}\\${settings.decimalCharacter}\\d].*?(\\d|\\${settings.decimalCharacter}\\d)`);
-        settings.skipLastAutoStrip = new RegExp(`(\\d\\${settings.decimalCharacter}?)[^\\${settings.decimalCharacter}\\d]\\D*$`);
+
+        let negativeSignRegPart;
+        if (settings.negativeSignCharacter) {
+            negativeSignRegPart = `\\${settings.negativeSignCharacter}`;
+        } else {
+            negativeSignRegPart = '';
+        }
+        settings.skipFirstAutoStrip = new RegExp(`${aNegReg}[^-${negativeSignRegPart}\\${settings.decimalCharacter}${allNumbersReg}].*?(${allNumbersReg}|\\${settings.decimalCharacter}${allNumbersReg})`);
+        settings.skipLastAutoStrip = new RegExp(`(${allNumbersReg}\\${settings.decimalCharacter}?)[^\\${settings.decimalCharacter}${allNumbersReg}]${noAllNumbersReg}*$`);
 
         const allowed = `-0123456789\\${settings.decimalCharacter}`;
-        settings.allowedAutoStrip = new RegExp(`[^${allowed}]`, 'gi');
-        settings.numRegAutoStrip = new RegExp(`${aNegReg}(?:\\${settings.decimalCharacter}?(\\d+\\${settings.decimalCharacter}\\d+)|(\\d*(?:\\${settings.decimalCharacter}\\d*)?))`);
+        settings.allowedAutoStrip = new RegExp(`[^${allowed}]`, 'g');
+        settings.numRegAutoStrip = new RegExp(`${aNegReg}(?:\\${settings.decimalCharacter}?(${allNumbersReg}+\\${settings.decimalCharacter}${allNumbersReg}+)|(${allNumbersReg}*(?:\\${settings.decimalCharacter}${allNumbersReg}*)?))`);
 
         // Using this regex version `^${settings.aNegRegAutoStrip}0*(\\d|$)` entirely clear the input on blur
-        settings.stripReg = new RegExp(`^${settings.aNegRegAutoStrip}0*(\\d)`);
+        settings.stripReg = new RegExp(`^${settings.aNegRegAutoStrip}0*(${allNumbersReg})`);
     }
 
     /**
@@ -4609,6 +4693,16 @@ if (typeof define === 'function' && define.amd) {
     $.fn.autoNumeric.defaults = defaultSettings; // Make those settings public via jQuery too.
 
     /**
+     * Return all the predefined language options in one object.
+     * You can also access a specific language object directly by using `an.getLanguages().French` for instance.
+     *
+     * @returns {object}
+     */
+    getLanguages = () => languageOption;
+
+    $.fn.autoNumeric.lang = languageOption; // Make those predefined language options public via jQuery too.
+
+    /**
      * Public function that allows formatting without an element trigger.
      *
      * @param {number|string} value A number, or a string that represent a javascript number
@@ -5049,6 +5143,7 @@ export default {
     format  : autoFormat,
     unFormat: autoUnFormat,
     getDefaultConfig,
+    getLanguages,
     validate, // an.validate(options) : throws if necessary
     areSettingsValid, // an.areSettingsValid(options) : return true or false //TODO Is this redundant? Should we let the developers wrap each autoNumeric.validate() calls in try/catch block? Or should we just facilitate their life by doing it already?
 

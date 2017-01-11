@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.20"
++ Fix issue #341 Add some default options in the `languageOption` object
+
 ### "2.0.0-beta.19"
 + Allow using `set` with Arabic and Persian numbers (ie. `aNInput.autoNumeric('set', '١٠٢٣٤٥٦٧.٨٩');`)
 + Allow using Arabic and Persian numbers (used in Arabic languages) in the html `value` attribute

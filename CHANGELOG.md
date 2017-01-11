@@ -2,6 +2,7 @@
 
 ### "2.0.0-beta.20"
 + Fix issue #341 Add some default options in the `languageOption` object
++ Fix issue #328 Switch from `npm` to `yarn`
 
 ### "2.0.0-beta.19"
 + Allow using `set` with Arabic and Persian numbers (ie. `aNInput.autoNumeric('set', '١٠٢٣٤٥٦٧.٨٩');`)

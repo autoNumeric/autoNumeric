@@ -5,12 +5,12 @@ autoNumeric is a library that provides live *as-you-type* formatting for interna
 #### Highlights
 autoNumeric main features are :
 - Easy to use and configure
-```javascript
+```js
 // Initialization
 $('.myInput').autoNumeric('init', { currencySymbol : '$' });
 ```
 - Very high configurability (more than 30 [options](#options) available)
-```javascript
+```js
 // The options are...optional :)
 const autoNumericOptionsEuro = {
     digitGroupSeparator        : '.',
@@ -50,7 +50,7 @@ Simply include jQuery and autoNumeric (in that order) in your html header tag.<b
 
 Initialize autoNumeric with or without options :
 
-```javascript
+```js
 // autoNumeric with the defaults options
 $(selector).autoNumeric('init');
 
@@ -191,25 +191,31 @@ Contributors and pull requests are welcome.<br>Feel free to contact us for any q
 
 ### Get the source
 ```sh
-# git clone -b next https://github.com/BobKnothe/autoNumeric.git
-// or the following if you are authentified on github :
-// `git clone -b next git@github.com:BobKnothe/autoNumeric.git`
+git clone -b next https://github.com/BobKnothe/autoNumeric.git
+# or the following if you are authentified on github :
+# `git clone -b next git@github.com:BobKnothe/autoNumeric.git`
 ```
 
 ### Make your changes
 ```sh
-# cd autoNumeric
+cd autoNumeric
 ```
 First things first, in order to be able to compile the ES6 source to something that can be interpreted by the browsers, and get the tools (linter, test runners, etc.) used by the developers, you need to install them by doing :
 ```sh
-# npm install
+yarn install
 ```
 
 Once you made your changes, you can build the library with :
 ```sh
-# npm run build
+yarn build
 ```
 This will generate the `autoNumeric.js` and `autoNumeric.min.js` in the `dist` folder, that you'll then be able to use in the browsers.
+
+If you want to clean the generated `.js` and `.min.js` files as well as development specific files like coverage and log files, use :
+```sh
+yarn run clean
+```
+*Note: do **not** use `yarn clean` as it's a [different command](https://yarnpkg.com/en/docs/cli/clean) entirely.*
 
 ### Run the mandatory tools for linting and testing
 We strive to keep the tests green at all times. Hence whenever you change the source, be sure to :
@@ -223,30 +229,30 @@ We strive to keep the tests green at all times. Hence whenever you change the so
 Tests **must always be green** before pushing. Any commit that make the tests fails will be ignored.
 To run the tests, you have multiple options :
 ```sh
-// Run unit testing as well as end-to-end testing
-# npm run test
+# Run unit testing as well as end-to-end testing
+yarn test
 
-// Run unit testing only
-# npm run test:unit
+# Run unit testing only
+yarn test:unit
 
-// Run end-to-end testing only
-# npm run test:e2e
+# Run end-to-end testing only
+yarn test:e2e
 
-// Run unit testing only...
-# npm run test:unitp //...with PhantomJS only
-# npm run test:unitf //...with Firefox only
-# npm run test:unitc //...with Chrome only
+# Run unit testing only...
+yarn test:unitp   # ...with PhantomJS only
+yarn test:unitf   # ...with Firefox only
+yarn test:unitc   # ...with Chrome only
 ```
 
 ##### How to lint?
-Linting allow us to keep a coherent code style in all the source files. In order to check that everything is ok, run :
+Linting allow us to keep a coherent code style in all the source files.<br>In order to check that everything is ok, run [eslint](http://eslint.org/) with :
 ```sh
-# npm run lint
+yarn lint
 ```
 If any errors are shown, you can try to automatically correct them by running :
 ```sh
-// Use the path of the faulty file there :
-# ./node_modules/eslint/bin/eslint.js --fix src/autoNumeric.js
+# Use the path of the faulty file there :
+./node_modules/eslint/bin/eslint.js --fix src/autoNumeric.js
 ```
 
 #### How to push?

@@ -1,8 +1,8 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0-beta.20
- * @date         2017-01-10 UTC 01:00
+ * @version      2.0-beta.21
+ * @date         2017-01-13 UTC 19:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and other Github users,
@@ -177,6 +177,13 @@ const defaultSettings = {
      */
     //TODO Rename the options to more explicit names ('p' => 'prefix', etc.)
     negativePositiveSignPlacement: null,
+
+
+    /* Allow the positive sign symbol `+` to be displayed for positive numbers.
+     * By default, this positive sign is not shown.
+     * The sign placement is controlled by the 'negativePositiveSignPlacement' option, mimicking the negative sign placement rules.
+     */
+    showPositiveSign: false,
 
     /* Additional suffix
      * Must be in quotes suffixText: 'gross', a space is allowed suffixText: ' dollars'
@@ -975,13 +982,48 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Return TRUE if the given string contains a negative sign on the first character.
+     * Return TRUE if the given string contains a negative sign :
+     * - everywhere in the string (by default), or
+     * - on the first character only if the `checkEverywhere` parameter is set to `false`.
      *
-     * @param {string} string A number represented by a string
+     * @param {string} numericString A number represented by a string
+     * @param {boolean} checkEverywhere If TRUE, then the negative sign is search everywhere in the numeric string (this is needed for instance if the string is '1234.56-')
      * @returns {boolean}
      */
-    function isNegative(string) {
-        return string.charAt(0) === '-';
+    function isNegative(numericString, checkEverywhere = true) {
+        //TODO Use the `negativeSignCharacter` from the settings here
+        if (checkEverywhere) {
+            return contains(numericString, '-');
+        }
+
+        return isNegativeStrict(numericString);
+    }
+
+    /**
+     * Return TRUE if the given string contains a negative sign on the first character (on the far left).
+     *
+     * @example isNegativeStrict('1234.56')     => false
+     * @example isNegativeStrict('1234.56-')    => false
+     * @example isNegativeStrict('-1234.56')    => true
+     * @example isNegativeStrict('-1,234.56 €') => true
+     *
+     * @param {string} numericString
+     * @returns {boolean}
+     */
+    function isNegativeStrict(numericString) {
+        //TODO Using the `negativeSignCharacter` from the settings here
+        return numericString.charAt(0) === '-';
+    }
+
+    /**
+     * Return TRUE if the formatted or unformatted numeric string represent the value 0 (ie. '0,00 €'), or is empty (' €').
+     * This works since we test if there are any numbers from 1 to 9 in the string. If there is none, then the number is zero (or the string is empty).
+     *
+     * @param {string} numericString
+     * @returns {boolean}
+     */
+    function isZeroOrHasNoValue(numericString) {
+        return !(/[1-9]/g).test(numericString);
     }
 
     /**
@@ -991,7 +1033,7 @@ if (typeof define === 'function' && define.amd) {
      * @returns {*}
      */
     function setRawNegativeSign(value) {
-        if (!isNegative(value)) {
+        if (!isNegativeStrict(value)) {
             return `-${value}`;
         }
 
@@ -1264,7 +1306,7 @@ if (typeof define === 'function' && define.amd) {
 
         if ((settings.negativePositiveSignPlacement === 's' ||
             (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement !== 'p')) &&
-            contains(s, '-') &&
+            isNegative(s) &&
             s !== '') {
             settings.trailingNegative = true;
         }
@@ -1364,7 +1406,7 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // Move the trailing negative sign to the right position, if any
-        if (contains(s, '-') && s.lastIndexOf('-') === s.length - 1) {
+        if (isNegative(s) && s.lastIndexOf('-') === s.length - 1) {
             s = s.replace('-', '');
             s = '-' + s;
         }
@@ -1397,7 +1439,7 @@ if (typeof define === 'function' && define.amd) {
                 result = Number(value);
                 break;
             case '.-':
-                result = contains(value, '-') ? value.replace('-', '') + '-' : value;
+                result = isNegative(value) ? value.replace('-', '') + '-' : value;
                 break;
             case ',':
             case '-,':
@@ -1405,7 +1447,7 @@ if (typeof define === 'function' && define.amd) {
                 break;
             case ',-':
                 result = value.replace('.', ',');
-                result = contains(result, '-') ? result.replace('-', '') + '-' : result;
+                result = isNegative(result) ? result.replace('-', '') + '-' : result;
                 break;
             // The default case
             case '.':
@@ -1493,13 +1535,14 @@ if (typeof define === 'function' && define.amd) {
         }
 
         //TODO This function `addGroupSeparators()` add group separators. Adding the negative sign as well is out of its scope. Move that to another function.
-        if (settings.trailingNegative && !contains(inputValue, '-')) {
+        if (settings.trailingNegative && !isNegative(inputValue)) {
             inputValue = '-' + inputValue;
         }
 
         const empty = checkEmpty(inputValue, settings, true);
-        const isNegative = contains(inputValue, '-');
-        if (isNegative) {
+        const isValueNegative = isNegative(inputValue);
+        const isZero = isZeroOrHasNoValue(inputValue);
+        if (isValueNegative) {
             inputValue = inputValue.replace('-', '');
         }
 
@@ -1551,17 +1594,31 @@ if (typeof define === 'function' && define.amd) {
         settings.trailingNegative = false;
 
         if (settings.currencySymbolPlacement === 'p') {
-            if (isNegative) {
+            if (isValueNegative) {
                 switch (settings.negativePositiveSignPlacement) {
                     case 'l':
-                        inputValue = settings.negativeSignCharacter + settings.currencySymbol + inputValue;
+                        inputValue = `${settings.negativeSignCharacter}${settings.currencySymbol}${inputValue}`;
                         break;
                     case 'r':
-                        inputValue = settings.currencySymbol + settings.negativeSignCharacter + inputValue;
+                        inputValue = `${settings.currencySymbol}${settings.negativeSignCharacter}${inputValue}`;
                         break;
                     case 's':
-                        inputValue = settings.currencySymbol + inputValue + settings.negativeSignCharacter;
+                        inputValue = `${settings.currencySymbol}${inputValue}${settings.negativeSignCharacter}`;
                         settings.trailingNegative = true;
+                        break;
+                    default :
+                    //
+                }
+            } else if (settings.showPositiveSign && !isZero) {
+                switch (settings.negativePositiveSignPlacement) {
+                    case 'l':
+                        inputValue = `${settings.positiveSignCharacter}${settings.currencySymbol}${inputValue}`;
+                        break;
+                    case 'r':
+                        inputValue = `${settings.currencySymbol}${settings.positiveSignCharacter}${inputValue}`;
+                        break;
+                    case 's':
+                        inputValue = `${settings.currencySymbol}${inputValue}${settings.positiveSignCharacter}`;
                         break;
                     default :
                     //
@@ -1572,18 +1629,32 @@ if (typeof define === 'function' && define.amd) {
         }
 
         if (settings.currencySymbolPlacement === 's') {
-            if (isNegative) {
+            if (isValueNegative) {
                 switch (settings.negativePositiveSignPlacement) {
                     case 'r':
-                        inputValue = inputValue + settings.currencySymbol + settings.negativeSignCharacter;
+                        inputValue = `${inputValue}${settings.currencySymbol}${settings.negativeSignCharacter}`;
                         settings.trailingNegative = true;
                         break;
                     case 'l':
-                        inputValue = inputValue + settings.negativeSignCharacter + settings.currencySymbol;
+                        inputValue = `${inputValue}${settings.negativeSignCharacter}${settings.currencySymbol}`;
                         settings.trailingNegative = true;
                         break;
                     case 'p':
-                        inputValue = settings.negativeSignCharacter + inputValue + settings.currencySymbol;
+                        inputValue = `${settings.negativeSignCharacter}${inputValue}${settings.currencySymbol}`;
+                        break;
+                    default :
+                    //
+                }
+            } else if (settings.showPositiveSign && !isZero) {
+                switch (settings.negativePositiveSignPlacement) {
+                    case 'r':
+                        inputValue = `${inputValue}${settings.currencySymbol}${settings.positiveSignCharacter}`;
+                        break;
+                    case 'l':
+                        inputValue = `${inputValue}${settings.positiveSignCharacter}${settings.currencySymbol}`;
+                        break;
+                    case 'p':
+                        inputValue = `${settings.positiveSignCharacter}${inputValue}${settings.currencySymbol}`;
                         break;
                     default :
                     //
@@ -1594,7 +1665,7 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // Removes the negative sign and places brackets
-        if (settings.negativeBracketsTypeOnBlur !== null && (settings.rawValue < 0 || inputValue.charAt(0) === '-')) {
+        if (settings.negativeBracketsTypeOnBlur !== null && (settings.rawValue < 0 || isNegativeStrict(inputValue))) {
             inputValue = toggleNegativeBracket(inputValue, settings);
         }
 
@@ -1681,7 +1752,7 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // Checks if the inputValue (input Value) is a negative value
-        if (inputValue.charAt(0) === '-') {
+        if (isNegativeStrict(inputValue)) {
             nSign = '-';
 
             // Removes the negative sign that will be added back later if required
@@ -1694,7 +1765,7 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // Determines if the value is equal to zero. If it is, remove the negative sign
-        if (nSign === '-' && Number(inputValue) === 0) {
+        if (Number(inputValue) === 0) {
             nSign = '';
         }
 
@@ -1834,7 +1905,7 @@ if (typeof define === 'function' && define.amd) {
 
         // Determine sign. 1 positive, -1 negative
         n = n.toString();
-        if (n.charAt(0) === '-') {
+        if (isNegativeStrict(n)) {
             n = n.slice(1);
             x.s = -1;
         } else {
@@ -2306,7 +2377,7 @@ if (typeof define === 'function' && define.amd) {
             left = stripAllNonNumberCharacters(left, this.settingsClone, stripZeros);
             right = stripAllNonNumberCharacters(right, this.settingsClone, false);
 
-            if (settingsClone.trailingNegative && !contains(left, '-')) {
+            if (settingsClone.trailingNegative && !isNegative(left)) {
                 left = '-' + left;
                 right = (right === '-') ? '' : right;
                 settingsClone.trailingNegative = false;
@@ -2344,7 +2415,7 @@ if (typeof define === 'function' && define.amd) {
                 left = left.substring(0, left.length - 1);
             }
 
-            if (settingsClone.trailingNegative && !contains(left, '-')) {
+            if (settingsClone.trailingNegative && !isNegative(left)) {
                 left = '-' + left;
                 settingsClone.trailingNegative = false;
             }
@@ -2380,6 +2451,7 @@ if (typeof define === 'function' && define.amd) {
 
             if (minTest && maxTest) {
                 this.newValue = truncateDecimal(this.newValue, settingsClone, isPaste);
+                //TODO Check if we need to replace the hard-coded ',' with settings.decimalCharacter
                 const testValue = (contains(this.newValue, ',')) ? this.newValue.replace(',', '.') : this.newValue;
                 if (testValue === '' || testValue === settingsClone.negativeSignCharacter) {
                     settingsClone.rawValue = (settingsClone.emptyInputBehavior === 'zero') ? '0' : '';
@@ -2525,7 +2597,7 @@ if (typeof define === 'function' && define.amd) {
                     e.preventDefault();
                     const valueLen = this.that.value.length;
                     const currencySymbolLen = this.settings.currencySymbol.length;
-                    const negLen = (!contains(this.that.value, '-'))?0:1;
+                    const negLen = (!isNegative(this.that.value))?0:1;
                     const suffixTextLen = this.settings.suffixText.length;
                     const currencySymbolPlacement = this.settings.currencySymbolPlacement;
                     const negativePositiveSignPlacement = this.settings.negativePositiveSignPlacement;
@@ -2626,7 +2698,7 @@ if (typeof define === 'function' && define.amd) {
                     if (this.selection.start >= this.value.indexOf(settingsClone.currencySymbol) + settingsClone.currencySymbol.length) {
                         right = right.substring(1, right.length);
                     }
-                    if (contains(left, '-') && this.value.charAt(this.selection.start) === '-') {
+                    if (isNegative(left) && this.value.charAt(this.selection.start) === '-') {
                         left = left.substring(1);
                     }
                 }
@@ -2690,7 +2762,7 @@ if (typeof define === 'function' && define.amd) {
 
                 if (((settingsClone.currencySymbolPlacement === 'p' && settingsClone.negativePositiveSignPlacement === 's') ||
                     (settingsClone.currencySymbolPlacement === 's' && (settingsClone.negativePositiveSignPlacement === 'l' || settingsClone.negativePositiveSignPlacement === 'r'))) &&
-                    contains(this.value, '-')) { //TODO Change `this.value` to `this.that.value`?
+                    isNegative(this.value)) { //TODO Change `this.value` to `this.that.value`?
                     [left, right] = this._processCharacterDeletionIfTrailingNegativeSign([left, right]);
                 } else {
                     if (this.eventKeyCode === keyCode.Backspace) {
@@ -2766,7 +2838,7 @@ if (typeof define === 'function' && define.amd) {
                     }
 
                     // Change number sign, remove part if should
-                    if (left.charAt(0) === '-' || contains(left, settingsClone.negativeSignCharacter)) {
+                    if (isNegativeStrict(left) || contains(left, settingsClone.negativeSignCharacter)) {
                         left = left.substring(1, left.length);
                     } else {
                         left = (e.key === '-') ? settingsClone.negativeSignCharacter + left : left;
@@ -2829,7 +2901,7 @@ if (typeof define === 'function' && define.amd) {
                 (settingsClone.currencySymbol === '' || (settingsClone.currencySymbol !== '' && !contains(leftLength, settingsClone.currencySymbol)))) {
                 let [subParts] = leftLength.split(settingsClone.decimalCharacter);
                 let nSign = '';
-                if (contains(subParts, '-')) {
+                if (isNegative(subParts)) {
                     nSign = '-';
                     subParts = subParts.replace('-', '');
                     left = left.replace('-', '');
@@ -2908,10 +2980,22 @@ if (typeof define === 'function' && define.amd) {
                 if (newLeft) {
                     position = newLeft[0].length;
 
+                    // If the positive sign is shown, calculate the caret position accordingly
+                    if (settingsClone.showPositiveSign) {
+                        if (position === 0 && newLeft.input.charAt(0) === settingsClone.positiveSignCharacter) {
+                            position = (newLeft.input.indexOf(settingsClone.currencySymbol) === 1) ? settingsClone.currencySymbol.length + 1 : 1;
+                        }
+
+                        if (position === 0 && newLeft.input.charAt(settingsClone.currencySymbol.length) === settingsClone.positiveSignCharacter) {
+                            position = settingsClone.currencySymbol.length + 1;
+                        }
+                    }
+
                     // If we are just before the sign which is in prefix position
                     if (((position === 0 && value.charAt(0) !== settingsClone.negativeSignCharacter) || (position === 1 && value.charAt(0) === settingsClone.negativeSignCharacter)) && settingsClone.currencySymbol && settingsClone.currencySymbolPlacement === 'p') {
                         // Place caret after prefix sign
-                        position = this.settingsClone.currencySymbol.length + (value.charAt(0) === '-' ? 1 : 0);
+                        //TODO Should the test be 'isNegative' instead of 'isNegativeStrict' in order to search for '-' everywhere in the string?
+                        position = this.settingsClone.currencySymbol.length + (isNegativeStrict(value) ? 1 : 0);
                     }
                 } else {
                     if (settingsClone.currencySymbol && settingsClone.currencySymbolPlacement === 's') {
@@ -3324,7 +3408,7 @@ if (typeof define === 'function' && define.amd) {
             value = stripAllNonNumberCharacters(value, settings, true);
 
             if (value !== '') {
-                if (settings.trailingNegative && !contains(value, '-')) {
+                if (settings.trailingNegative && !isNegative(value)) {
                     value = '-' + value;
                     settings.trailingNegative = false;
                 }
@@ -3405,7 +3489,7 @@ if (typeof define === 'function' && define.amd) {
         }
 
         // 1. Check if the paste has a negative sign (only if it's the first character), and store that information for later use
-        const isPasteNegative = isNegative(rawPastedText);
+        const isPasteNegative = isNegativeStrict(rawPastedText);
         if (isPasteNegative) {
             // 1a. Remove the negative sign from the pasted text
             rawPastedText = rawPastedText.slice(1, rawPastedText.length);
@@ -3437,7 +3521,7 @@ if (typeof define === 'function' && define.amd) {
         } else {
             initialUnformattedNumber = $this.autoNumeric('get');
         }
-        let isInitialValueNegative = isNegative(initialUnformattedNumber);
+        let isInitialValueNegative = isNegativeStrict(initialUnformattedNumber);
         let isPasteNegativeAndInitialValueIsPositive;
         let result;
 
@@ -3842,7 +3926,14 @@ if (typeof define === 'function' && define.amd) {
                             toStrip = currentValue;
                         }
 
-                        settings.rawValue = ((settings.negativePositiveSignPlacement === 's' || (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement !== 'p')) && settings.negativeSignCharacter !== '' && contains(currentValue, '-'))?'-' + stripAllNonNumberCharacters(toStrip, settings, true):stripAllNonNumberCharacters(toStrip, settings, true);
+                        if ((settings.negativePositiveSignPlacement === 's' ||
+                            (settings.negativePositiveSignPlacement !== 'p' && settings.currencySymbolPlacement === 's')) &&
+                            settings.negativeSignCharacter !== '' &&
+                            isNegative(currentValue)) {
+                            settings.rawValue = settings.negativeSignCharacter + stripAllNonNumberCharacters(toStrip, settings, true);
+                        } else {
+                            settings.rawValue = stripAllNonNumberCharacters(toStrip, settings, true);
+                        }
                     }
 
                     setValue = false;
@@ -3892,6 +3983,11 @@ if (typeof define === 'function' && define.amd) {
      * @param {object} settings
      */
     function correctNegativePositiveSignPlacementOption(settings) {
+        // If negativePositiveSignPlacement is already set, we do not overwrite it
+        if (!isNull(settings.negativePositiveSignPlacement)) {
+            return;
+        }
+
         if (!isUndefined(settings) &&
             isUndefinedOrNullOrEmpty(settings.negativePositiveSignPlacement) &&
             !isUndefinedOrNullOrEmpty(settings.currencySymbol)) {
@@ -4055,6 +4151,7 @@ if (typeof define === 'function' && define.amd) {
             currencySymbol               : true,
             currencySymbolPlacement      : true,
             negativePositiveSignPlacement: true,
+            showPositiveSign             : true,
             suffixText                   : true,
             overrideMinMaxLimits         : true,
             maximumValue                 : true,
@@ -4088,6 +4185,7 @@ if (typeof define === 'function' && define.amd) {
             strip                : true,
             tagList              : true,
             negativeSignCharacter: true,
+            positiveSignCharacter: true,
             mIntPos              : true,
             mIntNeg              : true,
             oDec                 : true,
@@ -4172,8 +4270,9 @@ if (typeof define === 'function' && define.amd) {
             // Improve the `negativePositiveSignPlacement` option if needed
             correctNegativePositiveSignPlacementOption(settings);
 
-            // Set the negative sign if needed
+            // Set the negative and positive signs, as needed
             settings.negativeSignCharacter = settings.minimumValue < 0 ? '-' : '';
+            settings.positiveSignCharacter = settings.maximumValue >= 0 ? '+' : '';
 
             // Additional changes to the settings object (from the original autoCode() function)
             runCallbacksFoundInTheSettingsObject($this, settings);
@@ -4385,6 +4484,12 @@ if (typeof define === 'function' && define.amd) {
 
                 if (value !== '') {
                     const [minTest, maxTest] = checkIfInRangeWithOverrideOption(value, settings);
+                    // This test is needed by the showPositiveSign option
+                    const isZero = isZeroOrHasNoValue(value);
+                    if (isZero) {
+                        value = '0';
+                    }
+
                     if (minTest && maxTest) {
                         if ($input || isInArray($this.prop('tagName').toLowerCase(), settings.tagList)) {
                             // to ensure rounding does not happen twice
@@ -4411,11 +4516,14 @@ if (typeof define === 'function' && define.amd) {
                                     settings.decimalPlacesOverride = tempDecimal;
                                 }
                             }
-                            // rounds if has not been done
-                            value = (hasBeenRounded) ? value : value = roundValue(value, settings);
 
-                            // stores rawValue including the decimalPlacesShownOnFocus
-                            settings.rawValue = cleanLeadingTrailingZeros(value, settings);
+                            // Rounds if this has not been done already
+                            if (!hasBeenRounded) {
+                                value = roundValue(value, settings);
+                            }
+
+                            // Stores rawValue including the decimalPlacesShownOnFocus
+                            settings.rawValue = cleanLeadingTrailingZeros(value.replace(settings.decimalCharacter, '.'), settings);
 
                             value = modifyNegativeSignAndDecimalCharacterForFormattedValue(value, settings);
                             value = addGroupSeparators(value, settings);
@@ -4534,10 +4642,10 @@ if (typeof define === 'function' && define.amd) {
             if (settings.decimalPlacesShownOnFocus || settings.scaleDivisor) {
                 value = settings.rawValue;
             } else {
-                // tests for negative symbol
-                const isNegative = contains(value, '-');
-                const isZero = Number(value) === 0;
-                if (!((/\d/).test(value) || isZero) && settings.emptyInputBehavior === 'focus') {
+                // Test if the value is negative
+                const isValueNegative = isNegative(value);
+
+                if (!(/\d/).test(value) && settings.emptyInputBehavior === 'focus') {
                     return '';
                 }
 
@@ -4550,10 +4658,10 @@ if (typeof define === 'function' && define.amd) {
                     // Strips trailing negative symbol
                     value = stripAllNonNumberCharacters(value, settings, true);
                     // Trims leading and trailing zeros when leadingZero does NOT equal "keep".
-                    value = cleanLeadingTrailingZeros(value, settings);
+                    value = cleanLeadingTrailingZeros(value.replace(settings.decimalCharacter, '.'), settings);
 
                     // Places the negative symbol in front of the trailing negative
-                    if (settings.trailingNegative && isNegative && !contains(value, '-') && !isZero) {
+                    if (settings.trailingNegative && isValueNegative && !isNegative(value) && Number(value) !== 0) {
                         value = '-' + value;
                     }
                 }
@@ -4780,7 +4888,8 @@ if (typeof define === 'function' && define.amd) {
         const autoStrip = new RegExp(`[^${allowed}]`, 'gi');
         value = value.toString();
 
-        if (value.charAt(0) === '-') {
+        // This checks is a negative sign is anywhere in the `value`, not just on the very first character (ie. '12345.67-')
+        if (isNegative(value)) {
             settings.negativeSignCharacter = '-';
         } else if (settings.negativeBracketsTypeOnBlur && settings.negativeBracketsTypeOnBlur.split(',')[0] === value.charAt(0)) {
             settings.negativeSignCharacter = '-';
@@ -4789,7 +4898,7 @@ if (typeof define === 'function' && define.amd) {
         }
 
         value = value.replace(autoStrip, '');
-        value = value.replace(',', '.');
+        value = value.replace(settings.decimalCharacter, '.');
         value = toLocale(value, settings.outputFormat);
 
         return value;
@@ -4892,8 +5001,12 @@ if (typeof define === 'function' && define.amd) {
         if (!isInArray(options.negativePositiveSignPlacement, ['p', 's', 'l', 'r', null])) {
             throwError(`The placement of the negative sign option 'negativePositiveSignPlacement' is invalid ; it should either be 'p' (prefix), 's' (suffix), 'l' (left), 'r' (right) or 'null', [${options.negativePositiveSignPlacement}] given.`);
         }
+        
+        if (!isTrueOrFalseString(options.showPositiveSign) && !isBoolean(options.showPositiveSign)) {
+            throwError(`The show positive sign option 'showPositiveSign' is invalid ; it should be either 'false' or 'true', [${options.showPositiveSign}] given.`);
+        }
 
-        if (!isString(options.suffixText) || (options.suffixText !== '' && (contains(options.suffixText, '-') || testNumericalCharacters.test(options.suffixText)))) {
+        if (!isString(options.suffixText) || (options.suffixText !== '' && (isNegative(options.suffixText) || testNumericalCharacters.test(options.suffixText)))) {
             throwError(`The additional suffix option 'suffixText' is invalid ; it should not contains the negative sign '-' nor any numerical characters, [${options.suffixText}] given.`);
         }
 

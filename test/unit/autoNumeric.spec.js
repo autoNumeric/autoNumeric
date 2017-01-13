@@ -95,6 +95,7 @@ describe('The autoNumeric object', () => {
         currencySymbol               : '',
         currencySymbolPlacement      : 'p',
         negativePositiveSignPlacement: null,
+        showPositiveSign             : false,
         suffixText                   : '',
         overrideMinMaxLimits         : null,
         maximumValue                 : '9999999999999.99',
@@ -312,6 +313,30 @@ describe('The autoNumeric object', () => {
             expect(aNInputSettings.currencySymbol).toEqual('$');
             expect(aNInputSettings.currencySymbolPlacement).toEqual('p');
             expect(aNInputSettings.negativePositiveSignPlacement).toEqual('l');
+        });
+
+        it(`this should not override the negativePositiveSignPlacement value 'p' if it has been set by the user`, () => {
+            aNInput = $(newInput).autoNumeric('init', { negativePositiveSignPlacement : 'p' }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.autoNumeric('getSettings');
+            expect(aNInputSettings.negativePositiveSignPlacement).toEqual('p');
+        });
+
+        it(`this should not override the negativePositiveSignPlacement value 's' if it has been set by the user`, () => {
+            aNInput = $(newInput).autoNumeric('init', { negativePositiveSignPlacement : 's' }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.autoNumeric('getSettings');
+            expect(aNInputSettings.negativePositiveSignPlacement).toEqual('s');
+        });
+
+        it(`this should not override the negativePositiveSignPlacement value 'l' if it has been set by the user`, () => {
+            aNInput = $(newInput).autoNumeric('init', { negativePositiveSignPlacement : 'l' }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.autoNumeric('getSettings');
+            expect(aNInputSettings.negativePositiveSignPlacement).toEqual('l');
+        });
+
+        it(`this should not override the negativePositiveSignPlacement value 'r' if it has been set by the user`, () => {
+            aNInput = $(newInput).autoNumeric('init', { negativePositiveSignPlacement : 'r' }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.autoNumeric('getSettings');
+            expect(aNInputSettings.negativePositiveSignPlacement).toEqual('r');
         });
     });
 
@@ -679,6 +704,149 @@ describe(`autoNumeric 'init' method`, () => {
 
         aNInput.autoNumeric('update', autoNumericOptionsDollar);
         expect(aNInput.autoNumeric('getFormatted')).toEqual('$256,789.02');
+    });
+
+    // Test the showPositiveSign option
+    // +1.234,00
+    const noneLeft = {
+        digitGroupSeparator        : '.',
+        decimalCharacter           : ',',
+        decimalCharacterAlternative: '.',
+        showPositiveSign           : true,
+    };
+
+    // 1.234,00+
+    const noneSuffix = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        negativePositiveSignPlacement: 's',
+        showPositiveSign             : true,
+    };
+
+    // € +1.234,00
+    const leftRight = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        currencySymbol               : '€\u00a0',
+        roundingMethod               : 'U',
+        negativePositiveSignPlacement: 'r',
+        showPositiveSign             : true,
+    };
+
+    // +€ 1.234,00
+    const leftLeft = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        currencySymbol               : '€\u00a0',
+        roundingMethod               : 'U',
+        negativePositiveSignPlacement: 'l',
+        showPositiveSign             : true,
+    };
+
+    // € 1.234,00+
+    const leftSuffix = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        currencySymbol               : '€\u00a0',
+        roundingMethod               : 'U',
+        negativePositiveSignPlacement: 's',
+        showPositiveSign             : true,
+    };
+
+    // 1.234,00+ €
+    const rightLeft = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        currencySymbol               : '\u00a0€',
+        currencySymbolPlacement      : 's',
+        roundingMethod               : 'U',
+        negativePositiveSignPlacement: 'l',
+        showPositiveSign             : true,
+    };
+
+    // 1.234,00 €+
+    const rightRight = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        currencySymbol               : '\u00a0€',
+        currencySymbolPlacement      : 's',
+        roundingMethod               : 'U',
+        negativePositiveSignPlacement: 'r',
+        showPositiveSign             : true,
+    };
+
+    // +1.234,00 €
+    const rightPrefix = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        currencySymbol               : '\u00a0€',
+        currencySymbolPlacement      : 's',
+        roundingMethod               : 'U',
+        negativePositiveSignPlacement: 'p',
+        showPositiveSign             : true,
+    };
+
+    it('should format with showPositiveSign, no currency sign, default placement', () => {
+        newInput.value = '1234567.89';
+        aNInput = $(newInput).autoNumeric('init', noneLeft);
+        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('+1.234.567,89');
+    });
+
+    it('should format with showPositiveSign, no currency sign, suffix placement', () => {
+        newInput.value = '1234567.89';
+        aNInput = $(newInput).autoNumeric('init', noneSuffix);
+        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('1.234.567,89+');
+    });
+
+    it('should format with showPositiveSign, left currency sign, right placement', () => {
+        newInput.value = '1234567.89';
+        aNInput = $(newInput).autoNumeric('init', leftRight);
+        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('€\u00a0+1.234.567,89');
+    });
+
+    it('should format with showPositiveSign, left currency sign, left placement', () => {
+        newInput.value = '1234567.89';
+        aNInput = $(newInput).autoNumeric('init', leftLeft);
+        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('+€\u00a01.234.567,89');
+    });
+
+    it('should format with showPositiveSign, left currency sign, suffix placement', () => {
+        newInput.value = '1234567.89';
+        aNInput = $(newInput).autoNumeric('init', leftSuffix);
+        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('€\u00a01.234.567,89+');
+    });
+
+    it('should format with showPositiveSign, right currency sign, left placement', () => {
+        newInput.value = '1234567.89';
+        aNInput = $(newInput).autoNumeric('init', rightLeft);
+        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('1.234.567,89+\u00a0€');
+    });
+
+    it('should format with showPositiveSign, right currency sign, right placement', () => {
+        newInput.value = '1234567.89';
+        aNInput = $(newInput).autoNumeric('init', rightRight);
+        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('1.234.567,89\u00a0€+');
+    });
+
+    it('should format with showPositiveSign, right currency sign, prefix placement', () => {
+        newInput.value = '1234567.89';
+        aNInput = $(newInput).autoNumeric('init', rightPrefix);
+        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('+1.234.567,89\u00a0€');
     });
 });
 
@@ -1317,6 +1485,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ negativePositiveSignPlacement: 'r' })).not.toThrow();
             expect(() => an.validate({ negativePositiveSignPlacement: null })).not.toThrow();
 
+            expect(() => an.validate({ showPositiveSign: true })).not.toThrow();
+            expect(() => an.validate({ showPositiveSign: false })).not.toThrow();
+            expect(() => an.validate({ showPositiveSign: 'true' })).not.toThrow();
+            expect(() => an.validate({ showPositiveSign: 'false' })).not.toThrow();
+
             expect(() => an.validate({ suffixText: '' })).not.toThrow();
             expect(() => an.validate({ suffixText: 'foobar' })).not.toThrow();
             expect(() => an.validate({ suffixText: ' foobar' })).not.toThrow();
@@ -1534,6 +1707,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ negativePositiveSignPlacement: 42 })).toThrow();
             expect(() => an.validate({ negativePositiveSignPlacement: true })).toThrow();
             expect(() => an.validate({ negativePositiveSignPlacement: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ showPositiveSign: 0 })).toThrow();
+            expect(() => an.validate({ showPositiveSign: 1 })).toThrow();
+            expect(() => an.validate({ showPositiveSign: '0' })).toThrow();
+            expect(() => an.validate({ showPositiveSign: '1' })).toThrow();
+            expect(() => an.validate({ showPositiveSign: 'foobar' })).toThrow();
 
             expect(() => an.validate({ suffixText: '-foobar' })).toThrow();
             expect(() => an.validate({ suffixText: 'foo-bar' })).toThrow();

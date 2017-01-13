@@ -93,6 +93,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | `currencySymbol` | Currency symbol | `''` |
 | `currencySymbolPlacement` | Placement of the currency sign, relative to the number (as a prefix or a suffix) | `'p'` |
 | `negativePositiveSignPlacement` | Placement of negative/positive sign relative to the currency symbol (possible options are `l` (left), `r` (right), `p` (prefix) and `s` (suffix)) | `null` |
+| `showPositiveSign` | Allow the positive sign symbol `+` to be displayed for positive numbers | `false` |
 | `suffixText` | Additional text suffix that is added after the number | `''` |
 | `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor` and `ignore`) | `null` |
 | `maximumValue` | Maximum possible value | `'9999999999999.99'` |
@@ -204,6 +205,8 @@ First things first, in order to be able to compile the ES6 source to something t
 ```sh
 yarn install
 ```
+
+*Note: you need to have `yarn` installed before doing this command.<br>You can install `yarn` globally by doing `npm install -g yarn` as root.*
 
 Once you made your changes, you can build the library with :
 ```sh

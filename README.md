@@ -222,6 +222,7 @@ yarn run clean
 
 ### Run the mandatory tools for linting and testing
 We strive to keep the tests green at all times. Hence whenever you change the source, be sure to :
+
 1. Write at least 2 tests :
   - One that validate your change
   - One that invalidate your change

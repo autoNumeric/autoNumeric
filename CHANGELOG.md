@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.21"
++ Fix issue #346 Add a `showPositiveSign` option to display the positive sign wherever needed
+
 ### "2.0.0-beta.20"
 + Fix issue #341 Add some default options in the `languageOption` object
 + Fix issue #328 Switch from `npm` to `yarn`

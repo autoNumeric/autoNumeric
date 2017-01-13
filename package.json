@@ -48,7 +48,7 @@
     "karma-jasmine": "latest",
     "karma-phantomjs-launcher": "latest",
     "karma-sourcemap-loader": "latest",
-    "karma-webpack": "latest",
+    "karma-webpack": "^2.0.1",
     "loader-utils": "latest",
     "phantomjs-prebuilt": "latest",
     "rimraf": "latest",

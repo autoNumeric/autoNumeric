@@ -1,4 +1,8 @@
-### Changing the defaults / options
+## *(Old)* Documentation
+
+**Disclaimer** : This documentation may be outdated.<br>Please consider using the [Readme](README.md) that always has up-to-date information.
+
+### Changing the defaults options
 
 The complete list of options are below
 
@@ -122,17 +126,13 @@ Change the "formatOnPageLoad" option to ***"formatOnPageLoad: false"*** - this c
 
 If there are no default value(vs) simply initialize 'init' the element 
 
-```javascript
-<script type="text/javascript">  
-  jQuery(function($) {
-  	$('selector').autoNumeric('init', {formatOnPageLoad: false});    
-  });
-</script>
+```js
+$('selector').autoNumeric('init', {formatOnPageLoad: false});    
 ```
 If there is a default value you will need to pre-format the default value as shown 
 ```html
-<!-- it is important that a prefomatted default values match the optings/settings
-      missmatches could cause errors -->
+<!-- it is important that a preformatted default values match the options/settings.
+      mismatches could cause errors -->
 <input type='text' name="someName" value="1,234.56"/>
 ```
 
@@ -144,13 +144,9 @@ Note: "defaultValueOverride" option should be the same value as the default valu
 <input type='text' name="someName" value="1234.56"/>
 ```
 
-```javascript
-<script type="text/javascript"> 
-  // 'defaultValueOverride' is the value of the defaul value above 
-  jQuery(function($) {
-  	$('selector').autoNumeric('init', {defaultValueOverride: "1234.56"});       
-  });
-</script>
+```js
+// 'defaultValueOverride' is the value of the default value above 
+$('selector').autoNumeric('init', {defaultValueOverride: "1234.56"});       
 ```
 Please note that "formatOnPageLoad" and "defaultValueOverride" can be set by either {options} or HTML5 data attribute
 
@@ -176,7 +172,7 @@ Notes:
 
 ****
 
-The following is a list of the methods and settings/options that control autoNumeric 2.0 :
+The following is an uncomplete list of the methods and settings/options that control autoNumeric 2.0.* :
 
 **'init'** - *initializes autoNumeric* Must be run before other methods can be called 
 -	$('someSelector').autoNumeric();
@@ -256,105 +252,130 @@ $.fn.autoFormat(number, autoNumericOptions); // Returns "1.234,56 €"
 ****
 
 
-###  Default settings &#38; supported options: 
+###  Default settings &#38; supported options
 [visit autoNumeric's home page for an easy to use settings and option code generator ](http://www.decorplanit.com/plugin/)
 
-**"digitGroupSeparator"** - *controls the thousand separator character*
--	digitGroupSeparator: ','	comma (default)
--	digitGroupSeparator: '\''	apostrophe (note: the apostrophe is escaped)
--	digitGroupSeparator: '.'	period
--	digitGroupSeparator: ' '	space
--	digitGroupSeparator: ''	none
+Disclaimer : This may be outdated. Please refer to the [Readme](README.md) or directly in the detailed comments in the source code for the `defaultSettings` object.
 
-**"noSeparatorOnFocus"** - *When true only numbers and the decimal character is visible while the input has focus*
+##### digitGroupSeparator
+*controls the thousand separator character*
+-	digitGroupSeparator: ','      // Comma
+-	digitGroupSeparator: '.'      // Dot
+-	digitGroupSeparator: ' '      // Normal space
+-	digitGroupSeparator: '\u2009' // Thin-space
+-	digitGroupSeparator: '\u202f' // Narrow no-break space
+-	digitGroupSeparator: '\u00a0' // No-break space
+-	digitGroupSeparator: ''       // No separator
+-	digitGroupSeparator: "'"      // Apostrophe
+-	digitGroupSeparator: '٬'      // Arabic thousands separator
+-	digitGroupSeparator: '˙'      // Dot above
+
+##### noSeparatorOnFocus
+*When true only numbers and the decimal character is visible while the input has focus*
 -	noSeparatorOnFocus: false (default)
 -	noSeparatorOnFocus: true 	removes currency sign and thousand seperator while the input has focus. Help on some mobile devices 
 
-**"digitalGroupSpacing"** - *controls the digital grouping and the placement of the thousand separator*
+##### digitalGroupSpacing
+*controls the digital grouping and the placement of the thousand separator*
 -	digitalGroupSpacing: '3'	 produces 333,333,333   (default)
 -	digitalGroupSpacing: '2'	 produces 22,22,22,333 India's Lakhs
 -	digitalGroupSpacing: '2s' produces 22,333,22,22,333 scaled version of India Lakhs
 -	digitalGroupSpacing: '4'	 produces 4,4444,4444 used in some Asian country's
 
-**"decimalCharacter"** - *controls the decimal character*
--	decimalCharacter: '.'	period   (default)
--	decimalCharacter: ','	comma
+##### decimalCharacter
+*controls the decimal character*
+-	decimalCharacter: ',' // Comma
+-	decimalCharacter: '.' // Dot
+-	decimalCharacter: '·' // Middle-dot
+-	decimalCharacter: '٫' // Arabic decimal separator
+-	decimalCharacter: '⎖' // Decimal separator key symbol
 
-**"decimalCharacterAlternative"**   *this was developed to accommodate for different keyboard layouts. decimalCharacterAlternative allows you to declare an alternative key to enter the decimal separator assigned in decimalCharacter*
+##### decimalCharacterAlternative
+*this was developed to accommodate for different keyboard layouts. decimalCharacterAlternative allows you to declare an alternative key to enter the decimal separator assigned in decimalCharacter*
 -	decimalCharacterAlternative: null   (default)
 
-**"currencySymbol"**		*displays the desired currency symbol (examples: &#8364; or EUR). Note: other symbols can be used, such as %, &deg;C, &deg;F, km/h &#38; MPH the possibilities are endless*
+##### currencySymbol
+*displays the desired currency symbol (examples: &#8364; or EUR). Note: other symbols can be used, such as %, &deg;C, &deg;F, km/h &#38; MPH the possibilities are endless*
 -	currencySymbol: '' 	none   (default)
 - 	examples:  	currencySymbol: 'U$D' or currencySymbol: 'EUR' 
 
-**"currencySymbolPlacement"** 	*controls the placement of the currency symbol (prefix or suffix)*
+##### currencySymbolPlacement
+*controls the placement of the currency symbol (prefix or suffix)*
 -	currencySymbolPlacement: 'p' 	prefix to the left   (default)
 -	currencySymbolPlacement: 's' 	suffix to the right
 
-**"negativePositiveSignPlacement"**		*placement of the negative sign. This position is relative to the currencySymbol position*
+##### negativePositiveSignPlacement
+*placement of the negative sign. This position is relative to the currencySymbol position*
  - 	negativePositiveSignPlacement: 'l'	(default) left of currency sign
  - 	negativePositiveSignPlacement: 'r'	right of currency sign
  - 	negativePositiveSignPlacement: 's'	suffix places the sign to the right of the numbers
- - 	negativePositiveSignPlacement: 'p'	prfix places the sign(-) to the felt of the numbers
+ - 	negativePositiveSignPlacement: 'p'	prefix places the sign(-) to the felt of the numbers
  - 	Examples:
 
-	| format	    | options to achieve format      						|
-	| :------------:| :------------------------------------ | 
-	|  -1,234.56    | defaults      						|
-	|   1,234.56-   | {negativePositiveSignPlacement: 's'}   						|
-        | -$1,234.56	| {currencySymbol: '$'}  						|
-        | $-1,234.56 	| {currencySymbol: '$', negativePositiveSignPlacement: 'r'} 				|
-        |  $1,234.56- 	| {currencySymbol: '$', negativePositiveSignPlacement: 's'}       		|
-        |   1,234.56-$	| {currencySymbol: '$', currencySymbolPlacement: 's'}      		|
-        |   1,234.56$- 	| {currencySymbol: '$', currencySymbolPlacement: 's', negativePositiveSignPlacement: 'r'}	|
-        |  -1,234.56$	| {currencySymbol: '$', currencySymbolPlacement: 's', negativePositiveSignPlacement: 'p'}	|
+| format	    | options to achieve format    |
+| :------------:| :------------------------------------: | 
+|  -1,234.56    | defaults      						|
+|   1,234.56-   | {negativePositiveSignPlacement: 's'}   						|
+| -$1,234.56	| {currencySymbol: '$'}  						|
+| $-1,234.56 	| {currencySymbol: '$', negativePositiveSignPlacement: 'r'} 				|
+|  $1,234.56- 	| {currencySymbol: '$', negativePositiveSignPlacement: 's'}       		|
+|   1,234.56-$	| {currencySymbol: '$', currencySymbolPlacement: 's'}      		|
+|   1,234.56$- 	| {currencySymbol: '$', currencySymbolPlacement: 's', negativePositiveSignPlacement: 'r'}	|
+|  -1,234.56$	| {currencySymbol: '$', currencySymbolPlacement: 's', negativePositiveSignPlacement: 'p'}	|
 
 
-**"suffixText"** 		*Allows additional text as a suffix*
+##### suffixText
+*Allows additional text as a suffix*
 -	suffixText: ''		(default) no suffix defined
 -	suffixText: 'test' example: 123,4.56 test
 -	Numbers and minus sign (-) are not allowed and will cause an error
 
-**"minimumValue"**	*controls the minimum value allowed*
+##### minimumValue
+*controls the minimum value allowed*
 -	minimumValue: '-9999999999999.99'   (default)
 - 	Must be set as text
 - 	Can be negative or positive but must be less than 'maximumValue'
 
-**"maximumValue"**	*controls the maximum value allowed*
+##### maximumValue
+*controls the maximum value allowed*
 -	maximumValue: '9999999999999.99'   (default)
 -	Must be set as text
 -	Can be positive or negative but must be greater than 'minimumValue'
 
 *Note: setting the minimumValue and maximumValue to both positive or negative with situations that limits the users ability to enter the proper values*  
 
-**"decimalPlacesOverride"** 	*overrides the decimal places that that are set via the minimumValue/maximumValue values*
+##### decimalPlacesOverride
+*overrides the decimal places that that are set via the minimumValue/maximumValue values*
 - 	decimalPlacesOverride: null  (default method) 
 - 	decimalPlacesOverride: '4'	overides the default and allows 4 decimal places
 
-**"roundingMethod"**	*sets the rounding method used (12 different available - case senitive)*
+##### roundingMethod
+*sets the rounding method used (12 different available - case sensitive)*
 
-| option	    	| Rounding method	                            		|
+| option | Rounding method |
 | :---------------- | :---------------------------------------------------- |
-|	roundingMethod: 'S'		|	Round-Half-Up Symmetric   (default)					|
-| 	roundingMethod: 'A'		|	Round-Half-Up Asymmetric							|
-| 	roundingMethod: 's'		|	Round-Half-Down Symmetric (lower case s)			|
-| 	roundingMethod: 'a'		|	Round-Half-Down Asymmetric (lower case a)			|
-| 	roundingMethod: 'B'		|	Round-Half-Even "Bankers Rounding"					|
-| 	roundingMethod: 'U'		|	Round Up "Round-Away-From-Zero"						|
-| 	roundingMethod: 'D'		|	Round Down "Round-Toward-Zero" - same as truncate	|
-| 	roundingMethod: 'C'		|	Round to Ceiling "Toward Positive Infinity"			| 																		|
-| 	roundingMethod: 'F'		|	Round to Floor "Toward Negative Infinity"			|
-| 	roundingMethod: 'N05'	|   Rounding "to the nearest .00 or .05"				|
-| 	roundingMethod: 'U05' 	|   Rounds up to next .00 or .05						|
-|	roundingMethod: 'D05' 	|	Rounds down to next .00 or .05						|
+| 'S'		|	Round-Half-Up Symmetric **(default)**					|
+| 'A'		|	Round-Half-Up Asymmetric							|
+| 's'		|	Round-Half-Down Symmetric (lower case s)			|
+| 'a'		|	Round-Half-Down Asymmetric (lower case a)			|
+| 'B'		|	Round-Half-Even "Bankers Rounding"					|
+| 'U'		|	Round Up "Round-Away-From-Zero"						|
+| 'D'		|	Round Down "Round-Toward-Zero" - same as truncate	|
+| 'C'		|	Round to Ceiling "Toward Positive Infinity"			| 																		|
+| 'F'		|	Round to Floor "Toward Negative Infinity"			|
+| 'N05'	|   Rounding "to the nearest .00 or .05"				|
+| 'U05' 	|   Rounds up to next .00 or .05						|
+| 'D05' 	|	Rounds down to next .00 or .05						|
 
 
-**"allowDecimalPadding"**	*controls padding of the decimal places*
+##### allowDecimalPadding
+*controls padding of the decimal places*
 - 	allowDecimalPadding: true		always pads the decimal with zeros (default)
 - 	allowDecimalPadding: false  	no padding
 
 
-**"negativeBracketsTypeOnBlur"** 	*controls if negative values are display with brackets when the input does not have focus*
+##### negativeBracketsTypeOnBlur
+*controls if negative values are display with brackets when the input does not have focus*
 -	negativeBracketsTypeOnBlur: null	 no brackets use for negative values (default)
 -	negativeBracketsTypeOnBlur: '(,)'
 -	negativeBracketsTypeOnBlur: '[,]'
@@ -362,42 +383,47 @@ $.fn.autoFormat(number, autoNumericOptions); // Returns "1.234,56 €"
 -	negativeBracketsTypeOnBlur: '&#60;,&#62;'
 
 
-**"emptyInputBehavior"**	*controls input currency sign display behavior when the input does not have a value ''*
+##### emptyInputBehavior
+*controls input currency sign display behavior when the input does not have a value ''*
 -	emptyInputBehavior: 'focus'		(default) the currency symbol will be displayed on focus
 -	emptyInputBehavior: 'press'		currency symbol will not be displayed until the first key is pressed
 -	emptyInputBehavior: 'always'	currency symbol is always displayed with or without a value
     
 
-**"leadingZero"**		*controls leading zeros behavior*
+##### leadingZero
+*controls leading zeros behavior*
 -	leadingZero: 'allow'	allows leading zero to be entered. They are removed on focusout event (default)
 -	leadingZero: 'deny'	leading zeros not allowed.
 -	leadingZero: 'keep'	leading zeros allowed and will be retained on the focusout event
 
-**"selectNumberOnly"** *controls the 'alt' &#38; 'a' select key combination
+##### selectNumberOnly
+*controls the 'alt' &#38; 'a' select key combination*
 -	selectNumberOnly: false	(default) selects all characters within the input
 -	selectNumberOnly: true 	selects only the numbers
 -	note: if the currency symbol is between the numeric value and the negative sign only the numeric characters will be selected
       
 
-**"formatOnPageLoad"**		*controls if default values are formatted on page ready (load)*
+##### formatOnPageLoad
+*controls if default values are formatted on page ready (load)*
 -	formatOnPageLoad: true		default values are formatted on page ready (default)
 -	formatOnPageLoad: false	default values are NOT formatted on page ready
 
-**"defaultValueOverride"**	*helper option for ASP.NET post-back*
+##### defaultValueOverride
+*helper option for ASP.NET post-back*
 - 	should be the value of the un-formatted default value
 -	this can be set as an option when initializing autoNumeric or as HTML5 data
 -	examples:
 -	no default value='' {defaultValueOverride: ''}
 -	value=1234.56 {defaultValueOverride: '1234.56'}
 
-**"unformatOnSubmit"**	*removes the format on the submit event*
+##### unformatOnSubmit
+*removes the format on the submit event*
 - 	unformatOnSubmit: false (default) does not remove the formatting
 - 	unformatOnSubmit: true - removes the formatting on the submit event
 - 	this can be done globally via the extend method or by elemnt via the jQuery selector
 - 	output is always "nnnn.nn" or negative "-nnnn.nn". n = 0-9 
 
-**"showWarnings"**	*error handling function*
+##### showWarnings
+*error handling function*
 - 	showWarnings: true - (default) throws errors - helpful during developing.
 -	showWarnings: false - stops most errors from being thrown.
-
-****

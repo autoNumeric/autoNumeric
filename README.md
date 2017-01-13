@@ -150,7 +150,7 @@ autoNumeric provides numerous methods to access and modify the input value, form
 
 #### jQuery plugin calls
 | Method           | Description | Call example |
-| :---------------- | :-----------:  | :-----------:  |
+| :----------------: | :-----------:  | :-----------:  |
 | `init` | Initialize autoNumeric and attach the settings (options can be passed as a parameter). **This must be run before other methods can be called.**  | `$(someSelector).autoNumeric('init', {options});` |
 | `destroy` | Stop and remove autoNumeric for the current element | `$(someSelector).autoNumeric("destroy");` |
 | `wipe` | Clear the value from sessionStorage (or cookie, depending on browser supports) | `$(someSelector).autoNumeric("wipe");` |
@@ -279,7 +279,7 @@ For integration into [Rails](http://rubyonrails.org/) projects, you can use the 
 
 ## Documentation
 A more detailed documentation can be found in the [Documentation](Documentation.md) file.<br>
-For more examples and an option code generator (that may be outdated), take a look at [here](http://www.decorplanit.com/plugin/).
+For more examples and an option code generator (that may be outdated), take a look [here](http://www.decorplanit.com/plugin/).
 
 ## Licence
 autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source project, and its authors are credited in [AUTHORS.md](https://github.com/BobKnothe/autoNumeric/blob/master/AUTHORS.md).

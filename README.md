@@ -2,11 +2,9 @@
 
 autoNumeric is a library that provides live *as-you-type* formatting for international numbers and currencies.
 
-[![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][downloads-url]
 [![NPM][nodei-image]][nodei-url]
 <br>
-[![Build Status][travis-image]][travis-url]
-[![Known Vulnerabilities](https://snyk.io/test/github/BobKnothe/autoNumeric/badge.svg)](https://snyk.io/test/github/BobKnothe/autoNumeric)
+[![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][downloads-url] [![Build Status][travis-image]][travis-url] [![Known Vulnerabilities](https://snyk.io/test/github/BobKnothe/autoNumeric/badge.svg)](https://snyk.io/test/github/BobKnothe/autoNumeric)
 <br>
 [![Gitter chat][gitter-image]][gitter-url]
 

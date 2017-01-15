@@ -2,6 +2,14 @@
 
 autoNumeric is a library that provides live *as-you-type* formatting for international numbers and currencies.
 
+[![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][downloads-url]
+[![NPM][nodei-image]][nodei-url]
+<br>
+[![Build Status][travis-image]][travis-url]
+[![Known Vulnerabilities](https://snyk.io/test/github/BobKnothe/autoNumeric/badge.svg)](https://snyk.io/test/github/BobKnothe/autoNumeric)
+<br>
+[![Gitter chat][gitter-image]][gitter-url]
+
 #### Highlights
 autoNumeric main features are :
 - Easy to use and configure
@@ -248,6 +256,8 @@ yarn test:unitf   # ...with Firefox only
 yarn test:unitc   # ...with Chrome only
 ```
 
+Behind the scene, [Karma](https://github.com/karma-runner/karma) is used to run the unit testing written with [Jasmine](https://jasmine.github.io/), while [webdriver.io](https://github.com/webdriverio/webdriver.io) will [soon](https://github.com/BobKnothe/autoNumeric/issues/310) be available for end-to-end testing.
+
 ##### How to lint?
 Linting allow us to keep a coherent code style in all the source files.<br>In order to check that everything is ok, run [eslint](http://eslint.org/) with :
 ```sh
@@ -287,3 +297,15 @@ autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source
 ****
 
 Feel free to donate via Paypal [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NCW5699RY8NN2) or [Patreon](https://www.patreon.com/user?u=4810062) to support autoNumeric development.
+
+
+[downloads-image]: http://img.shields.io/npm/dm/autonumeric.svg
+[downloads-url]: http://badge.fury.io/js/autonumeric
+[gitter-image]: https://img.shields.io/badge/gitter-autonumeric%2Flobby-brightgreen.svg
+[gitter-url]: https://gitter.im/autonumeric/lobby
+[npm-image]: https://img.shields.io/npm/v/autonumeric.svg
+[npm-url]: https://npmjs.org/package/autonumeric
+[nodei-image]: https://nodei.co/npm/autonumeric.png?downloads=true&downloadRank=true&stars=true
+[nodei-url]: https://nodei.co/npm/autonumeric
+[travis-url]: https://travis-ci.org/BobKnothe/autoNumeric
+[travis-image]: https://img.shields.io/travis/BobKnothe/autoNumeric.svg

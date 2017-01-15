@@ -1,0 +1,19 @@
+language: node_js
+node_js:
+ - "stable"
+
+before_script :
+ - yarn install
+
+script:
+ - yarn travis:lint
+ - yarn travis:test
+
+notifications:
+  irc: "chat.freenode.net#autoNumeric"
+  webhooks:
+      urls:
+        - https://webhooks.gitter.im/e/d6718ebae97be830c6d5
+      on_success: change  # options: [always|never|change] default: always
+      on_failure: always  # options: [always|never|change] default: always
+      on_start: never     # options: [always|never|change] default: always

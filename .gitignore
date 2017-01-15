@@ -1,11 +1,18 @@
 .DS_Store
 node_modules/
+
+# Logs
 *.log
-npm-debug.log
-test/unit/coverage
+
+# Test files
 test/e2e/reports
 test/e2e/screenshots
+
+# Built files
 dist/*
+
+# Coverage files
+test/unit/coverage
 
 # Config and settings directory from PhpStorm/WebStorm
 .idea

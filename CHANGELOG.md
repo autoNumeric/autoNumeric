@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.22"
++ Fix issue #345 Setup continuous integration testing (with Travis CI)
+
 ### "2.0.0-beta.21"
 + Fix issue #346 Add a `showPositiveSign` option to display the positive sign wherever needed
 

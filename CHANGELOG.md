@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.23"
++ Fix issue #354 Setup automated coverage tests (with Coveralls)
+
 ### "2.0.0-beta.22"
 + Fix issue #345 Setup continuous integration testing (with Travis CI)
 

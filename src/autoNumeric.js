@@ -1,7 +1,7 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0-beta.21
+ * @version      2.0.0-beta.23
  * @date         2017-01-13 UTC 19:00
  *
  * @author       Bob Knothe

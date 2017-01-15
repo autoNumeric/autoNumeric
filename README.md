@@ -4,7 +4,11 @@ autoNumeric is a library that provides live *as-you-type* formatting for interna
 
 [![NPM][nodei-image]][nodei-url]
 <br>
-[![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][downloads-url] [![Build Status][travis-image]][travis-url] [![Known Vulnerabilities](https://snyk.io/test/github/BobKnothe/autoNumeric/badge.svg)](https://snyk.io/test/github/BobKnothe/autoNumeric)
+[![NPM version][npm-image]][npm-url]
+[![Downloads][downloads-image]][downloads-url]
+[![Build Status][travis-image]][travis-url]
+[![Known Vulnerabilities][snyk-image]][snyk-url]
+[![Coverage Status][coveralls-image]][coveralls-url]
 <br>
 [![Gitter chat][gitter-image]][gitter-url]
 
@@ -307,3 +311,7 @@ Feel free to donate via Paypal [![Donate](https://www.paypalobjects.com/en_US/i/
 [nodei-url]: https://nodei.co/npm/autonumeric
 [travis-url]: https://travis-ci.org/BobKnothe/autoNumeric
 [travis-image]: https://img.shields.io/travis/BobKnothe/autoNumeric.svg
+[snyk-image]: https://snyk.io/test/github/BobKnothe/autoNumeric/badge.svg
+[snyk-url]: https://snyk.io/test/github/BobKnothe/autoNumeric
+[coveralls-image]: https://coveralls.io/repos/github/BobKnothe/autoNumeric/badge.svg?branch=next
+[coveralls-url]: https://coveralls.io/github/BobKnothe/autoNumeric?branch=next

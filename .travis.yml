@@ -9,6 +9,9 @@ script:
  - yarn travis:lint
  - yarn travis:test
 
+after_success:
+  - cat ./test/unit/coverage/lcov.info | ./node_modules/.bin/coveralls --verbose && rm -rf ./test/unit/coverage
+
 notifications:
   irc: "chat.freenode.net#autoNumeric"
   webhooks:

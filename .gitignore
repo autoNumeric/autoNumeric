@@ -13,6 +13,7 @@ dist/*
 
 # Coverage files
 test/unit/coverage
+.coveralls.yml
 
 # Config and settings directory from PhpStorm/WebStorm
 .idea

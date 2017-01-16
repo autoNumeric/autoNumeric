@@ -95,38 +95,39 @@ Multiple options allow you to customize precisely how a form input will format y
 
 | Option           | Description | Default Value |
 | :---------------- | :-----------:  | :-----------:  |
-| `digitGroupSeparator` | Thousand separator character  | `','` |
-| `noSeparatorOnFocus` | Remove the thousand separator, currency symbol and suffix on focus | `false` |
-| `digitalGroupSpacing` | Digital grouping for the thousand separator | `'3'` |
-| `decimalCharacter` | Decimal separator character | `'.'` |
-| `decimalCharacterAlternative` | Allow to declare alternative decimal separator which is automatically replaced by the *real* decimal character (useful in countries where the keyboard numeric pad have a period as the decimal character) | `null` |
+| `allowDecimalPadding`| Allow padding the decimal places with zeros | `true` |
 | `currencySymbol` | Currency symbol | `''` |
 | `currencySymbolPlacement` | Placement of the currency sign, relative to the number (as a prefix or a suffix) | `'p'` |
-| `negativePositiveSignPlacement` | Placement of negative/positive sign relative to the currency symbol (possible options are `l` (left), `r` (right), `p` (prefix) and `s` (suffix)) | `null` |
-| `showPositiveSign` | Allow the positive sign symbol `+` to be displayed for positive numbers | `false` |
-| `suffixText` | Additional text suffix that is added after the number | `''` |
-| `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor` and `ignore`) | `null` |
-| `maximumValue` | Maximum possible value | `'9999999999999.99'` |
-| `minimumValue` | Minimum possible value | `'-9999999999999.99'` |
+| `decimalCharacter` | Decimal separator character | `'.'` |
+| `decimalCharacterAlternative` | Allow to declare alternative decimal separator which is automatically replaced by the *real* decimal character (useful in countries where the keyboard numeric pad have a period as the decimal character) | `null` |
 | `decimalPlacesOverride` | Maximum number of decimal places (used to override decimal places set by the minimumValue & maximumValue values) | `null` |
 | `decimalPlacesShownOnFocus`| Expanded decimal places visible when input has focus | `null` |
-| `scaleDivisor`| This option decides the onfocus value and places the result in the input on focusout | `null` |
-| `scaleDecimalPlaces`| The number of decimal places when unfocused | `null` |
-| `scaleSymbol`| Symbol placed as a suffix when unfocused | `null` |
-| `saveValueToSessionStorage`| Allow the `decimalPlacesShownOnFocus` value to be saved into session storage | `false` |
-| `onInvalidPaste`| Manage how autoNumeric react when the user tries to paste an invalid number (possible options are `error`, `ignore`, `clamp`, `truncate` or `replace`) | `'error'` |
-| `roundingMethod`| Method used for rounding (possible options are `S`, `A`, `s`, `a`, `B`, `U`, `D`, `C`, `F`, `N05`, `U05` or `D05`) | `'S'` |
-| `allowDecimalPadding`| Allow padding the decimal places with zeros | `true` |
-| `negativeBracketsTypeOnBlur`| Adds brackets `[]`, parenthesis `()`, curly braces `{}` or `<>` on negative values when unfocused | `null` |
-| `emptyInputBehavior`| Define what to display when the input value is empty (possible options are `focus`, `press`, `always` and `zero`) | `'focus'` |
-| `leadingZero`| Controls the leading zero behavior (possible options are `allow`, `deny` and `keep`) | `'deny'` |
-| `formatOnPageLoad`| Determine if the default value will be formatted on initialization | `true` |
-| `selectNumberOnly`| Determine if the select all keyboard command will select the complete input text, or only the input numeric value | `false` |
 | `defaultValueOverride`| Helper option for the ASP.NET-specific postback issue | `null` |
-| `unformatOnSubmit`| Removes formatting on submit event | `false` |
-| `outputFormat`| Defines the localized output format of the `get`, `getString` & `getArray` methods | `null` |
-| `showWarnings`| Defines if warnings should be shown | `true` |
+| `digitalGroupSpacing` | Digital grouping for the thousand separator | `'3'` |
+| `digitGroupSeparator` | Thousand separator character  | `','` |
+| `emptyInputBehavior`| Define what to display when the input value is empty (possible options are `focus`, `press`, `always` and `zero`) | `'focus'` |
 | `failOnUnknownOption `| This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object. | `false` |
+| `formatOnPageLoad`| Determine if the default value will be formatted on initialization | `true` |
+| `leadingZero`| Controls the leading zero behavior (possible options are `allow`, `deny` and `keep`) | `'deny'` |
+| `maximumValue` | Maximum possible value | `'9999999999999.99'` |
+| `minimumValue` | Minimum possible value | `'-9999999999999.99'` |
+| `negativeBracketsTypeOnBlur`| Adds brackets `[]`, parenthesis `()`, curly braces `{}` or `<>` on negative values when unfocused | `null` |
+| `negativePositiveSignPlacement` | Placement of negative/positive sign relative to the currency symbol (possible options are `l` (left), `r` (right), `p` (prefix) and `s` (suffix)) | `null` |
+| `noSeparatorOnFocus` | Remove the thousand separator, currency symbol and suffix on focus | `false` |
+| `onInvalidPaste`| Manage how autoNumeric react when the user tries to paste an invalid number (possible options are `error`, `ignore`, `clamp`, `truncate` or `replace`) | `'error'` |
+| `outputFormat`| Defines the localized output format of the `get`, `getString` & `getArray` methods | `null` |
+| `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor` and `ignore`) | `null` |
+| `roundingMethod`| Method used for rounding (possible options are `S`, `A`, `s`, `a`, `B`, `U`, `D`, `C`, `F`, `N05`, `U05` or `D05`) | `'S'` |
+| `saveValueToSessionStorage`| Allow the `decimalPlacesShownOnFocus` value to be saved into session storage | `false` |
+| `scaleDecimalPlaces`| The number of decimal places when unfocused | `null` |
+| `scaleDivisor`| This option decides the onfocus value and places the result in the input on focusout | `null` |
+| `scaleSymbol`| Symbol placed as a suffix when unfocused | `null` |
+| `selectNumberOnly`| Determine if the select all keyboard command will select the complete input text, or only the input numeric value | `false` |
+| `showPositiveSign` | Allow the positive sign symbol `+` to be displayed for positive numbers | `false` |
+| `showWarnings`| Defines if warnings should be shown | `true` |
+| `suffixText` | Additional text suffix that is added after the number | `''` |
+| `unformatOnSubmit`| Removes formatting on submit event | `false` |
+
 
 For more detail on how to use each options, please take a look at the detailed comments in the source code for the `defaultSettings` object.
 
@@ -162,33 +163,33 @@ autoNumeric provides numerous methods to access and modify the input value, form
 | Method           | Description | Call example |
 | :----------------: | :-----------:  | :-----------:  |
 | `init` | Initialize autoNumeric and attach the settings (options can be passed as a parameter). **This must be run before other methods can be called.**  | `$(someSelector).autoNumeric('init', {options});` |
-| `destroy` | Stop and remove autoNumeric for the current element | `$(someSelector).autoNumeric("destroy");` |
-| `wipe` | Clear the value from sessionStorage (or cookie, depending on browser supports) | `$(someSelector).autoNumeric("wipe");` |
-| `update` | Updates the autoNumeric settings, which reformat the input on-the-fly | `$(someSelector).autoNumeric("update", {options});` |
-| `set` | Set the value given as a parameter, and formats it | `$(someSelector).autoNumeric('set', '12345.67');` |
-| `unSet` | Unformat inputs (handy right before form submission) | `$(someSelector).autoNumeric('unSet');` |
-| `reSet` | Re-format inputs (handy right after form submission) | `$(someSelector).autoNumeric('reSet');` |
-| `get` | Return the unformatted value as a string | `$(someSelector).autoNumeric('get');` |
-| `getLocalized` | Returns the unformatted value, but following the `outputFormat` setting | `$(someSelector).autoNumeric('getLocalized');`  |
-| `getNumber` | Return the input unformatted value as a real Javascript number | `$(someSelector).autoNumeric('getNumber');` |
-| `getFormatted` | Return the current formatted value | `$(someSelector).autoNumeric('getFormatted');` |
-| `getString` | Serialize the whole form input array into a String | `$(someSelector).autoNumeric('getString');` |
-| `getArray` | Serialize the whole form input array into an Array | `$(someSelector).autoNumeric('getArray');` |
-| `defaults` | Return the default autoNumeric settings | `$.fn.autoNumeric.defaults` |
-| `lang` | Return all the predefined language options in one object | `$.fn.autoNumeric.lang` |
 | `autoFormat` | cf. ES6 Module calls | `$(someSelector).autoFormat('1234.56', {options});` |
 | `autoUnFormat` | cf. ES6 Module calls | `$(someSelector).autoUnFormat('1.234,56 €', {options});` |
 | `autoValidate` | cf. ES6 Module calls | `$(someSelector).autoValidate({options});` |
+| `defaults` | Return the default autoNumeric settings | `$.fn.autoNumeric.defaults` |
+| `destroy` | Stop and remove autoNumeric for the current element | `$(someSelector).autoNumeric("destroy");` |
+| `get` | Return the unformatted value as a string | `$(someSelector).autoNumeric('get');` |
+| `getArray` | Serialize the whole form input array into an Array | `$(someSelector).autoNumeric('getArray');` |
+| `getFormatted` | Return the current formatted value | `$(someSelector).autoNumeric('getFormatted');` |
+| `getLocalized` | Returns the unformatted value, but following the `outputFormat` setting | `$(someSelector).autoNumeric('getLocalized');`  |
+| `getNumber` | Return the input unformatted value as a real Javascript number | `$(someSelector).autoNumeric('getNumber');` |
+| `getString` | Serialize the whole form input array into a String | `$(someSelector).autoNumeric('getString');` |
+| `lang` | Return all the predefined language options in one object | `$.fn.autoNumeric.lang` |
+| `reSet` | Re-format inputs (handy right after form submission) | `$(someSelector).autoNumeric('reSet');` |
+| `set` | Set the value given as a parameter, and formats it | `$(someSelector).autoNumeric('set', '12345.67');` |
+| `unSet` | Unformat inputs (handy right before form submission) | `$(someSelector).autoNumeric('unSet');` |
+| `update` | Updates the autoNumeric settings, which reformat the input on-the-fly | `$(someSelector).autoNumeric("update", {options});` |
+| `wipe` | Clear the value from sessionStorage (or cookie, depending on browser supports) | `$(someSelector).autoNumeric("wipe");` |
 
 #### ES6 Module calls
 | Method           | Description | Call example |
 | :---------------- | :-----------:  | :-----------:  |
+| `areSettingsValid` | Return true in the settings are valid | `an.areSettingsValid({options})` |
+| `format` | Format the given value without needing to initialize an autoNumeric input first | `an.format('1234.56', {options})` |
 | `getDefaultConfig` | Return the default autoNumeric settings | `an.getDefaultConfig()` |
 | `getLanguages` | Return all the predefined language options in one object | `an.getLanguages()` |
-| `format` | Format the given value without needing to initialize an autoNumeric input first | `an.format('1234.56', {options})` |
 | `unFormat` | Unformat the given value without needing to initialize an autoNumeric input first | `an.unFormat('1.234,56 €', {options})` |
 | `validate` | Check if the given option object is valid, and that each option is valid as well. This throws an error if it's not. | `an.validate({options})` |
-| `areSettingsValid` | Return true in the settings are valid | `an.areSettingsValid({options})` |
 
 *Work is ongoing to export all the current jQuery-only methods into the ES6 module.*
 
@@ -272,12 +273,12 @@ If any errors are shown, you can try to automatically correct them by running :
 ```
 
 #### How to push?
-Every changes that you pushed in its own branch in your personal autoNumeric copy should be based on the latest version of `next` branch.
+Every changes that you pushed in its own branch in your personal autoNumeric copy should be based on the latest version of the `next` branch.
 
 When you create a pull request, make sure to push against the `next` branch.
 
-Your commit must not contain any generated files (ie. files in the `/dist/` directory).<br>
-*Note: Generated `dist` files (ie. `autoNumeric.js` and `autoNumeric.min.js`) are built (and force-added to the git repository) only once for each official release on `master`.*
+Your commit must not contain any generated files (ie. files in the `/dist/` directory or logs).<br>
+*Note: Generated `dist` files (ie. `autoNumeric.js` and `autoNumeric.min.js`) are built and force-added to the git repository only once for each official release on `master`.*
 
 ### Dependencies
 Currently, autoNumeric depends on jQuery (which is pretty logical since it's a jQuery plugin ;P).<br>

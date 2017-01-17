@@ -1,5 +1,9 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.24"
++ Fix issue #326 Pasting a single decimal character into an input that has none does not work
++ Fix issue #322 Pasting a string containing a comma set the caret position at the wrong position
+
 ### "2.0.0-beta.23"
 + Fix issue #354 Setup automated coverage tests (with Coveralls)
 

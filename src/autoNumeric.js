@@ -293,6 +293,7 @@ const defaultSettings = {
      * Deprecated older option name : mRound
      */
     //TODO Rename the options to more explicit names ('S' => 'RoundHalfUpSymmetric', etc.)
+    //TODO Add an `an.roundingMethod` object that enum those options clearly
     roundingMethod: 'S',
 
     /* Allow padding the decimal places with zeros
@@ -1121,16 +1122,6 @@ if (typeof define === 'function' && define.amd) {
         }
 
         return formattedNumberStringIndex;
-    }
-
-    /**
-     * Return the number of dot '.' in the given text.
-     *
-     * @param {string} text
-     * @returns {number}
-     */
-    function countDotsInText(text) {
-        return countCharInText('.', text);
     }
 
     /**
@@ -3482,7 +3473,6 @@ if (typeof define === 'function' && define.amd) {
             // 1a. Remove the negative sign from the pasted text
             rawPastedText = rawPastedText.slice(1, rawPastedText.length);
         }
-        const rawPastedTextSize = rawPastedText.length; // This use the 'cleaned' paste text
 
         // 2. Strip all thousand separators, brackets and currency sign, and convert the decimal character to a dot
         const untranslatedPastedText = preparePastedText(rawPastedText, holder);
@@ -3720,7 +3710,7 @@ if (typeof define === 'function' && define.amd) {
                 if (selectionStart === selectionEnd) {
                     // There is no selection, then the caret position is set after the pasted text
                     const indexWherePastedTextHasBeenInserted = convertCharacterCountToIndexPosition(countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, holder.settings.decimalCharacter));
-                    caretPositionOnInitialTextAfterPasting = indexWherePastedTextHasBeenInserted + rawPastedTextSize - countDotsInText(rawPastedText); // I must not count the characters that have been removed from the pasted text (ie. '.')
+                    caretPositionOnInitialTextAfterPasting = indexWherePastedTextHasBeenInserted + pastedText.length; // I must not count the characters that have been removed from the pasted text (ie. '.')
                 } else {
                     if (isAllInputTextSelected) {
                         // Special case when all the input text is selected before pasting, which means we'll completely erase its content and paste only the clipboard content

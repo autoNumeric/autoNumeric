@@ -293,6 +293,7 @@ const defaultSettings = {
      * Deprecated older option name : mRound
      */
     //TODO Rename the options to more explicit names ('S' => 'RoundHalfUpSymmetric', etc.)
+    //TODO Add an `an.roundingMethod` object that enum those options clearly
     roundingMethod: 'S',
 
     /* Allow padding the decimal places with zeros
@@ -1041,18 +1042,6 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Insert a character or a string at the index given (0 being the far left side).
-     *
-     * @param {string} str
-     * @param {string} char
-     * @param {int} caretPosition
-     * @returns {string}
-     */
-    function insertCharAtPosition(str, char, caretPosition) {
-        return `${str.slice(0, caretPosition)}${char}${str.slice(caretPosition)}`;
-    }
-
-    /**
      * Replace the character at the position `index` in the string `string` by the character(s) `newCharacter`.
      *
      * @param {string} string
@@ -1133,16 +1122,6 @@ if (typeof define === 'function' && define.amd) {
         }
 
         return formattedNumberStringIndex;
-    }
-
-    /**
-     * Return the number of dot '.' in the given text.
-     *
-     * @param {string} text
-     * @returns {number}
-     */
-    function countDotsInText(text) {
-        return countCharInText('.', text);
     }
 
     /**
@@ -3494,16 +3473,22 @@ if (typeof define === 'function' && define.amd) {
             // 1a. Remove the negative sign from the pasted text
             rawPastedText = rawPastedText.slice(1, rawPastedText.length);
         }
-        const rawPastedTextSize = rawPastedText.length; // This use the 'cleaned' paste text
 
         // 2. Strip all thousand separators, brackets and currency sign, and convert the decimal character to a dot
         const untranslatedPastedText = preparePastedText(rawPastedText, holder);
 
-        // Allow pasting arabic numbers
-        const pastedText = arabicToLatinNumbers(untranslatedPastedText, false, false, false);
+        let pastedText;
+        if (untranslatedPastedText === '.') {
+            // Special case : If the user tries to paste a single decimal character (that has been translated to '.' already)
+            pastedText = '.';
+        } else {
+            // Normal case
+            // Allow pasting arabic numbers
+            pastedText = arabicToLatinNumbers(untranslatedPastedText, false, false, false);
+        }
 
         // 3. Test if the paste is valid (only has numbers and eventually a decimal character). If it's not valid, stop here.
-        if (!isNumber(pastedText) || pastedText === '') {
+        if (pastedText !== '.' && (!isNumber(pastedText) || pastedText === '')) {
             if (holder.settings.onInvalidPaste === 'error') {
                 //TODO Should we send a warning instead of throwing an error?
                 throwError(`The pasted value '${rawPastedText}' is not a valid paste content.`);
@@ -3517,6 +3502,7 @@ if (typeof define === 'function' && define.amd) {
         let initialUnformattedNumber;
         if (e.target.value === '') {
             // autoNumeric 'get' returns '0.00' if the input is empty, hence we need to store the 'real' empty initial value when needed
+            //FIXME This has been fixed in a previous commit, get should return '' on an empty input. Remove this unneeded 'if'
             initialUnformattedNumber = '';
         } else {
             initialUnformattedNumber = $this.autoNumeric('get');
@@ -3535,6 +3521,7 @@ if (typeof define === 'function' && define.amd) {
             isPasteNegativeAndInitialValueIsPositive = false;
         }
 
+        let leftPartContainedADot = false;
         switch (holder.settings.onInvalidPaste) {
             /* 4a. Truncate paste behavior:
              * Insert as many numbers as possible on the right hand side of the caret from the pasted text content, until the input reach its range limit.
@@ -3572,8 +3559,17 @@ if (typeof define === 'function' && define.amd) {
                     //TODO Quid if the negative sign is not on the left (negativePositiveSignPlacement and currencySymbolPlacement)?
                 }
 
-                const leftPart = result.slice(0, caretPositionOnInitialTextAfterPasting);
-                const rightPart = result.slice(caretPositionOnInitialTextAfterPasting, result.length);
+                let leftPart = result.slice(0, caretPositionOnInitialTextAfterPasting);
+                let rightPart = result.slice(caretPositionOnInitialTextAfterPasting, result.length);
+                if (pastedText === '.') {
+                    if (contains(leftPart, '.')) {
+                        // If I remove a dot here, then I need to update the caret position (decrement it by 1) when positioning it
+                        // To do so, we keep that info in order to modify the caret position later
+                        leftPartContainedADot = true;
+                        leftPart = leftPart.replace('.', '');
+                    }
+                    rightPart = rightPart.replace('.', '');
+                }
                 // -- Here, we are good to go to continue on the same basis
 
                 // c. Add numbers one by one at the caret position, while testing if the result is valid and within the range of the minimum and maximum value
@@ -3609,6 +3605,11 @@ if (typeof define === 'function' && define.amd) {
                 if (holder.settings.onInvalidPaste === 'truncate') {
                     //TODO If the user as defined a truncate callback and there are still some numbers (that will be dropped), then call this callback with the initial paste as well as the remaining numbers
                     result = lastGoodKnownResult;
+
+                    if (leftPartContainedADot) {
+                        // If a dot has been removed for the part on the left of the caret, we decrement the caret index position
+                        caretPositionOnInitialTextAfterPasting--;
+                    }
                     break;
                 }
                 //XXX ...else we need to continue modifying the result for the 'replace' option
@@ -3648,6 +3649,11 @@ if (typeof define === 'function' && define.amd) {
                 // Update the last caret position where to insert a new number
                 caretPositionOnInitialTextAfterPasting = lastGoodKnownResultIndex;
 
+                if (leftPartContainedADot) {
+                    // If a dot has been removed for the part on the left of the caret, we decrement the caret index position
+                    caretPositionOnInitialTextAfterPasting--;
+                }
+
                 result = lastGoodKnownResult;
 
                 break;
@@ -3658,50 +3664,80 @@ if (typeof define === 'function' && define.amd) {
             case 'ignore':
             case 'clamp':
             default:
-                // Test if there is a selection in the input
-                if (selectionStart === selectionEnd) {
-                    // There is no selection, and this is the caret position : Insert the paste into the element.value at that caret position
-                    let indexWhereToInsertThePastedText = convertCharacterCountToIndexPosition(countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, holder.settings.decimalCharacter));
-                    if (isPasteNegativeAndInitialValueIsPositive) {
-                        // If the pasted value has a '-' sign, but the initial value does not, offset the index by one
-                        indexWhereToInsertThePastedText++;
-                    }
+                // 1. Generate the unformatted result
+                const leftFormattedPart2 = initialFormattedValue.slice(0, selectionStart);
+                const rightFormattedPart2 = initialFormattedValue.slice(selectionEnd, initialFormattedValue.length);
 
-                    result = insertCharAtPosition(initialUnformattedNumber, pastedText, indexWhereToInsertThePastedText);
-
-                    caretPositionOnInitialTextAfterPasting = indexWhereToInsertThePastedText + rawPastedTextSize - countDotsInText(rawPastedText); // I must not count the characters that have been removed from the pasted text (ie. '.')
+                if (selectionStart !== selectionEnd) {
+                    // a. If there is a selection, remove the selected part, and return the left and right part
+                    result = preparePastedText(leftFormattedPart2 + rightFormattedPart2, holder);
                 } else {
-                    // There is a selection : replace the selection with the paste content
-                    const firstPart = e.target.value.slice(0, selectionStart);
-                    const lastPart = e.target.value.slice(selectionEnd, e.target.value.length);
-                    result = firstPart + pastedText + lastPart;
+                    // b. Else if this is only one caret (and therefore no selection), then return the left and right part
+                    result = preparePastedText(initialFormattedValue, holder);
+                }
 
-                    // Finally, remove any unwanted non-number characters
-                    if (firstPart !== '' || lastPart !== '') {
-                        // If the whole input has been selected prior to pasting, then firstPart and lastPart are empty, hence we only use the pastedText variable, otherwise we remove the potential decimal character in the result variable
-                        result = preparePastedText(result, holder);
+                // Add back the negative sign if needed
+                if (isInitialValueNegative) {
+                    result = setRawNegativeSign(result);
+                }
+
+                // Build the unformatted result string
+                caretPositionOnInitialTextAfterPasting = convertCharacterCountToIndexPosition(countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, holder.settings.decimalCharacter));
+                if (isPasteNegativeAndInitialValueIsPositive) {
+                    // If the initial paste is negative and the initial value is not, then I must offset the caret position by one place to the right to take the additional hyphen into account
+                    caretPositionOnInitialTextAfterPasting++;
+                    //TODO Quid if the negative sign is not on the left (negativePositiveSignPlacement and currencySymbolPlacement)?
+                }
+
+                leftPart = result.slice(0, caretPositionOnInitialTextAfterPasting);
+                rightPart = result.slice(caretPositionOnInitialTextAfterPasting, result.length);
+                if (pastedText === '.') {
+                    // If the user only paste a single decimal character, then we remove the previously existing one (if any)
+                    if (contains(leftPart, '.')) {
+                        // If I remove a dot here, then I need to update the caret position (decrement it by 1) when positioning it
+                        // To do so, we keep that info in order to modify the caret position later
+                        leftPartContainedADot = true;
+                        leftPart = leftPart.replace('.', '');
                     }
+                    rightPart = rightPart.replace('.', '');
+                }
+                // -- Here, we are good to go to continue on the same basis
 
-                    // Add back the negative sign if needed
-                    if (isInitialValueNegative) {
-                        result = setRawNegativeSign(result);
-                    }
+                // Generate the unformatted result
+                result = `${leftPart}${pastedText}${rightPart}`;
 
+                // 2. Calculate the caret position in the unformatted value, for later use
+                if (selectionStart === selectionEnd) {
+                    // There is no selection, then the caret position is set after the pasted text
+                    const indexWherePastedTextHasBeenInserted = convertCharacterCountToIndexPosition(countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, holder.settings.decimalCharacter));
+                    caretPositionOnInitialTextAfterPasting = indexWherePastedTextHasBeenInserted + pastedText.length; // I must not count the characters that have been removed from the pasted text (ie. '.')
+                } else {
                     if (isAllInputTextSelected) {
                         // Special case when all the input text is selected before pasting, which means we'll completely erase its content and paste only the clipboard content
                         caretPositionOnInitialTextAfterPasting = result.length;
+                    } else if (rightPart === '') {
+                        // If the user selected from the caret position to the end of the input (on the far right)
+                        caretPositionOnInitialTextAfterPasting = convertCharacterCountToIndexPosition(countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, holder.settings.decimalCharacter)) + pastedText.length;
                     } else {
                         // Normal case
-                        let indexSelectionEndInRawValue = convertCharacterCountToIndexPosition(countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionEnd, holder.settings.decimalCharacter));
-
-                        if (isPasteNegativeAndInitialValueIsPositive) {
-                            // If the pasted value has a '-' sign, but the initial value does not, offset the index by one
-                            indexSelectionEndInRawValue++;
-                        }
+                        const indexSelectionEndInRawValue = convertCharacterCountToIndexPosition(countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionEnd, holder.settings.decimalCharacter));
 
                         // Here I must not count the characters that have been removed from the pasted text (ie. '.'), or the thousand separators in the initial selected text
                         const selectedText = e.target.value.slice(selectionStart, selectionEnd);
-                        caretPositionOnInitialTextAfterPasting = indexSelectionEndInRawValue - selectionSize + countCharInText(holder.settings.digitGroupSeparator, selectedText) + rawPastedTextSize - countDotsInText(rawPastedText);
+                        caretPositionOnInitialTextAfterPasting = indexSelectionEndInRawValue - selectionSize + countCharInText(holder.settings.digitGroupSeparator, selectedText) + pastedText.length;
+                    }
+                }
+
+                // Modify the caret position for special cases, only if the whole input has not been selected
+                if (!isAllInputTextSelected) {
+                    if (isPasteNegativeAndInitialValueIsPositive) {
+                        // If the pasted value has a '-' sign, but the initial value does not, offset the index by one
+                        caretPositionOnInitialTextAfterPasting++;
+                    }
+
+                    if (leftPartContainedADot) {
+                        // If a dot has been removed for the part on the left of the caret, we decrement the caret index position
+                        caretPositionOnInitialTextAfterPasting--;
                     }
                 }
         }

@@ -1,0 +1,710 @@
+<!--
+ * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
+ * @copyright © 2017 Alexandre Bonneau
+ *
+ * The MIT License (http://www.opensource.org/licenses/mit-license.php)
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sub license, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8"/>
+	<title>End-to-end testing for autoNumeric</title>
+	<style>
+		.container {
+			height          : 100vh;
+			display         : flex;
+			justify-content : flex-start;
+			align-items     : center;
+			flex-direction  : column;
+		}
+
+		.testSuite {
+			border     : 1px solid #057905;
+			margin-top : 2rem;
+			padding    : 0.2rem 0.3rem;
+			transition : border 0.3s ease;
+		}
+
+		.testSuite:hover {
+			border : 1px solid lime;
+		}
+
+		.testSuite:hover p.description {
+			color : lime;
+		}
+
+		.test {
+			display : flex;
+		}
+
+		p.description {
+			color      : #EEE;
+			transition : color 0.3s ease;
+		}
+
+		input[type="text"] {
+			text-align       : right;
+			border-radius    : 2px;
+			border           : 1px solid #5F5F5F;
+			background-color : #3E3E3E;
+			font-size        : 1rem;
+			color            : #D4D4D4;
+			padding          : 0.2rem;
+			margin-top       : 0.1rem;
+			margin-bottom    : 0.1rem;
+			transition       : border 0.3s ease;
+			outline          : none;
+		}
+
+		input[type="text"]::-webkit-input-placeholder {
+			color : #737373;
+		}
+
+		input[type="text"]:hover {
+			border : 1px solid #70A0A5;
+		}
+
+		input[type="text"]:focus {
+			border : 1px solid #00B3C5;
+		}
+
+		body {
+			background : #333;
+			color      : #EEE;
+		}
+
+		p {
+			margin        : 0;
+			padding-left  : 0.3rem;
+			padding-right : 0.3rem;
+		}
+
+		a {
+			color           : #EEE;
+			text-decoration : none;
+		}
+
+		a:hover {
+			color           : lime;
+			text-decoration : underline;
+		}
+	</style>
+	<script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="../../dist/autoNumeric.min.js"></script>
+</head>
+<body>
+<div class="container">
+	<div class="title">End-to-end testing page for <a href="https://github.com/BobKnothe/autoNumeric" target="_blank">autoNumeric</a></div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Classic input that throws events</p>
+			<form class="classic">
+				<input id="classic" type="text" placeholder="classic input" value="987654321">
+			</form>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #292 : Native events</p>
+			<form autocomplete="off">
+				<input class="jqueryManagedInput" type="text" placeholder="via jQuery" name="foo" id="bar">
+				<input class="pureJsManagedInput" type="text" placeholder="via Pure JS" name="quu" id="quux">
+			</form>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #283</p>
+			<div class="issue_283">
+				<div>
+					<input id="issue283Input0" type="text" placeholder="leadingZero : 'allow'">
+					<input id="issue283Input1" type="text" placeholder="leadingZero : 'deny'">
+					<input id="issue283Input2" type="text" placeholder="leadingZero : 'deny'">
+				</div>
+				<div>
+					<input id="issue283Input3" type="text" placeholder="leadingZero : 'allow'">
+					<input id="issue283Input4" type="text" placeholder="leadingZero : 'deny'">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #295</p>
+			<div>
+				<div>1. Field : <input type="text" id="firstField"></div>
+				<div>2. Field : <input type="text" id="secondField"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #290</p>
+			<div class="issue_290">
+				<input type="text" placeholder="#290">
+			</div>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #291</p>
+			<input id="issue_291" type="text" placeholder="#291">
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #183</p>
+			<div>
+				<input id="issue_183_error" type="text" placeholder="#183 - onInvalidPaste error" value="12345678">
+				<input id="issue_183_ignore" type="text" placeholder="#183 - onInvalidPaste ignore" value="12345678">
+				<input id="issue_183_clamp" type="text" placeholder="#183 - onInvalidPaste clamp" value="12345678">
+				<input id="issue_183_truncate" type="text" placeholder="#183 - onInvalidPaste truncate" value="12345678">
+				<input id="issue_183_replace" type="text" placeholder="#183 - onInvalidPaste replace" value="12345678">
+			</div>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #302</p>
+			<input id="issue_302" type="text" placeholder="#302">
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #226</p>
+			<input id="issue_226" type="text" placeholder="#226">
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #187</p>
+			<input id="issue_187" type="text" placeholder="#187">
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #193</p>
+			<input id="issue_193" type="text" placeholder="#193">
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #306</p>
+			<div>
+				<input id="issue_306" type="text" placeholder="#306">
+				<input id="issue_306decimals" type="text" placeholder="#306">
+				<input id="issue_306decimals2" type="text" placeholder="#306">
+			</div>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #262</p>
+			<input id="issue_262" type="text" placeholder="#262">
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #321</p>
+			<div>
+				<div>
+					<input id="issue_321_a" type="text" placeholder="#321">
+					<input id="issue_321_b" type="text" placeholder="#321">
+					<input id="issue_321_c" type="text" placeholder="#321">
+				</div>
+				<div>
+					<input id="issue_321_d" type="text" placeholder="#321">
+					<input id="issue_321_e" type="text" placeholder="#321">
+				</div>
+				<div>
+					<input id="issue_321_f" type="text" placeholder="#321">
+					<input id="issue_321_g" type="text" placeholder="#321" value="١٢٣٤٥٠٦٧٫٨٩">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #319</p>
+			<input id="issue_319" type="text" placeholder="#319">
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #346</p>
+			<div>
+				<div>
+					<input id="issue_346_1" type="text" placeholder="#346" value="0">
+					<input id="issue_346_2" type="text" placeholder="#346" value="0">
+					<input id="issue_346_3" type="text" placeholder="#346" value="1234.567">
+				</div>
+				<div>
+					<input id="issue_346_4" type="text" placeholder="#346" value="1234.567">
+					<input id="issue_346_5" type="text" placeholder="#346" value="1234.567">
+					<input id="issue_346_6" type="text" placeholder="#346" value="1234.567">
+				</div>
+				<div>
+					<input id="issue_346_7" type="text" placeholder="#346" value="1234.567">
+					<input id="issue_346_8" type="text" placeholder="#346" value="1234.567">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #326</p>
+			<input id="issue_326" type="text" placeholder="#326" value="12345678">
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #322</p>
+			<input id="issue_322" type="text" placeholder="#322" value="12345678">
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #250</p>
+			<input id="issue_250" type="text" placeholder="#250">
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #317</p>
+			<input id="issue_317" type="text" placeholder="#317" value="0">
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #303</p>
+			<div>
+				<input id="issue_303non_an" type="text" placeholder="#303">
+				<input id="issue_303p" type="text" placeholder="#303" value="">
+				<input id="issue_303s" type="text" placeholder="#303" value="">
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+    //Current master : https://cdn.rawgit.com/BobKnothe/autoNumeric/master/dist/autoNumeric.min.js
+
+    //-------------- Classic input
+    const classicInput = document.querySelector('#classic');
+    classicInput.addEventListener('keydown', () => { console.warn('-- Classic "keydown" thrown'); }, false);
+    classicInput.addEventListener('keypress', () => { console.warn('Classic "keypress" thrown'); }, false);
+    classicInput.addEventListener('input', () => { console.warn('Classic "Input" thrown'); }, false);
+    classicInput.addEventListener('keyup', () => { console.warn('Classic "keyup" thrown'); }, false);
+    classicInput.addEventListener('blur', () => { console.warn('Classic "blur" thrown'); }, false);
+    classicInput.addEventListener('change', () => { console.warn('Classic "change" thrown'); }, false);
+    document.querySelector('form.classic').addEventListener('submit', (e) => {
+        console.warn('Classic "submit" thrown');
+        e.preventDefault();
+    }, false);
+
+    //-------------- Native input/change event not being thrown correctly (initially)
+    const jQueryInput = $('.jqueryManagedInput');
+    const pureJsInput = document.querySelector('.pureJsManagedInput');
+    const $pureJsInput = $(pureJsInput);
+
+    //    jQueryInput.autoNumeric('init', {decimalCharacter: ',', digitGroupSeparator: '.'}); //Basic
+    //    $pureJsInput.autoNumeric('init', {decimalCharacter: ',', digitGroupSeparator: '.'}); //Basic
+
+    jQueryInput.autoNumeric('init', { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', selectNumberOnly: true }); //Euro positive
+    $pureJsInput.autoNumeric('init', { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', selectNumberOnly: true }); //Euro positive
+
+    //    jQueryInput.autoNumeric('init', {digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '-9999999999.99', maximumValue: '0', negativePositiveSignPlacement: 'p'}); //Euro negative
+    //    $pureJsInput.autoNumeric('init', {digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '-9999999999.99', maximumValue: '0', negativePositiveSignPlacement: 'p'}); //Euro negative
+
+    // jQuery version
+    jQueryInput.on('input', () => {
+        console.warn('#### jQuery "Input" thrown', jQueryInput.autoNumeric('get'));
+    });
+
+    jQueryInput.on('change', () => {
+        console.warn('#### jQuery "Change" thrown', jQueryInput.autoNumeric('get'));
+    });
+
+    // Pure JS
+    pureJsInput.addEventListener('input', (e) => {
+        console.warn('>>> Pure "Input" thrown', $pureJsInput.autoNumeric('get'));
+    }, false);
+    pureJsInput.addEventListener('change', (e) => {
+        console.warn('>>> Pure "Change" thrown', $pureJsInput.autoNumeric('get'));
+    }, false);
+
+    //-------------- Issue #283
+    const issue283Input0 = $('#issue283Input0');
+    issue283Input0.autoNumeric('init', { leadingZero: 'allow' });
+    issue283Input0.autoNumeric('set', 1.12345);
+
+    const issue283Input1 = $('#issue283Input1');
+    issue283Input1.autoNumeric('init', { leadingZero: 'deny', maximumValue: '99999999.9999' });
+    issue283Input1.autoNumeric('set', 1.12345);
+
+    const issue283Input2 = $('#issue283Input2');
+    issue283Input2.autoNumeric('init', { digitGroupSeparator: ' ', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '%', currencySymbolPlacement: 's', roundingMethod: 'U', decimalPlacesOverride: '3', leadingZero: 'deny' });
+    issue283Input2.autoNumeric('set', 1.12345);
+
+    const issue283Input3 = $('#issue283Input3');
+    issue283Input3.autoNumeric('init', { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '\u00a0€', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', leadingZero: 'allow' });
+    issue283Input3.autoNumeric('set', 8000);
+    const pureIssue283Input3 = document.querySelector('#issue283Input3');
+    pureIssue283Input3.addEventListener('focus', (e) => { console.warn('issue283Input3 focus detected', e.keyCode); }, false);
+    pureIssue283Input3.addEventListener('keydown', (e) => { console.warn('issue283Input3 keydown detected', e.keyCode); }, false);
+    pureIssue283Input3.addEventListener('keypress', (e) => { console.warn('issue283Input3 keypress detected', e.keyCode); }, false);
+    pureIssue283Input3.addEventListener('input', (e) => { console.warn('issue283Input3 input detected', e.keyCode); }, false);
+    pureIssue283Input3.addEventListener('keyup', (e) => { console.warn('issue283Input3 keyup detected', e.keyCode); }, false);
+    pureIssue283Input3.addEventListener('change', (e) => { console.warn('issue283Input3 change detected', e.keyCode); }, false);
+    pureIssue283Input3.addEventListener('blur', (e) => { console.warn('issue283Input3 blur detected', e.keyCode); }, false);
+
+    const issue283Input4 = $('#issue283Input4');
+    issue283Input4.autoNumeric('init', { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '\u00a0€', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', leadingZero: 'deny' });
+    issue283Input4.autoNumeric('set', 8000);
+
+    //-------------- Issue #295
+    var priceFormatOptions = { decimalPlacesOverride: '2', maximumValue: '999999999999.99', digitGroupSeparator: ',', decimalCharacter: '.' };
+
+    $('#firstField, #secondField').autoNumeric('init', priceFormatOptions);
+
+    $("#firstField").on("keyup", function() {
+        var value = $(this).val();
+        $('#secondField').val(value);
+//        $('#firstField, #secondField').autoNumeric('update', priceFormatOptions);
+    });
+
+    //-------------- Issue #290
+    const issue290Input = $(document.querySelector('.issue_290 input'));
+    issue290Input.autoNumeric('init', {
+        digitGroupSeparator        : '.',
+        decimalCharacter           : ',',
+        decimalCharacterAlternative: '.',
+        currencySymbol             : '\u00a0€',
+        currencySymbolPlacement    : 's',
+        roundingMethod             : 'U',
+        leadingZero                : 'deny',
+        minimumValue               : '0.00',
+        maximumValue               : '999999999999.99'
+    });
+
+    //-------------- Issue #291
+    const issue291Input = $(document.querySelector('#issue_291'));
+    issue291Input.autoNumeric('init', {
+        digitGroupSeparator        : '.',
+        decimalCharacter           : ',',
+        decimalCharacterAlternative: '.',
+        currencySymbol             : '\u00a0€',
+        currencySymbolPlacement    : 's',
+        roundingMethod             : 'U',
+        leadingZero                : 'deny',
+        minimumValue               : '0.00',
+        maximumValue               : '999999999999.99'
+    });
+
+    //-------------- Issue #183
+    const issue183InputError = $(document.querySelector('#issue_183_error'));
+    issue183InputError.autoNumeric('init', {
+        digitGroupSeparator        : '.',
+        decimalCharacter           : ',',
+        decimalCharacterAlternative: '.',
+        currencySymbol             : '\u00a0€',
+        currencySymbolPlacement    : 's',
+        roundingMethod             : 'U',
+        leadingZero                : 'deny',
+        minimumValue               : '-999999999999.99',
+        maximumValue               : '999999999999.99',
+        onInvalidPaste             : 'error',
+        negativeBracketsTypeOnBlur : '(,)',
+        decimalPlacesShownOnFocus  : 5
+    });
+    const issue183InputIgnore = $(document.querySelector('#issue_183_ignore'));
+    issue183InputIgnore.autoNumeric('init', {
+        digitGroupSeparator        : '.',
+        decimalCharacter           : ',',
+        decimalCharacterAlternative: '.',
+        currencySymbol             : '\u00a0€',
+        currencySymbolPlacement    : 's',
+        roundingMethod             : 'U',
+        leadingZero                : 'deny',
+        minimumValue               : '-999999999999.99',
+        maximumValue               : '999999999999.99',
+        onInvalidPaste             : 'ignore'
+    });
+    const issue183InputClamp = $(document.querySelector('#issue_183_clamp'));
+    issue183InputClamp.autoNumeric('init', {
+        digitGroupSeparator        : '.',
+        decimalCharacter           : ',',
+        decimalCharacterAlternative: '.',
+        currencySymbol             : '$ ',
+        currencySymbolPlacement    : 'p',
+        roundingMethod             : 'U',
+        leadingZero                : 'deny',
+        minimumValue               : '-999999999999.99',
+        maximumValue               : '999999999999.99',
+        onInvalidPaste             : 'clamp'
+    });
+    const issue183InputTruncate = $(document.querySelector('#issue_183_truncate'));
+    issue183InputTruncate.autoNumeric('init', {
+        digitGroupSeparator        : '.',
+        decimalCharacter           : ',',
+        decimalCharacterAlternative: '.',
+        currencySymbol             : '\u00a0€',
+        currencySymbolPlacement    : 's',
+        roundingMethod             : 'U',
+        leadingZero                : 'deny',
+        minimumValue               : '-999999999999.99',
+        maximumValue               : '999999999999.99',
+        onInvalidPaste             : 'truncate'
+    });
+    const issue183InputReplace = $(document.querySelector('#issue_183_replace'));
+    issue183InputReplace.autoNumeric('init', {
+        digitGroupSeparator        : '.',
+        decimalCharacter           : ',',
+        decimalCharacterAlternative: '.',
+        currencySymbol             : '\u00a0€',
+        currencySymbolPlacement    : 's',
+        roundingMethod             : 'U',
+        leadingZero                : 'deny',
+        minimumValue               : '-999999999999.99',
+        maximumValue               : '2999999999911.99',
+        onInvalidPaste             : 'replace'
+    });
+
+    //-------------- Issue #302
+    const issue302Input = $(document.querySelector('#issue_302'));
+    issue302Input.autoNumeric('init', { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '\u00a0€', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', leadingZero: 'deny' });
+
+    //-------------- Issue #226
+    const issue226Input = $(document.querySelector('#issue_226'));
+    issue226Input.autoNumeric('init', { allowDecimalPadding: false, formatOnPageLoad: false, minimumValue: '0', leadingZero: 'deny', maximumValue: '2147483647', decimalPlacesOverride: '0' });
+
+    //-------------- Issue #187
+    const issue187input = document.querySelector('#issue_187');
+    const $issue187Input = $(issue187input);
+    $issue187Input.autoNumeric('init');
+    issue187input.addEventListener('autoNumeric:formatted', () => {
+        console.log(`The 'autoNumeric:formatted' event has been caught!`); //DEBUG
+    }, false);
+
+    //-------------- Issue #193
+    const issue193Input = $(document.querySelector('#issue_193'));
+    issue193Input.autoNumeric('init', { digitGroupSeparator: "'", decimalCharacter: ',' });
+
+    //-------------- Issue #306
+    const issue306Input = $(document.querySelector('#issue_306'));
+    issue306Input.autoNumeric('init', { leadingZero: 'deny' });
+    const issue306InputDecimals = $(document.querySelector('#issue_306decimals'));
+    issue306InputDecimals.autoNumeric('init', { leadingZero: 'deny', maximumValue : '999999999.99999', digitGroupSeparator: '.', decimalCharacter: ',' });
+    const issue306InputDecimals2 = $(document.querySelector('#issue_306decimals2'));
+    issue306InputDecimals2.autoNumeric('init', { leadingZero: 'deny', maximumValue : '999999999.99', digitGroupSeparator: '.', decimalCharacter: ',' });
+
+    //-------------- Issue #262
+    const issue262Input = $(document.querySelector('#issue_262'));
+    issue262Input.autoNumeric('init', { leadingZero: 'deny', decimalPlacesOverride:'2', roundingMethod:'D' });
+
+    //-------------- Issue #321
+    $(document.querySelector('#issue_321_a')).autoNumeric('init', { digitGroupSeparator: '٬'     , decimalCharacter: '٫', decimalCharacterAlternative: ',' });
+    $(document.querySelector('#issue_321_b')).autoNumeric('init', { digitGroupSeparator: '\u2009', decimalCharacter: '·', decimalCharacterAlternative: ',' });
+    $(document.querySelector('#issue_321_c')).autoNumeric('init', { digitGroupSeparator: '\u202f', decimalCharacter: '⎖', decimalCharacterAlternative: ',' });
+    $(document.querySelector('#issue_321_d')).autoNumeric('init', { digitGroupSeparator: '\u00a0', decimalCharacter: '.', decimalCharacterAlternative: ',' });
+    $(document.querySelector('#issue_321_e')).autoNumeric('init', { digitGroupSeparator: '˙'     , decimalCharacter: '·', decimalCharacterAlternative: ',' });
+    const issue321Input = $(document.querySelector('#issue_321_f'));
+    $(document.querySelector('#issue_321_f')).autoNumeric('init', { digitGroupSeparator: '٬' , decimalCharacter: '٫', decimalCharacterAlternative: ',' });
+    issue321Input.autoNumeric('set', '١٢٣٤٥٦٧٨٫٩٠'); // ٠١٢٣٤٥٦٧٨٩
+    $(document.querySelector('#issue_321_g')).autoNumeric('init', { digitGroupSeparator: '٬' , decimalCharacter: '٫', decimalCharacterAlternative: ',' });
+
+    //-------------- Issue #319
+    const issue319Input = $(document.querySelector('#issue_319'));
+    issue319Input.autoNumeric('init', { digitGroupSeparator: '.', decimalCharacter: ',', currencySymbol: " €", currencySymbolPlacement: 's', negativePositiveSignPlacement: 'l', emptyInputBehavior: 'zero' });
+
+    //-------------- Issue #346
+    // +1.234,00
+    const noneLeft = {
+        digitGroupSeparator        : '.',
+        decimalCharacter           : ',',
+        decimalCharacterAlternative: '.',
+        showPositiveSign           : true
+    };
+
+    // 1.234,00+
+    const noneSuffix = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        negativePositiveSignPlacement: 's',
+        showPositiveSign             : true
+    };
+
+    // € +1.234,00
+    const leftRight = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        currencySymbol               : '€\u00a0',
+        roundingMethod               : 'U',
+        negativePositiveSignPlacement: 'r',
+        showPositiveSign             : true
+    };
+
+    // +€ 1.234,00
+    const leftLeft = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        currencySymbol               : '€\u00a0',
+        roundingMethod               : 'U',
+        negativePositiveSignPlacement: 'l',
+        showPositiveSign             : true
+    };
+
+    // € 1.234,00+
+    const leftSuffix = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        currencySymbol               : '€\u00a0',
+        roundingMethod               : 'U',
+        negativePositiveSignPlacement: 's',
+        showPositiveSign             : true
+    };
+
+    // 1.234,00+ €
+    const rightLeft = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        currencySymbol               : '\u00a0€',
+        currencySymbolPlacement      : 's',
+        roundingMethod               : 'U',
+        negativePositiveSignPlacement: 'l',
+        showPositiveSign             : true
+    };
+
+    // 1.234,00 €+
+    const rightRight = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        currencySymbol               : '\u00a0€',
+        currencySymbolPlacement      : 's',
+        roundingMethod               : 'U',
+        negativePositiveSignPlacement: 'r',
+        showPositiveSign             : true
+    };
+
+    // +1.234,00 €
+    const rightPrefix = {
+        digitGroupSeparator          : '.',
+        decimalCharacter             : ',',
+        decimalCharacterAlternative  : '.',
+        currencySymbol               : '\u00a0€',
+        currencySymbolPlacement      : 's',
+        roundingMethod               : 'U',
+        negativePositiveSignPlacement: 'p',
+        showPositiveSign             : true
+    };
+
+    const inputIssue346_1 = document.querySelector('#issue_346_1');
+    const inputIssue346_2 = document.querySelector('#issue_346_2');
+    const inputIssue346_3 = document.querySelector('#issue_346_3');
+    const inputIssue346_4 = document.querySelector('#issue_346_4');
+    const inputIssue346_5 = document.querySelector('#issue_346_5');
+    const inputIssue346_6 = document.querySelector('#issue_346_6');
+    const inputIssue346_7 = document.querySelector('#issue_346_7');
+    const inputIssue346_8 = document.querySelector('#issue_346_8');
+
+    $(inputIssue346_1).autoNumeric('init', noneLeft);
+    $(inputIssue346_2).autoNumeric('init', noneSuffix);
+    $(inputIssue346_3).autoNumeric('init', leftRight);
+    $(inputIssue346_4).autoNumeric('init', leftLeft);
+    $(inputIssue346_5).autoNumeric('init', leftSuffix);
+    $(inputIssue346_6).autoNumeric('init', rightLeft);
+    $(inputIssue346_7).autoNumeric('init', rightRight);
+    $(inputIssue346_8).autoNumeric('init', rightPrefix);
+
+    inputIssue346_1.addEventListener('keyup', () => { console.log($(inputIssue346_1).autoNumeric("get"), $(inputIssue346_1).autoNumeric("getSettings").rawValue); }, false);
+    inputIssue346_2.addEventListener('keyup', () => { console.log($(inputIssue346_2).autoNumeric("get"), $(inputIssue346_2).autoNumeric("getSettings").rawValue); }, false);
+    inputIssue346_3.addEventListener('keyup', () => { console.log($(inputIssue346_3).autoNumeric("get"), $(inputIssue346_3).autoNumeric("getSettings").rawValue); }, false);
+    inputIssue346_4.addEventListener('keyup', () => { console.log($(inputIssue346_4).autoNumeric("get"), $(inputIssue346_4).autoNumeric("getSettings").rawValue); }, false);
+    inputIssue346_5.addEventListener('keyup', () => { console.log($(inputIssue346_5).autoNumeric("get"), $(inputIssue346_5).autoNumeric("getSettings").rawValue); }, false);
+    inputIssue346_6.addEventListener('keyup', () => { console.log($(inputIssue346_6).autoNumeric("get"), $(inputIssue346_6).autoNumeric("getSettings").rawValue); }, false);
+    inputIssue346_7.addEventListener('keyup', () => { console.log($(inputIssue346_7).autoNumeric("get"), $(inputIssue346_7).autoNumeric("getSettings").rawValue); }, false);
+    inputIssue346_8.addEventListener('keyup', () => { console.log($(inputIssue346_8).autoNumeric("get"), $(inputIssue346_8).autoNumeric("getSettings").rawValue); }, false);
+
+    //-------------- Issue #326
+    const issue326Input = $(document.querySelector('#issue_326'));
+    issue326Input.autoNumeric('init', {
+        digitGroupSeparator        : '.',
+        decimalCharacter           : ',',
+        decimalCharacterAlternative: '.',
+        currencySymbol             : '\u00a0€',
+        currencySymbolPlacement    : 's',
+        roundingMethod             : 'U',
+        leadingZero                : 'deny',
+        minimumValue               : '-999999999999.99',
+        maximumValue               : '999999999999.99',
+        onInvalidPaste             : 'ignore'
+    });
+
+    //-------------- Issue #322
+    const issue322Input = $(document.querySelector('#issue_322'));
+    issue322Input.autoNumeric('init');
+
+    //-------------- Issue #250
+    const issue250Input = $(document.querySelector('#issue_250'));
+    issue250Input.autoNumeric('init', { decimalPlacesOverride: 2, allowDecimalPadding: false, minimumValue: '2', maximumValue: '999999999' });
+
+    //-------------- Issue #317
+    const issue317Input = $(document.querySelector('#issue_317'));
+    issue317Input.autoNumeric('init', { leadingZero: 'deny', decimalCharacterAlternative: ',' });
+
+    //-------------- Issue #303
+    const issue303AInput = $(document.querySelector('#issue_303p'));
+    issue303AInput.autoNumeric('init', { currencySymbolPlacement: 'p', currencySymbol: '$'      , /*emptyInputBehavior: 'always'*/ });
+    const issue303BInput = $(document.querySelector('#issue_303s'));
+    issue303BInput.autoNumeric('init', { currencySymbolPlacement: 's', currencySymbol: '\u00a0€', /*emptyInputBehavior: 'always'*/ });
+</script>
+</body>
+</html>

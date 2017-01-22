@@ -1,5 +1,5 @@
 /**
- * Tests for autoNumeric.js
+ * Unit tests for autoNumeric.js
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
  * @copyright © 2016 Alexandre Bonneau
  *

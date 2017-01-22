@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "2.0.0-beta.25"
++ Fix issue #310 Setup Webdriver.io for end-to-end (e2e) testing
+
 ### "2.0.0-beta.24"
 + Fix issue #326 Pasting a single decimal character into an input that has none does not work
 + Fix issue #322 Pasting a string containing a comma set the caret position at the wrong position

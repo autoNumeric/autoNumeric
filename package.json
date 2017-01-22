@@ -1,6 +1,6 @@
 {
   "name": "autonumeric",
-  "version": "2.0.0-beta.24",
+  "version": "2.0.0-beta.25",
   "description": "autoNumeric is a library that provides live *as-you-type* formatting for international numbers and currencies. It supports most International numeric formats and currencies including those used in Europe, Asia, and North and South America.",
   "main": "src/autoNumeric.js",
   "readmeFilename": "README.MD",
@@ -31,6 +31,9 @@
     {
       "name": "Alexandre Bonneau",
       "email": "alexandre.bonneau@linuxfr.eu"
+    },
+    {
+      "name": "Sokolov Yura"
     },
     {
       "name": "Carlos Gonzales"
@@ -81,6 +84,7 @@
     "babel-loader": "latest",
     "babel-plugin-add-module-exports": "latest",
     "babel-preset-latest": "latest",
+    "babel-register": "^6.22.0",
     "coveralls": "^2.11.15",
     "eslint": "latest",
     "imports-loader": "latest",
@@ -97,6 +101,10 @@
     "phantomjs-prebuilt": "latest",
     "rimraf": "latest",
     "uglify-js": "latest",
+    "wdio-jasmine-framework": "^0.2.19",
+    "wdio-selenium-standalone-service": "^0.0.7",
+    "wdio-spec-reporter": "^0.0.5",
+    "webdriverio": "^4.6.1",
     "webpack": "latest"
   },
   "scripts": {
@@ -105,15 +113,16 @@
     "build": "yarn run clean:build && yarn run build:dev && yarn run build:prd",
     "clean:build": "rimraf dist",
     "clean:coverage": "rimraf test/unit/coverage",
-    "clean:log": "rimraf npm-debug.log selenium-debug.log yarn-error.log",
-    "clean": "yarn run clean:build && yarn run clean:coverage && yarn run clean:log",
+    "clean:e2e": "rimraf test/e2e/reports/* && rimraf test/e2e/screenshots/*",
+    "clean:log": "rimraf npm-debug.log selenium-debug.log test/e2e/selenium.log yarn-error.log",
+    "clean": "yarn run clean:build && yarn run clean:coverage && yarn run clean:log && npm run clean:e2e",
     "lint": "eslint --ext .js src test/unit test/e2e",
+    "test": "yarn run test:unit && yarn run test:e2e",
     "test:unit": "QT_QPA_PLATFORM='' ./node_modules/karma/bin/karma start karma.conf.js --single-run",
     "test:unitp": "QT_QPA_PLATFORM='' ./node_modules/karma/bin/karma start karma.conf.js --single-run --browsers PhantomJS",
     "test:unitf": "QT_QPA_PLATFORM='' ./node_modules/karma/bin/karma start karma.conf.js --single-run --browsers Firefox",
     "test:unitc": "QT_QPA_PLATFORM='' ./node_modules/karma/bin/karma start karma.conf.js --single-run --browsers Chrome",
-    "test:e2e": "node test/e2e/runner.js",
-    "test": "yarn run test:unit && yarn run test:e2e",
+    "test:e2e": "wdio test/e2e/wdio.local.conf.js",
     "travis:test": "yarn run test:unitp",
     "travis:lint": "yarn run lint"
   },

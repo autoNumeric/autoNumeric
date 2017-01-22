@@ -259,7 +259,7 @@ yarn test:unitf   # ...with Firefox only
 yarn test:unitc   # ...with Chrome only
 ```
 
-Behind the scene, [Karma](https://github.com/karma-runner/karma) is used to run the unit testing written with [Jasmine](https://jasmine.github.io/), while [webdriver.io](https://github.com/webdriverio/webdriver.io) will [soon](https://github.com/BobKnothe/autoNumeric/issues/310) be available for end-to-end testing.
+Behind the scene, all unit and end-to-end tests are written with [Jasmine](https://jasmine.github.io/).<br>[Karma](https://github.com/karma-runner/karma) is used to run the unit tests, while [Webdriver.io](https://github.com/webdriverio/webdriver.io) is used to run end-to-end tests.
 
 ##### How to lint?
 Linting allow us to keep a coherent code style in all the source files.<br>In order to check that everything is ok, run [eslint](http://eslint.org/) with :

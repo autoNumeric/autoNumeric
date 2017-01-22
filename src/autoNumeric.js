@@ -1,8 +1,8 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0.0-beta.23
- * @date         2017-01-13 UTC 19:00
+ * @version      2.0.0-beta.25
+ * @date         2017-01-22 UTC 09:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and other Github users,
@@ -967,6 +967,21 @@ if (typeof define === 'function' && define.amd) {
     function keyCodeNumber(event) {
         // `event.keyCode` and `event.which` are deprecated, `KeyboardEvent.key` (https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) must be used now
         return (typeof event.which === 'undefined')?event.keyCode:event.which;
+    }
+
+    /**
+     * Return the character from the event key code.
+     * @example character(50) => '2'
+     *
+     * @param {Event} event
+     * @returns {string}
+     */
+    function character(event) {
+        if (typeof event.key === 'undefined' || event.key === 'Unidentified') {
+            return String.fromCharCode(keyCodeNumber(event));
+        } else {
+            return event.key;
+        }
     }
 
     /**
@@ -2350,7 +2365,7 @@ if (typeof define === 'function' && define.amd) {
             }
             // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
             let stripZeros = true;
-            if (this.kdCode === keyCode.Hyphen && Number(left) === 0) {
+            if (this.eventKeyCode === keyCode.Hyphen && Number(left) === 0) {
                 stripZeros = false;
             }
             left = stripAllNonNumberCharacters(left, this.settingsClone, stripZeros);
@@ -2378,7 +2393,7 @@ if (typeof define === 'function' && define.amd) {
 
             // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
             let stripZeros = true;
-            if (this.kdCode === keyCode.Hyphen && Number(left) === 0) {
+            if (this.eventKeyCode === keyCode.Hyphen && Number(left) === 0) {
                 stripZeros = false;
             }
             left = stripAllNonNumberCharacters(left, settingsClone, stripZeros);
@@ -2771,11 +2786,14 @@ if (typeof define === 'function' && define.amd) {
             let [left, right] = this._getUnformattedLeftAndRightPartAroundTheSelection();
             settingsClone.throwInput = true;
 
+            // Retrieve the real character that has been entered (ie. 'a' instead of the key code)
+            const eventCharacter = character(e);
+
             // Start rules when the decimal character key is pressed always use numeric pad dot to insert decimal separator
             // Do not allow decimal character if no decimal part allowed
-            if (e.key === settingsClone.decimalCharacter ||
-                (settingsClone.decimalCharacterAlternative && e.key === settingsClone.decimalCharacterAlternative) ||
-                ((e.key === '.' || e.key === ',') && this.eventKeyCode === keyCode.DotNumpad)) {
+            if (eventCharacter === settingsClone.decimalCharacter ||
+                (settingsClone.decimalCharacterAlternative && eventCharacter === settingsClone.decimalCharacterAlternative) ||
+                ((eventCharacter === '.' || eventCharacter === ',') && this.eventKeyCode === keyCode.DotNumpad)) {
                 if (!settingsClone.decimalPlacesOverride || !settingsClone.decimalCharacter) {
                     return true;
                 }
@@ -2804,7 +2822,7 @@ if (typeof define === 'function' && define.amd) {
             }
 
             // Prevent minus if not allowed
-            if ((e.key === '-' || e.key === '+') && settingsClone.negativeSignCharacter === '-') {
+            if ((eventCharacter === '-' || eventCharacter === '+') && settingsClone.negativeSignCharacter === '-') {
                 if (!settingsClone) {
                     return true;
                 }
@@ -2820,7 +2838,7 @@ if (typeof define === 'function' && define.amd) {
                     if (isNegativeStrict(left) || contains(left, settingsClone.negativeSignCharacter)) {
                         left = left.substring(1, left.length);
                     } else {
-                        left = (e.key === '-') ? settingsClone.negativeSignCharacter + left : left;
+                        left = (eventCharacter === '-') ? settingsClone.negativeSignCharacter + left : left;
                     }
                 } else {
                     if (left === '' && contains(right, settingsClone.negativeSignCharacter)) {
@@ -2832,7 +2850,7 @@ if (typeof define === 'function' && define.amd) {
                     if (left.charAt(0) === settingsClone.negativeSignCharacter) {
                         left = left.substring(1, left.length);
                     } else {
-                        left = (e.key === '-') ? settingsClone.negativeSignCharacter + left : left;
+                        left = (eventCharacter === '-') ? settingsClone.negativeSignCharacter + left : left;
                     }
                 }
 
@@ -2842,18 +2860,18 @@ if (typeof define === 'function' && define.amd) {
             }
 
             // If the user tries to insert digit before minus sign
-            const eventNumber = Number(e.key);
+            const eventNumber = Number(eventCharacter);
             if (eventNumber >= 0 && eventNumber <= 9) {
                 if (settingsClone.negativeSignCharacter && left === '' && contains(right, settingsClone.negativeSignCharacter)) {
                     left = settingsClone.negativeSignCharacter;
                     right = right.substring(1, right.length);
                 }
 
-                if (settingsClone.maximumValue <= 0 && settingsClone.minimumValue < settingsClone.maximumValue && !contains(this.value, settingsClone.negativeSignCharacter) && e.key !== '0') {
+                if (settingsClone.maximumValue <= 0 && settingsClone.minimumValue < settingsClone.maximumValue && !contains(this.value, settingsClone.negativeSignCharacter) && eventCharacter !== '0') {
                     left = settingsClone.negativeSignCharacter + left;
                 }
 
-                this._setValueParts(left + e.key, right);
+                this._setValueParts(left + eventCharacter, right);
 
                 return true;
             }
@@ -3259,8 +3277,11 @@ if (typeof define === 'function' && define.amd) {
      * @param {Event} e
      */
     function onKeypress(holder, e) {
+        // Retrieve the real character that has been entered (ie. 'a' instead of the key code)
+        const eventCharacter = character(e);
+
         // Firefox generate a 'keypress' event (e.keyCode === 0) for the keys that do not print a character (ie. 'Insert', 'Delete', 'Fn' keys, 'PageUp', 'PageDown' etc.). 'Shift' on the other hand does not generate a keypress event.
-        if (e.key === keyName.Insert) {
+        if (eventCharacter === keyName.Insert) {
             return;
         }
 
@@ -3286,7 +3307,7 @@ if (typeof define === 'function' && define.amd) {
                 e.preventDefault(); // ...and immediately prevent the browser to add a second character
             }
             else {
-                if ((e.key === holder.settings.decimalCharacter || e.key === holder.settings.decimalCharacterAlternative) &&
+                if ((eventCharacter === holder.settings.decimalCharacter || eventCharacter === holder.settings.decimalCharacterAlternative) &&
                     (getElementSelection(e.target).start === getElementSelection(e.target).end) &&
                     getElementSelection(e.target).start === e.target.value.indexOf(holder.settings.decimalCharacter)) {
                     const position = getElementSelection(e.target).start + 1;

@@ -743,6 +743,7 @@ const languageOption = {
     },
 };
 languageOption.Spanish = languageOption.French; // Español (idem French)
+languageOption.Chinese = languageOption.Japanese; // 中国語 (Chinese)
 
 /**
  * UMD structure

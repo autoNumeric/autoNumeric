@@ -154,7 +154,7 @@ Currently, the predefined options are :
 | :es: | `Spanish` |
 | :us: | `NorthAmerican` |
 | :uk: | `British` |
-| :ch: | `Swiss` |
+| <span>&#x1f1e8;&#x1f1ed;</span> | `Swiss` |
 | :jp: | `Japanese` |
 | :cn: | `Chinese` |
 

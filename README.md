@@ -12,6 +12,8 @@ autoNumeric is a library that provides live *as-you-type* formatting for interna
 <br>
 [![Gitter chat][gitter-image]][gitter-url]
 
+The latest stable version is [2.0.0](https://github.com/BobKnothe/autoNumeric/tree/master).<br>For older stable versions, please take a look [here](#older-versions), while for the latest development version, check the `next` [branch](https://github.com/BobKnothe/autoNumeric/tree/next).
+
 #### Highlights
 autoNumeric main features are :
 - Easy to use and configure
@@ -26,7 +28,7 @@ const autoNumericOptionsEuro = {
     digitGroupSeparator        : '.',
     decimalCharacter           : ',',
     decimalCharacterAlternative: '.',
-    currencySymbol             : ' €',
+    currencySymbol             : '\u202f€',
     currencySymbolPlacement    : 's',
     roundingMethod             : 'U',
 };
@@ -41,6 +43,7 @@ $('.myInput').autoNumeric('init', autoNumericOptionsEuro);
 - Any number of different formats can be used at the same time on the same page.<br>Each input can be configured by either setting the options as HTML5 data attributes, or directly passed as an argument in the Javascript code
 - The settings can easily be changed at *any* time using the `update` method or via a callback
 - autoNumeric supports most text elements, allowing you to place formatted numbers and currency on just about any part of the page
+- Pre-defined [currency options](#predefined-language-options) allows you to directly use autoNumeric by skipping the option configuration step
 - 18 built-in [methods](#methods) gives you the flexibility needed to use autoNumeric to its maximum potential
 - More than 30 [options](#options) allows you to customize the output format
 
@@ -51,11 +54,11 @@ With that said, autoNumeric supports most International numeric formats and curr
 ## Getting started
 
 ### How to use?
-Simply include jQuery and autoNumeric (in that order) in your html header tag.<br>No other file or library are required.
+Simply include jQuery and autoNumeric (in that order) in your html `<header>` tag.<br>No other file or library are required.
 
 ```html
-<script src="jquery.js" type="text/javascript"></script>
-<script src="autoNumeric.js" type="text/javascript"></script>
+<script src="jquery.min.js" type="text/javascript"></script>
+<script src="autoNumeric.min.js" type="text/javascript"></script>
 ```
 
 Initialize autoNumeric with or without options :
@@ -145,19 +148,21 @@ $(selector).autoNumeric('init', $.fn.autoNumeric.lang.French);
 
 Currently, the predefined options are :
 
-| Option name       |
-| :---------------- |
-| `French` |
-| `NorthAmerican` |
-| `British` |
-| `Swiss` |
-| `Japanese` |
+| | Option name |
+| :---------------- | :---------------- |
+| :fr: | `French` |
+| :es: | `Spanish` |
+| :us: | `NorthAmerican` |
+| :uk: | `British` |
+| <span>&#x1f1e8;&#x1f1ed;</span> | `Swiss` |
+| :jp: | `Japanese` |
+| :cn: | `Chinese` |
 
 If you feel a common currency option is missing, please create a pull request and we'll add it!
 
 ## Methods
 autoNumeric provides numerous methods to access and modify the input value, formatted or unformatted, at any point in time.
-<br>It does so by either providing access to those methods via the jQuery wrapper, or directly from the autoNumeric ES6 module.
+<br>It does so by either providing access to those methods via the jQuery [wrapper](#jquery-plugin-calls), or directly via the autoNumeric [ES6 module](#es6-module-calls).
 
 #### jQuery plugin calls
 | Method           | Description | Call example |
@@ -182,6 +187,12 @@ autoNumeric provides numerous methods to access and modify the input value, form
 | `wipe` | Clear the value from sessionStorage (or cookie, depending on browser supports) | `$(someSelector).autoNumeric("wipe");` |
 
 #### ES6 Module calls
+First you need to get a reference to the autoNumeric object that you need to import:
+```js
+import an from 'lib/autoNumeric.js';
+```
+Then you'll be able to use that object static methods:
+
 | Method           | Description | Call example |
 | :---------------- | :-----------:  | :-----------:  |
 | `areSettingsValid` | Return true in the settings are valid | `an.areSettingsValid({options})` |
@@ -194,14 +205,14 @@ autoNumeric provides numerous methods to access and modify the input value, form
 *Work is ongoing to export all the current jQuery-only methods into the ES6 module.*
 
 ## Questions
-For questions and support please use the [Gitter chat room](https://gitter.im/autoNumeric/Lobby) or IRC on Freenode #autoNumeric.<br>The issue list of this repo is **exclusively** for bug reports and feature requests.
+For questions and support please use the [Gitter chat room](https://gitter.im/autoNumeric/Lobby) or IRC on Freenode #autoNumeric.<br>The issue list of this repository is **exclusively** for bug reports and feature requests.
 
 ****
 
 ## How to contribute?
-Contributors and pull requests are welcome.<br>Feel free to contact us for any questions.
+Contributors and pull requests are welcome.<br>Feel free to [contact](#questions) us for any questions.
 
-### Get the source
+### Get the latest source
 ```sh
 git clone -b next https://github.com/BobKnothe/autoNumeric.git
 # or the following if you are authentified on github :
@@ -217,15 +228,15 @@ First things first, in order to be able to compile the ES6 source to something t
 yarn install
 ```
 
-*Note: you need to have `yarn` installed before doing this command.<br>You can install `yarn` globally by doing `npm install -g yarn` as root.*
+*Note: you need to have `yarn` installed before executing this command.<br>You can install `yarn` globally by doing `npm install -g yarn` as root.*
 
 Once you made your changes, you can build the library with :
 ```sh
 yarn build
 ```
-This will generate the `autoNumeric.js` and `autoNumeric.min.js` in the `dist` folder, that you'll then be able to use in the browsers.
+This will generate the `autoNumeric.js` and `autoNumeric.min.js` files in the `dist` folder, that you'll then be able to use in the browsers.
 
-If you want to clean the generated `.js` and `.min.js` files as well as development specific files like coverage and log files, use :
+If you want to clean the generated `.js` and `.min.js` files as well as development specific ones like coverage and log files, use :
 ```sh
 yarn run clean
 ```
@@ -234,15 +245,15 @@ yarn run clean
 ### Run the mandatory tools for linting and testing
 We strive to keep the tests green at all times. Hence whenever you change the source, be sure to :
 
-1. Write at least 2 tests :
-  - One that validate your change
-  - One that invalidate your change
-2. Make sure all tests passes on all the supported browsers (PhantomJS, Firefox, and Chrome)
+1. Write at least 2 tests for each change :
+  - One that validate your changes
+  - One that invalidate your changes
+2. Make sure all tests passes on all supported browsers (PhantomJS, Firefox, and Chrome)
+  - Write unit tests *and* end-to-end tests
 3. Make sure `eslint` does not return any errors regarding the coding style.
 
 ##### How to test?
-Tests **must always be green** before pushing. Any commit that make the tests fails will be ignored.
-To run the tests, you have multiple options :
+Tests **must always be green** :white_check_mark: before pushing. Any commit that make the tests fails will be ignored.<br>To run the tests, you have multiple options :
 ```sh
 # Run unit testing as well as end-to-end testing
 yarn test
@@ -262,7 +273,7 @@ yarn test:unitc   # ...with Chrome only
 Behind the scene, all unit and end-to-end tests are written with [Jasmine](https://jasmine.github.io/).<br>[Karma](https://github.com/karma-runner/karma) is used to run the unit tests, while [Webdriver.io](https://github.com/webdriverio/webdriver.io) is used to run end-to-end tests.
 
 ##### How to lint?
-Linting allow us to keep a coherent code style in all the source files.<br>In order to check that everything is ok, run [eslint](http://eslint.org/) with :
+Linting allow us to keep a coherent code style in all the source files.<br>In order to check that everything is well formatted, run [eslint](http://eslint.org/) with :
 ```sh
 yarn lint
 ```

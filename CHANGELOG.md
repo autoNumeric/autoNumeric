@@ -1,5 +1,10 @@
 ### Change log for autoNumeric:
 
+### "2.0.0"
++ Release autoNumeric version `2.0.0`, enjoy! (¬‿¬) :tada:
++ The old options names are being deprecated, and will be removed *soon* ; update your scripts with the [new ones](README.md#options)!
++ Please be sure to read the updated [readme](README.md) in order to know what else has changed. 
+
 ### "2.0.0-beta.25"
 + Fix issue #310 Setup Webdriver.io for end-to-end (e2e) testing
 

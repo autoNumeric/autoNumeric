@@ -36,9 +36,8 @@
 //-----------------------------------------------------------------------------
 // ---- Configuration
 
-// Generate the index.html file full url
-const directory = require('path');
-const testUrl = `file://${directory.join(process.cwd(), 'test', 'e2e', 'index.html')}`; // Example : 'file:///home/user/taf/_dl/dev/autoNumeric/test/e2e/index.html'
+// Url to the end-to-end test page
+const testUrl = '/e2e';
 
 // Object that holds the references to the input we test
 const selectors = {

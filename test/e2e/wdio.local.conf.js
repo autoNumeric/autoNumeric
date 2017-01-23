@@ -80,7 +80,7 @@ exports.config = {
 
     // Set a base URL in order to shorten url command calls. If your url parameter starts
     // with "/", then the base url gets prepended.
-    baseUrl: 'http://localhost',
+    baseUrl: 'http://localhost:2202',
 
     // Default timeout for all waitFor* commands.
     waitforTimeout: 10000,
@@ -116,10 +116,32 @@ exports.config = {
     // commands. Instead, they hook themselves up into the test process.
     // services: [],
 
-    // This is used to launch the selenium server automatically when calling `yarn test:e2e`
     services           : [
+        // This is used to create a static server to serve the static end-to-end test page
+        'static-server',
+        // This is used to launch the selenium server automatically when calling `yarn test:e2e`
         'selenium-standalone',
     ],
+
+    staticServerFolders: [
+        {
+            mount: '/e2e',
+            path: './test/e2e/index.html',
+        },
+        // Libraries
+        {
+            mount: '/jquery',
+            path: './node_modules/jquery/dist/jquery.min.js',
+        },
+        {
+            mount: '/autonumeric',
+            path: './dist/autoNumeric.min.js',
+        },
+    ],
+    staticServerPort : 2202,
+    staticServerLog: false,
+
+
     seleniumLogs       : 'test/e2e/selenium.log',
     //XXX Using the latest v3.0.1 make the tests crash under Firefox. This is tracked here : https://github.com/SeleniumHQ/selenium/issues/2285
     seleniumInstallArgs: {

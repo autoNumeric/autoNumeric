@@ -53,12 +53,23 @@ With that said, autoNumeric supports most International numeric formats and curr
 
 ## Getting started
 
+### Installation
+You can install autoNumeric with your preferred dependency manager:
+```bash
+# with `yarn` :
+yarn add autonumeric
+# or with `npm` :
+npm install autonumeric
+```
+
 ### How to use?
 Simply include jQuery and autoNumeric (in that order) in your html `<header>` tag.<br>No other file or library are required.
 
 ```html
 <script src="jquery.min.js" type="text/javascript"></script>
 <script src="autoNumeric.min.js" type="text/javascript"></script>
+<!-- You may also directly use a CDN :-->
+<script src="https://cdn.jsdelivr.net/autonumeric/2.0.0/autoNumeric.min.js"></script>
 ```
 
 Initialize autoNumeric with or without options :
@@ -310,7 +321,7 @@ autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source
 
 ****
 
-Feel free to donate via Paypal [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NCW5699RY8NN2) or [Patreon](https://www.patreon.com/user?u=4810062) to support autoNumeric development.
+Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] or [Patreon](https://www.patreon.com/user?u=4810062) to support autoNumeric development.
 
 
 [downloads-image]: http://img.shields.io/npm/dm/autonumeric.svg
@@ -327,3 +338,6 @@ Feel free to donate via Paypal [![Donate](https://www.paypalobjects.com/en_US/i/
 [snyk-url]: https://snyk.io/test/github/BobKnothe/autoNumeric
 [coveralls-image]: https://coveralls.io/repos/github/BobKnothe/autoNumeric/badge.svg?branch=next
 [coveralls-url]: https://coveralls.io/github/BobKnothe/autoNumeric?branch=next
+[paypal-image]: http://img.shields.io/badge/paypal-donate-brightgreen.svg
+[paypal-url]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NCW5699RY8NN2
+[patreon-url]: https://www.patreon.com/user?u=4810062

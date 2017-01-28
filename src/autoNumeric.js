@@ -4427,7 +4427,7 @@ if (typeof define === 'function' && define.amd) {
                 if ($input) {
                     this.addEventListener('focusin', e => { onFocusInAndMouseEnter($this, holder, e); }, false);
                     this.addEventListener('mouseenter', e => { onFocusInAndMouseEnter($this, holder, e); }, false);
-                    this.addEventListener('focusout', e => { onFocusOutAndMouseLeave($this, holder, e); }, false);
+                    this.addEventListener('blur', e => { onFocusOutAndMouseLeave($this, holder, e); }, false);
                     this.addEventListener('mouseleave', e => { onFocusOutAndMouseLeave($this, holder, e); }, false);
                     this.addEventListener('keydown', e => { onKeydown(holder, e); }, false);
                     this.addEventListener('keypress', e => { onKeypress(holder, e); }, false);

@@ -12,7 +12,7 @@ autoNumeric is a library that provides live *as-you-type* formatting for interna
 <br>
 [![Gitter chat][gitter-image]][gitter-url]
 
-The latest stable version is [2.0.0](https://github.com/BobKnothe/autoNumeric/tree/master).<br>For older stable versions, please take a look [here](#older-versions), while for the latest development version, check the `next` [branch](https://github.com/BobKnothe/autoNumeric/tree/next).
+The latest stable version is [2.0.1](https://github.com/BobKnothe/autoNumeric/tree/master).<br>For older stable versions, please take a look [here](#older-versions), while for the latest development version, check the `next` [branch](https://github.com/BobKnothe/autoNumeric/tree/next).
 
 #### Highlights
 autoNumeric main features are :

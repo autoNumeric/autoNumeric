@@ -1,5 +1,11 @@
 ### Change log for autoNumeric:
 
+### "2.0.2", "2.0.3" & "2.0.4"
++ Fix issue #377 The `dist` files in the last publish to npmjs were not rebuilt with the fixes pushed to 2.0.1
++ Fix issue #373 The `dist` files are not included when publishing to npmjs
++ Fix issue #371 The currency symbol is not removed on blur with the default `emptyInputBehavior` value `focus`
++ Fix issue #367 The package.json "postinstall" task does not find the target file when not using the dev dependencies
+
 ### "2.0.1"
 + Fix issue #373 The `dist` files are not included when publishing to npmjs
 

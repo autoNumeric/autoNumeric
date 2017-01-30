@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "2.0.1"
++ Fix issue #373 The `dist` files are not included when publishing to npmjs
+
 ### "2.0.0"
 + Release autoNumeric version `2.0.0`, enjoy! (¬‿¬) :tada:
 + The old options names are being deprecated, and will be removed *soon* ; update your scripts with the [new ones](README.md#options)!

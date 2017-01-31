@@ -1,5 +1,11 @@
 ### Change log for autoNumeric:
 
+### "2.0.8"
++ Fix issue #389 autoNumeric 2.0.7 npm packages causes build error with typescriptify + browserify
+
+### "2.0.5", "2.0.6" & "2.0.7"
++ Fix issue #384 `npm install` for version 2.0.4 does not work on Windows machines
+
 ### "2.0.2", "2.0.3" & "2.0.4"
 + Fix issue #377 The `dist` files in the last publish to npmjs were not rebuilt with the fixes pushed to 2.0.1
 + Fix issue #373 The `dist` files are not included when publishing to npmjs

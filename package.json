@@ -1,10 +1,9 @@
 {
   "name": "autonumeric",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "description": "autoNumeric is a library that provides live *as-you-type* formatting for international numbers and currencies. It supports most International numeric formats and currencies including those used in Europe, Asia, and North and South America.",
   "main": "src/autoNumeric.js",
   "readmeFilename": "README.MD",
-  "typings": "typings.d.ts",
   "keywords": [
     "currency",
     "money",

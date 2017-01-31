@@ -109,7 +109,7 @@
     "webpack": "latest"
   },
   "scripts": {
-    "postinstall": "test -e node_modules/phantomjs-prebuilt/install.js && node node_modules/phantomjs-prebuilt/install.js; true",
+    "postinstall": "yarnfix.js",
     "build:dev": "webpack src/autoNumeric.js dist/autoNumeric.js --config config/webpack.config.dev.js",
     "build:prd": "webpack src/autoNumeric.js dist/autoNumeric.min.js --config config/webpack.config.prd.js",
     "build": "yarn clean:build && yarn build:dev && yarn build:prd",

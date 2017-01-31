@@ -1,6 +1,6 @@
 {
   "name": "autonumeric",
-  "version": "2.0.4",
+  "version": "2.0.7",
   "description": "autoNumeric is a library that provides live *as-you-type* formatting for international numbers and currencies. It supports most International numeric formats and currencies including those used in Europe, Asia, and North and South America.",
   "main": "src/autoNumeric.js",
   "readmeFilename": "README.MD",
@@ -109,7 +109,7 @@
     "webpack": "latest"
   },
   "scripts": {
-    "postinstall": "test -e node_modules/phantomjs-prebuilt/install.js && node node_modules/phantomjs-prebuilt/install.js; true",
+    "postinstall": "node yarnfix.js",
     "build:dev": "webpack src/autoNumeric.js dist/autoNumeric.js --config config/webpack.config.dev.js",
     "build:prd": "webpack src/autoNumeric.js dist/autoNumeric.min.js --config config/webpack.config.prd.js",
     "build": "yarn clean:build && yarn build:dev && yarn build:prd",

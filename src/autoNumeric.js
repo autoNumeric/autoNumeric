@@ -1,8 +1,8 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0.4
- * @date         2017-01-30 UTC 20:00
+ * @version      2.0.5
+ * @date         2017-01-31 UTC 00:30
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and other Github users,

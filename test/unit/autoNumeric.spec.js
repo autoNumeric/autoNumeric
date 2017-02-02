@@ -117,6 +117,7 @@ describe('The autoNumeric object', () => {
         defaultValueOverride         : null,
         unformatOnSubmit             : false,
         outputFormat                 : null,
+        isCancellable                : true,
         showWarnings                 : true,
         failOnUnknownOption          : false,
     };
@@ -1631,6 +1632,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ outputFormat: '.-' })).not.toThrow();
             expect(() => an.validate({ outputFormat: ',-' })).not.toThrow();
 
+            expect(() => an.validate({ isCancellable: true })).not.toThrow();
+            expect(() => an.validate({ isCancellable: false })).not.toThrow();
+            expect(() => an.validate({ isCancellable: 'true' })).not.toThrow();
+            expect(() => an.validate({ isCancellable: 'false' })).not.toThrow();
+
             expect(() => an.validate({ showWarnings: true })).not.toThrow();
             expect(() => an.validate({ showWarnings: false })).not.toThrow();
             expect(() => an.validate({ showWarnings: 'true' })).not.toThrow();
@@ -1871,6 +1877,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ outputFormat: '-5' })).toThrow();
             expect(() => an.validate({ outputFormat: 5 })).toThrow();
             expect(() => an.validate({ outputFormat: -5 })).toThrow();
+
+            expect(() => an.validate({ isCancellable: 0 })).toThrow();
+            expect(() => an.validate({ isCancellable: 1 })).toThrow();
+            expect(() => an.validate({ isCancellable: '0' })).toThrow();
+            expect(() => an.validate({ isCancellable: '1' })).toThrow();
+            expect(() => an.validate({ isCancellable: 'foobar' })).toThrow();
 
             expect(() => an.validate({ showWarnings: 0 })).toThrow();
             expect(() => an.validate({ showWarnings: 1 })).toThrow();

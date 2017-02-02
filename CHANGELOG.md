@@ -1,5 +1,14 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.1"
++ Fix issue #387 Add a 'cancellable' feature
++ Fix issue #391 The currency symbol is selected when focusing on an input via the `Tab` key, when `selectNumberOnly` is set to `true`
++ Refactor the code to create a `_selectOnlyNumbers()` function that extract that behavior for re-use.
++ Create a `_select()` function that select the whole element content, while respecting the `selectNumberOnly` option.
++ Create a `_defaultSelectAll()` function that select the whole element content, including all characters.
++ Modify the `setElementSelection()` calls to simplify them with the ability to use one argument instead of two when the `start` and `end` position are the same.
++ Add a feature where when the user hit 'Escape', the element content is selected (cf. issue #387).
+
 ### "2.0.8"
 + Fix issue #389 autoNumeric 2.0.7 npm packages causes build error with typescriptify + browserify
 
@@ -50,9 +59,9 @@
 + Fix issue #339 `get` returns `'0'` when the input is empty even if `emptyInputBehavior` is not equal to `'zero'`
 
 ### "2.0.0-beta.17"
-+ Fix issue #317 allow jumping over the decimal character when the caret is just left of the decimal character and the user enters the decimal character
-+ Fix issue #319 so the 'get' method returns a negative value when there is a trailing negative sign.
-+ Fix issue #327 so the entire content is selected when tabbing in. 
++ Fix issue #317 Jump over the decimal character when trying to enter a number and the integer part limit has already been attained
++ Fix issue #319 'get' returns wrong value when the value has a trailing negative sign
++ Fix issue #327 When focusing on an input via the `Tab` key, the value is not always selected 
 
 ### "2.0.0-beta.16"
 + Fix issue #321 Allows more international decimal characters and grouping separators :

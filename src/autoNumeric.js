@@ -1,7 +1,7 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0.8
+ * @version      3.0.0-beta.1
  * @date         2017-02-01 UTC 20:00
  *
  * @author       Bob Knothe
@@ -375,6 +375,18 @@ const defaultSettings = {
      * Deprecated older option name : outputType
      */
     outputFormat: null,
+
+    /* Allow the user to 'cancel' and undo the changes he made to the given autonumeric-managed element, by pressing the 'Escape' key.
+     * Whenever the user 'validate' the input (either by hitting 'Enter', or blurring the element), the new value is saved for subsequent 'cancellation'.
+     *
+     * The process :
+     *   - save the input value on focus
+     *   - if the user change the input value, and hit `Escape`, then the initial value saved on focus is set back
+     *   - on the other hand if the user either have used `Enter` to validate (`Enter` throws a change event) his entries, or if the input value has been changed by another script in the mean time, then we save the new input value
+     *   - on a successful 'cancel', select the whole value (while respecting the `selectNumberOnly` option)
+     *   - bonus; if the value has not changed, hitting 'Esc' just select all the input value (while respecting the `selectNumberOnly` option)
+     */
+    isCancellable : true,
 
     /* Defines if warnings should be shown
      * Error handling function
@@ -2263,6 +2275,8 @@ if (typeof define === 'function' && define.amd) {
             this.formatted = false;
             this.settingsClone = settings;
             this.value = that.value;
+            // Note: This variable is needed and not a duplicate of `initialValueOnKeydown` nor `valueOnFocus` since it serves a different purpose and has a different lifecycle
+            this.savedCancellableValue = null;
         }
 
         /**
@@ -2299,6 +2313,16 @@ if (typeof define === 'function' && define.amd) {
         _updateAutoNumericHolderEventKeycode(e) {
             // Note: the keypress event overwrites meaningful value of e.keyCode, hence we do not update that value on 'keypress'
             this.eventKeyCode = keyCodeNumber(e);
+        }
+
+        /**
+         * Save the unformatted element value.
+         * This is used in the 'cancellable' feature where the element value is saved on focus and input validation, to be used if the user wants to cancel his modifications by hitting the 'Escape' key.
+         *
+         * @private
+         */
+        _saveCancellableValue() {
+            this.savedCancellableValue = this.settings.rawValue;
         }
 
         /**
@@ -2590,37 +2614,7 @@ if (typeof define === 'function' && define.amd) {
                 if (this.settings.selectNumberOnly) {
                     // `preventDefault()` is used here to prevent the browser to first select all the input text (including the currency sign), otherwise we would see that whole selection first in a flash, then the selection with only the number part without the currency sign.
                     e.preventDefault();
-                    const valueLen = this.that.value.length;
-                    const currencySymbolLen = this.settings.currencySymbol.length;
-                    const negLen = (!isNegative(this.that.value))?0:1;
-                    const suffixTextLen = this.settings.suffixText.length;
-                    const currencySymbolPlacement = this.settings.currencySymbolPlacement;
-                    const negativePositiveSignPlacement = this.settings.negativePositiveSignPlacement;
-
-                    let start;
-                    if (currencySymbolPlacement === 's') {
-                        start = 0;
-                    } else {
-                        start = (negativePositiveSignPlacement === 'l' && negLen === 1 && currencySymbolLen > 0)?currencySymbolLen + 1:currencySymbolLen;
-                    }
-
-                    let end;
-                    if (currencySymbolPlacement === 'p') {
-                        end = valueLen - suffixTextLen;
-                    } else {
-                        switch (negativePositiveSignPlacement) {
-                            case 'l':
-                                end = valueLen - (suffixTextLen + currencySymbolLen);
-                                break;
-                            case 'r':
-                                end = (currencySymbolLen > 0)?valueLen - (currencySymbolLen + negLen + suffixTextLen):valueLen - (currencySymbolLen + suffixTextLen);
-                                break;
-                            default :
-                                end = valueLen - (currencySymbolLen + suffixTextLen);
-                        }
-                    }
-
-                    setElementSelection(this.that, start, end);
+                    this._selectOnlyNumbers();
                 }
 
                 return true;
@@ -2668,6 +2662,64 @@ if (typeof define === 'function' && define.amd) {
             }
 
             return this.eventKeyCode >= keyCode.PageDown && this.eventKeyCode <= keyCode.DownArrow;
+        }
+
+        /**
+         * Select the whole element content, based on the `selectNumberOnly` option.
+         * @private
+         */
+        _select() {
+            if (this.settings.selectNumberOnly) {
+                this._selectOnlyNumbers();
+            } else {
+                this._defaultSelectAll();
+            }
+        }
+
+        /**
+         * Select the whole element content (including the currency symbol).
+         * @private
+         */
+        _defaultSelectAll() {
+            setElementSelection(this.that, 0, this.that.value.length);
+        }
+
+        /**
+         * Select only the numbers in the formatted input, leaving out the currency symbol.
+         * @private
+         */
+        _selectOnlyNumbers() {
+            const valueLen = this.that.value.length;
+            const currencySymbolLen = this.settings.currencySymbol.length;
+            const negLen = (!isNegative(this.that.value))?0:1;
+            const suffixTextLen = this.settings.suffixText.length;
+            const currencySymbolPlacement = this.settings.currencySymbolPlacement;
+            const negativePositiveSignPlacement = this.settings.negativePositiveSignPlacement;
+
+            let start;
+            if (currencySymbolPlacement === 's') {
+                start = 0;
+            } else {
+                start = (negativePositiveSignPlacement === 'l' && negLen === 1 && currencySymbolLen > 0)?currencySymbolLen + 1:currencySymbolLen;
+            }
+
+            let end;
+            if (currencySymbolPlacement === 'p') {
+                end = valueLen - suffixTextLen;
+            } else {
+                switch (negativePositiveSignPlacement) {
+                    case 'l':
+                        end = valueLen - (suffixTextLen + currencySymbolLen);
+                        break;
+                    case 'r':
+                        end = (currencySymbolLen > 0)?valueLen - (currencySymbolLen + negLen + suffixTextLen):valueLen - (currencySymbolLen + suffixTextLen);
+                        break;
+                    default :
+                        end = valueLen - (currencySymbolLen + suffixTextLen);
+                }
+            }
+
+            setElementSelection(this.that, start, end);
         }
 
         /**
@@ -3127,7 +3179,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Handler for 'focusin' events
+     * Handler for 'focusin' and 'mouseenter' events
      *
      * @param {object} $this jQuery-selected DOM element
      * @param {AutoNumericHolder} holder
@@ -3172,10 +3224,28 @@ if (typeof define === 'function' && define.amd) {
             const onEmpty = checkEmpty(holder.valueOnFocus, settings, true);
             if ((onEmpty !== null && onEmpty !== '') && settings.emptyInputBehavior === 'focus') {
                 $this.val(onEmpty);
+
+                // If there is a currency symbol and its on the right hand side, then we place the caret accordingly on the far left side
                 if (onEmpty === settings.currencySymbol && settings.currencySymbolPlacement === 's') {
-                    setElementSelection(e.target, 0, 0);
+                    setElementSelection(e.target, 0);
                 }
+            } else {
+                // Otherwise by default the whole input content is selected on focus (following the `selectNumberOnly` option)
+                //XXX Firefox <47 does not respect this selection...Oh well.
+                holder._select();
             }
+        }
+    }
+
+    /**
+     * Handler for the 'focus' event
+     *
+     * @param {AutoNumericHolder} holder
+     */
+    function onFocus(holder) {
+        if (holder.settings.isCancellable) {
+            // Save the current unformatted value for later use by the 'cancellable' feature
+            holder._saveCancellableValue();
         }
     }
 
@@ -3233,10 +3303,31 @@ if (typeof define === 'function' && define.amd) {
             return;
         }
 
+        if (holder.eventKeyCode === keyCode.Esc) {
+            //XXX The default 'Escape' key behavior differs between Firefox and Chrome, Firefox already having a built-in 'cancellable-like' feature. This is why we call `e.preventDefault()` here instead of just when `isCancellable` is set to `true`. This allow us to keep the same behavior across browsers.
+            e.preventDefault();
+
+            if (holder.settings.isCancellable) {
+                // If the user wants to cancel its modifications :
+                // We set back the saved value
+                holder.$that.autoNumeric('set', holder.savedCancellableValue);
+                // And we need to send an 'input' event when setting back the initial value in order to make other scripts aware of the value change...
+                triggerEvent('input', e.target);
+            }
+
+            // ..and lastly we update the caret selection, even if the option `isCancellable` is false
+            holder._select();
+        }
+
         // The "enter" key throws a `change` event if the value has changed since the `focus` event
         if (holder.eventKeyCode === keyCode.Enter && holder.valueOnFocus !== e.target.value) {
             triggerEvent('change', e.target);
             holder.valueOnFocus = e.target.value;
+
+            if (holder.settings.isCancellable) {
+                // If the user activated the 'cancellable' feature, we save the validated value when 'Enter' is hit
+                holder._saveCancellableValue();
+            }
         }
 
         holder._updateAutoNumericHolderProperties(e);
@@ -3312,7 +3403,7 @@ if (typeof define === 'function' && define.amd) {
                     (getElementSelection(e.target).start === getElementSelection(e.target).end) &&
                     getElementSelection(e.target).start === e.target.value.indexOf(holder.settings.decimalCharacter)) {
                     const position = getElementSelection(e.target).start + 1;
-                    setElementSelection(e.target, position, position);
+                    setElementSelection(e.target, position);
                 }
                 e.preventDefault();
             }
@@ -3337,6 +3428,12 @@ if (typeof define === 'function' && define.amd) {
      * @param {Event} e
      */
     function onKeyup(holder, settings, e) {
+        if (holder.settings.isCancellable && holder.eventKeyCode === keyCode.Esc) {
+            // If the user wants to cancel its modifications, we drop the 'keyup' event for the Esc key
+            e.preventDefault();
+            return;
+        }
+
         holder._updateAutoNumericHolderProperties(e);
 
         const skip = holder._skipAlways(e);
@@ -3348,9 +3445,9 @@ if (typeof define === 'function' && define.amd) {
         // Added to properly place the caret when only the currency sign is present
         if (e.target.value === holder.settingsClone.currencySymbol) {
             if (holder.settingsClone.currencySymbolPlacement === 's') {
-                setElementSelection(e.target, 0, 0);
+                setElementSelection(e.target, 0);
             } else {
-                setElementSelection(e.target, holder.settingsClone.currencySymbol.length, holder.settingsClone.currencySymbol.length);
+                setElementSelection(e.target, holder.settingsClone.currencySymbol.length);
             }
         } else if (holder.eventKeyCode === keyCode.Tab) {
             setElementSelection(e.target, 0, e.target.value.length);
@@ -3358,7 +3455,7 @@ if (typeof define === 'function' && define.amd) {
 
         if ((e.target.value === holder.settingsClone.suffixText) ||
             (holder.settingsClone.rawValue === '' && holder.settingsClone.currencySymbol !== '' && holder.settingsClone.suffixText !== '')) {
-            setElementSelection(e.target, 0, 0);
+            setElementSelection(e.target, 0);
         }
 
         // Saves the extended decimal to preserve the data when navigating away from the page
@@ -4231,6 +4328,7 @@ if (typeof define === 'function' && define.amd) {
             defaultValueOverride         : true,
             unformatOnSubmit             : true,
             outputFormat                 : true,
+            isCancellable                : true,
             showWarnings                 : true,
             failOnUnknownOption          : true,
             //FIXME Find a way to exclude those internal data from the settings object (ideally by using another object, or better yet, class attributes) -->
@@ -4426,6 +4524,7 @@ if (typeof define === 'function' && define.amd) {
                 // Add the events listeners to supported input types ("text", "hidden", "tel" and no type)
                 if ($input) {
                     this.addEventListener('focusin', e => { onFocusInAndMouseEnter($this, holder, e); }, false);
+                    this.addEventListener('focus', () => { onFocus(holder); }, false);
                     this.addEventListener('mouseenter', e => { onFocusInAndMouseEnter($this, holder, e); }, false);
                     this.addEventListener('blur', e => { onFocusOutAndMouseLeave($this, holder, e); }, false);
                     this.addEventListener('mouseleave', e => { onFocusOutAndMouseLeave($this, holder, e); }, false);
@@ -5197,6 +5296,10 @@ if (typeof define === 'function' && define.amd) {
             ',-',
         ])) {
             throwError(`The custom locale format option 'outputFormat' is invalid ; it should either be null, 'string', 'number', '.', '-.', ',', '-,', '.-' or ',-', [${options.outputFormat}] given.`);
+        }
+
+        if (!isTrueOrFalseString(options.isCancellable) && !isBoolean(options.isCancellable)) {
+            throwError(`The cancellable behavior option 'isCancellable' is invalid ; it should be either 'false' or 'true', [${options.isCancellable}] given.`);
         }
 
         if (!isTrueOrFalseString(options.failOnUnknownOption) && !isBoolean(options.failOnUnknownOption)) {

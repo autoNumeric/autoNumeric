@@ -41,26 +41,30 @@ const testUrl = '/e2e';
 
 // Object that holds the references to the input we test
 const selectors = {
-    inputClassic          : '#classic',
-    issue283Input0        : '#issue283Input0',
-    issue283Input1        : '#issue283Input1',
-    issue283Input2        : '#issue283Input2',
-    issue283Input3        : '#issue283Input3',
-    issue283Input4        : '#issue283Input4',
-    issue183error         : '#issue_183_error',
-    issue183ignore        : '#issue_183_ignore',
-    issue183clamp         : '#issue_183_clamp',
-    issue183truncate      : '#issue_183_truncate',
-    issue183replace       : '#issue_183_replace',
-    issue326input         : '#issue_326',
-    issue322input         : '#issue_322',
-    issue317input         : '#issue_317',
-    issue306input         : '#issue_306',
-    issue306inputDecimals : '#issue_306decimals',
-    issue306inputDecimals2: '#issue_306decimals2',
-    issue303inputNonAn    : '#issue_303non_an',
-    issue303inputP        : '#issue_303p',
-    issue303inputS        : '#issue_303s',
+    inputClassic                      : '#classic',
+    issue283Input0                    : '#issue283Input0',
+    issue283Input1                    : '#issue283Input1',
+    issue283Input2                    : '#issue283Input2',
+    issue283Input3                    : '#issue283Input3',
+    issue283Input4                    : '#issue283Input4',
+    issue183error                     : '#issue_183_error',
+    issue183ignore                    : '#issue_183_ignore',
+    issue183clamp                     : '#issue_183_clamp',
+    issue183truncate                  : '#issue_183_truncate',
+    issue183replace                   : '#issue_183_replace',
+    issue326input                     : '#issue_326',
+    issue322input                     : '#issue_322',
+    issue317input                     : '#issue_317',
+    issue306input                     : '#issue_306',
+    issue306inputDecimals             : '#issue_306decimals',
+    issue306inputDecimals2            : '#issue_306decimals2',
+    issue303inputNonAn                : '#issue_303non_an',
+    issue303inputP                    : '#issue_303p',
+    issue303inputS                    : '#issue_303s',
+    issue387inputCancellable          : '#issue_387_cancellable',
+    issue387inputCancellableNumOnly   : '#issue_387_cancellable_numOnly',
+    issue387inputNotCancellable       : '#issue_387_not_cancellable',
+    issue387inputNotCancellableNumOnly: '#issue_387_not_cancellable_numOnly',
 };
 
 //-----------------------------------------------------------------------------
@@ -730,5 +734,157 @@ xdescribe('Issue #303', () => { //FIXME Finish this
             return input.selectionStart;
         }).value;
         expect(inputCaretPosition).toEqual(0);
+    });
+});
+
+describe('Issue #387', () => {
+    it('should tests for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$220,242.76');
+    });
+
+    it('should cancel the last modifications', () => {
+        // Focus in the input
+        const input = $(selectors.issue387inputCancellable);
+        input.click();
+        // Test the initial value
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+
+        // Test that after deleting characters, we get back the original value
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'Backspace', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$2,202.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+        // Check the text selection
+        const inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#issue_387_cancellable');
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }).value;
+        expect(inputCaretPosition.start).toEqual(0);
+        expect(inputCaretPosition.end).toEqual('$220,242.76'.length);
+
+        // Test that after adding characters, we get back the original value
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', '583']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$225,830,242.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+
+        // Test that after adding and deleting characters, we get back the original value
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Delete', '583', 'Delete', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$225,842.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+
+        // Test that after not modifying the value, we get the same value
+        // Focus in the next input
+        browser.keys(['Tab']);
+        // Test the initial value
+        expect(browser.getValue(selectors.issue387inputCancellableNumOnly)).toEqual('$220,242.76');
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', '146']);
+        expect(browser.getValue(selectors.issue387inputCancellableNumOnly)).toEqual('$220,146,242.76');
+        browser.keys(['Backspace', 'Backspace', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputCancellableNumOnly)).toEqual('$220,242.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellableNumOnly)).toEqual('$220,242.76');
+    });
+
+    it('should select only the numbers on focus, without the currency symbol', () => {
+        // Focus in the first input
+        const input = $(selectors.issue387inputCancellable);
+        input.click();
+
+        // Then focus in the next input
+        browser.keys(['Tab']);
+        // Test the initial value
+        expect(browser.getValue(selectors.issue387inputCancellableNumOnly)).toEqual('$220,242.76');
+        // Check the text selection
+        const inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#issue_387_cancellable_numOnly');
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }).value;
+        // Since `selectNumberOnly` is set to `true`, the currency symbol is not selected by default
+        expect(inputCaretPosition.start).toEqual(1); //XXX This does not work under Firefox 45.7, but does under firefox 53. Since we only support the browsers last version - 2, let's ignore it.
+        expect(inputCaretPosition.end).toEqual('$220,242.76'.length);
+    });
+
+    it('should not cancel the last modifications, since `Enter` is used or the element is blurred', () => {
+        // Focus in the input
+        const input = $(selectors.issue387inputCancellable);
+        input.click();
+        // Test the initial value
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+
+        // Test that after hitting 'Enter' the saved cancellable value is updated
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$22,024.76');
+        browser.keys(['Enter', 'Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$22,024.76');
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', '678']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$22,024,678.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$22,024.76');
+        // Check the text selection
+        const inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#issue_387_cancellable');
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }).value;
+        expect(inputCaretPosition.start).toEqual(0);
+        expect(inputCaretPosition.end).toEqual('$22,024.76'.length);
+
+        // Test that after blurring the input the saved cancellable value is updated
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', '446']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$24,462,024.76');
+        browser.keys(['Tab', 'Shift', 'Tab', 'Shift']); // I focus on the next input, then come back to this one
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$24,462,024.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$24,462,024.76');
+    });
+
+    it('should not cancel the last modifications, since `isCancellable` is set to false', () => {
+        // Focus in the input
+        const input = $(selectors.issue387inputNotCancellable);
+        input.click();
+        // Test the initial value
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$220,242.76');
+
+        // Test that after deleting characters, we get back the original value
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'Backspace', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$2,202.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$2,202.76');
+        // Check the text selection
+        const inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#issue_387_not_cancellable');
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }).value;
+        expect(inputCaretPosition.start).toEqual(0);
+        expect(inputCaretPosition.end).toEqual('$2,202.76'.length);
+
+        // Test that after adding characters, we get back the original value
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', '583']);
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$2,258,302.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$2,258,302.76');
+
+        browser.setValue(selectors.issue387inputNotCancellable, '$220,242.76');
+        // Test that after adding and deleting characters, we get back the original value
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Delete', '583', 'Delete', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$225,842.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$225,842.76');
+
+        // Test that after not modifying the value, we get the same value
+        // Focus in the next input
+        browser.keys(['Tab']);
+        // Test the initial value
+        expect(browser.getValue(selectors.issue387inputNotCancellableNumOnly)).toEqual('$220,242.76');
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', '146']);
+        expect(browser.getValue(selectors.issue387inputNotCancellableNumOnly)).toEqual('$220,146,242.76');
+        browser.keys(['Backspace', 'Backspace', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputNotCancellableNumOnly)).toEqual('$220,242.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputNotCancellableNumOnly)).toEqual('$220,242.76');
     });
 });

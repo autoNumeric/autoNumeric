@@ -47,6 +47,10 @@
 			transition : border 0.3s ease;
 		}
 
+		.testSuite:last-child {
+			margin-bottom: 4rem;
+		}
+
 		.testSuite:hover {
 			border : 1px solid lime;
 		}
@@ -111,8 +115,12 @@
 			text-decoration : underline;
 		}
 	</style>
+	<!-- Used by the end-to-end server spin up for the tests : -->
 	<script src="/jquery"></script>
 	<script src="/autonumeric"></script>
+	<!--<script src="../../node_modules/jquery/dist/jquery.min.js"></script>-->
+	<!--<script src="../../dist/autoNumeric.min.js"></script>-->
+	<!-- ^ Used by the page when calling it manually directly in the browser -->
 </head>
 <body>
 <div class="container">
@@ -324,6 +332,22 @@
 				<input id="issue_303non_an" type="text" placeholder="#303">
 				<input id="issue_303p" type="text" placeholder="#303" value="">
 				<input id="issue_303s" type="text" placeholder="#303" value="">
+			</div>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #387</p>
+			<div>
+				<div>
+					<input id="issue_387_cancellable" type="text" placeholder="#387" value="220242.76">
+					<input id="issue_387_cancellable_numOnly" type="text" placeholder="#387" value="220242.76">
+				</div>
+				<div>
+					<input id="issue_387_not_cancellable" type="text" placeholder="#387" value="220242.76">
+					<input id="issue_387_not_cancellable_numOnly" type="text" placeholder="#387" value="220242.76">
+				</div>
 			</div>
 		</div>
 	</div>
@@ -705,6 +729,17 @@
     issue303AInput.autoNumeric('init', { currencySymbolPlacement: 'p', currencySymbol: '$'      , /*emptyInputBehavior: 'always'*/ });
     const issue303BInput = $(document.querySelector('#issue_303s'));
     issue303BInput.autoNumeric('init', { currencySymbolPlacement: 's', currencySymbol: '\u00a0€', /*emptyInputBehavior: 'always'*/ });
+
+    //-------------- Issue #387
+    const issue387InputCancellable = $(document.querySelector('#issue_387_cancellable'));
+    issue387InputCancellable.autoNumeric('init', { isCancellable: true, currencySymbol: '$' });
+    const issue387InputCancellableNumOnly = $(document.querySelector('#issue_387_cancellable_numOnly'));
+    issue387InputCancellableNumOnly.autoNumeric('init', { isCancellable: true, selectNumberOnly: true, currencySymbol: '$' });
+
+    const issue387InputNotCancellable = $(document.querySelector('#issue_387_not_cancellable'));
+    issue387InputNotCancellable.autoNumeric('init', { isCancellable: false, currencySymbol: '$' });
+    const issue387InputNotCancellableNumOnly = $(document.querySelector('#issue_387_not_cancellable_numOnly'));
+    issue387InputNotCancellableNumOnly.autoNumeric('init', { isCancellable: false, selectNumberOnly: true, currencySymbol: '$' });
 </script>
 </body>
 </html>

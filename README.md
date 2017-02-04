@@ -123,6 +123,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | `emptyInputBehavior`| Define what to display when the input value is empty (possible options are `focus`, `press`, `always` and `zero`) | `'focus'` |
 | `failOnUnknownOption `| This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object. | `false` |
 | `formatOnPageLoad`| Determine if the default value will be formatted on initialization | `true` |
+| `isCancellable`| Determine if the user can *'cancel'* the last modifications done to the element value when using the `Escape` key | `true` |
 | `leadingZero`| Controls the leading zero behavior (possible options are `allow`, `deny` and `keep`) | `'deny'` |
 | `maximumValue` | Maximum possible value | `'9999999999999.99'` |
 | `minimumValue` | Minimum possible value | `'-9999999999999.99'` |

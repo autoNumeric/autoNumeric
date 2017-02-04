@@ -267,7 +267,7 @@ We strive to keep the tests green at all times. Hence whenever you change the so
   - Write unit tests *and* end-to-end tests
 3. Make sure `eslint` does not return any errors regarding the coding style.
 
-##### How to test?
+#### How to test?
 Tests **must always be green** :white_check_mark: before pushing. Any commit that make the tests fails will be ignored.<br>To run the tests, you have multiple options :
 ```sh
 # Run unit testing as well as end-to-end testing
@@ -287,7 +287,7 @@ yarn test:unitc   # ...with Chrome only
 
 Behind the scene, all unit and end-to-end tests are written with [Jasmine](https://jasmine.github.io/).<br>[Karma](https://github.com/karma-runner/karma) is used to run the unit tests, while [Webdriver.io](https://github.com/webdriverio/webdriver.io) is used to run end-to-end tests.
 
-##### How to lint?
+#### How to lint?
 Linting allow us to keep a coherent code style in all the source files.<br>In order to check that everything is well formatted, run [eslint](http://eslint.org/) with :
 ```sh
 yarn lint

@@ -118,6 +118,8 @@ describe('The autoNumeric object', () => {
         unformatOnSubmit             : false,
         outputFormat                 : null,
         isCancellable                : true,
+        modifyValueOnWheel           : true,
+        wheelStep                    : 'progressive',
         showWarnings                 : true,
         failOnUnknownOption          : false,
     };
@@ -1637,6 +1639,17 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ isCancellable: 'true' })).not.toThrow();
             expect(() => an.validate({ isCancellable: 'false' })).not.toThrow();
 
+            expect(() => an.validate({ modifyValueOnWheel: true })).not.toThrow();
+            expect(() => an.validate({ modifyValueOnWheel: false })).not.toThrow();
+            expect(() => an.validate({ modifyValueOnWheel: 'true' })).not.toThrow();
+            expect(() => an.validate({ modifyValueOnWheel: 'false' })).not.toThrow();
+
+            expect(() => an.validate({ wheelStep: 'progressive' })).not.toThrow();
+            expect(() => an.validate({ wheelStep: '1000' })).not.toThrow();
+            expect(() => an.validate({ wheelStep: '422.345' })).not.toThrow();
+            expect(() => an.validate({ wheelStep: 1000 })).not.toThrow();
+            expect(() => an.validate({ wheelStep: 422.345 })).not.toThrow();
+
             expect(() => an.validate({ showWarnings: true })).not.toThrow();
             expect(() => an.validate({ showWarnings: false })).not.toThrow();
             expect(() => an.validate({ showWarnings: 'true' })).not.toThrow();
@@ -1883,6 +1896,21 @@ describe('Static autoNumeric functions', () => {
             expect(() => an.validate({ isCancellable: '0' })).toThrow();
             expect(() => an.validate({ isCancellable: '1' })).toThrow();
             expect(() => an.validate({ isCancellable: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ modifyValueOnWheel: 0 })).toThrow();
+            expect(() => an.validate({ modifyValueOnWheel: 1 })).toThrow();
+            expect(() => an.validate({ modifyValueOnWheel: '0' })).toThrow();
+            expect(() => an.validate({ modifyValueOnWheel: '1' })).toThrow();
+            expect(() => an.validate({ modifyValueOnWheel: 'foobar' })).toThrow();
+
+            expect(() => an.validate({ wheelStep: 'foobar' })).toThrow();
+            expect(() => an.validate({ wheelStep: true })).toThrow();
+            expect(() => an.validate({ wheelStep: 0 })).toThrow();
+            expect(() => an.validate({ wheelStep: -42 })).toThrow();
+            expect(() => an.validate({ wheelStep: '-42' })).toThrow();
+            expect(() => an.validate({ wheelStep: -1000.02 })).toThrow();
+            expect(() => an.validate({ wheelStep: '-1000.02' })).toThrow();
+            expect(() => an.validate({ wheelStep: '1000foobar' })).toThrow();
 
             expect(() => an.validate({ showWarnings: 0 })).toThrow();
             expect(() => an.validate({ showWarnings: 1 })).toThrow();

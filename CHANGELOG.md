@@ -1,7 +1,12 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.2"
++ Fix issue #393 Add an option `modifyValueOnWheel` that allow the user to use mouse wheel to increment/decrement the element value
++ The related `wheelStep` option allows to either define a *fixed* step (ie. `1000`), or a *progressive* one calculated based on the current element value
+
 ### "3.0.0-beta.1"
 + Fix issue #387 Add a 'cancellable' feature
++ It's now possible to select the whole input by hitting the `Escape` key (if no changes have been made to the element value, otherwise this will cancel those changes if the `isCancellable` is set to `true`)
 + Fix issue #391 The currency symbol is selected when focusing on an input via the `Tab` key, when `selectNumberOnly` is set to `true`
 + Refactor the code to create a `_selectOnlyNumbers()` function that extract that behavior for re-use.
 + Create a `_select()` function that select the whole element content, while respecting the `selectNumberOnly` option.

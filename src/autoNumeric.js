@@ -1,8 +1,8 @@
 /**
  *               autoNumeric.js
  *
- * @version      3.0.0-beta.1
- * @date         2017-02-01 UTC 20:00
+ * @version      3.0.0-beta.2
+ * @date         2017-02-03 UTC 03:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and other Github users,
@@ -387,6 +387,28 @@ const defaultSettings = {
      *   - bonus; if the value has not changed, hitting 'Esc' just select all the input value (while respecting the `selectNumberOnly` option)
      */
     isCancellable : true,
+
+    /* Allow the user to increment or decrement the element value with the mouse wheel.
+     * The wheel behavior can by modified by the `wheelStep` option.
+     * This `wheelStep` options can be used in two ways, either by setting :
+     * - a 'fixed' step value (`wheelStep : 1000`), or
+     * - the 'progressive' string (`wheelStep : 'progressive'`), which will then activate a special mode where the step is automatically calculated based on the element value size.
+     *
+     * Note :
+     * A special behavior is applied in order to avoid preventing the user to scroll the page if the inputs are covering the whole available space.
+     * You can use the 'Shift' modifier key while using the mouse wheel in order to temporarily disable the increment/decrement feature (useful on small screen where some badly configured inputs could use all the available space).
+     */
+    modifyValueOnWheel : true,
+
+    /* That option is linked to the `modifyValueOnWheel` one and will only be used if the latter is set to `true`.
+     * This option will modify the wheel behavior and can be used in two ways, either by setting :
+     * - a 'fixed' step value (a positive float or integer number `1000`), or
+     * - the `'progressive'` string.
+     *
+     * The 'fixed' mode always increment/decrement the element value by that amount, while respecting the `minimumValue` and `maximumValue` settings.
+     * The 'progressive' mode will increment/decrement the element value based on its current value. The bigger the number, the bigger the step, and vice versa.
+     */
+    wheelStep : 'progressive',
 
     /* Defines if warnings should be shown
      * Error handling function
@@ -1250,6 +1272,124 @@ if (typeof define === 'function' && define.amd) {
             /* eslint no-console: 0 */
             console.warn(`Warning: ${message}`);
         }
+    }
+
+    /**
+     * Return `true` if the given event is a wheelup event
+     *
+     * @param {Event} DOMevent
+     * @returns {boolean}
+     */
+    function isWheelUpEvent(DOMevent) {
+        if (!DOMevent.deltaY) {
+            throwError(`The event passed as a parameter is not a wheel event, ${DOMevent.type} given.`);
+        }
+
+        return DOMevent.deltaY < 0;
+    }
+
+    /**
+     * Return `true` if the given event is a wheeldown event
+     *
+     * @param {Event} DOMevent
+     * @returns {boolean}
+     */
+    function isWheelDownEvent(DOMevent) {
+        if (!DOMevent.deltaY) {
+            throwError(`The event passed as a parameter is not a wheel event, ${DOMevent.type} given.`);
+        }
+
+        return DOMevent.deltaY > 0;
+    }
+
+    /**
+     * Return the 'nearest rounded' value, according to the given step size.
+     * @example roundToNearest(264789, 10000)) => 260000
+     *
+     * @param {number} value
+     * @param {number} stepPlace
+     * @returns {*}
+     */
+    function roundToNearest(value, stepPlace = 1000) {
+        if (value <= 10 && value >= -10) {
+            return value;
+        }
+
+        if (0 === value) {
+            return 0;
+        }
+
+        return Math.round(value / stepPlace) * stepPlace;
+    }
+
+    /**
+     * Return the 'nearest rounded' value automatically by adding or subtracting the calculated offset to the initial value.
+     * This is done without having to pass a step to this function.
+     * @example                    Calculated offset
+     *           1 ->           1 (10)
+     *          14 ->          10 (10)
+     *         143 ->         140 (10)
+     *       1.278 ->       1.300 (100)
+     *      28.456 ->      28.500 (100)
+     *     276.345 ->     276.000 (1000)
+     *   4.534.061 ->   4.530.000 (10000)
+     *  66.723.844 ->  66.700.000 (100000)
+     * 257.833.411 -> 258.000.000 (1000000)
+     *
+     * @param {number} value
+     * @param {boolean} isAddition
+     * @returns {*}
+     */
+    function modifyAndRoundToNearestAuto(value, isAddition) {
+        value = parseInt(value, 10);
+        const lengthValue = Math.abs(value).toString().length; // Math.abs is needed here to omit the negative sign '-' in case of a negative value
+
+        let pow;
+        switch (lengthValue) {
+            // Special cases for small numbers
+            case 1:
+            case 2:
+            case 3:
+                pow = 1;
+                break;
+            case 4:
+            case 5:
+                pow = 2;
+                break;
+            // Default behavior
+            default:
+                pow = lengthValue - 3;
+        }
+        const offset = Math.pow(10, pow);
+
+        let result;
+        if (isAddition) {
+            result = value + offset;
+        } else {
+            result = value - offset;
+        }
+
+        return roundToNearest(result, Math.pow(10, pow));
+    }
+
+    /**
+     * Return the 'nearest rounded' value automatically by adding the calculated offset to the initial value.
+     *
+     * @param {number} value
+     * @returns {*}
+     */
+    function addAndRoundToNearestAuto(value) {
+        return modifyAndRoundToNearestAuto(value, true);
+    }
+
+    /**
+     * Return the 'nearest rounded' value automatically by subtracting the calculated offset to the initial value.
+     *
+     * @param {number} value
+     * @returns {*}
+     */
+    function subtractAndRoundToNearestAuto(value) {
+        return modifyAndRoundToNearestAuto(value, false);
     }
 
     // autoNumeric-specific functions
@@ -3561,7 +3701,7 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
-     * Handler for 'paste' events
+     * Handler for 'paste' event
      *
      * @param {object} $this jQuery-selected DOM element
      * @param {AutoNumericHolder} holder
@@ -3979,6 +4119,84 @@ if (typeof define === 'function' && define.amd) {
     }
 
     /**
+     * Handler for 'wheel' event
+     *
+     * @param {AutoNumericHolder} holder
+     * @param {Event} e
+     */
+    function onWheel(holder, e) {
+        // If the user is using the 'Shift' key modifier, then we ignore the wheel event
+        // This special behavior is applied in order to avoid preventing the user to scroll the page if the inputs are covering the whole available space.
+        // If that's the case, then he can use the 'Shift' modifier key while using the mouse wheel in order to bypass the increment/decrement feature
+        // This is useful on small screen where some badly configured inputs could use all the available space.
+        if (!e.shiftKey && holder.settings.modifyValueOnWheel) {
+            // 0) First, save the caret position so we can set it back once the value has been changed
+            const selectionStart = e.target.selectionStart || 0;
+            const selectionEnd = e.target.selectionEnd || 0;
+
+            // 1) Get the unformatted value
+            const currentUnformattedValue = holder.settings.rawValue;
+            let result;
+            if (isUndefinedOrNullOrEmpty(currentUnformattedValue)) {
+                // If by default the input is empty, start at '0'
+                if (holder.settings.minimumValue > 0 || holder.settings.maximumValue < 0) {
+                    // or if '0' is not between min and max value, 'minimumValue' if the user does a wheelup, 'maximumValue' if the user does a wheeldown
+                    if (isWheelUpEvent(e)) {
+                        result = holder.settings.minimumValue;
+                    } else if (isWheelDownEvent(e)) {
+                        result = holder.settings.maximumValue;
+                    } else {
+                        throwError(`The event is not a 'wheel' event.`);
+                    }
+                } else {
+                    result = 0;
+                }
+            } else {
+                result = currentUnformattedValue;
+            }
+
+            result = +result; // Typecast to a number needed for the following addition/subtraction
+
+            // 2) Increment/Decrement the value
+            // But first, choose the increment/decrement method ; fixed or progressive
+            if (isNumber(holder.settings.wheelStep)) {
+                const step = +holder.settings.wheelStep; // Typecast to a number needed for the following addition/subtraction
+                // Fixed method
+                // This is the simplest method, where a fixed offset in added/subtracted from the current value
+                if (isWheelUpEvent(e)) { // Increment
+                    result = result + step;
+                } else if (isWheelDownEvent(e)) { // Decrement
+                    result = result - step;
+                }
+            } else {
+                // Progressive method
+                // For this method, we calculate an offset that is in relation to the size of the current number (using only the integer part size).
+                // The bigger the number, the bigger the offset (usually the number count in the integer part minus 3, except for small numbers where a different behavior is better for the user experience).
+                if (isWheelUpEvent(e)) { // Increment
+                    result = addAndRoundToNearestAuto(result);
+                } else if (isWheelDownEvent(e)) { // Decrement
+                    result = subtractAndRoundToNearestAuto(result);
+                }
+            }
+
+            // 3) Set the new value so it gets formatted
+            // First clamp the result if needed
+            result = clampToRangeLimits(result, holder.settings);
+            if (result !== +currentUnformattedValue) {
+                // Only 'set' the value if it has changed. For instance 'set' should not happen if the user hits a limit and continue to try to go past it since we clamp the value.
+                holder.$that.autoNumeric('set', result);
+            }
+
+            //XXX Do not prevent if the value is not modified? From a UX point of view, preventing the wheel event when the user use it on top of an autoNumeric element should always be done, even if the value does not change. Perhaps that could affect other scripts relying on this event to be sent though.
+            e.preventDefault(); // We prevent the page to scroll while we increment/decrement the value
+
+            // 4) Finally, we set back the caret position/selection
+            // There is no need to take into account the fact that the number count could be different at the end of the wheel event ; it would be too complex and most of the time unreliable
+            holder._setSelection(selectionStart, selectionEnd);
+        }
+    }
+
+    /**
      * Handler for 'submit' events
      *
      * @param {object} $this jQuery-selected DOM element
@@ -4329,6 +4547,8 @@ if (typeof define === 'function' && define.amd) {
             unformatOnSubmit             : true,
             outputFormat                 : true,
             isCancellable                : true,
+            modifyValueOnWheel           : true,
+            wheelStep                    : true,
             showWarnings                 : true,
             failOnUnknownOption          : true,
             //FIXME Find a way to exclude those internal data from the settings object (ideally by using another object, or better yet, class attributes) -->
@@ -4533,6 +4753,7 @@ if (typeof define === 'function' && define.amd) {
                     this.addEventListener('keyup', e => { onKeyup(holder, settings, e); }, false);
                     this.addEventListener('blur', e => { onBlur(holder, e); }, false);
                     this.addEventListener('paste', e => { onPaste($this, holder, e); }, false);
+                    this.addEventListener('wheel', e => { onWheel(holder, e); }, false);
                     onSubmit($this, holder); //TODO Switch to `addEventListener'
                 }
             });
@@ -5300,6 +5521,17 @@ if (typeof define === 'function' && define.amd) {
 
         if (!isTrueOrFalseString(options.isCancellable) && !isBoolean(options.isCancellable)) {
             throwError(`The cancellable behavior option 'isCancellable' is invalid ; it should be either 'false' or 'true', [${options.isCancellable}] given.`);
+        }
+
+        if (!isTrueOrFalseString(options.modifyValueOnWheel) && !isBoolean(options.modifyValueOnWheel)) {
+            throwError(`The increment/decrement on mouse wheel option 'modifyValueOnWheel' is invalid ; it should be either 'false' or 'true', [${options.modifyValueOnWheel}] given.`);
+        }
+
+        if (!(isString(options.wheelStep) || isNumber(options.wheelStep)) ||
+            (options.wheelStep !== 'progressive' && !testPositiveFloatOrInteger.test(options.wheelStep)) ||
+            Number(options.wheelStep) === 0) {
+            // We do not accept a step equal to '0'
+            throwError(`The wheel step value option 'wheelStep' is invalid ; it should either be the string 'progressive', or a number or a string that represents a positive number, [${options.wheelStep}] given.`);
         }
 
         if (!isTrueOrFalseString(options.failOnUnknownOption) && !isBoolean(options.failOnUnknownOption)) {

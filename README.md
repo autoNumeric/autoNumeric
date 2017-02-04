@@ -127,6 +127,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | `leadingZero`| Controls the leading zero behavior (possible options are `allow`, `deny` and `keep`) | `'deny'` |
 | `maximumValue` | Maximum possible value | `'9999999999999.99'` |
 | `minimumValue` | Minimum possible value | `'-9999999999999.99'` |
+| `modifyValueOnWheel`| Determine if the element value can be incremented / decremented with the mouse wheel. The wheel behavior is modified with the `wheelStep` option. | `true` |
 | `negativeBracketsTypeOnBlur`| Adds brackets `[]`, parenthesis `()`, curly braces `{}` or `<>` on negative values when unfocused | `null` |
 | `negativePositiveSignPlacement` | Placement of negative/positive sign relative to the currency symbol (possible options are `l` (left), `r` (right), `p` (prefix) and `s` (suffix)) | `null` |
 | `noSeparatorOnFocus` | Remove the thousand separator, currency symbol and suffix on focus | `false` |
@@ -143,6 +144,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | `showWarnings`| Defines if warnings should be shown | `true` |
 | `suffixText` | Additional text suffix that is added after the number | `''` |
 | `unformatOnSubmit`| Removes formatting on submit event | `false` |
+| `wheelStep`| Used in conjonction with the `modifyValueOnWheel` option, this allow to either define a *fixed* step (ie. `1000`), or a *progressive* one | `'progressive'` |
 
 
 For more detail on how to use each options, please take a look at the detailed comments in the source code for the `defaultSettings` object.

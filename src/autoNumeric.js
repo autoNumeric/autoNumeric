@@ -5478,7 +5478,19 @@ if (typeof define === 'function' && define.amd) {
             throwError(`The control decimal padding option 'allowDecimalPadding' is invalid ; it should be either 'false' or 'true', [${options.allowDecimalPadding}] given.`);
         }
 
-        if (!isNull(options.negativeBracketsTypeOnBlur) && !isInArray(options.negativeBracketsTypeOnBlur, ['(,)', '[,]', '<,>', '{,}'])) {
+        if (!isNull(options.negativeBracketsTypeOnBlur) && !isInArray(options.negativeBracketsTypeOnBlur, [
+            '(,)',
+            '[,]',
+            '<,>',
+            '{,}',
+            //TODO Add the following brackets :
+            // '〈,〉'
+            // '｢,｣'
+            // '⸤,⸥'
+            // '⟦,⟧'
+            // '‹,›'
+            // '«,»'
+        ])) {
             throwError(`The brackets for negative values option 'negativeBracketsTypeOnBlur' is invalid ; it should either be '(,)', '[,]', '<,>' or '{,}', [${options.negativeBracketsTypeOnBlur}] given.`);
         }
 
@@ -5643,9 +5655,236 @@ if (typeof define === 'function' && define.amd) {
 }));
 
 /**
+ * Temporary class declaration for the AutoNumeric object that will replace the current export
+ * cf. https://github.com/BobKnothe/autoNumeric/issues/399
+ */
+class AutoNumeric {
+    //
+}
+
+/**
+ * Enumeration of the options values
+ */
+AutoNumeric.options = {
+    digitGroupSeparator          : {
+        comma                   : ',',
+        dot                     : '.',
+        normalSpace             : ' ',
+        thinSpace               : '\u2009',
+        narrowNoBreakSpace      : '\u202f',
+        noBreakSpace            : '\u00a0',
+        noSeparator             : '',
+        apostrophe              : "'",
+        arabicThousandsSeparator: '٬',
+        dotAbove                : '˙',
+    },
+    noSeparatorOnFocus           : {
+        noSeparator  : true,
+        withSeparator: false,
+    },
+    digitalGroupSpacing          : {
+        default: '3',
+    },
+    decimalCharacter             : {
+        comma                    : ',',
+        dot                      : '.',
+        middleDot                : '·',
+        arabicDecimalSeparator   : '٫',
+        decimalSeparatorKeySymbol: '⎖',
+    },
+    decimalCharacterAlternative  : {
+        none: null,
+    },
+    // cf. https://en.wikipedia.org/wiki/Currency_symbol
+    currencySymbol               : {
+        default       : '',
+        currencySign  : '¤',
+        austral       : '₳', // ARA
+        australCentavo: '¢',
+        baht          : '฿', // THB
+        cedi          : '₵', // GHS
+        cent          : '¢',
+        colon         : '₡', // CRC
+        cruzeiro      : '₢', // BRB
+        dollar        : '$',
+        dong          : '₫', // VND
+        drachma       : '₯', // GRD (or 'Δρχ.' or 'Δρ.')
+        lepton        : 'Λ.', // cents of the Drachma
+        dram          : '​֏', // AMD
+        european      : '₠', // XEU (old currency before the Euro)
+        euro          : '€', // EUR
+        florin        : 'ƒ',
+        franc         : '₣', // FRF
+        guarani       : '₲', // PYG
+        hryvnia       : '₴', // грн
+        kip           : '₭', // LAK
+        att           : 'ອັດ', // cents of the Kip
+        lira          : '₺', // TRY
+        liraOld       : '₤',
+        lari          : '₾', // GEL
+        mark          : 'ℳ',
+        pfennig       : '₰', // cents of the Mark
+        mill          : '₥',
+        naira         : '₦', // NGN
+        peseta        : '₧',
+        peso          : '₱', // PHP
+        pound         : '£',
+        riel          : '៛', // KHR
+        ruble         : '₽', // RUB
+        rupee         : '₹', // INR
+        rupeeOld      : '₨',
+        shekel        : '₪',
+        shekelAlt     : 'ש״ח‎‎',
+        taka          : '৳', // BDT
+        tenge         : '₸', // KZT
+        togrog        : '₮', // MNT
+        won           : '₩',
+        yen           : '¥',
+    },
+    currencySymbolPlacement      : {
+        prefix: 'p',
+        suffix: 's',
+    },
+    negativePositiveSignPlacement: {
+        prefix: 'p',
+        suffix: 's',
+        left  : 'l',
+        right : 'r',
+        none  : null,
+    },
+    showPositiveSign             : {
+        show: true,
+        hide: false,
+    },
+    suffixText                   : {
+        default: '',
+    },
+    overrideMinMaxLimits         : {
+        ceiling      : 'ceiling',
+        floor        : 'floor',
+        ignore       : 'ignore',
+        doNotOverride: null,
+    },
+    maximumValue                 : {
+        default: '9999999999999.99',
+    },
+    minimumValue                 : {
+        default: '-9999999999999.99',
+    },
+    decimalPlacesOverride        : {
+        default: null,
+    },
+    decimalPlacesShownOnFocus    : {
+        default: null,
+    },
+    scaleDivisor                 : {
+        default: null,
+    },
+    scaleDecimalPlaces           : {
+        default: null,
+    },
+    scaleSymbol                  : {
+        default: null,
+    },
+    saveValueToSessionStorage    : {
+        save     : true,
+        doNotSave: false,
+    },
+    onInvalidPaste               : {
+        error   : 'error',
+        ignore  : 'ignore',
+        clamp   : 'clamp',
+        truncate: 'truncate',
+        replace : 'replace',
+    },
+    roundingMethod               : {
+        halfUpSymmetric                : 'S',
+        halfUpAsymmetric               : 'A',
+        halfDownSymmetric              : 's',
+        halfDownAsymmetric             : 'a',
+        halfEvenBankersRounding        : 'B',
+        upRoundAwayFromZero            : 'U',
+        downRoundTowardZero            : 'D',
+        toCeilingTowardPositiveInfinity: 'C',
+        toFloorTowardNegativeInfinity  : 'F',
+        toNearest05                    : 'N05', // also 'CHF'
+        upToNext05                     : 'U05',
+        downToNext05                   : 'D05',
+    },
+    allowDecimalPadding          : {
+        padding  : true,
+        noPadding: false,
+    },
+    negativeBracketsTypeOnBlur   : {
+        parentheses: '(,)',
+        brackets   : '[,]',
+        chevrons   : '<,>',
+        curlyBraces: '{,}',
+        none       : null,
+    },
+    emptyInputBehavior           : {
+        focus : 'focus',
+        press : 'press',
+        always: 'always',
+        zero  : 'zero',
+    },
+    leadingZero                  : {
+        allow: 'allow',
+        deny : 'deny',
+        keep : 'keep',
+    },
+    formatOnPageLoad             : {
+        format     : true,
+        doNotFormat: false,
+    },
+    selectNumberOnly             : {
+        selectNumbersOnly: true,
+        selectAll        : false,
+    },
+    defaultValueOverride         : {
+        default: null,
+    },
+    unformatOnSubmit             : {
+        unformat        : true,
+        keepCurrentValue: false,
+    },
+    outputFormat                 : {
+        string       : 'string',
+        number       : 'number',
+        dot          : '.',
+        negativeDot  : '-.',
+        comma        : ',',
+        negativeComma: '-,',
+        dotNegative  : '.-',
+        commaNegative: ',-',
+        none         : null,
+    },
+    isCancellable                : {
+        cancellable   : true,
+        notCancellable: false,
+    },
+    modifyValueOnWheel           : {
+        modifyValue: true,
+        doNothing  : false,
+    },
+    wheelStep                    : {
+        progressive: 'progressive',
+    },
+    showWarnings                 : {
+        show: true,
+        hide: false,
+    },
+    failOnUnknownOption          : {
+        fail  : true,
+        ignore: false,
+    },
+};
+
+/**
  * This exports the interface for the autoNumeric object
  */
 export default {
+    AutoNumeric,
     format  : autoFormat,
     unFormat: autoUnFormat,
     getDefaultConfig,

@@ -3,6 +3,7 @@
 ### "3.0.0-beta.2"
 + Fix issue #393 Add an option `modifyValueOnWheel` that allow the user to use mouse wheel to increment/decrement the element value
 + The related `wheelStep` option allows to either define a *fixed* step (ie. `1000`), or a *progressive* one calculated based on the current element value
++ Fix issue #397 Create enumerations for every options that allows only a set of values
 
 ### "3.0.0-beta.1"
 + Fix issue #387 Add a 'cancellable' feature

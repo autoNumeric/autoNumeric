@@ -1958,4 +1958,16 @@ describe('Static autoNumeric functions', () => {
     });
 });
 
-//TODO Complete the tests with user interactions tests
+//-----------------------------------------------------------------------------
+//---- ES6 tests
+
+describe(`the static options object`, () => {
+    it('should give access to the enumerations', () => {
+        expect(an.AutoNumeric.options.onInvalidPaste.error).toEqual('error');
+        expect(an.AutoNumeric.options.currencySymbolPlacement.suffix).toEqual('s');
+        expect(an.AutoNumeric.options.digitGroupSeparator.apostrophe).toEqual("'");
+        expect(an.AutoNumeric.options.decimalCharacter.middleDot).toEqual('·');
+        expect(an.AutoNumeric.options.decimalCharacterAlternative.none).toBeNull();
+        expect(an.AutoNumeric.options.currencySymbol.default).toEqual('');
+    });
+});

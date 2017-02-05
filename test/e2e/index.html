@@ -372,8 +372,6 @@
 	</div>
 </div>
 <script>
-    //Current master : https://cdn.rawgit.com/BobKnothe/autoNumeric/master/dist/autoNumeric.min.js
-
     //-------------- Classic input
     const classicInput = document.querySelector('#classic');
     classicInput.addEventListener('keydown', () => { console.warn('-- Classic "keydown" thrown'); }, false);
@@ -411,10 +409,10 @@
     });
 
     // Pure JS
-    pureJsInput.addEventListener('input', (e) => {
+    pureJsInput.addEventListener('input', () => {
         console.warn('>>> Pure "Input" thrown', $pureJsInput.autoNumeric('get'));
     }, false);
-    pureJsInput.addEventListener('change', (e) => {
+    pureJsInput.addEventListener('change', () => {
         console.warn('>>> Pure "Change" thrown', $pureJsInput.autoNumeric('get'));
     }, false);
 
@@ -448,12 +446,12 @@
     issue283Input4.autoNumeric('set', 8000);
 
     //-------------- Issue #295
-    var priceFormatOptions = { decimalPlacesOverride: '2', maximumValue: '999999999999.99', digitGroupSeparator: ',', decimalCharacter: '.' };
+    const priceFormatOptions = { decimalPlacesOverride: '2', maximumValue: '999999999999.99', digitGroupSeparator: ',', decimalCharacter: '.' };
 
     $('#firstField, #secondField').autoNumeric('init', priceFormatOptions);
 
     $("#firstField").on("keyup", function() {
-        var value = $(this).val();
+        const value = $(this).val();
         $('#secondField').val(value);
 //        $('#firstField, #secondField').autoNumeric('update', priceFormatOptions);
     });

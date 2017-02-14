@@ -90,7 +90,15 @@ $(selector).autoNumeric('init', $.fn.autoNumeric.lang.French);
 You're done!
 
 ### On which elements can it be used?
-Here are the following supported input types:
+
+autoNumeric can be used in two ways ;
+- with event listeners when used on `<input>` elements making them reactive (in a *read/write* mode), or
+- without event listeners when used on other DOM elements types, essentially acting as a *format-once-and-forget* mode (*read only*).
+
+#### On `<input>` elements
+When used on an `<input>` element, you'll be able to interact with its value and get a formatted input value *as-you-type*, using the full power of autoNumeric.
+
+Only the following supported `<input>` types are supported :
 - `text`,
 - `tel`,
 - `hidden`, or
@@ -104,6 +112,20 @@ Here are the following supported input types:
 ```
 
 Note : the `number` type is **not** supported simply because autoNumeric formats numbers as strings (ie. `'123.456.789,00 &#8364;'`) that this input type does not allow.
+
+#### On other DOM elements
+
+You can use autoNumeric to format a DOM element value **once** on load.<br>
+This means it will then not react to any user interaction.
+
+The following elements are accepted :
+```js
+const allowedTagList = [
+    'b', 'caption', 'cite', 'code', 'const', 'dd', 'del', 'div', 'dfn', 'dt', 'em', 'h1', 'h2', 'h3',
+    'h4', 'h5', 'h6', 'ins', 'kdb', 'label', 'li', 'option', 'output', 'p', 'q', 's', 'sample',
+    'span', 'strong', 'td', 'th', 'u',
+]
+```
 
 ## Options
 Multiple options allow you to customize precisely how a form input will format your inputs as you type :

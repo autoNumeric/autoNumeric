@@ -605,7 +605,7 @@ autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source
 
 ****
 
-Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] or [Patreon](https://www.patreon.com/user?u=4810062) to support autoNumeric development.
+Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] *(Robert)* or Patreon [![Donate][patreon-image]][patreon-url] *(Alexandre)* to support autoNumeric development.
 
 
 [downloads-image]: http://img.shields.io/npm/dm/autonumeric.svg
@@ -625,3 +625,4 @@ Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] or [Patreon
 [paypal-image]: http://img.shields.io/badge/paypal-donate-brightgreen.svg
 [paypal-url]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NCW5699RY8NN2
 [patreon-url]: https://www.patreon.com/user?u=4810062
+[patreon-image]: https://img.shields.io/badge/patreon-donate-orange.svg

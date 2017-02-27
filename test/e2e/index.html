@@ -116,9 +116,7 @@
 		}
 	</style>
 	<!-- Used by the end-to-end server spin up for the tests : -->
-	<script src="/jquery"></script>
 	<script src="/autonumeric"></script>
-	<script src="../../node_modules/jquery/dist/jquery.min.js"></script>
 	<script src="../../dist/autoNumeric.min.js"></script>
 	<!-- ^ Used by the page when calling it manually directly in the browser -->
 </head>
@@ -139,9 +137,23 @@
 		<div class="test">
 			<p class="description">Issue #292 : Native events</p>
 			<form autocomplete="off">
-				<input class="jqueryManagedInput" type="text" placeholder="via jQuery" name="foo" id="bar">
 				<input class="pureJsManagedInput" type="text" placeholder="via Pure JS" name="quu" id="quux">
 			</form>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<div>
+				<p class="description">Non input tags</p>
+				<p id="tag_p1">0.0214</p>
+				<p id="tag_p2"></p>
+				<code id="tag_code">12345.67</code>
+				<div id="tag_div">12345.67</div>
+				<h5 id="tag_h5">12345.67</h5>
+				<label id="tag_label">12345.67</label>
+				<span id="tag_span">12345.67</span>
+			</div>
 		</div>
 	</div>
 
@@ -370,6 +382,27 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #403</p>
+			<input id="issue_403" type="text" placeholder="#403" value="0">
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">noEventListeners option</p>
+			<input id="noEventListeners_option" type="text" placeholder="" value="69.67">
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">readOnly option</p>
+			<input id="readOnly_option" type="text" placeholder="" value="42.42">
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -386,52 +419,40 @@
     }, false);
 
     //-------------- Native input/change event not being thrown correctly (initially)
-    const jQueryInput = $('.jqueryManagedInput');
     const pureJsInput = document.querySelector('.pureJsManagedInput');
-    const $pureJsInput = $(pureJsInput);
-
-    //    jQueryInput.autoNumeric('init', {decimalCharacter: ',', digitGroupSeparator: '.'}); //Basic
     //    $pureJsInput.autoNumeric('init', {decimalCharacter: ',', digitGroupSeparator: '.'}); //Basic
 
-    jQueryInput.autoNumeric('init', { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', selectNumberOnly: true }); //Euro positive
-    $pureJsInput.autoNumeric('init', { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', selectNumberOnly: true }); //Euro positive
-
-    //    jQueryInput.autoNumeric('init', {digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '-9999999999.99', maximumValue: '0', negativePositiveSignPlacement: 'p'}); //Euro negative
-    //    $pureJsInput.autoNumeric('init', {digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '-9999999999.99', maximumValue: '0', negativePositiveSignPlacement: 'p'}); //Euro negative
-
-    // jQuery version
-    jQueryInput.on('input', () => {
-        console.warn('#### jQuery "Input" thrown', jQueryInput.autoNumeric('get'));
-    });
-
-    jQueryInput.on('change', () => {
-        console.warn('#### jQuery "Change" thrown', jQueryInput.autoNumeric('get'));
-    });
+    const anElement = new AutoNumeric(pureJsInput, { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', selectNumberOnly: true }); // OK
+//    const anElement = new AutoNumeric(pureJsInput, {digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '-9999999999.99', maximumValue: '0', negativePositiveSignPlacement: 'p'}); //Euro negative
 
     // Pure JS
     pureJsInput.addEventListener('input', () => {
-        console.warn('>>> Pure "Input" thrown', $pureJsInput.autoNumeric('get'));
+        console.warn('>>> Pure "Input" thrown', anElement.getNumericString());
     }, false);
     pureJsInput.addEventListener('change', () => {
-        console.warn('>>> Pure "Change" thrown', $pureJsInput.autoNumeric('get'));
+        console.warn('>>> Pure "Change" thrown', anElement.getNumericString());
     }, false);
 
+    //-------------- Initializing AutoNumeric on non-<input> tags
+    new AutoNumeric('#tag_p1', { scaleDecimalPlaces: 3, scaleDivisor: 0.01, scaleSymbol: '%', maximumValue: '999.999' });
+    new AutoNumeric('#tag_p2', 666.42).french();
+    new AutoNumeric('#tag_code', AutoNumeric.getLanguages().Japanese);
+    new AutoNumeric('#tag_div').northAmerican();
+    new AutoNumeric('#tag_h5', 666.42).swiss();
+    new AutoNumeric('#tag_label');
+    new AutoNumeric('#tag_span', '');
+
     //-------------- Issue #283
-    const issue283Input0 = $('#issue283Input0');
-    issue283Input0.autoNumeric('init', { leadingZero: 'allow' });
-    issue283Input0.autoNumeric('set', 1.12345);
+    const issue283Input0 = document.querySelector('#issue283Input0');
+    const issue283Input0An = new AutoNumeric(issue283Input0, { leadingZero: 'allow' });
+    issue283Input0An.set(1.12345);
 
-    const issue283Input1 = $('#issue283Input1');
-    issue283Input1.autoNumeric('init', { leadingZero: 'deny', maximumValue: '99999999.9999' });
-    issue283Input1.autoNumeric('set', 1.12345);
+    const issue283Input1An = new AutoNumeric('#issue283Input1', { leadingZero: 'deny', maximumValue: '99999999.9999' });
+    issue283Input1An.set(1.12345);
 
-    const issue283Input2 = $('#issue283Input2');
-    issue283Input2.autoNumeric('init', { digitGroupSeparator: ' ', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '%', currencySymbolPlacement: 's', roundingMethod: 'U', decimalPlacesOverride: '3', leadingZero: 'deny' });
-    issue283Input2.autoNumeric('set', 1.12345);
+    new AutoNumeric('#issue283Input2', 1.12345, { digitGroupSeparator: ' ', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '%', currencySymbolPlacement: 's', roundingMethod: 'U', decimalPlacesOverride: '3', leadingZero: 'deny' });
 
-    const issue283Input3 = $('#issue283Input3');
-    issue283Input3.autoNumeric('init', { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '\u00a0€', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', leadingZero: 'allow' });
-    issue283Input3.autoNumeric('set', 8000);
+    new AutoNumeric('#issue283Input3', 8000, { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '\u00a0€', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', leadingZero: 'allow' });
     const pureIssue283Input3 = document.querySelector('#issue283Input3');
     pureIssue283Input3.addEventListener('focus', (e) => { console.warn('issue283Input3 focus detected', e.keyCode); }, false);
     pureIssue283Input3.addEventListener('keydown', (e) => { console.warn('issue283Input3 keydown detected', e.keyCode); }, false);
@@ -441,24 +462,22 @@
     pureIssue283Input3.addEventListener('change', (e) => { console.warn('issue283Input3 change detected', e.keyCode); }, false);
     pureIssue283Input3.addEventListener('blur', (e) => { console.warn('issue283Input3 blur detected', e.keyCode); }, false);
 
-    const issue283Input4 = $('#issue283Input4');
-    issue283Input4.autoNumeric('init', { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '\u00a0€', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', leadingZero: 'deny' });
-    issue283Input4.autoNumeric('set', 8000);
+    new AutoNumeric('#issue283Input4', 8000, { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '\u00a0€', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', leadingZero: 'deny' });
 
     //-------------- Issue #295
     const priceFormatOptions = { decimalPlacesOverride: '2', maximumValue: '999999999999.99', digitGroupSeparator: ',', decimalCharacter: '.' };
 
-    $('#firstField, #secondField').autoNumeric('init', priceFormatOptions);
+    new AutoNumeric('#firstField', priceFormatOptions); //FIXME à terminer : use the 'global' function to create both element in one call
+    new AutoNumeric('#secondField', priceFormatOptions);
 
-    $("#firstField").on("keyup", function() {
-        const value = $(this).val();
-        $('#secondField').val(value);
-//        $('#firstField, #secondField').autoNumeric('update', priceFormatOptions);
+    const firstField = document.querySelector('#firstField');
+    const secondField = document.querySelector('#secondField');
+    firstField.addEventListener('keyup', () => {
+	    secondField.value = firstField.value;
     });
 
     //-------------- Issue #290
-    const issue290Input = $(document.querySelector('.issue_290 input'));
-    issue290Input.autoNumeric('init', {
+    new AutoNumeric('.issue_290 input', {
         digitGroupSeparator        : '.',
         decimalCharacter           : ',',
         decimalCharacterAlternative: '.',
@@ -471,8 +490,7 @@
     });
 
     //-------------- Issue #291
-    const issue291Input = $(document.querySelector('#issue_291'));
-    issue291Input.autoNumeric('init', {
+    new AutoNumeric('#issue_291', {
         digitGroupSeparator        : '.',
         decimalCharacter           : ',',
         decimalCharacterAlternative: '.',
@@ -485,8 +503,7 @@
     });
 
     //-------------- Issue #183
-    const issue183InputError = $(document.querySelector('#issue_183_error'));
-    issue183InputError.autoNumeric('init', {
+    new AutoNumeric('#issue_183_error', {
         digitGroupSeparator        : '.',
         decimalCharacter           : ',',
         decimalCharacterAlternative: '.',
@@ -500,8 +517,7 @@
         negativeBracketsTypeOnBlur : '(,)',
         decimalPlacesShownOnFocus  : 5
     });
-    const issue183InputIgnore = $(document.querySelector('#issue_183_ignore'));
-    issue183InputIgnore.autoNumeric('init', {
+    new AutoNumeric('#issue_183_ignore', {
         digitGroupSeparator        : '.',
         decimalCharacter           : ',',
         decimalCharacterAlternative: '.',
@@ -513,8 +529,7 @@
         maximumValue               : '999999999999.99',
         onInvalidPaste             : 'ignore'
     });
-    const issue183InputClamp = $(document.querySelector('#issue_183_clamp'));
-    issue183InputClamp.autoNumeric('init', {
+    new AutoNumeric('#issue_183_clamp', {
         digitGroupSeparator        : '.',
         decimalCharacter           : ',',
         decimalCharacterAlternative: '.',
@@ -526,8 +541,7 @@
         maximumValue               : '999999999999.99',
         onInvalidPaste             : 'clamp'
     });
-    const issue183InputTruncate = $(document.querySelector('#issue_183_truncate'));
-    issue183InputTruncate.autoNumeric('init', {
+    new AutoNumeric('#issue_183_truncate', {
         digitGroupSeparator        : '.',
         decimalCharacter           : ',',
         decimalCharacterAlternative: '.',
@@ -539,8 +553,7 @@
         maximumValue               : '999999999999.99',
         onInvalidPaste             : 'truncate'
     });
-    const issue183InputReplace = $(document.querySelector('#issue_183_replace'));
-    issue183InputReplace.autoNumeric('init', {
+    new AutoNumeric('#issue_183_replace', {
         digitGroupSeparator        : '.',
         decimalCharacter           : ',',
         decimalCharacterAlternative: '.',
@@ -554,51 +567,39 @@
     });
 
     //-------------- Issue #302
-    const issue302Input = $(document.querySelector('#issue_302'));
-    issue302Input.autoNumeric('init', { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '\u00a0€', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', leadingZero: 'deny' });
+    new AutoNumeric('#issue_302', { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '\u00a0€', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', leadingZero: 'deny' });
 
     //-------------- Issue #226
-    const issue226Input = $(document.querySelector('#issue_226'));
-    issue226Input.autoNumeric('init', { allowDecimalPadding: false, formatOnPageLoad: false, minimumValue: '0', leadingZero: 'deny', maximumValue: '2147483647', decimalPlacesOverride: '0' });
+    new AutoNumeric('#issue_226', { allowDecimalPadding: false, formatOnPageLoad: false, minimumValue: '0', leadingZero: 'deny', maximumValue: '2147483647', decimalPlacesOverride: '0' });
 
     //-------------- Issue #187
-    const issue187input = document.querySelector('#issue_187');
-    const $issue187Input = $(issue187input);
-    $issue187Input.autoNumeric('init');
-    issue187input.addEventListener('autoNumeric:formatted', () => {
+    new AutoNumeric('#issue_187');
+    document.querySelector('#issue_187').addEventListener('autoNumeric:formatted', () => {
         console.log(`The 'autoNumeric:formatted' event has been caught!`); //DEBUG
     }, false);
 
     //-------------- Issue #193
-    const issue193Input = $(document.querySelector('#issue_193'));
-    issue193Input.autoNumeric('init', { digitGroupSeparator: "'", decimalCharacter: ',' });
+    new AutoNumeric('#issue_193', { digitGroupSeparator: "'", decimalCharacter: ',' });
 
     //-------------- Issue #306
-    const issue306Input = $(document.querySelector('#issue_306'));
-    issue306Input.autoNumeric('init', { leadingZero: 'deny' });
-    const issue306InputDecimals = $(document.querySelector('#issue_306decimals'));
-    issue306InputDecimals.autoNumeric('init', { leadingZero: 'deny', maximumValue : '999999999.99999', digitGroupSeparator: '.', decimalCharacter: ',' });
-    const issue306InputDecimals2 = $(document.querySelector('#issue_306decimals2'));
-    issue306InputDecimals2.autoNumeric('init', { leadingZero: 'deny', maximumValue : '999999999.99', digitGroupSeparator: '.', decimalCharacter: ',' });
+    new AutoNumeric('#issue_306', { leadingZero: 'deny' });
+    new AutoNumeric('#issue_306decimals', { leadingZero: 'deny', maximumValue : '999999999.99999', digitGroupSeparator: '.', decimalCharacter: ',' });
+    new AutoNumeric('#issue_306decimals2', { leadingZero: 'deny', maximumValue : '999999999.99', digitGroupSeparator: '.', decimalCharacter: ',' });
 
     //-------------- Issue #262
-    const issue262Input = $(document.querySelector('#issue_262'));
-    issue262Input.autoNumeric('init', { leadingZero: 'deny', decimalPlacesOverride:'2', roundingMethod:'D' });
+    new AutoNumeric('#issue_262', { leadingZero: 'deny', decimalPlacesOverride:'2', roundingMethod:'D' });
 
     //-------------- Issue #321
-    $(document.querySelector('#issue_321_a')).autoNumeric('init', { digitGroupSeparator: '٬'     , decimalCharacter: '٫', decimalCharacterAlternative: ',' });
-    $(document.querySelector('#issue_321_b')).autoNumeric('init', { digitGroupSeparator: '\u2009', decimalCharacter: '·', decimalCharacterAlternative: ',' });
-    $(document.querySelector('#issue_321_c')).autoNumeric('init', { digitGroupSeparator: '\u202f', decimalCharacter: '⎖', decimalCharacterAlternative: ',' });
-    $(document.querySelector('#issue_321_d')).autoNumeric('init', { digitGroupSeparator: '\u00a0', decimalCharacter: '.', decimalCharacterAlternative: ',' });
-    $(document.querySelector('#issue_321_e')).autoNumeric('init', { digitGroupSeparator: '˙'     , decimalCharacter: '·', decimalCharacterAlternative: ',' });
-    const issue321Input = $(document.querySelector('#issue_321_f'));
-    $(document.querySelector('#issue_321_f')).autoNumeric('init', { digitGroupSeparator: '٬' , decimalCharacter: '٫', decimalCharacterAlternative: ',' });
-    issue321Input.autoNumeric('set', '١٢٣٤٥٦٧٨٫٩٠'); // ٠١٢٣٤٥٦٧٨٩
-    $(document.querySelector('#issue_321_g')).autoNumeric('init', { digitGroupSeparator: '٬' , decimalCharacter: '٫', decimalCharacterAlternative: ',' });
+    new AutoNumeric('#issue_321_a', { digitGroupSeparator: '٬'     , decimalCharacter: '٫', decimalCharacterAlternative: ',' });
+    new AutoNumeric('#issue_321_b', { digitGroupSeparator: '\u2009', decimalCharacter: '·', decimalCharacterAlternative: ',' });
+    new AutoNumeric('#issue_321_c', { digitGroupSeparator: '\u202f', decimalCharacter: '⎖', decimalCharacterAlternative: ',' });
+    new AutoNumeric('#issue_321_d', { digitGroupSeparator: '\u00a0', decimalCharacter: '.', decimalCharacterAlternative: ',' });
+    new AutoNumeric('#issue_321_e', { digitGroupSeparator: '˙'     , decimalCharacter: '·', decimalCharacterAlternative: ',' });
+    new AutoNumeric('#issue_321_f', '١٢٣٤٥٦٧٨٫٩٠', { digitGroupSeparator: '٬' , decimalCharacter: '٫', decimalCharacterAlternative: ',' });
+    new AutoNumeric('#issue_321_g', { digitGroupSeparator: '٬' , decimalCharacter: '٫', decimalCharacterAlternative: ',' });
 
     //-------------- Issue #319
-    const issue319Input = $(document.querySelector('#issue_319'));
-    issue319Input.autoNumeric('init', { digitGroupSeparator: '.', decimalCharacter: ',', currencySymbol: " €", currencySymbolPlacement: 's', negativePositiveSignPlacement: 'l', emptyInputBehavior: 'zero' });
+    new AutoNumeric('#issue_319', { digitGroupSeparator: '.', decimalCharacter: ',', currencySymbol: " €", currencySymbolPlacement: 's', negativePositiveSignPlacement: 'l', emptyInputBehavior: 'zero' });
 
     //-------------- Issue #346
     // +1.234,00
@@ -606,7 +607,7 @@
         digitGroupSeparator        : '.',
         decimalCharacter           : ',',
         decimalCharacterAlternative: '.',
-        showPositiveSign           : true
+        showPositiveSign           : true,
     };
 
     // 1.234,00+
@@ -615,7 +616,7 @@
         decimalCharacter             : ',',
         decimalCharacterAlternative  : '.',
         negativePositiveSignPlacement: 's',
-        showPositiveSign             : true
+        showPositiveSign             : true,
     };
 
     // € +1.234,00
@@ -626,7 +627,7 @@
         currencySymbol               : '€\u00a0',
         roundingMethod               : 'U',
         negativePositiveSignPlacement: 'r',
-        showPositiveSign             : true
+        showPositiveSign             : true,
     };
 
     // +€ 1.234,00
@@ -637,7 +638,7 @@
         currencySymbol               : '€\u00a0',
         roundingMethod               : 'U',
         negativePositiveSignPlacement: 'l',
-        showPositiveSign             : true
+        showPositiveSign             : true,
     };
 
     // € 1.234,00+
@@ -648,7 +649,7 @@
         currencySymbol               : '€\u00a0',
         roundingMethod               : 'U',
         negativePositiveSignPlacement: 's',
-        showPositiveSign             : true
+        showPositiveSign             : true,
     };
 
     // 1.234,00+ €
@@ -660,7 +661,7 @@
         currencySymbolPlacement      : 's',
         roundingMethod               : 'U',
         negativePositiveSignPlacement: 'l',
-        showPositiveSign             : true
+        showPositiveSign             : true,
     };
 
     // 1.234,00 €+
@@ -672,7 +673,7 @@
         currencySymbolPlacement      : 's',
         roundingMethod               : 'U',
         negativePositiveSignPlacement: 'r',
-        showPositiveSign             : true
+        showPositiveSign             : true,
     };
 
     // +1.234,00 €
@@ -684,39 +685,29 @@
         currencySymbolPlacement      : 's',
         roundingMethod               : 'U',
         negativePositiveSignPlacement: 'p',
-        showPositiveSign             : true
+        showPositiveSign             : true,
     };
 
-    const inputIssue346_1 = document.querySelector('#issue_346_1');
-    const inputIssue346_2 = document.querySelector('#issue_346_2');
-    const inputIssue346_3 = document.querySelector('#issue_346_3');
-    const inputIssue346_4 = document.querySelector('#issue_346_4');
-    const inputIssue346_5 = document.querySelector('#issue_346_5');
-    const inputIssue346_6 = document.querySelector('#issue_346_6');
-    const inputIssue346_7 = document.querySelector('#issue_346_7');
-    const inputIssue346_8 = document.querySelector('#issue_346_8');
+    const inputIssue346_1An = new AutoNumeric('#issue_346_1', noneLeft);
+    const inputIssue346_2An = new AutoNumeric('#issue_346_2', noneSuffix);
+    const inputIssue346_3An = new AutoNumeric('#issue_346_3', leftRight);
+    const inputIssue346_4An = new AutoNumeric('#issue_346_4', leftLeft);
+    const inputIssue346_5An = new AutoNumeric('#issue_346_5', leftSuffix);
+    const inputIssue346_6An = new AutoNumeric('#issue_346_6', rightLeft);
+    const inputIssue346_7An = new AutoNumeric('#issue_346_7', rightRight);
+    const inputIssue346_8An = new AutoNumeric('#issue_346_8', rightPrefix);
 
-    $(inputIssue346_1).autoNumeric('init', noneLeft);
-    $(inputIssue346_2).autoNumeric('init', noneSuffix);
-    $(inputIssue346_3).autoNumeric('init', leftRight);
-    $(inputIssue346_4).autoNumeric('init', leftLeft);
-    $(inputIssue346_5).autoNumeric('init', leftSuffix);
-    $(inputIssue346_6).autoNumeric('init', rightLeft);
-    $(inputIssue346_7).autoNumeric('init', rightRight);
-    $(inputIssue346_8).autoNumeric('init', rightPrefix);
-
-    inputIssue346_1.addEventListener('keyup', () => { console.log($(inputIssue346_1).autoNumeric("get"), $(inputIssue346_1).autoNumeric("getSettings").rawValue); }, false);
-    inputIssue346_2.addEventListener('keyup', () => { console.log($(inputIssue346_2).autoNumeric("get"), $(inputIssue346_2).autoNumeric("getSettings").rawValue); }, false);
-    inputIssue346_3.addEventListener('keyup', () => { console.log($(inputIssue346_3).autoNumeric("get"), $(inputIssue346_3).autoNumeric("getSettings").rawValue); }, false);
-    inputIssue346_4.addEventListener('keyup', () => { console.log($(inputIssue346_4).autoNumeric("get"), $(inputIssue346_4).autoNumeric("getSettings").rawValue); }, false);
-    inputIssue346_5.addEventListener('keyup', () => { console.log($(inputIssue346_5).autoNumeric("get"), $(inputIssue346_5).autoNumeric("getSettings").rawValue); }, false);
-    inputIssue346_6.addEventListener('keyup', () => { console.log($(inputIssue346_6).autoNumeric("get"), $(inputIssue346_6).autoNumeric("getSettings").rawValue); }, false);
-    inputIssue346_7.addEventListener('keyup', () => { console.log($(inputIssue346_7).autoNumeric("get"), $(inputIssue346_7).autoNumeric("getSettings").rawValue); }, false);
-    inputIssue346_8.addEventListener('keyup', () => { console.log($(inputIssue346_8).autoNumeric("get"), $(inputIssue346_8).autoNumeric("getSettings").rawValue); }, false);
+    document.querySelector('#issue_346_1').addEventListener('keyup', () => { console.log(inputIssue346_1An.getNumericString(), inputIssue346_1An.getSettings().rawValue); }, false);
+    document.querySelector('#issue_346_2').addEventListener('keyup', () => { console.log(inputIssue346_2An.getNumericString(), inputIssue346_2An.getSettings().rawValue); }, false);
+    document.querySelector('#issue_346_3').addEventListener('keyup', () => { console.log(inputIssue346_3An.getNumericString(), inputIssue346_3An.getSettings().rawValue); }, false);
+    document.querySelector('#issue_346_4').addEventListener('keyup', () => { console.log(inputIssue346_4An.getNumericString(), inputIssue346_4An.getSettings().rawValue); }, false);
+    document.querySelector('#issue_346_5').addEventListener('keyup', () => { console.log(inputIssue346_5An.getNumericString(), inputIssue346_5An.getSettings().rawValue); }, false);
+    document.querySelector('#issue_346_6').addEventListener('keyup', () => { console.log(inputIssue346_6An.getNumericString(), inputIssue346_6An.getSettings().rawValue); }, false);
+    document.querySelector('#issue_346_7').addEventListener('keyup', () => { console.log(inputIssue346_7An.getNumericString(), inputIssue346_7An.getSettings().rawValue); }, false);
+    document.querySelector('#issue_346_8').addEventListener('keyup', () => { console.log(inputIssue346_8An.getNumericString(), inputIssue346_8An.getSettings().rawValue); }, false);
 
     //-------------- Issue #326
-    const issue326Input = $(document.querySelector('#issue_326'));
-    issue326Input.autoNumeric('init', {
+    new AutoNumeric('#issue_326', {
         digitGroupSeparator        : '.',
         decimalCharacter           : ',',
         decimalCharacterAlternative: '.',
@@ -730,50 +721,43 @@
     });
 
     //-------------- Issue #322
-    const issue322Input = $(document.querySelector('#issue_322'));
-    issue322Input.autoNumeric('init');
+    new AutoNumeric('#issue_322');
 
     //-------------- Issue #250
-    const issue250Input = $(document.querySelector('#issue_250'));
-    issue250Input.autoNumeric('init', { decimalPlacesOverride: 2, allowDecimalPadding: false, minimumValue: '2', maximumValue: '999999999' });
+    new AutoNumeric('#issue_250', { decimalPlacesOverride: 2, allowDecimalPadding: false, minimumValue: '2', maximumValue: '999999999' });
 
     //-------------- Issue #317
-    const issue317Input = $(document.querySelector('#issue_317'));
-    issue317Input.autoNumeric('init', { leadingZero: 'deny', decimalCharacterAlternative: ',' });
+    new AutoNumeric('#issue_317', { leadingZero: 'deny', decimalCharacterAlternative: ',' });
 
     //-------------- Issue #303
-    const issue303AInput = $(document.querySelector('#issue_303p'));
-    issue303AInput.autoNumeric('init', { currencySymbolPlacement: 'p', currencySymbol: '$'      , /*emptyInputBehavior: 'always'*/ });
-    const issue303BInput = $(document.querySelector('#issue_303s'));
-    issue303BInput.autoNumeric('init', { currencySymbolPlacement: 's', currencySymbol: '\u00a0€', /*emptyInputBehavior: 'always'*/ });
+    new AutoNumeric('#issue_303p', { currencySymbolPlacement: 'p', currencySymbol: '$'      , /*emptyInputBehavior: 'always'*/ });
+    new AutoNumeric('#issue_303s', { currencySymbolPlacement: 's', currencySymbol: '\u00a0€', /*emptyInputBehavior: 'always'*/ });
 
     //-------------- Issue #387
-    const issue387InputCancellable = $(document.querySelector('#issue_387_cancellable'));
-    issue387InputCancellable.autoNumeric('init', { isCancellable: true, currencySymbol: '$' });
-    const issue387InputCancellableNumOnly = $(document.querySelector('#issue_387_cancellable_numOnly'));
-    issue387InputCancellableNumOnly.autoNumeric('init', { isCancellable: true, selectNumberOnly: true, currencySymbol: '$' });
+    new AutoNumeric('#issue_387_cancellable', { isCancellable: true, currencySymbol: '$' });
+    new AutoNumeric('#issue_387_cancellable_numOnly', { isCancellable: true, selectNumberOnly: true, currencySymbol: '$' });
 
-    const issue387InputNotCancellable = $(document.querySelector('#issue_387_not_cancellable'));
-    issue387InputNotCancellable.autoNumeric('init', { isCancellable: false, currencySymbol: '$' });
-    const issue387InputNotCancellableNumOnly = $(document.querySelector('#issue_387_not_cancellable_numOnly'));
-    issue387InputNotCancellableNumOnly.autoNumeric('init', { isCancellable: false, selectNumberOnly: true, currencySymbol: '$' });
+    new AutoNumeric('#issue_387_not_cancellable', { isCancellable: false, currencySymbol: '$' });
+    new AutoNumeric('#issue_387_not_cancellable_numOnly', { isCancellable: false, selectNumberOnly: true, currencySymbol: '$' });
 
     //-------------- Issue #393
-    const issue393InputNoWheel = $(document.querySelector('#issue_393_nowheel'));
-    issue393InputNoWheel.autoNumeric('init', { modifyValueOnWheel: false });
-    const issue393InputFixed = $(document.querySelector('#issue_393_fixed'));
-    issue393InputFixed.autoNumeric('init', { modifyValueOnWheel: true, wheelStep: 1000 });
-    const issue393InputProgressive = $(document.querySelector('#issue_393_progressive'));
-    issue393InputProgressive.autoNumeric('init', { modifyValueOnWheel: true, wheelStep: 'progressive' });
+    new AutoNumeric('#issue_393_nowheel', { modifyValueOnWheel: false });
+    new AutoNumeric('#issue_393_fixed', { modifyValueOnWheel: true, wheelStep: 1000 });
+    new AutoNumeric('#issue_393_progressive', { modifyValueOnWheel: true, wheelStep: 'progressive' });
 
-    const issue393InputFixedUpperLimit = $(document.querySelector('#issue_393_upperLimit'));
-    issue393InputFixedUpperLimit.autoNumeric('init', { modifyValueOnWheel: true, wheelStep: 1000, minimumValue: '25000', maximumValue: '1000999' });
-    const issue393InputLowerLimit = $(document.querySelector('#issue_393_lowerLimit'));
-    issue393InputLowerLimit.autoNumeric('init', { modifyValueOnWheel: true, wheelStep: 'progressive', minimumValue: '-75999', maximumValue: '34100' });
-    const issue393InputLimitOneSideUp = $(document.querySelector('#issue_393_limitOneSideUp'));
-    issue393InputLimitOneSideUp.autoNumeric('init', { modifyValueOnWheel: true, wheelStep: 'progressive', minimumValue: '45002', maximumValue: '52003' });
-    const issue393InputLimitOneSideDown = $(document.querySelector('#issue_393_limitOneSideDown'));
-    issue393InputLimitOneSideDown.autoNumeric('init', { modifyValueOnWheel: true, wheelStep: 'progressive', minimumValue: '-75999', maximumValue: '-52500' });
+    new AutoNumeric('#issue_393_upperLimit', { modifyValueOnWheel: true, wheelStep: 1000, minimumValue: '25000', maximumValue: '1000999' });
+    new AutoNumeric('#issue_393_lowerLimit', { modifyValueOnWheel: true, wheelStep: 'progressive', minimumValue: '-75999', maximumValue: '34100' });
+    new AutoNumeric('#issue_393_limitOneSideUp', { modifyValueOnWheel: true, wheelStep: 'progressive', minimumValue: '45002', maximumValue: '52003' });
+    new AutoNumeric('#issue_393_limitOneSideDown', { modifyValueOnWheel: true, wheelStep: 'progressive', minimumValue: '-75999', maximumValue: '-52500' });
+
+    //-------------- Issue #403
+    new AutoNumeric('#issue_403', { scaleDecimalPlaces: 2, scaleDivisor: 0.01, scaleSymbol: '%' });
+
+    //-------------- noEventListeners option
+    new AutoNumeric('#noEventListeners_option', { noEventListeners: true }).french();
+
+    //-------------- readOnly option
+    new AutoNumeric('#readOnly_option', { readOnly: true });
 </script>
 </body>
 </html>

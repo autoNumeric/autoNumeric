@@ -1,5 +1,126 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.3"
++ Fix issue #399 Fully convert autoNumeric to an ES6 module
++ Fix issue #398 Finish removing all jQuery dependencies
++ Fix issue #244 \[Feature request] Remove the jQuery dependency
++ Add an entry point `src/main.js` for bundling the library.
++ Split the library into 3 files ; 
+ - `autoNumeric.js`, which contains the AutoNumeric class,
+ - `AutoNumericEnum.js` which contains the enumerations used by AutoNumeric, and
+ - `AutoNumericHelper.js` which contains the AutoNumericHelper class which provides static helper functions.
+ 
++ Extract the `allowedTagList`, `keyCode` and `keyName` into `AutoNumericEnum`.
++ Add the `isEmptyString`, `isNumberOrArabic`, `isFunction`, `isElement`, `isInputElement`, `arabicToLatinNumbers`, `triggerEvent`, `randomString`, `getElementValue`, `setElementValue`, `cloneObject`, `camelize`, `text`, `setText` and `filterOut` functions to the helper functions.
++ Move the `preparePastedText`, `runCallbacksFoundInTheSettingsObject`, `maximumVMinAndVMaxDecimalLength`, `stripAllNonNumberCharacters`, `toggleNegativeBracket`, `convertToNumericString`, `toLocale`, `modifyNegativeSignAndDecimalCharacterForRawValue`, `modifyNegativeSignAndDecimalCharacterForFormattedValue`, `checkEmpty`, `addGroupSeparators`, `truncateZeros`, `roundValue`, `truncateDecimal`, `checkIfInRangeWithOverrideOption` functions into the AutoNumeric object.
++ Improve the `character()` method to take into account the quirks of some obsolete browsers.
++ Remove the `getCurrentElement()` function since we now only need to access the `this.domElement` property.
++ Remove the `AutoNumericHolder` class and the `getAutoNumericHolder()` function since we are now using the AutoNumeric class as the 'property holder'.
++ Add multiple ways to initialize an AutoNumeric element (cf. the AutoNumeric constructor and the `_setArgumentsValues()` method).
++ Simplify the input type and tag support check.
++ Add the `serializeSpaces` option that allows the user to defines how the serialize function will managed the spaces, either by converting them to `'%20'`, or to the `'+'` string, the latter now being the default.
++ Add the `noEventListeners` option that allows the user to initialize an AutoNumeric `<input>` element without adding any AutoNumeric event listeners.
++ Add the `readOnly` option to the settings that allow the `<input>` element to be set to read-only on initialization.
++ Add a feature where all AutoNumeric-managed elements in a page share a common list.
++ Add a feature where the AutoNumeric-managed elements that initialized each other share a common list, allowing the user to perform a single action on many elements at once (via the `.global.*` functions).
++ Add a `isPristine()` method to test if an AutoNumeric-managed element `value`/`textContent` has been changed since its initialization.
++ Rename `unset` to `unformat`.
++ Rename `reSet` to `reformat`.
++ Add an `unformatLocalized()` function to unformat the element value while using the `outputFormat` setting.
++ Add a `clear()` method to empty the element value.
++ Add a `nuke()` method to remove the DOM element from the DOM tree.
++ Add a `.global.has()` method to check if the given AutoNumeric object (or DOM element) is in the local AutoNumeric element list.
++ Add a `.global.addObject()` method that adds an existing AutoNumeric object (or DOM element) to the local AutoNumeric element list.
++ Add a `.global.removeObject()` method that removes the given AutoNumeric object (or DOM element) from the local AutoNumeric element list.
++ Add a `.global.empty()` method to remove all elements from the shared list.
++ Add a `.global.elements()` method to retrieve all the AutoNumeric object that share the same local list.
++ Add a `.global.getList()` method to retrieve the local AutoNumeric element list.
++ Add one function for updating each option individually (ie. anElement.options.decimalCharacter('.')) instead of having to pass an object.
++ Add a `version()` method to output the current AutoNumeric version (for debug purpose).
++ Fix the `set()` method so that the `rawValue` is updated when the value is set to `''`.
++ Add a `setUnformatted()` method to set the value given value directly as the DOM element value, without formatting it beforehand.
++ Deprecate the `get()` method to the renamed `getNumericString()` which bares more meaning.
++ Add a `getFormatted()` method to retrieve the current formatted value of the AutoNumeric element as a string.
++ Add a `getNumber()` method that returns the element unformatted value as a real Javascript number.
++ Add a `getLocalized()` method that returns the unformatted value, but following the `outputFormat` setting.
++ Add a `unformatLocalized()` method that unformats the element value by removing the formatting and keeping only the localized unformatted value in the element.
++ Add a `selectNumber()` method that select only the numbers in the formatted element content, leaving out the currency symbol, whatever the value of the `selectNumberOnly` option.
++ Add a `selectInteger()` method that select only the integer part in the formatted element content, whatever the value of the `selectNumberOnly` option.
++ Add a `selectDecimal()` method that select only the decimal part in the formatted element content, whatever the value of `selectNumberOnly`.
++ Add a `node()` method that returns the DOM element reference of the autoNumeric-managed element.
++ Add a `parent()` method that returns the DOM element reference of the parent node of the autoNumeric-managed element.
++ Add a `detach()` method that detach the current AutoNumeric element from the shared local 'init' list.
++ Add an `attach()` method that attach the given AutoNumeric element to the shared local 'init' list.
++ Add a `formatOther()` method that format and return the given value, or set the formatted value into the given DOM element if one is passed as an argument.
++ Add an `unformatOther()` method that unformat and return the raw numeric string corresponding to the given value, or directly set the unformatted value into the given DOM element if one is passed as an argument.
++ Add an `init()` method that allows to use the current AutoNumeric element settings to initialize the DOM element given as a parameter. This effectively *link* the two AutoNumeric element by making them share the same local AutoNumeric element list.
++ Add a `form()` method that return a reference to the parent <form> element if it exists, otherwise return `null`.
++ Add a `formNumericString()` method that returns a string in standard URL-encoded notation with the form input values being unformatted.
++ Add a `formFormatted()` method that returns a string in standard URL-encoded notation with the form input values being formatted.
++ Add a `formLocalized()` method that returns a string in standard URL-encoded notation with the form input values, with localized values.
++ Add a `formArrayNumericString()` method that returns an array containing an object for each form `<input>` element.
++ Add a `formArrayFormatted()` method that returns an array containing an object for each form `<input>` element, with the value formatted.
++ Add a `formArrayLocalized()` method that returns an array containing an object for each form `<input>` element, with the value localized.
++ Add a `formJsonNumericString()` method that returns a JSON string containing an object representing the form input values.
++ Add a `formJsonFormatted()` method that returns a JSON string containing an object representing the form input values, with the value formatted.
++ Add a `formJsonLocalized()` method that returns a JSON string containing an object representing the form input values, with the value localized.
++ Add a `formUnformat()` method that unformat all the autoNumeric-managed elements that are a child of the parent <form> element of this DOM element, to numeric strings.
++ Add a `formUnformatLocalized()` method that unformat all the autoNumeric-managed elements that are a child of the parent <form> element of this DOM element, to localized strings.
++ Add a `formReformat()` method that reformat all the autoNumeric-managed elements that are a child of the parent <form> element of this DOM element.
++ Add a `formSubmitNumericString()` method that convert the input values to numeric strings, submit the form, then reformat those back.
++ Add a `formSubmitFormatted()` method that submit the form with the current formatted values.
++ Add a `formSubmitLocalized()` method that convert the input values to localized strings, submit the form, then reformat those back.
++ Add a `formSubmitArrayNumericString()` method that generate an array of numeric strings from the `<input>` elements, and pass it to the given callback.
++ Add a `formSubmitArrayFormatted()` method that generate an array of the current formatted values from the `<input>` elements, and pass it to the given callback.
++ Add a `formSubmitArrayLocalized()` method that generate an array of localized strings from the `<input>` elements, and pass it to the given callback.
++ Add a `formSubmitJsonNumericString()` method that generate a JSON string with the numeric strings values from the `<input>` elements, and pass it to the given callback.
++ Add a `formSubmitJsonFormatted()` method that generate a JSON string with the current formatted values from the `<input>` elements, and pass it to the given callback.
++ Add a `formSubmitJsonLocalized()` method that generate a JSON string with the localized strings values from the `<input>` elements, and pass it to the given callback.
++ Add a static `test()` method that if the given domElement is already managed by AutoNumeric (if it has been initialized on the current page).
++ Add multiple private methods to create and delete a global list of AutoNumeric objects (via a WeakMap), as well as the methods to add and remove elements to that list.
++ Add multiple private methods to manage the local enumerable list of AutoNumeric objects that are initialized together and share a common local list.
++ Add the private methods `_mergeSettings()` and `_cloneAndMergeSettings()` to do what they are named about.
++ Modify the static `format()` method so that it formats the given number (or numeric string) with the given options, and returns the formatted value as a string.
++ Add a static `formatAndSet()` method that format the given DOM element value, and set the resulting value back as the element value.
++ Modify the static `unformat()` method so that it unformats the given formatted string with the given options, and returns a numeric string.
++ Add a static `unformatAndSet()` method that unformat the given DOM element value, and set the resulting value back as the element value.
++ Add a static `localize()` method that unformat and localize the given formatted string with the given options, and returns a numeric string.
++ Add a static `isManagedByAutoNumeric()` method that returns `true` is the given DOM element has an AutoNumeric object that manages it.
++ Add a static `getAutoNumericElement()` method that returns the AutoNumeric object that manages the given DOM element.
++ Add the `french()`, `northAmerican()`, `british()`, `swiss()`, `japanese()`, `spanish()` and `chinese()` methods that update the settings to use the named pre-defined language options.
++ Convert some cryptic ternary statements to if/else block.
++ Remove the unknown parameter `setReal` from some functions.
++ Remove the need to pass around the settings in many functions signatures (using `this.settings` directly).
++ Rename the temporary variables created by coping some settings, with the new option names.
++ Correct the warning shown when using `isNan()` on non-number elements like strings.
++ Keep the focus status of the DOM element in the new `this.isFocused` variable.
++ Use the `getElementValue()` function to retrieve the element `value` or `textContent` (depending if the element in an `<input>` or another tag), which allow AutoNumeric to perform some operations on non-input elements too. This is the first changes needed for the goal of managing the non-input tags with `contentEditable` with AutoNumeric.
++ Use the `getElementValue()` function as well in order to be able to set the `value` or `textContent` transparently where needed.
++ Rename `_updateAutoNumericHolderProperties()` to `_updateInternalProperties()`.
++ Complete some JSDoc to be more precise on the event or element types. This helps for IDE autocompletion.
++ Rewrite completely how AutoNumeric test if the given DOM element is supported or not (by using the new `_checkElement()` method). This simplify the process by calling the new `_isElementTagSupported()`, `_isInputElement()` and `_isInputTypeSupported()` functions which respect the separation of concerns.
++ The `_formatDefaultValueOnPageLoad()` method now accepts a 'forced' initial value instead of the default one.
++ Remove the tests about the input type or element support from the `set()` methods, since those cannot change once AutoNumeric has been initialized, simplifying the code.
++ Remove duplicated tests (ie. `settings.formatOnPageLoad` inside the `formatDefaultValueOnPageLoad()` function that is only called if `settings.formatOnPageLoad` is already set).
++ Rename the `getInitialSettings()` method to `_setSettings()`.
++ Use array destructuring to give more meaningful names to the data returned by the `_getSignPosition()` function.
++ Add a private `_serialize()` function that take care of serializing the form data into multiple output as needed, which is called by the `_serializeNumericString()`, `_serializeFormatted()`,`_serializeLocalized()`, `_serializeNumericStringArray()`, `_serializeFormattedArray()` and `_serializeLocalizedArray()` methods.
++ The default settings are now exposed on the AutoNumeric class as a static object `AutoNumeric.defaultSettings`.
++ Add the static `AutoNumeric.options` object that gives access to all the possible options values, with a semantic name (handy for IDE autocompletion).
++ The pre-defined language options objects are now accessible via the static `AutoNumeric.languageOptions` object.
++ Add the static `AutoNumeric.multiple()` function that allows to initialize numerous AutoNumeric object (on numerous DOM elements) in one call (and possibly pass multiple values that will be mapped to each DOM element).
++ Add end-to-end tests for initializing non-`<input>` tags.
++ Add e2e tests for initializing elements with the `noEventListeners` or `readOnly` options.
++ Convert the end-to-end tests to the new API v3.
++ Convert the unit tests to the new API v3.
++ Add unit tests for the `serializeSpaces`, `noEventListeners` and `readOnly` options.
++ Fix the unit tests checking that the `rawValue` was correctly set when using `getSettings()`.
++ Add unit tests to check the `.global.*` methods.
++ Add unit tests to check the `AutoNumeric.multiple()` methods.
++ Add unit tests to check the `selectDecimal`, `selectInteger`, `reformat`, `unformat` and `unformatLocalized` methods.
++ Add unit tests to check the `.form*` methods.
++ Add the `babel-plugin-transform-object-assign` dev dependency in order to be able to use `Object.assign()` in the ES6 source.
+
 ### "3.0.0-beta.2"
 + Fix issue #393 Add an option `modifyValueOnWheel` that allow the user to use mouse wheel to increment/decrement the element value
 + The related `wheelStep` option allows to either define a *fixed* step (ie. `1000`), or a *progressive* one calculated based on the current element value

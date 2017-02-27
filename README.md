@@ -1,6 +1,6 @@
 ## What is [autoNumeric](http://www.decorplanit.com/plugin/)?
 
-autoNumeric is a library that provides live *as-you-type* formatting for international numbers and currencies.
+autoNumeric is a standalone Javascript library that provides live *as-you-type* formatting for international numbers and currencies.
 
 [![NPM][nodei-image]][nodei-url]
 <br>
@@ -12,7 +12,7 @@ autoNumeric is a library that provides live *as-you-type* formatting for interna
 <br>
 [![Gitter chat][gitter-image]][gitter-url]
 
-The latest stable branch is [2.*](https://github.com/BobKnothe/autoNumeric/tree/master).<br>For older stable versions, please take a look [here](#older-versions), while for the latest development version, check the `next` [branch](https://github.com/BobKnothe/autoNumeric/tree/next).<br><br>
+The latest stable branch is [3.*](https://github.com/BobKnothe/autoNumeric/tree/master).<br>For older stable versions, please take a look [here](#older-versions), while for the latest development version, check the `next` [branch](https://github.com/BobKnothe/autoNumeric/tree/next).<br><br>
 Moreover, you can take a look at what could be the next features coming to autoNumeric on our [project](https://github.com/BobKnothe/autoNumeric/projects) page *(feel free to participate!)*.
 
 #### Highlights
@@ -20,9 +20,9 @@ autoNumeric main features are :
 - Easy to use and configure
 ```js
 // Initialization
-$('.myInput').autoNumeric('init', { currencySymbol : '$' });
+new AutoNumeric('.myInput', { currencySymbol : '$' });
 ```
-- Very high configurability (more than 30 [options](#options) available)
+- Very high configurability (more than 38 [options](#options) available)
 ```js
 // The options are...optional :)
 const autoNumericOptionsEuro = {
@@ -30,12 +30,12 @@ const autoNumericOptionsEuro = {
     decimalCharacter           : ',',
     decimalCharacterAlternative: '.',
     currencySymbol             : '\u202f€',
-    currencySymbolPlacement    : 's',
+    currencySymbolPlacement    : AutoNumeric.options.currencySymbolPlacement.suffix,
     roundingMethod             : 'U',
 };
 
 // Initialization
-$('.myInput').autoNumeric('init', autoNumericOptionsEuro);
+new AutoNumeric(domElement, autoNumericOptionsEuro);
 ```
 - User experience oriented ; using autoNumeric just feels right and natural
 - Supports most international numeric formats and currencies<br>*(If the one you use is not supported yet, open an [issue](https://github.com/BobKnothe/autoNumeric/issues/new) and we'll add it as soon as possible!)*
@@ -43,12 +43,14 @@ $('.myInput').autoNumeric('init', autoNumericOptionsEuro);
 *And also:*
 - Any number of different formats can be used at the same time on the same page.<br>Each input can be configured by either setting the options as HTML5 data attributes, or directly passed as an argument in the Javascript code
 - The settings can easily be changed at *any* time using the `update` method or via a callback
-- autoNumeric supports most text elements, allowing you to place formatted numbers and currency on just about any part of the page
-- Pre-defined [currency options](#predefined-language-options) allows you to directly use autoNumeric by skipping the option configuration step
-- 18 built-in [methods](#methods) gives you the flexibility needed to use autoNumeric to its maximum potential
-- More than 30 [options](#options) allows you to customize the output format
+- autoNumeric supports `input` elements as well as most text elements, allowing you to place formatted numbers and currencies on just about any part of your page
+- AutoNumeric elements can be linked together allowing you to perform one action on multiple elements at once
+- 7 pre-defined [currency options](#predefined-language-options) allows you to directly use autoNumeric by skipping the option configuration step
+- 26 built-in [methods](#methods) gives you the flexibility needed to use autoNumeric to its maximum potential
+- 21 additional [methods](#methods) specialized for managing form submission
+- More than 38 [options](#options) allows you to customize the output format
 
-With that said, autoNumeric supports most International numeric formats and currencies including those used in Europe, Asia, and North and South America.
+With that said, autoNumeric supports most international numeric formats and currencies including those used in Europe, Asia, and North and South America.
 
 ****
 
@@ -64,36 +66,44 @@ npm install autonumeric
 ```
 
 ### How to use?
-Simply include jQuery and autoNumeric (in that order) in your html `<header>` tag.<br>No other file or library are required.
+
+#### In the browser
+Simply include **autoNumeric** in your html `<header>` tag.<br>No other files or libraries are required ; autoNumeric has **no dependency**.
 
 ```html
-<script src="jquery.min.js" type="text/javascript"></script>
 <script src="autoNumeric.min.js" type="text/javascript"></script>
-<!-- You may also directly use a CDN :-->
-<script src="https://cdn.jsdelivr.net/autonumeric/2.0.0/autoNumeric.min.js"></script>
+<!-- ...or, you may also directly use a CDN :-->
+<script src="https://cdn.jsdelivr.net/autonumeric/3.0.0/autoNumeric.min.js"></script>
 ```
 
-Initialize autoNumeric with or without options :
+#### In another script
+If you want to use AutoNumeric in your code, you can import the `src/autoNumeric.js` file as an ES6 module using:
+```js
+import AutoNumeric from 'autoNumeric';
+```
 
+Then you can initialize autoNumeric with or without options :
 ```js
 // autoNumeric with the defaults options
-$(selector).autoNumeric('init');
+anElement = new AutoNumeric(domElement);
 
 // autoNumeric with specific options being passed
-$(selector).autoNumeric('init', { options }); 
+anElement = new AutoNumeric(domElement, { options });
 
-// autoNumeric with pre-defined language options being passed
-$(selector).autoNumeric('init', $.fn.autoNumeric.lang.French);
+// autoNumeric with a css selector and a pre-defined language options
+anElement = new AutoNumeric('.myCssClass > input').french();
 ```
 *(See the available language list [here](#predefined-language-options))*
 
 You're done!
 
+*Note : an AutoNumeric object can be initialized in various ways, check those out [here](#initialization)*
+
 ### On which elements can it be used?
 
 autoNumeric can be used in two ways ;
 - with event listeners when used on `<input>` elements making them reactive (in a *read/write* mode), or
-- without event listeners when used on other DOM elements types, essentially acting as a *format-once-and-forget* mode (*read only*).
+- without event listeners when used on other DOM elements types, essentially acting as a *format-once-and-forget*-*read only* mode.
 
 #### On `<input>` elements
 When used on an `<input>` element, you'll be able to interact with its value and get a formatted input value *as-you-type*, using the full power of autoNumeric.
@@ -123,12 +133,12 @@ The following elements are accepted :
 const allowedTagList = [
     'b', 'caption', 'cite', 'code', 'const', 'dd', 'del', 'div', 'dfn', 'dt', 'em', 'h1', 'h2', 'h3',
     'h4', 'h5', 'h6', 'ins', 'kdb', 'label', 'li', 'option', 'output', 'p', 'q', 's', 'sample',
-    'span', 'strong', 'td', 'th', 'u',
+    'span', 'strong', 'td', 'th', 'u'
 ]
 ```
 
 ## Options
-Multiple options allow you to customize precisely how a form input will format your inputs as you type :
+Multiple options allow you to customize precisely how a form input will format your key strokes as you type :
 
 | Option           | Description | Default Value |
 | :---------------- | :-----------:  | :-----------:  |
@@ -152,15 +162,18 @@ Multiple options allow you to customize precisely how a form input will format y
 | `modifyValueOnWheel`| Determine if the element value can be incremented / decremented with the mouse wheel. The wheel behavior is modified with the `wheelStep` option. | `true` |
 | `negativeBracketsTypeOnBlur`| Adds brackets `[]`, parenthesis `()`, curly braces `{}` or `<>` on negative values when unfocused | `null` |
 | `negativePositiveSignPlacement` | Placement of negative/positive sign relative to the currency symbol (possible options are `l` (left), `r` (right), `p` (prefix) and `s` (suffix)) | `null` |
+| `noEventListeners` | Defines if the element should have event listeners activated on it | `false` |
 | `noSeparatorOnFocus` | Remove the thousand separator, currency symbol and suffix on focus | `false` |
 | `onInvalidPaste`| Manage how autoNumeric react when the user tries to paste an invalid number (possible options are `error`, `ignore`, `clamp`, `truncate` or `replace`) | `'error'` |
 | `outputFormat`| Defines the localized output format of the `get`, `getString` & `getArray` methods | `null` |
 | `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor` and `ignore`) | `null` |
+| `readOnly` | Defines if the `<input>` element should be set as read only on initialization | `false` |
 | `roundingMethod`| Method used for rounding (possible options are `S`, `A`, `s`, `a`, `B`, `U`, `D`, `C`, `F`, `N05`, `U05` or `D05`) | `'S'` |
 | `saveValueToSessionStorage`| Allow the `decimalPlacesShownOnFocus` value to be saved into session storage | `false` |
 | `scaleDecimalPlaces`| The number of decimal places when unfocused | `null` |
 | `scaleDivisor`| This option decides the onfocus value and places the result in the input on focusout | `null` |
 | `scaleSymbol`| Symbol placed as a suffix when unfocused | `null` |
+| `serializeSpaces`| Defines how the serialize functions should treat spaces when serializing (convert them to `'%20'` or `'+'`) | `'+'` |
 | `selectNumberOnly`| Determine if the select all keyboard command will select the complete input text, or only the input numeric value | `false` |
 | `showPositiveSign` | Allow the positive sign symbol `+` to be displayed for positive numbers | `false` |
 | `showWarnings`| Defines if warnings should be shown | `true` |
@@ -169,18 +182,31 @@ Multiple options allow you to customize precisely how a form input will format y
 | `wheelStep`| Used in conjonction with the `modifyValueOnWheel` option, this allow to either define a *fixed* step (ie. `1000`), or a *progressive* one | `'progressive'` |
 
 
+###### noEventListeners
+Using the `noEventListeners` option allow autoNumeric to only format without adding any event listeners to an input, or any other DOM elements (that the function would accept as a parameter). This would be useful for read-only values for instance.
+```js
+// Initialize without setting up any event listeners
+anElement = new AutoNumeric(domElement, 12345.789, { options }).remove(); // This is the default existing way of doing that...
+// ...but you can also directly pass a special option `noEventListeners` to prevent the initial creation of those event listeners
+anElement = new AutoNumeric(domElement, 12345.789, { noEventListeners: true });
+```
+In the latter case, it initialize the AutoNumeric element, except it does not add any event listeners. Which means it format the value only once and then let the user modify it freely.<br>*Note: The value can then be formatted via a call to `set`.*
+
+###### readOnly
+AutoNumeric can initialize an `<input>` element with the `readonly` property by setting the `readOnly` option to `true` in the settings:
+```js
+anElement = new AutoNumeric(domElement, 12345.789, { readOnly: true });
+```
+
 For more detail on how to use each options, please take a look at the detailed comments in the source code for the `defaultSettings` object.
 
 #### Predefined language options
+
 Sometime you do not want to have to configure every single aspect of your format, specially if it's a common one.<br>Hence, we provide multiple default options for the most common currencies.
 
 You can use those pre-defined language option like so :
 ```js
-// ES6 way
-$(selector).autoNumeric('init', an.getLanguages().French);
-
-// jQuery way
-$(selector).autoNumeric('init', $.fn.autoNumeric.lang.French);
+new AutoNumeric('.mySelector > input').french();
 ```
 
 Currently, the predefined options are :
@@ -197,49 +223,281 @@ Currently, the predefined options are :
 
 If you feel a common currency option is missing, please create a pull request and we'll add it!
 
-## Methods
-autoNumeric provides numerous methods to access and modify the input value, formatted or unformatted, at any point in time.
-<br>It does so by either providing access to those methods via the jQuery [wrapper](#jquery-plugin-calls), or directly via the autoNumeric [ES6 module](#es6-module-calls).
+## Initialization
 
-#### jQuery plugin calls
+An AutoNumeric object can be initialized in various ways.
+
+### Initialize one AutoNumeric object
+
+It always takes either a DOM element reference as its first argument, or a css string selector.<br>
+*Note: only one element can be selected this way, since under the hood `document.querySelector` is called, and this only return one element.*<br>
+*If you need to be able to select and initialize multiple elements in one call, then consider using the static `AutoNumeric.multiple()` function*
+
+```js
+anElement = new AutoNumeric(domElement); // With the default options
+anElement = new AutoNumeric(domElement, { options }); // With one option object
+anElement = new AutoNumeric(domElement).french(); // With one pre-defined language object
+anElement = new AutoNumeric(domElement).french({ options });// With one pre-defined language object and additional options that will override those defaults
+
+// ...or init and set the value in one call :
+anElement = new AutoNumeric(domElement, 12345.789); // With the default options, and an initial value
+anElement = new AutoNumeric(domElement, 12345.789, { options });
+anElement = new AutoNumeric(domElement, '12345.789', { options });
+anElement = new AutoNumeric(domElement, null, { options }); // With a null initial value
+anElement = new AutoNumeric(domElement, 12345.789).french({ options });
+anElement = new AutoNumeric(domElement, 12345.789, { options }).french({ options }); // Not really helpful, but possible
+
+// The AutoNumeric constructor class can also accept a string as a css selector. Under the hood this use `QuerySelector` and limit itself to only the first element it finds.
+anElement = new AutoNumeric('.myCssClass > input');
+anElement = new AutoNumeric('.myCssClass > input', { options });
+anElement = new AutoNumeric('.myCssClass > input', 12345.789);
+anElement = new AutoNumeric('.myCssClass > input', 12345.789, { options });
+anElement = new AutoNumeric('.myCssClass > input', null, { options }); // With a null initial value
+anElement = new AutoNumeric('.myCssClass > input', 12345.789).french({ options });
+```
+*Note: AutoNumeric also accepts a limited tag list that it will format on page load, but without adding any event listeners*
+
+### Initialize multiple AutoNumeric objects at once
+If you know you want to initialize multiple elements in one call, you must then use the static `AutoNumeric.multiple()` function:
+```js
+// Init multiple DOM elements in one call (and possibly pass multiple values that will be mapped to each DOM element)
+[anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], { options });
+[anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], 12345.789, { options });
+[anElement1, anElement2, anElement3] = AutoNumeric.multiple.french([domElement1, domElement2, domElement3], [12345.789, 234.78, null], { options });
+
+// Special case, if a <form> element is passed (or any other 'parent' (or 'root') DOM element), then autoNumeric will initialize each child `<input>` elements recursively, ignoring those referenced in the `exclude` attribute
+[anElement1, anElement2] = AutoNumeric.multiple({ rootElement: formElement }, { options });
+[anElement1, anElement2] = AutoNumeric.multiple({ rootElement: formElement, exclude : [hiddenElement, tokenElement] }, { options });
+[anElement1, anElement2] = AutoNumeric.multiple({ rootElement: formElement, exclude : [hiddenElement, tokenElement] }, [12345.789, null], { options });
+
+// If you want to select multiple elements via a css selector, then you must use the `multiple` function. Under the hood `QuerySelectorAll` is used.
+[anElement1, anElement2] = AutoNumeric.multiple('.myCssClass > input', { options }); // This always return an Array, even if there is only one element selected
+[anElement1, anElement2] = AutoNumeric.multiple('.myCssClass > input', [null, 12345.789], { options }); // Idem above, but with passing the initial values too
+```
+
+## Options update
+Options can be added and/or modified after the initialization has been done.
+
+Either by passing an options object that contains multiple options...
+```js
+anElement.update({ moreOptions });
+anElement.update(AutoNumeric.getLanguages().NorthAmerican); // Update the settings (and immediately reformat the element accordingly)
+```
+
+...or by changing the options one by one (or by calling a pre-defined option object)
+```js
+anElement.options.minimumValue('12343567.89');
+anElement.options.allowDecimalPadding(false);
+```
+
+Lastly, the option object can be accessed directly, thus allowing to query each options globally too
+```js
+anElement.getSettings(); // Return the options object containing all the current autoNumeric settings in effect
+```
+
+## Methods
+autoNumeric provides numerous methods to access and modify the element value, formatted or unformatted, at any point in time.
+<br>It does so by providing access to those [methods](#instantiated-methods) via the AutoNumeric object class (declared as an ES6 Module).
+
+First. you need to get a reference to the AutoNumeric module that you need to import:
+```js
+import AutoNumeric from 'autoNumeric.min';
+```
+
+Then you'll be able to access either the methods on the instantiated AutoNumeric object, or the [static functions](#static-methods) directly by using the `AutoNumeric` class.
+
+#### Instantiated methods
+
+##### Usual functions on each autoNumeric-managed element
+
 | Method           | Description | Call example |
 | :----------------: | :-----------:  | :-----------:  |
-| `init` | Initialize autoNumeric and attach the settings (options can be passed as a parameter). **This must be run before other methods can be called.**  | `$(someSelector).autoNumeric('init', {options});` |
-| `autoFormat` | cf. ES6 Module calls | `$(someSelector).autoFormat('1234.56', {options});` |
-| `autoUnFormat` | cf. ES6 Module calls | `$(someSelector).autoUnFormat('1.234,56 €', {options});` |
-| `autoValidate` | cf. ES6 Module calls | `$(someSelector).autoValidate({options});` |
-| `defaults` | Return the default autoNumeric settings | `$.fn.autoNumeric.defaults` |
-| `destroy` | Stop and remove autoNumeric for the current element | `$(someSelector).autoNumeric("destroy");` |
-| `get` | Return the unformatted value as a string | `$(someSelector).autoNumeric('get');` |
-| `getArray` | Serialize the whole form input array into an Array | `$(someSelector).autoNumeric('getArray');` |
-| `getFormatted` | Return the current formatted value | `$(someSelector).autoNumeric('getFormatted');` |
-| `getLocalized` | Returns the unformatted value, but following the `outputFormat` setting | `$(someSelector).autoNumeric('getLocalized');`  |
-| `getNumber` | Return the input unformatted value as a real Javascript number | `$(someSelector).autoNumeric('getNumber');` |
-| `getString` | Serialize the whole form input array into a String | `$(someSelector).autoNumeric('getString');` |
-| `lang` | Return all the predefined language options in one object | `$.fn.autoNumeric.lang` |
-| `reSet` | Re-format inputs (handy right after form submission) | `$(someSelector).autoNumeric('reSet');` |
-| `set` | Set the value given as a parameter, and formats it | `$(someSelector).autoNumeric('set', '12345.67');` |
-| `unSet` | Unformat inputs (handy right before form submission) | `$(someSelector).autoNumeric('unSet');` |
-| `update` | Updates the autoNumeric settings, which reformat the input on-the-fly | `$(someSelector).autoNumeric("update", {options});` |
-| `wipe` | Clear the value from sessionStorage (or cookie, depending on browser supports) | `$(someSelector).autoNumeric("wipe");` |
+| `set` | Set the value (that will be formatted immediately) | `anElement.set(42.76);` |
+| `set` | Set the value and update the setting in one go | `anElement.set(42.76, { options });` |
+| `setUnformatted` | Set the value (that will not be formatted immediately) | `anElement.setUnformatted(42.76);` |
+| `setUnformatted` | Set the value and update the setting in one go (the value will not be formatted immediately) | `anElement.setUnformatted(42.76, { options });` |
+| `getNumericString` | Return the unformatted number as a string | `anElement.getNumericString();` |
+| `get` | Alias for the `.getNumericString()` method | `anElement.get();` |
+| `getFormatted` | Return the formatted string | `anElement.getFormatted();` |
+| `getNumber` | Return the unformatted number as a number | `anElement.getNumber();` |
+| `getLocalized` | Return the localized unformatted number as a string | `anElement.getLocalized();` |
+| `getLocalized` | Return the localized unformatted number as a string, using the outputFormat option override passed as a parameter | `anElement.getLocalized(forcedOutputFormat);` |
+| `reformat` | Force the element to reformat its value again (in case the formatting has been lost) | `anElement.reformat();` |
+| `unformat` | Remove the formatting and keep only the raw unformatted value in the element (as a numeric string) | `anElement.unformat();` |
+| `unformatLocalized` | Remove the formatting and keep only the localized unformatted value in the element | `anElement.unformatLocalized();` |
+| `unformatLocalized` | Idem above, but using the outputFormat option override passed as a parameter | `anElement.unformatLocalized(forcedOutputFormat);` |
+| `isPristine` | Return `true` if the current value is the same as when the element got initialized | `anElement.isPristine();` |
+| `select` | Select the formatted element content, based on the `selectNumberOnly` option | `anElement.select();` |
+| `selectNumber` | Select only the numbers in the formatted element content, leaving out the currency symbol, whatever the value of the `selectNumberOnly` option | `anElement.selectNumber();` |
+| `selectInteger` | Select only the integer part in the formatted element content, whatever the value of `selectNumberOnly` | `anElement.selectInteger(); ` |
+| `selectDecimal` | Select only the decimal part in the formatted element content, whatever the value of `selectNumberOnly` | `anElement.selectDecimal();` |
+| `clear` | Reset the element value to the empty string '' (or the currency sign, depending on the `emptyInputBehavior` option value) | `anElement.clear();` |
+| `clear` | Reset the element value to the empty string '' as above, no matter the `emptyInputBehavior` option value | `anElement.clear(true);` |
 
-#### ES6 Module calls
-First you need to get a reference to the autoNumeric object that you need to import:
+
+##### Un-initialize the AutoNumeric element with the following methods
+
+| Method           | Description | Call example |
+| :----------------: | :-----------:  | :-----------:  |
+| `remove` | Remove the autoNumeric listeners from the element (previous name : 'destroy'). Keep the element content intact. | `anElement.remove();` |
+| `wipe` | Remove the autoNumeric listeners from the element, and reset its value to '' | `anElement.wipe();` |
+| `nuke` | Remove the autoNumeric listeners from the element, and delete the DOM element altogether | `anElement.nuke();` |
+
+
+##### Node manipulation
+
+| Method           | Description | Call example |
+| :----------------: | :-----------:  | :-----------:  |
+| `node` | Return the DOM element reference of the autoNumeric-managed element | `anElement.node();` |
+| `parent` | Return the DOM element reference of the parent node of the autoNumeric-managed element | `anElement.parent();` |
+| `detach` | Detach the current AutoNumeric element from the shared 'init' list (which means any changes made on that local shared list will not be transmitted to that element anymore) | `anElement.detach();` |
+| `detach` | Idem above, but detach the given AutoNumeric element, not the current one | `anElement.detach(otherAnElement);` |
+| `attach` | Attach the given AutoNumeric element to the shared local 'init' list. When doing that, by default the DOM content is left untouched. The user can force a reformat with the new shared list options by passing a second argument to `true`. | `anElement.attach(otherAnElement, reFormat = true);` |
+
+
+##### Use any AutoNumeric element to format/unformat other numbers or DOM elements
+
+This allows to format or unformat numbers, strings or directly other DOM elements without having to specify the options each time, since the current AutoNumeric object already has those settings set.
+
+| Method           | Description | Call example |
+| :----------------: | :-----------:  | :-----------:  |
+| `formatOther` | This use the same function signature that when using the static AutoNumeric method directly (cf. below: `AutoNumeric.format`), but without having to pass the options | `anElement.formatOther(12345, { options });` |
+| `formatOther` | Idem above, but apply the formatting to the DOM element content directly | `anElement.formatOther(domElement5, { options }); ` |
+| `unformatOther` | This use the same function signature that when using the static AutoNumeric method directly (cf. below: `AutoNumeric.unformat`), but without having to pass the options | `anElement.unformatOther('1.234,56 €', { options });` |
+| `unformatOther` | Idem above, but apply the unformatting to the DOM element content directly | `anElement.unformatOther(domElement5, { options });` |
+
+
+##### Initialize other DOM Elements
+
+Once you have an AutoNumeric element already setup correctly with the right options, you can use it as many times you want to initialize as many other DOM elements as needed (this works only on elements that can be managed by autoNumeric).
+
+Whenever `init` is used to initialize other DOM element, a shared 'local' list of those elements is stored in the AutoNumeric objects.<br>This allows for neat things like modifying all those *linked* AutoNumeric elements globally, with one call.
+
+| Method           | Description | Call example |
+| :----------------: | :-----------:  | :-----------:  |
+| `init` | Use an existing AutoNumeric element to initialize another DOM element with the same options | `const anElement2 = anElement.init(domElement2);` |
+| `init` | If `true` is set as the second argument, then the newly generated AutoNumeric element will not share the same local element list as `anElement` | `const anElement2 = anElement.init(domElement2, true);` |
+
+
+##### Perform actions globally on a shared list of AutoNumeric elements
+
+This local list can be used to perform global operations on all those AutoNumeric elements, with one function call.<br>
+To do so, you must call the wanted function by prefixing `.global` before the method name (ie. `anElement.global.set(42)`).<br>
+Below are listed all the supported methods than can be called globally:
+
 ```js
-import an from 'lib/autoNumeric.js';
+anElement.global.set(2000); // Set the value 2000 in all the autoNumeric-managed elements that are shared on this element
+anElement.global.setUnformatted(69);
+[result1, result2, result3] = anElement.global.get(); // Return an array of results
+[result1, result2, result3] = anElement.global.getNumericString(); // Return an array of results
+[result1, result2, result3] = anElement.global.getFormatted(); // Return an array of results
+[result1, result2, result3] = anElement.global.getNumber(); // Return an array of results
+[result1, result2, result3] = anElement.global.getLocalized(); // Return an array of results
+anElement.global.reformat();
+anElement.global.unformat();
+anElement.global.unformatLocalized();
+anElement.global.unformatLocalized(forcedOutputFormat);
+anElement.global.isPristine(); // Return `true` is *all* the autoNumeric-managed elements are pristine, if their raw value hasn't changed
+anElement.global.isPristine(false); // Idem as above, but also checks that the formatted value hasn't changed
+anElement.global.clear(); // Clear the value in all the autoNumeric-managed elements that are shared on this element
+anElement.global.remove();
+anElement.global.wipe();
 ```
-Then you'll be able to use that object static methods:
+
+The shared local list also provide list-specific methods to manipulate it:
+```js
+anElement.global.has(domElementOrAutoNumericObject); // Return `true` if the given AutoNumeric object (or DOM element) is in the local AutoNumeric element list
+anElement.global.addObject(domElementOrAutoNumericObject); // Add an existing AutoNumeric object (or DOM element) to the local AutoNumeric element list, using the DOM element as the key
+anElement.global.removeObject(domElementOrAutoNumericObject); // Remove the given AutoNumeric object (or DOM element) from the local AutoNumeric element list, using the DOM element as the key
+anElement.global.empty(); // Remove all elements from the shared list, effectively emptying it
+[anElement0, anElement1, anElement2, anElement3] = anElement.global.elements(); // Return an array containing all the AutoNumeric elements that have been initialized by each other
+anElement.global.getList(); // Return the `Map` object directly
+anElement.global.size(); // Return the number of elements in the local AutoNumeric element list
+```
+
+##### Form functions
+
+autoNumeric elements provide special functions to manipulate the form they are a part of.
+Those special functions really work on the parent `<form>` element, instead of the `<input>` element itself. 
+
+| Method           | Description | Call example |
+| :----------------: | :-----------:  | :-----------:  |
+| `form` | Return a reference to the parent <form> element, `null` if it does not exist | `anElement.form();` |
+| `formNumericString` | Return a string in standard URL-encoded notation with the form input values being unformatted | `anElement.formNumericString();` |
+| `formFormatted` | Return a string in standard URL-encoded notation with the form input values being formatted | `anElement.formFormatted();` |
+| `formLocalized` | Return a string in standard URL-encoded notation with the form input values, with localized values | `anElement.formLocalized();` |
+| `formLocalized(forcedOutputFormat)` | Idem above, but with the possibility of overriding the `outputFormat` option | `anElement.formLocalized(forcedOutputFormat);` |
+| `formArrayNumericString` | Return an array containing an object for each form `<input>` element, with the values as numeric strings | `anElement.formArrayNumericString();` |
+| `formArrayFormatted` | Return an array containing an object for each form `<input>` element, with the values as formatted strings | `anElement.formArrayFormatted();` |
+| `formArrayLocalized` | Return an array containing an object for each form `<input>` element, with the values as localized numeric strings | `anElement.formArrayLocalized();` |
+| `formArrayLocalized(forcedOutputFormat)` | Idem above, but with the possibility of overriding the `outputFormat` option | `anElement.formArrayLocalized(forcedOutputFormat);` |
+| `formJsonNumericString` | Return a JSON string containing an object representing the form input values. This is based on the result of the `formArrayNumericString()` function. | `anElement.formJsonNumericString();` |
+| `formJsonFormatted` | Return a JSON string containing an object representing the form input values. This is based on the result of the `formArrayFormatted()` function. | `anElement.formJsonFormatted();` |
+| `formJsonLocalized` | Return a JSON string containing an object representing the form input values. This is based on the result of the `formArrayLocalized()` function. | `anElement.formJsonLocalized();` |
+| `formJsonLocalized(forcedOutputFormat)` | Idem above, but with the possibility of overriding the `outputFormat` option | `anElement.formJsonLocalized(forcedOutputFormat);` |
+| `formUnformat` | Unformat all the autoNumeric-managed elements that are a child to the parent <form> element of this `anElement` input, to numeric strings | `anElement.formUnformat();` |
+| `formUnformatLocalized` | Unformat all the autoNumeric-managed elements that are a child to the parent <form> element of this `anElement` input, to localized strings | `anElement.formUnformatLocalized();` |
+| `formReformat` | Reformat all the autoNumeric-managed elements that are a child to the parent <form> element of this `anElement` input | `anElement.formReformat();` |
+
+The following functions can either take a callback, or not. If they don't, the default `form.submit()` function will be called.
+
+| Method           | Description | Call example |
+| :----------------: | :-----------:  | :-----------:  |
+| `formSubmitNumericString(callback)` | Run the `callback(value)` with `value` being equal to the result of `formNumericString()` | `anElement.formSubmitNumericString(callback);` |
+| `formSubmitFormatted(callback)` | Run the `callback(value)` with `value` being equal to the result of `formFormatted()` | `anElement.formSubmitFormatted(callback);` |
+| `formSubmitLocalized(callback)` | Run the `callback(value)` with `value` being equal to the result of `formLocalized()` | `anElement.formSubmitLocalized(callback);` |
+| `formSubmitLocalized(forcedOutputFormat, callback)` | Idem above, but with the possibility of overriding the `outputFormat` option | `anElement.formSubmitLocalized(forcedOutputFormat, callback);` |
+
+For the following methods, the callback is mandatory:
+
+| Method           | Description | Call example |
+| :----------------: | :-----------:  | :-----------:  |
+| `formSubmitArrayNumericString(callback)` | Run the `callback(value)` with `value` being equal to the result of `formArrayNumericString()` | `anElement.formSubmitArrayNumericString(callback);` |
+| `formSubmitArrayFormatted(callback)` | Run the `callback(value)` with `value` being equal to the result of `formArrayFormatted()` | `anElement.formSubmitArrayFormatted(callback);` |
+| `formSubmitArrayLocalized(callback, forcedOutputFormat)` | Idem above, but with the possibility of overriding the `outputFormat` option | `anElement.formSubmitArrayLocalized(callback, forcedOutputFormat);` |
+| `formSubmitJsonNumericString(callback)` | Run the `callback(value)` with `value` being equal to the result of `formJsonNumericString()` | `anElement.formSubmitJsonNumericString(callback);` |
+| `formSubmitJsonFormatted(callback)` | Run the `callback(value)` with `value` being equal to the result of `formJsonFormatted()` | `anElement.formSubmitJsonFormatted(callback);` |
+| `formSubmitJsonLocalized(callback, forcedOutputFormat)` | Idem above, but with the possibility of overriding the `outputFormat` option | `anElement.formSubmitJsonLocalized(callback, forcedOutputFormat);` |
+
+
+#### Function chaining
+
+Most of those functions can be chained which allow to be less verbose and more concise.
+
+```js
+anElement.french()
+         .set(42)
+         .update({ options })
+         .formSubmitJsonNumericString(callback)
+         .clear();
+```
+
+#### Static methods
+
+Without having to initialize any AutoNumeric object, you can directly use the static `AutoNumeric` class functions.
 
 | Method           | Description | Call example |
 | :---------------- | :-----------:  | :-----------:  |
-| `areSettingsValid` | Return true in the settings are valid | `an.areSettingsValid({options})` |
-| `format` | Format the given value without needing to initialize an autoNumeric input first | `an.format('1234.56', {options})` |
-| `getDefaultConfig` | Return the default autoNumeric settings | `an.getDefaultConfig()` |
-| `getLanguages` | Return all the predefined language options in one object | `an.getLanguages()` |
-| `unFormat` | Unformat the given value without needing to initialize an autoNumeric input first | `an.unFormat('1.234,56 €', {options})` |
-| `validate` | Check if the given option object is valid, and that each option is valid as well. This throws an error if it's not. | `an.validate({options})` |
+| `validate` | Check if the given option object is valid, and that each option is valid as well. This throws an error if it's not. | `AutoNumeric.validate({ options })` |
+| `areSettingsValid` | Return true in the settings are valid | `AutoNumeric.areSettingsValid({ options })` |
+| `getDefaultConfig` | Return the default autoNumeric settings | `AutoNumeric.getDefaultConfig()` |
+| `getLanguages` | Return all the predefined language options in one object | `AutoNumeric.getLanguages()` |
+| `getLanguages` | Return a specific pre-defined language options object | `AutoNumeric.getLanguages().French` |
+| `format` | Format the given number with the given options. This returns the formatted value as a string. | `AutoNumeric.format(12345.21, { options });` |
+| `format` | Idem above, but using a numeric string as the first parameter | `AutoNumeric.format('12345.21', { options });` |
+| `format` | Format the `domElement` *`value`* (or *`textContent`*) with the given options and returns the formatted value as a string. This does *not* update that element value. | `AutoNumeric.format(domElement, { options });` |
+| `formatAndSet` | Format the `domElement` value with the given options and returns the formatted value as a string. This function does update that element value with the newly formatted value in the process. | `AutoNumeric.formatAndSet(domElement, { options });` |
+| `unformat` | Unformat the given formatted string with the given options. This returns a numeric string. | `AutoNumeric.unformat('1.234,56 €', { options });` |
+| `unformat` | Unformat the `domElement` value with the given options and returns the unformatted numeric string. This does *not* update that element value. | `AutoNumeric.unformat(domElement, { options });` |
+| `unformatAndSet` | Unformat the `domElement` value with the given options and returns the unformatted value as a numeric string. This function does update that element value with the newly unformatted value in the process. | `AutoNumeric.unformatAndSet(domElement, { options });` |
+| `unformatAndSet` | Recursively unformat all the autoNumeric-managed elements that are a child to the `referenceToTheDomElement` element given as a parameter (this is usually the parent `<form>` element) | `AutoNumeric.unformatAndSet(referenceToTheDomElement);` |
+| `reformatAndSet` | Recursively format all the autoNumeric-managed elements that are a child to the `referenceToTheDomElement` element given as a parameter (this is usually the parent `<form>` element), with the settings of each AutoNumeric elements. | `AutoNumeric.reformatAndSet(referenceToTheDomElement);` |
+| `localize` | Unformat and localize the given formatted string with the given options. This returns a string. | `AutoNumeric.localize('1.234,56 €', { options });` |
+| `localize` | Idem as above, but return the localized DOM element value. This does *not* update that element value. | `AutoNumeric.localize(domElement, { options });` |
+| `localizeAndSet` | Unformat and localize the `domElement` value with the given options and returns the localized value as a string. This function does update that element value with the newly localized value in the process. | `AutoNumeric.localizeAndSet(domElement, { options });` |
+| `test` | Test if the given domElement is already managed by AutoNumeric (if it is initialized) | `AutoNumeric.test(domElement);` |
+| `version` | Return the AutoNumeric version number (for debugging purpose) | `AutoNumeric.version();` |
 
-*Work is ongoing to export all the current jQuery-only methods into the ES6 module.*
 
 ## Questions
 For questions and support please use the [Gitter chat room](https://gitter.im/autoNumeric/Lobby) or IRC on Freenode #autoNumeric.<br>The issue list of this repository is **exclusively** for bug reports and feature requests.
@@ -333,7 +591,7 @@ Currently, autoNumeric depends on jQuery (which is pretty logical since it's a j
 Some work is [in progress](https://github.com/BobKnothe/autoNumeric/issues/244) to provide a jQuery-free version of autoNumeric.
 
 ## Older versions
-The previous stable autoNumeric version v1.9.46 can be found [here](https://github.com/BobKnothe/autoNumeric/releases/tag/1.9.46).
+The previous stable autoNumeric version v1.9.46 can be found [here](https://github.com/BobKnothe/autoNumeric/releases/tag/1.9.46), and the v2 branch can be found [here](https://github.com/BobKnothe/autoNumeric/releases/tag/v2.0.7).
 
 ## Related projects
 For integration into [Rails](http://rubyonrails.org/) projects, you can use the [autonumeric-rails](https://github.com/randoum/autonumeric-rails) project.

@@ -42,6 +42,15 @@ const testUrl = '/e2e';
 // Object that holds the references to the input we test
 const selectors = {
     inputClassic                      : '#classic',
+    elementP1                         : '#tag_p1',
+    elementP2                         : '#tag_p2',
+    elementCode                       : '#tag_code',
+    elementDiv                        : '#tag_div',
+    elementH5                         : '#tag_h5',
+    elementLabel                      : '#tag_label',
+    elementSpan                       : '#tag_span',
+    readOnlyElement                   : '#readOnly_option',
+    noEventListenersElement           : '#noEventListeners_option',
     issue283Input0                    : '#issue283Input0',
     issue283Input1                    : '#issue283Input1',
     issue283Input2                    : '#issue283Input2',
@@ -94,13 +103,15 @@ function helperGetCaretPosition(wdioElement) { //FIXME Find a way to allow using
 //-----------------------------------------------------------------------------
 // ---- Tests
 
-xdescribe('webdriver.io page', () => {
+/*
+describe('webdriver.io page', () => {
     it('should have the right title - the fancy generator way', () => {
         browser.url('http://webdriver.io');
         const title = browser.getTitle();
         expect(title).toEqual('WebdriverIO - Selenium 2.0 javascript bindings for nodejs');
     });
 });
+*/
 
 describe('webdriver.io runner', () => {
     it(`should be able to send basic keys to basic inputs (which we'll use later for copy-pasting text strings)`, () => {
@@ -161,6 +172,45 @@ describe('webdriver.io runner', () => {
         browser.keys('NULL'); // This deactivates any modifiers key (I could have used `browser.keys('Shift');` again to toggle it off)
         browser.keys('foobar');
         expect(browser.getValue(selectors.inputClassic)).toEqual('987654foobarg');
+    });
+});
+
+describe('Initialized non-input elements', () => {
+    it('should show the same formatting as their <input> counterparts', () => {
+        browser.url(testUrl);
+
+        /* eslint space-in-parens: 0 */
+        expect(browser.getText(selectors.elementP1   )).toEqual('2.139%');
+        expect(browser.getText(selectors.elementP2   )).toEqual('666,42 €');
+        expect(browser.getText(selectors.elementCode )).toEqual('¥12,345.67');
+        expect(browser.getText(selectors.elementDiv  )).toEqual('$12,345.67');
+        expect(browser.getText(selectors.elementH5   )).toEqual('666.42 CHF');
+        expect(browser.getText(selectors.elementLabel)).toEqual('12,345.67');
+        expect(browser.getText(selectors.elementSpan )).toEqual('');
+    });
+});
+
+describe('Initialized elements with the noEventListeners option', () => {
+    it('should not be react with the autoNumeric listeners', () => {
+        browser.url(testUrl);
+
+        // Focus in that input
+        const input = $(selectors.noEventListenersElement);
+        input.click();
+
+        expect(browser.getValue(selectors.noEventListenersElement)).toEqual('69,67 €');
+        browser.keys(['End', '123', 'Home', '789']);
+        expect(browser.getValue(selectors.noEventListenersElement)).toEqual('78969,67 €123');
+    });
+});
+
+describe('Initialized elements with the readOnly option', () => {
+    it('should not be modifiable', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.readOnlyElement)).toEqual('42.42');
+        browser.keys(['Home', '12345']);
+        expect(browser.getValue(selectors.readOnlyElement)).toEqual('42.42');
     });
 });
 

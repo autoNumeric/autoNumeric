@@ -1,7 +1,7 @@
 /**
  *               autoNumeric.js
  *
- * @version      3.0.0-beta.3
+ * @version      3.0.0-beta.4
  * @date         2017-02-26 UTC 22:00
  *
  * @author       Bob Knothe
@@ -109,18 +109,18 @@ class AutoNumeric {
         // Set the initial value if it exists and if the `formatOnPageLoad` option will allow it
         if (!this.runOnce && this.settings.formatOnPageLoad) {
             // Format the element value if needed
-            this._formatDefaultValueOnPageLoad(this.isInputElement, initialValue);
+            this._formatDefaultValueOnPageLoad(initialValue);
         }
 
         this.runOnce = true;
 
         // Add the events listeners only on input elements
-        if (this.isInputElement) {
+        if (this.isInputElement || this.isContentEditable) {
             if (!this.settings.noEventListeners) {
                 this._createEventListeners();
             }
 
-            if (this.settings.readOnly) {
+            if (this.isInputElement && this.settings.readOnly) {
                 this.domElement.readOnly = true;
             }
         }
@@ -518,7 +518,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '3.0.0-beta.3';
+        return '3.0.0-beta.4';
     }
 
     /**
@@ -733,13 +733,8 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     update(newOptions) {
-        let numericString;
         // Store the current unformatted input value
-        if (this.isInputElement) {
-            numericString = this.settings.rawValue;
-        } else {
-            numericString = AutoNumericHelper.getElementValue(this.domElement);
-        }
+        const numericString = this.settings.rawValue;
 
         // Update the settings
         try {
@@ -755,7 +750,7 @@ class AutoNumeric {
         this.savedCancellableValue = null;
 
         // Reformat the input value with the new settings
-        if (AutoNumericHelper.getElementValue(this.domElement) !== '' || AutoNumericHelper.text(this.domElement) !== '') {
+        if (AutoNumericHelper.getElementValue(this.domElement) !== '') {
             this.set(numericString);
         }
 
@@ -1074,7 +1069,7 @@ class AutoNumeric {
      */
     unformat() {
         // this.settings.hasFocus = true; //TODO Is this necessary? //FIXME delete this
-        this.domElement.value = this.getNumericString();
+        AutoNumericHelper.setElementValue(this.domElement, this.getNumericString());
         
         return this;
     }
@@ -1090,7 +1085,7 @@ class AutoNumeric {
      */
     unformatLocalized(forcedOutputFormat = null) {
         // this.settings.hasFocus = true; //TODO Is this necessary? Can we remove that? //FIXME delete this
-        this.domElement.value = this.getLocalized(forcedOutputFormat);
+        AutoNumericHelper.setElementValue(this.domElement, this.getLocalized(forcedOutputFormat));
 
         return this;
     }
@@ -1134,7 +1129,7 @@ class AutoNumeric {
      * @private
      */
     _defaultSelectAll() {
-        AutoNumericHelper.setElementSelection(this.domElement, 0, this.domElement.value.length);
+        AutoNumericHelper.setElementSelection(this.domElement, 0, AutoNumericHelper.getElementValue(this.domElement).length);
     }
 
     /**
@@ -1144,10 +1139,11 @@ class AutoNumeric {
      */
     selectNumber() {
         //TODO Make sure the selection is ok when showPositiveSign is set to `true` (select the negative sign, but not the positive one)
-        const valueLen = this.domElement.value.length;
+        const unformattedValue = AutoNumericHelper.getElementValue(this.domElement);
+        const valueLen = unformattedValue.length;
         const currencySymbolSize = this.settings.currencySymbol.length;
         const currencySymbolPlacement = this.settings.currencySymbolPlacement;
-        const negLen = (!AutoNumericHelper.isNegative(this.domElement.value))?0:1;
+        const negLen = (!AutoNumericHelper.isNegative(unformattedValue))?0:1;
         const suffixTextLen = this.settings.suffixText.length;
         const negativePositiveSignPlacement = this.settings.negativePositiveSignPlacement;
 
@@ -1490,7 +1486,7 @@ class AutoNumeric {
      * @example anElement.wipe()
      */
     wipe() {
-        this.domElement.value = '';
+        AutoNumericHelper.setElementValue(this.domElement, '');
         this.remove();
     }
 
@@ -3578,7 +3574,7 @@ class AutoNumeric {
             this.lastVal = this.valueOnFocus;
             const onEmpty = this.constructor._checkEmpty(this.valueOnFocus, this.settings, true);
             if ((onEmpty !== null && onEmpty !== '') && this.settings.emptyInputBehavior === 'focus') {
-                this.domElement.value = onEmpty;
+                AutoNumericHelper.setElementValue(this.domElement, onEmpty);
 
                 // If there is a currency symbol and its on the right hand side, then we place the caret accordingly on the far left side
                 if (onEmpty === this.settings.currencySymbol && this.settings.currencySymbolPlacement === 's') {
@@ -4455,12 +4451,12 @@ class AutoNumeric {
      * Check if the DOM element is supported by autoNumeric.
      * A supported element is either an <input> element with the right 'type' attribute, or a tag whitelisted in the `allowedTagList`.
      * If the check fails, this method throws.
-     * This function also set the info `this.isInputElement` which keep tracks if the DOM element is an <input> or not.
+     * This function also set the info `this.isInputElement` which keep tracks if the DOM element is an <input> or not, and the `this.isContentEditable` if the element has the `contenteditable` attribute set to `true`.
      *
      * @throws
      * @private
      */
-    _checkElement() { //FIXME à tester
+    _checkElement() {
         const currentElementTag = this.domElement.tagName.toLowerCase();
 
         if (!this._isElementTagSupported()) {
@@ -4474,6 +4470,12 @@ class AutoNumeric {
             this.isInputElement = true;
         } else {
             this.isInputElement = false;
+
+            if (this.domElement.hasAttribute('contenteditable') && this.domElement.getAttribute('contenteditable') === 'true') {
+                this.isContentEditable = true;
+            } else {
+                this.isContentEditable = false;
+            }
         }
     }
 
@@ -4481,10 +4483,9 @@ class AutoNumeric {
      * Formats the default value on page load.
      * This is called only if the `formatOnPageLoad` option is set to `true`.
      *
-     * @param {Boolean} isInputElement Is `true` if the DOM element is an <input>
      * @param {number|string|null} forcedInitialValue The value that should be used for initialization, in place on the eventual html one
      */
-    _formatDefaultValueOnPageLoad(isInputElement, forcedInitialValue = null) {
+    _formatDefaultValueOnPageLoad(forcedInitialValue = null) {
         let setValue = true;
         let currentValue;
         if (!AutoNumericHelper.isNull(forcedInitialValue)) {
@@ -4493,7 +4494,7 @@ class AutoNumeric {
             currentValue = AutoNumericHelper.getElementValue(this.domElement);
         }
 
-        if (isInputElement) {
+        if (this.isInputElement || this.isContentEditable) {
             /*
              * If the input value has been set by the dev, but not directly as an attribute in the html, then it takes
              * precedence and should get formatted during the initialization (if this input value is a valid number and that the
@@ -5006,7 +5007,7 @@ class AutoNumeric {
      */
     _setSelection(start, end) {
         start = Math.max(start, 0);
-        end = Math.min(end, this.domElement.value.length);
+        end = Math.min(end, AutoNumericHelper.getElementValue(this.domElement).length);
         this.selection = {
             start,
             end,
@@ -5034,8 +5035,9 @@ class AutoNumeric {
      * @private
      */
     _getLeftAndRightPartAroundTheSelection() {
-        const left = this.domElement.value.substring(0, this.selection.start);
-        const right = this.domElement.value.substring(this.selection.end, this.domElement.value.length);
+        const value = AutoNumericHelper.getElementValue(this.domElement);
+        const left = value.substring(0, this.selection.start);
+        const right = value.substring(this.selection.end, value.length);
 
         return [left, right];
     }
@@ -5155,7 +5157,7 @@ class AutoNumeric {
                 }
             }
 
-            this.domElement.value = this.newValue;
+            AutoNumericHelper.setElementValue(this.domElement, this.newValue);
             this._setCaretPosition(position);
 
             return true;
@@ -5180,15 +5182,16 @@ class AutoNumeric {
         let result;
         if (this.settings.currencySymbol) {
             const currencySymbolLen = this.settings.currencySymbol.length;
+            const value = AutoNumericHelper.getElementValue(this.domElement);
             if (this.settings.currencySymbolPlacement === 'p') {
-                const hasNeg = this.settings.negativeSignCharacter && this.domElement.value && this.domElement.value.charAt(0) === this.settings.negativeSignCharacter;
+                const hasNeg = this.settings.negativeSignCharacter && value && value.charAt(0) === this.settings.negativeSignCharacter;
                 if (hasNeg) {
                     result = [1, currencySymbolLen + 1];
                 } else {
                     result = [0, currencySymbolLen];
                 }
             } else {
-                const valueLen = this.domElement.value.length;
+                const valueLen = value.length;
                 result = [valueLen - currencySymbolLen, valueLen];
             }
         } else {
@@ -5210,7 +5213,9 @@ class AutoNumeric {
         // If selection catches something except sign and catches only space from sign
         if (selection.start < currencySymbolPosition && selection.end > signPosition) {
             // Then select without empty space
-            if ((selection.start < signPosition || selection.end > currencySymbolPosition) && this.domElement.value.substring(Math.max(selection.start, signPosition), Math.min(selection.end, currencySymbolPosition)).match(/^\s*$/)) {
+            if ((selection.start < signPosition || selection.end > currencySymbolPosition) &&
+                AutoNumericHelper.getElementValue(this.domElement).substring(Math.max(selection.start, signPosition), Math.min(selection.end, currencySymbolPosition))
+                    .match(/^\s*$/)) {
                 if (selection.start < signPosition) {
                     this._setSelection(selection.start, signPosition);
                 } else {
@@ -5236,7 +5241,7 @@ class AutoNumeric {
 
             const modifiedLeftPart = left.substr(0, oldParts[0].length) + AutoNumeric._stripAllNonNumberCharacters(left.substr(oldParts[0].length), this.settings, true);
             if (!this._setValueParts(modifiedLeftPart, right, true)) {
-                this.domElement.value = oldParts.join('');
+                AutoNumericHelper.setElementValue(this.domElement, oldParts.join(''));
                 this._setCaretPosition(oldParts[0].length);
             }
         }
@@ -5312,13 +5317,14 @@ class AutoNumeric {
         //TODO Move this test inside the `onKeydown` handler
         if (this.eventKeyCode === AutoNumericEnum.keyCode.LeftArrow || this.eventKeyCode === AutoNumericEnum.keyCode.RightArrow) {
             if (e.type === 'keydown' && !e.shiftKey) {
+                const value = AutoNumericHelper.getElementValue(this.domElement);
                 if (this.eventKeyCode === AutoNumericEnum.keyCode.LeftArrow &&
-                    (this.domElement.value.charAt(this.selection.start - 2) === this.settings.digitGroupSeparator ||
-                    this.domElement.value.charAt(this.selection.start - 2) === this.settings.decimalCharacter)) {
+                    (value.charAt(this.selection.start - 2) === this.settings.digitGroupSeparator ||
+                    value.charAt(this.selection.start - 2) === this.settings.decimalCharacter)) {
                     this._setCaretPosition(this.selection.start - 1);
                 } else if (this.eventKeyCode === AutoNumericEnum.keyCode.RightArrow &&
-                    (this.domElement.value.charAt(this.selection.start + 1) === this.settings.digitGroupSeparator ||
-                    this.domElement.value.charAt(this.selection.start + 1) === this.settings.decimalCharacter)) {
+                    (value.charAt(this.selection.start + 1) === this.settings.digitGroupSeparator ||
+                    value.charAt(this.selection.start + 1) === this.settings.decimalCharacter)) {
                     this._setCaretPosition(this.selection.start + 1);
                 }
             }
@@ -5338,20 +5344,22 @@ class AutoNumeric {
      * @private
      */
     _processCharacterDeletionIfTrailingNegativeSign([left, right]) {
+        const value = AutoNumericHelper.getElementValue(this.domElement);
+
         if (this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's') {
             if (this.eventKeyCode === AutoNumericEnum.keyCode.Backspace) {
-                this.settings.caretFix = (this.selection.start >= this.domElement.value.indexOf(this.settings.suffixText) && this.settings.suffixText !== '');
-                if (this.domElement.value.charAt(this.selection.start - 1) === '-') {
+                this.settings.caretFix = (this.selection.start >= value.indexOf(this.settings.suffixText) && this.settings.suffixText !== '');
+                if (value.charAt(this.selection.start - 1) === '-') {
                     left = left.substring(1);
-                } else if (this.selection.start <= this.domElement.value.length - this.settings.suffixText.length) {
+                } else if (this.selection.start <= value.length - this.settings.suffixText.length) {
                     left = left.substring(0, left.length - 1);
                 }
             } else {
-                this.settings.caretFix = (this.selection.start >= this.domElement.value.indexOf(this.settings.suffixText) && this.settings.suffixText !== '');
-                if (this.selection.start >= this.domElement.value.indexOf(this.settings.currencySymbol) + this.settings.currencySymbol.length) {
+                this.settings.caretFix = (this.selection.start >= value.indexOf(this.settings.suffixText) && this.settings.suffixText !== '');
+                if (this.selection.start >= value.indexOf(this.settings.currencySymbol) + this.settings.currencySymbol.length) {
                     right = right.substring(1, right.length);
                 }
-                if (AutoNumericHelper.isNegative(left) && this.domElement.value.charAt(this.selection.start) === '-') {
+                if (AutoNumericHelper.isNegative(left) && value.charAt(this.selection.start) === '-') {
                     left = left.substring(1);
                 }
             }
@@ -5359,36 +5367,36 @@ class AutoNumeric {
 
         //TODO Merge the two following 'if' blocks into one `if (settings.currencySymbolPlacement === 's') {` and a switch on settings.negativePositiveSignPlacement
         if (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'l') {
-            this.settings.caretFix = (this.selection.start >= this.domElement.value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
+            this.settings.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
             if (this.eventKeyCode === AutoNumericEnum.keyCode.Backspace) {
-                if (this.selection.start === (this.domElement.value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length) && AutoNumericHelper.contains(this.domElement.value, this.settings.negativeSignCharacter)) {
+                if (this.selection.start === (value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length) && AutoNumericHelper.contains(value, this.settings.negativeSignCharacter)) {
                     left = left.substring(1);
-                } else if (left !== '-' && ((this.selection.start <= this.domElement.value.indexOf(this.settings.negativeSignCharacter)) || !AutoNumericHelper.contains(this.domElement.value, this.settings.negativeSignCharacter))) {
+                } else if (left !== '-' && ((this.selection.start <= value.indexOf(this.settings.negativeSignCharacter)) || !AutoNumericHelper.contains(value, this.settings.negativeSignCharacter))) {
                     left = left.substring(0, left.length - 1);
                 }
             } else {
                 if (left[0] === '-') {
                     right = right.substring(1);
                 }
-                if (this.selection.start === this.domElement.value.indexOf(this.settings.negativeSignCharacter) && AutoNumericHelper.contains(this.domElement.value, this.settings.negativeSignCharacter)) {
+                if (this.selection.start === value.indexOf(this.settings.negativeSignCharacter) && AutoNumericHelper.contains(value, this.settings.negativeSignCharacter)) {
                     left = left.substring(1);
                 }
             }
         }
 
         if (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'r') {
-            this.settings.caretFix = (this.selection.start >= this.domElement.value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
+            this.settings.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
             if (this.eventKeyCode === AutoNumericEnum.keyCode.Backspace) {
-                if (this.selection.start === (this.domElement.value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length)) {
+                if (this.selection.start === (value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length)) {
                     left = left.substring(1);
-                } else if (left !== '-' && this.selection.start <= (this.domElement.value.indexOf(this.settings.negativeSignCharacter) - this.settings.currencySymbol.length)) {
+                } else if (left !== '-' && this.selection.start <= (value.indexOf(this.settings.negativeSignCharacter) - this.settings.currencySymbol.length)) {
                     left = left.substring(0, left.length - 1);
-                } else if (left !== '' && !AutoNumericHelper.contains(this.domElement.value, this.settings.negativeSignCharacter)) {
+                } else if (left !== '' && !AutoNumericHelper.contains(value, this.settings.negativeSignCharacter)) {
                     left = left.substring(0, left.length - 1);
                 }
             } else {
-                this.settings.caretFix = (this.selection.start >= this.domElement.value.indexOf(this.settings.currencySymbol) && this.settings.currencySymbol !== '');
-                if (this.selection.start === this.domElement.value.indexOf(this.settings.negativeSignCharacter)) {
+                this.settings.caretFix = (this.selection.start >= value.indexOf(this.settings.currencySymbol) && this.settings.currencySymbol !== '');
+                if (this.selection.start === value.indexOf(this.settings.negativeSignCharacter)) {
                     left = left.substring(1);
                 }
                 right = right.substring(1);
@@ -5413,7 +5421,7 @@ class AutoNumeric {
 
             if (((this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's') ||
                 (this.settings.currencySymbolPlacement === 's' && (this.settings.negativePositiveSignPlacement === 'l' || this.settings.negativePositiveSignPlacement === 'r'))) &&
-                AutoNumericHelper.isNegative(this.domElement.value)) {
+                AutoNumericHelper.isNegative(AutoNumericHelper.getElementValue(this.domElement))) {
                 [left, right] = this._processCharacterDeletionIfTrailingNegativeSign([left, right]);
             } else {
                 if (this.eventKeyCode === AutoNumericEnum.keyCode.Backspace) {
@@ -5523,7 +5531,7 @@ class AutoNumeric {
                 right = right.substring(1, right.length);
             }
 
-            if (this.settings.maximumValue <= 0 && this.settings.minimumValue < this.settings.maximumValue && !AutoNumericHelper.contains(this.domElement.value, this.settings.negativeSignCharacter) && eventCharacter !== '0') {
+            if (this.settings.maximumValue <= 0 && this.settings.minimumValue < this.settings.maximumValue && !AutoNumericHelper.contains(AutoNumericHelper.getElementValue(this.domElement), this.settings.negativeSignCharacter) && eventCharacter !== '0') {
                 left = this.settings.negativeSignCharacter + left;
             }
 
@@ -5545,13 +5553,13 @@ class AutoNumeric {
      * @private
      */
     _formatValue(e) {
-        const leftLength = this.domElement.value;
+        const elementValue = AutoNumericHelper.getElementValue(this.domElement);
         let [left] = this._getUnformattedLeftAndRightPartAroundTheSelection();
 
         // No grouping separator and no currency sign
-        if ((this.settings.digitGroupSeparator  === '' || (this.settings.digitGroupSeparator !== ''  && !AutoNumericHelper.contains(leftLength, this.settings.digitGroupSeparator))) &&
-            (this.settings.currencySymbol === '' || (this.settings.currencySymbol !== '' && !AutoNumericHelper.contains(leftLength, this.settings.currencySymbol)))) {
-            let [subParts] = leftLength.split(this.settings.decimalCharacter);
+        if ((this.settings.digitGroupSeparator  === '' || (this.settings.digitGroupSeparator !== ''  && !AutoNumericHelper.contains(elementValue, this.settings.digitGroupSeparator))) &&
+            (this.settings.currencySymbol === '' || (this.settings.currencySymbol !== '' && !AutoNumericHelper.contains(elementValue, this.settings.currencySymbol)))) {
+            let [subParts] = elementValue.split(this.settings.decimalCharacter);
             let nSign = '';
             if (AutoNumericHelper.isNegative(subParts)) {
                 nSign = '-';
@@ -5572,7 +5580,7 @@ class AutoNumeric {
             left = nSign + left;
         }
 
-        const value = this.constructor._addGroupSeparators(this.domElement.value, this.settings);
+        const value = this.constructor._addGroupSeparators(elementValue, this.settings);
         let position = value.length;
         if (value) {
             // Prepare regexp which searches for cursor position from unformatted left part
@@ -5665,9 +5673,9 @@ class AutoNumeric {
         }
 
         // Only update the value if it has changed. This prevents modifying the selection, if any.
-        if (value !== this.domElement.value ||
-            value === this.domElement.value && (this.eventKeyCode === AutoNumericEnum.keyCode.num0 || this.eventKeyCode === AutoNumericEnum.keyCode.numpad0)) {
-            this.domElement.value = value;
+        if (value !== elementValue ||
+            value === elementValue && (this.eventKeyCode === AutoNumericEnum.keyCode.num0 || this.eventKeyCode === AutoNumericEnum.keyCode.numpad0)) {
+            AutoNumericHelper.setElementValue(this.domElement, value);
             this._setCaretPosition(position);
         }
 

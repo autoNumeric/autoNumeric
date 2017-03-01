@@ -1,5 +1,13 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.4"
++ Fix issue #396 Allow autoNumeric to manage user inputs in `contentEditable`-enabled elements
++ Simplify the `_formatDefaultValueOnPageLoad()` method signature.
++ Simplify how the `update()` function retrieve the current raw value and one of its test.
++ Remove any direct access to `this.domElement.value`, and use the `getElementValue()` to access the element `value` or `textContent`, and `setElementValue()` to set it.
++ Rewrite the `getElementSelection()` and `setElementSelection()` functions in order to manage non-input DOM elements.
++ Strengthen `getElementValue()` when managing non-input DOM elements.
+
 ### "3.0.0-beta.3"
 + Fix issue #399 Fully convert autoNumeric to an ES6 module
 + Fix issue #398 Finish removing all jQuery dependencies

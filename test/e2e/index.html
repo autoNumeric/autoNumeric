@@ -403,6 +403,15 @@
 			<input id="readOnly_option" type="text" placeholder="" value="42.42">
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">contentEditable option</p>
+			<p id="contentEditable1" contenteditable="true"></p>
+			<p id="contentEditable2" contenteditable="true">12345678.9012</p>
+			<p id="contentEditableNotActivated" contenteditable="false">69.02</p>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -758,6 +767,11 @@
 
     //-------------- readOnly option
     new AutoNumeric('#readOnly_option', { readOnly: true });
+
+    //-------------- contentEditable elements
+    new AutoNumeric('#contentEditable1').french();
+    new AutoNumeric('#contentEditable2').northAmerican();
+    new AutoNumeric('#contentEditableNotActivated').swiss();
 </script>
 </body>
 </html>

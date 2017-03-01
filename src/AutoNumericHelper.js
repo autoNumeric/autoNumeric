@@ -506,12 +506,11 @@ export default class AutoNumericHelper {
     static getElementSelection(element) {
         const position = {};
         if (this.isUndefined(element.selectionStart)) {
-            element.focus();
-            const select = document.selection.createRange();
-            position.length = select.text.length;
-            select.moveStart('character', -element.value.length);
-            position.end = select.text.length;
-            position.start = position.end - position.length;
+            const selection = window.getSelection();
+            const selectionInfo = selection.getRangeAt(0);
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            position.length = position.end - position.start;
         } else {
             position.start = element.selectionStart;
             position.end = element.selectionEnd;
@@ -529,21 +528,19 @@ export default class AutoNumericHelper {
      * @param {int|null} end
      */
     static setElementSelection(element, start, end = null) {
-        //TODO Replace this with the official `setSelectionRange()` (cf. https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/setSelectionRange)
         if (this.isUndefinedOrNullOrEmpty(end)) {
             end = start;
         }
 
-        if (this.isUndefined(element.selectionStart)) {
-            element.focus();
-            const range = element.createTextRange();
-            range.collapse(true);
-            range.moveEnd('character', end);
-            range.moveStart('character', start);
-            range.select();
+        if (this.isInputElement(element)) {
+            element.setSelectionRange(start, end);
         } else {
-            element.selectionStart = start;
-            element.selectionEnd = end;
+            const range = document.createRange();
+            range.setStart(element.firstChild, start);
+            range.setEnd(element.firstChild, end);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
         }
     }
 
@@ -911,9 +908,7 @@ export default class AutoNumericHelper {
             return element.value;
         }
 
-        // if (typeof element.textContent !== 'undefined') {
-        return element.textContent;
-        // }
+        return this.text(element);
     }
 
     /**

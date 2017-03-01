@@ -81,6 +81,9 @@ const selectors = {
     issue393inputLowerLimit           : '#issue_393_lowerLimit',
     issue393inputLimitOneSideUp       : '#issue_393_limitOneSideUp',
     issue393inputLimitOneSideDown     : '#issue_393_limitOneSideDown',
+    contentEditable1                  : '#contentEditable1',
+    contentEditable2                  : '#contentEditable2',
+    contentEditableNotActivated       : '#contentEditableNotActivated',
 };
 
 //-----------------------------------------------------------------------------
@@ -997,4 +1000,52 @@ xdescribe('Issue #393', () => { //FIXME Finish this
         // input.mouseWheel(-100); //FIXME Does not work (cf. http://stackoverflow.com/questions/29837922/how-to-implement-zoom-in-out-by-using-ctrlmousewheel-in-selenium-webdriver)
         expect(browser.getValue(selectors.issue393inputFixed)).toEqual('1,000.00');
     });
+});
+
+describe('Elements with the `contenteditable` attribute set to `true`', () => {
+    it('should tests for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getText(selectors.contentEditable1)).toEqual('');
+        expect(browser.getText(selectors.contentEditable2)).toEqual('$12,345,678.90');
+    });
+
+    it('should change the input value accordingly when focusing on the element', () => {
+        const contentEditable1 = $(selectors.contentEditable1);
+        const contentEditable2 = $(selectors.contentEditable2);
+
+        // Focus in the input
+        contentEditable1.click();
+
+        // Test the values
+        // expect(browser.getText(selectors.contentEditable1)).toEqual('\u202f€'); //TODO There is a bug upstream in webdriver.io where `getText` trims whitespaces (https://github.com/webdriverio/webdriverio/issues/1896)
+        expect(browser.getText(selectors.contentEditable1)).toEqual('€'); //TODO Delete this line when the upstream bug (https://github.com/webdriverio/webdriverio/issues/1896) is corrected
+        browser.keys(['Home', '1234567.89']);
+        expect(browser.getText(selectors.contentEditable1)).toEqual('1.234.567,89\u202f€');
+
+        // Focus in the input
+        contentEditable2.click();
+
+        // Test the values
+        expect(browser.getText(selectors.contentEditable2)).toEqual('$12,345,678.90');
+        browser.keys(['ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft']); // Under Firefox, 'Home' does not work and I must rely on that //TODO Change it back when the bug is fixed upstream
+        browser.keys(['Home']); // Under Firefox, 'Home' does not work and I must rely on that //TODO Change it back when the bug is fixed upstream
+        // browser.keys(['Home', 'Delete', 'Delete', 'Delete', 'Delete', 'Delete', 'Delete', '2267']); //TODO Uncomment this line when the bug is fixed upstream
+        browser.keys(['Delete', 'Delete', 'Delete', 'Delete', 'Delete', 'Delete', '2267']); //TODO Delete this line when the bug is fixed upstream
+        expect(browser.getText(selectors.contentEditable2)).toEqual('$226,778.90');
+    });
+
+    it('should not change the element value since `contenteditable` is set to `false`', () => {
+        const contentEditableNotActivated = $(selectors.contentEditableNotActivated);
+
+        // Focus in the input
+        contentEditableNotActivated.click();
+
+        // Test the values
+        expect(browser.getText(selectors.contentEditableNotActivated)).toEqual('69.02 CHF');
+        browser.keys(['Home', '1234']);
+        expect(browser.getText(selectors.contentEditableNotActivated)).toEqual('69.02 CHF');
+    });
+
+    //FIXME Add the paste tests (and check the resulting caret position)
 });

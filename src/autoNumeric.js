@@ -2774,6 +2774,8 @@ class AutoNumeric {
         //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
         //TODO This function is called 10 times (sic!) on each key input, couldn't we lower that number? cf. issue #325
         //TODO Refactor this with `convertToNumericString()` if possible?
+        s = String(s); // Typecast to to a string, in case that the initialValue is a number
+
         if (settings.currencySymbol !== '') {
             // Remove currency sign
             s = s.replace(settings.currencySymbol, '');
@@ -4508,7 +4510,7 @@ class AutoNumeric {
              * is false, we should ignore `defaultValueOverride` altogether.
              */
             const unLocalizedCurrentValue = this.constructor._toNumericValue(currentValue, this.settings); // This allows to use a localized value on startup
-            if (!this.domElement.hasAttribute('value')) {
+            if (!this.domElement.hasAttribute('value') || this.domElement.getAttribute('value') === '') {
                 // Check if the `value` is valid or not
                 if (!isNaN(Number(unLocalizedCurrentValue)) && Infinity !== unLocalizedCurrentValue) {
                     this.set(unLocalizedCurrentValue);

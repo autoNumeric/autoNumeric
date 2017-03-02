@@ -1,8 +1,8 @@
 /**
  *               autoNumeric.js
  *
- * @version      3.0.0-beta.5
- * @date         2017-03-02 UTC 02:40
+ * @version      3.0.0-beta.6
+ * @date         2017-03-02 UTC 10:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
@@ -990,7 +990,7 @@ class AutoNumeric {
 
     /**
      * Return the current formatted value of the AutoNumeric element as a string
-     * 
+     *
      * @usage anElement.getFormatted()
      *
      * @returns {string}
@@ -1082,7 +1082,7 @@ class AutoNumeric {
     unformat() {
         // this.settings.hasFocus = true; //TODO Is this necessary? //FIXME delete this
         AutoNumericHelper.setElementValue(this.domElement, this.getNumericString());
-        
+
         return this;
     }
 
@@ -1378,7 +1378,7 @@ class AutoNumeric {
      *
      * By default, this use the current element settings.
      * The user can override any option of its choosing by passing an option object.
-     * 
+     *
      * @param {boolean} isFormatting If set to `true`, then the method formats, otherwise if set to `false`, it unformats
      * @param {number|string|HTMLElement|HTMLInputElement} valueOrStringOrElement
      * @param {null|object} optionOverride
@@ -2038,7 +2038,7 @@ class AutoNumeric {
         delete this.autoNumericLocalList;
         //TODO Manage the side effects if this list is undefined (what if we later try to access/modify it?)
     }
-    
+
     _setLocalList(localList) {
         this.autoNumericLocalList = localList;
     }
@@ -6241,7 +6241,7 @@ AutoNumeric.defaultSettings = {
      * The 'progressive' mode will increment/decrement the element value based on its current value. The bigger the number, the bigger the step, and vice versa.
      */
     wheelStep : 'progressive',
-    
+
     /* Defines how the serialize functions should treat the spaces.
      * Those spaces ' ' can either be converted to the plus sign '+', which is the default, or to '%20'.
      * Both values being valid per the spec (http://www.w3.org/Addressing/URL/uri-spec.html).
@@ -6258,7 +6258,7 @@ AutoNumeric.defaultSettings = {
      * false => no warnings are shown, only the thrown errors
      */
     showWarnings: true,
-    
+
     /* Defines if the element should have event listeners activated on it.
      * By default, those event listeners are only added to <input> elements, but not on the other html tags.
      * This allows to initialize <input> elements without any event listeners.

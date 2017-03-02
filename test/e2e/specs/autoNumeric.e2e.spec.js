@@ -84,6 +84,9 @@ const selectors = {
     contentEditable1                  : '#contentEditable1',
     contentEditable2                  : '#contentEditable2',
     contentEditableNotActivated       : '#contentEditableNotActivated',
+    issue403a                         : '#issue_403a',
+    issue403b                         : '#issue_403b',
+    issue403c                         : '#issue_403c',
 };
 
 //-----------------------------------------------------------------------------
@@ -91,10 +94,10 @@ const selectors = {
 
 /*
 function helperGetCaretPosition(wdioElement) { //FIXME Find a way to allow using helper functions inside webdriver.io `execute()` blocks
-    console.log('wdioElement:', wdioElement); //DEBUG 
+    console.log('wdioElement:', wdioElement); //DEBUG
     // console.log('this:', this); //DEBUG
     const selector = wdioElement.selector;
-    console.log('selector:', selector); //DEBUG 
+    console.log('selector:', selector); //DEBUG
 
     const element = document.querySelector(selector);
     console.log('element.selectionStart:', element.selectionStart); //DEBUG 
@@ -1048,4 +1051,100 @@ describe('Elements with the `contenteditable` attribute set to `true`', () => {
     });
 
     //FIXME Add the paste tests (and check the resulting caret position)
+});
+
+describe('Issue #403', () => {
+    it('should tests for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue403a)).toEqual('25.00%');
+    });
+
+    it('should change the input value accordingly when focusing on the element', () => {
+        const inputA = $(selectors.issue403a);
+        const inputB = $(selectors.issue403b);
+
+        // Focus in the input
+        inputA.click();
+
+        // Test the input value while the element is focused
+        expect(browser.getValue(selectors.issue403a)).toEqual('0.25');
+
+        // Focus out of the input
+        inputB.click();
+
+        // Test the input value while the element is not focused
+        expect(browser.getValue(selectors.issue403a)).toEqual('25.00%');
+
+        // Then we cycle back twice just to make sure the value stays the same while tabbing in/out
+        inputA.click();
+        expect(browser.getValue(selectors.issue403a)).toEqual('0.25');
+        inputB.click();
+        expect(browser.getValue(selectors.issue403a)).toEqual('25.00%');
+        inputA.click();
+        expect(browser.getValue(selectors.issue403a)).toEqual('0.25');
+        inputB.click();
+        expect(browser.getValue(selectors.issue403a)).toEqual('25.00%');
+    });
+
+    it('should change the input value accordingly when focusing on the element', () => {
+        const inputA = $(selectors.issue403a);
+        const inputB = $(selectors.issue403b);
+
+        // Focus in the input
+        inputB.click();
+
+        // Set the value
+        browser.keys(['Control', 'a', 'Control', '0.01234']);
+        //browser.keys(['Home', 'Delete', 'Delete', 'Delete', 'Delete', '0.12']); //FIXME à supprimer
+
+        // Test the input value while the element is focused
+        expect(browser.getValue(selectors.issue403b)).toEqual('0.012'); //FIXME à tester
+
+        // Focus out of the input
+        inputA.click();
+
+        // Test the input value while the element is not focused
+        expect(browser.getValue(selectors.issue403b)).toEqual('1.20%');
+
+        // Then we cycle back twice just to make sure the value stays the same while tabbing in/out
+        inputB.click();
+        expect(browser.getValue(selectors.issue403b)).toEqual('0.012');
+        inputA.click();
+        expect(browser.getValue(selectors.issue403b)).toEqual('1.20%');
+
+        inputB.click();
+        expect(browser.getValue(selectors.issue403b)).toEqual('0.012');
+        inputA.click();
+        expect(browser.getValue(selectors.issue403b)).toEqual('1.20%');
+    });
+
+    it('should change the input value accordingly when focusing on the element, with a bigger number of decimal places', () => {
+        const inputB = $(selectors.issue403b);
+        const inputC = $(selectors.issue403c);
+
+        // Focus in the input
+        inputC.click();
+        browser.keys(['1234567.89']);
+
+        // Test the input value while the element is focused
+        expect(browser.getValue(selectors.issue403c)).toEqual('1,234,567.89');
+
+        // Focus out of the input
+        inputB.click();
+
+        // Test the input value while the element is not focused
+        expect(browser.getValue(selectors.issue403c)).toEqual('1.23457MM');
+
+        // Then we cycle back twice just to make sure the value stays the same while tabbing in/out
+        inputC.click();
+        expect(browser.getValue(selectors.issue403c)).toEqual('1,234,567.89');
+        inputB.click();
+        expect(browser.getValue(selectors.issue403c)).toEqual('1.23457MM');
+
+        inputC.click();
+        expect(browser.getValue(selectors.issue403c)).toEqual('1,234,567.89');
+        inputB.click();
+        expect(browser.getValue(selectors.issue403c)).toEqual('1.23457MM');
+    });
 });

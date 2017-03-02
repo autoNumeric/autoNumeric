@@ -1,5 +1,12 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.6"
++ Merge the fixes for #401 and #403 into the v3
+
+### "2.0.9" -> "3.0.0-beta.6"
++ Fix issue #401 autoNumeric 2.0.8 prevents IE11 from entering the decimal character from the numpad
++ Fix issue #403 autoNumeric 2.0.8 scaling option when the divisor is less than zero and the input receives focus multiple times
+
 ### "3.0.0-beta.5"
 + Fix issue #395 Allow to show the unformatted value when hovering over the element and pressing `Alt`
 

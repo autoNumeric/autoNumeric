@@ -386,7 +386,11 @@
 	<div class="testSuite">
 		<div class="test">
 			<p class="description">Issue #403</p>
-			<input id="issue_403" type="text" placeholder="#403" value="0">
+			<div>
+				<input id="issue_403a" type="text" placeholder="#403" value="0.25">
+				<input id="issue_403b" type="text" placeholder="#403" value="0.012">
+				<input id="issue_403c" type="text" placeholder="#403" value="">
+			</div>
 		</div>
 	</div>
 
@@ -768,6 +772,8 @@
 
     //-------------- Issue #403
     new AutoNumeric('#issue_403', { scaleDecimalPlaces: 2, scaleDivisor: 0.01, scaleSymbol: '%' });
+    new AutoNumeric('#issue_403b', { scaleDecimalPlaces: 3, scaleDivisor: 0.01, scaleSymbol: '%', maximumValue: '999.99999' });
+    new AutoNumeric('#issue_403c', { scaleDecimalPlaces: 5, scaleDivisor: 1000000, scaleSymbol: 'MM' });
 
     //-------------- noEventListeners option
     new AutoNumeric('#noEventListeners_option', { noEventListeners: true }).french();

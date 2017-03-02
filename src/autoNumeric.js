@@ -1,8 +1,8 @@
 /**
  *               autoNumeric.js
  *
- * @version      3.0.0-beta.4
- * @date         2017-02-26 UTC 22:00
+ * @version      3.0.0-beta.5
+ * @date         2017-03-02 UTC 02:40
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
@@ -117,6 +117,7 @@ class AutoNumeric {
         // Add the events listeners only on input elements
         if (this.isInputElement || this.isContentEditable) {
             if (!this.settings.noEventListeners) {
+                //XXX Here we make sure the global list is created after creating the event listeners, to only create the event listeners on `document` once
                 this._createEventListeners();
             }
 
@@ -518,7 +519,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '3.0.0-beta.4';
+        return '3.0.0-beta.5';
     }
 
     /**
@@ -673,6 +674,8 @@ class AutoNumeric {
         this._onPasteFunc = e => { this._onPaste(e); };
         this._onWheelFunc = e => { this._onWheel(e); };
         this._onFormSubmitFunc = e => { this._onFormSubmit(e); };
+        this._onKeydownGlobalFunc = e => { this._onKeydownGlobal(e); };
+        this._onKeyupGlobalFunc = e => { this._onKeyupGlobal(e); };
 
         // Add the event listeners
         this.domElement.addEventListener('focusin', this._onFocusInAndMouseEnterFunc, false);
@@ -690,6 +693,12 @@ class AutoNumeric {
         const parentForm = this.form();
         if (!AutoNumericHelper.isNull(parentForm)) {
             parentForm.addEventListener('submit.autoNumeric', this._onFormSubmitFunc, false); //FIXME à tester
+        }
+
+        // Create one global event listener for the keyup event on the document object, which will be shared by all the autoNumeric elements
+        if (!AutoNumeric._doesGlobalListExists()) {
+            document.addEventListener('keydown', this._onKeydownGlobalFunc, false);
+            document.addEventListener('keyup', this._onKeyupGlobalFunc, false);
         }
     }
 
@@ -709,6 +718,9 @@ class AutoNumeric {
         this.domElement.removeEventListener('blur', this._onBlurFunc, false);
         this.domElement.removeEventListener('paste', this._onPasteFunc, false);
         this.domElement.removeEventListener('wheel', this._onWheelFunc, false);
+
+        document.removeEventListener('keydown', this._onKeydownGlobalFunc, false);
+        document.removeEventListener('keyup', this._onKeyupGlobalFunc, false);
 
         const parentForm = this.form();
         if (!AutoNumericHelper.isNull(parentForm)) {
@@ -1848,6 +1860,28 @@ class AutoNumeric {
     }
 
     /**
+     * Unformat the given AutoNumeric element, and update the `hoveredWithAlt` variable.
+     *
+     * @param {AutoNumeric} anElement
+     * @private
+     */
+    static _unformatAltHovered(anElement) {
+        anElement.hoveredWithAlt = true;
+        anElement.unformat();
+    }
+
+    /**
+     * Reformat the given AutoNumeric element, and update the `hoveredWithAlt` variable.
+     *
+     * @param {AutoNumeric} anElement
+     * @private
+     */
+    static _reformatAltHovered(anElement) {
+        anElement.hoveredWithAlt = false;
+        anElement.reformat();
+    }
+
+    /**
      * Return an array of autoNumeric elements, child of the <form> element passed as a parameter.
      *
      * @param {HTMLElement} formNode
@@ -2361,6 +2395,10 @@ class AutoNumeric {
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.readOnly) && !AutoNumericHelper.isBoolean(options.readOnly)) {
             AutoNumericHelper.throwError(`The option 'readOnly' is invalid ; it should be either 'false' or 'true', [${options.readOnly}] given.`);
+        }
+
+        if (!AutoNumericHelper.isTrueOrFalseString(options.unformatOnHover) && !AutoNumericHelper.isBoolean(options.unformatOnHover)) {
+            AutoNumericHelper.throwError(`The option 'unformatOnHover' is invalid ; it should be either 'false' or 'true', [${options.unformatOnHover}] given.`);
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.failOnUnknownOption) && !AutoNumericHelper.isBoolean(options.failOnUnknownOption)) {
@@ -3541,6 +3579,16 @@ class AutoNumeric {
      * @param {Event} e
      */
     _onFocusInAndMouseEnter(e) {
+        if (this.settings.unformatOnHover && e.type === 'mouseenter' && e.altKey) {
+            this.constructor._unformatAltHovered(this);
+
+            return;
+        }
+
+        if (e.type === 'focusin' && this.settings.unformatOnHover && this.hoveredWithAlt) {
+            this.constructor._reformatAltHovered(this);
+        }
+
         if (e.type === 'focusin' || e.type === 'mouseenter' && !this.isFocused && this.settings.emptyInputBehavior === 'focus') {
             this.settings.hasFocus = true;
 
@@ -3647,6 +3695,13 @@ class AutoNumeric {
      * @param {KeyboardEvent} e
      */
     _onKeydown(e) {
+        if (!this.isFocused && this.settings.unformatOnHover && e.altKey && this.domElement === AutoNumericHelper.getHoveredElement()) {
+            // Here I prevent calling _unformatAltHovered if the element is already focused, since the global 'keydown' listener will pick it up as well
+            this.constructor._unformatAltHovered(this);
+
+            return;
+        }
+
         this._updateEventKeycode(e);
         this.initialValueOnKeydown = AutoNumericHelper.getElementValue(e.target); // This is needed in `onKeyup()` to check if the value as changed during the key press
 
@@ -3785,6 +3840,13 @@ class AutoNumeric {
         if (this.settings.isCancellable && this.eventKeyCode === AutoNumericEnum.keyCode.Esc) {
             // If the user wants to cancel its modifications, we drop the 'keyup' event for the Esc key
             e.preventDefault();
+
+            return;
+        }
+
+        if (AutoNumericHelper.character(e) === AutoNumericEnum.keyName.Alt && this.hoveredWithAlt) {
+            this.constructor._reformatAltHovered(this);
+
             return;
         }
 
@@ -3835,6 +3897,12 @@ class AutoNumeric {
      * @param {Event} e
      */
     _onFocusOutAndMouseLeave(e) {
+        if (this.settings.unformatOnHover && e.type === 'mouseleave' && this.hoveredWithAlt) {
+            this.constructor._reformatAltHovered(this);
+
+            return;
+        }
+
         if (!this.isFocused) {
             let value = AutoNumericHelper.getElementValue(e.target);
             const origValue = value;
@@ -4412,6 +4480,39 @@ class AutoNumeric {
     }
 
     /**
+     * Listen for the `alt` key keydown event globally, and if the event is caught, unformat the AutoNumeric element that is hovered by the mouse.
+     *
+     * @param {KeyboardEvent} e
+     * @private
+     */
+    _onKeydownGlobal(e) {
+        //TODO Find a way to keep the caret position between the alt keyup/keydown states
+        if (AutoNumericHelper.character(e) === AutoNumericEnum.keyName.Alt) {
+            const hoveredElement = AutoNumericHelper.getHoveredElement();
+            if (AutoNumeric.isManagedByAutoNumeric(hoveredElement)) {
+                const anElement = AutoNumeric.getAutoNumericElement(hoveredElement);
+                this.constructor._unformatAltHovered(anElement);
+            }
+        }
+    }
+
+    /**
+     * Listen for the `alt` key keyup event globally, and if the event is caught, reformat the AutoNumeric element that is hovered by the mouse.
+     *
+     * @param {KeyboardEvent} e
+     * @private
+     */
+    _onKeyupGlobal(e) {
+        if (AutoNumericHelper.character(e) === AutoNumericEnum.keyName.Alt) {
+            const hoveredElement = AutoNumericHelper.getHoveredElement();
+            if (AutoNumeric.isManagedByAutoNumeric(hoveredElement)) {
+                const anElement = AutoNumeric.getAutoNumericElement(hoveredElement);
+                this.constructor._reformatAltHovered(anElement);
+            }
+        }
+    }
+
+    /**
      * Return `true` if the DOM element is supported by autoNumeric.
      * A supported element is an element whitelisted in the `allowedTagList`.
      *
@@ -4790,6 +4891,7 @@ class AutoNumeric {
             showWarnings                      : true,
             noEventListeners                  : true,
             readOnly                          : true,
+            unformatOnHover                   : true,
             failOnUnknownOption               : true,
             //FIXME Find a way to exclude those internal data from the settings object (ideally by using another object, or better yet, class attributes) -->
             hasFocus                          : true,
@@ -4870,6 +4972,7 @@ class AutoNumeric {
                 tagList         : AutoNumericEnum.allowedTagList,
             });
             this.runOnce = false;
+            this.hoveredWithAlt = false; // Keep tracks if the current aN element is hovered by the mouse cursor while `Alt` is pressed
         }
 
         // Modify the user settings to make them 'exploitable'
@@ -6168,6 +6271,17 @@ AutoNumeric.defaultSettings = {
      */
     readOnly: false,
 
+    /* Defines if the element value should be unformatted when the user hover his mouse over it while holding the `Alt` key.
+     * We reformat back before anything else if :
+     * - the user focus on the element by tabbing or clicking into it,
+     * - the user releases the `Alt` key, and
+     * - if we detect a mouseleave event.
+     *
+     * We unformat again if :
+     * - while the mouse is over the element, the user hit ctrl again
+     */
+    unformatOnHover: true,
+
     /*
      * This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object.
      * You should set that to 'TRUE' if you want to make sure you are only using 'pure' autoNumeric settings objects in your code.
@@ -6396,9 +6510,13 @@ AutoNumeric.options = {
         noEvents : true,
         addEvents: false,
     },
-    readOnly             : {
+    readOnly                     : {
         readOnly : true,
         readWrite: false,
+    },
+    unformatOnHover              : {
+        unformat     : true,
+        doNotUnformat: false,
     },
     failOnUnknownOption          : {
         fail  : true,

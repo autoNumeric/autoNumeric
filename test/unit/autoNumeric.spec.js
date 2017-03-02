@@ -117,6 +117,7 @@ describe('The autoNumeric object', () => {
             showWarnings                 : true,
             noEventListeners             : false,
             readOnly                     : false,
+            unformatOnHover              : true,
             failOnUnknownOption          : false,
         };
 
@@ -2962,6 +2963,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ readOnly: 'true' })).not.toThrow();
             expect(() => AutoNumeric.validate({ readOnly: 'false' })).not.toThrow();
 
+            expect(() => AutoNumeric.validate({ unformatOnHover: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: 'false' })).not.toThrow();
+
             expect(() => AutoNumeric.validate({ failOnUnknownOption: true })).not.toThrow();
             expect(() => AutoNumeric.validate({ failOnUnknownOption: false })).not.toThrow();
             expect(() => AutoNumeric.validate({ failOnUnknownOption: 'true' })).not.toThrow();
@@ -3245,6 +3251,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ readOnly: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ readOnly: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ readOnly: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ unformatOnHover: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: 'foobar' })).toThrow();
 
             expect(() => AutoNumeric.validate({ failOnUnknownOption: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ failOnUnknownOption: 1 })).toThrow();

@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.5"
++ Fix issue #395 Allow to show the unformatted value when hovering over the element and pressing `Alt`
+
 ### "3.0.0-beta.4"
 + Fix issue #396 Allow autoNumeric to manage user inputs in `contentEditable`-enabled elements
 + Simplify the `_formatDefaultValueOnPageLoad()` method signature.

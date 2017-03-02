@@ -1054,4 +1054,14 @@ export default class AutoNumericHelper {
 
         return result;
     }
+
+    /**
+     * Return the top-most hovered item by the mouse cursor.
+     *
+     * @returns {*}
+     */
+    static getHoveredElement() {
+        const hoveredElements = [... document.querySelectorAll(':hover')];
+        return hoveredElements[hoveredElements.length - 1];
+    }
 }

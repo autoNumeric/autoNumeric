@@ -412,16 +412,23 @@
 			<p id="contentEditableNotActivated" contenteditable="false">69.02</p>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #395</p>
+			<input id="issue_395" type="text" placeholder="#395" value="">
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
     const classicInput = document.querySelector('#classic');
-    classicInput.addEventListener('keydown', () => { console.warn('-- Classic "keydown" thrown'); }, false);
-    classicInput.addEventListener('keypress', () => { console.warn('Classic "keypress" thrown'); }, false);
-    classicInput.addEventListener('input', () => { console.warn('Classic "Input" thrown'); }, false);
-    classicInput.addEventListener('keyup', () => { console.warn('Classic "keyup" thrown'); }, false);
-    classicInput.addEventListener('blur', () => { console.warn('Classic "blur" thrown'); }, false);
-    classicInput.addEventListener('change', () => { console.warn('Classic "change" thrown'); }, false);
+    classicInput.addEventListener('keydown', (e) => { console.warn('-- Classic "keydown" thrown', e); }, false);
+    classicInput.addEventListener('keypress', (e) => { console.warn('Classic "keypress" thrown', e); }, false);
+    classicInput.addEventListener('input', (e) => { console.warn('Classic "Input" thrown', e); }, false);
+    classicInput.addEventListener('keyup', (e) => { console.warn('Classic "keyup" thrown', e); }, false);
+    classicInput.addEventListener('blur', (e) => { console.warn('Classic "blur" thrown', e); }, false);
+    classicInput.addEventListener('change', (e) => { console.warn('Classic "change" thrown', e); }, false);
     document.querySelector('form.classic').addEventListener('submit', (e) => {
         console.warn('Classic "submit" thrown');
         e.preventDefault();
@@ -772,6 +779,9 @@
     new AutoNumeric('#contentEditable1').french();
     new AutoNumeric('#contentEditable2').northAmerican();
     new AutoNumeric('#contentEditableNotActivated').swiss();
+
+    //-------------- Issue #395
+    new AutoNumeric('#issue_395', 12234678.321).french();
 </script>
 </body>
 </html>

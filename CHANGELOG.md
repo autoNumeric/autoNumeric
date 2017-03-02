@@ -1,5 +1,9 @@
 ### Change log for autoNumeric:
 
+### "2.0.9"
++ Fix issue #401 autoNumeric 2.0.8 prevents IE11 from entering the decimal character from the numpad
++ Fix issue #403 autoNumeric 2.0.8 scaling option when the divisor is less than zero and the input receives focus multiple times  
+
 ### "2.0.8"
 + Fix issue #389 autoNumeric 2.0.7 npm packages causes build error with typescriptify + browserify
 

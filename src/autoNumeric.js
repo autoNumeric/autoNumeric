@@ -1,8 +1,8 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0.8
- * @date         2017-02-01 UTC 20:00
+ * @version      2.0.9
+ * @date         2017-02-28 UTC 14:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and other Github users,
@@ -673,6 +673,17 @@ const keyName = {
     RightBracket:   ']',
     Backslash:      '\\',
     Quote:          "'",
+    NumpadDot:      '.',
+    NumpadDotAlt:   ',', // Modern browsers automatically adapt the character sent by this key to the decimal character of the current language
+    NumpadMultiply: '*',
+    NumpadPlus:     '+',
+    NumpadMinus:    '-',
+    NumpadSlash:    '/',
+    NumpadDotObsoleteBrowsers:      'Decimal',
+    NumpadMultiplyObsoleteBrowsers: 'Multiply',
+    NumpadPlusObsoleteBrowsers:     'Add',
+    NumpadMinusObsoleteBrowsers:    'Subtract',
+    NumpadSlashObsoleteBrowsers:    'Divide',
 };
 
 const defaultMinimumValue     = '-999999999999.99';
@@ -751,13 +762,13 @@ languageOption.Chinese = languageOption.Japanese; // 中国語 (Chinese)
 (function(factory) {
     //TODO This surely can be improved by letting webpack take care of generating this UMD part
 if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module.
+        // AMD. Register as an anonymous module.
     define(['jquery'], factory);
 } else if (typeof module === 'object' && module.exports) {
-    // Node/CommonJS
+        // Node/CommonJS
     module.exports = factory(require('jquery'));
 } else {
-    // Browser globals
+        // Browser globals
     factory(window.jQuery);
 }
 }($ => {
@@ -979,9 +990,35 @@ if (typeof define === 'function' && define.amd) {
      */
     function character(event) {
         if (typeof event.key === 'undefined' || event.key === 'Unidentified') {
-            return String.fromCharCode(keyCodeNumber(event));
+            return String.fromCharCode(this.keyCodeNumber(event));
         } else {
-            return event.key;
+            // Special case for obsolete browsers like IE that return the old names
+            let result;
+            switch (event.key) {
+                case 'Decimal':
+                    result = keyName.NumpadDot;
+                    break;
+                case 'Multiply':
+                    result = keyName.NumpadMultiply;
+                    break;
+                case 'Add':
+                    result = keyName.NumpadPlus;
+                    break;
+                case 'Subtract':
+                    result = keyName.NumpadMinus;
+                    break;
+                case 'Divide':
+                    result = keyName.NumpadSlash;
+                    break;
+                case 'Del':
+                    // Special workaround for the obsolete browser IE11 which output a 'Delete' key when using the numpad 'dot' one! This fixes issue #401 //FIXME à terminer
+                    result = keyName.Dot; // as of version 2.0.8 the character() function is only called on keypress event. The 'Del' does not throw the keypress event.
+                    break;
+                default:
+                    result = event.key;
+            }
+
+            return result;
         }
     }
 
@@ -3151,18 +3188,23 @@ if (typeof define === 'function' && define.amd) {
                 result = '-' + result;
             }
 
+            let roundedValue;
             if (settings.decimalPlacesShownOnFocus) {
                 settings.decimalPlacesOverride = settings.decimalPlacesShownOnFocus;
-                $this.autoNumeric('set', settings.rawValue);
+                roundedValue = roundValue(settings.rawValue, settings);
+                $this.val(addGroupSeparators(roundedValue, settings));
             } else if (settings.scaleDivisor) {
-                settings.decimalPlacesOverride = settings.oDec;
-                $this.autoNumeric('set', settings.rawValue);
+                settings.decimalPlacesOverride = Number(settings.oDec);
+                roundedValue = roundValue(settings.rawValue, settings);
+                $this.val(addGroupSeparators(roundedValue, settings));
             } else if (settings.noSeparatorOnFocus) {
                 settings.digitGroupSeparator = '';
                 settings.currencySymbol = '';
                 settings.suffixText = '';
-                $this.autoNumeric('set', settings.rawValue);
+                roundedValue = roundValue(settings.rawValue, settings);
+                $this.val(addGroupSeparators(roundedValue, settings));
             } else if (result !== settings.rawValue) {
+                // updates the rawValue
                 $this.autoNumeric('set', result);
             }
 
@@ -3424,7 +3466,7 @@ if (typeof define === 'function' && define.amd) {
                         value = value.toString();
                     }
 
-                    settings.decimalPlacesOverride = (settings.scaleDivisor && settings.scaleDecimalPlaces) ? +settings.scaleDecimalPlaces : settings.decimalPlacesOverride;
+                    settings.decimalPlacesOverride = (settings.scaleDivisor && settings.scaleDecimalPlaces) ? Number(settings.scaleDecimalPlaces) : settings.decimalPlacesOverride;
                     value = roundValue(value, settings);
                     value = modifyNegativeSignAndDecimalCharacterForFormattedValue(value, settings);
                 } else {
@@ -3948,7 +3990,7 @@ if (typeof define === 'function' && define.amd) {
              * Hence, if `defaultValueOverride` is not null, but `input.value` is a number and `$this.attr('value')` is not set,
              * we should ignore `defaultValueOverride` altogether.
              */
-            const unLocalizedCurrentValue = toNumericValue(currentValue, settings); // This allows to use a localized value on startup
+            const unLocalizedCurrentValue = toNumericValue(currentValue, settings); // This allows to use a localized value on startup oDec
             if (settings.formatOnPageLoad && currentValue !== '' && isUndefinedOrNullOrEmpty($this.attr('value'))) {
                 // Check if the `value` is valid or not
                 if (!isNaN(unLocalizedCurrentValue) && Infinity !== unLocalizedCurrentValue) {
@@ -4086,11 +4128,7 @@ if (typeof define === 'function' && define.amd) {
      * @param {object} settings
      */
     function correctDecimalPlacesOverrideOption(settings) {
-        if (!isNull(settings.scaleDivisor) && !isNull(settings.scaleDecimalPlaces)) {
-            // Override the maximum number of decimal places with the one defined with the number of decimals to show when not in focus, if set
-            settings.decimalPlacesOverride = settings.scaleDecimalPlaces;
-        }
-        else if (isNull(settings.decimalPlacesOverride)) {
+        if (isNull(settings.decimalPlacesOverride)) {
             settings.decimalPlacesOverride = maximumVMinAndVMaxDecimalLength(settings.minimumValue, settings.maximumValue);
         }
         settings.oDec = String(settings.decimalPlacesOverride);
@@ -4554,24 +4592,26 @@ if (typeof define === 'function' && define.amd) {
                             let hasBeenRounded = false;
 
                             // rounds the the extended decimal places
+                            let tempDecimal;
                             if (settings.decimalPlacesShownOnFocus) {
-                                const tempDecimal = settings.decimalPlacesOverride;
-                                settings.decimalPlacesOverride = settings.decimalPlacesShownOnFocus;
+                                tempDecimal = settings.decimalPlacesOverride;
+                                settings.decimalPlacesOverride = Number(settings.decimalPlacesShownOnFocus);
                                 value = roundValue(value, settings);
                                 hasBeenRounded = true;
                                 settings.decimalPlacesOverride = tempDecimal;
                             }
 
                             if (settings.scaleDivisor && !settings.onOff) {
+                                value = roundValue(value, settings);
+                                settings.rawValue = cleanLeadingTrailingZeros(value.replace(settings.decimalCharacter, '.'), settings);
                                 value = toNumericValue(value, settings);
                                 value = value / settings.scaleDivisor;
                                 value = value.toString();
                                 if (settings.scaleDecimalPlaces) {
-                                    const tempDecimal = settings.decimalPlacesOverride;
-                                    settings.decimalPlacesOverride = settings.scaleDecimalPlaces;
+                                    tempDecimal = settings.decimalPlacesOverride;
+                                    settings.decimalPlacesOverride = Number(settings.scaleDecimalPlaces);
                                     value = roundValue(value, settings);
                                     hasBeenRounded = true;
-                                    settings.decimalPlacesOverride = tempDecimal;
                                 }
                             }
 
@@ -4581,10 +4621,16 @@ if (typeof define === 'function' && define.amd) {
                             }
 
                             // Stores rawValue including the decimalPlacesShownOnFocus
-                            settings.rawValue = cleanLeadingTrailingZeros(value.replace(settings.decimalCharacter, '.'), settings);
+                            if (!settings.scaleDivisor) {
+                                settings.rawValue = cleanLeadingTrailingZeros(value.replace(settings.decimalCharacter, '.'), settings);
+                            }
 
                             value = modifyNegativeSignAndDecimalCharacterForFormattedValue(value, settings);
                             value = addGroupSeparators(value, settings);
+
+                            if (settings.scaleDivisor && settings.scaleDecimalPlaces && !settings.onOff) {
+                                settings.decimalPlacesOverride = tempDecimal;
+                            }
                         }
 
                         if (settings.saveValueToSessionStorage && (settings.decimalPlacesShownOnFocus || settings.scaleDivisor)) {
@@ -5059,7 +5105,7 @@ if (typeof define === 'function' && define.amd) {
         if (!isInArray(options.negativePositiveSignPlacement, ['p', 's', 'l', 'r', null])) {
             throwError(`The placement of the negative sign option 'negativePositiveSignPlacement' is invalid ; it should either be 'p' (prefix), 's' (suffix), 'l' (left), 'r' (right) or 'null', [${options.negativePositiveSignPlacement}] given.`);
         }
-        
+
         if (!isTrueOrFalseString(options.showPositiveSign) && !isBoolean(options.showPositiveSign)) {
             throwError(`The show positive sign option 'showPositiveSign' is invalid ; it should be either 'false' or 'true', [${options.showPositiveSign}] given.`);
         }

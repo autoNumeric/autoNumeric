@@ -22,7 +22,7 @@ autoNumeric main features are :
 // Initialization
 new AutoNumeric('.myInput', { currencySymbol : '$' });
 ```
-- Very high configurability (more than 38 [options](#options) available)
+- Very high configurability (more than 39 [options](#options) available)
 ```js
 // The options are...optional :)
 const autoNumericOptionsEuro = {
@@ -48,7 +48,7 @@ new AutoNumeric(domElement, autoNumericOptionsEuro);
 - 7 pre-defined [currency options](#predefined-language-options) allows you to directly use autoNumeric by skipping the option configuration step
 - 26 built-in [methods](#methods) gives you the flexibility needed to use autoNumeric to its maximum potential
 - 21 additional [methods](#methods) specialized for managing form submission
-- More than 38 [options](#options) allows you to customize the output format
+- More than 39 [options](#options) allows you to customize the output format
 
 With that said, autoNumeric supports most international numeric formats and currencies including those used in Europe, Asia, and North and South America.
 
@@ -178,6 +178,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | `showPositiveSign` | Allow the positive sign symbol `+` to be displayed for positive numbers | `false` |
 | `showWarnings`| Defines if warnings should be shown | `true` |
 | `suffixText` | Additional text suffix that is added after the number | `''` |
+| `unformatOnHover`| Defines if the element value should be unformatted when the user hover his mouse over it while holding the `Alt` key | `true` |
 | `unformatOnSubmit`| Removes formatting on submit event | `false` |
 | `wheelStep`| Used in conjonction with the `modifyValueOnWheel` option, this allow to either define a *fixed* step (ie. `1000`), or a *progressive* one | `'progressive'` |
 

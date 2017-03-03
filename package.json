@@ -1,7 +1,7 @@
 {
   "name": "autonumeric",
-  "version": "3.0.0-beta.6",
-  "description": "autoNumeric is a library that provides live *as-you-type* formatting for international numbers and currencies. It supports most International numeric formats and currencies including those used in Europe, Asia, and North and South America.",
+  "version": "3.0.0-beta.7",
+  "description": "autoNumeric is a standalone Javascript library that provides live *as-you-type* formatting for international numbers and currencies. It supports most International numeric formats and currencies including those used in Europe, Asia, and North and South America.",
   "main": "src/main.js",
   "readmeFilename": "README.md",
   "keywords": [
@@ -108,8 +108,8 @@
   },
   "scripts": {
     "postinstall": "node yarnfix.js",
-    "build:dev": "webpack src/autoNumeric.js dist/autoNumeric.js --config config/webpack.config.dev.js",
-    "build:prd": "webpack src/autoNumeric.js dist/autoNumeric.min.js --config config/webpack.config.prd.js",
+    "build:dev": "webpack src/AutoNumeric.js dist/autoNumeric.js --config config/webpack.config.dev.js",
+    "build:prd": "webpack src/AutoNumeric.js dist/autoNumeric.min.js --config config/webpack.config.prd.js",
     "build": "yarn clean:build && yarn build:dev && yarn build:prd",
     "clean:build": "rimraf dist",
     "clean:coverage": "rimraf test/unit/coverage",
@@ -138,9 +138,9 @@
     "target": "git://github.com/BobKnothe/autoNumeric.git",
     "basePath": "",
     "files": [
-      "src/autoNumeric.js",
-      "src/autoNumericEnum.js",
-      "src/autoNumericHelper.js",
+      "src/AutoNumeric.js",
+      "src/AutoNumericEnum.js",
+      "src/AutoNumericHelper.js",
       "src/main.js"
     ]
   }

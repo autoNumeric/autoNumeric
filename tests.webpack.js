@@ -1,3 +1,5 @@
+/* global require */
+
 // require all test files (files that ends with .spec.js)
 const testsContext = require.context('./test/unit', true, /\.spec\.js$/);
 testsContext.keys().forEach(testsContext);

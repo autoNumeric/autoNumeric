@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.7"
++ Rename autoNumeric.js to AutoNumeric.js (since it's now a module)
+
 ### "3.0.0-beta.6"
 + Finish merging the fixes for #403 and #401 into v3, and fix the introduced bugs
 + Make sure that if an element is focused, and a `mouseleave` event is captured, we do not unformat the element value (with the scale options).

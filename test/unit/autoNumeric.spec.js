@@ -32,7 +32,7 @@
 // eslint-disable-next-line
 /* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach, spyOn */
 
-import AutoNumeric from '../../src/autoNumeric';
+import AutoNumeric from '../../src/AutoNumeric';
 
 // The autoNumeric tests :
 

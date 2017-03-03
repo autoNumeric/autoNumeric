@@ -30,7 +30,7 @@
 
 /* global module */
 
-import AutoNumeric from './autoNumeric';
+import AutoNumeric from './AutoNumeric';
 
 /**
  * This file serve as the main entry point to the library.

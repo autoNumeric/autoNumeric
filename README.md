@@ -77,9 +77,9 @@ Simply include **autoNumeric** in your html `<header>` tag.<br>No other files or
 ```
 
 #### In another script
-If you want to use AutoNumeric in your code, you can import the `src/autoNumeric.js` file as an ES6 module using:
+If you want to use AutoNumeric in your code, you can import the `src/AutoNumeric.js` file as an ES6 module using:
 ```js
-import AutoNumeric from 'autoNumeric';
+import AutoNumeric from 'AutoNumeric';
 ```
 
 Then you can initialize autoNumeric with or without options :
@@ -576,7 +576,7 @@ yarn lint
 If any errors are shown, you can try to automatically correct them by running :
 ```sh
 # Use the path of the faulty file there :
-./node_modules/eslint/bin/eslint.js --fix src/autoNumeric.js
+./node_modules/eslint/bin/eslint.js --fix src/AutoNumeric.js
 ```
 
 #### How to push?
@@ -598,8 +598,8 @@ The previous stable autoNumeric version v1.9.46 can be found [here](https://gith
 For integration into [Rails](http://rubyonrails.org/) projects, you can use the [autonumeric-rails](https://github.com/randoum/autonumeric-rails) project.
 
 ## Documentation
-A more detailed documentation can be found in the [Documentation](Documentation.md) file.<br>
-For more examples and an option code generator (that may be outdated), take a look [here](http://www.decorplanit.com/plugin/).
+The old and outdated documentation can be found in the [Documentation](Documentation.md) file.<br>
+For some examples and an option code generator for the old v1.9.* version, take a look [here](http://www.decorplanit.com/plugin/).
 
 ## Licence
 autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source project, and its authors are credited in [AUTHORS.md](https://github.com/BobKnothe/autoNumeric/blob/master/AUTHORS.md).

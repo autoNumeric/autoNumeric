@@ -1,8 +1,8 @@
 /**
  *               autoNumeric.js
  *
- * @version      3.0.0-beta.5
- * @date         2017-03-02 UTC 02:40
+ * @version      3.0.0-beta.6
+ * @date         2017-03-02 UTC 10:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
@@ -813,7 +813,7 @@ class AutoNumeric {
         let value = this.constructor._toNumericValue(newValue, this.settings);
         if (isNaN(Number(value))) {
             AutoNumericHelper.setElementValue(this.domElement, '');
-            this.settings.rawValue = ''; //FIXME à tester : this was missing
+            this.settings.rawValue = '';
 
             return this;
         }
@@ -830,25 +830,27 @@ class AutoNumeric {
                 // Ensure rounding does not happen twice
                 let hasBeenRounded = false;
 
-                // rounds the the extended decimal places
+                // Rounds the extended decimal places
+                let tempDecimal;
                 if (this.settings.decimalPlacesShownOnFocus) {
-                    const tempDecimal = this.settings.decimalPlacesOverride;
-                    this.settings.decimalPlacesOverride = this.settings.decimalPlacesShownOnFocus;
+                    tempDecimal = this.settings.decimalPlacesOverride;
+                    this.settings.decimalPlacesOverride = Number(this.settings.decimalPlacesShownOnFocus);
                     value = this.constructor._roundValue(value, this.settings);
                     hasBeenRounded = true;
                     this.settings.decimalPlacesOverride = tempDecimal;
                 }
 
                 if (this.settings.scaleDivisor && !this.settings.hasFocus) {
+                    value = this.constructor._roundValue(value, this.settings);
+                    this.settings.rawValue = this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.'));
                     value = this.constructor._toNumericValue(value, this.settings);
                     value = value / this.settings.scaleDivisor;
                     value = value.toString();
                     if (this.settings.scaleDecimalPlaces) {
-                        const tempDecimal = this.settings.decimalPlacesOverride;
-                        this.settings.decimalPlacesOverride = this.settings.scaleDecimalPlaces;
+                        tempDecimal = this.settings.decimalPlacesOverride;
+                        this.settings.decimalPlacesOverride = Number(this.settings.scaleDecimalPlaces);
                         value = this.constructor._roundValue(value, this.settings);
                         hasBeenRounded = true;
-                        this.settings.decimalPlacesOverride = tempDecimal;
                     }
                 }
 
@@ -858,10 +860,16 @@ class AutoNumeric {
                 }
 
                 // Stores rawValue including the decimalPlacesShownOnFocus
-                this.settings.rawValue = this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.'));
+                if (!this.settings.scaleDivisor) {
+                    this.settings.rawValue = this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.'));
+                }
 
                 value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
                 value = this.constructor._addGroupSeparators(value, this.settings);
+
+                if (this.settings.scaleDivisor && this.settings.scaleDecimalPlaces && !this.settings.hasFocus) {
+                    this.settings.decimalPlacesOverride = tempDecimal;
+                }
 
                 if (this.settings.saveValueToSessionStorage && (this.settings.decimalPlacesShownOnFocus || this.settings.scaleDivisor)) {
                     this._saveValueToPersistentStorage('set');
@@ -888,7 +896,7 @@ class AutoNumeric {
             }
         } else {
             AutoNumericHelper.setElementValue(this.domElement, '');
-            this.settings.rawValue = ''; //FIXME à tester : this was missing
+            this.settings.rawValue = '';
 
             return this;
         }
@@ -990,7 +998,7 @@ class AutoNumeric {
 
     /**
      * Return the current formatted value of the AutoNumeric element as a string
-     * 
+     *
      * @usage anElement.getFormatted()
      *
      * @returns {string}
@@ -1082,7 +1090,7 @@ class AutoNumeric {
     unformat() {
         // this.settings.hasFocus = true; //TODO Is this necessary? //FIXME delete this
         AutoNumericHelper.setElementValue(this.domElement, this.getNumericString());
-        
+
         return this;
     }
 
@@ -1378,7 +1386,7 @@ class AutoNumeric {
      *
      * By default, this use the current element settings.
      * The user can override any option of its choosing by passing an option object.
-     * 
+     *
      * @param {boolean} isFormatting If set to `true`, then the method formats, otherwise if set to `false`, it unformats
      * @param {number|string|HTMLElement|HTMLInputElement} valueOrStringOrElement
      * @param {null|object} optionOverride
@@ -2038,7 +2046,7 @@ class AutoNumeric {
         delete this.autoNumericLocalList;
         //TODO Manage the side effects if this list is undefined (what if we later try to access/modify it?)
     }
-    
+
     _setLocalList(localList) {
         this.autoNumericLocalList = localList;
     }
@@ -3604,19 +3612,26 @@ class AutoNumeric {
                 result = '-' + result;
             }
 
+            let updateElementValue = false;
             if (this.settings.decimalPlacesShownOnFocus) {
                 this.settings.decimalPlacesOverride = this.settings.decimalPlacesShownOnFocus;
-                this.set(this.settings.rawValue);
-            } else if (this.settings.scaleDivisor) {
-                this.settings.decimalPlacesOverride = this.settings.originalDecimalPlacesOverride;
-                this.set(this.settings.rawValue);
+                updateElementValue = true;
+            } else if (this.settings.scaleDivisor && this.settings.rawValue !== '') {
+                // Prevent changing the element value if it's empty (so we don't end up having a '0.000scaleSymbol' value after a mouseenter/mouseleave cycle)
+                this.settings.decimalPlacesOverride = Number(this.settings.originalDecimalPlacesOverride);
+                updateElementValue = true;
             } else if (this.settings.noSeparatorOnFocus) {
                 this.settings.digitGroupSeparator = '';
                 this.settings.currencySymbol = '';
                 this.settings.suffixText = '';
-                this.set(this.settings.rawValue);
+                updateElementValue = true;
             } else if (result !== this.settings.rawValue) {
-                this.set(result);
+                this.set(result); // This update the rawValue
+            }
+
+            if (updateElementValue) {
+                const roundedValue = this.constructor._roundValue(this.settings.rawValue, this.settings);
+                AutoNumericHelper.setElementValue(this.domElement, this.constructor._addGroupSeparators(roundedValue, this.settings));
             }
 
             // In order to send a 'native' change event when blurring the input, we need to first store the initial input value on focus.
@@ -3903,7 +3918,7 @@ class AutoNumeric {
             return;
         }
 
-        if (!this.isFocused) {
+        if ((e.type === 'mouseleave' && !this.isFocused) || e.type === 'blur') {
             let value = AutoNumericHelper.getElementValue(e.target);
             const origValue = value;
             this.settings.hasFocus = false;
@@ -3942,7 +3957,7 @@ class AutoNumeric {
                         value = value.toString();
                     }
 
-                    this.settings.decimalPlacesOverride = (this.settings.scaleDivisor && this.settings.scaleDecimalPlaces) ? +this.settings.scaleDecimalPlaces : this.settings.decimalPlacesOverride;
+                    this.settings.decimalPlacesOverride = (this.settings.scaleDivisor && this.settings.scaleDecimalPlaces) ? Number(this.settings.scaleDecimalPlaces) : this.settings.decimalPlacesOverride;
                     value = this.constructor._roundValue(value, this.settings);
                     value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
                 } else {
@@ -3970,7 +3985,10 @@ class AutoNumeric {
             }
 
             if (groupedValue !== origValue) {
-                groupedValue = (this.settings.scaleSymbol) ? groupedValue + this.settings.scaleSymbol : groupedValue;
+                if (this.settings.scaleSymbol) {
+                    groupedValue = `${groupedValue}${this.settings.scaleSymbol}`;
+                }
+
                 AutoNumericHelper.setElementValue(this.domElement, groupedValue);
             }
 
@@ -4740,11 +4758,7 @@ class AutoNumeric {
      * Modify `decimalPlacesOverride` as needed
      */
     _correctDecimalPlacesOverrideOption() {
-        if (!AutoNumericHelper.isNull(this.settings.scaleDivisor) && !AutoNumericHelper.isNull(this.settings.scaleDecimalPlaces)) {
-            // Override the maximum number of decimal places with the one defined with the number of decimals to show when not in focus, if set
-            this.settings.decimalPlacesOverride = this.settings.scaleDecimalPlaces;
-        }
-        else if (AutoNumericHelper.isNull(this.settings.decimalPlacesOverride)) {
+        if (AutoNumericHelper.isNull(this.settings.decimalPlacesOverride)) {
             this.settings.decimalPlacesOverride = this.constructor._maximumVMinAndVMaxDecimalLength(this.settings.minimumValue, this.settings.maximumValue);
         }
         this.settings.originalDecimalPlacesOverride = String(this.settings.decimalPlacesOverride);
@@ -6241,7 +6255,7 @@ AutoNumeric.defaultSettings = {
      * The 'progressive' mode will increment/decrement the element value based on its current value. The bigger the number, the bigger the step, and vice versa.
      */
     wheelStep : 'progressive',
-    
+
     /* Defines how the serialize functions should treat the spaces.
      * Those spaces ' ' can either be converted to the plus sign '+', which is the default, or to '%20'.
      * Both values being valid per the spec (http://www.w3.org/Addressing/URL/uri-spec.html).
@@ -6258,7 +6272,7 @@ AutoNumeric.defaultSettings = {
      * false => no warnings are shown, only the thrown errors
      */
     showWarnings: true,
-    
+
     /* Defines if the element should have event listeners activated on it.
      * By default, those event listeners are only added to <input> elements, but not on the other html tags.
      * This allows to initialize <input> elements without any event listeners.

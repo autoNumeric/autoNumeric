@@ -318,6 +318,13 @@ export default class AutoNumericHelper {
                 case 'Divide':
                     result = AutoNumericEnum.keyName.NumpadSlash;
                     break;
+                case 'Del':
+                    // Special workaround for the obsolete browser IE11 which output a 'Delete' key when using the numpad 'dot' one! This fixes issue #401
+                    //FIXME This workaround will break the usage of the 'Delete' key for Firefox <=36, and IE9, since those browser send 'Del' instead of 'Delete'
+                    // As of version 2.0.9, when the character() function is called, it's never to test for the 'Delete' key name
+                    // The 'Del' does not throw the keypress event so right now this hack is acceptable (but could bite us back if we where to use the `character()` functions in other events.
+                    result = AutoNumericEnum.keyName.Dot;
+                    break;
                 default:
                     result = event.key;
             }

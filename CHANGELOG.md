@@ -1,5 +1,16 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.6"
++ Finish merging the fixes for #403 and #401 into v3, and fix the introduced bugs
++ Make sure that if an element is focused, and a `mouseleave` event is captured, we do not unformat the element value (with the scale options).
++ Make sure if the element value is empty, that the scaleDivisor option do not convert it to `'0.00'` on `mouseenter`.
++ Remove a ternary operator which lead to a variable overwriting itself.
++ Fix the end-to-end tests which test the percentage with the scale options.
+
+### "2.0.9"
++ Fix issue #401 autoNumeric 2.0.8 prevents IE11 from entering the decimal character from the numpad
++ Fix issue #403 autoNumeric 2.0.8 scaling option when the divisor is less than zero and the input receives focus multiple times
+
 ### "3.0.0-beta.5"
 + Fix issue #395 Allow to show the unformatted value when hovering over the element and pressing `Alt`
 

@@ -43,7 +43,6 @@
  */
 
 /* global module */
-//FIXME Rename autoNumeric.js into AutoNumeric.js
 
 //TODO Prevent having to enter relative path in the js files (ie. using `./AutoNumericHelper` instead of just `AutoNumericHelper`) (cf. http://moduscreate.com/es6-es2015-import-no-relative-path-webpack/)
 import AutoNumericHelper from './AutoNumericHelper';

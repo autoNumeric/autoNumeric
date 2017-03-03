@@ -454,7 +454,7 @@
     }, false);
 
     //-------------- Initializing AutoNumeric on non-<input> tags
-    new AutoNumeric('#tag_p1', { scaleDecimalPlaces: 3, scaleDivisor: 0.01, scaleSymbol: '%', maximumValue: '999.999' });
+    new AutoNumeric('#tag_p1', { scaleDecimalPlaces: 3, scaleDivisor: 0.01, scaleSymbol: '%', maximumValue: '999.9999' });
     new AutoNumeric('#tag_p2', 666.42).french();
     new AutoNumeric('#tag_code', AutoNumeric.getLanguages().Japanese);
     new AutoNumeric('#tag_div').northAmerican();
@@ -771,7 +771,7 @@
     new AutoNumeric('#issue_393_limitOneSideDown', { modifyValueOnWheel: true, wheelStep: 'progressive', minimumValue: '-75999', maximumValue: '-52500' });
 
     //-------------- Issue #403
-    new AutoNumeric('#issue_403', { scaleDecimalPlaces: 2, scaleDivisor: 0.01, scaleSymbol: '%' });
+    new AutoNumeric('#issue_403a', { scaleDecimalPlaces: 2, scaleDivisor: 0.01, scaleSymbol: '%' });
     new AutoNumeric('#issue_403b', { scaleDecimalPlaces: 3, scaleDivisor: 0.01, scaleSymbol: '%', maximumValue: '999.99999' });
     new AutoNumeric('#issue_403c', { scaleDecimalPlaces: 5, scaleDivisor: 1000000, scaleSymbol: 'MM' });
 

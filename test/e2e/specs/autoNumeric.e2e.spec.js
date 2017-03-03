@@ -186,7 +186,7 @@ describe('Initialized non-input elements', () => {
         browser.url(testUrl);
 
         /* eslint space-in-parens: 0 */
-        expect(browser.getText(selectors.elementP1   )).toEqual('2.139%');
+        expect(browser.getText(selectors.elementP1   )).toEqual('2.140%');
         expect(browser.getText(selectors.elementP2   )).toEqual('666,42 €');
         expect(browser.getText(selectors.elementCode )).toEqual('¥12,345.67');
         expect(browser.getText(selectors.elementDiv  )).toEqual('$12,345.67');
@@ -1058,6 +1058,8 @@ describe('Issue #403', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue403a)).toEqual('25.00%');
+        expect(browser.getValue(selectors.issue403b)).toEqual('1.200%');
+        expect(browser.getValue(selectors.issue403c)).toEqual('');
     });
 
     it('should change the input value accordingly when focusing on the element', () => {
@@ -1096,27 +1098,26 @@ describe('Issue #403', () => {
 
         // Set the value
         browser.keys(['Control', 'a', 'Control', '0.01234']);
-        //browser.keys(['Home', 'Delete', 'Delete', 'Delete', 'Delete', '0.12']); //FIXME à supprimer
 
         // Test the input value while the element is focused
-        expect(browser.getValue(selectors.issue403b)).toEqual('0.012'); //FIXME à tester
+        expect(browser.getValue(selectors.issue403b)).toEqual('0.01234');
 
         // Focus out of the input
         inputA.click();
 
         // Test the input value while the element is not focused
-        expect(browser.getValue(selectors.issue403b)).toEqual('1.20%');
+        expect(browser.getValue(selectors.issue403b)).toEqual('1.234%');
 
         // Then we cycle back twice just to make sure the value stays the same while tabbing in/out
         inputB.click();
-        expect(browser.getValue(selectors.issue403b)).toEqual('0.012');
+        expect(browser.getValue(selectors.issue403b)).toEqual('0.01234');
         inputA.click();
-        expect(browser.getValue(selectors.issue403b)).toEqual('1.20%');
+        expect(browser.getValue(selectors.issue403b)).toEqual('1.234%');
 
         inputB.click();
-        expect(browser.getValue(selectors.issue403b)).toEqual('0.012');
+        expect(browser.getValue(selectors.issue403b)).toEqual('0.01234');
         inputA.click();
-        expect(browser.getValue(selectors.issue403b)).toEqual('1.20%');
+        expect(browser.getValue(selectors.issue403b)).toEqual('1.234%');
     });
 
     it('should change the input value accordingly when focusing on the element, with a bigger number of decimal places', () => {

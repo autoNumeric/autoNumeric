@@ -813,7 +813,7 @@ class AutoNumeric {
         let value = this.constructor._toNumericValue(newValue, this.settings);
         if (isNaN(Number(value))) {
             AutoNumericHelper.setElementValue(this.domElement, '');
-            this.settings.rawValue = ''; //FIXME à tester : this was missing
+            this.settings.rawValue = '';
 
             return this;
         }
@@ -830,25 +830,27 @@ class AutoNumeric {
                 // Ensure rounding does not happen twice
                 let hasBeenRounded = false;
 
-                // rounds the the extended decimal places
+                // Rounds the extended decimal places
+                let tempDecimal;
                 if (this.settings.decimalPlacesShownOnFocus) {
-                    const tempDecimal = this.settings.decimalPlacesOverride;
-                    this.settings.decimalPlacesOverride = this.settings.decimalPlacesShownOnFocus;
+                    tempDecimal = this.settings.decimalPlacesOverride;
+                    this.settings.decimalPlacesOverride = Number(this.settings.decimalPlacesShownOnFocus);
                     value = this.constructor._roundValue(value, this.settings);
                     hasBeenRounded = true;
                     this.settings.decimalPlacesOverride = tempDecimal;
                 }
 
                 if (this.settings.scaleDivisor && !this.settings.hasFocus) {
+                    value = this.constructor._roundValue(value, this.settings);
+                    this.settings.rawValue = this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.'));
                     value = this.constructor._toNumericValue(value, this.settings);
                     value = value / this.settings.scaleDivisor;
                     value = value.toString();
                     if (this.settings.scaleDecimalPlaces) {
-                        const tempDecimal = this.settings.decimalPlacesOverride;
-                        this.settings.decimalPlacesOverride = this.settings.scaleDecimalPlaces;
+                        tempDecimal = this.settings.decimalPlacesOverride;
+                        this.settings.decimalPlacesOverride = Number(this.settings.scaleDecimalPlaces);
                         value = this.constructor._roundValue(value, this.settings);
                         hasBeenRounded = true;
-                        this.settings.decimalPlacesOverride = tempDecimal;
                     }
                 }
 
@@ -858,10 +860,16 @@ class AutoNumeric {
                 }
 
                 // Stores rawValue including the decimalPlacesShownOnFocus
-                this.settings.rawValue = this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.'));
+                if (!this.settings.scaleDivisor) {
+                    this.settings.rawValue = this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.'));
+                }
 
                 value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
                 value = this.constructor._addGroupSeparators(value, this.settings);
+
+                if (this.settings.scaleDivisor && this.settings.scaleDecimalPlaces && !this.settings.hasFocus) {
+                    this.settings.decimalPlacesOverride = tempDecimal;
+                }
 
                 if (this.settings.saveValueToSessionStorage && (this.settings.decimalPlacesShownOnFocus || this.settings.scaleDivisor)) {
                     this._saveValueToPersistentStorage('set');
@@ -888,7 +896,7 @@ class AutoNumeric {
             }
         } else {
             AutoNumericHelper.setElementValue(this.domElement, '');
-            this.settings.rawValue = ''; //FIXME à tester : this was missing
+            this.settings.rawValue = '';
 
             return this;
         }
@@ -3604,19 +3612,26 @@ class AutoNumeric {
                 result = '-' + result;
             }
 
+            let updateElementValue = false;
             if (this.settings.decimalPlacesShownOnFocus) {
                 this.settings.decimalPlacesOverride = this.settings.decimalPlacesShownOnFocus;
-                this.set(this.settings.rawValue);
-            } else if (this.settings.scaleDivisor) {
-                this.settings.decimalPlacesOverride = this.settings.originalDecimalPlacesOverride;
-                this.set(this.settings.rawValue);
+                updateElementValue = true;
+            } else if (this.settings.scaleDivisor && this.settings.rawValue !== '') {
+                // Prevent changing the element value if it's empty (so we don't end up having a '0.000scaleSymbol' value after a mouseenter/mouseleave cycle)
+                this.settings.decimalPlacesOverride = Number(this.settings.originalDecimalPlacesOverride);
+                updateElementValue = true;
             } else if (this.settings.noSeparatorOnFocus) {
                 this.settings.digitGroupSeparator = '';
                 this.settings.currencySymbol = '';
                 this.settings.suffixText = '';
-                this.set(this.settings.rawValue);
+                updateElementValue = true;
             } else if (result !== this.settings.rawValue) {
-                this.set(result);
+                this.set(result); // This update the rawValue
+            }
+
+            if (updateElementValue) {
+                const roundedValue = this.constructor._roundValue(this.settings.rawValue, this.settings);
+                AutoNumericHelper.setElementValue(this.domElement, this.constructor._addGroupSeparators(roundedValue, this.settings));
             }
 
             // In order to send a 'native' change event when blurring the input, we need to first store the initial input value on focus.
@@ -3903,7 +3918,7 @@ class AutoNumeric {
             return;
         }
 
-        if (!this.isFocused) {
+        if ((e.type === 'mouseleave' && !this.isFocused) || e.type === 'blur') {
             let value = AutoNumericHelper.getElementValue(e.target);
             const origValue = value;
             this.settings.hasFocus = false;
@@ -3942,7 +3957,7 @@ class AutoNumeric {
                         value = value.toString();
                     }
 
-                    this.settings.decimalPlacesOverride = (this.settings.scaleDivisor && this.settings.scaleDecimalPlaces) ? +this.settings.scaleDecimalPlaces : this.settings.decimalPlacesOverride;
+                    this.settings.decimalPlacesOverride = (this.settings.scaleDivisor && this.settings.scaleDecimalPlaces) ? Number(this.settings.scaleDecimalPlaces) : this.settings.decimalPlacesOverride;
                     value = this.constructor._roundValue(value, this.settings);
                     value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
                 } else {
@@ -3970,7 +3985,10 @@ class AutoNumeric {
             }
 
             if (groupedValue !== origValue) {
-                groupedValue = (this.settings.scaleSymbol) ? groupedValue + this.settings.scaleSymbol : groupedValue;
+                if (this.settings.scaleSymbol) {
+                    groupedValue = `${groupedValue}${this.settings.scaleSymbol}`;
+                }
+
                 AutoNumericHelper.setElementValue(this.domElement, groupedValue);
             }
 
@@ -4740,11 +4758,7 @@ class AutoNumeric {
      * Modify `decimalPlacesOverride` as needed
      */
     _correctDecimalPlacesOverrideOption() {
-        if (!AutoNumericHelper.isNull(this.settings.scaleDivisor) && !AutoNumericHelper.isNull(this.settings.scaleDecimalPlaces)) {
-            // Override the maximum number of decimal places with the one defined with the number of decimals to show when not in focus, if set
-            this.settings.decimalPlacesOverride = this.settings.scaleDecimalPlaces;
-        }
-        else if (AutoNumericHelper.isNull(this.settings.decimalPlacesOverride)) {
+        if (AutoNumericHelper.isNull(this.settings.decimalPlacesOverride)) {
             this.settings.decimalPlacesOverride = this.constructor._maximumVMinAndVMaxDecimalLength(this.settings.minimumValue, this.settings.maximumValue);
         }
         this.settings.originalDecimalPlacesOverride = String(this.settings.decimalPlacesOverride);

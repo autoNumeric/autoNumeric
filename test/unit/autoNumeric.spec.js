@@ -1343,7 +1343,7 @@ describe('The autoNumeric object', () => {
             document.body.appendChild(span);
 
             expect(() => new AutoNumeric(newInput)).not.toThrow();
-            expect(new AutoNumeric(p1, { scaleDecimalPlaces: 3, scaleDivisor: 0.01, scaleSymbol: '%', maximumValue: '999.999' }).getFormatted()).toEqual('2.139%');
+            expect(new AutoNumeric(p1, { scaleDecimalPlaces: 3, scaleDivisor: 0.01, scaleSymbol: '%', maximumValue: '999.9999' }).getFormatted()).toEqual('2.140%');
             expect(new AutoNumeric(p2, 666.42).french().getFormatted()).toEqual('666,42 €');
             expect(new AutoNumeric(code, AutoNumeric.getLanguages().Japanese).getFormatted()).toEqual('¥12,345.67');
             expect(new AutoNumeric(div).northAmerican().getFormatted()).toEqual('$12,345.67');

@@ -87,6 +87,19 @@ const selectors = {
     issue403a                         : '#issue_403a',
     issue403b                         : '#issue_403b',
     issue403c                         : '#issue_403c',
+    negativeBrackets1                 : '#negativeBrackets1',
+    negativeBrackets2                 : '#negativeBrackets2',
+    negativeBrackets3                 : '#negativeBrackets3',
+    negativeBrackets4                 : '#negativeBrackets4',
+    negativeBrackets5                 : '#negativeBrackets5',
+    negativeBracketsInput1            : '#negativeBrackets_1',
+    negativeBracketsInput2            : '#negativeBrackets_2',
+    negativeBracketsInput3            : '#negativeBrackets_3',
+    negativeBracketsInput4            : '#negativeBrackets_4',
+    negativeBracketsInput5            : '#negativeBrackets_5',
+    negativeBracketsInput6            : '#negativeBrackets_6',
+    negativeBracketsInput7            : '#negativeBrackets_7',
+    negativeBracketsInput8            : '#negativeBrackets_8',
 };
 
 //-----------------------------------------------------------------------------
@@ -1147,5 +1160,98 @@ describe('Issue #403', () => {
         expect(browser.getValue(selectors.issue403c)).toEqual('1,234,567.89');
         inputB.click();
         expect(browser.getValue(selectors.issue403c)).toEqual('1.23457MM');
+    });
+});
+
+describe('Negative numbers & brackets notations', () => {
+    it('should tests for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.negativeBrackets1)).toEqual('[1.352.468,24 €]');
+        expect(browser.getValue(selectors.negativeBrackets2)).toEqual('<$1,352,468.24>');
+        expect(browser.getValue(selectors.negativeBrackets3)).toEqual("{1'352'468.24 CHF}");
+        expect(browser.getValue(selectors.negativeBrackets4)).toEqual('(1.352.468,24 €)');
+        expect(browser.getValue(selectors.negativeBrackets5)).toEqual('$-1,352,468.24');
+
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('(1.234,57 €)');
+    });
+
+    it('should hide the parenthesis on focus', () => {
+        const negativeBrackets1 = $(selectors.negativeBrackets1);
+
+        // Focus in the input
+        negativeBrackets1.click();
+        expect(browser.getValue(selectors.negativeBrackets1)).toEqual('-1.352.468,24 €');
+    });
+
+    it('should show the parenthesis back on blur', () => {
+        const negativeBrackets2 = $(selectors.negativeBrackets2);
+
+        // Focus on another the input
+        negativeBrackets2.click();
+        expect(browser.getValue(selectors.negativeBrackets1)).toEqual('[1.352.468,24 €]');
+        expect(browser.getValue(selectors.negativeBrackets2)).toEqual('$-1,352,468.24');
+    });
+
+    it('should not show the parenthesis back on blur if the value has changed for a positive one', () => {
+        const negativeBrackets1 = $(selectors.negativeBrackets1);
+        const negativeBrackets2 = $(selectors.negativeBrackets2);
+
+        // Focus in the input
+        negativeBrackets1.click();
+        browser.keys(['Home', 'Delete']);
+        expect(browser.getValue(selectors.negativeBrackets1)).toEqual('1.352.468,24 €');
+        // Focus on another the input
+        negativeBrackets2.click();
+        expect(browser.getValue(selectors.negativeBrackets1)).toEqual('1.352.468,24 €');
+    });
+
+    it('should hide the parenthesis on focus for each variations of the currency and negative sign placements', () => {
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+        const negativeBracketsInput2 = $(selectors.negativeBracketsInput2);
+        const negativeBracketsInput3 = $(selectors.negativeBracketsInput3);
+        const negativeBracketsInput4 = $(selectors.negativeBracketsInput4);
+        const negativeBracketsInput5 = $(selectors.negativeBracketsInput5);
+        const negativeBracketsInput6 = $(selectors.negativeBracketsInput6);
+        const negativeBracketsInput7 = $(selectors.negativeBracketsInput7);
+        const negativeBracketsInput8 = $(selectors.negativeBracketsInput8);
+
+        // Focus in the input
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+        negativeBracketsInput2.click();
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57-');
+        negativeBracketsInput3.click();
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ -1.234,57');
+        negativeBracketsInput4.click();
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('-€ 1.234,57');
+        negativeBracketsInput5.click();
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+        negativeBracketsInput6.click();
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57- €');
+        negativeBracketsInput7.click();
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €-');
+        negativeBracketsInput8.click();
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('-1.234,57 €');
+
+        // Focus elsewhere
+        $(selectors.negativeBrackets1).click();
+
+        // Check that the values are back with the parenthesis
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('(1.234,57 €)');
     });
 });

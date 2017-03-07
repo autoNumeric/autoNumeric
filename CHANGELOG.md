@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.8"
++ Fix issue #408 Allow brackets and parenthesis to be added for negative numbers on any combination of `currencySymbolPlacement` and `negativePositiveSignPlacement` values
+
 ### "3.0.0-beta.7"
 + Rename autoNumeric.js to AutoNumeric.js (since it's now a module)
 

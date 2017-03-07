@@ -1,16 +1,17 @@
 /**
  *               AutoNumeric.js
  *
- * @version      3.0.0-beta.7
- * @date         2017-03-03 UTC 20:40
+ * @version      3.0.0-beta.8
+ * @date         2017-03-07 UTC 03:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
  * @copyright    2009 Robert J. Knothe http://www.decorplanit.com/plugin/
  * @since        2009-08-09
  *
- * @summary      autoNumeric is a library that provides live as-you-type
- *               formatting for international numbers and currencies.
+ * @summary      autoNumeric is a standalone Javascript library
+ *               that provides live *as-you-type* formatting for
+ *               international numbers and currencies.
  *
  *               Note : Some functions are borrowed from big.js
  * @link         https://github.com/MikeMcl/big.js/
@@ -518,7 +519,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '3.0.0-beta.7';
+        return '3.0.0-beta.8';
     }
 
     /**
@@ -969,8 +970,7 @@ class AutoNumeric {
             }
 
             if (value !== '' && this.settings.negativeBracketsTypeOnBlur !== null) {
-                this.settings.hasFocus = true; //TODO Why do we set the focus information here? That's not logical and should be removed. //FIXME delete this
-                value = this.constructor._toggleNegativeBracket(value, this.settings);
+                value = this.constructor._removeBrackets(value, this.settings);
             }
 
             if (this.runOnce || this.settings.formatOnPageLoad === false) {
@@ -2557,8 +2557,7 @@ class AutoNumeric {
             settings.negativeSignCharacter = '-';
         } else if (settings.negativeBracketsTypeOnBlur && settings.negativeBracketsTypeOnBlur.split(',')[0] === value.charAt(0)) {
             settings.negativeSignCharacter = '-';
-            settings.hasFocus = true; //TODO Why do we set the focus information here? That's not logical and should be removed. //FIXME delete this
-            value = this._toggleNegativeBracket(value, settings);
+            value = this._removeBrackets(value, settings);
         }
 
         value = value.replace(autoStrip, '');
@@ -2888,31 +2887,79 @@ class AutoNumeric {
     /**
      * Sets or removes brackets on negative values, depending on the focus state.
      * The focus state is 'stored' in the settings object under the `settings.hasFocus` attribute.
-     * //TODO Use another object to keep track of internal data that are not settings
      *
-     * @param {string} s
+     * @param {string} value
      * @param {object} settings
      * @returns {*}
      */
-    static _toggleNegativeBracket(s, settings) {
+    static _toggleNegativeBracket(value, settings) {
         //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
-        if ((settings.currencySymbolPlacement === 'p' && settings.negativePositiveSignPlacement === 'l') ||
-            (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement === 'p')) {
-            //TODO Split the first and last bracket only once during the settings initialization
-            const [firstBracket, lastBracket] = settings.negativeBracketsTypeOnBlur.split(',');
-            if (!settings.hasFocus) {
-                // Add brackets
-                s = s.replace(settings.negativeSignCharacter, '');
-                s = firstBracket + s + lastBracket;
-            } else if (settings.hasFocus && s.charAt(0) === firstBracket) {
-                // Remove brackets
-                //TODO Quid if the negative sign is not on the left, shouldn't we replace the '-' sign at the right place?
-                s = s.replace(firstBracket, settings.negativeSignCharacter);
-                s = s.replace(lastBracket, '');
-            }
+        let result;
+        if (settings.hasFocus) {
+            result = this._removeBrackets(value, settings);
+        } else {
+            result = this._addBrackets(value, settings);
         }
 
-        return s;
+        return result;
+    }
+
+    /**
+     * Add the bracket types specified in the `settings` object, to the given string `value`.
+     *
+     * @param {string} value
+     * @param {object} settings
+     * @returns {string}
+     * @private
+     */
+    static _addBrackets(value, settings) {
+        let result;
+        if (!AutoNumericHelper.isNull(settings.negativeBracketsTypeOnBlur)) {
+            result = `${settings.firstBracket}${value.replace(settings.negativeSignCharacter, '')}${settings.lastBracket}`;
+        } else {
+            result = value;
+        }
+
+        return result;
+    }
+
+    /**
+     * Remove the bracket types specified in the `settings` object, from the given string `value`.
+     *
+     * @param {string} value
+     * @param {object} settings
+     * @returns {string}
+     * @private
+     */
+    static _removeBrackets(value, settings) {
+        let result;
+        if (!AutoNumericHelper.isNull(settings.negativeBracketsTypeOnBlur) && value.charAt(0) === settings.firstBracket) {
+            // Remove the brackets if they are present
+            result = value.replace(settings.firstBracket, '');
+            result = result.replace(settings.lastBracket, '');
+
+            // Add back the negative sign at the right place
+            // First we need to remove the currency symbol from the value, since we want to be able to add back the negative sign at the right place (including between the value and the currency sign)
+            result = result.replace(settings.currencySymbol, '');
+            result = this._mergeCurrencySignNegativePositiveSignAndValue(result, settings, true, false); //TODO This assume the value is negative and non-empty. Is this always the case?
+        } else {
+            result = value;
+        }
+
+        return result;
+    }
+
+    /**
+     * Analyze the `negativeBracketsTypeOnBlur` options and keep track of the first and last bracket characters to use.
+     * @private
+     */
+    _setBrackets() {
+        if (!AutoNumericHelper.isNull(this.settings.negativeBracketsTypeOnBlur)) {
+            [this.settings.firstBracket, this.settings.lastBracket] = this.settings.negativeBracketsTypeOnBlur.split(',');
+        } else {
+            this.settings.firstBracket = '';
+            this.settings.lastBracket = '';
+        }
     }
 
     /**
@@ -3074,7 +3121,9 @@ class AutoNumeric {
 
         const empty = this._checkEmpty(inputValue, settings, true);
         const isValueNegative = AutoNumericHelper.isNegative(inputValue);
-        const isZero = AutoNumericHelper.isZeroOrHasNoValue(inputValue);
+        const isZeroOrHasNoValue = AutoNumericHelper.isZeroOrHasNoValue(inputValue);
+
+        // Temporarily remove the negative sign if present
         if (isValueNegative) {
             inputValue = inputValue.replace('-', '');
         }
@@ -3125,84 +3174,101 @@ class AutoNumeric {
         }
 
         settings.trailingNegative = false;
+        // Add back the negative sign and the currency symbol, at the right position
+        inputValue = AutoNumeric._mergeCurrencySignNegativePositiveSignAndValue(inputValue, settings, isValueNegative, isZeroOrHasNoValue);
 
-        if (settings.currencySymbolPlacement === 'p') {
-            if (isValueNegative) {
-                switch (settings.negativePositiveSignPlacement) {
-                    case 'l':
-                        inputValue = `${settings.negativeSignCharacter}${settings.currencySymbol}${inputValue}`;
-                        break;
-                    case 'r':
-                        inputValue = `${settings.currencySymbol}${settings.negativeSignCharacter}${inputValue}`;
-                        break;
-                    case 's':
-                        inputValue = `${settings.currencySymbol}${inputValue}${settings.negativeSignCharacter}`;
-                        settings.trailingNegative = true;
-                        break;
-                    default :
-                    //
-                }
-            } else if (settings.showPositiveSign && !isZero) {
-                switch (settings.negativePositiveSignPlacement) {
-                    case 'l':
-                        inputValue = `${settings.positiveSignCharacter}${settings.currencySymbol}${inputValue}`;
-                        break;
-                    case 'r':
-                        inputValue = `${settings.currencySymbol}${settings.positiveSignCharacter}${inputValue}`;
-                        break;
-                    case 's':
-                        inputValue = `${settings.currencySymbol}${inputValue}${settings.positiveSignCharacter}`;
-                        break;
-                    default :
-                    //
-                }
-            } else {
-                inputValue = settings.currencySymbol + inputValue;
-            }
-        }
-
-        if (settings.currencySymbolPlacement === 's') {
-            if (isValueNegative) {
-                switch (settings.negativePositiveSignPlacement) {
-                    case 'r':
-                        inputValue = `${inputValue}${settings.currencySymbol}${settings.negativeSignCharacter}`;
-                        settings.trailingNegative = true;
-                        break;
-                    case 'l':
-                        inputValue = `${inputValue}${settings.negativeSignCharacter}${settings.currencySymbol}`;
-                        settings.trailingNegative = true;
-                        break;
-                    case 'p':
-                        inputValue = `${settings.negativeSignCharacter}${inputValue}${settings.currencySymbol}`;
-                        break;
-                    default :
-                    //
-                }
-            } else if (settings.showPositiveSign && !isZero) {
-                switch (settings.negativePositiveSignPlacement) {
-                    case 'r':
-                        inputValue = `${inputValue}${settings.currencySymbol}${settings.positiveSignCharacter}`;
-                        break;
-                    case 'l':
-                        inputValue = `${inputValue}${settings.positiveSignCharacter}${settings.currencySymbol}`;
-                        break;
-                    case 'p':
-                        inputValue = `${settings.positiveSignCharacter}${inputValue}${settings.currencySymbol}`;
-                        break;
-                    default :
-                    //
-                }
-            } else {
-                inputValue = inputValue + settings.currencySymbol;
-            }
-        }
-
-        // Removes the negative sign and places brackets
+        // Toggle the negative sign and brackets
         if (settings.negativeBracketsTypeOnBlur !== null && (settings.rawValue < 0 || AutoNumericHelper.isNegativeStrict(inputValue))) {
             inputValue = this._toggleNegativeBracket(inputValue, settings);
         }
 
         return inputValue + settings.suffixText;
+    }
+
+    /**
+     * Return a semi-formatted string where the input value, the negative or positive sign, and the currency symbol are stitched together at the right positions, using the options set in the `settings` object.
+     * Note : the `inputValue` is usually not a numeric string since the grouping symbols are already added to it at this point.
+     *
+     * @param {string} inputValue
+     * @param {object} settings
+     * @param {boolean} isValueNegative
+     * @param {boolean} isZeroOrHasNoValue
+     * @returns {*}
+     * @throws
+     * @private
+     */
+    static _mergeCurrencySignNegativePositiveSignAndValue(inputValue, settings, isValueNegative, isZeroOrHasNoValue) {
+        let result;
+        if (settings.currencySymbolPlacement === 'p') {
+            if (isValueNegative) {
+                switch (settings.negativePositiveSignPlacement) {
+                    case 'l':
+                        result = `${settings.negativeSignCharacter}${settings.currencySymbol}${inputValue}`;
+                        break;
+                    case 'r':
+                        result = `${settings.currencySymbol}${settings.negativeSignCharacter}${inputValue}`;
+                        break;
+                    case 's':
+                        result = `${settings.currencySymbol}${inputValue}${settings.negativeSignCharacter}`;
+                        settings.trailingNegative = true;
+                        break;
+                    default :
+                        AutoNumericHelper.throwError(`The 'negativePositiveSignPlacement' options is invalid.`);
+                }
+            } else if (settings.showPositiveSign && !isZeroOrHasNoValue) {
+                switch (settings.negativePositiveSignPlacement) {
+                    case 'l':
+                        result = `${settings.positiveSignCharacter}${settings.currencySymbol}${inputValue}`;
+                        break;
+                    case 'r':
+                        result = `${settings.currencySymbol}${settings.positiveSignCharacter}${inputValue}`;
+                        break;
+                    case 's':
+                        result = `${settings.currencySymbol}${inputValue}${settings.positiveSignCharacter}`;
+                        break;
+                    default :
+                        AutoNumericHelper.throwError(`The 'negativePositiveSignPlacement' options is invalid.`);
+                }
+            } else {
+                result = settings.currencySymbol + inputValue;
+            }
+        } else if (settings.currencySymbolPlacement === 's') {
+            if (isValueNegative) {
+                switch (settings.negativePositiveSignPlacement) {
+                    case 'r':
+                        result = `${inputValue}${settings.currencySymbol}${settings.negativeSignCharacter}`;
+                        settings.trailingNegative = true;
+                        break;
+                    case 'l':
+                        result = `${inputValue}${settings.negativeSignCharacter}${settings.currencySymbol}`;
+                        settings.trailingNegative = true;
+                        break;
+                    case 'p':
+                        result = `${settings.negativeSignCharacter}${inputValue}${settings.currencySymbol}`;
+                        break;
+                    default :
+                        AutoNumericHelper.throwError(`The 'negativePositiveSignPlacement' options is invalid.`);
+                }
+            } else if (settings.showPositiveSign && !isZeroOrHasNoValue) {
+                switch (settings.negativePositiveSignPlacement) {
+                    case 'r':
+                        result = `${inputValue}${settings.currencySymbol}${settings.positiveSignCharacter}`;
+                        break;
+                    case 'l':
+                        result = `${inputValue}${settings.positiveSignCharacter}${settings.currencySymbol}`;
+                        break;
+                    case 'p':
+                        result = `${settings.positiveSignCharacter}${inputValue}${settings.currencySymbol}`;
+                        break;
+                    default :
+                        AutoNumericHelper.throwError(`The 'negativePositiveSignPlacement' options is invalid.`);
+                }
+            } else {
+                result = inputValue + settings.currencySymbol;
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -3600,7 +3666,7 @@ class AutoNumeric {
             this.settings.hasFocus = true;
 
             if (this.settings.negativeBracketsTypeOnBlur !== null && this.settings.negativeSignCharacter !== '') {
-                AutoNumericHelper.setElementValue(this.domElement, this.constructor._toggleNegativeBracket(AutoNumericHelper.getElementValue(e.target), this.settings));
+                AutoNumericHelper.setElementValue(this.domElement, this.constructor._removeBrackets(AutoNumericHelper.getElementValue(e.target), this.settings));
             }
 
             // clean the value to compare to rawValue
@@ -3608,7 +3674,7 @@ class AutoNumeric {
             result = this.constructor._convertToNumericString(result, this.settings);
             result = this._cleanLeadingTrailingZeros(result);
             if (this.settings.trailingNegative) {
-                result = '-' + result;
+                result = `-${result}`;
             }
 
             let updateElementValue = false;
@@ -4406,7 +4472,7 @@ class AutoNumeric {
             AutoNumericHelper.triggerEvent('change', e.target);
         }
 
-        // We keep track if the element is currently focused
+        // Keep track if the element is currently focused
         this.isFocused = false;
     }
 
@@ -4657,8 +4723,7 @@ class AutoNumeric {
                         let toStrip;
 
                         if (this.settings.negativeBracketsTypeOnBlur !== null && this.settings.negativeSignCharacter !== '') {
-                            this.settings.hasFocus = true; //TODO Why do we set the focus information here? That's not logical and should be removed. //FIXME delete this
-                            toStrip = this.constructor._toggleNegativeBracket(currentValue, this.settings);
+                            toStrip = this.constructor._removeBrackets(currentValue, this.settings);
                         } else {
                             toStrip = currentValue;
                         }
@@ -5004,6 +5069,7 @@ class AutoNumeric {
         this._correctDecimalPlacesOverrideOption();
         this._setsAlternativeDecimalSeparatorCharacter();
         this._cachesUsualRegularExpressions();
+        this._setBrackets();
 
         // Validate the settings. Both tests throws if necessary.
         this.constructor.validate(this.settings, false);
@@ -6169,7 +6235,6 @@ AutoNumeric.defaultSettings = {
      * '<,>' or
      * '{,}'
      */
-    //TODO Rename the options to more explicit names ('(,)' => 'parentheses', etc.)
     negativeBracketsTypeOnBlur: null,
 
     /* Displayed on empty string ""

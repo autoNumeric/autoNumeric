@@ -423,6 +423,37 @@
 			<input id="issue_395" type="text" placeholder="#395" value="">
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Negative numbers & brackets notations</p>
+			<div>
+				<div>
+					<input id="negativeBrackets1" type="text" value="-1352468.241">
+					<input id="negativeBrackets2" type="text" value="-1352468.241">
+					<input id="negativeBrackets3" type="text" value="-1352468.241">
+				</div>
+				<div>
+					<input id="negativeBrackets4" type="text" value="-1352468.241">
+					<input id="negativeBrackets5" type="text" value="-1352468.241">
+				</div>
+				<div>
+					<input id="negativeBrackets_1" type="text" value="-1234.567">
+					<input id="negativeBrackets_2" type="text" value="-1234.567">
+					<input id="negativeBrackets_3" type="text" value="-1234.567">
+				</div>
+				<div>
+					<input id="negativeBrackets_4" type="text" value="-1234.567">
+					<input id="negativeBrackets_5" type="text" value="-1234.567">
+					<input id="negativeBrackets_6" type="text" value="-1234.567">
+				</div>
+				<div>
+					<input id="negativeBrackets_7" type="text" value="-1234.567">
+					<input id="negativeBrackets_8" type="text" value="-1234.567">
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -645,8 +676,9 @@
         decimalCharacter             : ',',
         decimalCharacterAlternative  : '.',
         currencySymbol               : '€\u00a0',
-        roundingMethod               : 'U',
+        currencySymbolPlacement      : 'p',
         negativePositiveSignPlacement: 'r',
+        roundingMethod               : 'U',
         showPositiveSign             : true,
     };
 
@@ -656,8 +688,9 @@
         decimalCharacter             : ',',
         decimalCharacterAlternative  : '.',
         currencySymbol               : '€\u00a0',
-        roundingMethod               : 'U',
+        currencySymbolPlacement      : 'p',
         negativePositiveSignPlacement: 'l',
+        roundingMethod               : 'U',
         showPositiveSign             : true,
     };
 
@@ -667,8 +700,9 @@
         decimalCharacter             : ',',
         decimalCharacterAlternative  : '.',
         currencySymbol               : '€\u00a0',
-        roundingMethod               : 'U',
+        currencySymbolPlacement      : 'p',
         negativePositiveSignPlacement: 's',
+        roundingMethod               : 'U',
         showPositiveSign             : true,
     };
 
@@ -679,8 +713,8 @@
         decimalCharacterAlternative  : '.',
         currencySymbol               : '\u00a0€',
         currencySymbolPlacement      : 's',
-        roundingMethod               : 'U',
         negativePositiveSignPlacement: 'l',
+        roundingMethod               : 'U',
         showPositiveSign             : true,
     };
 
@@ -691,8 +725,8 @@
         decimalCharacterAlternative  : '.',
         currencySymbol               : '\u00a0€',
         currencySymbolPlacement      : 's',
-        roundingMethod               : 'U',
         negativePositiveSignPlacement: 'r',
+        roundingMethod               : 'U',
         showPositiveSign             : true,
     };
 
@@ -703,8 +737,8 @@
         decimalCharacterAlternative  : '.',
         currencySymbol               : '\u00a0€',
         currencySymbolPlacement      : 's',
-        roundingMethod               : 'U',
         negativePositiveSignPlacement: 'p',
+        roundingMethod               : 'U',
         showPositiveSign             : true,
     };
 
@@ -788,6 +822,22 @@
 
     //-------------- Issue #395
     new AutoNumeric('#issue_395', 12234678.321).french();
+
+    //-------------- Negative numbers & brackets notations
+    new AutoNumeric('#negativeBrackets1').french().options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.brackets);
+    new AutoNumeric('#negativeBrackets2').northAmerican().options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.chevrons);
+    new AutoNumeric('#negativeBrackets3').swiss().options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.curlyBraces);
+    new AutoNumeric('#negativeBrackets4').french().options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
+    new AutoNumeric('#negativeBrackets5').northAmerican().options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.none);
+
+    new AutoNumeric('#negativeBrackets_1', noneLeft).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
+    new AutoNumeric('#negativeBrackets_2', noneSuffix).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
+    new AutoNumeric('#negativeBrackets_3', leftRight).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
+    new AutoNumeric('#negativeBrackets_4', leftLeft).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
+    new AutoNumeric('#negativeBrackets_5', leftSuffix).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
+    new AutoNumeric('#negativeBrackets_6', rightLeft).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
+    new AutoNumeric('#negativeBrackets_7', rightRight).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
+    new AutoNumeric('#negativeBrackets_8', rightPrefix).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
 </script>
 </body>
 </html>

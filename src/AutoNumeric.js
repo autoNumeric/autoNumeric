@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      3.0.0-beta.8
+ * @version      3.0.0-beta.9
  * @date         2017-03-07 UTC 03:00
  *
  * @author       Bob Knothe
@@ -104,7 +104,6 @@ class AutoNumeric {
         // Store the additional attributes inside the AutoNumeric object
         // Note: This variable is needed and not a duplicate of `initialValueOnKeydown` nor `valueOnFocus` since it serves a different purpose and has a different lifecycle
         this.savedCancellableValue = null;
-        // console.log('constructor(): domElement:', domElement, 'initialValue:', initialValue, 'userOptions:', userOptions); //DEBUG
 
         // Set the initial value if it exists and if the `formatOnPageLoad` option will allow it
         if (!this.runOnce && this.settings.formatOnPageLoad) {
@@ -519,7 +518,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '3.0.0-beta.8';
+        return '3.0.0-beta.9';
     }
 
     /**
@@ -553,8 +552,6 @@ class AutoNumeric {
 
         const isArg3Object = AutoNumericHelper.isObject(arg3);
         const isArg3Null = AutoNumericHelper.isNull(arg3);
-        // console.log('isArg1Element, isArg2Null, isArg3Null:', isArg1Element, isArg2Null, isArg3Null); //DEBUG
-        // console.log('arg1, arg2, arg3:', arg1, arg2, arg3); //DEBUG
 
         // Given the parameters passed, sort the data and return a stable state before the initialization
         let domElement;
@@ -566,67 +563,62 @@ class AutoNumeric {
             domElement = arg1;
             initialValue = null;
             userOptions = null;
-            // console.log(`Init 1`, domElement); //DEBUG
         } else if (isArg1Element && isArg2Number && isArg3Null) {
             // new AutoNumeric(domElement, 12345.789); // With the default options, and an initial value
+            // new AutoNumeric(domElement, '12345.789');
             domElement = arg1;
             initialValue = arg2;
             userOptions = null;
-            // console.log(`Init 2`, domElement, initialValue); //DEBUG
         } else if (isArg1Element && isArg2Object && isArg3Null) {
             // new AutoNumeric(domElement, { options }); // With one option object
             domElement = arg1;
             initialValue = null;
             userOptions = arg2;
-            // console.log(`Init 3a`, domElement, userOptions); //DEBUG
         } else if (isArg1Element && (isArg2Null || isArg2EmptyString) && isArg3Object) {
             // new AutoNumeric(domElement, null, { options }); // With one option object
             domElement = arg1;
             initialValue = null;
             userOptions = arg3;
-            // console.log(`Init 3b`, domElement, userOptions); //DEBUG
         } else if (isArg1String && isArg2Null && isArg3Null) {
             // new AutoNumeric('.myCssClass > input');
             domElement = document.querySelector(arg1);
             initialValue = null;
             userOptions = null;
-            // console.log(`Init 4`, domElement); //DEBUG
         } else if (isArg1String && isArg2Object && isArg3Null) {
             // new AutoNumeric('.myCssClass > input', { options });
             domElement = document.querySelector(arg1);
             initialValue = null;
             userOptions = arg2;
-            // console.log(`Init 5a`, domElement, userOptions); //DEBUG
         } else if (isArg1String && (isArg2Null || isArg2EmptyString) && isArg3Object) {
             // new AutoNumeric('.myCssClass > input', null, { options });
             domElement = document.querySelector(arg1);
             initialValue = null;
             userOptions = arg3;
-            // console.log(`Init 5b`, domElement, userOptions); //DEBUG
         } else if (isArg1String && isArg2Number && isArg3Null) {
             // new AutoNumeric('.myCssClass > input', 12345.789);
+            // new AutoNumeric('.myCssClass > input', '12345.789');
+            // new AutoNumeric('.myCssClass > input', '');
             domElement = document.querySelector(arg1);
             initialValue = arg2;
             userOptions = null;
-            // console.log(`Init 6`, domElement, initialValue); //DEBUG
         } else if (isArg1String && isArg2Number && isArg3Object) {
             // new AutoNumeric('.myCssClass > input', 12345.789, { options });
+            // new AutoNumeric('.myCssClass > input', '12345.789', { options });
+            // new AutoNumeric('.myCssClass > input', '', { options });
             domElement = document.querySelector(arg1);
             initialValue = arg2;
             userOptions = arg3;
-            // console.log(`Init 7`, domElement, initialValue, userOptions); //DEBUG
         } else if (isArg1Element && isArg2Number && isArg3Object) {
             // new AutoNumeric(domElement, 12345.789, { options });
+            // new AutoNumeric(domElement, '12345.789', { options });
+            // new AutoNumeric(domElement, '', { options });
             domElement = arg1;
             initialValue = arg2;
             userOptions = arg3;
-            // console.log(`Init 8`, domElement, initialValue, userOptions); //DEBUG
         }
         else {
-            AutoNumericHelper.throwError(`The parameters given to the AutoNumeric object are not valid, '${arg1}', '${arg2}' and '${arg3}' given.`); //TODO Change the error message based on the number of argument passed
+            AutoNumericHelper.throwError(`The parameters given to the AutoNumeric object are not valid, '${arg1}', '${arg2}' and '${arg3}' given.`);
         }
-        // console.log('_setArgumentsValues(): domElement:', domElement, 'initialValue:', initialValue, 'userOptions:', userOptions); //DEBUG
-        // console.log('isInitialElementAForm:', isInitialElementAForm); //DEBUG
 
         return { domElement, initialValue, userOptions };
     }
@@ -757,10 +749,6 @@ class AutoNumeric {
             return this;
         }
 
-        // Update other variables
-        //TODO Evaluate if the following variable needs to be updated as well
-        this.savedCancellableValue = null;
-
         // Reformat the input value with the new settings
         if (AutoNumericHelper.getElementValue(this.domElement) !== '') {
             this.set(numericString);
@@ -806,7 +794,6 @@ class AutoNumeric {
             this._setSettings(options, true); // We do not call `update` here since this would call `set` too
         }
 
-        //TODO This looks a lot like `getInputIfSupportedTagAndType()`. Is that necessary? Can the input element be changed since autoNumeric has been initialized?
         // Reset the trailing negative settings, since it's possible the previous value was negative, but not the newly set one
         this.settings.trailingNegative = false; //TODO Use a separate variable to store that info (`this.tempEditing` object for instance?)
 
@@ -911,7 +898,7 @@ class AutoNumeric {
     }
 
     /**
-     * Set the value given value directly as the DOM element value, without formatting it beforehand.
+     * Set the given value directly as the DOM element value, without formatting it beforehand.
      * You can also set the value and update the setting in one go (the value will again not be formatted immediately).
      *
      * @param {number|string} value
@@ -921,9 +908,8 @@ class AutoNumeric {
     setUnformatted(value, options = null) {
         AutoNumericHelper.setElementValue(this.domElement, value);
 
-        // Update the rawValue and the savedCancellableValue values //FIXME à tester
+        // Update the rawValue
         this.settings.rawValue = value; // Doing this without any test can lead to badly formatted rawValue
-        this._saveCancellableValue();
 
         if (!AutoNumericHelper.isNull(options)) {
             this._setSettings(options, true); // We do not call `update` here since this would call `set` too
@@ -1087,7 +1073,6 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     unformat() {
-        // this.settings.hasFocus = true; //TODO Is this necessary? //FIXME delete this
         AutoNumericHelper.setElementValue(this.domElement, this.getNumericString());
 
         return this;
@@ -1103,7 +1088,6 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     unformatLocalized(forcedOutputFormat = null) {
-        // this.settings.hasFocus = true; //TODO Is this necessary? Can we remove that? //FIXME delete this
         AutoNumericHelper.setElementValue(this.domElement, this.getLocalized(forcedOutputFormat));
 
         return this;
@@ -2005,7 +1989,6 @@ class AutoNumeric {
      * @private
      */
     static _getFromGlobalList(domElement) { //FIXME à tester
-        // console.log(`_getFromGlobalList`, this._doesGlobalListExists(), this.autoNumericGlobalListName, window[this.autoNumericGlobalListName].get(domElement)); //DEBUG
         if (this._doesGlobalListExists()) {
             return window[this.autoNumericGlobalListName].get(domElement);
         }
@@ -2473,6 +2456,8 @@ class AutoNumeric {
         if (valueOrDomElement < 0) {
             settings.negativeSignCharacter = '-';
         }
+        const regex = {};
+        this._cachesUsualRegularExpressions(settings, regex); // This is needed by `_stripAllNonNumberCharacters` that uses those regex
 
         if (AutoNumericHelper.isNull(settings.decimalPlacesOverride)) {
             settings.decimalPlacesOverride = this._maximumVMinAndVMaxDecimalLength(settings.minimumValue, settings.maximumValue);
@@ -3522,12 +3507,12 @@ class AutoNumeric {
      */
     _keepAnOriginalSettingsCopy() {
         //TODO Move this data to temporary attributes, in order to prevent changing the user settings
-        this.settings.originalDecimalPlacesOverride      = this.settings.decimalPlacesOverride;
-        this.settings.originalAllowDecimalPadding        = this.settings.allowDecimalPadding;
-        this.settings.originalNegativeBracketsTypeOnBlur = this.settings.negativeBracketsTypeOnBlur;
-        this.settings.originalDigitGroupSeparator        = this.settings.digitGroupSeparator;
-        this.settings.originalCurrencySymbol             = this.settings.currencySymbol;
-        this.settings.originalSuffixText                 = this.settings.suffixText;
+        this.originalDecimalPlacesOverride      = this.settings.decimalPlacesOverride;
+        this.originalAllowDecimalPadding        = this.settings.allowDecimalPadding;
+        this.originalNegativeBracketsTypeOnBlur = this.settings.negativeBracketsTypeOnBlur;
+        this.originalDigitGroupSeparator        = this.settings.digitGroupSeparator;
+        this.originalCurrencySymbol             = this.settings.currencySymbol;
+        this.originalSuffixText                 = this.settings.suffixText;
     }
 
     /**
@@ -3683,7 +3668,7 @@ class AutoNumeric {
                 updateElementValue = true;
             } else if (this.settings.scaleDivisor && this.settings.rawValue !== '') {
                 // Prevent changing the element value if it's empty (so we don't end up having a '0.000scaleSymbol' value after a mouseenter/mouseleave cycle)
-                this.settings.decimalPlacesOverride = Number(this.settings.originalDecimalPlacesOverride);
+                this.settings.decimalPlacesOverride = Number(this.originalDecimalPlacesOverride);
                 updateElementValue = true;
             } else if (this.settings.noSeparatorOnFocus) {
                 this.settings.digitGroupSeparator = '';
@@ -3798,10 +3783,12 @@ class AutoNumeric {
             if (this.settings.isCancellable) {
                 // If the user wants to cancel its modifications :
                 // We set back the saved value
-                //TODO Do not set the value again if it has not changed
-                this.set(this.savedCancellableValue);
-                // And we need to send an 'input' event when setting back the initial value in order to make other scripts aware of the value change...
-                AutoNumericHelper.triggerEvent('input', e.target);
+                if (this.settings.rawValue !== this.savedCancellableValue) {
+                    // Do not set the value again if it has not changed
+                    this.set(this.savedCancellableValue);
+                    // And we need to send an 'input' event when setting back the initial value in order to make other scripts aware of the value change...
+                    AutoNumericHelper.triggerEvent('input', e.target);
+                }
             }
 
             // ..and lastly we update the caret selection, even if the option `isCancellable` is false
@@ -3836,14 +3823,14 @@ class AutoNumeric {
 
             // If and only if the resulting value has changed after that backspace/delete, then we have to send an 'input' event like browsers normally do.
             targetValue = AutoNumericHelper.getElementValue(e.target); // Update the value since it could have been changed during the deletion
-            if ((targetValue !== this.lastVal) && this.settings.throwInput) {
+            if ((targetValue !== this.lastVal) && this.throwInput) {
                 // Throw an input event when a character deletion is detected
                 AutoNumericHelper.triggerEvent('input', e.target);
                 e.preventDefault(); // ...and immediately prevent the browser to delete a second character
             }
 
             this.lastVal = targetValue;
-            this.settings.throwInput = true;
+            this.throwInput = true;
 
             return;
         }
@@ -3884,7 +3871,7 @@ class AutoNumeric {
         if (isCharacterInsertionAllowed) {
             this._formatValue(e);
             const targetValue = AutoNumericHelper.getElementValue(e.target);
-            if ((targetValue !== this.lastVal) && this.settings.throwInput) {
+            if ((targetValue !== this.lastVal) && this.throwInput) {
                 // Throws input event on adding a character
                 AutoNumericHelper.triggerEvent('input', e.target);
                 e.preventDefault(); // ...and immediately prevent the browser to add a second character
@@ -3900,7 +3887,7 @@ class AutoNumeric {
             }
 
             this.lastVal = AutoNumericHelper.getElementValue(e.target);
-            this.settings.throwInput = true;
+            this.throwInput = true;
 
             return;
         }
@@ -3993,15 +3980,15 @@ class AutoNumeric {
             }
 
             if (this.settings.noSeparatorOnFocus === true) {
-                this.settings.digitGroupSeparator = this.settings.originalDigitGroupSeparator;
-                this.settings.currencySymbol = this.settings.originalCurrencySymbol;
-                this.settings.suffixText = this.settings.originalSuffixText;
+                this.settings.digitGroupSeparator = this.originalDigitGroupSeparator;
+                this.settings.currencySymbol = this.originalCurrencySymbol;
+                this.settings.suffixText = this.originalSuffixText;
             }
 
             if (this.settings.decimalPlacesShownOnFocus !== null) {
-                this.settings.decimalPlacesOverride = this.settings.originalDecimalPlacesOverride;
-                this.settings.allowDecimalPadding = this.settings.originalAllowDecimalPadding;
-                this.settings.negativeBracketsTypeOnBlur = this.settings.originalNegativeBracketsTypeOnBlur;
+                this.settings.decimalPlacesOverride = this.originalDecimalPlacesOverride;
+                this.settings.allowDecimalPadding = this.originalAllowDecimalPadding;
+                this.settings.negativeBracketsTypeOnBlur = this.originalNegativeBracketsTypeOnBlur;
             }
 
             value = this.constructor._stripAllNonNumberCharacters(value, this.settings, true);
@@ -4607,7 +4594,7 @@ class AutoNumeric {
             AutoNumericHelper.throwError(`The DOM element is not valid, ${this.domElement} given.`);
         }
 
-        return AutoNumericHelper.isInArray(this.domElement.tagName.toLowerCase(), this.settings.tagList);
+        return AutoNumericHelper.isInArray(this.domElement.tagName.toLowerCase(), this.allowedTagList);
     }
 
     /**
@@ -4825,7 +4812,7 @@ class AutoNumeric {
         if (AutoNumericHelper.isNull(this.settings.decimalPlacesOverride)) {
             this.settings.decimalPlacesOverride = this.constructor._maximumVMinAndVMaxDecimalLength(this.settings.minimumValue, this.settings.maximumValue);
         }
-        this.settings.originalDecimalPlacesOverride = String(this.settings.decimalPlacesOverride);
+        this.originalDecimalPlacesOverride = String(this.settings.decimalPlacesOverride);
 
         // Most calculus assume `decimalPlacesOverride` is an integer, the following statement makes it clear (otherwise having it as a string leads to problems in rounding for instance)
         this.settings.decimalPlacesOverride = Number(this.settings.decimalPlacesOverride);
@@ -4834,7 +4821,7 @@ class AutoNumeric {
     /**
      * Sets the alternative decimal separator key.
      */
-    _setsAlternativeDecimalSeparatorCharacter() {
+    _setAlternativeDecimalSeparatorCharacter() {
         if (AutoNumericHelper.isNull(this.settings.decimalCharacterAlternative) && Number(this.settings.decimalPlacesOverride) > 0) {
             if (this.settings.decimalCharacter === '.' && this.settings.digitGroupSeparator !== ',') {
                 this.settings.decimalCharacterAlternative = ',';
@@ -4846,31 +4833,34 @@ class AutoNumeric {
 
     /**
      * Caches regular expressions for _stripAllNonNumberCharacters
+     *
+     * @param {object} settings
+     * @param {object} regex
      */
-    _cachesUsualRegularExpressions() {
+    static _cachesUsualRegularExpressions(settings, regex) {
         const allNumbersReg = '[0-9]';
         const noAllNumbersReg = '[^0-9]';
 
         // Test if there is a negative character in the string
-        const aNegReg = this.settings.negativeSignCharacter?`([-\\${this.settings.negativeSignCharacter}]?)`:'(-?)';
-        this.settings.aNegRegAutoStrip = aNegReg;
+        const aNegReg = settings.negativeSignCharacter?`([-\\${settings.negativeSignCharacter}]?)`:'(-?)';
+        regex.aNegRegAutoStrip = aNegReg;
 
         let negativeSignRegPart;
-        if (this.settings.negativeSignCharacter) {
-            negativeSignRegPart = `\\${this.settings.negativeSignCharacter}`;
+        if (settings.negativeSignCharacter) {
+            negativeSignRegPart = `\\${settings.negativeSignCharacter}`;
         } else {
             negativeSignRegPart = '';
         }
 
-        this.settings.skipFirstAutoStrip = new RegExp(`${aNegReg}[^-${negativeSignRegPart}\\${this.settings.decimalCharacter}${allNumbersReg}].*?(${allNumbersReg}|\\${this.settings.decimalCharacter}${allNumbersReg})`);
-        this.settings.skipLastAutoStrip = new RegExp(`(${allNumbersReg}\\${this.settings.decimalCharacter}?)[^\\${this.settings.decimalCharacter}${allNumbersReg}]${noAllNumbersReg}*$`);
+        settings.skipFirstAutoStrip = new RegExp(`${aNegReg}[^-${negativeSignRegPart}\\${settings.decimalCharacter}${allNumbersReg}].*?(${allNumbersReg}|\\${settings.decimalCharacter}${allNumbersReg})`);
+        settings.skipLastAutoStrip = new RegExp(`(${allNumbersReg}\\${settings.decimalCharacter}?)[^\\${settings.decimalCharacter}${allNumbersReg}]${noAllNumbersReg}*$`);
 
-        const allowed = `-0123456789\\${this.settings.decimalCharacter}`;
-        this.settings.allowedAutoStrip = new RegExp(`[^${allowed}]`, 'g');
-        this.settings.numRegAutoStrip = new RegExp(`${aNegReg}(?:\\${this.settings.decimalCharacter}?(${allNumbersReg}+\\${this.settings.decimalCharacter}${allNumbersReg}+)|(${allNumbersReg}*(?:\\${this.settings.decimalCharacter}${allNumbersReg}*)?))`);
+        const allowed = `-0123456789\\${settings.decimalCharacter}`;
+        settings.allowedAutoStrip = new RegExp(`[^${allowed}]`, 'g');
+        settings.numRegAutoStrip = new RegExp(`${aNegReg}(?:\\${settings.decimalCharacter}?(${allNumbersReg}+\\${settings.decimalCharacter}${allNumbersReg}+)|(${allNumbersReg}*(?:\\${settings.decimalCharacter}${allNumbersReg}*)?))`);
 
-        // Using this regex version `^${this.settings.aNegRegAutoStrip}0*(\\d|$)` entirely clear the input on blur
-        this.settings.stripReg = new RegExp(`^${this.settings.aNegRegAutoStrip}0*(${allNumbersReg})`);
+        // Using this regex version `^${regex.aNegRegAutoStrip}0*(\\d|$)` entirely clear the input on blur
+        settings.stripReg = new RegExp(`^${regex.aNegRegAutoStrip}0*(${allNumbersReg})`);
     }
 
     /**
@@ -4888,7 +4878,7 @@ class AutoNumeric {
 
                 // Convert numbers in options to strings
                 //TODO if a value is already of type 'Number', shouldn't we keep it as a number for further manipulation, instead of using a string?
-                if (typeof value === 'number' && key !== 'aScale') { //FIXME Replace the old `aScale` name with the new one
+                if (typeof value === 'number') {
                     this.settings[key] = value.toString();
                 }
             }
@@ -4975,21 +4965,11 @@ class AutoNumeric {
             hasFocus                          : true,
             rawValue                          : true,
             trailingNegative                  : true,
-            caretFix                          : true,
-            throwInput                        : true,
             strip                             : true,
-            tagList                           : true,
             negativeSignCharacter             : true,
             positiveSignCharacter             : true,
             mIntPos                           : true,
             mIntNeg                           : true,
-            originalDecimalPlacesOverride     : true,
-            originalAllowDecimalPadding       : true,
-            originalNegativeBracketsTypeOnBlur: true,
-            originalDigitGroupSeparator       : true,
-            originalCurrencySymbol            : true,
-            originalSuffixText                : true,
-            aNegRegAutoStrip                  : true,
             skipFirstAutoStrip                : true,
             skipLastAutoStrip                 : true,
             allowedAutoStrip                  : true,
@@ -5044,11 +5024,11 @@ class AutoNumeric {
                 hasFocus        : false,
                 rawValue        : '',
                 trailingNegative: false,
-                caretFix        : false,
-                throwInput      : true, // Throw input event
                 strip           : true,
-                tagList         : AutoNumericEnum.allowedTagList,
             });
+            this.caretFix = false;
+            this.throwInput = true; // Throw input event
+            this.allowedTagList = AutoNumericEnum.allowedTagList;
             this.runOnce = false;
             this.hoveredWithAlt = false; // Keep tracks if the current aN element is hovered by the mouse cursor while `Alt` is pressed
         }
@@ -5063,12 +5043,13 @@ class AutoNumeric {
         this.settings.negativeSignCharacter = this.settings.minimumValue < 0 ? '-' : '';
         this.settings.positiveSignCharacter = this.settings.maximumValue >= 0 ? '+' : '';
 
-        // Additional changes to the settings object (from the original autoCode() function)
+        // Additional changes to the settings object
         this._runCallbacksFoundInTheSettingsObject();
         this._calculateVMinAndVMaxIntegerSizes();
         this._correctDecimalPlacesOverrideOption();
-        this._setsAlternativeDecimalSeparatorCharacter();
-        this._cachesUsualRegularExpressions();
+        this._setAlternativeDecimalSeparatorCharacter();
+        this.regex = {}; // Create the object that will store the regular expressions
+        this.constructor._cachesUsualRegularExpressions(this.settings, this.regex);
         this._setBrackets();
 
         // Validate the settings. Both tests throws if necessary.
@@ -5292,7 +5273,7 @@ class AutoNumeric {
         // Insert zero if has leading dot
         this.newValue = left + right;
         if (this.settings.decimalCharacter) {
-            const m = this.newValue.match(new RegExp(`^${this.settings.aNegRegAutoStrip}\\${this.settings.decimalCharacter}`));
+            const m = this.newValue.match(new RegExp(`^${this.regex.aNegRegAutoStrip}\\${this.settings.decimalCharacter}`));
             if (m) {
                 left = left.replace(m[1], m[1] + '0');
                 this.newValue = left + right;
@@ -5532,14 +5513,14 @@ class AutoNumeric {
 
         if (this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's') {
             if (this.eventKeyCode === AutoNumericEnum.keyCode.Backspace) {
-                this.settings.caretFix = (this.selection.start >= value.indexOf(this.settings.suffixText) && this.settings.suffixText !== '');
+                this.caretFix = (this.selection.start >= value.indexOf(this.settings.suffixText) && this.settings.suffixText !== '');
                 if (value.charAt(this.selection.start - 1) === '-') {
                     left = left.substring(1);
                 } else if (this.selection.start <= value.length - this.settings.suffixText.length) {
                     left = left.substring(0, left.length - 1);
                 }
             } else {
-                this.settings.caretFix = (this.selection.start >= value.indexOf(this.settings.suffixText) && this.settings.suffixText !== '');
+                this.caretFix = (this.selection.start >= value.indexOf(this.settings.suffixText) && this.settings.suffixText !== '');
                 if (this.selection.start >= value.indexOf(this.settings.currencySymbol) + this.settings.currencySymbol.length) {
                     right = right.substring(1, right.length);
                 }
@@ -5551,7 +5532,7 @@ class AutoNumeric {
 
         //TODO Merge the two following 'if' blocks into one `if (settings.currencySymbolPlacement === 's') {` and a switch on settings.negativePositiveSignPlacement
         if (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'l') {
-            this.settings.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
+            this.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
             if (this.eventKeyCode === AutoNumericEnum.keyCode.Backspace) {
                 if (this.selection.start === (value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length) && AutoNumericHelper.contains(value, this.settings.negativeSignCharacter)) {
                     left = left.substring(1);
@@ -5569,7 +5550,7 @@ class AutoNumeric {
         }
 
         if (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'r') {
-            this.settings.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
+            this.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
             if (this.eventKeyCode === AutoNumericEnum.keyCode.Backspace) {
                 if (this.selection.start === (value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length)) {
                     left = left.substring(1);
@@ -5579,7 +5560,7 @@ class AutoNumeric {
                     left = left.substring(0, left.length - 1);
                 }
             } else {
-                this.settings.caretFix = (this.selection.start >= value.indexOf(this.settings.currencySymbol) && this.settings.currencySymbol !== '');
+                this.caretFix = (this.selection.start >= value.indexOf(this.settings.currencySymbol) && this.settings.currencySymbol !== '');
                 if (this.selection.start === value.indexOf(this.settings.negativeSignCharacter)) {
                     left = left.substring(1);
                 }
@@ -5600,7 +5581,7 @@ class AutoNumeric {
         if (!this.selection.length) {
             [left, right] = this._getUnformattedLeftAndRightPartAroundTheSelection();
             if (left === '' && right === '') {
-                this.settings.throwInput = false;
+                this.throwInput = false;
             }
 
             if (((this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's') ||
@@ -5632,7 +5613,7 @@ class AutoNumeric {
      */
     _processCharacterInsertion(e) {
         let [left, right] = this._getUnformattedLeftAndRightPartAroundTheSelection();
-        this.settings.throwInput = true;
+        this.throwInput = true;
 
         // Retrieve the real character that has been entered (ie. 'a' instead of the key code)
         const eventCharacter = AutoNumericHelper.character(e);
@@ -5676,7 +5657,8 @@ class AutoNumeric {
             }
 
             // Caret is always after minus
-            if ((this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's') || (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement !== 'p')) {
+            if ((this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's') ||
+                (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement !== 'p')) {
                 if (left === '' && AutoNumericHelper.contains(right, this.settings.negativeSignCharacter)) {
                     left = this.settings.negativeSignCharacter;
                     right = right.substring(1, right.length);
@@ -5725,7 +5707,7 @@ class AutoNumeric {
         }
 
         // Prevent any other character
-        this.settings.throwInput = false;
+        this.throwInput = false;
 
         return false;
     }
@@ -5771,20 +5753,17 @@ class AutoNumeric {
             const leftAr = left.split('');
 
             // Fixes caret position with trailing minus sign
-            if ((this.settings.negativePositiveSignPlacement === 's' || (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement !== 'p')) &&
+            if ((this.settings.negativePositiveSignPlacement === 's' ||
+                (this.settings.negativePositiveSignPlacement !== 'p' && this.settings.currencySymbolPlacement === 's')) &&
                 leftAr[0] === '-' && this.settings.negativeSignCharacter !== '') {
                 leftAr.shift();
 
                 if ((this.eventKeyCode === AutoNumericEnum.keyCode.Backspace || this.eventKeyCode === AutoNumericEnum.keyCode.Delete) &&
-                    this.settings.caretFix) {
-                    if (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'l') {
+                    this.caretFix) {
+                    if ((this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'l') ||
+                        (this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's')) {
                         leftAr.push('-');
-                        this.settings.caretFix = e.type === 'keydown';
-                    }
-
-                    if (this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's') {
-                        leftAr.push('-');
-                        this.settings.caretFix = e.type === 'keydown';
+                        this.caretFix = e.type === 'keydown';
                     }
 
                     if (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'r') {
@@ -5806,7 +5785,7 @@ class AutoNumeric {
 
                         // Pushing the escaped sign
                         leftAr.push(escapedParts.join(''));
-                        this.settings.caretFix = e.type === 'keydown';
+                        this.caretFix = e.type === 'keydown';
                     }
                 }
             }

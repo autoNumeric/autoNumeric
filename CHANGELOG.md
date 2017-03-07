@@ -1,5 +1,18 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.9"
++ Fix and removes some TODOs and FIXMEs
++ Remove some debug messages.
++ Remove the need to initialize the `savedCancellableValue` variable when unneeded.
++ Check and remove the unnecessary `hasFocus` calls and sets.
++ Add regex caching to the static `format()` function, since this used the `_addGroupSeparators` function that calls the `_stripAllNonNumberCharacters` one that extensively uses those.
++ Rename the temporary settings copy, and move those out of the `this.settings` object.
++ Prevent setting the value with `set()` if the value hasn't changed when calling the 'cancellable' event.
++ Rename `_setsAlternativeDecimalSeparatorCharacter()` to `_setAlternativeDecimalSeparatorCharacter()`.
++ Remove the unused and deprecated `aScale` reference from a test.
++ Move away from the `this.settings` object the following variables : `caretFix`, `throwInput`, `tagList`, `originalDecimalPlacesOverride`, `originalAllowDecimalPadding`, `originalNegativeBracketsTypeOnBlur`, `originalDigitGroupSeparator`, `originalCurrencySymbol`, `originalSuffixText` and `aNegRegAutoStrip`.
++ Refactor some tests in `_formatValue()`.
+
 ### "3.0.0-beta.8"
 + Fix issue #408 Allow brackets and parenthesis to be added for negative numbers on any combination of `currencySymbolPlacement` and `negativePositiveSignPlacement` values
 

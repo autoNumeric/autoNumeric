@@ -531,13 +531,13 @@ class AutoNumeric {
      * @param {object|Array|number|string|null} arg2
      * @param {object|Array|number|string|null} arg3
      * @returns {{domElement: *, initialValue: *, userOptions: *}}
+     * @throws
      * @private
      */
     static _setArgumentsValues(arg1, arg2, arg3) {
         // Basic check on the argument count
-        const isArg1Null = AutoNumericHelper.isNull(arg1);
-        if (isArg1Null) {
-            AutoNumericHelper.throwError('At least one parameter is needed in order to initialize an AutoNumeric object');
+        if (AutoNumericHelper.isNull(arg1)) {
+            AutoNumericHelper.throwError('At least one valid parameter is needed in order to initialize an AutoNumeric object');
         }
 
         // Prepare the arguments in order to create the AutoNumeric object with the right values
@@ -615,9 +615,12 @@ class AutoNumeric {
             domElement = arg1;
             initialValue = arg2;
             userOptions = arg3;
-        }
-        else {
+        } else {
             AutoNumericHelper.throwError(`The parameters given to the AutoNumeric object are not valid, '${arg1}', '${arg2}' and '${arg3}' given.`);
+        }
+
+        if (AutoNumericHelper.isNull(domElement)) {
+            AutoNumericHelper.throwError(`The selector '${arg1}' did not select any valid DOM element. Please check on which element you called AutoNumeric.`);
         }
 
         return { domElement, initialValue, userOptions };

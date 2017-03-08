@@ -1522,6 +1522,11 @@ class AutoNumeric {
         let tagName;
         do {
             node = node.parentNode;
+            if (AutoNumericHelper.isNull(node)) {
+                // Special case when using templates with frameworks like Vue.js, where the input element can be 'detached' when initializing the DOM structure
+                return null;
+            }
+
             tagName = node.tagName.toLowerCase();
 
             if (tagName === 'body') {

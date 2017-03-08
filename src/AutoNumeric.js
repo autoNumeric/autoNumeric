@@ -6018,378 +6018,16 @@ class AutoNumeric {
 }
 
 /**
- * The defaults options.
- * These can be overridden by the following methods:
- * - HTML5 data attributes (ie. `<input type="text" data-currency-symbol=" €">`)
- * - Options passed to the `update` method (ie. `anElement.update({ currencySymbol: ' €' });`), or simply during the initialization (ie. `new AutoNumeric(domElement, {options});`)
- */
-AutoNumeric.defaultSettings = {
-    /* Allow padding the decimal places with zeros
-     * allowDecimalPadding: true - always Pad decimals with zeros
-     * allowDecimalPadding: false - does not pad with zeros.
-     * Note: setting allowDecimalPadding to 'false' will override the 'decimalPlacesOverride' setting.
-     *
-     * thanks to Jonas Johansson for the suggestion
-     */
-    allowDecimalPadding: true,
-
-    /* currencySymbol = allowed currency symbol
-     * Must be in quotes currencySymbol: "$"
-     * space to the right of the currency symbol currencySymbol: '$ '
-     * space to the left of the currency symbol currencySymbol: ' $'
-     */
-    currencySymbol: '',
-
-    /* currencySymbolPlacement = placement of currency sign as a p=prefix or s=suffix
-     * for prefix currencySymbolPlacement: "p" (default)
-     * for suffix currencySymbolPlacement: "s"
-     */
-    //TODO Rename the options to more explicit names ('p' => 'prefix', etc.)
-    currencySymbolPlacement: 'p',
-
-    /* Allowed decimal separator characters :
-     * ',' : Comma
-     * '.' : Dot
-     * '·' : Middle-dot
-     * '٫' : Arabic decimal separator
-     * '⎖' : Decimal separator key symbol
-     */
-    decimalCharacter: '.',
-
-    /* Allow to declare an alternative decimal separator which is automatically replaced by `decimalCharacter` when typed.
-     * This is used by countries that use a comma "," as the decimal character and have keyboards\numeric pads that have
-     * a period 'full stop' as the decimal characters (France or Spain for instance).
-     */
-    decimalCharacterAlternative: null,
-
-    /* Maximum number of decimal places = used to override decimal places set by the minimumValue & maximumValue values
-     */
-    decimalPlacesOverride: null,
-
-    /* Expanded decimal places visible when input has focus - example:
-     * {decimalPlacesShownOnFocus: "5"} and the default 2 decimal places with focus "1,000.12345" without focus "1,000.12" the results depends on the rounding method used
-     * the "get" method returns the extended decimal places
-     */
-    decimalPlacesShownOnFocus: null,
-
-    /* Helper option for ASP.NET postback
-     * should be the value of the unformatted default value
-     * examples:
-     * no default value="" {defaultValueOverride: ""}
-     * value=1234.56 {defaultValueOverride: '1234.56'}
-     */
-    defaultValueOverride: null,
-
-    /* Digital grouping for the thousand separator used in Format
-     * digitalGroupSpacing: "2", results in 99,99,99,999 India's lakhs
-     * digitalGroupSpacing: "2s", results in 99,999,99,99,999 India's lakhs scaled
-     * digitalGroupSpacing: "3", results in 999,999,999 default
-     * digitalGroupSpacing: "4", results in 9999,9999,9999 used in some Asian countries
-     */
-    digitalGroupSpacing: '3',
-
-    /* Allowed thousand grouping separator characters :
-     * ','      // Comma
-     * '.'      // Dot
-     * ' '      // Normal space
-     * '\u2009' // Thin-space
-     * '\u202f' // Narrow no-break space
-     * '\u00a0' // No-break space
-     * ''       // No separator
-     * "'"      // Apostrophe
-     * '٬'      // Arabic thousands separator
-     * '˙'      // Dot above
-     */
-    digitGroupSeparator: ',',
-
-    /* Displayed on empty string ""
-     * emptyInputBehavior: "focus" - (default) currency sign displayed and the input receives focus
-     * emptyInputBehavior: "press" - currency sign displays on any key being pressed
-     * emptyInputBehavior: "always" - always displays the currency sign only
-     * emptyInputBehavior: "zero" - if the input has no value on focus out displays a zero "rounded" with or without a currency sign
-     */
-    emptyInputBehavior: 'focus',
-
-    /*
-     * This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object.
-     * You should set that to 'TRUE' if you want to make sure you are only using 'pure' autoNumeric settings objects in your code.
-     * If you see uncaught errors in the console and your code starts to fail, this means somehow those options gets corrupted by another program.
-     */
-    failOnUnknownOption: false,
-
-    /* Determine if the default value will be formatted on initialization.
-     * true = automatically formats the default value on initialization
-     * false = will not format the default value on initialization
-     */
-    formatOnPageLoad: true,
-
-    /* Allow the user to 'cancel' and undo the changes he made to the given autonumeric-managed element, by pressing the 'Escape' key.
-     * Whenever the user 'validate' the input (either by hitting 'Enter', or blurring the element), the new value is saved for subsequent 'cancellation'.
-     *
-     * The process :
-     *   - save the input value on focus
-     *   - if the user change the input value, and hit `Escape`, then the initial value saved on focus is set back
-     *   - on the other hand if the user either have used `Enter` to validate (`Enter` throws a change event) his entries, or if the input value has been changed by another script in the mean time, then we save the new input value
-     *   - on a successful 'cancel', select the whole value (while respecting the `selectNumberOnly` option)
-     *   - bonus; if the value has not changed, hitting 'Esc' just select all the input value (while respecting the `selectNumberOnly` option)
-     */
-    isCancellable : true,
-
-    /* Controls leading zero behavior
-     * leadingZero: "allow", - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
-     * leadingZero: "deny", - allows only one leading zero on values less than one
-     * leadingZero: "keep", - allows leading zeros to be entered. on focusout zeros will be retained.
-     */
-    leadingZero: 'deny',
-
-    /* Maximum possible value
-     * value must be enclosed in quotes and use the period for the decimal point
-     * value must be larger than minimumValue
-     */
-    maximumValue: '9999999999999.99', // 9.999.999.999.999,99 ~= 10000 billions
-
-    /* Minimum possible value
-     * value must be enclosed in quotes and use the period for the decimal point
-     * value must be smaller than maximumValue
-     */
-    minimumValue: '-9999999999999.99', // -9.999.999.999.999,99 ~= 10000 billions
-
-    /* Allow the user to increment or decrement the element value with the mouse wheel.
-     * The wheel behavior can by modified by the `wheelStep` option.
-     * This `wheelStep` options can be used in two ways, either by setting :
-     * - a 'fixed' step value (`wheelStep : 1000`), or
-     * - the 'progressive' string (`wheelStep : 'progressive'`), which will then activate a special mode where the step is automatically calculated based on the element value size.
-     *
-     * Note :
-     * A special behavior is applied in order to avoid preventing the user to scroll the page if the inputs are covering the whole available space.
-     * You can use the 'Shift' modifier key while using the mouse wheel in order to temporarily disable the increment/decrement feature (useful on small screen where some badly configured inputs could use all the available space).
-     */
-    modifyValueOnWheel : true,
-
-    /* Adds brackets on negative values (ie. transforms '-$ 999.99' to '(999.99)')
-     * Those brackets are visible only when the field does NOT have the focus.
-     * The left and right symbols should be enclosed in quotes and separated by a comma
-     * This option can be of the following values :
-     * null, // This is the default value, which deactivate this feature
-     * '(,)',
-     * '[,]',
-     * '<,>' or
-     * '{,}'
-     */
-    negativeBracketsTypeOnBlur: null,
-
-    /* Placement of negative/positive sign relative to the currencySymbol option l=left, r=right, p=prefix & s=suffix
-     * -1,234.56  => default no options required
-     * -$1,234.56 => {currencySymbol: "$"} or {currencySymbol: "$", negativePositiveSignPlacement: "l"}
-     * $-1,234.56 => {currencySymbol: "$", negativePositiveSignPlacement: "r"} // Default if negativePositiveSignPlacement is 'null' and currencySymbol is not empty
-     * -1,234.56$ => {currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "p"} // Default if negativePositiveSignPlacement is 'null' and currencySymbol is not empty
-     * 1,234.56-  => {negativePositiveSignPlacement: "s"}
-     * $1,234.56- => {currencySymbol: "$", negativePositiveSignPlacement: "s"}
-     * 1,234.56-$ => {currencySymbol: "$", currencySymbolPlacement: "s"}
-     * 1,234.56$- => {currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "r"}
-     */
-    //TODO Rename the options to more explicit names ('p' => 'prefix', etc.)
-    negativePositiveSignPlacement: null,
-
-    /* Defines if the element should have event listeners activated on it.
-     * By default, those event listeners are only added to <input> elements, but not on the other html tags.
-     * This allows to initialize <input> elements without any event listeners.
-     * Warning: Since AutoNumeric will not check the input content after its initialization, using some autoNumeric methods will probably leads to formatting problems.
-     */
-    noEventListeners: false,
-
-    /* Remove the thousand separator on focus, currency symbol and suffix on focus
-     * example if the input value "$ 1,999.88 suffix"
-     * on "focusin" it becomes "1999.88" and back to "$ 1,999.88 suffix" on focus out.
-     */
-    noSeparatorOnFocus: false,
-
-    /*
-     * Manage how autoNumeric react when the user tries to paste an invalid number.
-     * - 'error'    : (This is the default behavior) The input value is not changed and an error is output in the console.
-     * - 'ignore'   : idem than 'error', but fail silently without outputting any error/warning in the console.
-     * - 'clamp'    : if the pasted value is either too small or too big regarding the minimumValue and maximumValue range, then the result is clamped to those limits.
-     * - 'truncate' : autoNumeric will insert as many pasted numbers it can at the initial caret/selection, until everything is pasted, or the range limit is hit.
-     *                The non-pasted numbers are dropped and therefore not used at all.
-     * - 'replace'  : autoNumeric will first insert as many pasted numbers it can at the initial caret/selection, then if the range limit is hit, it will try
-     *                to replace one by one the remaining initial numbers (on the right side of the caret) with the rest of the pasted numbers.
-     *
-     * Note 1 : A paste content starting with a negative sign '-' will be accepted anywhere in the input, and will set the resulting value as a negative number
-     * Note 2 : A paste content starting with a number will be accepted, even if the rest is gibberish (ie. '123foobar456').
-     *          Only the first number will be used (here '123').
-     * Note 3 : The paste event works with the `decimalPlacesShownOnFocus` option too.
-     */
-    //TODO Shouldn't we use `truncate` as the default value?
-    onInvalidPaste: 'error',
-
-    /* Defines how the value should be formatted when wanting a 'localized' version of it.
-     * null or 'string' => 'nnnn.nn' or '-nnnn.nn' as text type. This is the default behavior.
-     * 'number'         => nnnn.nn or -nnnn.nn as a Number (Warning: this works only for integers inferior to Number.MAX_SAFE_INTEGER)
-     * ',' or '-,'      => 'nnnn,nn' or '-nnnn,nn'
-     * '.-'             => 'nnnn.nn' or 'nnnn.nn-'
-     * ',-'             => 'nnnn,nn' or 'nnnn,nn-'
-     */
-    outputFormat: null,
-
-    /* Override min max limits
-     * overrideMinMaxLimits: "ceiling" adheres to maximumValue and ignores minimumValue settings
-     * overrideMinMaxLimits: "floor" adheres to minimumValue and ignores maximumValue settings
-     * overrideMinMaxLimits: "ignore" ignores both minimumValue & maximumValue
-     */
-    overrideMinMaxLimits: null,
-
-    /* Defines if the <input> element should be set as read only on initialization.
-     * When set to `true`, then the `readonly` html property is added to the <input> element on initialization.
-     */
-    readOnly: false,
-
-    /* method used for rounding
-     * roundingMethod: "S", Round-Half-Up Symmetric (default)
-     * roundingMethod: "A", Round-Half-Up Asymmetric
-     * roundingMethod: "s", Round-Half-Down Symmetric (lower case s)
-     * roundingMethod: "a", Round-Half-Down Asymmetric (lower case a)
-     * roundingMethod: "B", Round-Half-Even "Bankers Rounding"
-     * roundingMethod: "U", Round Up "Round-Away-From-Zero"
-     * roundingMethod: "D", Round Down "Round-Toward-Zero" - same as truncate
-     * roundingMethod: "C", Round to Ceiling "Toward Positive Infinity"
-     * roundingMethod: "F", Round to Floor "Toward Negative Infinity"
-     * roundingMethod: "N05" Rounds to the nearest .05 => same as "CHF" used in 1.9X and still valid
-     * roundingMethod: "U05" Rounds up to next .05
-     * roundingMethod: "D05" Rounds down to next .05
-     */
-    //TODO Rename the options to more explicit names ('S' => 'RoundHalfUpSymmetric', etc.)
-    //TODO Add an `an.roundingMethod` object that enum those options clearly
-    roundingMethod: 'S',
-
-    /* Set to true to allow the decimalPlacesShownOnFocus value to be saved with sessionStorage
-     * if ie 6 or 7 the value will be saved as a session cookie
-     */
-    saveValueToSessionStorage: false,
-
-    /* The next three options (scaleDivisor, scaleDecimalPlaces & scaleSymbol) handle scaling of the input when the input does not have focus
-     * Please note that the non-scaled value is held in data and it is advised that you use the "saveValueToSessionStorage" option to ensure retaining the value
-     * ["divisor", "decimal places", "symbol"]
-     * Example: with the following options set {scaleDivisor: '1000', scaleDecimalPlaces: '1', scaleSymbol: ' K'}
-     * Example: focusin value "1,111.11" focusout value "1.1 K"
-     */
-
-    /*
-     * The `scaleDecimalPlaces` option is the number of decimal place when not in focus - for this to work, `scaledDivisor` must not be `null`.
-     * This is optional ; if omitted the decimal places will be the same when the input has the focus.
-     */
-    scaleDecimalPlaces: null,
-
-    /* The `scaleDivisor` decides the on focus value and places the result in the input on focusout
-     * Example {scaleDivisor: '1000'} or <input data-scale-divisor="1000">
-     * The divisor value - does not need to be whole number but please understand that Javascript has limited accuracy in math
-     * The "get" method returns the full value, including the 'hidden' decimals.
-     */
-    scaleDivisor: null,
-
-    /*
-     * The `scaleSymbol` option is a symbol placed as a suffix when not in focus.
-     * This is optional too.
-     */
-    scaleSymbol: null,
-
-    /* Determine if the select all keyboard command will select the complete input text, or only the input numeric value
-     * Note : If the currency symbol is between the numeric value and the negative sign, only the numeric value will selected
-     */
-    selectNumberOnly: false,
-
-    /* Defines how the serialize functions should treat the spaces.
-     * Those spaces ' ' can either be converted to the plus sign '+', which is the default, or to '%20'.
-     * Both values being valid per the spec (http://www.w3.org/Addressing/URL/uri-spec.html).
-     * Also see the summed up answer on http://stackoverflow.com/a/33939287.
-     *
-     * tl;dr : Spaces should be converted to '%20' before the '?' sign, then converted to '+' after.
-     * In our case since we serialize the query, we use '+' as the default (but allow the user to get back the old *wrong* behavior).
-     */
-    serializeSpaces : '+',
-
-    /* Allow the positive sign symbol `+` to be displayed for positive numbers.
-     * By default, this positive sign is not shown.
-     * The sign placement is controlled by the 'negativePositiveSignPlacement' option, mimicking the negative sign placement rules.
-     */
-    showPositiveSign: false,
-
-    /* Defines if warnings should be shown
-     * Error handling function
-     * true => all warning are shown
-     * false => no warnings are shown, only the thrown errors
-     */
-    showWarnings: true,
-
-    /* Additional suffix
-     * Must be in quotes suffixText: 'gross', a space is allowed suffixText: ' dollars'
-     * Numeric characters and negative sign not allowed'
-     */
-    suffixText: '',
-
-    /* Defines if the element value should be unformatted when the user hover his mouse over it while holding the `Alt` key.
-     * We reformat back before anything else if :
-     * - the user focus on the element by tabbing or clicking into it,
-     * - the user releases the `Alt` key, and
-     * - if we detect a mouseleave event.
-     *
-     * We unformat again if :
-     * - while the mouse is over the element, the user hit ctrl again
-     */
-    unformatOnHover: true,
-
-    /* Removes formatting on submit event
-     * this output format: positive nnnn.nn, negative -nnnn.nn
-     * review the 'unSet' method for other formats
-     */
-    unformatOnSubmit: false,
-
-    /* That option is linked to the `modifyValueOnWheel` one and will only be used if the latter is set to `true`.
-     * This option will modify the wheel behavior and can be used in two ways, either by setting :
-     * - a 'fixed' step value (a positive float or integer number `1000`), or
-     * - the `'progressive'` string.
-     *
-     * The 'fixed' mode always increment/decrement the element value by that amount, while respecting the `minimumValue` and `maximumValue` settings.
-     * The 'progressive' mode will increment/decrement the element value based on its current value. The bigger the number, the bigger the step, and vice versa.
-     */
-    wheelStep : 'progressive',
-};
-
-/**
  * Options values enumeration
  */
 AutoNumeric.options = {
-    digitGroupSeparator          : {
-        comma                   : ',',
-        dot                     : '.',
-        normalSpace             : ' ',
-        thinSpace               : '\u2009',
-        narrowNoBreakSpace      : '\u202f',
-        noBreakSpace            : '\u00a0',
-        noSeparator             : '',
-        apostrophe              : "'",
-        arabicThousandsSeparator: '٬',
-        dotAbove                : '˙',
-    },
-    noSeparatorOnFocus           : {
-        noSeparator  : true,
-        withSeparator: false,
-    },
-    digitalGroupSpacing          : {
-        default: '3',
-    },
-    decimalCharacter             : {
-        comma                    : ',',
-        dot                      : '.',
-        middleDot                : '·',
-        arabicDecimalSeparator   : '٫',
-        decimalSeparatorKeySymbol: '⎖',
-    },
-    decimalCharacterAlternative  : {
-        none: null,
+    allowDecimalPadding          : {
+        padding  : true,
+        noPadding: false,
     },
     // cf. https://en.wikipedia.org/wiki/Currency_symbol
     currencySymbol               : {
-        default       : '',
+        none          : '',
         currencySign  : '¤',
         austral       : '₳', // ARA
         australCentavo: '¢',
@@ -6437,6 +6075,90 @@ AutoNumeric.options = {
         prefix: 'p',
         suffix: 's',
     },
+    decimalCharacter             : {
+        comma                    : ',',
+        dot                      : '.',
+        middleDot                : '·',
+        arabicDecimalSeparator   : '٫',
+        decimalSeparatorKeySymbol: '⎖',
+    },
+    decimalCharacterAlternative  : {
+        none : null,
+        comma: ',',
+    },
+    decimalPlacesOverride        : {
+        doNotOverride: null,
+    },
+    decimalPlacesShownOnFocus    : {
+        useDefault: null,
+    },
+    defaultValueOverride         : {
+        doNotOverride: null,
+    },
+    digitalGroupSpacing          : {
+        two      : '2',
+        twoScaled: '2s',
+        three    : '3',
+        four     : '4',
+    },
+    digitGroupSeparator          : {
+        comma                   : ',',
+        dot                     : '.',
+        normalSpace             : ' ',
+        thinSpace               : '\u2009',
+        narrowNoBreakSpace      : '\u202f',
+        noBreakSpace            : '\u00a0',
+        noSeparator             : '',
+        apostrophe              : "'",
+        arabicThousandsSeparator: '٬',
+        dotAbove                : '˙',
+    },
+    emptyInputBehavior           : {
+        focus : 'focus',
+        press : 'press',
+        always: 'always',
+        zero  : 'zero',
+    },
+    failOnUnknownOption          : {
+        fail  : true,
+        ignore: false,
+    },
+    formatOnPageLoad             : {
+        format     : true,
+        doNotFormat: false,
+    },
+    isCancellable                : {
+        cancellable   : true,
+        notCancellable: false,
+    },
+    leadingZero                  : {
+        allow: 'allow',
+        deny : 'deny',
+        keep : 'keep',
+    },
+    maximumValue                 : {
+        tenTrillions: '9999999999999.99', // 9.999.999.999.999,99 ~= 10000 billions
+        noDecimals  : '9999999999999',
+        oneBillion  : '999999999.99',
+        zero        : '0',
+    },
+    minimumValue                 : {
+        tenTrillions: '-9999999999999.99', // -9.999.999.999.999,99 ~= 10000 billions
+        noDecimals  : '-9999999999999',
+        oneBillion  : '-999999999.99',
+        zero        : '0',
+    },
+    modifyValueOnWheel           : {
+        modifyValue: true,
+        doNothing  : false,
+    },
+    negativeBracketsTypeOnBlur   : {
+        parentheses: '(,)',
+        brackets   : '[,]',
+        chevrons   : '<,>',
+        curlyBraces: '{,}',
+        none       : null,
+    },
     negativePositiveSignPlacement: {
         prefix: 'p',
         suffix: 's',
@@ -6444,43 +6166,13 @@ AutoNumeric.options = {
         right : 'r',
         none  : null,
     },
-    showPositiveSign             : {
-        show: true,
-        hide: false,
+    noEventListeners             : {
+        noEvents : true,
+        addEvents: false,
     },
-    suffixText                   : {
-        default: '',
-    },
-    overrideMinMaxLimits         : {
-        ceiling      : 'ceiling',
-        floor        : 'floor',
-        ignore       : 'ignore',
-        doNotOverride: null,
-    },
-    maximumValue                 : {
-        default: '9999999999999.99',
-    },
-    minimumValue                 : {
-        default: '-9999999999999.99',
-    },
-    decimalPlacesOverride        : {
-        default: null,
-    },
-    decimalPlacesShownOnFocus    : {
-        default: null,
-    },
-    scaleDivisor                 : {
-        default: null,
-    },
-    scaleDecimalPlaces           : {
-        default: null,
-    },
-    scaleSymbol                  : {
-        default: null,
-    },
-    saveValueToSessionStorage    : {
-        save     : true,
-        doNotSave: false,
+    noSeparatorOnFocus           : {
+        noSeparator  : true,
+        withSeparator: false,
     },
     onInvalidPaste               : {
         error   : 'error',
@@ -6488,6 +6180,27 @@ AutoNumeric.options = {
         clamp   : 'clamp',
         truncate: 'truncate',
         replace : 'replace',
+    },
+    outputFormat                 : {
+        string       : 'string',
+        number       : 'number',
+        dot          : '.',
+        negativeDot  : '-.',
+        comma        : ',',
+        negativeComma: '-,',
+        dotNegative  : '.-',
+        commaNegative: ',-',
+        none         : null,
+    },
+    overrideMinMaxLimits         : {
+        ceiling      : 'ceiling',
+        floor        : 'floor',
+        ignore       : 'ignore',
+        doNotOverride: null,
+    },
+    readOnly                     : {
+        readOnly : true,
+        readWrite: false,
     },
     roundingMethod               : {
         halfUpSymmetric                : 'S',
@@ -6503,91 +6216,389 @@ AutoNumeric.options = {
         upToNext05                     : 'U05',
         downToNext05                   : 'D05',
     },
-    allowDecimalPadding          : {
-        padding  : true,
-        noPadding: false,
+    saveValueToSessionStorage    : {
+        save     : true,
+        doNotSave: false,
     },
-    negativeBracketsTypeOnBlur   : {
-        parentheses: '(,)',
-        brackets   : '[,]',
-        chevrons   : '<,>',
-        curlyBraces: '{,}',
-        none       : null,
+    scaleDecimalPlaces           : {
+        doNotChangeDecimalPlaces: null,
     },
-    emptyInputBehavior           : {
-        focus : 'focus',
-        press : 'press',
-        always: 'always',
-        zero  : 'zero',
+    scaleDivisor                 : {
+        doNotActivateTheScalingOption: null,
+        percentage                   : 100,
+        permille                     : 1000,
+        basisPoint                   : 10000,
     },
-    leadingZero                  : {
-        allow: 'allow',
-        deny : 'deny',
-        keep : 'keep',
-    },
-    formatOnPageLoad             : {
-        format     : true,
-        doNotFormat: false,
+    scaleSymbol                  : {
+        none      : null,
+        percentage: '%',
+        permille  : '‰',
+        basisPoint : '‱',
     },
     selectNumberOnly             : {
         selectNumbersOnly: true,
         selectAll        : false,
     },
-    defaultValueOverride         : {
-        default: null,
-    },
-    unformatOnSubmit             : {
-        unformat        : true,
-        keepCurrentValue: false,
-    },
-    outputFormat                 : {
-        string       : 'string',
-        number       : 'number',
-        dot          : '.',
-        negativeDot  : '-.',
-        comma        : ',',
-        negativeComma: '-,',
-        dotNegative  : '.-',
-        commaNegative: ',-',
-        none         : null,
-    },
-    isCancellable                : {
-        cancellable   : true,
-        notCancellable: false,
-    },
-    modifyValueOnWheel           : {
-        modifyValue: true,
-        doNothing  : false,
-    },
-    wheelStep                    : {
-        progressive: 'progressive',
-    },
     serializeSpaces              : {
         plus   : '+',
         percent: '%20',
+    },
+    showPositiveSign             : {
+        show: true,
+        hide: false,
     },
     showWarnings                 : {
         show: true,
         hide: false,
     },
-    noEventListeners             : {
-        noEvents : true,
-        addEvents: false,
-    },
-    readOnly                     : {
-        readOnly : true,
-        readWrite: false,
+    suffixText                   : {
+        none: '',
     },
     unformatOnHover              : {
         unformat     : true,
         doNotUnformat: false,
     },
-    failOnUnknownOption          : {
-        fail  : true,
-        ignore: false,
+    unformatOnSubmit             : {
+        unformat        : true,
+        keepCurrentValue: false,
+    },
+    wheelStep                    : {
+        progressive: 'progressive',
     },
 };
 
+/**
+ * The defaults options.
+ * These can be overridden by the following methods:
+ * - HTML5 data attributes (ie. `<input type="text" data-currency-symbol=" €">`)
+ * - Options passed to the `update` method (ie. `anElement.update({ currencySymbol: ' €' });`), or simply during the initialization (ie. `new AutoNumeric(domElement, {options});`)
+ */
+AutoNumeric.defaultSettings = {
+    /* Allow padding the decimal places with zeros
+     * allowDecimalPadding: true - always Pad decimals with zeros
+     * allowDecimalPadding: false - does not pad with zeros.
+     * Note: setting allowDecimalPadding to 'false' will override the 'decimalPlacesOverride' setting.
+     *
+     * thanks to Jonas Johansson for the suggestion
+     */
+    allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.padding,
+
+    /* currencySymbol = allowed currency symbol
+     * Must be in quotes currencySymbol: "$"
+     * space to the right of the currency symbol currencySymbol: '$ '
+     * space to the left of the currency symbol currencySymbol: ' $'
+     */
+    currencySymbol: AutoNumeric.options.currencySymbol.none,
+
+    /* currencySymbolPlacement = placement of currency sign as a p=prefix or s=suffix
+     * for prefix currencySymbolPlacement: "p" (default)
+     * for suffix currencySymbolPlacement: "s"
+     */
+    currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.prefix,
+
+    /* Allowed decimal separator characters :
+     * ',' : Comma
+     * '.' : Dot
+     * '·' : Middle-dot
+     * '٫' : Arabic decimal separator
+     * '⎖' : Decimal separator key symbol
+     */
+    decimalCharacter: AutoNumeric.options.decimalCharacter.dot,
+
+    /* Allow to declare an alternative decimal separator which is automatically replaced by `decimalCharacter` when typed.
+     * This is used by countries that use a comma "," as the decimal character and have keyboards\numeric pads that have
+     * a period 'full stop' as the decimal characters (France or Spain for instance).
+     */
+    decimalCharacterAlternative: AutoNumeric.options.decimalCharacterAlternative.none,
+
+    /* Maximum number of decimal places = used to override decimal places set by the minimumValue & maximumValue values
+     */
+    decimalPlacesOverride: AutoNumeric.options.decimalPlacesOverride.doNotOverride,
+
+    /* Expanded decimal places visible when input has focus - example:
+     * {decimalPlacesShownOnFocus: "5"} and the default 2 decimal places with focus "1,000.12345" without focus "1,000.12" the results depends on the rounding method used
+     * the "get" method returns the extended decimal places
+     */
+    decimalPlacesShownOnFocus: AutoNumeric.options.decimalPlacesShownOnFocus.useDefault,
+
+    /* Helper option for ASP.NET postback
+     * should be the value of the unformatted default value
+     * examples:
+     * no default value="" {defaultValueOverride: ""}
+     * value=1234.56 {defaultValueOverride: '1234.56'}
+     */
+    defaultValueOverride: AutoNumeric.options.defaultValueOverride.doNotOverride,
+
+    /* Digital grouping for the thousand separator used in Format
+     * digitalGroupSpacing: "2", results in 99,99,99,999 India's lakhs
+     * digitalGroupSpacing: "2s", results in 99,999,99,99,999 India's lakhs scaled
+     * digitalGroupSpacing: "3", results in 999,999,999 default
+     * digitalGroupSpacing: "4", results in 9999,9999,9999 used in some Asian countries
+     */
+    digitalGroupSpacing: AutoNumeric.options.digitalGroupSpacing.three,
+
+    /* Allowed thousand grouping separator characters :
+     * ','      // Comma
+     * '.'      // Dot
+     * ' '      // Normal space
+     * '\u2009' // Thin-space
+     * '\u202f' // Narrow no-break space
+     * '\u00a0' // No-break space
+     * ''       // No separator
+     * "'"      // Apostrophe
+     * '٬'      // Arabic thousands separator
+     * '˙'      // Dot above
+     */
+    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.comma,
+
+    /* Displayed on empty string ""
+     * emptyInputBehavior: "focus" - (default) currency sign displayed and the input receives focus
+     * emptyInputBehavior: "press" - currency sign displays on any key being pressed
+     * emptyInputBehavior: "always" - always displays the currency sign only
+     * emptyInputBehavior: "zero" - if the input has no value on focus out displays a zero "rounded" with or without a currency sign
+     */
+    emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.focus,
+
+    /*
+     * This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object.
+     * You should set that to 'TRUE' if you want to make sure you are only using 'pure' autoNumeric settings objects in your code.
+     * If you see uncaught errors in the console and your code starts to fail, this means somehow those options gets corrupted by another program.
+     */
+    failOnUnknownOption: AutoNumeric.options.failOnUnknownOption.ignore,
+
+    /* Determine if the default value will be formatted on initialization.
+     * true = automatically formats the default value on initialization
+     * false = will not format the default value on initialization
+     */
+    formatOnPageLoad: AutoNumeric.options.formatOnPageLoad.format,
+
+    /* Allow the user to 'cancel' and undo the changes he made to the given autonumeric-managed element, by pressing the 'Escape' key.
+     * Whenever the user 'validate' the input (either by hitting 'Enter', or blurring the element), the new value is saved for subsequent 'cancellation'.
+     *
+     * The process :
+     *   - save the input value on focus
+     *   - if the user change the input value, and hit `Escape`, then the initial value saved on focus is set back
+     *   - on the other hand if the user either have used `Enter` to validate (`Enter` throws a change event) his entries, or if the input value has been changed by another script in the mean time, then we save the new input value
+     *   - on a successful 'cancel', select the whole value (while respecting the `selectNumberOnly` option)
+     *   - bonus; if the value has not changed, hitting 'Esc' just select all the input value (while respecting the `selectNumberOnly` option)
+     */
+    isCancellable : AutoNumeric.options.isCancellable.cancellable,
+
+    /* Controls leading zero behavior
+     * leadingZero: "allow", - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
+     * leadingZero: "deny", - allows only one leading zero on values less than one
+     * leadingZero: "keep", - allows leading zeros to be entered. on focusout zeros will be retained.
+     */
+    leadingZero: AutoNumeric.options.leadingZero.deny,
+
+    /* Maximum possible value
+     * value must be enclosed in quotes and use the period for the decimal point
+     * value must be larger than minimumValue
+     */
+    maximumValue: AutoNumeric.options.maximumValue.tenTrillions,
+
+    /* Minimum possible value
+     * value must be enclosed in quotes and use the period for the decimal point
+     * value must be smaller than maximumValue
+     */
+    minimumValue: AutoNumeric.options.minimumValue.tenTrillions,
+
+    /* Allow the user to increment or decrement the element value with the mouse wheel.
+     * The wheel behavior can by modified by the `wheelStep` option.
+     * This `wheelStep` options can be used in two ways, either by setting :
+     * - a 'fixed' step value (`wheelStep : 1000`), or
+     * - the 'progressive' string (`wheelStep : 'progressive'`), which will then activate a special mode where the step is automatically calculated based on the element value size.
+     *
+     * Note :
+     * A special behavior is applied in order to avoid preventing the user to scroll the page if the inputs are covering the whole available space.
+     * You can use the 'Shift' modifier key while using the mouse wheel in order to temporarily disable the increment/decrement feature (useful on small screen where some badly configured inputs could use all the available space).
+     */
+    modifyValueOnWheel : AutoNumeric.options.modifyValueOnWheel.modifyValue,
+
+    /* Adds brackets on negative values (ie. transforms '-$ 999.99' to '(999.99)')
+     * Those brackets are visible only when the field does NOT have the focus.
+     * The left and right symbols should be enclosed in quotes and separated by a comma
+     * This option can be of the following values :
+     * null, // This is the default value, which deactivate this feature
+     * '(,)',
+     * '[,]',
+     * '<,>' or
+     * '{,}'
+     */
+    negativeBracketsTypeOnBlur: AutoNumeric.options.negativeBracketsTypeOnBlur.none,
+
+    /* Placement of negative/positive sign relative to the currencySymbol option l=left, r=right, p=prefix & s=suffix
+     * -1,234.56  => default no options required
+     * -$1,234.56 => {currencySymbol: "$"} or {currencySymbol: "$", negativePositiveSignPlacement: "l"}
+     * $-1,234.56 => {currencySymbol: "$", negativePositiveSignPlacement: "r"} // Default if negativePositiveSignPlacement is 'null' and currencySymbol is not empty
+     * -1,234.56$ => {currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "p"} // Default if negativePositiveSignPlacement is 'null' and currencySymbol is not empty
+     * 1,234.56-  => {negativePositiveSignPlacement: "s"}
+     * $1,234.56- => {currencySymbol: "$", negativePositiveSignPlacement: "s"}
+     * 1,234.56-$ => {currencySymbol: "$", currencySymbolPlacement: "s"}
+     * 1,234.56$- => {currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "r"}
+     */
+    negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
+
+    /* Defines if the element should have event listeners activated on it.
+     * By default, those event listeners are only added to <input> elements, but not on the other html tags.
+     * This allows to initialize <input> elements without any event listeners.
+     * Warning: Since AutoNumeric will not check the input content after its initialization, using some autoNumeric methods will probably leads to formatting problems.
+     */
+    noEventListeners: AutoNumeric.options.noEventListeners.addEvents,
+
+    /* Remove the thousand separator on focus, currency symbol and suffix on focus
+     * example if the input value "$ 1,999.88 suffix"
+     * on "focusin" it becomes "1999.88" and back to "$ 1,999.88 suffix" on focus out.
+     */
+    noSeparatorOnFocus: AutoNumeric.options.noSeparatorOnFocus.withSeparator,
+
+    /*
+     * Manage how autoNumeric react when the user tries to paste an invalid number.
+     * - 'error'    : (This is the default behavior) The input value is not changed and an error is output in the console.
+     * - 'ignore'   : idem than 'error', but fail silently without outputting any error/warning in the console.
+     * - 'clamp'    : if the pasted value is either too small or too big regarding the minimumValue and maximumValue range, then the result is clamped to those limits.
+     * - 'truncate' : autoNumeric will insert as many pasted numbers it can at the initial caret/selection, until everything is pasted, or the range limit is hit.
+     *                The non-pasted numbers are dropped and therefore not used at all.
+     * - 'replace'  : autoNumeric will first insert as many pasted numbers it can at the initial caret/selection, then if the range limit is hit, it will try
+     *                to replace one by one the remaining initial numbers (on the right side of the caret) with the rest of the pasted numbers.
+     *
+     * Note 1 : A paste content starting with a negative sign '-' will be accepted anywhere in the input, and will set the resulting value as a negative number
+     * Note 2 : A paste content starting with a number will be accepted, even if the rest is gibberish (ie. '123foobar456').
+     *          Only the first number will be used (here '123').
+     * Note 3 : The paste event works with the `decimalPlacesShownOnFocus` option too.
+     */
+    //TODO Shouldn't we use `truncate` as the default value?
+    onInvalidPaste: AutoNumeric.options.onInvalidPaste.error,
+
+    /* Defines how the value should be formatted when wanting a 'localized' version of it.
+     * null or 'string' => 'nnnn.nn' or '-nnnn.nn' as text type. This is the default behavior.
+     * 'number'         => nnnn.nn or -nnnn.nn as a Number (Warning: this works only for integers inferior to Number.MAX_SAFE_INTEGER)
+     * ',' or '-,'      => 'nnnn,nn' or '-nnnn,nn'
+     * '.-'             => 'nnnn.nn' or 'nnnn.nn-'
+     * ',-'             => 'nnnn,nn' or 'nnnn,nn-'
+     */
+    outputFormat: AutoNumeric.options.outputFormat.none,
+
+    /* Override min max limits
+     * overrideMinMaxLimits: "ceiling" adheres to maximumValue and ignores minimumValue settings
+     * overrideMinMaxLimits: "floor" adheres to minimumValue and ignores maximumValue settings
+     * overrideMinMaxLimits: "ignore" ignores both minimumValue & maximumValue
+     */
+    overrideMinMaxLimits: AutoNumeric.options.overrideMinMaxLimits.doNotOverride,
+
+    /* Defines if the <input> element should be set as read only on initialization.
+     * When set to `true`, then the `readonly` html property is added to the <input> element on initialization.
+     */
+    readOnly: AutoNumeric.options.readOnly.readWrite,
+
+    /* method used for rounding
+     * roundingMethod: "S", Round-Half-Up Symmetric (default)
+     * roundingMethod: "A", Round-Half-Up Asymmetric
+     * roundingMethod: "s", Round-Half-Down Symmetric (lower case s)
+     * roundingMethod: "a", Round-Half-Down Asymmetric (lower case a)
+     * roundingMethod: "B", Round-Half-Even "Bankers Rounding"
+     * roundingMethod: "U", Round Up "Round-Away-From-Zero"
+     * roundingMethod: "D", Round Down "Round-Toward-Zero" - same as truncate
+     * roundingMethod: "C", Round to Ceiling "Toward Positive Infinity"
+     * roundingMethod: "F", Round to Floor "Toward Negative Infinity"
+     * roundingMethod: "N05" Rounds to the nearest .05 => same as "CHF" used in 1.9X and still valid
+     * roundingMethod: "U05" Rounds up to next .05
+     * roundingMethod: "D05" Rounds down to next .05
+     */
+    roundingMethod: AutoNumeric.options.roundingMethod.halfUpSymmetric,
+
+    /* Set to true to allow the decimalPlacesShownOnFocus value to be saved with sessionStorage
+     * if ie 6 or 7 the value will be saved as a session cookie
+     */
+    saveValueToSessionStorage: AutoNumeric.options.saveValueToSessionStorage.doNotSave,
+
+    /* The next three options (scaleDivisor, scaleDecimalPlaces & scaleSymbol) handle scaling of the input when the input does not have focus
+     * Please note that the non-scaled value is held in data and it is advised that you use the "saveValueToSessionStorage" option to ensure retaining the value
+     * ["divisor", "decimal places", "symbol"]
+     * Example: with the following options set {scaleDivisor: '1000', scaleDecimalPlaces: '1', scaleSymbol: ' K'}
+     * Example: focusin value "1,111.11" focusout value "1.1 K"
+     */
+
+    /*
+     * The `scaleDecimalPlaces` option is the number of decimal place when not in focus - for this to work, `scaledDivisor` must not be `null`.
+     * This is optional ; if omitted the decimal places will be the same when the input has the focus.
+     */
+    scaleDecimalPlaces: AutoNumeric.options.scaleDecimalPlaces.doNotChangeDecimalPlaces,
+
+    /* The `scaleDivisor` decides the on focus value and places the result in the input on focusout
+     * Example {scaleDivisor: '1000'} or <input data-scale-divisor="1000">
+     * The divisor value - does not need to be whole number but please understand that Javascript has limited accuracy in math
+     * The "get" method returns the full value, including the 'hidden' decimals.
+     */
+    scaleDivisor: AutoNumeric.options.scaleDivisor.doNotActivateTheScalingOption,
+
+    /*
+     * The `scaleSymbol` option is a symbol placed as a suffix when not in focus.
+     * This is optional too.
+     */
+    scaleSymbol: AutoNumeric.options.scaleSymbol.none,
+
+    /* Determine if the select all keyboard command will select the complete input text, or only the input numeric value
+     * Note : If the currency symbol is between the numeric value and the negative sign, only the numeric value will selected
+     */
+    selectNumberOnly: AutoNumeric.options.selectNumberOnly.selectAll,
+
+    /* Defines how the serialize functions should treat the spaces.
+     * Those spaces ' ' can either be converted to the plus sign '+', which is the default, or to '%20'.
+     * Both values being valid per the spec (http://www.w3.org/Addressing/URL/uri-spec.html).
+     * Also see the summed up answer on http://stackoverflow.com/a/33939287.
+     *
+     * tl;dr : Spaces should be converted to '%20' before the '?' sign, then converted to '+' after.
+     * In our case since we serialize the query, we use '+' as the default (but allow the user to get back the old *wrong* behavior).
+     */
+    serializeSpaces : AutoNumeric.options.serializeSpaces.plus,
+
+    /* Allow the positive sign symbol `+` to be displayed for positive numbers.
+     * By default, this positive sign is not shown.
+     * The sign placement is controlled by the 'negativePositiveSignPlacement' option, mimicking the negative sign placement rules.
+     */
+    showPositiveSign: AutoNumeric.options.showPositiveSign.hide,
+
+    /* Defines if warnings should be shown
+     * Error handling function
+     * true => all warning are shown
+     * false => no warnings are shown, only the thrown errors
+     */
+    showWarnings: AutoNumeric.options.showWarnings.show,
+
+    /* Additional suffix
+     * Must be in quotes suffixText: 'gross', a space is allowed suffixText: ' dollars'
+     * Numeric characters and negative sign not allowed'
+     */
+    suffixText: AutoNumeric.options.suffixText.none,
+
+    /* Defines if the element value should be unformatted when the user hover his mouse over it while holding the `Alt` key.
+     * We reformat back before anything else if :
+     * - the user focus on the element by tabbing or clicking into it,
+     * - the user releases the `Alt` key, and
+     * - if we detect a mouseleave event.
+     *
+     * We unformat again if :
+     * - while the mouse is over the element, the user hit ctrl again
+     */
+    unformatOnHover: AutoNumeric.options.unformatOnHover.unformat,
+
+    /* Removes formatting on submit event
+     * this output format: positive nnnn.nn, negative -nnnn.nn
+     * review the 'unSet' method for other formats
+     */
+    unformatOnSubmit: AutoNumeric.options.unformatOnSubmit.keepCurrentValue,
+
+    /* That option is linked to the `modifyValueOnWheel` one and will only be used if the latter is set to `true`.
+     * This option will modify the wheel behavior and can be used in two ways, either by setting :
+     * - a 'fixed' step value (a positive float or integer number `1000`), or
+     * - the `'progressive'` string.
+     *
+     * The 'fixed' mode always increment/decrement the element value by that amount, while respecting the `minimumValue` and `maximumValue` settings.
+     * The 'progressive' mode will increment/decrement the element value based on its current value. The bigger the number, the bigger the step, and vice versa.
+     */
+    wheelStep : AutoNumeric.options.wheelStep.progressive,
+};
 
 /**
  * Predefined options for the most common languages

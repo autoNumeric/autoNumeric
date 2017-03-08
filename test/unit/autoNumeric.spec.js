@@ -3286,6 +3286,6 @@ describe(`the static options object`, () => {
         expect(AutoNumeric.options.digitGroupSeparator.apostrophe).toEqual("'");
         expect(AutoNumeric.options.decimalCharacter.middleDot).toEqual('·');
         expect(AutoNumeric.options.decimalCharacterAlternative.none).toBeNull();
-        expect(AutoNumeric.options.currencySymbol.default).toEqual('');
+        expect(AutoNumeric.options.currencySymbol.none).toEqual('');
     });
 });

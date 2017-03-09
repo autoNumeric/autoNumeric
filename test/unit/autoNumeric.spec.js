@@ -152,8 +152,8 @@ describe('The autoNumeric object', () => {
                     negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
                     roundingMethod               : 'U',
                     leadingZero                  : 'deny',
-                    minimumValue                 : '-999999999999.99',
-                    maximumValue                 : '999999999999.99',
+                    minimumValue                 : '-9999999999999.99',
+                    maximumValue                 : '9999999999999.99',
                 },
                 NorthAmerican: {
                     selectNumberOnly             : true,
@@ -164,8 +164,8 @@ describe('The autoNumeric object', () => {
                     negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
                     roundingMethod               : 'U',
                     leadingZero                  : 'deny',
-                    minimumValue                 : '-999999999999.99',
-                    maximumValue                 : '999999999999.99',
+                    minimumValue                 : '-9999999999999.99',
+                    maximumValue                 : '9999999999999.99',
                 },
             };
 
@@ -2026,9 +2026,9 @@ describe('autoNumeric `selectDecimal` methods', () => {
     it('should select only the decimal part', () => {
         expect(aNInput.getNumericString()).toEqual('');
         aNInput.set(2172834.234);
-        expect(aNInput.getNumericString()).toEqual('2172834.24');
-        expect(aNInput.getNumber()).toEqual(2172834.24);
-        expect(aNInput.getFormatted()).toEqual('2.172.834,24\u202f€'); // '2.172.834,24 €'
+        expect(aNInput.getNumericString()).toEqual('2172834.23');
+        expect(aNInput.getNumber()).toEqual(2172834.23);
+        expect(aNInput.getFormatted()).toEqual('2.172.834,23\u202f€');
 
         aNInput.select();
         expect(aNInput.node().selectionStart).toEqual(0);
@@ -2088,9 +2088,9 @@ describe('autoNumeric `selectInteger` methods', () => {
     it('should select only the decimal part', () => {
         expect(aNInput.getNumericString()).toEqual('');
         aNInput.set(2172834.234);
-        expect(aNInput.getNumericString()).toEqual('2172834.24');
-        expect(aNInput.getNumber()).toEqual(2172834.24);
-        expect(aNInput.getFormatted()).toEqual('2.172.834,24\u202f€'); // '2.172.834,24 €'
+        expect(aNInput.getNumericString()).toEqual('2172834.23');
+        expect(aNInput.getNumber()).toEqual(2172834.23);
+        expect(aNInput.getFormatted()).toEqual('2.172.834,23\u202f€');
 
         aNInput.select();
         expect(aNInput.node().selectionStart).toEqual(0);

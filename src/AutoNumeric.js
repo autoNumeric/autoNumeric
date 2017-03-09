@@ -6085,6 +6085,7 @@ AutoNumeric.options = {
     decimalCharacterAlternative  : {
         none : null,
         comma: ',',
+        dot  : '.',
     },
     decimalPlacesOverride        : {
         doNotOverride: null,
@@ -6109,7 +6110,7 @@ AutoNumeric.options = {
         narrowNoBreakSpace      : '\u202f',
         noBreakSpace            : '\u00a0',
         noSeparator             : '',
-        apostrophe              : "'",
+        apostrophe              : `'`,
         arabicThousandsSeparator: '٬',
         dotAbove                : '˙',
     },
@@ -6603,72 +6604,52 @@ AutoNumeric.defaultSettings = {
 /**
  * Predefined options for the most common languages
  */
-const defaultMinimumValue     = '-999999999999.99';
-const defaultMaximumValue     = '999999999999.99';
-const defaultRoundingMethod   = AutoNumeric.options.roundingMethod.upRoundAwayFromZero;
-const defaultLeadingZero      = AutoNumeric.options.leadingZero.deny;
-const defaultSelectNumberOnly = true;
 AutoNumeric.languageOptions = {
     French       : { // Français
-        digitGroupSeparator          : '.', // or '\u202f'
-        decimalCharacter             : ',',
-        decimalCharacterAlternative  : '.',
+        digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.dot, // or '\u202f'
+        decimalCharacter             : AutoNumeric.options.decimalCharacter.comma,
+        decimalCharacterAlternative  : AutoNumeric.options.decimalCharacterAlternative.dot,
         currencySymbol               : '\u202f€',
         currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
         negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
-        selectNumberOnly             : defaultSelectNumberOnly,
-        roundingMethod               : defaultRoundingMethod,
-        leadingZero                  : defaultLeadingZero,
-        minimumValue                 : defaultMinimumValue,
-        maximumValue                 : defaultMaximumValue,
+        minimumValue                 : AutoNumeric.options.minimumValue.tenTrillions,
+        maximumValue                 : AutoNumeric.options.maximumValue.tenTrillions,
     },
     NorthAmerican: {
-        digitGroupSeparator          : ',',
-        decimalCharacter             : '.',
-        currencySymbol               : '$',
+        digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.comma,
+        decimalCharacter             : AutoNumeric.options.decimalCharacter.dot,
+        currencySymbol               : AutoNumeric.options.currencySymbol.dollar,
         currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
         negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
-        selectNumberOnly             : defaultSelectNumberOnly,
-        roundingMethod               : defaultRoundingMethod,
-        leadingZero                  : defaultLeadingZero,
-        minimumValue                 : defaultMinimumValue,
-        maximumValue                 : defaultMaximumValue,
+        minimumValue                 : AutoNumeric.options.minimumValue.tenTrillions,
+        maximumValue                 : AutoNumeric.options.maximumValue.tenTrillions,
     },
     British      : {
-        digitGroupSeparator          : ',',
-        decimalCharacter             : '.',
-        currencySymbol               : '£',
+        digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.comma,
+        decimalCharacter             : AutoNumeric.options.decimalCharacter.dot,
+        currencySymbol               : AutoNumeric.options.currencySymbol.pound,
         currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
         negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
-        selectNumberOnly             : defaultSelectNumberOnly,
-        roundingMethod               : defaultRoundingMethod,
-        leadingZero                  : defaultLeadingZero,
-        minimumValue                 : defaultMinimumValue,
-        maximumValue                 : defaultMaximumValue,
+        minimumValue                 : AutoNumeric.options.minimumValue.tenTrillions,
+        maximumValue                 : AutoNumeric.options.maximumValue.tenTrillions,
     },
     Swiss        : { // Suisse
-        digitGroupSeparator          : `'`,
-        decimalCharacter             : '.',
+        digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.apostrophe,
+        decimalCharacter             : AutoNumeric.options.decimalCharacter.dot,
         currencySymbol               : '\u202fCHF',
         currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
         negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
-        selectNumberOnly             : defaultSelectNumberOnly,
-        roundingMethod               : defaultRoundingMethod,
-        leadingZero                  : defaultLeadingZero,
-        minimumValue                 : defaultMinimumValue,
-        maximumValue                 : defaultMaximumValue,
+        minimumValue                 : AutoNumeric.options.minimumValue.tenTrillions,
+        maximumValue                 : AutoNumeric.options.maximumValue.tenTrillions,
     },
     Japanese     : { // 日本語
-        digitGroupSeparator          : ',',
-        decimalCharacter             : '.',
-        currencySymbol               : '¥',
+        digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.comma,
+        decimalCharacter             : AutoNumeric.options.decimalCharacter.dot,
+        currencySymbol               : AutoNumeric.options.currencySymbol.yen,
         currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
         negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
-        selectNumberOnly             : defaultSelectNumberOnly,
-        roundingMethod               : defaultRoundingMethod,
-        leadingZero                  : defaultLeadingZero,
-        minimumValue                 : defaultMinimumValue,
-        maximumValue                 : defaultMaximumValue,
+        minimumValue                 : AutoNumeric.options.minimumValue.tenTrillions,
+        maximumValue                 : AutoNumeric.options.maximumValue.tenTrillions,
     },
 };
 AutoNumeric.languageOptions.Spanish = AutoNumeric.languageOptions.French; // Español (idem French)

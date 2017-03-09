@@ -561,7 +561,6 @@
         currencySymbol             : '\u00a0€',
         currencySymbolPlacement    : 's',
         roundingMethod             : 'U',
-        leadingZero                : 'deny',
         minimumValue               : '-999999999999.99',
         maximumValue               : '999999999999.99',
         onInvalidPaste             : 'error',
@@ -575,7 +574,6 @@
         currencySymbol             : '\u00a0€',
         currencySymbolPlacement    : 's',
         roundingMethod             : 'U',
-        leadingZero                : 'deny',
         minimumValue               : '-999999999999.99',
         maximumValue               : '999999999999.99',
         onInvalidPaste             : 'ignore'
@@ -587,7 +585,6 @@
         currencySymbol             : '$ ',
         currencySymbolPlacement    : 'p',
         roundingMethod             : 'U',
-        leadingZero                : 'deny',
         minimumValue               : '-999999999999.99',
         maximumValue               : '999999999999.99',
         onInvalidPaste             : 'clamp'
@@ -599,7 +596,6 @@
         currencySymbol             : '\u00a0€',
         currencySymbolPlacement    : 's',
         roundingMethod             : 'U',
-        leadingZero                : 'deny',
         minimumValue               : '-999999999999.99',
         maximumValue               : '999999999999.99',
         onInvalidPaste             : 'truncate'
@@ -611,7 +607,6 @@
         currencySymbol             : '\u00a0€',
         currencySymbolPlacement    : 's',
         roundingMethod             : 'U',
-        leadingZero                : 'deny',
         minimumValue               : '-999999999999.99',
         maximumValue               : '2999999999911.99',
         onInvalidPaste             : 'replace'
@@ -789,10 +784,10 @@
     new AutoNumeric('#issue_303s', { currencySymbolPlacement: 's', currencySymbol: '\u00a0€', /*emptyInputBehavior: 'always'*/ });
 
     //-------------- Issue #387
-    new AutoNumeric('#issue_387_cancellable', { isCancellable: true, currencySymbol: '$' });
+    new AutoNumeric('#issue_387_cancellable', { isCancellable: true, selectNumberOnly: false, currencySymbol: '$' });
     new AutoNumeric('#issue_387_cancellable_numOnly', { isCancellable: true, selectNumberOnly: true, currencySymbol: '$' });
 
-    new AutoNumeric('#issue_387_not_cancellable', { isCancellable: false, currencySymbol: '$' });
+    new AutoNumeric('#issue_387_not_cancellable', { isCancellable: false, selectNumberOnly: false, currencySymbol: '$' });
     new AutoNumeric('#issue_387_not_cancellable_numOnly', { isCancellable: false, selectNumberOnly: true, currencySymbol: '$' });
 
     //-------------- Issue #393

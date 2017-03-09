@@ -6541,7 +6541,7 @@ AutoNumeric.defaultSettings = {
     /* Determine if the select all keyboard command will select the complete input text, or only the input numeric value
      * Note : If the currency symbol is between the numeric value and the negative sign, only the numeric value will selected
      */
-    selectNumberOnly: AutoNumeric.options.selectNumberOnly.selectAll,
+    selectNumberOnly: AutoNumeric.options.selectNumberOnly.selectNumbersOnly,
 
     /* Defines how the serialize functions should treat the spaces.
      * Those spaces ' ' can either be converted to the plus sign '+', which is the default, or to '%20'.

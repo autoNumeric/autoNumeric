@@ -111,7 +111,7 @@ describe('The autoNumeric object', () => {
             scaleDecimalPlaces           : null,
             scaleDivisor                 : null,
             scaleSymbol                  : null,
-            selectNumberOnly             : false,
+            selectNumberOnly             : true,
             serializeSpaces              : '+',
             showPositiveSign             : false,
             showWarnings                 : true,

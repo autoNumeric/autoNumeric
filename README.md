@@ -580,7 +580,8 @@ In a nutshell :
 - Lint, build, and run tests `yarn lint && yarn build && yarn test`
 - Create a pull request, and we'll check it out as soon as possible!
 
-Again, be sure to check the [CONTRIBUTING](CONTRIBUTING.md) file for more details.
+Again, be sure to check the [CONTRIBUTING](CONTRIBUTING.md) file for more details.<br>
+Also, feel free to follow our RSS feeds on [master](https://github.com/BobKnothe/autoNumeric//commits/master.atom) and [next](https://github.com/BobKnothe/autoNumeric//commits/next.atom) to keep up with the latest commits.
 
 ### Dependencies
 None!

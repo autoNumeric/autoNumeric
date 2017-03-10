@@ -77,5 +77,9 @@ Every changes that you pushed in its own branch in your personal autoNumeric cop
 
 When you create a pull request, make sure to push against the `next` branch.
 
-Your commit must not contain any generated files (ie. files in the `/dist/` directory or logs).<br>
+Please try to break down your pull requests and commits into small and manageable entities, in order:
+- to make them easier to process, and more importantly
+- to keep each logical set of changes in its own commit.
+
+Additionally, your commits must not contain any generated files (ie. files built in the `/dist/` directory, or logs).<br>
 *Note: Generated `dist` files (ie. `autoNumeric.js` and `autoNumeric.min.js`) are built and force-added to the git repository only once for each official release on `master`.*

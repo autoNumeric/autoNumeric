@@ -1361,9 +1361,23 @@ describe('The autoNumeric object', () => {
             document.body.removeChild(span);
         });
 
+        it('should fail initializing an input element of type `number`', () => {
+            // Create the element
+            const inputTel = document.createElement('input');
+            inputTel.type = 'number';
+            inputTel.value = '663241800.0214';
+            document.body.appendChild(inputTel);
+
+            expect(() => new AutoNumeric(inputTel)).toThrow();
+
+            // Remove the element
+            document.body.removeChild(inputTel);
+        });
+
         it('should correctly initialize input element of type `tel`', () => {
             // Create the element
             const inputTel = document.createElement('input');
+            inputTel.type = 'tel';
             inputTel.value = '663241800.0214';
             document.body.appendChild(inputTel);
 

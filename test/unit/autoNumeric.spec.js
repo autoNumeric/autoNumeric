@@ -786,7 +786,7 @@ describe('The autoNumeric object', () => {
         });
     });
 
-    describe('provides public methods for modifying multiple AutoNumeric objects sharing the same local list at once', () => { //FIXME à terminer
+    describe('provides public methods for modifying multiple AutoNumeric objects sharing the same local list at once', () => {
         let newInput1;
         let newInput2;
         let newInput3;
@@ -1007,7 +1007,7 @@ describe('The autoNumeric object', () => {
             //FIXME Test the case where the raw value have not changed, but the formatting has
         });
 
-        //FIXME à terminer --> getNumericString, getFormatted, getNumber, getLocalized, clear, remove, wipe, has, addObject, removeObject, empty, elements, getList
+        //FIXME Test the other methods: getNumericString, getFormatted, getNumber, getLocalized, clear, remove, wipe, has, addObject, removeObject, empty, elements, getList
     });
 
     describe('initialization methods with the `multiple()` function', () => {
@@ -1359,6 +1359,18 @@ describe('The autoNumeric object', () => {
             document.body.removeChild(h5);
             document.body.removeChild(label);
             document.body.removeChild(span);
+        });
+
+        it('should correctly initialize input element of type `tel`', () => {
+            // Create the element
+            const inputTel = document.createElement('input');
+            inputTel.value = '663241800.0214';
+            document.body.appendChild(inputTel);
+
+            expect(new AutoNumeric(inputTel).french().getFormatted()).toEqual('663.241.800,02 €');
+
+            // Remove the element
+            document.body.removeChild(inputTel);
         });
 
         it('should correctly initialize the AutoNumeric element', () => {

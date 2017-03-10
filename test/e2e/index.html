@@ -68,7 +68,8 @@
 			transition : color 0.3s ease;
 		}
 
-		input[type="text"] {
+		input[type="text"],
+		input[type="tel"] {
 			text-align       : right;
 			border-radius    : 2px;
 			border           : 1px solid #5F5F5F;
@@ -82,15 +83,18 @@
 			outline          : none;
 		}
 
-		input[type="text"]::-webkit-input-placeholder {
+		input[type="text"]::-webkit-input-placeholder,
+		input[type="tel"]::-webkit-input-placeholder {
 			color : #737373;
 		}
 
-		input[type="text"]:hover {
+		input[type="text"]:hover,
+		input[type="tel"]:hover {
 			border : 1px solid #70A0A5;
 		}
 
-		input[type="text"]:focus {
+		input[type="text"]:focus,
+		input[type="tel"]:focus {
 			border : 1px solid #00B3C5;
 		}
 
@@ -454,6 +458,16 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<div class="test">
+				<p class="description">Input type 'tel'</p>
+				<input id="inputTel1" type="tel" value="12345.678">
+				<input id="inputTel2" type="tel" value="12345.678">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -764,7 +778,6 @@
         currencySymbol             : '\u00a0€',
         currencySymbolPlacement    : 's',
         roundingMethod             : 'U',
-        leadingZero                : 'deny',
         minimumValue               : '-999999999999.99',
         maximumValue               : '999999999999.99',
         onInvalidPaste             : 'ignore'
@@ -834,6 +847,10 @@
     new AutoNumeric('#negativeBrackets_6', rightLeft).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
     new AutoNumeric('#negativeBrackets_7', rightRight).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
     new AutoNumeric('#negativeBrackets_8', rightPrefix).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
+
+    //-------------- Input element of type 'tel'
+    new AutoNumeric('#inputTel1').french();
+    new AutoNumeric('#inputTel2').japanese();
 </script>
 </body>
 </html>

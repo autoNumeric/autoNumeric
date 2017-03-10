@@ -1,5 +1,25 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.10"
++ Add lots of pre-defined options.
++ Those options are `dotDecimalCharCommaSeparator`, `commaDecimalCharDotSeparator`, `integer`, `integerPos`, `integerNeg`, `float`, `floatPos`, `floatNeg`, `numeric`, `numericPos`, `numericNeg`, `euro`, `euroPos`, `euroNeg`, `euroSpace`, `euroSpacePos`, `euroSpaceNeg`, `percentageEU2dec`, `percentageEU2decPos`, `percentageEU2decNeg`, `percentageEU3dec`, `percentageEU3decPos`, `percentageEU3decNeg`, `dollar`, `dollarPos`, `dollarNeg`, `percentageUS2dec`, `percentageUS2decPos`, `percentageUS2decNeg`, `percentageUS3dec`, `percentageUS3decPos` and `percentageUS3decNeg`.
++ Add the unit tests for those pre-defined options.
++ Update the readme accordingly, doing a distinction between the 'Predefined language options' and the 'Predefined common options'.
++ Rename `getLanguages()` to `getPredefinedOptions()`.
++ Add the percentage, permille and basis point sign to the default `suffixText` options.
++ Add a test to warn the user when the given CSS selector does not select any element during initialization.
++ Fix the initialization problem when searching for a parent <form> on an element that has no parentNode.
++ Re-order alphabetically the default settings
++ Replace the hard-coded default option values with references to the `AutoNumeric.options` object values.
++ Re-order alphabetically the options enumeration.
++ Add more choices for some options.
++ Rename default options value names to more meaningful descriptions.
++ Change the default option `selectNumberOnly` value to `true`
++ Simplify the `AutoNumeric.languageOptions` object.
++ Add the 'dot' character to the `decimalCharacterAlternative` option enumeration.
++ Update the end-to-end tests that test the element value selection on focus, to reflect the change to the default value for `selectNumberOnly`.
++ Update the unit tests to correct the rounding on some values that used the previous default one defined in `AutoNumeric.languageOptions.French`.
+  
 ### "3.0.0-beta.9"
 + Fix and removes some TODOs and FIXMEs
 + Remove some debug messages.

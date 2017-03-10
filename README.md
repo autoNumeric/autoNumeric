@@ -201,16 +201,22 @@ anElement = new AutoNumeric(domElement, 12345.789, { readOnly: true });
 
 For more detail on how to use each options, please take a look at the detailed comments in the source code for the `defaultSettings` object.
 
-#### Predefined language options
+#### Predefined options
 
-Sometime you do not want to have to configure every single aspect of your format, specially if it's a common one.<br>Hence, we provide multiple default options for the most common currencies.
+Sometimes you do not want to have to configure every single aspect of your format, specially if it's a common one.<br>Hence, we provide multiple default options for the most common currencies and number formats.
 
-You can use those pre-defined language option like so :
+##### Predefined language options
+
+autoNumeric provides predefined language options to format currencies.<br>
+You can set the pre-defined language option like so:
 ```js
+// Use the methods
 new AutoNumeric('.mySelector > input').french();
+// ...or just create the AutoNumeric object with the language option
+new AutoNumeric('.mySelector > input', AutoNumeric.getPredefinedOptions().French);
 ```
 
-Currently, the predefined options are :
+Currently, the predefined language options are:
 
 | | Option name |
 | :---------------- | :---------------- |
@@ -222,7 +228,51 @@ Currently, the predefined options are :
 | :jp: | `Japanese` |
 | :cn: | `Chinese` |
 
-If you feel a common currency option is missing, please create a pull request and we'll add it!
+If you feel a common currency option is missing, please [create a pull request](https://github.com/BobKnothe/autoNumeric/compare) and we'll add it!
+
+##### Predefined common options
+
+Moreover, autoNumeric provides the following common options:
+
+| Option name | Description |
+| :---------------- | :---------------- |
+| `dotDecimalCharCommaSeparator` | Set the decimal character as a dot `.` and the group separator as a comma `,` |
+| `commaDecimalCharDotSeparator` | Set the decimal character as a comma `,` and the group separator as a dot `.` |
+| `integer` | Set the minimum and maximum value so that only an integer can be entered, without any decimal places available |
+| `integerPos` | Set the minimum and maximum value so that only a positive integer can be entered |
+| `integerNeg` | Set the minimum and maximum value so that only a negative integer can be entered |
+| `float` | Set the minimum and maximum value so that a float can be entered, without the default `2` decimal places |
+| `floatPos` | Set the minimum and maximum value so that only a positive float can be entered |
+| `floatNeg` | Set the minimum and maximum value so that only a negative float can be entered |
+| `numeric` | Format the value as a numeric string (with no digit group separator, and a dot for the decimal point) |
+| `numericPos` | Idem above, but only allow positive values |
+| `numericNeg` | Idem above, but only allow negative values |
+| `euro` | Same configuration than `French` |
+| `euroPos` | Idem above, but only allow positive values |
+| `euroNeg` | Idem above, but only allow negative values |
+| `euroSpace` | Same configuration than `French` except a space is used for the group separator instead of the dot |
+| `euroSpacePos` | Idem above, but only allow positive values |
+| `euroSpaceNeg` | Idem above, but only allow negative values |
+| `dollar` | Same configuration than `NorthAmerican`  |
+| `dollarPos` | Idem above, but only allow positive values |
+| `dollarNeg` | Idem above, but only allow negative values |
+| `percentageEU2dec` | Same configuration than `French`, but display a percent `%` sign instead of the currency sign, with `2` decimal places |
+| `percentageEU2decPos` | Idem above, but only allow positive values |
+| `percentageEU2decNeg` | Idem above, but only allow negative values |
+| `percentageEU3dec` | Same configuration than `French`, but display a percent `%` sign instead of the currency sign, with `3` decimal places |
+| `percentageEU3decPos` | Idem above, but only allow positive values |
+| `percentageEU3decNeg` | Idem above, but only allow negative values |
+| `percentageUS2dec` | Same configuration than `NorthAmerican`, but display a percent `%` sign instead of the currency sign, with `2` decimal places |
+| `percentageUS2decPos` | Idem above, but only allow positive values |
+| `percentageUS2decNeg` | Idem above, but only allow negative values |
+| `percentageUS3dec` | Same configuration than `NorthAmerican`, but display a percent `%` sign instead of the currency sign, with `3` decimal places |
+| `percentageUS3decPos` | Idem above, but only allow positive values |
+| `percentageUS3decNeg` | Idem above, but only allow negative values |
+
+You can set those pre-defined options like so:
+```js
+new AutoNumeric('.mySelector > input', AutoNumeric.getPredefinedOptions().integerPos);
+```
 
 ## Initialization
 
@@ -282,7 +332,7 @@ Options can be added and/or modified after the initialization has been done.
 Either by passing an options object that contains multiple options...
 ```js
 anElement.update({ moreOptions });
-anElement.update(AutoNumeric.getLanguages().NorthAmerican); // Update the settings (and immediately reformat the element accordingly)
+anElement.update(AutoNumeric.getPredefinedOptions().NorthAmerican); // Update the settings (and immediately reformat the element accordingly)
 ```
 
 ...or by changing the options one by one (or by calling a pre-defined option object)
@@ -482,8 +532,8 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 | `validate` | Check if the given option object is valid, and that each option is valid as well. This throws an error if it's not. | `AutoNumeric.validate({ options })` |
 | `areSettingsValid` | Return true in the settings are valid | `AutoNumeric.areSettingsValid({ options })` |
 | `getDefaultConfig` | Return the default autoNumeric settings | `AutoNumeric.getDefaultConfig()` |
-| `getLanguages` | Return all the predefined language options in one object | `AutoNumeric.getLanguages()` |
-| `getLanguages` | Return a specific pre-defined language options object | `AutoNumeric.getLanguages().French` |
+| `getPredefinedOptions` | Return all the predefined options in one object | `AutoNumeric.getPredefinedOptions()` |
+| `getPredefinedOptions` | Return a specific pre-defined language option object | `AutoNumeric.getPredefinedOptions().French` |
 | `format` | Format the given number with the given options. This returns the formatted value as a string. | `AutoNumeric.format(12345.21, { options });` |
 | `format` | Idem above, but using a numeric string as the first parameter | `AutoNumeric.format('12345.21', { options });` |
 | `format` | Format the `domElement` *`value`* (or *`textContent`*) with the given options and returns the formatted value as a string. This does *not* update that element value. | `AutoNumeric.format(domElement, { options });` |

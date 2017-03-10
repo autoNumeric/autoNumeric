@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      3.0.0-beta.9
+ * @version      3.0.0-beta.10
  * @date         2017-03-07 UTC 03:00
  *
  * @author       Bob Knothe
@@ -518,7 +518,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '3.0.0-beta.9';
+        return '3.0.0-beta.10';
     }
 
     /**
@@ -2433,12 +2433,12 @@ class AutoNumeric {
 
     /**
      * Return all the predefined language options in one object.
-     * You can also access a specific language object directly by using `AutoNumeric.getLanguages().French` for instance.
+     * You can also access a specific language object directly by using `AutoNumeric.getPredefinedOptions().French` for instance.
      *
      * @returns {object}
      */
-    static getLanguages() {
-        return AutoNumeric.languageOptions;
+    static getPredefinedOptions() {
+        return AutoNumeric.predefinedOptions;
     }
 
     /**
@@ -2649,19 +2649,19 @@ class AutoNumeric {
     //XXX A better way would be to not initialize first, but that's not possible since `new` is called first and we do not pass the language options (ie. `French`) to the constructor
 
     /**
-     * Update the AutoNumeric object with the predefined language options, and possibly some option overrides.
+     * Update the AutoNumeric object with the predefined options, and possibly some option overrides.
      *
-     * @param {object} predefinedLanguageOption
+     * @param {object} predefinedOption
      * @param {object} optionOverride
      * @private
      * @returns {AutoNumeric}
      */
-    _updateLanguage(predefinedLanguageOption, optionOverride = null) {
+    _updatePredefinedOptions(predefinedOption, optionOverride = null) {
         if (!AutoNumericHelper.isNull(optionOverride)) {
-            this._mergeSettings(predefinedLanguageOption, optionOverride);
+            this._mergeSettings(predefinedOption, optionOverride);
             this.update(this.settings);
         } else {
-            this.update(predefinedLanguageOption);
+            this.update(predefinedOption);
         }
 
         return this;
@@ -2675,7 +2675,7 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     french(optionOverride = null) {
-        this._updateLanguage(AutoNumeric.getLanguages().French, optionOverride);
+        this._updatePredefinedOptions(AutoNumeric.getPredefinedOptions().French, optionOverride);
 
         return this;
     }
@@ -2688,7 +2688,7 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     northAmerican(optionOverride = null) {
-        this._updateLanguage(AutoNumeric.getLanguages().NorthAmerican, optionOverride);
+        this._updatePredefinedOptions(AutoNumeric.getPredefinedOptions().NorthAmerican, optionOverride);
 
         return this;
     }
@@ -2701,7 +2701,7 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     british(optionOverride = null) {
-        this._updateLanguage(AutoNumeric.getLanguages().British, optionOverride);
+        this._updatePredefinedOptions(AutoNumeric.getPredefinedOptions().British, optionOverride);
 
         return this;
     }
@@ -2714,7 +2714,7 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     swiss(optionOverride = null) {
-        this._updateLanguage(AutoNumeric.getLanguages().Swiss, optionOverride);
+        this._updatePredefinedOptions(AutoNumeric.getPredefinedOptions().Swiss, optionOverride);
 
         return this;
     }
@@ -2727,7 +2727,7 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     japanese(optionOverride = null) {
-        this._updateLanguage(AutoNumeric.getLanguages().Japanese, optionOverride);
+        this._updatePredefinedOptions(AutoNumeric.getPredefinedOptions().Japanese, optionOverride);
 
         return this;
     }
@@ -2740,7 +2740,7 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     spanish(optionOverride = null) {
-        this._updateLanguage(AutoNumeric.getLanguages().Spanish, optionOverride);
+        this._updatePredefinedOptions(AutoNumeric.getPredefinedOptions().Spanish, optionOverride);
 
         return this;
     }
@@ -2753,7 +2753,7 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     chinese(optionOverride = null) {
-        this._updateLanguage(AutoNumeric.getLanguages().Chinese, optionOverride);
+        this._updatePredefinedOptions(AutoNumeric.getPredefinedOptions().Chinese, optionOverride);
 
         return this;
     }
@@ -6138,16 +6138,16 @@ AutoNumeric.options = {
         keep : 'keep',
     },
     maximumValue                 : {
-        tenTrillions: '9999999999999.99', // 9.999.999.999.999,99 ~= 10000 billions
-        noDecimals  : '9999999999999',
-        oneBillion  : '999999999.99',
-        zero        : '0',
+        tenTrillions          : '9999999999999.99', // 9.999.999.999.999,99 ~= 10000 billions
+        tenTrillionsNoDecimals: '9999999999999',
+        oneBillion            : '999999999.99',
+        zero                  : '0',
     },
     minimumValue                 : {
-        tenTrillions: '-9999999999999.99', // -9.999.999.999.999,99 ~= 10000 billions
-        noDecimals  : '-9999999999999',
-        oneBillion  : '-999999999.99',
-        zero        : '0',
+        tenTrillions          : '-9999999999999.99', // -9.999.999.999.999,99 ~= 10000 billions
+        tenTrillionsNoDecimals: '-9999999999999',
+        oneBillion            : '-999999999.99',
+        zero                  : '0',
     },
     modifyValueOnWheel           : {
         modifyValue: true,
@@ -6254,6 +6254,9 @@ AutoNumeric.options = {
     },
     suffixText                   : {
         none: '',
+        percentage: '%',
+        permille  : '‰',
+        basisPoint : '‱',
     },
     unformatOnHover              : {
         unformat     : true,
@@ -6604,7 +6607,7 @@ AutoNumeric.defaultSettings = {
 /**
  * Predefined options for the most common languages
  */
-AutoNumeric.languageOptions = {
+AutoNumeric.predefinedOptions = {
     French       : { // Français
         digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.dot, // or '\u202f'
         decimalCharacter             : AutoNumeric.options.decimalCharacter.comma,
@@ -6651,9 +6654,106 @@ AutoNumeric.languageOptions = {
         minimumValue                 : AutoNumeric.options.minimumValue.tenTrillions,
         maximumValue                 : AutoNumeric.options.maximumValue.tenTrillions,
     },
+    dotDecimalCharCommaSeparator: {
+        digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.comma,
+        decimalCharacter             : AutoNumeric.options.decimalCharacter.dot,
+    },
+    commaDecimalCharDotSeparator: {
+        digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.dot,
+        decimalCharacter             : AutoNumeric.options.decimalCharacter.comma,
+        decimalCharacterAlternative  : AutoNumeric.options.decimalCharacterAlternative.dot,
+    },
+    integer:    { minimumValue: AutoNumeric.options.minimumValue.tenTrillionsNoDecimals, maximumValue: AutoNumeric.options.maximumValue.tenTrillionsNoDecimals },
+    integerPos: { minimumValue: AutoNumeric.options.minimumValue.zero                  , maximumValue: AutoNumeric.options.maximumValue.tenTrillionsNoDecimals },
+    integerNeg: { minimumValue: AutoNumeric.options.minimumValue.tenTrillionsNoDecimals, maximumValue: AutoNumeric.options.maximumValue.zero                   },
+    float:      { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.noPadding },
+    floatPos:   { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.noPadding, minimumValue: AutoNumeric.options.minimumValue.zero        , maximumValue: AutoNumeric.options.maximumValue.tenTrillions },
+    floatNeg:   { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.noPadding, minimumValue: AutoNumeric.options.minimumValue.tenTrillions, maximumValue: AutoNumeric.options.maximumValue.zero         },
+    numeric: {
+        digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator,
+        decimalCharacter   : AutoNumeric.options.decimalCharacter.dot,
+        currencySymbol     : AutoNumeric.options.currencySymbol.none,
+    },
+    numericPos: {
+        digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator,
+        decimalCharacter   : AutoNumeric.options.decimalCharacter.dot,
+        currencySymbol     : AutoNumeric.options.currencySymbol.none,
+        minimumValue       : AutoNumeric.options.minimumValue.zero,
+        maximumValue       : AutoNumeric.options.maximumValue.tenTrillions,
+    },
+    numericNeg: {
+        digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator,
+        decimalCharacter   : AutoNumeric.options.decimalCharacter.dot,
+        currencySymbol     : AutoNumeric.options.currencySymbol.none,
+        minimumValue       : AutoNumeric.options.minimumValue.tenTrillions,
+        maximumValue       : AutoNumeric.options.maximumValue.zero,
+    },
 };
-AutoNumeric.languageOptions.Spanish = AutoNumeric.languageOptions.French; // Español (idem French)
-AutoNumeric.languageOptions.Chinese = AutoNumeric.languageOptions.Japanese; // 中国語 (Chinese)
+
+AutoNumeric.predefinedOptions.Spanish = AutoNumeric.predefinedOptions.French; // Español (idem French)
+AutoNumeric.predefinedOptions.Chinese = AutoNumeric.predefinedOptions.Japanese; // 中国語 (Chinese)
+
+AutoNumeric.predefinedOptions.euro = AutoNumeric.predefinedOptions.French;
+AutoNumeric.predefinedOptions.euroPos = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.French);
+AutoNumeric.predefinedOptions.euroPos.minimumValue = '0.00'; // Here we need to clone the initial object in order to be able to edit it without affecting the initial object
+AutoNumeric.predefinedOptions.euroNeg = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.French);
+AutoNumeric.predefinedOptions.euroNeg.maximumValue = '0.00';
+AutoNumeric.predefinedOptions.euroNeg.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix;
+
+AutoNumeric.predefinedOptions.euroSpace = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.French);
+AutoNumeric.predefinedOptions.euroSpace.digitGroupSeparator = AutoNumeric.options.digitGroupSeparator.normalSpace;
+AutoNumeric.predefinedOptions.euroSpacePos = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.euroSpace);
+AutoNumeric.predefinedOptions.euroSpacePos.minimumValue = '0.00';
+AutoNumeric.predefinedOptions.euroSpaceNeg = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.euroSpace);
+AutoNumeric.predefinedOptions.euroSpaceNeg.maximumValue = '0.00';
+AutoNumeric.predefinedOptions.euroSpaceNeg.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix;
+
+AutoNumeric.predefinedOptions.percentageEU2dec = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.French);
+AutoNumeric.predefinedOptions.percentageEU2dec.currencySymbol = AutoNumeric.options.currencySymbol.none;
+AutoNumeric.predefinedOptions.percentageEU2dec.suffixText = AutoNumeric.options.suffixText.percentage;
+AutoNumeric.predefinedOptions.percentageEU2decPos = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageEU2dec);
+AutoNumeric.predefinedOptions.percentageEU2decPos.minimumValue = '0.00';
+AutoNumeric.predefinedOptions.percentageEU2decNeg = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageEU2dec);
+AutoNumeric.predefinedOptions.percentageEU2decNeg.maximumValue = '0.00';
+AutoNumeric.predefinedOptions.percentageEU2decNeg.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix;
+
+AutoNumeric.predefinedOptions.percentageEU3dec = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageEU2dec);
+AutoNumeric.predefinedOptions.percentageEU3dec.maximumValue = `${AutoNumeric.predefinedOptions.French.maximumValue}9`;
+AutoNumeric.predefinedOptions.percentageEU3dec.decimalPlacesOverride = 3;
+AutoNumeric.predefinedOptions.percentageEU3decPos = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageEU2decPos);
+AutoNumeric.predefinedOptions.percentageEU3decPos.maximumValue = `${AutoNumeric.predefinedOptions.French.maximumValue}9`;
+AutoNumeric.predefinedOptions.percentageEU3decPos.decimalPlacesOverride = 3;
+AutoNumeric.predefinedOptions.percentageEU3decNeg = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageEU2decNeg);
+AutoNumeric.predefinedOptions.percentageEU3decNeg.maximumValue = `${AutoNumeric.predefinedOptions.French.maximumValue}9`;
+AutoNumeric.predefinedOptions.percentageEU3decNeg.decimalPlacesOverride = 3;
+
+AutoNumeric.predefinedOptions.dollar = AutoNumeric.predefinedOptions.NorthAmerican;
+AutoNumeric.predefinedOptions.dollarPos = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.NorthAmerican);
+AutoNumeric.predefinedOptions.dollarPos.minimumValue = '0.00';
+AutoNumeric.predefinedOptions.dollarNeg = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.NorthAmerican);
+AutoNumeric.predefinedOptions.dollarNeg.maximumValue = '0.00';
+AutoNumeric.predefinedOptions.dollarNeg.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix;
+AutoNumeric.predefinedOptions.dollarNegBrackets = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.dollarNeg);
+AutoNumeric.predefinedOptions.dollarNegBrackets.negativeBracketsTypeOnBlur = AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses;
+
+AutoNumeric.predefinedOptions.percentageUS2dec = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.NorthAmerican);
+AutoNumeric.predefinedOptions.percentageUS2dec.currencySymbol = AutoNumeric.options.currencySymbol.none;
+AutoNumeric.predefinedOptions.percentageUS2dec.suffixText = AutoNumeric.options.suffixText.percentage;
+AutoNumeric.predefinedOptions.percentageUS2decPos = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageUS2dec);
+AutoNumeric.predefinedOptions.percentageUS2decPos.minimumValue = '0.00';
+AutoNumeric.predefinedOptions.percentageUS2decNeg = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageUS2dec);
+AutoNumeric.predefinedOptions.percentageUS2decNeg.maximumValue = '0.00';
+AutoNumeric.predefinedOptions.percentageUS2decNeg.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix;
+
+AutoNumeric.predefinedOptions.percentageUS3dec = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageUS2dec);
+AutoNumeric.predefinedOptions.percentageUS3dec.maximumValue = `${AutoNumeric.predefinedOptions.NorthAmerican.maximumValue}9`;
+AutoNumeric.predefinedOptions.percentageUS3dec.decimalPlacesOverride = 3;
+AutoNumeric.predefinedOptions.percentageUS3decPos = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageUS2decPos);
+AutoNumeric.predefinedOptions.percentageUS3decPos.maximumValue = `${AutoNumeric.predefinedOptions.NorthAmerican.maximumValue}9`;
+AutoNumeric.predefinedOptions.percentageUS3decPos.decimalPlacesOverride = 3;
+AutoNumeric.predefinedOptions.percentageUS3decNeg = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageUS2decNeg);
+AutoNumeric.predefinedOptions.percentageUS3decNeg.maximumValue = `${AutoNumeric.predefinedOptions.NorthAmerican.maximumValue}9`;
+AutoNumeric.predefinedOptions.percentageUS3decNeg.decimalPlacesOverride = 3;
 
 /**
  * Initialize multiple DOM elements in one call (and possibly pass multiple values that will be mapped to each DOM element).

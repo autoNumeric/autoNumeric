@@ -487,7 +487,7 @@
     //-------------- Initializing AutoNumeric on non-<input> tags
     new AutoNumeric('#tag_p1', { scaleDecimalPlaces: 3, scaleDivisor: 0.01, scaleSymbol: '%', maximumValue: '999.9999' });
     new AutoNumeric('#tag_p2', 666.42).french();
-    new AutoNumeric('#tag_code', AutoNumeric.getLanguages().Japanese);
+    new AutoNumeric('#tag_code', AutoNumeric.getPredefinedOptions().Japanese);
     new AutoNumeric('#tag_div').northAmerican();
     new AutoNumeric('#tag_h5', 666.42).swiss();
     new AutoNumeric('#tag_label');

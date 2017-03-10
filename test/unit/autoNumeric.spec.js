@@ -171,7 +171,7 @@ describe('The autoNumeric object', () => {
 
             // Test the options one by one, which makes it easier to spot the error
             //XXX This loop is useful to spot the faulty options, since only those that are not equal to the default are shown
-            const predefinedLanguages = AutoNumeric.getLanguages();
+            const predefinedLanguages = AutoNumeric.getPredefinedOptions();
             let i = 0;
             for (const lang in defaultLanguageOption) { //XXX Here I test only this language subset
                 i++;
@@ -188,7 +188,7 @@ describe('The autoNumeric object', () => {
             }
 
             // Global test
-            // expect(an.getLanguages()).toEqual(defaultLanguageOption); //XXX Here I test only a language subset, not all language options
+            // expect(an.getPredefinedOptions()).toEqual(defaultLanguageOption); //XXX Here I test only a language subset, not all language options
         });
 
         it('should be initiated with the default values', () => {
@@ -544,7 +544,7 @@ describe('The autoNumeric object', () => {
         //FIXME à terminer
         // test
         // validate
-        // areSettingsValid, getDefaultConfig, getLanguages, format, unformat,
+        // areSettingsValid, getDefaultConfig, getPredefinedOptions, format, unformat,
     });
 
     describe('provides public methods', () => {
@@ -626,9 +626,9 @@ describe('The autoNumeric object', () => {
             const aNInput1 = new AutoNumeric(input1);
             const aNInput3 = new AutoNumeric(input3);
             // Set their value (and the option at the same time)
-            aNInput1.set(13567.897, AutoNumeric.getLanguages().French);
+            aNInput1.set(13567.897, AutoNumeric.getPredefinedOptions().French);
             expect(aNInput1.getFormatted()).toEqual('13.567,90\u202f€');
-            aNInput3.set(2987367.0262, AutoNumeric.getLanguages().NorthAmerican);
+            aNInput3.set(2987367.0262, AutoNumeric.getPredefinedOptions().NorthAmerican);
             expect(aNInput3.getFormatted()).toEqual('$2,987,367.03');
             input2.value = 666;
 
@@ -1345,7 +1345,7 @@ describe('The autoNumeric object', () => {
             expect(() => new AutoNumeric(newInput)).not.toThrow();
             expect(new AutoNumeric(p1, { scaleDecimalPlaces: 3, scaleDivisor: 0.01, scaleSymbol: '%', maximumValue: '999.9999' }).getFormatted()).toEqual('2.140%');
             expect(new AutoNumeric(p2, 666.42).french().getFormatted()).toEqual('666,42 €');
-            expect(new AutoNumeric(code, AutoNumeric.getLanguages().Japanese).getFormatted()).toEqual('¥12,345.67');
+            expect(new AutoNumeric(code, AutoNumeric.getPredefinedOptions().Japanese).getFormatted()).toEqual('¥12,345.67');
             expect(new AutoNumeric(div).northAmerican().getFormatted()).toEqual('$12,345.67');
             expect(new AutoNumeric(h5, 666.42).swiss().getFormatted()).toEqual('666.42 CHF');
             expect(new AutoNumeric(label).getFormatted()).toEqual('12,345.67');
@@ -1453,7 +1453,7 @@ describe(`autoNumeric 'init' method should init with predefined options`, () => 
     it('with French', () => {
         newInput = document.createElement('input');
         document.body.appendChild(newInput);
-        aNInput = new AutoNumeric(newInput, AutoNumeric.getLanguages().French); // Initiate the autoNumeric input
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().French); // Initiate the autoNumeric input
 
         aNInput.set('1234567.89');
         expect(aNInput.get()).toEqual('1234567.89');
@@ -1468,7 +1468,7 @@ describe(`autoNumeric 'init' method should init with predefined options`, () => 
     it('with North American', () => {
         newInput = document.createElement('input');
         document.body.appendChild(newInput);
-        aNInput = new AutoNumeric(newInput, AutoNumeric.getLanguages().NorthAmerican); // Initiate the autoNumeric input
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().NorthAmerican); // Initiate the autoNumeric input
 
         aNInput.set('1234567.89');
         expect(aNInput.get()).toEqual('1234567.89');
@@ -1483,7 +1483,7 @@ describe(`autoNumeric 'init' method should init with predefined options`, () => 
     it('with Japanese', () => {
         newInput = document.createElement('input');
         document.body.appendChild(newInput);
-        aNInput = new AutoNumeric(newInput, AutoNumeric.getLanguages().Japanese); // Initiate the autoNumeric input
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().Japanese); // Initiate the autoNumeric input
 
         aNInput.set('1234567.89');
         expect(aNInput.get()).toEqual('1234567.89');
@@ -1548,6 +1548,213 @@ describe(`autoNumeric initialization calls`, () => {
 
         aNInput.update(autoNumericOptionsDollar);
         expect(aNInput.getFormatted()).toEqual('$256,789.02');
+    });
+
+    it('should init and update the element with the correct predefined settings', () => {
+        newInput.value = '1256789.02';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().dotDecimalCharCommaSeparator);
+        expect(aNInput.getNumericString()).toEqual('1256789.02');
+        expect(aNInput.getFormatted()).toEqual('1,256,789.02');
+
+        aNInput.update(AutoNumeric.getPredefinedOptions().commaDecimalCharDotSeparator);
+        expect(aNInput.getFormatted()).toEqual('1.256.789,02');
+
+        aNInput.update(AutoNumeric.getPredefinedOptions().euro);
+        expect(aNInput.getFormatted()).toEqual('1.256.789,02\u202f€');
+
+        aNInput.update(AutoNumeric.getPredefinedOptions().euroSpace);
+        expect(aNInput.getFormatted()).toEqual('1 256 789,02\u202f€');
+
+        aNInput.update(AutoNumeric.getPredefinedOptions().dollar);
+        expect(aNInput.getFormatted()).toEqual('$1,256,789.02');
+
+        aNInput.update(AutoNumeric.getPredefinedOptions().percentageEU2dec);
+        aNInput.set(0.012345);
+        expect(aNInput.getNumericString()).toEqual('0.01');
+        aNInput.set(2.3413);
+        expect(aNInput.getNumericString()).toEqual('2.34');
+        expect(aNInput.getFormatted()).toEqual('2,34%');
+
+        aNInput.update(AutoNumeric.getPredefinedOptions().percentageUS2dec);
+        expect(aNInput.getFormatted()).toEqual('2.34%');
+
+        aNInput.update(AutoNumeric.getPredefinedOptions().percentageEU3dec);
+        expect(aNInput.getFormatted()).toEqual('2,340%');
+        aNInput.set(2.3413);
+        expect(aNInput.getFormatted()).toEqual('2,341%');
+
+        aNInput.update(AutoNumeric.getPredefinedOptions().percentageUS3dec);
+        expect(aNInput.getFormatted()).toEqual('2.341%');
+    });
+
+    it('should init and update the element with the correct predefined settings, limiting to a positive value', () => {
+        newInput.value = '1256789.02';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().euroPos);
+        expect(aNInput.getNumericString()).toEqual('1256789.02');
+        expect(aNInput.getFormatted()).toEqual('1.256.789,02\u202f€');
+        expect(() => aNInput.set(999999.99)).not.toThrow();
+        expect(() => aNInput.set(-1)).toThrow();
+        expect(aNInput.getFormatted()).toEqual('999.999,99\u202f€');
+    });
+
+    it('should fail to init when the default value is outside of the min and max limits', () => {
+        newInput.value = '-1256789.02';
+        expect(() => new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().euroPos)).toThrow();
+    });
+
+    it('should init and update the element with the correct predefined settings, limiting to a negative value', () => {
+        newInput.value = '-1256789.02';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().euroNeg);
+        expect(aNInput.getNumericString()).toEqual('-1256789.02');
+        expect(aNInput.getFormatted()).toEqual('-1.256.789,02\u202f€');
+        expect(() => aNInput.set(1)).toThrow();
+        expect(() => aNInput.set(-999999.99)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('-999.999,99\u202f€');
+    });
+
+    it('should init and update the element with the correct predefined settings, limiting to a positive value', () => {
+        newInput.value = '6.246';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().percentageEU2decPos);
+        expect(aNInput.getNumericString()).toEqual('6.25');
+        expect(aNInput.getFormatted()).toEqual('6,25%');
+        expect(() => aNInput.set(-0.001)).toThrow();
+        expect(() => aNInput.set(0.712)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('0,71%');
+    });
+
+    it('should init and update the element with the correct predefined settings, limiting to a negative value', () => {
+        newInput.value = '-6.246';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().percentageEU2decNeg);
+        expect(aNInput.getNumericString()).toEqual('-6.25');
+        expect(aNInput.getFormatted()).toEqual('-6,25%');
+        expect(() => aNInput.set(0.001)).toThrow();
+        expect(() => aNInput.set(-0.712)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('-0,71%');
+    });
+
+    it('should init and update the element with the correct predefined settings, using integers only', () => {
+        newInput.value = '-6.246';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().integer);
+        expect(aNInput.getNumericString()).toEqual('-6');
+        expect(aNInput.getFormatted()).toEqual('-6');
+        expect(() => aNInput.set(15.001)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('15');
+        expect(() => aNInput.set(-0.712)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('-1');
+        aNInput.set(13256.678);
+        expect(aNInput.getFormatted()).toEqual('13,257');
+    });
+
+    it('should init and update the element with the correct predefined settings, using positive integers only', () => {
+        newInput.value = '6.246';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().integerPos);
+        expect(aNInput.getNumericString()).toEqual('6');
+        expect(aNInput.getFormatted()).toEqual('6');
+        expect(() => aNInput.set(15.001)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('15');
+        expect(() => aNInput.set(-0.712)).toThrow();
+        expect(aNInput.getFormatted()).toEqual('15');
+        aNInput.set(13256.678);
+        expect(aNInput.getFormatted()).toEqual('13,257');
+    });
+
+    it('should init and update the element with the correct predefined settings, using negative integers only', () => {
+        newInput.value = '-6.246';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().integerNeg);
+        expect(aNInput.getNumericString()).toEqual('-6');
+        expect(aNInput.getFormatted()).toEqual('-6');
+        expect(() => aNInput.set(15.001)).toThrow();
+        expect(aNInput.getFormatted()).toEqual('-6');
+        expect(() => aNInput.set(-0.712)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('-1');
+        aNInput.set(-13256.678);
+        expect(aNInput.getFormatted()).toEqual('-13,257');
+    });
+
+    it('should init and update the element with the correct predefined settings, using floats only', () => {
+        spyOn(console, 'warn');
+        newInput.value = '-6.246';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().float);
+        expect(aNInput.getNumericString()).toEqual('-6.25');
+        expect(aNInput.getFormatted()).toEqual('-6.25');
+        expect(() => aNInput.set(15.021)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('15.02');
+        expect(() => aNInput.set(-0.712)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('-0.71');
+        aNInput.set(13256.678);
+        expect(aNInput.getFormatted()).toEqual('13,256.68');
+
+        aNInput.set(15.001);
+        expect(aNInput.getFormatted()).toEqual('15');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.padding);
+        expect(aNInput.getFormatted()).toEqual('15.00');
+    });
+
+    it('should init and update the element with the correct predefined settings, using positive floats only', () => {
+        spyOn(console, 'warn');
+        newInput.value = '6.246';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().floatPos);
+        expect(aNInput.getNumericString()).toEqual('6.25');
+        expect(aNInput.getFormatted()).toEqual('6.25');
+        expect(() => aNInput.set(15.021)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('15.02');
+        expect(() => aNInput.set(-0.712)).toThrow();
+        expect(aNInput.getFormatted()).toEqual('15.02');
+        aNInput.set(13256.678);
+        expect(aNInput.getFormatted()).toEqual('13,256.68');
+    });
+
+    it('should init and update the element with the correct predefined settings, using negative floats only', () => {
+        spyOn(console, 'warn');
+        newInput.value = '-6.246';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().floatNeg);
+        expect(aNInput.getNumericString()).toEqual('-6.25');
+        expect(aNInput.getFormatted()).toEqual('-6.25');
+        expect(() => aNInput.set(15.021)).toThrow();
+        expect(aNInput.getFormatted()).toEqual('-6.25');
+        expect(() => aNInput.set(-0.712)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('-0.71');
+        aNInput.set(-13256.678);
+        expect(aNInput.getFormatted()).toEqual('-13,256.68');
+    });
+
+    it('should init and update the element with the correct predefined settings, formatting numeric strings', () => {
+        newInput.value = '-72376.246';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().numeric);
+        expect(aNInput.getNumericString()).toEqual('-72376.25');
+        expect(aNInput.getFormatted()).toEqual('-72376.25');
+        expect(() => aNInput.set(15.001)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('15.00');
+        expect(() => aNInput.set(-0.712)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('-0.71');
+        aNInput.set(13256.678);
+        expect(aNInput.getFormatted()).toEqual('13256.68');
+    });
+
+    it('should init and update the element with the correct predefined settings, formatting positive numeric strings', () => {
+        newInput.value = '72376.246';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().numericPos);
+        expect(aNInput.getNumericString()).toEqual('72376.25');
+        expect(aNInput.getFormatted()).toEqual('72376.25');
+        expect(() => aNInput.set(15.001)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('15.00');
+        expect(() => aNInput.set(-0.712)).toThrow();
+        expect(aNInput.getFormatted()).toEqual('15.00');
+        aNInput.set(13256.678);
+        expect(aNInput.getFormatted()).toEqual('13256.68');
+    });
+
+    it('should init and update the element with the correct predefined settings, formatting negative numeric strings', () => {
+        newInput.value = '-72376.246';
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().numericNeg);
+        expect(aNInput.getNumericString()).toEqual('-72376.25');
+        expect(aNInput.getFormatted()).toEqual('-72376.25');
+        expect(() => aNInput.set(15.001)).toThrow();
+        expect(aNInput.getFormatted()).toEqual('-72376.25');
+        expect(() => aNInput.set(-0.712)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('-0.71');
+        aNInput.set(-13256.678);
+        expect(aNInput.getFormatted()).toEqual('-13256.68');
     });
 
     // Test the showPositiveSign option

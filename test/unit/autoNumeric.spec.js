@@ -1363,15 +1363,15 @@ describe('The autoNumeric object', () => {
 
         it('should fail initializing an input element of type `number`', () => {
             // Create the element
-            const inputTel = document.createElement('input');
-            inputTel.type = 'number';
-            inputTel.value = '663241800.0214';
-            document.body.appendChild(inputTel);
+            const inputNumber = document.createElement('input');
+            inputNumber.type = 'number';
+            inputNumber.value = '663241800.0214';
+            document.body.appendChild(inputNumber);
 
-            expect(() => new AutoNumeric(inputTel)).toThrow();
+            expect(() => new AutoNumeric(inputNumber)).toThrow();
 
             // Remove the element
-            document.body.removeChild(inputTel);
+            document.body.removeChild(inputNumber);
         });
 
         it('should correctly initialize input element of type `tel`', () => {
@@ -1385,6 +1385,19 @@ describe('The autoNumeric object', () => {
 
             // Remove the element
             document.body.removeChild(inputTel);
+        });
+
+        it('should correctly initialize input element of type `hidden`', () => {
+            // Create the element
+            const inputHidden = document.createElement('input');
+            inputHidden.type = 'hidden';
+            inputHidden.value = '663241800.0214';
+            document.body.appendChild(inputHidden);
+
+            expect(new AutoNumeric(inputHidden).french().getFormatted()).toEqual('663.241.800,02 €');
+
+            // Remove the element
+            document.body.removeChild(inputHidden);
         });
 
         it('should correctly initialize the AutoNumeric element', () => {

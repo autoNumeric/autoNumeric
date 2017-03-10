@@ -102,13 +102,13 @@ You're done!
 ### On which elements can it be used?
 
 autoNumeric can be used in two ways ;
-- with event listeners when used on `<input>` elements making them reactive (in a *read/write* mode), or
-- without event listeners when used on other DOM elements types, essentially acting as a *format-once-and-forget*-*read only* mode.
+- with event listeners when used on `<input>` elements or on `contenteditable`-enabled elements making them reactive (in a *read/write* mode), or
+- without event listeners when used on DOM elements not having the `contenteditable` attribute set to `true`, essentially acting as a *format-once-and-forget*-*read only* mode.
 
 #### On `<input>` elements
 When used on an `<input>` element, you'll be able to interact with its value and get a formatted input value *as-you-type*, using the full power of autoNumeric.
 
-Only the following supported `<input>` types are supported :
+Please note than due to browser constraints, only the following supported `<input>` *types* are supported :
 - `text`,
 - `tel`,
 - `hidden`, or
@@ -122,6 +122,21 @@ Only the following supported `<input>` types are supported :
 ```
 
 Note : the `number` type is **not** supported simply because autoNumeric formats numbers as strings (ie. `'123.456.789,00 &#8364;'`) that this input type does not allow.
+
+
+#### On `contenteditable`-enabled elements
+Any element in the following `allowedTagList` that support the `contenteditable` attribute can be initialized by autoNumeric.
+This means that anywhere on a page, on any DOM element, you can harness the power of autoNumeric which will allow you to mask the user inputs.
+
+Given the following html code...:
+```html
+<p id="editableDom" contenteditable="true">12345678.9012</p>
+```
+you can initialize this `<p>` element with autoNumeric:
+```js
+new AutoNumeric('#editableDom').french();
+```
+...and it will act exactly like an `<input>` element controlled by autoNumeric.
 
 #### On other DOM elements
 

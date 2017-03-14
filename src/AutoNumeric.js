@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      3.0.0-beta.12
+ * @version      3.0.0-beta.13
  * @date         2017-03-14 UTC 11:30
  *
  * @author       Bob Knothe
@@ -518,7 +518,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '3.0.0-beta.12';
+        return '3.0.0-beta.13';
     }
 
     /**
@@ -2770,6 +2770,18 @@ class AutoNumeric {
         return this;
     }
 
+    /**
+     * Update the settings to use the Brazilian pre-defined language options.
+     * Those pre-defined options can be overridden by passing an option object as a parameter.
+     *
+     * @param {object} optionOverride
+     * @returns {AutoNumeric}
+     */
+    brazilian(optionOverride = null) {
+        this._updatePredefinedOptions(AutoNumeric.getPredefinedOptions().Brazilian, optionOverride);
+
+        return this;
+    }
 
 
     // Internal private functions
@@ -6054,11 +6066,10 @@ AutoNumeric.options = {
         cedi          : '₵', // GHS
         cent          : '¢',
         colon         : '₡', // CRC
-        cruzeiro      : '₢', // BRB
+        cruzeiro      : '₢', // BRB - Not used anymore since 1993
         dollar        : '$',
         dong          : '₫', // VND
         drachma       : '₯', // GRD (or 'Δρχ.' or 'Δρ.')
-        lepton        : 'Λ.', // cents of the Drachma
         dram          : '​֏', // AMD
         european      : '₠', // XEU (old currency before the Euro)
         euro          : '€', // EUR
@@ -6068,16 +6079,18 @@ AutoNumeric.options = {
         hryvnia       : '₴', // грн
         kip           : '₭', // LAK
         att           : 'ອັດ', // cents of the Kip
+        lepton        : 'Λ.', // cents of the Drachma
         lira          : '₺', // TRY
         liraOld       : '₤',
         lari          : '₾', // GEL
         mark          : 'ℳ',
-        pfennig       : '₰', // cents of the Mark
         mill          : '₥',
         naira         : '₦', // NGN
         peseta        : '₧',
         peso          : '₱', // PHP
+        pfennig       : '₰', // cents of the Mark
         pound         : '£',
+        real          : 'R$', // Brazilian real
         riel          : '៛', // KHR
         ruble         : '₽', // RUB
         rupee         : '₹', // INR
@@ -6635,8 +6648,6 @@ AutoNumeric.predefinedOptions = {
         currencySymbol               : '\u202f€',
         currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
         negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
-        minimumValue                 : AutoNumeric.options.minimumValue.tenTrillions,
-        maximumValue                 : AutoNumeric.options.maximumValue.tenTrillions,
     },
     NorthAmerican: {
         digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.comma,
@@ -6644,8 +6655,6 @@ AutoNumeric.predefinedOptions = {
         currencySymbol               : AutoNumeric.options.currencySymbol.dollar,
         currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
         negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
-        minimumValue                 : AutoNumeric.options.minimumValue.tenTrillions,
-        maximumValue                 : AutoNumeric.options.maximumValue.tenTrillions,
     },
     British      : {
         digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.comma,
@@ -6653,8 +6662,6 @@ AutoNumeric.predefinedOptions = {
         currencySymbol               : AutoNumeric.options.currencySymbol.pound,
         currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
         negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
-        minimumValue                 : AutoNumeric.options.minimumValue.tenTrillions,
-        maximumValue                 : AutoNumeric.options.maximumValue.tenTrillions,
     },
     Swiss        : { // Suisse
         digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.apostrophe,
@@ -6662,8 +6669,6 @@ AutoNumeric.predefinedOptions = {
         currencySymbol               : '\u202fCHF',
         currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
         negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
-        minimumValue                 : AutoNumeric.options.minimumValue.tenTrillions,
-        maximumValue                 : AutoNumeric.options.maximumValue.tenTrillions,
     },
     Japanese     : { // 日本語
         digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.comma,
@@ -6671,8 +6676,13 @@ AutoNumeric.predefinedOptions = {
         currencySymbol               : AutoNumeric.options.currencySymbol.yen,
         currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
         negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
-        minimumValue                 : AutoNumeric.options.minimumValue.tenTrillions,
-        maximumValue                 : AutoNumeric.options.maximumValue.tenTrillions,
+    },
+    Brazilian      : {
+        digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.dot,
+        decimalCharacter             : AutoNumeric.options.decimalCharacter.comma,
+        currencySymbol               : AutoNumeric.options.currencySymbol.real,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
     },
     dotDecimalCharCommaSeparator: {
         digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.comma,
@@ -6738,13 +6748,13 @@ AutoNumeric.predefinedOptions.percentageEU2decNeg.maximumValue = '0.00';
 AutoNumeric.predefinedOptions.percentageEU2decNeg.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix;
 
 AutoNumeric.predefinedOptions.percentageEU3dec = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageEU2dec);
-AutoNumeric.predefinedOptions.percentageEU3dec.maximumValue = `${AutoNumeric.predefinedOptions.French.maximumValue}9`;
+AutoNumeric.predefinedOptions.percentageEU3dec.maximumValue = `${AutoNumeric.options.maximumValue.tenTrillions}9`;
 AutoNumeric.predefinedOptions.percentageEU3dec.decimalPlacesOverride = 3;
 AutoNumeric.predefinedOptions.percentageEU3decPos = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageEU2decPos);
-AutoNumeric.predefinedOptions.percentageEU3decPos.maximumValue = `${AutoNumeric.predefinedOptions.French.maximumValue}9`;
+AutoNumeric.predefinedOptions.percentageEU3decPos.maximumValue = `${AutoNumeric.options.maximumValue.tenTrillions}9`;
 AutoNumeric.predefinedOptions.percentageEU3decPos.decimalPlacesOverride = 3;
 AutoNumeric.predefinedOptions.percentageEU3decNeg = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageEU2decNeg);
-AutoNumeric.predefinedOptions.percentageEU3decNeg.maximumValue = `${AutoNumeric.predefinedOptions.French.maximumValue}9`;
+AutoNumeric.predefinedOptions.percentageEU3decNeg.maximumValue = `${AutoNumeric.options.maximumValue.tenTrillions}9`;
 AutoNumeric.predefinedOptions.percentageEU3decNeg.decimalPlacesOverride = 3;
 
 AutoNumeric.predefinedOptions.dollar = AutoNumeric.predefinedOptions.NorthAmerican;
@@ -6766,13 +6776,13 @@ AutoNumeric.predefinedOptions.percentageUS2decNeg.maximumValue = '0.00';
 AutoNumeric.predefinedOptions.percentageUS2decNeg.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix;
 
 AutoNumeric.predefinedOptions.percentageUS3dec = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageUS2dec);
-AutoNumeric.predefinedOptions.percentageUS3dec.maximumValue = `${AutoNumeric.predefinedOptions.NorthAmerican.maximumValue}9`;
+AutoNumeric.predefinedOptions.percentageUS3dec.maximumValue = `${AutoNumeric.options.maximumValue.tenTrillions}9`;
 AutoNumeric.predefinedOptions.percentageUS3dec.decimalPlacesOverride = 3;
 AutoNumeric.predefinedOptions.percentageUS3decPos = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageUS2decPos);
-AutoNumeric.predefinedOptions.percentageUS3decPos.maximumValue = `${AutoNumeric.predefinedOptions.NorthAmerican.maximumValue}9`;
+AutoNumeric.predefinedOptions.percentageUS3decPos.maximumValue = `${AutoNumeric.options.maximumValue.tenTrillions}9`;
 AutoNumeric.predefinedOptions.percentageUS3decPos.decimalPlacesOverride = 3;
 AutoNumeric.predefinedOptions.percentageUS3decNeg = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageUS2decNeg);
-AutoNumeric.predefinedOptions.percentageUS3decNeg.maximumValue = `${AutoNumeric.predefinedOptions.NorthAmerican.maximumValue}9`;
+AutoNumeric.predefinedOptions.percentageUS3decNeg.maximumValue = `${AutoNumeric.options.maximumValue.tenTrillions}9`;
 AutoNumeric.predefinedOptions.percentageUS3decNeg.decimalPlacesOverride = 3;
 
 /**

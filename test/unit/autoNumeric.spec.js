@@ -608,6 +608,7 @@ describe('The autoNumeric object', () => {
             expect(() => aNInput.japanese()).not.toThrow();
             expect(() => aNInput.spanish()).not.toThrow();
             expect(() => aNInput.chinese()).not.toThrow();
+            expect(() => aNInput.brazilian()).not.toThrow();
 
             document.body.removeChild(otherDomElement);
         });

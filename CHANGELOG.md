@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.13"
++ Fix issue #411 Add the pre-defined Brazilian language configuration
+
 ### "3.0.0-beta.12"
 + Refactor the hard-coded option values with the `AutoNumeric.options` object attribute values
 

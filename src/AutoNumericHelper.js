@@ -248,7 +248,7 @@ export default class AutoNumericHelper {
      * @returns {boolean}
      * @private
      */
-    static isInputElement(domElement) { //FIXME à terminer
+    static isInputElement(domElement) {
         return this.isElement(domElement) && domElement.tagName.toLowerCase() === 'input';
     }
 
@@ -286,51 +286,143 @@ export default class AutoNumericHelper {
      */
     static keyCodeNumber(event) {
         // `event.keyCode` and `event.which` are deprecated, `KeyboardEvent.key` (https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) must be used now
+        // Also, do note that Firefox generate a 'keypress' event (e.keyCode === 0) for the keys that do not print a character (ie. 'Insert', 'Delete', 'Fn' keys, 'PageUp', 'PageDown' etc.). 'Shift' on the other hand does not generate a keypress event.
         return (typeof event.which === 'undefined')?event.keyCode:event.which;
     }
 
     /**
      * Return the character from the event key code.
+     * If the KeyboardEvent does not represent a printable character, then the key name is used (ie. 'Meta', 'Shift', 'F1', etc.)
      * @example character(50) => '2'
      *
      * @param {KeyboardEvent} event
      * @returns {string}
      */
     static character(event) {
-        if (typeof event.key === 'undefined' || event.key === 'Unidentified') {
-            return String.fromCharCode(this.keyCodeNumber(event));
+        let result;
+        if (event.key === 'Unidentified' || event.key === void(0) || this.isSeleniumBot()) {
+            //XXX The selenium geckodriver do not understand `event.key`, hence when using it, we need to rely on the old deprecated `keyCode` attribute, cf. upstream issue https://github.com/mozilla/geckodriver/issues/440
+            // Use the old deprecated keyCode property, if the new `key` one is not supported
+            const keyCode = this.keyCodeNumber(event);
+            const potentialResult = AutoNumericEnum.fromCharCodeKeyCode[keyCode];
+            if (!AutoNumericHelper.isUndefinedOrNullOrEmpty(potentialResult)) {
+                // Since `String.fromCharCode` do not return named keys for some keys ('Escape' and 'Enter' for instance), we convert the characters to the key names
+                result = potentialResult;
+            } else {
+                result = String.fromCharCode(keyCode);
+            }
         } else {
-            // Special case for obsolete browsers like IE that return the old names
-            let result;
+            let browser;
             switch (event.key) {
-                case 'Decimal':
-                    result = AutoNumericEnum.keyName.NumpadDot;
-                    break;
-                case 'Multiply':
-                    result = AutoNumericEnum.keyName.NumpadMultiply;
-                    break;
+                // Manages all the special cases for obsolete browsers that return the non-standard names
                 case 'Add':
                     result = AutoNumericEnum.keyName.NumpadPlus;
                     break;
-                case 'Subtract':
-                    result = AutoNumericEnum.keyName.NumpadMinus;
+                case 'Apps':
+                    result = AutoNumericEnum.keyName.ContextMenu;
+                    break;
+                case 'Crsel':
+                    result = AutoNumericEnum.keyName.CrSel;
+                    break;
+                case 'Decimal':
+                    result = AutoNumericEnum.keyName.NumpadDot;
+                    break;
+                case 'Del':
+                    browser = this.browser();
+                    if ((browser.name = 'firefox' && browser.version <= 36) ||
+                        (browser.name = 'ie' && browser.version <= 9)) {
+                        // Special workaround for the obsolete browser IE11 which output a 'Delete' key when using the numpad 'dot' one! This fixes issue #401
+                        // This workaround break the usage of the 'Delete' key for Firefox <=36, and IE9, since those browser send 'Del' instead of 'Delete', therefore we only use it for those obsolete browsers
+                        result = AutoNumericEnum.keyName.Dot;
+                    } else {
+                        result = AutoNumericEnum.keyName.Delete;
+                    }
                     break;
                 case 'Divide':
                     result = AutoNumericEnum.keyName.NumpadSlash;
                     break;
-                case 'Del':
-                    // Special workaround for the obsolete browser IE11 which output a 'Delete' key when using the numpad 'dot' one! This fixes issue #401
-                    //FIXME This workaround will break the usage of the 'Delete' key for Firefox <=36, and IE9, since those browser send 'Del' instead of 'Delete'
-                    // As of version 2.0.9, when the character() function is called, it's never to test for the 'Delete' key name
-                    // The 'Del' does not throw the keypress event so right now this hack is acceptable (but could bite us back if we where to use the `character()` functions in other events.
-                    result = AutoNumericEnum.keyName.Dot;
+                case 'Down':
+                    result = AutoNumericEnum.keyName.DownArrow;
+                    break;
+                case 'Esc':
+                    result = AutoNumericEnum.keyName.Esc;
+                    break;
+                case 'Exsel':
+                    result = AutoNumericEnum.keyName.ExSel;
+                    break;
+                case 'Left':
+                    result = AutoNumericEnum.keyName.LeftArrow;
+                    break;
+                case 'Meta':
+                case 'Super':
+                    result = AutoNumericEnum.keyName.OSLeft;
+                    break;
+                case 'Multiply':
+                    result = AutoNumericEnum.keyName.NumpadMultiply;
+                    break;
+                case 'Right':
+                    result = AutoNumericEnum.keyName.RightArrow;
+                    break;
+                case 'Spacebar':
+                    result = AutoNumericEnum.keyName.Space;
+                    break;
+                case 'Subtract':
+                    result = AutoNumericEnum.keyName.NumpadMinus;
+                    break;
+                case 'Up':
+                    result = AutoNumericEnum.keyName.UpArrow;
                     break;
                 default:
+                    // The normal case
                     result = event.key;
             }
-
-            return result;
         }
+
+        return result;
+    }
+
+    /**
+     * Return an object containing the name and version of the current browser.
+     * @example `browserVersion()` => { name: 'Firefox', version: '42' }
+     * Based on http://stackoverflow.com/a/38080051/2834898
+     *
+     * @returns {{ name: string, version: string }}
+     */
+    static browser() {
+        const ua = navigator.userAgent;
+        let tem;
+        let M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+
+        if (/trident/i.test(M[1])) {
+            tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
+            return { name: 'ie', version: (tem[1] || '') };
+        }
+
+        if (M[1] === 'Chrome') {
+            tem = ua.match(/\b(OPR|Edge)\/(\d+)/);
+            if (tem !== null) {
+                return { name: tem[1].replace('OPR', 'opera'), version: tem[2] };
+            }
+        }
+
+        M = M[2]?[M[1], M[2]]:[navigator.appName, navigator.appVersion, '-?'];
+        if ((tem = ua.match(/version\/(\d+)/i)) !== null) {
+            M.splice(1, 1, tem[1]);
+        }
+
+        return { name: M[0].toLowerCase(), version: M[1] };
+    }
+
+    /**
+     * Check if the browser is controlled by Selenium.
+     * Note: This only works within the geckodriver.
+     * cf. http://stackoverflow.com/questions/33225947/can-a-website-detect-when-you-are-using-selenium-with-chromedriver
+     *
+     * @returns {boolean}
+     */
+    static isSeleniumBot() {
+        // noinspection JSUnresolvedVariable
+        return window.navigator.webdriver === true;
     }
 
     /**

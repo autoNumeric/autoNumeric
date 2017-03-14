@@ -305,6 +305,19 @@ describe('Issue #306', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue306input)).toEqual('');
+
+        /*
+        // The following code snippet shows if the browser detects that this is using the selenium geckodriver
+        browser.execute(() => {
+            const input306 = document.querySelector('#issue_306');
+            if (window.navigator.webdriver) {
+                input306.value = 'This is using the gecko webdriver.';
+            } else {
+                input306.value = 'This in NOT using the gecko webdriver.';
+            }
+        });
+        browser.pause(5000);
+        */
     });
 
     it(`should allow entering '0.0'`, () => {
@@ -718,7 +731,7 @@ describe('Issue #317', () => {
         // Try to enter a '0' that will be dropped
         browser.keys('0');
 
-        // Check that the value did not change, and the the caret is correctly positionned
+        // Check that the value did not change, and that the caret is correctly positioned
         expect(browser.getValue(selectors.issue317input)).toEqual('0.00');
         const inputCaretPosition = browser.execute(() => {
             const input = document.querySelector('#issue_317');
@@ -738,7 +751,7 @@ describe('Issue #317', () => {
         // Try to enter a '9' that will be dropped
         browser.keys('9');
 
-        // Check that the value did not change, and the the caret is correctly positionned
+        // Check that the value did not change, and that the caret is correctly positioned
         expect(browser.getValue(selectors.issue317input)).toEqual('2,342,423,423,423.00');
         let inputCaretPosition = browser.execute(() => {
             const input = document.querySelector('#issue_317');
@@ -944,7 +957,8 @@ describe('Issue #387', () => {
         browser.keys(['Escape']);
         expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$2,258,302.76');
 
-        browser.setValue(selectors.issue387inputNotCancellable, '$220,242.76');
+        browser.setValue(selectors.issue387inputNotCancellable, '220242.76');
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$220,242.76');
         // Test that after adding and deleting characters, we get back the original value
         browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Delete', '583', 'Delete', 'Backspace']);
         expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$225,842.76');

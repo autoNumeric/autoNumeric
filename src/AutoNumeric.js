@@ -3775,7 +3775,7 @@ class AutoNumeric {
             return;
         }
 
-        this._updateEventKeycode(e);
+        this._updateEventKeyInfo(e);
         this.initialValueOnKeydown = AutoNumericHelper.getElementValue(e.target); // This is needed in `onKeyup()` to check if the value as changed during the key press
 
         if (this.domElement.readOnly) {
@@ -3784,7 +3784,7 @@ class AutoNumeric {
             return;
         }
 
-        if (this.eventKeyCode === AutoNumericEnum.keyCode.Esc) {
+        if (this.eventKey === AutoNumericEnum.keyName.Esc) {
             //XXX The default 'Escape' key behavior differs between Firefox and Chrome, Firefox already having a built-in 'cancellable-like' feature. This is why we call `e.preventDefault()` here instead of just when `isCancellable` is set to `true`. This allow us to keep the same behavior across browsers.
             e.preventDefault();
 
@@ -3805,7 +3805,7 @@ class AutoNumeric {
 
         // The "enter" key throws a `change` event if the value has changed since the `focus` event
         let targetValue = AutoNumericHelper.getElementValue(e.target);
-        if (this.eventKeyCode === AutoNumericEnum.keyCode.Enter && this.valueOnFocus !== targetValue) {
+        if (this.eventKey === AutoNumericEnum.keyName.Enter && this.valueOnFocus !== targetValue) {
             AutoNumericHelper.triggerEvent('change', e.target);
             this.valueOnFocus = targetValue;
 
@@ -3824,7 +3824,7 @@ class AutoNumeric {
         }
 
         // Check if the key is a delete/backspace key
-        if (this.eventKeyCode === AutoNumericEnum.keyCode.Backspace || this.eventKeyCode === AutoNumericEnum.keyCode.Delete) {
+        if (this.eventKey === AutoNumericEnum.keyName.Backspace || this.eventKey === AutoNumericEnum.keyName.Delete) {
             this._processCharacterDeletion(); // Because backspace and delete only triggers keydown and keyup events, not keypress
             this.processed = true;
             this._formatValue(e);
@@ -3854,11 +3854,7 @@ class AutoNumeric {
      * @param {KeyboardEvent} e
      */
     _onKeypress(e) {
-        // Retrieve the real character that has been entered (ie. 'a' instead of the key code)
-        const eventCharacter = AutoNumericHelper.character(e);
-
-        // Firefox generate a 'keypress' event (e.keyCode === 0) for the keys that do not print a character (ie. 'Insert', 'Delete', 'Fn' keys, 'PageUp', 'PageDown' etc.). 'Shift' on the other hand does not generate a keypress event.
-        if (eventCharacter === AutoNumericEnum.keyName.Insert) {
+        if (this.eventKey === AutoNumericEnum.keyName.Insert) {
             return;
         }
 
@@ -3875,7 +3871,7 @@ class AutoNumeric {
             return;
         }
 
-        const isCharacterInsertionAllowed = this._processCharacterInsertion(e);
+        const isCharacterInsertionAllowed = this._processCharacterInsertion();
         if (isCharacterInsertionAllowed) {
             this._formatValue(e);
             const targetValue = AutoNumericHelper.getElementValue(e.target);
@@ -3885,7 +3881,7 @@ class AutoNumeric {
                 e.preventDefault(); // ...and immediately prevent the browser to add a second character
             }
             else {
-                if ((eventCharacter === this.settings.decimalCharacter || eventCharacter === this.settings.decimalCharacterAlternative) &&
+                if ((this.eventKey === this.settings.decimalCharacter || this.eventKey === this.settings.decimalCharacterAlternative) &&
                     (AutoNumericHelper.getElementSelection(e.target).start === AutoNumericHelper.getElementSelection(e.target).end) &&
                     AutoNumericHelper.getElementSelection(e.target).start === targetValue.indexOf(this.settings.decimalCharacter)) {
                     const position = AutoNumericHelper.getElementSelection(e.target).start + 1;
@@ -3912,14 +3908,14 @@ class AutoNumeric {
      * @param {KeyboardEvent} e
      */
     _onKeyup(e) {
-        if (this.settings.isCancellable && this.eventKeyCode === AutoNumericEnum.keyCode.Esc) {
+        if (this.settings.isCancellable && this.eventKey === AutoNumericEnum.keyName.Esc) {
             // If the user wants to cancel its modifications, we drop the 'keyup' event for the Esc key
             e.preventDefault();
 
             return;
         }
 
-        if (AutoNumericHelper.character(e) === AutoNumericEnum.keyName.Alt && this.hoveredWithAlt) {
+        if (this.eventKey === AutoNumericEnum.keyName.Alt && this.hoveredWithAlt) {
             this.constructor._reformatAltHovered(this);
 
             return;
@@ -3941,7 +3937,7 @@ class AutoNumeric {
             } else {
                 AutoNumericHelper.setElementSelection(e.target, this.settings.currencySymbol.length);
             }
-        } else if (this.eventKeyCode === AutoNumericEnum.keyCode.Tab) {
+        } else if (this.eventKey === AutoNumericEnum.keyName.Tab) {
             AutoNumericHelper.setElementSelection(e.target, 0, targetValue.length);
         }
 
@@ -5143,22 +5139,21 @@ class AutoNumeric {
     }
 
     /**
-     * Update the keycode of the key that triggered the given event.
-     * Note : e.which is sometimes different than e.keyCode during the keypress event, when entering a printable character key (ie. 't'). `e.which` equals 0 for non-printable characters.
+     * Update the `event.key` attribute that triggered the given event.
      *
-     * //TODO Switch to the non-deprecated e.key attribute, instead of inconsistant e.which and e.keyCode.
-     * e.key describe the key name used to trigger the event.
-     * e.keyCode being deprecated : https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
-     * How e.key works : https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
-     * The key list is described here
+     * `event.key` describes :
+     * - the key name (if a non-printable character),
+     * - or directly the character that result from the key press used to trigger the event.
+     *
+     * @link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
+     * The key list is described here:
      * @link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
      *
-     * @param {Event} e
+     * @param {Event|KeyboardEvent} e
      * @private
      */
-    _updateEventKeycode(e) {
-        // Note: the keypress event overwrites meaningful value of e.keyCode, hence we do not update that value on 'keypress'
-        this.eventKeyCode = AutoNumericHelper.keyCodeNumber(e);
+    _updateEventKeyInfo(e) {
+        this.eventKey = AutoNumericHelper.character(e);
     }
 
     /**
@@ -5230,7 +5225,7 @@ class AutoNumeric {
 
         // If changing the sign and `left` is equal to the number zero - prevents stripping the leading zeros
         let stripZeros = true;
-        if (this.eventKeyCode === AutoNumericEnum.keyCode.Hyphen && Number(left) === 0) {
+        if (this.eventKey === AutoNumericEnum.keyName.Hyphen && Number(left) === 0) {
             stripZeros = false;
         }
 
@@ -5257,7 +5252,7 @@ class AutoNumeric {
     _normalizeParts(left, right) {
         // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
         let stripZeros = true;
-        if (this.eventKeyCode === AutoNumericEnum.keyCode.Hyphen && Number(left) === 0) {
+        if (this.eventKey === AutoNumericEnum.keyName.Hyphen && Number(left) === 0) {
             stripZeros = false;
         }
         left = AutoNumeric._stripAllNonNumberCharacters(left, this.settings, stripZeros);
@@ -5267,7 +5262,7 @@ class AutoNumeric {
 
         // Prevents multiple leading zeros from being entered
         if (this.settings.leadingZero === 'deny' &&
-            (this.eventKeyCode === AutoNumericEnum.keyCode.num0 || this.eventKeyCode === AutoNumericEnum.keyCode.numpad0) &&
+            (this.eventKey === AutoNumericEnum.keyName.num0 || this.eventKey === AutoNumericEnum.keyName.numpad0) &&
             Number(left) === 0 &&
             !AutoNumericHelper.contains(left, this.settings.decimalCharacter)  && right !== '') {
             left = left.substring(0, left.length - 1);
@@ -5421,8 +5416,29 @@ class AutoNumeric {
     }
 
     /**
+     * Return `true` is the given key should be ignored or not.
+     *
+     * @param {string} eventKeyName
+     * @returns {boolean}
+     * @private
+     */
+    static _shouldSkipEventKey(eventKeyName) {
+        const isFnKeys = AutoNumericHelper.isInArray(eventKeyName, AutoNumericEnum.keyName._allFnKeys);
+        const isOSKeys = eventKeyName === AutoNumericEnum.keyName.OSLeft || eventKeyName === AutoNumericEnum.keyName.OSRight;
+        const isContextMenu = eventKeyName === AutoNumericEnum.keyName.ContextMenu;
+        const isSomeNonPrintableKeys = AutoNumericHelper.isInArray(eventKeyName, AutoNumericEnum.keyName._someNonPrintableKeys);
+        const isOtherNonPrintableKeys = eventKeyName === AutoNumericEnum.keyName.NumLock ||
+            eventKeyName === AutoNumericEnum.keyName.ScrollLock ||
+            eventKeyName === AutoNumericEnum.keyName.Insert ||
+            eventKeyName === AutoNumericEnum.keyName.Command;
+        const isUnrecognizableKeys = eventKeyName === AutoNumericEnum.keyName.Unidentified;
+
+        return isFnKeys || isOSKeys || isContextMenu || isSomeNonPrintableKeys || isUnrecognizableKeys || isOtherNonPrintableKeys;
+    }
+
+    /**
+     * Return `true` if further processing should not be performed.
      * Process pasting, cursor moving and skipping of not interesting keys.
-     * If this function returns TRUE, then further processing is not performed.
      *
      * @param {KeyboardEvent} e
      * @returns {boolean}
@@ -5430,7 +5446,7 @@ class AutoNumeric {
      */
     _skipAlways(e) {
         // Catch the ctrl up on ctrl-v
-        if (((e.ctrlKey || e.metaKey) && e.type === 'keyup' && !AutoNumericHelper.isUndefined(this.valuePartsBeforePaste)) || (e.shiftKey && this.eventKeyCode === AutoNumericEnum.keyCode.Insert)) {
+        if (((e.ctrlKey || e.metaKey) && e.type === 'keyup' && !AutoNumericHelper.isUndefined(this.valuePartsBeforePaste)) || (e.shiftKey && this.eventKey === AutoNumericEnum.keyName.Insert)) {
             //TODO Move this test inside the `onKeyup` handler
             this._checkPaste();
 
@@ -5438,21 +5454,12 @@ class AutoNumeric {
         }
 
         // Skip all function keys (F1-F12), Windows keys, tab and other special keys
-        if ((this.eventKeyCode >= AutoNumericEnum.keyCode.F1 && this.eventKeyCode <= AutoNumericEnum.keyCode.F12) ||
-            (this.eventKeyCode >= AutoNumericEnum.keyCode.Windows && this.eventKeyCode <= AutoNumericEnum.keyCode.RightClick) ||
-            (this.eventKeyCode >= AutoNumericEnum.keyCode.Tab && this.eventKeyCode < AutoNumericEnum.keyCode.Space) ||
-            // `e.which` is sometimes different than `this.eventKeyCode` during the keypress event when entering a printable character key (ie. 't'). Also, `e.which` equals 0 for non-printable characters.
-            (this.eventKeyCode < AutoNumericEnum.keyCode.Backspace &&
-            (e.which === 0 || e.which === this.eventKeyCode)) ||
-            this.eventKeyCode === AutoNumericEnum.keyCode.NumLock ||
-            this.eventKeyCode === AutoNumericEnum.keyCode.ScrollLock ||
-            this.eventKeyCode === AutoNumericEnum.keyCode.Insert ||
-            this.eventKeyCode === AutoNumericEnum.keyCode.Command) {
+        if (this.constructor._shouldSkipEventKey(this.eventKey)) {
             return true;
         }
 
         // If a "Select all" keyboard shortcut is detected (ctrl + a)
-        if ((e.ctrlKey || e.metaKey) && this.eventKeyCode === AutoNumericEnum.keyCode.a) {
+        if ((e.ctrlKey || e.metaKey) && this.eventKey === AutoNumericEnum.keyName.a) {
             if (this.settings.selectNumberOnly) {
                 // `preventDefault()` is used here to prevent the browser to first select all the input text (including the currency sign), otherwise we would see that whole selection first in a flash, then the selection with only the number part without the currency sign.
                 e.preventDefault();
@@ -5463,13 +5470,13 @@ class AutoNumeric {
         }
 
         // If a "Copy", "Paste" or "Cut" keyboard shortcut is detected (respectively 'ctrl + c', 'ctrl + v' or 'ctrl + x')
-        if ((e.ctrlKey || e.metaKey) && (this.eventKeyCode === AutoNumericEnum.keyCode.c || this.eventKeyCode === AutoNumericEnum.keyCode.v || this.eventKeyCode === AutoNumericEnum.keyCode.x)) {
+        if ((e.ctrlKey || e.metaKey) && (this.eventKey === AutoNumericEnum.keyName.c || this.eventKey === AutoNumericEnum.keyName.v || this.eventKey === AutoNumericEnum.keyName.x)) {
             if (e.type === 'keydown') {
                 this._expandSelectionOnSign();
             }
 
             // Try to prevent wrong paste
-            if (this.eventKeyCode === AutoNumericEnum.keyCode.v || this.eventKeyCode === AutoNumericEnum.keyCode.Insert) {
+            if (this.eventKey === AutoNumericEnum.keyName.v || this.eventKey === AutoNumericEnum.keyName.Insert) {
                 if (e.type === 'keydown' || e.type === 'keypress') {
                     if (AutoNumericHelper.isUndefined(this.valuePartsBeforePaste)) {
                         this.valuePartsBeforePaste = this._getLeftAndRightPartAroundTheSelection();
@@ -5479,7 +5486,7 @@ class AutoNumeric {
                 }
             }
 
-            return e.type === 'keydown' || e.type === 'keypress' || this.eventKeyCode === AutoNumericEnum.keyCode.c;
+            return e.type === 'keydown' || e.type === 'keypress' || this.eventKey === AutoNumericEnum.keyName.c;
         }
 
         if (e.ctrlKey || e.metaKey) {
@@ -5488,14 +5495,14 @@ class AutoNumeric {
 
         // Jump over the thousand separator
         //TODO Move this test inside the `onKeydown` handler
-        if (this.eventKeyCode === AutoNumericEnum.keyCode.LeftArrow || this.eventKeyCode === AutoNumericEnum.keyCode.RightArrow) {
+        if (this.eventKey === AutoNumericEnum.keyName.LeftArrow || this.eventKey === AutoNumericEnum.keyName.RightArrow) {
             if (e.type === 'keydown' && !e.shiftKey) {
                 const value = AutoNumericHelper.getElementValue(this.domElement);
-                if (this.eventKeyCode === AutoNumericEnum.keyCode.LeftArrow &&
+                if (this.eventKey === AutoNumericEnum.keyName.LeftArrow &&
                     (value.charAt(this.selection.start - 2) === this.settings.digitGroupSeparator ||
                     value.charAt(this.selection.start - 2) === this.settings.decimalCharacter)) {
                     this._setCaretPosition(this.selection.start - 1);
-                } else if (this.eventKeyCode === AutoNumericEnum.keyCode.RightArrow &&
+                } else if (this.eventKey === AutoNumericEnum.keyName.RightArrow &&
                     (value.charAt(this.selection.start + 1) === this.settings.digitGroupSeparator ||
                     value.charAt(this.selection.start + 1) === this.settings.decimalCharacter)) {
                     this._setCaretPosition(this.selection.start + 1);
@@ -5505,7 +5512,7 @@ class AutoNumeric {
             return true;
         }
 
-        return this.eventKeyCode >= AutoNumericEnum.keyCode.PageDown && this.eventKeyCode <= AutoNumericEnum.keyCode.DownArrow;
+        return AutoNumericHelper.isInArray(this.eventKey, AutoNumericEnum.keyName._directionKeys);
     }
 
     /**
@@ -5520,7 +5527,7 @@ class AutoNumeric {
         const value = AutoNumericHelper.getElementValue(this.domElement);
 
         if (this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's') {
-            if (this.eventKeyCode === AutoNumericEnum.keyCode.Backspace) {
+            if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
                 this.caretFix = (this.selection.start >= value.indexOf(this.settings.suffixText) && this.settings.suffixText !== '');
                 if (value.charAt(this.selection.start - 1) === '-') {
                     left = left.substring(1);
@@ -5541,7 +5548,7 @@ class AutoNumeric {
         //TODO Merge the two following 'if' blocks into one `if (settings.currencySymbolPlacement === 's') {` and a switch on settings.negativePositiveSignPlacement
         if (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'l') {
             this.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
-            if (this.eventKeyCode === AutoNumericEnum.keyCode.Backspace) {
+            if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
                 if (this.selection.start === (value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length) && AutoNumericHelper.contains(value, this.settings.negativeSignCharacter)) {
                     left = left.substring(1);
                 } else if (left !== '-' && ((this.selection.start <= value.indexOf(this.settings.negativeSignCharacter)) || !AutoNumericHelper.contains(value, this.settings.negativeSignCharacter))) {
@@ -5559,7 +5566,7 @@ class AutoNumeric {
 
         if (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'r') {
             this.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
-            if (this.eventKeyCode === AutoNumericEnum.keyCode.Backspace) {
+            if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
                 if (this.selection.start === (value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length)) {
                     left = left.substring(1);
                 } else if (left !== '-' && this.selection.start <= (value.indexOf(this.settings.negativeSignCharacter) - this.settings.currencySymbol.length)) {
@@ -5597,7 +5604,7 @@ class AutoNumeric {
                 AutoNumericHelper.isNegative(AutoNumericHelper.getElementValue(this.domElement))) {
                 [left, right] = this._processCharacterDeletionIfTrailingNegativeSign([left, right]);
             } else {
-                if (this.eventKeyCode === AutoNumericEnum.keyCode.Backspace) {
+                if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
                     left = left.substring(0, left.length - 1);
                 } else {
                     right = right.substring(1, right.length);
@@ -5612,25 +5619,21 @@ class AutoNumeric {
     }
 
     /**
+     * Return `true` if the key is allowed.
      * This function decides if the key pressed should be dropped or accepted, and modify the value 'on-the-fly' accordingly.
-     * Returns `true` if the keycode is allowed.
      * This functions also modify the value on-the-fly. //TODO This should use another function in order to separate the test and the modification
      *
-     * @param {KeyboardEvent} e
      * @returns {boolean}
      */
-    _processCharacterInsertion(e) {
+    _processCharacterInsertion() {
         let [left, right] = this._getUnformattedLeftAndRightPartAroundTheSelection();
         this.throwInput = true;
 
-        // Retrieve the real character that has been entered (ie. 'a' instead of the key code)
-        const eventCharacter = AutoNumericHelper.character(e);
-
         // Start rules when the decimal character key is pressed always use numeric pad dot to insert decimal separator
         // Do not allow decimal character if no decimal part allowed
-        if (eventCharacter === this.settings.decimalCharacter ||
-            (this.settings.decimalCharacterAlternative && eventCharacter === this.settings.decimalCharacterAlternative) ||
-            ((eventCharacter === '.' || eventCharacter === ',') && this.eventKeyCode === AutoNumericEnum.keyCode.DotNumpad)) {
+        if (this.eventKey === this.settings.decimalCharacter ||
+            (this.settings.decimalCharacterAlternative && this.eventKey === this.settings.decimalCharacterAlternative) ||
+            (this.eventKey === '.' || this.eventKey === ',' || this.eventKey === AutoNumericEnum.keyName.NumpadDot)) {
             if (!this.settings.decimalPlacesOverride || !this.settings.decimalCharacter) {
                 return true;
             }
@@ -5659,7 +5662,7 @@ class AutoNumeric {
         }
 
         // Prevent minus if not allowed
-        if ((eventCharacter === '-' || eventCharacter === '+') && this.settings.negativeSignCharacter === '-') {
+        if ((this.eventKey === '-' || this.eventKey === '+') && this.settings.negativeSignCharacter === '-') {
             if (!this.settings) {
                 return true;
             }
@@ -5676,7 +5679,7 @@ class AutoNumeric {
                 if (AutoNumericHelper.isNegativeStrict(left) || AutoNumericHelper.contains(left, this.settings.negativeSignCharacter)) {
                     left = left.substring(1, left.length);
                 } else {
-                    left = (eventCharacter === '-') ? this.settings.negativeSignCharacter + left : left;
+                    left = (this.eventKey === '-') ? this.settings.negativeSignCharacter + left : left;
                 }
             } else {
                 if (left === '' && AutoNumericHelper.contains(right, this.settings.negativeSignCharacter)) {
@@ -5688,7 +5691,7 @@ class AutoNumeric {
                 if (left.charAt(0) === this.settings.negativeSignCharacter) {
                     left = left.substring(1, left.length);
                 } else {
-                    left = (eventCharacter === '-') ? this.settings.negativeSignCharacter + left : left;
+                    left = (this.eventKey === '-') ? this.settings.negativeSignCharacter + left : left;
                 }
             }
 
@@ -5697,24 +5700,24 @@ class AutoNumeric {
             return true;
         }
 
-        // If the user tries to insert digit before minus sign
-        const eventNumber = Number(eventCharacter);
+        // If the user tries to insert a digit before the minus sign
+        const eventNumber = Number(this.eventKey);
         if (eventNumber >= 0 && eventNumber <= 9) {
             if (this.settings.negativeSignCharacter && left === '' && AutoNumericHelper.contains(right, this.settings.negativeSignCharacter)) {
                 left = this.settings.negativeSignCharacter;
                 right = right.substring(1, right.length);
             }
 
-            if (this.settings.maximumValue <= 0 && this.settings.minimumValue < this.settings.maximumValue && !AutoNumericHelper.contains(AutoNumericHelper.getElementValue(this.domElement), this.settings.negativeSignCharacter) && eventCharacter !== '0') {
+            if (this.settings.maximumValue <= 0 && this.settings.minimumValue < this.settings.maximumValue && !AutoNumericHelper.contains(AutoNumericHelper.getElementValue(this.domElement), this.settings.negativeSignCharacter) && this.eventKey !== '0') {
                 left = this.settings.negativeSignCharacter + left;
             }
 
-            this._setValueParts(left + eventCharacter, right);
+            this._setValueParts(left + this.eventKey, right);
 
             return true;
         }
 
-        // Prevent any other character
+        // Prevent any other characters
         this.throwInput = false;
 
         return false;
@@ -5766,7 +5769,7 @@ class AutoNumeric {
                 leftAr[0] === '-' && this.settings.negativeSignCharacter !== '') {
                 leftAr.shift();
 
-                if ((this.eventKeyCode === AutoNumericEnum.keyCode.Backspace || this.eventKeyCode === AutoNumericEnum.keyCode.Delete) &&
+                if ((this.eventKey === AutoNumericEnum.keyName.Backspace || this.eventKey === AutoNumericEnum.keyName.Delete) &&
                     this.caretFix) {
                     if ((this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'l') ||
                         (this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's')) {
@@ -5787,7 +5790,7 @@ class AutoNumeric {
                             }
                         });
 
-                        if (this.eventKeyCode === AutoNumericEnum.keyCode.Backspace) {
+                        if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
                             escapedParts.push('-');
                         }
 
@@ -5845,7 +5848,7 @@ class AutoNumeric {
 
         // Only update the value if it has changed. This prevents modifying the selection, if any.
         if (value !== elementValue ||
-            value === elementValue && (this.eventKeyCode === AutoNumericEnum.keyCode.num0 || this.eventKeyCode === AutoNumericEnum.keyCode.numpad0)) {
+            value === elementValue && (this.eventKey === AutoNumericEnum.keyName.num0 || this.eventKey === AutoNumericEnum.keyName.numpad0)) {
             AutoNumericHelper.setElementValue(this.domElement, value);
             this._setCaretPosition(position);
         }

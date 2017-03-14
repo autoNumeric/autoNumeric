@@ -29,7 +29,7 @@
 
 /**
  * Object that store the helper enumerations
- * @type {{allowedTagList: [*], keyCode: {Backspace: number, Tab: number, Enter: number, Shift: number, Ctrl: number, Alt: number, PauseBreak: number, CapsLock: number, Esc: number, Space: number, PageUp: number, PageDown: number, End: number, Home: number, LeftArrow: number, UpArrow: number, RightArrow: number, DownArrow: number, Insert: number, Delete: number, num0: number, num1: number, num2: number, num3: number, num4: number, num5: number, num6: number, num7: number, num8: number, num9: number, a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number, t: number, u: number, v: number, w: number, x: number, y: number, z: number, Windows: number, RightClick: number, numpad0: number, numpad1: number, numpad2: number, numpad3: number, numpad4: number, numpad5: number, numpad6: number, numpad7: number, numpad8: number, numpad9: number, MultiplyNumpad: number, PlusNumpad: number, MinusNumpad: number, DotNumpad: number, SlashNumpad: number, F1: number, F2: number, F3: number, F4: number, F5: number, F6: number, F7: number, F8: number, F9: number, F10: number, F11: number, F12: number, NumLock: number, ScrollLock: number, MyComputer: number, MyCalculator: number, Semicolon: number, Equal: number, Comma: number, Hyphen: number, Dot: number, Slash: number, Backquote: number, LeftBracket: number, Backslash: number, RightBracket: number, Quote: number, Command: number}, keyName: {Unidentified: string, Alt: string, AltGr: string, CapsLock: string, Ctrl: string, Fn: string, FnLock: string, Hyper: string, Meta: string, Windows: string, Command: string, NumLock: string, ScrollLock: string, Shift: string, Super: string, Symbol: string, SymbolLock: string, Enter: string, Tab: string, Space: string, DownArrow: string, LeftArrow: string, RightArrow: string, UpArrow: string, End: string, Home: string, PageDown: string, PageUp: string, Backspace: string, Clear: string, Copy: string, CrSel: string, Cut: string, Delete: string, EraseEof: string, ExSel: string, Insert: string, Paste: string, Redo: string, Undo: string, Accept: string, Again: string, Attn: string, Cancel: string, ContextMenu: string, Esc: string, Execute: string, Find: string, Finish: string, Help: string, Pause: string, Play: string, Props: string, Select: string, ZoomIn: string, ZoomOut: string, BrightnessDown: string, BrightnessUp: string, Eject: string, LogOff: string, Power: string, PowerOff: string, PrintScreen: string, Hibernate: string, Standby: string, WakeUp: string, Compose: string, Dead: string, F1: string, F2: string, F3: string, F4: string, F5: string, F6: string, F7: string, F8: string, F9: string, F10: string, F11: string, F12: string, Print: string, num0: string, num1: string, num2: string, num3: string, num4: string, num5: string, num6: string, num7: string, num8: string, num9: string, a: string, b: string, c: string, d: string, e: string, f: string, g: string, h: string, i: string, j: string, k: string, l: string, m: string, n: string, o: string, p: string, q: string, r: string, s: string, t: string, u: string, v: string, w: string, x: string, y: string, z: string, Semicolon: string, Equal: string, Comma: string, Hyphen: string, Minus: string, Plus: string, Dot: string, Slash: string, Backquote: string, LeftBracket: string, RightBracket: string, Backslash: string, Quote: string, numpad0: string, numpad1: string, numpad2: string, numpad3: string, numpad4: string, numpad5: string, numpad6: string, numpad7: string, numpad8: string, numpad9: string, NumpadDot: string, NumpadDotAlt: string, NumpadMultiply: string, NumpadPlus: string, NumpadMinus: string, NumpadSlash: string, NumpadDotObsoleteBrowsers: string, NumpadMultiplyObsoleteBrowsers: string, NumpadPlusObsoleteBrowsers: string, NumpadMinusObsoleteBrowsers: string, NumpadSlashObsoleteBrowsers: string}}}
+ * @type {{ allowedTagList: [string], keyCode: {}, fromCharCodeKeyCode: [string], keyName: {} }}
  */
 const AutoNumericEnum = {
     /**
@@ -73,19 +73,29 @@ const AutoNumericEnum = {
 
     /**
      * Wrapper variable that hold named keyboard keys with their respective keyCode as seen in DOM events.
-     * //TODO Replace every call to this object with a call to `keyName`
+     * cf. https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
+     *
+     * This deprecated information is used for obsolete browsers.
      * @deprecated
      */
     keyCode: {
         Backspace:      8,
         Tab:            9,
+        // No 10, 11
+        // 12 === NumpadEqual on Windows
+        // 12 === NumLock on Mac
         Enter:          13,
+        // 14 reserved, but not used
+        // 15 does not exists
         Shift:          16,
         Ctrl:           17,
         Alt:            18,
-        PauseBreak:     19,
+        Pause:          19,
         CapsLock:       20,
+        // 21, 22, 23, 24, 25 : Asiatic key codes
+        // 26 does not exists
         Esc:            27,
+        // 28, 29, 30, 31 : Convert, NonConvert, Accept and ModeChange keys
         Space:          32,
         PageUp:         33,
         PageDown:       34,
@@ -133,8 +143,9 @@ const AutoNumericEnum = {
         x:              88,
         y:              89,
         z:              90,
-        Windows:        91,
-        RightClick:     93,
+        OSLeft:         91,
+        OSRight:        92,
+        ContextMenu:    93,
         numpad0:        96,
         numpad1:        97,
         numpad2:        98,
@@ -178,7 +189,14 @@ const AutoNumericEnum = {
         RightBracket:   221,
         Quote:          222,
         Command:        224,
+        AltGraph:       225,
     },
+
+    /**
+     * This object is the reverse of `keyCode`, and is used to translate the key code to named keys when no valid characters can be obtained by `String.fromCharCode`.
+     * Note: this sparse array is initialized later in the source code.
+     */
+    fromCharCodeKeyCode: [],
 
     /**
      * Wrapper variable that hold named keyboard keys with their respective key name (as set in KeyboardEvent.key).
@@ -197,9 +215,10 @@ const AutoNumericEnum = {
         Fn:             'Fn',
         FnLock:         'FnLock',
         Hyper:          'Hyper', // 'OS' under Firefox
-        Meta:           'Meta', // The Windows, Command or ⌘ key // 'OS' under Firefox and IE9
-        Windows:        'Meta', // This is a non-official key name
-        Command:        'Meta', // This is a non-official key name
+        Meta:           'Meta',
+        OSLeft:         'OS',
+        OSRight:        'OS',
+        Command:        'OS',
         NumLock:        'NumLock',
         ScrollLock:     'ScrollLock',
         Shift:          'Shift',
@@ -213,14 +232,14 @@ const AutoNumericEnum = {
         Space:          ' ', // 'Spacebar' for Firefox <37, and IE9
 
         // Navigation keys
-        DownArrow:      'ArrowDown', // 'Down' for Firefox <=36, and IE9
         LeftArrow:      'ArrowLeft', // 'Left' for Firefox <=36, and IE9
-        RightArrow:     'ArrowRight', // 'Right' for Firefox <=36, and IE9
         UpArrow:        'ArrowUp', // 'Up' for Firefox <=36, and IE9
+        RightArrow:     'ArrowRight', // 'Right' for Firefox <=36, and IE9
+        DownArrow:      'ArrowDown', // 'Down' for Firefox <=36, and IE9
         End:            'End',
         Home:           'Home',
-        PageDown:       'PageDown',
         PageUp:         'PageUp',
+        PageDown:       'PageDown',
 
         // Editing keys
         Backspace:      'Backspace',
@@ -360,7 +379,118 @@ const AutoNumericEnum = {
         NumpadPlusObsoleteBrowsers:     'Add',
         NumpadMinusObsoleteBrowsers:    'Subtract',
         NumpadSlashObsoleteBrowsers:    'Divide',
+
+        // Special arrays for quicker tests
+        _allFnKeys:     ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'],
+        _someNonPrintableKeys: ['Tab', 'Enter', 'Shift', 'ShiftLeft', 'ShiftRight', 'Control', 'ControlLeft', 'ControlRight', 'Alt', 'AltLeft', 'AltRight', 'Pause', 'CapsLock', 'Escape'],
+        _directionKeys: ['PageUp', 'PageDown', 'End', 'Home', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp'],
     },
 };
+
+// Here we populate the sparse array that uses the `event.keyCode` as index, and returns the corresponding key name (à la event.key)
+AutoNumericEnum.fromCharCodeKeyCode[0] = 'LaunchCalculator';
+AutoNumericEnum.fromCharCodeKeyCode[8] = 'Backspace';
+AutoNumericEnum.fromCharCodeKeyCode[9] = 'Tab';
+AutoNumericEnum.fromCharCodeKeyCode[13] = 'Enter';
+AutoNumericEnum.fromCharCodeKeyCode[16] = 'Shift';
+AutoNumericEnum.fromCharCodeKeyCode[17] = 'Ctrl';
+AutoNumericEnum.fromCharCodeKeyCode[18] = 'Alt';
+AutoNumericEnum.fromCharCodeKeyCode[19] = 'Pause';
+AutoNumericEnum.fromCharCodeKeyCode[20] = 'CapsLock';
+AutoNumericEnum.fromCharCodeKeyCode[27] = 'Escape';
+AutoNumericEnum.fromCharCodeKeyCode[32] = ' ';
+AutoNumericEnum.fromCharCodeKeyCode[33] = 'PageUp';
+AutoNumericEnum.fromCharCodeKeyCode[34] = 'PageDown';
+AutoNumericEnum.fromCharCodeKeyCode[35] = 'End';
+AutoNumericEnum.fromCharCodeKeyCode[36] = 'Home';
+AutoNumericEnum.fromCharCodeKeyCode[37] = 'ArrowLeft';
+AutoNumericEnum.fromCharCodeKeyCode[38] = 'ArrowUp';
+AutoNumericEnum.fromCharCodeKeyCode[39] = 'ArrowRight';
+AutoNumericEnum.fromCharCodeKeyCode[40] = 'ArrowDown';
+AutoNumericEnum.fromCharCodeKeyCode[45] = 'Insert';
+AutoNumericEnum.fromCharCodeKeyCode[46] = 'Delete';
+AutoNumericEnum.fromCharCodeKeyCode[48] = '0';
+AutoNumericEnum.fromCharCodeKeyCode[49] = '1';
+AutoNumericEnum.fromCharCodeKeyCode[50] = '2';
+AutoNumericEnum.fromCharCodeKeyCode[51] = '3';
+AutoNumericEnum.fromCharCodeKeyCode[52] = '4';
+AutoNumericEnum.fromCharCodeKeyCode[53] = '5';
+AutoNumericEnum.fromCharCodeKeyCode[54] = '6';
+AutoNumericEnum.fromCharCodeKeyCode[55] = '7';
+AutoNumericEnum.fromCharCodeKeyCode[56] = '8';
+AutoNumericEnum.fromCharCodeKeyCode[57] = '9';
+// [65, 'a'],
+// [66, 'b'],
+// [67, 'c'],
+// [68, 'd'],
+// [69, 'e'],
+// [70, 'f'],
+// [71, 'g'],
+// [72, 'h'],
+// [73, 'i'],
+// [74, 'j'],
+// [75, 'k'],
+// [76, 'l'],
+// [77, 'm'],
+// [78, 'n'],
+// [79, 'o'],
+// [80, 'p'],
+// [81, 'q'],
+// [82, 'r'],
+// [83, 's'],
+// [84, 't'],
+// [85, 'u'],
+// [86, 'v'],
+// [87, 'w'],
+// [88, 'x'],
+// [89, 'y'],
+// [90, 'z'],
+AutoNumericEnum.fromCharCodeKeyCode[91] = 'OS'; // Note: Firefox and Chrome reports 'OS' instead of 'OSLeft'
+AutoNumericEnum.fromCharCodeKeyCode[92] = 'OSRight';
+AutoNumericEnum.fromCharCodeKeyCode[93] = 'ContextMenu';
+AutoNumericEnum.fromCharCodeKeyCode[96] =  '0';
+AutoNumericEnum.fromCharCodeKeyCode[97] =  '1';
+AutoNumericEnum.fromCharCodeKeyCode[98] =  '2';
+AutoNumericEnum.fromCharCodeKeyCode[99] =  '3';
+AutoNumericEnum.fromCharCodeKeyCode[100] = '4';
+AutoNumericEnum.fromCharCodeKeyCode[101] = '5';
+AutoNumericEnum.fromCharCodeKeyCode[102] = '6';
+AutoNumericEnum.fromCharCodeKeyCode[103] = '7';
+AutoNumericEnum.fromCharCodeKeyCode[104] = '8';
+AutoNumericEnum.fromCharCodeKeyCode[105] = '9';
+AutoNumericEnum.fromCharCodeKeyCode[106] = '*';
+AutoNumericEnum.fromCharCodeKeyCode[107] = '+';
+AutoNumericEnum.fromCharCodeKeyCode[109] = '-';
+AutoNumericEnum.fromCharCodeKeyCode[110] = '.';
+AutoNumericEnum.fromCharCodeKeyCode[111] = '/';
+AutoNumericEnum.fromCharCodeKeyCode[112] = 'F1';
+AutoNumericEnum.fromCharCodeKeyCode[113] = 'F2';
+AutoNumericEnum.fromCharCodeKeyCode[114] = 'F3';
+AutoNumericEnum.fromCharCodeKeyCode[115] = 'F4';
+AutoNumericEnum.fromCharCodeKeyCode[116] = 'F5';
+AutoNumericEnum.fromCharCodeKeyCode[117] = 'F6';
+AutoNumericEnum.fromCharCodeKeyCode[118] = 'F7';
+AutoNumericEnum.fromCharCodeKeyCode[119] = 'F8';
+AutoNumericEnum.fromCharCodeKeyCode[120] = 'F9';
+AutoNumericEnum.fromCharCodeKeyCode[121] = 'F10';
+AutoNumericEnum.fromCharCodeKeyCode[122] = 'F11';
+AutoNumericEnum.fromCharCodeKeyCode[123] = 'F12';
+AutoNumericEnum.fromCharCodeKeyCode[144] = 'NumLock';
+AutoNumericEnum.fromCharCodeKeyCode[145] = 'ScrollLock';
+AutoNumericEnum.fromCharCodeKeyCode[182] = 'MyComputer';
+AutoNumericEnum.fromCharCodeKeyCode[183] = 'MyCalculator';
+AutoNumericEnum.fromCharCodeKeyCode[186] = ';';
+AutoNumericEnum.fromCharCodeKeyCode[187] = '=';
+AutoNumericEnum.fromCharCodeKeyCode[188] = ',';
+AutoNumericEnum.fromCharCodeKeyCode[189] = '-';
+AutoNumericEnum.fromCharCodeKeyCode[190] = '.';
+AutoNumericEnum.fromCharCodeKeyCode[191] = '/';
+AutoNumericEnum.fromCharCodeKeyCode[192] = '`';
+AutoNumericEnum.fromCharCodeKeyCode[219] = '[';
+AutoNumericEnum.fromCharCodeKeyCode[220] = '\\';
+AutoNumericEnum.fromCharCodeKeyCode[221] = ']';
+AutoNumericEnum.fromCharCodeKeyCode[222] = "'";
+AutoNumericEnum.fromCharCodeKeyCode[224] = 'Meta';
+AutoNumericEnum.fromCharCodeKeyCode[225] = 'AltGraph';
 
 export default AutoNumericEnum;

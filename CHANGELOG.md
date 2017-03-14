@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.11"
++ Fix issue #320 Use `event.key` instead of `event.keyCode` and `event.which` since those two attributes are deprecated
+
 ### "3.0.0-beta.10"
 + Add lots of pre-defined options.
 + Those options are `dotDecimalCharCommaSeparator`, `commaDecimalCharDotSeparator`, `integer`, `integerPos`, `integerNeg`, `float`, `floatPos`, `floatNeg`, `numeric`, `numericPos`, `numericNeg`, `euro`, `euroPos`, `euroNeg`, `euroSpace`, `euroSpacePos`, `euroSpaceNeg`, `percentageEU2dec`, `percentageEU2decPos`, `percentageEU2decNeg`, `percentageEU3dec`, `percentageEU3decPos`, `percentageEU3decNeg`, `dollar`, `dollarPos`, `dollarNeg`, `percentageUS2dec`, `percentageUS2decPos`, `percentageUS2decNeg`, `percentageUS3dec`, `percentageUS3decPos` and `percentageUS3decNeg`.

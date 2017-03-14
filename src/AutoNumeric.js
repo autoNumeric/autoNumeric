@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      3.0.0-beta.10
+ * @version      3.0.0-beta.11
  * @date         2017-03-07 UTC 03:00
  *
  * @author       Bob Knothe
@@ -518,7 +518,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '3.0.0-beta.10';
+        return '3.0.0-beta.11';
     }
 
     /**

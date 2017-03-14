@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.12"
++ Refactor the hard-coded option values with the `AutoNumeric.options` object attribute values
+
 ### "3.0.0-beta.11"
 + Fix issue #320 Use `event.key` instead of `event.keyCode` and `event.which` since those two attributes are deprecated
 

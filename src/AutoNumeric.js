@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      3.0.0-beta.11
- * @date         2017-03-07 UTC 03:00
+ * @version      3.0.0-beta.12
+ * @date         2017-03-14 UTC 11:30
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
@@ -518,7 +518,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '3.0.0-beta.11';
+        return '3.0.0-beta.12';
     }
 
     /**
@@ -954,7 +954,7 @@ class AutoNumeric {
             // Test if the value is negative
             const isValueNegative = AutoNumericHelper.isNegative(value);
 
-            if (!(/\d/).test(value) && this.settings.emptyInputBehavior === 'focus') {
+            if (!(/\d/).test(value) && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus) {
                 return '';
             }
 
@@ -974,7 +974,7 @@ class AutoNumeric {
                 }
             }
 
-            if (value !== '' || (value === '' && this.settings.emptyInputBehavior === 'zero')) {
+            if (value !== '' || (value === '' && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero)) {
                 value = this._modifyNegativeSignAndDecimalCharacterForRawValue(value);
             }
         }
@@ -992,8 +992,8 @@ class AutoNumeric {
      * @returns {string}
      */
     getFormatted() {
-        // Make sure `this[0]` exists as well as `.value` before trying to access that property
         if (!('value' in this.domElement || 'textContent' in this.domElement)) {
+            // Make sure `.value` or `.textContent' exists before trying to access those properties
             AutoNumericHelper.throwError('Unable to get the formatted string from the element.');
         }
 
@@ -1037,7 +1037,7 @@ class AutoNumeric {
             value = ''+Number(this.settings.rawValue);
         }
 
-        if (value !== '' && Number(value) === 0 && this.settings.leadingZero !== 'keep') {
+        if (value !== '' && Number(value) === 0 && this.settings.leadingZero !== AutoNumeric.options.leadingZero.keep) {
             value = '0';
         }
 
@@ -1154,23 +1154,23 @@ class AutoNumeric {
         const negativePositiveSignPlacement = this.settings.negativePositiveSignPlacement;
 
         let start;
-        if (currencySymbolPlacement === 's') {
+        if (currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
             start = 0;
-        } else if (negativePositiveSignPlacement === 'l' && negLen === 1 && currencySymbolSize > 0) {
+        } else if (negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.left && negLen === 1 && currencySymbolSize > 0) {
             start = currencySymbolSize + 1;
         } else {
             start = currencySymbolSize;
         }
 
         let end;
-        if (currencySymbolPlacement === 'p') {
+        if (currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix) {
             end = valueLen - suffixTextLen;
         } else {
             switch (negativePositiveSignPlacement) {
-                case 'l':
+                case AutoNumeric.options.negativePositiveSignPlacement.left:
                     end = valueLen - (suffixTextLen + currencySymbolSize);
                     break;
-                case 'r':
+                case AutoNumeric.options.negativePositiveSignPlacement.right:
                     if (currencySymbolSize > 0) {
                         end = valueLen - (currencySymbolSize + negLen + suffixTextLen);
                     } else {
@@ -1514,6 +1514,7 @@ class AutoNumeric {
      * @returns {HTMLFormElement|null}
      */
     form() {
+        //TODO Store a reference to the parent <form> in `this.form` so we do not have to search it on each call?
         if (this.domElement.tagName.toLowerCase() === 'body') {
             return null;
         }
@@ -2108,7 +2109,6 @@ class AutoNumeric {
         return result;
     }
 
-    // Throw if the `options` are not valid
     /**
      * Validate the given option object.
      * If the options are valid, this function returns nothing, otherwise if the options are invalid, this function throws an error.
@@ -2118,7 +2118,7 @@ class AutoNumeric {
      *
      * @param {*} userOptions
      * @param {Boolean} shouldExtendDefaultOptions If TRUE, then this function will extends the `userOptions` passed by the user, with the default options.
-     * @throws Error
+     * @throws Error This throws if the `userOptions` are not valid
      */
     static validate(userOptions, shouldExtendDefaultOptions = true) {
         if (AutoNumericHelper.isUndefinedOrNullOrEmpty(userOptions) || !AutoNumericHelper.isObject(userOptions) || AutoNumericHelper.isEmptyObj(userOptions)) {
@@ -2152,16 +2152,16 @@ class AutoNumeric {
 
         // Then tests the options individually
         if (!AutoNumericHelper.isInArray(options.digitGroupSeparator, [
-            ',',      // Comma
-            '.',      // Dot
-            ' ',      // Normal space
-            '\u2009', // Thin-space
-            '\u202f', // Narrow no-break space
-            '\u00a0', // No-break space
-            '',       // No separator
-            "'",      // Apostrophe
-            '٬',      // Arabic thousands separator
-            '˙',      // Dot above
+            AutoNumeric.options.digitGroupSeparator.comma,
+            AutoNumeric.options.digitGroupSeparator.dot,
+            AutoNumeric.options.digitGroupSeparator.normalSpace,
+            AutoNumeric.options.digitGroupSeparator.thinSpace,
+            AutoNumeric.options.digitGroupSeparator.narrowNoBreakSpace,
+            AutoNumeric.options.digitGroupSeparator.noBreakSpace,
+            AutoNumeric.options.digitGroupSeparator.noSeparator,
+            AutoNumeric.options.digitGroupSeparator.apostrophe,
+            AutoNumeric.options.digitGroupSeparator.arabicThousandsSeparator,
+            AutoNumeric.options.digitGroupSeparator.dotAbove,
         ])) {
             AutoNumericHelper.throwError(`The thousand separator character option 'digitGroupSeparator' is invalid ; it should be ',', '.', '٬', '˙', "'", ' ', '\u2009', '\u202f', '\u00a0' or empty (''), [${options.digitGroupSeparator}] given.`);
         }
@@ -2175,11 +2175,11 @@ class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isInArray(options.decimalCharacter, [
-            ',', // Comma
-            '.', // Dot
-            '·', // Middle-dot
-            '٫', // Arabic decimal separator
-            '⎖', // Decimal separator key symbol
+            AutoNumeric.options.decimalCharacter.comma,
+            AutoNumeric.options.decimalCharacter.dot,
+            AutoNumeric.options.decimalCharacter.middleDot,
+            AutoNumeric.options.decimalCharacter.arabicDecimalSeparator,
+            AutoNumeric.options.decimalCharacter.decimalSeparatorKeySymbol,
         ])) {
             AutoNumericHelper.throwError(`The decimal separator character option 'decimalCharacter' is invalid ; it should be '.', ',', '·', '⎖' or '٫', [${options.decimalCharacter}] given.`);
         }
@@ -2198,18 +2198,18 @@ class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isInArray(options.currencySymbolPlacement, [
-            'p',
-            's',
+            AutoNumeric.options.currencySymbolPlacement.prefix,
+            AutoNumeric.options.currencySymbolPlacement.suffix,
         ])) {
             AutoNumericHelper.throwError(`The placement of the currency sign option 'currencySymbolPlacement' is invalid ; it should either be 'p' (prefix) or 's' (suffix), [${options.currencySymbolPlacement}] given.`);
         }
 
         if (!AutoNumericHelper.isInArray(options.negativePositiveSignPlacement, [
-            'p',
-            's',
-            'l',
-            'r',
-            null,
+            AutoNumeric.options.negativePositiveSignPlacement.prefix,
+            AutoNumeric.options.negativePositiveSignPlacement.suffix,
+            AutoNumeric.options.negativePositiveSignPlacement.left,
+            AutoNumeric.options.negativePositiveSignPlacement.right,
+            AutoNumeric.options.negativePositiveSignPlacement.none,
         ])) {
             AutoNumericHelper.throwError(`The placement of the negative sign option 'negativePositiveSignPlacement' is invalid ; it should either be 'p' (prefix), 's' (suffix), 'l' (left), 'r' (right) or 'null', [${options.negativePositiveSignPlacement}] given.`);
         }
@@ -2222,7 +2222,11 @@ class AutoNumeric {
             AutoNumericHelper.throwError(`The additional suffix option 'suffixText' is invalid ; it should not contains the negative sign '-' nor any numerical characters, [${options.suffixText}] given.`);
         }
 
-        if (!AutoNumericHelper.isNull(options.overrideMinMaxLimits) && !AutoNumericHelper.isInArray(options.overrideMinMaxLimits, ['ceiling', 'floor', 'ignore'])) {
+        if (!AutoNumericHelper.isNull(options.overrideMinMaxLimits) && !AutoNumericHelper.isInArray(options.overrideMinMaxLimits, [
+            AutoNumeric.options.overrideMinMaxLimits.ceiling,
+            AutoNumeric.options.overrideMinMaxLimits.floor,
+            AutoNumeric.options.overrideMinMaxLimits.ignore,
+        ])) {
             AutoNumericHelper.throwError(`The override min & max limits option 'overrideMinMaxLimits' is invalid ; it should either be 'ceiling', 'floor' or 'ignore', [${options.overrideMinMaxLimits}] given.`);
         }
 
@@ -2281,29 +2285,29 @@ class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isInArray(options.onInvalidPaste, [
-            'error',
-            'ignore',
-            'clamp',
-            'truncate',
-            'replace',
+            AutoNumeric.options.onInvalidPaste.error,
+            AutoNumeric.options.onInvalidPaste.ignore,
+            AutoNumeric.options.onInvalidPaste.clamp,
+            AutoNumeric.options.onInvalidPaste.truncate,
+            AutoNumeric.options.onInvalidPaste.replace,
         ])) {
             AutoNumericHelper.throwError(`The paste behavior option 'onInvalidPaste' is invalid ; it should either be 'error', 'ignore', 'clamp', 'truncate' or 'replace' (cf. documentation), [${options.onInvalidPaste}] given.`);
         }
 
         if (!AutoNumericHelper.isInArray(options.roundingMethod, [
-            'S',
-            'A',
-            's',
-            'a',
-            'B',
-            'U',
-            'D',
-            'C',
-            'F',
-            'N05',
-            'CHF',
-            'U05',
-            'D05',
+            AutoNumeric.options.roundingMethod.halfUpSymmetric,
+            AutoNumeric.options.roundingMethod.halfUpAsymmetric,
+            AutoNumeric.options.roundingMethod.halfDownSymmetric,
+            AutoNumeric.options.roundingMethod.halfDownAsymmetric,
+            AutoNumeric.options.roundingMethod.halfEvenBankersRounding,
+            AutoNumeric.options.roundingMethod.upRoundAwayFromZero,
+            AutoNumeric.options.roundingMethod.downRoundTowardZero,
+            AutoNumeric.options.roundingMethod.toCeilingTowardPositiveInfinity,
+            AutoNumeric.options.roundingMethod.toFloorTowardNegativeInfinity,
+            AutoNumeric.options.roundingMethod.toNearest05,
+            AutoNumeric.options.roundingMethod.toNearest05Alt,
+            AutoNumeric.options.roundingMethod.upToNext05,
+            AutoNumeric.options.roundingMethod.downToNext05,
         ])) {
             AutoNumericHelper.throwError(`The rounding method option 'roundingMethod' is invalid ; it should either be 'S', 'A', 's', 'a', 'B', 'U', 'D', 'C', 'F', 'N05', 'CHF', 'U05' or 'D05' (cf. documentation), [${options.roundingMethod}] given.`);
         }
@@ -2313,10 +2317,10 @@ class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isNull(options.negativeBracketsTypeOnBlur) && !AutoNumericHelper.isInArray(options.negativeBracketsTypeOnBlur, [
-            '(,)',
-            '[,]',
-            '<,>',
-            '{,}',
+            AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses,
+            AutoNumeric.options.negativeBracketsTypeOnBlur.brackets,
+            AutoNumeric.options.negativeBracketsTypeOnBlur.chevrons,
+            AutoNumeric.options.negativeBracketsTypeOnBlur.curlyBraces,
             //TODO Add the following brackets :
             // '〈,〉'
             // '｢,｣'
@@ -2328,11 +2332,20 @@ class AutoNumeric {
             AutoNumericHelper.throwError(`The brackets for negative values option 'negativeBracketsTypeOnBlur' is invalid ; it should either be '(,)', '[,]', '<,>' or '{,}', [${options.negativeBracketsTypeOnBlur}] given.`);
         }
 
-        if (!AutoNumericHelper.isInArray(options.emptyInputBehavior, ['focus', 'press', 'always', 'zero'])) {
+        if (!AutoNumericHelper.isInArray(options.emptyInputBehavior, [
+            AutoNumeric.options.emptyInputBehavior.focus,
+            AutoNumeric.options.emptyInputBehavior.press,
+            AutoNumeric.options.emptyInputBehavior.always,
+            AutoNumeric.options.emptyInputBehavior.zero,
+        ])) {
             AutoNumericHelper.throwError(`The display on empty string option 'emptyInputBehavior' is invalid ; it should either be 'focus', 'press', 'always' or 'zero', [${options.emptyInputBehavior}] given.`);
         }
 
-        if (!AutoNumericHelper.isInArray(options.leadingZero, ['allow', 'deny', 'keep'])) {
+        if (!AutoNumericHelper.isInArray(options.leadingZero, [
+            AutoNumeric.options.leadingZero.allow,
+            AutoNumeric.options.leadingZero.deny,
+            AutoNumeric.options.leadingZero.keep,
+        ])) {
             AutoNumericHelper.throwError(`The leading zero behavior option 'leadingZero' is invalid ; it should either be 'allow', 'deny' or 'keep', [${options.leadingZero}] given.`);
         }
 
@@ -2353,14 +2366,14 @@ class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isNull(options.outputFormat) && !AutoNumericHelper.isInArray(options.outputFormat, [
-            'string',
-            'number',
-            '.',
-            '-.',
-            ',',
-            '-,',
-            '.-',
-            ',-',
+            AutoNumeric.options.outputFormat.string,
+            AutoNumeric.options.outputFormat.number,
+            AutoNumeric.options.outputFormat.dot,
+            AutoNumeric.options.outputFormat.negativeDot,
+            AutoNumeric.options.outputFormat.comma,
+            AutoNumeric.options.outputFormat.negativeComma,
+            AutoNumeric.options.outputFormat.dotNegative,
+            AutoNumeric.options.outputFormat.commaNegative,
         ])) {
             AutoNumericHelper.throwError(`The custom locale format option 'outputFormat' is invalid ; it should either be null, 'string', 'number', '.', '-.', ',', '-,', '.-' or ',-', [${options.outputFormat}] given.`);
         }
@@ -2376,13 +2389,13 @@ class AutoNumeric {
         if (!(AutoNumericHelper.isString(options.wheelStep) || AutoNumericHelper.isNumber(options.wheelStep)) ||
             (options.wheelStep !== 'progressive' && !testPositiveFloatOrInteger.test(options.wheelStep)) ||
             Number(options.wheelStep) === 0) {
-            // We do not accept a step equal to '0'
-            AutoNumericHelper.throwError(`The wheel step value option 'wheelStep' is invalid ; it should either be the string 'progressive', or a number or a string that represents a positive number, [${options.wheelStep}] given.`);
+            // A step equal to '0' is rejected
+            AutoNumericHelper.throwError(`The wheel step value option 'wheelStep' is invalid ; it should either be the string 'progressive', or a number or a string that represents a positive number (excluding zero), [${options.wheelStep}] given.`);
         }
 
         if (!AutoNumericHelper.isInArray(options.serializeSpaces, [
-            '+',
-            '%20',
+            AutoNumeric.options.serializeSpaces.plus,
+            AutoNumeric.options.serializeSpaces.percent,
         ])) {
             AutoNumericHelper.throwError(`The space replacement character option 'serializeSpaces' is invalid ; it should either be '+' or '%20', [${options.serializeSpaces}] given.`);
         }
@@ -2414,8 +2427,7 @@ class AutoNumeric {
         let isValid = true;
         try {
             this.validate(options);
-        }
-        catch (error) {
+        } catch (error) {
             isValid = false;
         }
 
@@ -2482,7 +2494,7 @@ class AutoNumeric {
         const [minTest, maxTest] = this._checkIfInRangeWithOverrideOption(valueString, settings);
         if (!minTest || !maxTest) {
             // Throw a custom event
-            AutoNumericHelper.triggerEvent('autoFormat.autoNumeric', document, `Range test failed`);
+            AutoNumericHelper.triggerEvent('autoFormat.autoNumeric', document, 'Range test failed');
             AutoNumericHelper.throwError(`The value [${valueString}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`);
         }
 
@@ -2542,7 +2554,7 @@ class AutoNumeric {
 
         const settings = Object.assign({}, this.getDefaultConfig(), { strip: false }, options);
         const allowed = `-0123456789\\${settings.decimalCharacter}`;
-        const autoStrip = new RegExp(`[^${allowed}]`, 'gi');
+        const unwantedCharacters = new RegExp(`[^${allowed}]`, 'gi');
         value = value.toString();
 
         // This checks is a negative sign is anywhere in the `value`, not just on the very first character (ie. '12345.67-')
@@ -2553,7 +2565,7 @@ class AutoNumeric {
             value = this._removeBrackets(value, settings);
         }
 
-        value = value.replace(autoStrip, '');
+        value = value.replace(unwantedCharacters, '');
         value = value.replace(settings.decimalCharacter, '.');
         value = this._toLocale(value, settings.outputFormat);
 
@@ -2599,7 +2611,7 @@ class AutoNumeric {
         value = this.unformat(value, options);
 
         //XXX The following code is pretty close to the one you can find in `getLocalized()`, but different enough so we won't refactor it.
-        if (Number(value) === 0 && options.leadingZero !== 'keep') {
+        if (Number(value) === 0 && options.leadingZero !== AutoNumeric.options.leadingZero.keep) {
             value = '0';
         }
 
@@ -2827,8 +2839,8 @@ class AutoNumeric {
         // First replace anything before digits
         s = s.replace(settings.skipFirstAutoStrip, '$1$2');
 
-        if ((settings.negativePositiveSignPlacement === 's' ||
-            (settings.currencySymbolPlacement === 's' && settings.negativePositiveSignPlacement !== 'p')) &&
+        if ((settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix ||
+            (settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix && settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.prefix)) &&
             AutoNumericHelper.isNegative(s) &&
             s !== '') {
             settings.trailingNegative = true;
@@ -2847,7 +2859,7 @@ class AutoNumeric {
         const m = s.match(settings.numRegAutoStrip);
         s = m ? [m[1], m[2], m[3]].join('') : '';
 
-        if (settings.leadingZero === 'allow' || settings.leadingZero === 'keep') {
+        if (settings.leadingZero === AutoNumeric.options.leadingZero.allow || settings.leadingZero === AutoNumeric.options.leadingZero.keep) {
             let nSign = '';
             const [integerPart, decimalPart] = s.split(settings.decimalCharacter);
             let modifiedIntegerPart = integerPart;
@@ -2869,8 +2881,8 @@ class AutoNumeric {
             s = `${nSign}${modifiedIntegerPart}${AutoNumericHelper.isUndefined(decimalPart)?'':settings.decimalCharacter + decimalPart}`;
         }
 
-        if ((leftOrAll && settings.leadingZero === 'deny') ||
-            (!settings.hasFocus && settings.leadingZero === 'allow')) {
+        if ((leftOrAll && settings.leadingZero === AutoNumeric.options.leadingZero.deny) ||
+            (!settings.hasFocus && settings.leadingZero === AutoNumeric.options.leadingZero.allow)) {
             s = s.replace(settings.stripReg, '$1$2');
         }
 
@@ -3001,29 +3013,29 @@ class AutoNumeric {
      * @returns {*}
      */
     static _toLocale(value, locale) {
-        if (AutoNumericHelper.isNull(locale) || locale === 'string') {
+        if (AutoNumericHelper.isNull(locale) || locale === AutoNumeric.options.outputFormat.string) {
             return value;
         }
 
         let result;
         switch (locale) {
-            case 'number':
+            case AutoNumeric.options.outputFormat.number:
                 result = Number(value);
                 break;
-            case '.-':
+            case AutoNumeric.options.outputFormat.dotNegative:
                 result = AutoNumericHelper.isNegative(value) ? value.replace('-', '') + '-' : value;
                 break;
-            case ',':
-            case '-,':
+            case AutoNumeric.options.outputFormat.comma:
+            case AutoNumeric.options.outputFormat.negativeComma:
                 result = value.replace('.', ',');
                 break;
-            case ',-':
+            case AutoNumeric.options.outputFormat.commaNegative:
                 result = value.replace('.', ',');
                 result = AutoNumericHelper.isNegative(result) ? result.replace('-', '') + '-' : result;
                 break;
             // The default case
-            case '.':
-            case '-.':
+            case AutoNumeric.options.outputFormat.dot:
+            case AutoNumeric.options.outputFormat.negativeDot:
                 result = value;
                 break;
             default :
@@ -3084,8 +3096,8 @@ class AutoNumeric {
      */
     static _checkEmpty(inputValue, settings, signOnEmpty) {
         if (inputValue === '' || inputValue === settings.negativeSignCharacter) {
-            if (settings.emptyInputBehavior === 'always' || signOnEmpty) {
-                return (settings.negativePositiveSignPlacement === 'l') ? inputValue + settings.currencySymbol + settings.suffixText : settings.currencySymbol + inputValue + settings.suffixText;
+            if (settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.always || signOnEmpty) {
+                return (settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.left) ? inputValue + settings.currencySymbol + settings.suffixText : settings.currencySymbol + inputValue + settings.suffixText;
             }
 
             return inputValue;
@@ -3128,15 +3140,16 @@ class AutoNumeric {
         settings.digitalGroupSpacing = settings.digitalGroupSpacing.toString();
         let digitalGroup;
         switch (settings.digitalGroupSpacing) {
-            case '2':
+            case AutoNumeric.options.digitalGroupSpacing.two:
                 digitalGroup = /(\d)((\d)(\d{2}?)+)$/;
                 break;
-            case '2s':
+            case AutoNumeric.options.digitalGroupSpacing.twoScaled:
                 digitalGroup = /(\d)((?:\d{2}){0,2}\d{3}(?:(?:\d{2}){2}\d{3})*?)$/;
                 break;
-            case '4':
+            case AutoNumeric.options.digitalGroupSpacing.four:
                 digitalGroup = /(\d)((\d{4}?)+)$/;
                 break;
+            case AutoNumeric.options.digitalGroupSpacing.three:
             default :
                 digitalGroup = /(\d)((\d{3}?)+)$/;
         }
@@ -3192,16 +3205,16 @@ class AutoNumeric {
      */
     static _mergeCurrencySignNegativePositiveSignAndValue(inputValue, settings, isValueNegative, isZeroOrHasNoValue) {
         let result;
-        if (settings.currencySymbolPlacement === 'p') {
+        if (settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix) {
             if (isValueNegative) {
                 switch (settings.negativePositiveSignPlacement) {
-                    case 'l':
+                    case AutoNumeric.options.negativePositiveSignPlacement.left:
                         result = `${settings.negativeSignCharacter}${settings.currencySymbol}${inputValue}`;
                         break;
-                    case 'r':
+                    case AutoNumeric.options.negativePositiveSignPlacement.right:
                         result = `${settings.currencySymbol}${settings.negativeSignCharacter}${inputValue}`;
                         break;
-                    case 's':
+                    case AutoNumeric.options.negativePositiveSignPlacement.suffix:
                         result = `${settings.currencySymbol}${inputValue}${settings.negativeSignCharacter}`;
                         settings.trailingNegative = true;
                         break;
@@ -3210,13 +3223,13 @@ class AutoNumeric {
                 }
             } else if (settings.showPositiveSign && !isZeroOrHasNoValue) {
                 switch (settings.negativePositiveSignPlacement) {
-                    case 'l':
+                    case AutoNumeric.options.negativePositiveSignPlacement.left:
                         result = `${settings.positiveSignCharacter}${settings.currencySymbol}${inputValue}`;
                         break;
-                    case 'r':
+                    case AutoNumeric.options.negativePositiveSignPlacement.right:
                         result = `${settings.currencySymbol}${settings.positiveSignCharacter}${inputValue}`;
                         break;
-                    case 's':
+                    case AutoNumeric.options.negativePositiveSignPlacement.suffix:
                         result = `${settings.currencySymbol}${inputValue}${settings.positiveSignCharacter}`;
                         break;
                     default :
@@ -3225,18 +3238,18 @@ class AutoNumeric {
             } else {
                 result = settings.currencySymbol + inputValue;
             }
-        } else if (settings.currencySymbolPlacement === 's') {
+        } else if (settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
             if (isValueNegative) {
                 switch (settings.negativePositiveSignPlacement) {
-                    case 'r':
+                    case AutoNumeric.options.negativePositiveSignPlacement.right:
                         result = `${inputValue}${settings.currencySymbol}${settings.negativeSignCharacter}`;
                         settings.trailingNegative = true;
                         break;
-                    case 'l':
+                    case AutoNumeric.options.negativePositiveSignPlacement.left:
                         result = `${inputValue}${settings.negativeSignCharacter}${settings.currencySymbol}`;
                         settings.trailingNegative = true;
                         break;
-                    case 'p':
+                    case AutoNumeric.options.negativePositiveSignPlacement.prefix:
                         result = `${settings.negativeSignCharacter}${inputValue}${settings.currencySymbol}`;
                         break;
                     default :
@@ -3244,13 +3257,13 @@ class AutoNumeric {
                 }
             } else if (settings.showPositiveSign && !isZeroOrHasNoValue) {
                 switch (settings.negativePositiveSignPlacement) {
-                    case 'r':
+                    case AutoNumeric.options.negativePositiveSignPlacement.right:
                         result = `${inputValue}${settings.currencySymbol}${settings.positiveSignCharacter}`;
                         break;
-                    case 'l':
+                    case AutoNumeric.options.negativePositiveSignPlacement.left:
                         result = `${inputValue}${settings.positiveSignCharacter}${settings.currencySymbol}`;
                         break;
-                    case 'p':
+                    case AutoNumeric.options.negativePositiveSignPlacement.prefix:
                         result = `${settings.positiveSignCharacter}${inputValue}${settings.currencySymbol}`;
                         break;
                     default :
@@ -3309,12 +3322,15 @@ class AutoNumeric {
     static _roundValue(inputValue, settings) {
         //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
         inputValue = (inputValue === '') ? '0' : inputValue.toString();
-        if (settings.roundingMethod === 'N05' || settings.roundingMethod === 'CHF' || settings.roundingMethod === 'U05' || settings.roundingMethod === 'D05') {
+        if (settings.roundingMethod === AutoNumeric.options.roundingMethod.toNearest05 ||
+            settings.roundingMethod === AutoNumeric.options.roundingMethod.toNearest05Alt ||
+            settings.roundingMethod === AutoNumeric.options.roundingMethod.upToNext05 ||
+            settings.roundingMethod === AutoNumeric.options.roundingMethod.downToNext05) {
             switch (settings.roundingMethod) {
-                case 'N05':
+                case AutoNumeric.options.roundingMethod.toNearest05:
                     inputValue = (Math.round(inputValue * 20) / 20).toString();
                     break;
-                case 'U05':
+                case AutoNumeric.options.roundingMethod.upToNext05:
                     inputValue = (Math.ceil(inputValue * 20) / 20).toString();
                     break;
                 default :
@@ -3329,12 +3345,13 @@ class AutoNumeric {
             } else {
                 result = inputValue;
             }
+
             return result;
         }
 
-        let ivRounded = '';
+        let inputValueRounded = '';
         let i = 0;
-        let nSign = '';
+        let negativeSign = '';
         let temporaryDecimalPlacesOverride;
 
         // sets the truncate zero method
@@ -3346,7 +3363,7 @@ class AutoNumeric {
 
         // Checks if the inputValue (input Value) is a negative value
         if (AutoNumericHelper.isNegativeStrict(inputValue)) {
-            nSign = '-';
+            negativeSign = '-';
 
             // Removes the negative sign that will be added back later if required
             inputValue = inputValue.replace('-', '');
@@ -3359,11 +3376,11 @@ class AutoNumeric {
 
         // Determines if the value is equal to zero. If it is, remove the negative sign
         if (Number(inputValue) === 0) {
-            nSign = '';
+            negativeSign = '';
         }
 
         // Trims leading zero's as needed
-        if ((Number(inputValue) > 0 && settings.leadingZero !== 'keep') || (inputValue.length > 0 && settings.leadingZero === 'allow')) {
+        if ((Number(inputValue) > 0 && settings.leadingZero !== AutoNumeric.options.leadingZero.keep) || (inputValue.length > 0 && settings.leadingZero === AutoNumeric.options.leadingZero.allow)) {
             inputValue = inputValue.replace(/^0*(\d)/, '$1');
         }
 
@@ -3379,72 +3396,72 @@ class AutoNumeric {
 
         if (cDec <= settings.decimalPlacesOverride) {
             // Check if we need to pad with zeros
-            ivRounded = inputValue;
+            inputValueRounded = inputValue;
             if (cDec < temporaryDecimalPlacesOverride) {
                 if (inputValueHasADot) {
-                    ivRounded += settings.decimalCharacter;
+                    inputValueRounded += settings.decimalCharacter;
                 }
 
                 let zeros = '000000';
                 while (cDec < temporaryDecimalPlacesOverride) {
                     zeros = zeros.substring(0, temporaryDecimalPlacesOverride - cDec);
-                    ivRounded += zeros;
+                    inputValueRounded += zeros;
                     cDec += zeros.length;
                 }
             } else if (cDec > temporaryDecimalPlacesOverride) {
-                ivRounded = this._truncateZeros(ivRounded, temporaryDecimalPlacesOverride);
+                inputValueRounded = this._truncateZeros(inputValueRounded, temporaryDecimalPlacesOverride);
             } else if (cDec === 0 && temporaryDecimalPlacesOverride === 0) {
-                ivRounded = ivRounded.replace(/\.$/, '');
+                inputValueRounded = inputValueRounded.replace(/\.$/, '');
             }
 
-            return (Number(ivRounded) === 0) ? ivRounded : nSign + ivRounded;
+            return (Number(inputValueRounded) === 0) ? inputValueRounded : negativeSign + inputValueRounded;
         }
 
         // Rounded length of the string after rounding
-        let rLength;
+        let roundedStrLength;
         if (inputValueHasADot) {
-            rLength = settings.decimalPlacesOverride - 1;
+            roundedStrLength = settings.decimalPlacesOverride - 1;
         } else {
-            rLength = settings.decimalPlacesOverride + dPos;
+            roundedStrLength = settings.decimalPlacesOverride + dPos;
         }
 
-        const tRound = Number(inputValue.charAt(rLength + 1));
-        const odd = (inputValue.charAt(rLength) === '.') ? (inputValue.charAt(rLength - 1) % 2) : (inputValue.charAt(rLength) % 2);
-        let ivArray = inputValue.substring(0, rLength + 1).split('');
+        const tRound = Number(inputValue.charAt(roundedStrLength + 1));
+        const odd = (inputValue.charAt(roundedStrLength) === '.') ? (inputValue.charAt(roundedStrLength - 1) % 2) : (inputValue.charAt(roundedStrLength) % 2);
+        let inpuValueArray = inputValue.substring(0, roundedStrLength + 1).split('');
 
-        if ((tRound > 4 && settings.roundingMethod === 'S')                  || // Round half up symmetric
-            (tRound > 4 && settings.roundingMethod === 'A' && nSign === '')  || // Round half up asymmetric positive values
-            (tRound > 5 && settings.roundingMethod === 'A' && nSign === '-') || // Round half up asymmetric negative values
-            (tRound > 5 && settings.roundingMethod === 's')                  || // Round half down symmetric
-            (tRound > 5 && settings.roundingMethod === 'a' && nSign === '')  || // Round half down asymmetric positive values
-            (tRound > 4 && settings.roundingMethod === 'a' && nSign === '-') || // Round half down asymmetric negative values
-            (tRound > 5 && settings.roundingMethod === 'B')                  || // Round half even "Banker's Rounding"
-            (tRound === 5 && settings.roundingMethod === 'B' && odd === 1)   || // Round half even "Banker's Rounding"
-            (tRound > 0 && settings.roundingMethod === 'C' && nSign === '')  || // Round to ceiling toward positive infinite
-            (tRound > 0 && settings.roundingMethod === 'F' && nSign === '-') || // Round to floor toward negative infinite
-            (tRound > 0 && settings.roundingMethod === 'U')) {                  // Round up away from zero
+        if ((tRound > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpSymmetric)                                         || // Round half up symmetric
+            (tRound > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpAsymmetric && negativeSign === '')                 || // Round half up asymmetric positive values
+            (tRound > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpAsymmetric && negativeSign === '-')                || // Round half up asymmetric negative values
+            (tRound > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfDownSymmetric)                                       || // Round half down symmetric
+            (tRound > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfDownAsymmetric && negativeSign === '')               || // Round half down asymmetric positive values
+            (tRound > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfDownAsymmetric && negativeSign === '-')              || // Round half down asymmetric negative values
+            (tRound > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfEvenBankersRounding)                                 ||
+            (tRound === 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfEvenBankersRounding && odd === 1)                  ||
+            (tRound > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.toCeilingTowardPositiveInfinity && negativeSign === '')  ||
+            (tRound > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.toFloorTowardNegativeInfinity && negativeSign === '-')   ||
+            (tRound > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.upRoundAwayFromZero)) {                                     // Round up away from zero
             // Round up the last digit if required, and continue until no more 9's are found
-            for (i = (ivArray.length - 1); i >= 0; i -= 1) {
-                if (ivArray[i] !== '.') {
-                    ivArray[i] = +ivArray[i] + 1;
-                    if (ivArray[i] < 10) {
+            for (i = (inpuValueArray.length - 1); i >= 0; i -= 1) {
+                if (inpuValueArray[i] !== '.') {
+                    inpuValueArray[i] = +inpuValueArray[i] + 1;
+                    if (inpuValueArray[i] < 10) {
                         break;
                     }
 
                     if (i > 0) {
-                        ivArray[i] = '0';
+                        inpuValueArray[i] = '0';
                     }
                 }
             }
         }
 
         // Reconstruct the string, converting any 10's to 0's
-        ivArray = ivArray.slice(0, rLength + 1);
+        inpuValueArray = inpuValueArray.slice(0, roundedStrLength + 1);
 
         // Return the rounded value
-        ivRounded = this._truncateZeros(ivArray.join(''), temporaryDecimalPlacesOverride);
+        inputValueRounded = this._truncateZeros(inpuValueArray.join(''), temporaryDecimalPlacesOverride);
 
-        return (Number(ivRounded) === 0) ? ivRounded : nSign + ivRounded;
+        return (Number(inputValueRounded) === 0) ? inputValueRounded : negativeSign + inputValueRounded;
     }
 
     /**
@@ -3493,13 +3510,13 @@ class AutoNumeric {
 
         let result;
         switch (settings.overrideMinMaxLimits) {
-            case 'floor':
+            case AutoNumeric.options.overrideMinMaxLimits.floor:
                 result = [AutoNumericHelper.testMinMax(minParse, valParse) > -1, true];
                 break;
-            case 'ceiling':
+            case AutoNumeric.options.overrideMinMaxLimits.ceiling:
                 result = [true, AutoNumericHelper.testMinMax(maxParse, valParse) < 1];
                 break;
-            case 'ignore':
+            case AutoNumeric.options.overrideMinMaxLimits.ignore:
                 result = [true, true];
                 break;
             default:
@@ -3575,12 +3592,12 @@ class AutoNumeric {
             return '';
         }
 
-        // Return '0' if the value is zero
-        if (Number(value) === 0 && this.settings.leadingZero !== 'keep') {
-            return '0';
-        }
+        if (this.settings.leadingZero !== AutoNumeric.options.leadingZero.keep) {
+            if (Number(value) === 0) {
+                // Return '0' if the value is zero
+                return '0';
+            }
 
-        if (this.settings.leadingZero !== 'keep') {
             // Trim leading zero's - leaves one zero to the left of the decimal point
             value = value.replace(/^(-)?0+(?=\d)/g,'$1');
 
@@ -3654,7 +3671,7 @@ class AutoNumeric {
             this.constructor._reformatAltHovered(this);
         }
 
-        if (e.type === 'focusin' || e.type === 'mouseenter' && !this.isFocused && this.settings.emptyInputBehavior === 'focus') {
+        if (e.type === 'focusin' || e.type === 'mouseenter' && !this.isFocused && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus) {
             this.settings.hasFocus = true;
 
             if (this.settings.negativeBracketsTypeOnBlur !== null && this.settings.negativeSignCharacter !== '') {
@@ -3695,11 +3712,11 @@ class AutoNumeric {
             this.valueOnFocus = AutoNumericHelper.getElementValue(e.target);
             this.lastVal = this.valueOnFocus;
             const onEmpty = this.constructor._checkEmpty(this.valueOnFocus, this.settings, true);
-            if ((onEmpty !== null && onEmpty !== '') && this.settings.emptyInputBehavior === 'focus') {
+            if ((onEmpty !== null && onEmpty !== '') && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus) {
                 AutoNumericHelper.setElementValue(this.domElement, onEmpty);
 
                 // If there is a currency symbol and its on the right hand side, then we place the caret accordingly on the far left side
-                if (onEmpty === this.settings.currencySymbol && this.settings.currencySymbolPlacement === 's') {
+                if (onEmpty === this.settings.currencySymbol && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
                     AutoNumericHelper.setElementSelection(e.target, 0);
                 }
             } else {
@@ -3878,14 +3895,14 @@ class AutoNumeric {
                 // Throws input event on adding a character
                 AutoNumericHelper.triggerEvent('input', e.target);
                 e.preventDefault(); // ...and immediately prevent the browser to add a second character
-            }
-            else {
+            } else {
                 if ((this.eventKey === this.settings.decimalCharacter || this.eventKey === this.settings.decimalCharacterAlternative) &&
                     (AutoNumericHelper.getElementSelection(e.target).start === AutoNumericHelper.getElementSelection(e.target).end) &&
                     AutoNumericHelper.getElementSelection(e.target).start === targetValue.indexOf(this.settings.decimalCharacter)) {
                     const position = AutoNumericHelper.getElementSelection(e.target).start + 1;
                     AutoNumericHelper.setElementSelection(e.target, position);
                 }
+
                 e.preventDefault();
             }
 
@@ -3931,7 +3948,7 @@ class AutoNumeric {
 
         // Added to properly place the caret when only the currency sign is present
         if (targetValue === this.settings.currencySymbol) {
-            if (this.settings.currencySymbolPlacement === 's') {
+            if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
                 AutoNumericHelper.setElementSelection(e.target, 0);
             } else {
                 AutoNumericHelper.setElementSelection(e.target, this.settings.currencySymbol.length);
@@ -4026,7 +4043,7 @@ class AutoNumeric {
                     value = this.settings.rawValue;
                 }
             } else {
-                if (this.settings.emptyInputBehavior === 'zero') {
+                if (this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {
                     this.settings.rawValue = '0';
                     value = this.constructor._roundValue('0', this.settings);
                 } else {
@@ -4100,7 +4117,7 @@ class AutoNumeric {
 
         // 3. Test if the paste is valid (only has numbers and eventually a decimal character). If it's not valid, stop here.
         if (pastedText !== '.' && (!AutoNumericHelper.isNumber(pastedText) || pastedText === '')) {
-            if (this.settings.onInvalidPaste === 'error') {
+            if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.error) {
                 //TODO Should we send a warning instead of throwing an error?
                 AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' is not a valid paste content.`);
             }
@@ -4137,8 +4154,8 @@ class AutoNumeric {
              * Idem than the 'truncate' paste behavior, except that when a range limit is hit, we try to replace the subsequent initial numbers with the pasted ones, until we hit the range limit a second (and last) time, or we run out of numbers to paste
              */
             /* eslint no-case-declarations: 0 */
-            case 'truncate':
-            case 'replace':
+            case AutoNumeric.options.onInvalidPaste.truncate:
+            case AutoNumeric.options.onInvalidPaste.replace:
                 const leftFormattedPart = initialFormattedValue.slice(0, selectionStart);
                 const rightFormattedPart = initialFormattedValue.slice(selectionEnd, initialFormattedValue.length);
 
@@ -4206,7 +4223,7 @@ class AutoNumeric {
                 caretPositionOnInitialTextAfterPasting += pastedTextIndex;
 
                 //XXX Here we have the result for the `truncate` option
-                if (this.settings.onInvalidPaste === 'truncate') {
+                if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.truncate) {
                     //TODO If the user as defined a truncate callback and there are still some numbers (that will be dropped), then call this callback with the initial paste as well as the remaining numbers
                     result = lastGoodKnownResult;
 
@@ -4264,9 +4281,9 @@ class AutoNumeric {
             /* 4c. Normal paste behavior:
              * Insert the pasted number inside the current unformatted text, at the right caret position or selection
              */
-            case 'error':
-            case 'ignore':
-            case 'clamp':
+            case AutoNumeric.options.onInvalidPaste.error:
+            case AutoNumeric.options.onInvalidPaste.ignore:
+            case AutoNumeric.options.onInvalidPaste.clamp:
             default:
                 // 1. Generate the unformatted result
                 const leftFormattedPart2 = initialFormattedValue.slice(0, selectionStart);
@@ -4348,7 +4365,7 @@ class AutoNumeric {
 
         // 5. Check if the result is a valid number, if not, drop the paste and do nothing.
         if (!AutoNumericHelper.isNumber(result) || result === '') {
-            if (this.settings.onInvalidPaste === 'error') {
+            if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.error) {
                 AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' would result into an invalid content '${result}'.`); //TODO Should we send a warning instead of throwing an error?
                 //TODO This is not DRY ; refactor with above
             }
@@ -4386,16 +4403,14 @@ class AutoNumeric {
         try {
             this.set(result);
             valueHasBeenSet = true;
-        }
-        catch (error) {
+        } catch (error) {
             let clampedValue;
             switch (this.settings.onInvalidPaste) {
-                case 'clamp':
+                case AutoNumeric.options.onInvalidPaste.clamp:
                     clampedValue = AutoNumericHelper.clampToRangeLimits(result, this.settings);
                     try {
                         this.set(clampedValue);
-                    }
-                    catch (error) {
+                    } catch (error) {
                         AutoNumericHelper.throwError(`Fatal error: Unable to set the clamped value '${clampedValue}'.`);
                     }
 
@@ -4403,13 +4418,13 @@ class AutoNumeric {
                     valueHasBeenSet = true;
                     result = clampedValue; // This is used only for setting the caret position later
                     break;
-                case 'error':
-                case 'truncate':
-                case 'replace':
+                case AutoNumeric.options.onInvalidPaste.error:
+                case AutoNumeric.options.onInvalidPaste.truncate:
+                case AutoNumeric.options.onInvalidPaste.replace:
                     // Throw an error message
                     AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' results in a value '${result}' that is outside of the minimum [${this.settings.minimumValue}] and maximum [${this.settings.maximumValue}] value range.`);
                 // falls through
-                case 'ignore':
+                case AutoNumeric.options.onInvalidPaste.ignore:
                 // Do nothing
                 // falls through
                 default :
@@ -4422,9 +4437,9 @@ class AutoNumeric {
         let caretPositionInFormattedNumber;
         if (valueHasBeenSet) {
             switch (this.settings.onInvalidPaste) {
-                case 'clamp':
+                case AutoNumeric.options.onInvalidPaste.clamp:
                     if (valueHasBeenClamped) {
-                        if (this.settings.currencySymbolPlacement === 's') {
+                        if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
                             AutoNumericHelper.setElementSelection(e.target, targetValue.length - this.settings.currencySymbol.length); // This puts the caret on the right of the last decimal place
                         } else {
                             AutoNumericHelper.setElementSelection(e.target, targetValue.length); // ..and this on the far right
@@ -4433,10 +4448,10 @@ class AutoNumeric {
                         break;
                     } // else if the value has not been clamped, the default behavior is used...
                 // falls through
-                case 'error':
-                case 'ignore':
-                case 'truncate':
-                case 'replace':
+                case AutoNumeric.options.onInvalidPaste.error:
+                case AutoNumeric.options.onInvalidPaste.ignore:
+                case AutoNumeric.options.onInvalidPaste.truncate:
+                case AutoNumeric.options.onInvalidPaste.replace:
                 default :
                     // Whenever one or multiple characters are pasted, this means we have to manage the potential thousand separators that could be added by the formatting
                     caretPositionInFormattedNumber = AutoNumericHelper.findCaretPositionInFormattedNumber(result, caretPositionOnInitialTextAfterPasting, targetValue, this.settings.decimalCharacter);
@@ -4646,12 +4661,7 @@ class AutoNumeric {
             this.isInputElement = true;
         } else {
             this.isInputElement = false;
-
-            if (this.domElement.hasAttribute('contenteditable') && this.domElement.getAttribute('contenteditable') === 'true') {
-                this.isContentEditable = true;
-            } else {
-                this.isContentEditable = false;
-            }
+            this.isContentEditable = this.domElement.hasAttribute('contenteditable') && this.domElement.getAttribute('contenteditable') === 'true';
         }
     }
 
@@ -4718,8 +4728,8 @@ class AutoNumeric {
                             toStrip = currentValue;
                         }
 
-                        if ((this.settings.negativePositiveSignPlacement === 's' ||
-                            (this.settings.negativePositiveSignPlacement !== 'p' && this.settings.currencySymbolPlacement === 's')) &&
+                        if ((this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix ||
+                            (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.prefix && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix)) &&
                             this.settings.negativeSignCharacter !== '' &&
                             AutoNumericHelper.isNegative(currentValue)) {
                             this.settings.rawValue = this.settings.negativeSignCharacter + this.constructor._stripAllNonNumberCharacters(toStrip, this.settings, true);
@@ -4734,14 +4744,14 @@ class AutoNumeric {
 
             if (currentValue === '') {
                 switch (this.settings.emptyInputBehavior) {
-                    case 'focus':
+                    case AutoNumeric.options.emptyInputBehavior.focus:
                         setValue = false;
                         break;
-                    case 'always':
+                    case AutoNumeric.options.emptyInputBehavior.always:
                         AutoNumericHelper.setElementValue(this.domElement, this.settings.currencySymbol);
                         setValue = false;
                         break;
-                    case 'zero':
+                    case AutoNumeric.options.emptyInputBehavior.zero:
                         this.set('0');
                         setValue = false;
                         break;
@@ -4780,18 +4790,18 @@ class AutoNumeric {
             AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.negativePositiveSignPlacement) &&
             !AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.currencySymbol)) {
             switch (this.settings.currencySymbolPlacement) {
-                case 's':
-                    this.settings.negativePositiveSignPlacement = 'p'; // Default -1,234.56 €
+                case AutoNumeric.options.currencySymbolPlacement.suffix:
+                    this.settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix; // Default -1,234.56 €
                     break;
-                case 'p':
-                    this.settings.negativePositiveSignPlacement = 'l'; // Default -$1,234.56
+                case AutoNumeric.options.currencySymbolPlacement.prefix:
+                    this.settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.left; // Default -$1,234.56
                     break;
                 default :
                 //
             }
         } else {
             // Sets the default value if `negativePositiveSignPlacement` is `null`
-            this.settings.negativePositiveSignPlacement = 'l';
+            this.settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.left;
         }
     }
 
@@ -4896,7 +4906,7 @@ class AutoNumeric {
     static _convertOldOptionsToNewOnes(options) {
         //TODO Delete this function once the old options are not used anymore
         const oldOptionsConverter = {
-            // Old option name, with their corresponding new option
+            // Old option names, with their corresponding new names
             aSep                              : 'digitGroupSeparator',
             nSep                              : 'noSeparatorOnFocus',
             dGroup                            : 'digitalGroupSpacing',
@@ -4924,6 +4934,7 @@ class AutoNumeric {
             unSetOnSubmit                     : 'unformatOnSubmit',
             outputType                        : 'outputFormat',
             debug                             : 'showWarnings',
+
             // Current options :
             digitGroupSeparator               : true,
             noSeparatorOnFocus                : true,
@@ -4964,6 +4975,8 @@ class AutoNumeric {
             readOnly                          : true,
             unformatOnHover                   : true,
             failOnUnknownOption               : true,
+
+            // Additional information that are added to the `settings` object :
             //FIXME Find a way to exclude those internal data from the settings object (ideally by using another object, or better yet, class attributes) -->
             hasFocus                          : true,
             rawValue                          : true,
@@ -5140,7 +5153,7 @@ class AutoNumeric {
     /**
      * Update the `event.key` attribute that triggered the given event.
      *
-     * `event.key` describes :
+     * `event.key` describes:
      * - the key name (if a non-printable character),
      * - or directly the character that result from the key press used to trigger the event.
      *
@@ -5260,7 +5273,7 @@ class AutoNumeric {
         right = AutoNumeric._stripAllNonNumberCharacters(right, this.settings, false);
 
         // Prevents multiple leading zeros from being entered
-        if (this.settings.leadingZero === 'deny' &&
+        if (this.settings.leadingZero === AutoNumeric.options.leadingZero.deny &&
             (this.eventKey === AutoNumericEnum.keyName.num0 || this.eventKey === AutoNumericEnum.keyName.numpad0) &&
             Number(left) === 0 &&
             !AutoNumericHelper.contains(left, this.settings.decimalCharacter)  && right !== '') {
@@ -5295,6 +5308,7 @@ class AutoNumeric {
      * @private
      */
     _setValueParts(left, right, isPaste = false) {
+        //TODO Use destructuring here to make `parts` semantically more meaningful
         const parts = this._normalizeParts(left, right);
         const [minTest, maxTest] = AutoNumeric._checkIfInRangeWithOverrideOption(this.newValue, this.settings);
         let position = parts[0].length;
@@ -5305,7 +5319,7 @@ class AutoNumeric {
             //TODO Check if we need to replace the hard-coded ',' with settings.decimalCharacter
             const testValue = (AutoNumericHelper.contains(this.newValue, ',')) ? this.newValue.replace(',', '.') : this.newValue;
             if (testValue === '' || testValue === this.settings.negativeSignCharacter) {
-                this.settings.rawValue = (this.settings.emptyInputBehavior === 'zero') ? '0' : '';
+                this.settings.rawValue = (this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) ? '0' : '';
             } else {
                 this.settings.rawValue = this._cleanLeadingTrailingZeros(testValue);
             }
@@ -5315,7 +5329,7 @@ class AutoNumeric {
             }
 
             // Make sure when the user enter a '0' on the far left with a leading zero option set to 'deny', that the caret does not moves since the input is dropped (fix issue #283)
-            if (position === 1 && parts[0] === '0' && this.settings.leadingZero === 'deny') {
+            if (position === 1 && parts[0] === '0' && this.settings.leadingZero === AutoNumeric.options.leadingZero.deny) {
                 // If the user enter `0`, then the caret is put on the right side of it (Fix issue #299)
                 if (parts[1] === '' || parts[0] === '0' && parts[1] !== '') {
                     position = 1;
@@ -5350,7 +5364,7 @@ class AutoNumeric {
         if (this.settings.currencySymbol) {
             const currencySymbolLen = this.settings.currencySymbol.length;
             const value = AutoNumericHelper.getElementValue(this.domElement);
-            if (this.settings.currencySymbolPlacement === 'p') {
+            if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix) {
                 const hasNeg = this.settings.negativeSignCharacter && value && value.charAt(0) === this.settings.negativeSignCharacter;
                 if (hasNeg) {
                     result = [1, currencySymbolLen + 1];
@@ -5525,7 +5539,7 @@ class AutoNumeric {
     _processCharacterDeletionIfTrailingNegativeSign([left, right]) {
         const value = AutoNumericHelper.getElementValue(this.domElement);
 
-        if (this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's') {
+        if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix) {
             if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
                 this.caretFix = (this.selection.start >= value.indexOf(this.settings.suffixText) && this.settings.suffixText !== '');
                 if (value.charAt(this.selection.start - 1) === '-') {
@@ -5544,9 +5558,9 @@ class AutoNumeric {
             }
         }
 
-        if (this.settings.currencySymbolPlacement === 's') {
+        if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
             switch (this.settings.negativePositiveSignPlacement) {
-                case 'l':
+                case AutoNumeric.options.negativePositiveSignPlacement.left:
                     this.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
                     if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
                         if (this.selection.start === (value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length) && AutoNumericHelper.contains(value, this.settings.negativeSignCharacter)) {
@@ -5563,7 +5577,7 @@ class AutoNumeric {
                         }
                     }
                     break;
-                case 'r':
+                case AutoNumeric.options.negativePositiveSignPlacement.right:
                     this.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
                     if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
                         if (this.selection.start === (value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length)) {
@@ -5601,8 +5615,8 @@ class AutoNumeric {
                 this.throwInput = false;
             }
 
-            if (((this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's') ||
-                (this.settings.currencySymbolPlacement === 's' && (this.settings.negativePositiveSignPlacement === 'l' || this.settings.negativePositiveSignPlacement === 'r'))) &&
+            if (((this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix) ||
+                (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix && (this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.left || this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.right))) &&
                 AutoNumericHelper.isNegative(AutoNumericHelper.getElementValue(this.domElement))) {
                 [left, right] = this._processCharacterDeletionIfTrailingNegativeSign([left, right]);
             } else {
@@ -5670,8 +5684,8 @@ class AutoNumeric {
             }
 
             // Caret is always after minus
-            if ((this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's') ||
-                (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement !== 'p')) {
+            if ((this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix) ||
+                (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix && this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.prefix)) {
                 if (left === '' && AutoNumericHelper.contains(right, this.settings.negativeSignCharacter)) {
                     left = this.settings.negativeSignCharacter;
                     right = right.substring(1, right.length);
@@ -5739,24 +5753,24 @@ class AutoNumeric {
         if ((this.settings.digitGroupSeparator  === '' || (this.settings.digitGroupSeparator !== ''  && !AutoNumericHelper.contains(elementValue, this.settings.digitGroupSeparator))) &&
             (this.settings.currencySymbol === '' || (this.settings.currencySymbol !== '' && !AutoNumericHelper.contains(elementValue, this.settings.currencySymbol)))) {
             let [subParts] = elementValue.split(this.settings.decimalCharacter);
-            let nSign = '';
+            let negativeSign = '';
             if (AutoNumericHelper.isNegative(subParts)) {
-                nSign = '-';
+                negativeSign = '-';
                 subParts = subParts.replace('-', '');
                 left = left.replace('-', '');
             }
 
             // Strip leading zero on positive value if needed
-            if (nSign === '' && subParts.length > this.settings.mIntPos && left.charAt(0) === '0') {
+            if (negativeSign === '' && subParts.length > this.settings.mIntPos && left.charAt(0) === '0') {
                 left = left.slice(1);
             }
 
             // Strip leading zero on negative value if needed
-            if (nSign === '-' && subParts.length > this.settings.mIntNeg && left.charAt(0) === '0') {
+            if (negativeSign === '-' && subParts.length > this.settings.mIntNeg && left.charAt(0) === '0') {
                 left = left.slice(1);
             }
 
-            left = nSign + left;
+            left = negativeSign + left;
         }
 
         const value = this.constructor._addGroupSeparators(elementValue, this.settings);
@@ -5766,20 +5780,20 @@ class AutoNumeric {
             const leftAr = left.split('');
 
             // Fixes caret position with trailing minus sign
-            if ((this.settings.negativePositiveSignPlacement === 's' ||
-                (this.settings.negativePositiveSignPlacement !== 'p' && this.settings.currencySymbolPlacement === 's')) &&
+            if ((this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix ||
+                (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.prefix && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix)) &&
                 leftAr[0] === '-' && this.settings.negativeSignCharacter !== '') {
                 leftAr.shift();
 
                 if ((this.eventKey === AutoNumericEnum.keyName.Backspace || this.eventKey === AutoNumericEnum.keyName.Delete) &&
                     this.caretFix) {
-                    if ((this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'l') ||
-                        (this.settings.currencySymbolPlacement === 'p' && this.settings.negativePositiveSignPlacement === 's')) {
+                    if ((this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.left) ||
+                        (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix)) {
                         leftAr.push('-');
                         this.caretFix = e.type === 'keydown';
                     }
 
-                    if (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'r') {
+                    if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.right) {
                         const signParts = this.settings.currencySymbol.split('');
                         const escapeChr = ['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '['];
                         const escapedParts = [];
@@ -5828,13 +5842,13 @@ class AutoNumeric {
                 }
 
                 // If we are just before the sign which is in prefix position
-                if (((position === 0 && value.charAt(0) !== this.settings.negativeSignCharacter) || (position === 1 && value.charAt(0) === this.settings.negativeSignCharacter)) && this.settings.currencySymbol && this.settings.currencySymbolPlacement === 'p') {
+                if (((position === 0 && value.charAt(0) !== this.settings.negativeSignCharacter) || (position === 1 && value.charAt(0) === this.settings.negativeSignCharacter)) && this.settings.currencySymbol && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix) {
                     // Place caret after prefix sign
                     //TODO Should the test be 'isNegative' instead of 'isNegativeStrict' in order to search for '-' everywhere in the string?
                     position = this.settings.currencySymbol.length + (AutoNumericHelper.isNegativeStrict(value) ? 1 : 0);
                 }
             } else {
-                if (this.settings.currencySymbol && this.settings.currencySymbolPlacement === 's') {
+                if (this.settings.currencySymbol && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
                     // If we could not find a place for cursor and have a sign as a suffix
                     // Place caret before suffix currency sign
                     position -= this.settings.currencySymbol.length;
@@ -6218,7 +6232,8 @@ AutoNumeric.options = {
         downRoundTowardZero            : 'D',
         toCeilingTowardPositiveInfinity: 'C',
         toFloorTowardNegativeInfinity  : 'F',
-        toNearest05                    : 'N05', // also 'CHF'
+        toNearest05                    : 'N05',
+        toNearest05Alt                 : 'CHF',
         upToNext05                     : 'U05',
         downToNext05                   : 'D05',
     },

@@ -3514,7 +3514,6 @@ class AutoNumeric {
      * Those original settings are used exclusively in the `focusin` and `focusout` event handlers.
      */
     _keepAnOriginalSettingsCopy() {
-        //TODO Move this data to temporary attributes, in order to prevent changing the user settings
         this.originalDecimalPlacesOverride      = this.settings.decimalPlacesOverride;
         this.originalAllowDecimalPadding        = this.settings.allowDecimalPadding;
         this.originalNegativeBracketsTypeOnBlur = this.settings.negativeBracketsTypeOnBlur;
@@ -5545,41 +5544,44 @@ class AutoNumeric {
             }
         }
 
-        //TODO Merge the two following 'if' blocks into one `if (settings.currencySymbolPlacement === 's') {` and a switch on settings.negativePositiveSignPlacement
-        if (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'l') {
-            this.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
-            if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
-                if (this.selection.start === (value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length) && AutoNumericHelper.contains(value, this.settings.negativeSignCharacter)) {
-                    left = left.substring(1);
-                } else if (left !== '-' && ((this.selection.start <= value.indexOf(this.settings.negativeSignCharacter)) || !AutoNumericHelper.contains(value, this.settings.negativeSignCharacter))) {
-                    left = left.substring(0, left.length - 1);
-                }
-            } else {
-                if (left[0] === '-') {
-                    right = right.substring(1);
-                }
-                if (this.selection.start === value.indexOf(this.settings.negativeSignCharacter) && AutoNumericHelper.contains(value, this.settings.negativeSignCharacter)) {
-                    left = left.substring(1);
-                }
-            }
-        }
+        if (this.settings.currencySymbolPlacement === 's') {
+            switch (this.settings.negativePositiveSignPlacement) {
+                case 'l':
+                    this.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
+                    if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
+                        if (this.selection.start === (value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length) && AutoNumericHelper.contains(value, this.settings.negativeSignCharacter)) {
+                            left = left.substring(1);
+                        } else if (left !== '-' && ((this.selection.start <= value.indexOf(this.settings.negativeSignCharacter)) || !AutoNumericHelper.contains(value, this.settings.negativeSignCharacter))) {
+                            left = left.substring(0, left.length - 1);
+                        }
+                    } else {
+                        if (left[0] === '-') {
+                            right = right.substring(1);
+                        }
+                        if (this.selection.start === value.indexOf(this.settings.negativeSignCharacter) && AutoNumericHelper.contains(value, this.settings.negativeSignCharacter)) {
+                            left = left.substring(1);
+                        }
+                    }
+                    break;
+                case 'r':
+                    this.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
+                    if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
+                        if (this.selection.start === (value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length)) {
+                            left = left.substring(1);
+                        } else if (left !== '-' && this.selection.start <= (value.indexOf(this.settings.negativeSignCharacter) - this.settings.currencySymbol.length)) {
+                            left = left.substring(0, left.length - 1);
+                        } else if (left !== '' && !AutoNumericHelper.contains(value, this.settings.negativeSignCharacter)) {
+                            left = left.substring(0, left.length - 1);
+                        }
+                    } else {
+                        this.caretFix = (this.selection.start >= value.indexOf(this.settings.currencySymbol) && this.settings.currencySymbol !== '');
+                        if (this.selection.start === value.indexOf(this.settings.negativeSignCharacter)) {
+                            left = left.substring(1);
+                        }
 
-        if (this.settings.currencySymbolPlacement === 's' && this.settings.negativePositiveSignPlacement === 'r') {
-            this.caretFix = (this.selection.start >= value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length);
-            if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
-                if (this.selection.start === (value.indexOf(this.settings.negativeSignCharacter) + this.settings.negativeSignCharacter.length)) {
-                    left = left.substring(1);
-                } else if (left !== '-' && this.selection.start <= (value.indexOf(this.settings.negativeSignCharacter) - this.settings.currencySymbol.length)) {
-                    left = left.substring(0, left.length - 1);
-                } else if (left !== '' && !AutoNumericHelper.contains(value, this.settings.negativeSignCharacter)) {
-                    left = left.substring(0, left.length - 1);
-                }
-            } else {
-                this.caretFix = (this.selection.start >= value.indexOf(this.settings.currencySymbol) && this.settings.currencySymbol !== '');
-                if (this.selection.start === value.indexOf(this.settings.negativeSignCharacter)) {
-                    left = left.substring(1);
-                }
-                right = right.substring(1);
+                        right = right.substring(1);
+                    }
+                    break;
             }
         }
 

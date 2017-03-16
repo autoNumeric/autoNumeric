@@ -468,6 +468,13 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Remove function</p>
+			<input id="remove1" type="text" value="2468.42">
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -851,6 +858,9 @@
     //-------------- Input element of type 'tel'
     new AutoNumeric('#inputTel1').french();
     new AutoNumeric('#inputTel2').japanese();
+
+    //-------------- Testing the remove() function
+    new AutoNumeric('#remove1').french();
 </script>
 </body>
 </html>

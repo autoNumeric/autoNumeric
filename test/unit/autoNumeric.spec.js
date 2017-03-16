@@ -81,6 +81,7 @@ describe('The autoNumeric object', () => {
 
         const defaultOption = {
             allowDecimalPadding          : true,
+            createLocalList              : true,
             currencySymbol               : '',
             currencySymbolPlacement      : 'p',
             decimalCharacter             : '.',
@@ -598,7 +599,7 @@ describe('The autoNumeric object', () => {
             expect(() => aNInput.formatOther(27368)).not.toThrow();
             expect(() => aNInput.unformatOther('1.234.789,89 €')).not.toThrow();
             expect(() => aNInput.init(otherDomElement)).not.toThrow();
-            expect(() => aNInput.init(otherDomElement, true)).not.toThrow();
+            expect(() => aNInput.init(otherDomElement, false)).not.toThrow();
 
             // Calling the pre-defined options
             expect(() => aNInput.french()).not.toThrow();
@@ -1008,7 +1009,589 @@ describe('The autoNumeric object', () => {
             //FIXME Test the case where the raw value have not changed, but the formatting has
         });
 
-        //FIXME Test the other methods: getNumericString, getFormatted, getNumber, getLocalized, clear, remove, wipe, has, addObject, removeObject, empty, elements, getList
+        it('should return the correct values with `getNumericString`, `getFormatted`, `getNumber` and `getLocalized`', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            anElement1.options.outputFormat(AutoNumeric.options.outputFormat.commaNegative);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.get()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '187 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+            expect(anElement1.global.getNumber()).toEqual([22, 13568.24, 187568.24, 21613568.24, 1028.01]);
+            expect(anElement1.global.getLocalized()).toEqual(['22', '13568,24', '187568,24', '21613568,24', '1028,01']);
+
+            // Then test that those elements share the same local list
+            anElement4.global.set(1223355.66);
+
+            expect(anElement1.global.get()).toEqual(['1223355.66', '1223355.66', '1223355.66', '1223355.66', '1223355.66']);
+            expect(anElement1.global.getNumericString()).toEqual(['1223355.66', '1223355.66', '1223355.66', '1223355.66', '1223355.66']);
+            expect(anElement1.global.getFormatted()).toEqual(['1 223 355,66 €', '1 223 355,66 €', '1 223 355,66 €', '1 223 355,66 €', '1 223 355,66 €']);
+            expect(anElement1.global.getNumber()).toEqual([1223355.66, 1223355.66, 1223355.66, 1223355.66, 1223355.66]);
+            expect(anElement1.global.getLocalized()).toEqual(['1223355,66', '1223355,66', '1223355,66', '1223355,66', '1223355,66']);
+
+            anElement1.set(-22);
+            anElement2.set(-13568.243);
+            anElement3.set(-187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(-1028.005);
+            expect(anElement1.global.getLocalized()).toEqual(['22-', '13568,24-', '187568,24-', '21613568,24', '1028,01-']);
+            anElement1.options.outputFormat(AutoNumeric.options.outputFormat.dotNegative);
+            expect(anElement1.global.getLocalized()).toEqual(['22-', '13568,24-', '187568,24-', '21613568,24', '1028,01-']);
+            anElement3.options.outputFormat(AutoNumeric.options.outputFormat.dotNegative);
+            expect(anElement1.global.getLocalized()).toEqual(['22-', '13568,24-', '187568.24-', '21613568,24', '1028,01-']);
+            anElement5.global.update({ outputFormat: AutoNumeric.options.outputFormat.negativeDot });
+            expect(anElement1.global.getLocalized()).toEqual(['-22', '-13568.24', '-187568.24', '21613568.24', '-1028.01']);
+            anElement5.global.update({ outputFormat: AutoNumeric.options.outputFormat.number });
+            expect(anElement1.global.getLocalized()).toEqual([-22, -13568.24, -187568.24, 21613568.24, -1028.01]);
+        });
+
+        it('should `clear` the input values', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            anElement1.options.outputFormat(AutoNumeric.options.outputFormat.commaNegative);
+            anElement1.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.always);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '187 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Clear only one element
+            expect(anElement3.clear().global.getNumericString()).toEqual(['22', '13568.24', '', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', ' €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Then clear all elements
+            anElement3.global.clear();
+            expect(anElement1.global.getNumericString()).toEqual(['', '', '', '', '']);
+            expect(anElement1.global.getFormatted()).toEqual([' €', ' €', ' €', ' €', ' €']);
+            anElement3.global.clear(true);
+            expect(anElement1.global.getFormatted()).toEqual(['', '', '', '', '']);
+        });
+
+        it('should `remove` the elements correctly, either one by one or globally', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '187 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Remove only one element
+            expect(newInput3.value).toEqual('187 568,24 €');
+            anElement3.remove();
+            expect(newInput3.value).toEqual('187 568,24 €');
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+            // Test that anElement3 is no more in the global AutoNumeric element list
+            expect(AutoNumeric.test(newInput3)).toBe(false);
+
+            // Then remove all elements
+            anElement1.global.remove();
+            expect(AutoNumeric.test(newInput1)).toBe(false);
+            expect(AutoNumeric.test(newInput2)).toBe(false);
+            expect(AutoNumeric.test(newInput4)).toBe(false);
+            expect(AutoNumeric.test(newInput5)).toBe(false);
+
+            // Here we can still access the .global.* functions since the garbage collector has not passed yet
+            expect(anElement1.global.getNumericString()).toEqual([]);
+            expect(anElement1.global.getFormatted()).toEqual([]);
+        });
+
+        it('should `wipe` the elements correctly, either one by one or globally', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '187 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Wipe only one element
+            expect(newInput3.value).toEqual('187 568,24 €');
+            anElement3.wipe();
+            expect(newInput3.value).toEqual('');
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Test that anElement3 is no more in the global AutoNumeric element list
+            expect(AutoNumeric.test(newInput3)).toBe(false);
+
+            // Then wipe all elements
+            anElement1.global.wipe();
+            expect(AutoNumeric.test(newInput1)).toBe(false);
+            expect(AutoNumeric.test(newInput2)).toBe(false);
+            expect(AutoNumeric.test(newInput4)).toBe(false);
+            expect(AutoNumeric.test(newInput5)).toBe(false);
+            expect(newInput1.value).toEqual('');
+            expect(newInput2.value).toEqual('');
+            expect(newInput4.value).toEqual('');
+            expect(newInput5.value).toEqual('');
+        });
+
+        it('should detect the DOM elements correctly using the `has` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Wipe only one element
+            expect(anElement1.global.has(newInput1)).toBe(true);
+            expect(anElement1.global.has(newInput2)).toBe(true);
+            expect(anElement1.global.has(newInput3)).toBe(true);
+            expect(anElement1.global.has(newInput4)).toBe(false);
+            expect(anElement1.global.has(newInput5)).toBe(false);
+
+            expect(anElement4.global.has(newInput1)).toBe(false);
+            expect(anElement4.global.has(newInput2)).toBe(false);
+            expect(anElement4.global.has(newInput3)).toBe(false);
+            expect(anElement4.global.has(newInput4)).toBe(true);
+            expect(anElement4.global.has(newInput5)).toBe(true);
+        });
+
+        it('should detect the AutoNumeric object correctly using the `has` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Wipe only one element
+            expect(anElement1.global.has(anElement1)).toBe(true);
+            expect(anElement1.global.has(anElement2)).toBe(true);
+            expect(anElement1.global.has(anElement3)).toBe(true);
+            expect(anElement1.global.has(anElement4)).toBe(false);
+            expect(anElement1.global.has(anElement5)).toBe(false);
+
+            expect(anElement4.global.has(anElement1)).toBe(false);
+            expect(anElement4.global.has(anElement2)).toBe(false);
+            expect(anElement4.global.has(anElement3)).toBe(false);
+            expect(anElement4.global.has(anElement4)).toBe(true);
+            expect(anElement4.global.has(anElement5)).toBe(true);
+        });
+
+        it('should add the given AutoNumeric object with the `addObject` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = new AutoNumeric(newInput5, options);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['1028.01']);
+
+            // Add an AutoNumeric object to the local list
+            anElement2.global.addObject(anElement5);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            anElement5.global.addObject(anElement4);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+        });
+
+        it('should add the given DOM element with the `addObject` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = new AutoNumeric(newInput5, options);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['1028.01']);
+
+            // Add a DOM element to the local list
+            anElement2.global.addObject(newInput5);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            anElement5.global.addObject(newInput4);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+        });
+
+        it('should add the given AutoNumeric object, and its other linked AutoNumeric objects, with the `addObject` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Add an AutoNumeric object to the local list
+            // This manages the case where we use `addObject` on an AutoNumeric object that already has multiple elements in its local list
+            anElement2.global.addObject(anElement4);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement4.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+        });
+
+        it('should add the given DOM element, and its other linked AutoNumeric objects, with the `addObject` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Add a DOM element to the local list
+            // This manages the case where `addObject` is used on an AutoNumeric object that already has multiple elements in its local list.
+            anElement2.global.addObject(newInput4);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement4.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+        });
+
+        it('should remove the given AutoNumeric object with the `removeObject` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+
+            // Remove an AutoNumeric object from the local list
+            anElement2.global.removeObject(anElement1);
+            expect(anElement1.global.getNumericString()).toEqual(['22']); // The element got removed by another one, it keeps itself in its own local list
+            expect(anElement2.global.getNumericString()).toEqual(['13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['13568.24', '187568.24']);
+            anElement3.global.removeObject(anElement3);
+            expect(anElement1.global.getNumericString()).toEqual(['22']);
+            expect(anElement2.global.getNumericString()).toEqual(['13568.24']);
+            expect(anElement3.global.getNumericString()).toEqual([]); // The element removed itself
+
+            anElement4.global.removeObject(anElement4, true);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            anElement4.global.removeObject(anElement4);
+            expect(anElement4.global.getNumericString()).toEqual([]);
+
+            // Then make sure an object with an empty local list can add other AutoNumeric objects back (without having to add itself into it)
+            anElement4.global.addObject(anElement3);
+            expect(anElement3.global.getNumericString()).toEqual(['21613568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '187568.24']);
+        });
+
+        it('should remove the given DOM element with the `removeObject` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+
+            // Remove a DOM element from the local list
+            anElement2.global.removeObject(newInput1);
+            expect(anElement1.global.getNumericString()).toEqual(['22']); // The element got removed by another one, it keeps itself in its own local list
+            expect(anElement2.global.getNumericString()).toEqual(['13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['13568.24', '187568.24']);
+            anElement3.global.removeObject(newInput3);
+            expect(anElement1.global.getNumericString()).toEqual(['22']);
+            expect(anElement2.global.getNumericString()).toEqual(['13568.24']);
+            expect(anElement3.global.getNumericString()).toEqual([]); // The element removed itself
+
+            anElement4.global.removeObject(newInput4, true);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            anElement4.global.removeObject(newInput4);
+            expect(anElement4.global.getNumericString()).toEqual([]);
+
+            // Then make sure an object with an empty local list can add other DOM elements back (without having to add itself into it)
+            anElement4.global.addObject(newInput3);
+            expect(anElement3.global.getNumericString()).toEqual(['21613568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '187568.24']);
+        });
+
+        it('should empty the local AutoNumeric objects list, with the `empty` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Empty the local list
+            anElement2.global.empty();
+            expect(anElement1.global.getNumericString()).toEqual([]);
+            expect(anElement2.global.getNumericString()).toEqual([]);
+            expect(anElement3.global.getNumericString()).toEqual([]);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            anElement4.global.empty(true);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['1028.01']);
+            anElement4.global.empty();
+            expect(anElement4.global.getNumericString()).toEqual([]);
+            expect(anElement5.global.getNumericString()).toEqual(['1028.01']);
+            anElement5.global.empty();
+            expect(anElement5.global.getNumericString()).toEqual([]);
+            anElement5.global.empty();
+            expect(anElement5.global.getNumericString()).toEqual([]);
+        });
+
+        it('should return the DOM elements from the local AutoNumeric objects list, with the `elements` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Get the DOM elements form the local lists
+            expect(anElement2.global.elements()).toEqual([
+                newInput1,
+                newInput2,
+                newInput3,
+            ]);
+            expect(anElement4.global.elements()).toEqual([
+                newInput4,
+                newInput5,
+            ]);
+        });
+
+        it('should return the local AutoNumeric objects list with the `getList` function, and get its size with `size`', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Get the local list
+            expect(anElement1.global.getList()).toEqual(anElement1.autoNumericLocalList);
+            expect(anElement2.global.getList()).toEqual(anElement1.autoNumericLocalList);
+            expect(anElement3.global.getList()).toEqual(anElement1.autoNumericLocalList);
+            expect(anElement4.global.getList()).toEqual(anElement4.autoNumericLocalList);
+            expect(anElement5.global.getList()).toEqual(anElement4.autoNumericLocalList);
+
+            // Get the local list sizes
+            expect(anElement1.global.size()).toEqual(3);
+            expect(anElement5.global.size()).toEqual(2);
+
+            anElement2.global.removeObject(anElement3);
+            expect(anElement1.global.size()).toEqual(2);
+        });
+    });
+
+    describe('initialization methods with the multiple `nuke` function', () => {
+        it('should `nuke` the elements correctly, either one by one or globally', () => {
+            // Initialize the DOM elements
+            const options = { currencySymbol: ' €', currencySymbolPlacement: 's', decimalCharacter: ',', digitGroupSeparator: ' ', outputFormat: ',-' };
+            const newInput1 = document.createElement('input');
+            const newInput2 = document.createElement('input');
+            const newInput3 = document.createElement('input');
+            const newInput4 = document.createElement('input');
+            const newInput5 = document.createElement('input');
+            document.body.appendChild(newInput1);
+            document.body.appendChild(newInput2);
+            document.body.appendChild(newInput3);
+            document.body.appendChild(newInput4);
+            document.body.appendChild(newInput5);
+            newInput1.name = 'nameInput1';
+            newInput2.name = 'nameInput2';
+            newInput3.name = 'nameInput3';
+            newInput4.name = 'nameInput4';
+            newInput5.name = 'nameInput5';
+            newInput1.id = 'uniqueId1';
+            newInput2.id = 'uniqueId2';
+            newInput3.id = 'uniqueId3';
+            newInput4.id = 'uniqueId4';
+            newInput5.id = 'uniqueId5';
+
+            expect(document.querySelector('#uniqueId1')).not.toBeNull();
+            expect(document.querySelector('#uniqueId2')).not.toBeNull();
+            expect(document.querySelector('#uniqueId3')).not.toBeNull();
+            expect(document.querySelector('#uniqueId4')).not.toBeNull();
+            expect(document.querySelector('#uniqueId5')).not.toBeNull();
+
+            // Initialize the AutoNumeric elements
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '187 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Nuke only one element
+            expect(newInput3.value).toEqual('187 568,24 €');
+            anElement3.nuke();
+            expect(document.querySelector('#uniqueId3')).toBeNull();
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Test that anElement3 is no more in the global AutoNumeric element list
+            expect(AutoNumeric.test(newInput3)).toBe(false);
+
+            // Then nuke all elements
+            anElement1.global.nuke();
+            expect(AutoNumeric.test(newInput1)).toBe(false);
+            expect(AutoNumeric.test(newInput2)).toBe(false);
+            expect(AutoNumeric.test(newInput4)).toBe(false);
+            expect(AutoNumeric.test(newInput5)).toBe(false);
+            expect(document.querySelector('#uniqueId1')).toBeNull();
+            expect(document.querySelector('#uniqueId2')).toBeNull();
+            expect(document.querySelector('#uniqueId4')).toBeNull();
+            expect(document.querySelector('#uniqueId5')).toBeNull();
+
+            expect(anElement1.global.getFormatted()).toEqual([]);
+        });
     });
 
     describe('initialization methods with the `multiple()` function', () => {
@@ -2999,6 +3582,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ digitGroupSeparator: '٬' })).not.toThrow();
             expect(() => AutoNumeric.validate({ digitGroupSeparator: '˙' })).not.toThrow();
 
+            expect(() => AutoNumeric.validate({ createLocalList: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: 'false' })).not.toThrow();
+
             expect(() => AutoNumeric.validate({ noSeparatorOnFocus: false })).not.toThrow();
             expect(() => AutoNumeric.validate({ noSeparatorOnFocus: true })).not.toThrow();
             expect(() => AutoNumeric.validate({ noSeparatorOnFocus: 'false' })).not.toThrow();
@@ -3253,6 +3841,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ digitGroupSeparator: '.' })).toThrow(); // Since the default 'decimalCharacter' is '.' too
             expect(() => AutoNumeric.validate({ digitGroupSeparator: true })).toThrow();
             expect(() => AutoNumeric.validate({ digitGroupSeparator: null })).toThrow();
+
+            expect(() => AutoNumeric.validate({ createLocalList: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: 'foobar' })).toThrow();
 
             expect(() => AutoNumeric.validate({ noSeparatorOnFocus: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ noSeparatorOnFocus: 42 })).toThrow();

@@ -100,6 +100,7 @@ const selectors = {
     negativeBracketsInput6            : '#negativeBrackets_6',
     negativeBracketsInput7            : '#negativeBrackets_7',
     negativeBracketsInput8            : '#negativeBrackets_8',
+    remove1                           : '#remove1',
 };
 
 //-----------------------------------------------------------------------------
@@ -234,7 +235,7 @@ describe('Initialized elements with the readOnly option', () => {
 });
 
 describe('Issue #327 (using inputs from issue #183)', () => {
-    it('should tests for default values', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         /* eslint space-in-parens: 0 */
@@ -301,7 +302,7 @@ describe('Issue #327 (using inputs from issue #183)', () => {
 });
 
 describe('Issue #306', () => {
-    it('should tests for default values', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue306input)).toEqual('');
@@ -474,7 +475,7 @@ describe('Issue #306', () => {
 });
 
 describe('Issue #283', () => {
-    it('should tests for default values', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue283Input0)).toEqual('1.12');
@@ -578,7 +579,7 @@ describe('Issue #283', () => {
 });
 
 describe('Issue #326', () => {
-    it('should tests for default values, and focus on it', () => {
+    it('should test for default values, and focus on it', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue326input)).toEqual('12.345.678,00 €');
@@ -630,7 +631,7 @@ describe('Issue #326', () => {
 
 
 describe('Issue #322', () => {
-    it('should tests for default values, and focus on it', () => {
+    it('should test for default values, and focus on it', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue322input)).toEqual('12,345,678.00');
@@ -714,7 +715,7 @@ describe('Issue #322', () => {
 });
 
 describe('Issue #317', () => {
-    it('should tests for default values, and focus on it', () => {
+    it('should test for default values, and focus on it', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue317input)).toEqual('0.00');
@@ -792,7 +793,7 @@ describe('Issue #317', () => {
 });
 
 xdescribe('Issue #303', () => { //FIXME Finish this
-    it('should tests for default values', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue303inputP)).toEqual('');
@@ -827,7 +828,7 @@ xdescribe('Issue #303', () => { //FIXME Finish this
 });
 
 describe('Issue #387', () => {
-    it('should tests for default values', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
@@ -980,7 +981,7 @@ describe('Issue #387', () => {
 });
 
 xdescribe('Issue #393', () => { //FIXME Finish this
-    it('should tests for default values', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue393inputFixed)).toEqual('');
@@ -1033,7 +1034,7 @@ xdescribe('Issue #393', () => { //FIXME Finish this
 });
 
 describe('Elements with the `contenteditable` attribute set to `true`', () => {
-    it('should tests for default values', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         expect(browser.getText(selectors.contentEditable1)).toEqual('');
@@ -1081,7 +1082,7 @@ describe('Elements with the `contenteditable` attribute set to `true`', () => {
 });
 
 describe('Issue #403', () => {
-    it('should tests for default values', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue403a)).toEqual('25.00%');
@@ -1178,7 +1179,7 @@ describe('Issue #403', () => {
 });
 
 describe('Negative numbers & brackets notations', () => {
-    it('should tests for default values', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.negativeBrackets1)).toEqual('[1.352.468,24 €]');
@@ -1267,5 +1268,35 @@ describe('Negative numbers & brackets notations', () => {
         expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('(1.234,57 €)');
         expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('(1.234,57 €)');
         expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('(1.234,57 €)');
+    });
+});
+
+describe('remove() function', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.remove1)).toEqual('2.468,42 €');
+    });
+
+    it('should stop reacting with the AutoNumeric event handlers to user interactions once its removed', () => {
+        const remove1 = $(selectors.remove1);
+
+        // Focus in the input
+        remove1.click();
+        browser.keys(['Home', '115']);
+        expect(browser.getValue(selectors.remove1)).toEqual('1.152.468,42 €');
+
+        // Call the `remove()` function
+        browser.execute(() => {
+            const inputRemove1 = document.querySelector('#remove1');
+            // eslint-disable-next-line
+            const anElement = AutoNumeric.getAutoNumericElement(inputRemove1);
+            anElement.remove();
+        });
+
+        // Check that the value has not changed
+        expect(browser.getValue(selectors.remove1)).toEqual('1.152.468,42 €');
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Delete', 'Delete']);
+        expect(browser.getValue(selectors.remove1)).toEqual('1.15468,42 €');
     });
 });

@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      3.0.0-beta.13
+ * @version      3.0.0-beta.14
  * @date         2017-03-14 UTC 11:30
  *
  * @author       Bob Knothe
@@ -133,8 +133,10 @@ class AutoNumeric {
         // Keep track if the element is currently focused
         this.isFocused = false;
 
-        // Keep track of every AutoNumeric elements that this object initialized
-        this._createLocalList();
+        if (this.settings.createLocalList) {
+            // Keep track of every AutoNumeric elements that this object initialized
+            this._createLocalList();
+        }
 
         // Keep track of all AutoNumeric elements in the current web page
         this.constructor._addToGlobalList(this);
@@ -174,7 +176,7 @@ class AutoNumeric {
              * @returns {Array<string>}
              * @deprecated
              */
-            get: () => { //FIXME à tester
+            get: () => {
                 const result = [];
                 this.autoNumericLocalList.forEach(aNObject => {
                     result.push(aNObject.get());
@@ -188,7 +190,7 @@ class AutoNumeric {
              *
              * @returns {Array<string>}
              */
-            getNumericString: () => { //FIXME à tester
+            getNumericString: () => {
                 const result = [];
                 this.autoNumericLocalList.forEach(aNObject => {
                     result.push(aNObject.getNumericString());
@@ -202,7 +204,7 @@ class AutoNumeric {
              *
              * @returns {Array<string>}
              */
-            getFormatted: () => { //FIXME à tester
+            getFormatted: () => {
                 const result = [];
                 this.autoNumericLocalList.forEach(aNObject => {
                     result.push(aNObject.getFormatted());
@@ -216,7 +218,7 @@ class AutoNumeric {
              *
              * @returns {Array<number>}
              */
-            getNumber: () => { //FIXME à tester
+            getNumber: () => {
                 const result = [];
                 this.autoNumericLocalList.forEach(aNObject => {
                     result.push(aNObject.getNumber());
@@ -230,7 +232,7 @@ class AutoNumeric {
              *
              * @returns {Array<string>}
              */
-            getLocalized: () => { //FIXME à tester
+            getLocalized: () => {
                 const result = [];
                 this.autoNumericLocalList.forEach(aNObject => {
                     result.push(aNObject.getLocalized());
@@ -269,6 +271,17 @@ class AutoNumeric {
             },
 
             /**
+             * Updates the AutoNumeric settings, and immediately format the elements accordingly, for each elements of the local AutoNumeric element list
+             *
+             * @param {object} newOptions
+             */
+            update: newOptions => {
+                this.autoNumericLocalList.forEach(aNObject => {
+                    aNObject.update(newOptions);
+                });
+            },
+
+            /**
              * Return `true` is *all* the autoNumeric-managed elements are pristine, if their raw value hasn't changed.
              * By default, this returns `true` if the raw unformatted value is still the same even if the formatted one has changed (due to a configuration update for instance).
              *
@@ -288,17 +301,19 @@ class AutoNumeric {
 
             /**
              * Execute the `clear()` method on each AutoNumeric object in the local AutoNumeric element list
+             *
+             * @param {boolean} forceClearAll
              */
-            clear: () => { //FIXME à tester
+            clear: (forceClearAll = false) => {
                 this.autoNumericLocalList.forEach(aNObject => {
-                    aNObject.clear();
+                    aNObject.clear(forceClearAll);
                 });
             },
 
             /**
              * Execute the `remove()` method on each AutoNumeric object in the local AutoNumeric element list
              */
-            remove: () => { //FIXME à tester
+            remove: () => {
                 this.autoNumericLocalList.forEach(aNObject => {
                     aNObject.remove();
                 });
@@ -307,9 +322,18 @@ class AutoNumeric {
             /**
              * Execute the `wipe()` method on each AutoNumeric object in the local AutoNumeric element list
              */
-            wipe: () => { //FIXME à tester
+            wipe: () => {
                 this.autoNumericLocalList.forEach(aNObject => {
                     aNObject.wipe();
+                });
+            },
+
+            /**
+             * Execute the `nuke()` method on each AutoNumeric object in the local AutoNumeric element list
+             */
+            nuke: () => {
+                this.autoNumericLocalList.forEach(aNObject => {
+                    aNObject.nuke();
                 });
             },
 
@@ -319,7 +343,7 @@ class AutoNumeric {
              * @param {HTMLElement|HTMLInputElement|AutoNumeric} domElementOrAutoNumericObject
              * @returns {*}
              */
-            has: domElementOrAutoNumericObject => { //FIXME à tester
+            has: domElementOrAutoNumericObject => {
                 let result;
                 if (domElementOrAutoNumericObject instanceof AutoNumeric) {
                     result = this.autoNumericLocalList.has(domElementOrAutoNumericObject.node());
@@ -331,39 +355,112 @@ class AutoNumeric {
             },
 
             /**
-             * Add an existing AutoNumeric object (or DOM element) to the local AutoNumeric element list, using the DOM element as the key
+             * Add an existing AutoNumeric object (or DOM element) to the local AutoNumeric element list, using the DOM element as the key.
+             * This manages the case where `addObject` is used on an AutoNumeric object that already has multiple elements in its local list.
              *
              * @param {HTMLElement|HTMLInputElement|AutoNumeric} domElementOrAutoNumericObject
              */
-            addObject: domElementOrAutoNumericObject => { //FIXME à tester
+            addObject: domElementOrAutoNumericObject => {
+                // Start with the same data, whatever the user passed as arguments
+                let domElement;
+                let otherAutoNumericObject;
                 if (domElementOrAutoNumericObject instanceof AutoNumeric) {
-                    this._addToLocalList(domElementOrAutoNumericObject.node(), domElementOrAutoNumericObject);
+                    domElement = domElementOrAutoNumericObject.node();
+                    otherAutoNumericObject = domElementOrAutoNumericObject;
                 } else {
-                    // We need to specify the AutoNumeric object, otherwise the `_addToLocalList` function would not correctly add the AutoNumeric object since we would not have a reference to it, but a reference to the current AutoNumeric object on which is called this method.
-                    this._addToLocalList(domElementOrAutoNumericObject, AutoNumeric.getAutoNumericElement(domElementOrAutoNumericObject));
+                    domElement = domElementOrAutoNumericObject;
+                    otherAutoNumericObject = AutoNumeric.getAutoNumericElement(domElementOrAutoNumericObject);
                 }
+
+                // Check if the current autoNumeric object has a local list
+                if (!this._hasLocalList()) {
+                    this._createLocalList();
+                }
+
+                // Check if the other autoNumeric object has a local list...
+                let otherANLocalList = otherAutoNumericObject._getLocalList();
+                if (otherANLocalList.size === 0) {
+                    // Special case if the other AutoNumeric object has an empty local list, then populate itself to it
+                    otherAutoNumericObject._createLocalList();
+                    otherANLocalList = otherAutoNumericObject._getLocalList(); // Update the other local list
+                }
+
+                let mergedLocalLists;
+                if (otherANLocalList instanceof Map) {
+                    // ...If it does, merge the local lists together
+                    mergedLocalLists = AutoNumericHelper.mergeMaps(this._getLocalList(), otherANLocalList);
+                } else {
+                    // ...If not, just set the current local list onto the other AutoNumeric object
+                    // We need to specify the AutoNumeric object, otherwise the `_addToLocalList` function would not correctly add the AutoNumeric object since we would not have a reference to it, but a reference to the current AutoNumeric object on which is called this method.
+                    this._addToLocalList(domElement, otherAutoNumericObject);
+                    mergedLocalLists = this._getLocalList();
+                }
+
+                // Update the resulting list, on all the objects of that local list (so that we can indifferently use `init()` on any object belonging to that list)
+                mergedLocalLists.forEach(aNObject => {
+                    aNObject._setLocalList(mergedLocalLists);
+                });
             },
 
             /**
-             * Remove the given AutoNumeric object (or DOM element) from the local AutoNumeric element list, using the DOM element as the key
+             * Remove the given AutoNumeric object (or DOM element) from the local AutoNumeric element list, using the DOM element as the key.
+             * If this function attempts to remove the current AutoNumeric object from the local list, a warning is shown, but the deletion is still done.
+             *
+             * Special cases :
+             * - If the current object removes itself, then it's removed from the shared local list, then a new empty local list is used/created
+             * - If another object remove this object, then a local list with only this object is used/created
              *
              * @param {HTMLElement|HTMLInputElement|AutoNumeric} domElementOrAutoNumericObject
+             * @param {boolean} keepCurrentANObject If set to `false`, then the function will also remove the current AutoNumeric object if asked, otherwise it will ignore it and print a warning message
              */
-            removeObject: domElementOrAutoNumericObject => { //FIXME à tester
+            removeObject: (domElementOrAutoNumericObject, keepCurrentANObject = false) => {
+                // Start with the same data, whatever the user passed as arguments
+                let domElement;
+                let otherAutoNumericObject;
                 if (domElementOrAutoNumericObject instanceof AutoNumeric) {
-                    this.autoNumericLocalList.delete(domElementOrAutoNumericObject.node());
+                    domElement = domElementOrAutoNumericObject.node();
+                    otherAutoNumericObject = domElementOrAutoNumericObject;
                 } else {
-                    this.autoNumericLocalList.delete(domElementOrAutoNumericObject);
+                    domElement = domElementOrAutoNumericObject;
+                    otherAutoNumericObject = AutoNumeric.getAutoNumericElement(domElementOrAutoNumericObject);
+                }
+
+                // Remove the other object from the local list
+                const initialCompleteLocalList = this.autoNumericLocalList;
+                this.autoNumericLocalList.delete(domElement);
+
+                // Update the local list for all objects in it
+                initialCompleteLocalList.forEach(aNObject => {
+                    aNObject._setLocalList(this.autoNumericLocalList);
+                });
+
+                if (!keepCurrentANObject && domElement === this.node()) {
+                    // This object is removed by itself
+                    // Empty the object local list
+                    otherAutoNumericObject._setLocalList(new Map);
+                } else {
+                    // This object is removed by another object
+                    // Set the local list for the removed object, with only this object in it
+                    otherAutoNumericObject._createLocalList();
                 }
             },
 
             /**
              * Remove all elements from the shared list, effectively emptying it.
              * This is the equivalent of calling `detach()` on each of its elements.
+             *
+             * @param {boolean} keepEachANObjectInItsOwnList If set to `true`, then instead of completely emptying the local list of each AutoNumeric objects, each one of those keeps itself in its own local list
              */
-            empty: () => { //FIXME à tester
-                this.autoNumericLocalList.forEach(aNObject => {
-                    aNObject.detach();
+            empty: (keepEachANObjectInItsOwnList = false) => {
+                const initialCompleteLocalList = this.autoNumericLocalList;
+
+                // Update the local list for all objects in it
+                initialCompleteLocalList.forEach(aNObject => {
+                    if (keepEachANObjectInItsOwnList) {
+                        aNObject._createLocalList();
+                    } else {
+                        aNObject._setLocalList(new Map);
+                    }
                 });
             },
 
@@ -372,7 +469,7 @@ class AutoNumeric {
              *
              * @returns {Array<HTMLElement>}
              */
-            elements: () => { //FIXME à tester
+            elements: () => {
                 const result = [];
                 this.autoNumericLocalList.forEach(aNObject => {
                     result.push(aNObject.node());
@@ -385,7 +482,7 @@ class AutoNumeric {
              * Return the `Map` object directly
              * @returns {Map}
              */
-            getList: () => this.autoNumericLocalList, //FIXME à tester
+            getList: () => this.autoNumericLocalList,
 
             /**
              * Return the number of element in the local AutoNumeric element list
@@ -518,7 +615,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '3.0.0-beta.13';
+        return '3.0.0-beta.14';
     }
 
     /**
@@ -885,7 +982,15 @@ class AutoNumeric {
                 return this;
             }
         } else {
-            AutoNumericHelper.setElementValue(this.domElement, '');
+            let result;
+            if (this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.always) {
+                // Keep the currency symbol as per emptyInputBehavior
+                result = this.settings.currencySymbol;
+            } else {
+                result = '';
+            }
+
+            AutoNumericHelper.setElementValue(this.domElement, result);
             this.settings.rawValue = '';
 
             return this;
@@ -1424,25 +1529,29 @@ class AutoNumeric {
      * Note : this works only on elements that can be managed by autoNumeric.
      *
      * @param {HTMLElement|HTMLInputElement} domElement
-     * @param {boolean} detached If set to `true`, then the newly generated AutoNumeric element will not share the same local element list
+     * @param {boolean} attached If set to `false`, then the newly generated AutoNumeric element will not share the same local element list
      * @returns {AutoNumeric}
      */
-    init(domElement, detached = false) {
+    init(domElement, attached = true) {
         // Initialize the new AutoNumeric element
-        //TODO Use a special call that would prevent calling `_createLocalList` (since we'll delete that list just after if detached == false)
+        //TODO Use a special call that would prevent calling `_createLocalList` (since we'll delete that list just after if attached == false)
+        const originalCreateLocalListSetting = this.settings.createLocalList;
+        if (attached) {
+            // Temporary variable to know if we should create the local list during the initialization (since we'll remove it afterwards)
+            this.settings.createLocalList = false;
+        }
+
         const newAutoNumericElement =  new AutoNumeric(domElement, AutoNumericHelper.getElementValue(domElement), this.settings);
 
         // Set the common shared local list if needed
         // If the user wants to create a detached new AutoNumeric element, then skip the following step that bind the two elements together by default
-        if (!detached) {
-            // 1) Remove the local list created during initialization
-            newAutoNumericElement._deleteLocalList();
-
-            // 2) Set the local list reference to point to the initializer's one
+        if (attached) {
+            // 1) Set the local list reference to point to the initializer's one
             newAutoNumericElement._setLocalList(this._getLocalList());
 
-            // 3) Add the new element to that existing list
-            newAutoNumericElement._addToLocalList(domElement); // Here we use the new AutoNumeric object reference to add to the local list, since we'll need the reference to `this` in the methods to points to that new AutoNumeric object.
+            // 2) Add the new element to that existing list
+            this._addToLocalList(domElement, newAutoNumericElement); // Here we use the new AutoNumeric object reference to add to the local list, since we'll need the reference to `this` in the methods to points to that new AutoNumeric object. //FIXME à terminer : rework the comment that is now out-dated
+            this.settings.createLocalList = originalCreateLocalListSetting;
         }
 
         return newAutoNumericElement;
@@ -1455,7 +1564,7 @@ class AutoNumeric {
      * @param {boolean} forceClearAll
      * @returns {AutoNumeric}
      */
-    clear(forceClearAll = false) { //FIXME à tester
+    clear(forceClearAll = false) {
         if (forceClearAll) {
             const temporaryForcedOptions = {
                 emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.focus,
@@ -1477,12 +1586,12 @@ class AutoNumeric {
      */
     remove() {
         this._saveValueToPersistentStorage('remove');
-        this._removeEventListeners(); //FIXME à tester
+        this._removeEventListeners();
 
         // Also remove the element from the local AutoNumeric list
-        this._removeFromLocalList(this.domElement); //FIXME à tester
+        this._removeFromLocalList(this.domElement);
         // Also remove the element from the global AutoNumeric list
-        this.constructor._removeFromGlobalList(this); //FIXME à tester
+        this.constructor._removeFromGlobalList(this);
     }
 
     /**
@@ -2038,12 +2147,34 @@ class AutoNumeric {
         //TODO Manage the side effects if this list is undefined (what if we later try to access/modify it?)
     }
 
+    /**
+     * Set the local list with the given Map object.
+     *
+     * @param {Map} localList
+     * @private
+     */
     _setLocalList(localList) {
         this.autoNumericLocalList = localList;
     }
 
+    /**
+     * Return the local list Map object.
+     *
+     * @returns {*|Map}
+     * @private
+     */
     _getLocalList() {
         return this.autoNumericLocalList;
+    }
+
+    /**
+     * Return `true` is the AutoNumeric object has a local list defined already and has at least one element in it (itself usually).
+     *
+     * @returns {boolean}
+     * @private
+     */
+    _hasLocalList() {
+        return this.autoNumericLocalList instanceof Map && this.autoNumericLocalList.size !== 0;
     }
 
     /**
@@ -2414,6 +2545,10 @@ class AutoNumeric {
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.failOnUnknownOption) && !AutoNumericHelper.isBoolean(options.failOnUnknownOption)) {
             AutoNumericHelper.throwError(`The debug option 'failOnUnknownOption' is invalid ; it should be either 'false' or 'true', [${options.failOnUnknownOption}] given.`);
+        }
+
+        if (!AutoNumericHelper.isTrueOrFalseString(options.createLocalList) && !AutoNumericHelper.isBoolean(options.createLocalList)) {
+            AutoNumericHelper.throwError(`The debug option 'createLocalList' is invalid ; it should be either 'false' or 'true', [${options.createLocalList}] given.`);
         }
     }
 
@@ -4949,6 +5084,7 @@ class AutoNumeric {
 
             // Current options :
             digitGroupSeparator               : true,
+            createLocalList                   : true,
             noSeparatorOnFocus                : true,
             digitalGroupSpacing               : true,
             decimalCharacter                  : true,
@@ -6056,6 +6192,10 @@ AutoNumeric.options = {
         padding  : true,
         noPadding: false,
     },
+    createLocalList              : {
+        createList     : true,
+        doNotCreateList: false,
+    },
     // cf. https://en.wikipedia.org/wiki/Currency_symbol
     currencySymbol               : {
         none          : '',
@@ -6320,6 +6460,11 @@ AutoNumeric.defaultSettings = {
      */
     allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.padding,
 
+    /* Defines if a local list of AutoNumeric objects should be kept when initializing this object.
+     * This list is used by the `global.*` functions.
+     */
+    createLocalList: AutoNumeric.options.createLocalList.createList,
+
     /* currencySymbol = allowed currency symbol
      * Must be in quotes currencySymbol: "$"
      * space to the right of the currency symbol currencySymbol: '$ '
@@ -6396,8 +6541,7 @@ AutoNumeric.defaultSettings = {
      */
     emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.focus,
 
-    /*
-     * This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object.
+    /* This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object.
      * You should set that to 'TRUE' if you want to make sure you are only using 'pure' autoNumeric settings objects in your code.
      * If you see uncaught errors in the console and your code starts to fail, this means somehow those options gets corrupted by another program.
      */

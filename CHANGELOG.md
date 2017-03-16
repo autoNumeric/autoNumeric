@@ -1,5 +1,23 @@
 ### Change log for autoNumeric:
 
+### "3.0.0-beta.14"
++ Add unit tests for the new `global.*` features
++ Fix issue #412 Using `set('')` does not respect the `emptyInputBehavior` option when it's set to `'always'`
++ Add a `createLocalList` option which allow to control whether a local list of AutoNumeric objects should be saved on initializations.
++ Add a `global.update()` function to update the settings on a local list.
++ Modify the `global.clear()` function to be able to force a `clear` call.
++ Add a `global.nuke()` function to `remove` then delete the local list DOM element from the DOM.
++ Update the `global.clear()` function signature with the `clear()` one.
++ Fix the `global.addObject()` function that did not update the local list of the added element.
++ Fix the `global.addObject()` function so that if it add an AutoNumeric object that already has a local list with multiple other AutoNumeric objects, it merges the list.
++ Fix the `global.removeObject()` function to make it update all the objects local list. Also add special behaviors when an AutoNumeric element removes itself or another one.
++ Fix the `global.empty()` function to match the `removeObject` behavior.
++ Simplify the `init()` method by removing a negation in one of its parameter.
++ Fix the `init()` method initialization process by preventing creating a local list, then removing it immediately if the user wanted a detached element. Now, the local list is just not created (Using the `createLocalList` option set to `false`).
++ Add an end-to-end test for the `remove()` method.
++ Add a `_hasLocalList()` method that tests if the AutoNumeric element has a local list and that it has at least one element in it (itself usually).
+
+
 ### "3.0.0-beta.13"
 + Fix issue #411 Add the pre-defined Brazilian language configuration
 

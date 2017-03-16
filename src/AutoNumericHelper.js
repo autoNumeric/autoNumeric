@@ -1160,7 +1160,28 @@ export default class AutoNumericHelper {
      * @returns {*}
      */
     static getHoveredElement() {
-        const hoveredElements = [... document.querySelectorAll(':hover')];
+        const hoveredElements = [...document.querySelectorAll(':hover')];
         return hoveredElements[hoveredElements.length - 1];
+    }
+
+    /**
+     * Merge all the given arrays by keeping only unique elements, and return an array with de-duplicated values.
+     * cf. http://stackoverflow.com/a/27664971/2834898
+     *
+     * @param {...array} arrays
+     * @returns {[*]}
+     */
+    static arrayUnique(...arrays) { //FIXME à tester
+        return [...new Set([].concat(...arrays))];
+    }
+
+    /**
+     * Merge all the given Maps by keeping only unique elements, and return a new Map with de-duplicated keys.
+     *
+     * @param {...Map} mapObjects
+     * @returns {Map}
+     */
+    static mergeMaps(...mapObjects) {
+        return new Map(mapObjects.reduce((as, b) => as.concat([...b]), []));
     }
 }

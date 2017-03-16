@@ -22,7 +22,7 @@ autoNumeric main features are :
 // Initialization
 new AutoNumeric('.myInput', { currencySymbol : '$' });
 ```
-- Very high configurability (more than 39 [options](#options) available)
+- Very high configurability (more than 40 [options](#options) available)
 ```js
 // The options are...optional :)
 const autoNumericOptionsEuro = {
@@ -48,7 +48,7 @@ new AutoNumeric(domElement, autoNumericOptionsEuro);
 - 7 pre-defined [currency options](#predefined-language-options) allows you to directly use autoNumeric by skipping the option configuration step
 - 26 built-in [methods](#methods) gives you the flexibility needed to use autoNumeric to its maximum potential
 - 21 additional [methods](#methods) specialized for managing form submission
-- More than 39 [options](#options) allows you to customize the output format
+- More than 40 [options](#options) allows you to customize the output format
 
 With that said, autoNumeric supports most international numeric formats and currencies including those used in Europe, Asia, and North and South America.
 
@@ -158,6 +158,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | Option           | Description | Default Value |
 | :---------------- | :-----------:  | :-----------:  |
 | `allowDecimalPadding`| Allow padding the decimal places with zeros | `true` |
+| `createLocalList` | Determine if a local list of AutoNumeric objects must be kept when initializing the elements and others | `true` |
 | `currencySymbol` | Currency symbol | `''` |
 | `currencySymbolPlacement` | Placement of the currency sign, relative to the number (as a prefix or a suffix) | `'p'` |
 | `decimalCharacter` | Decimal separator character | `'.'` |
@@ -464,11 +465,13 @@ anElement.global.reformat();
 anElement.global.unformat();
 anElement.global.unformatLocalized();
 anElement.global.unformatLocalized(forcedOutputFormat);
+anElement.global.update({ options }); // Update the settings of each autoNumeric-managed elements
 anElement.global.isPristine(); // Return `true` is *all* the autoNumeric-managed elements are pristine, if their raw value hasn't changed
 anElement.global.isPristine(false); // Idem as above, but also checks that the formatted value hasn't changed
 anElement.global.clear(); // Clear the value in all the autoNumeric-managed elements that are shared on this element
 anElement.global.remove();
 anElement.global.wipe();
+anElement.global.nuke();
 ```
 
 The shared local list also provide list-specific methods to manipulate it:
@@ -476,7 +479,9 @@ The shared local list also provide list-specific methods to manipulate it:
 anElement.global.has(domElementOrAutoNumericObject); // Return `true` if the given AutoNumeric object (or DOM element) is in the local AutoNumeric element list
 anElement.global.addObject(domElementOrAutoNumericObject); // Add an existing AutoNumeric object (or DOM element) to the local AutoNumeric element list, using the DOM element as the key
 anElement.global.removeObject(domElementOrAutoNumericObject); // Remove the given AutoNumeric object (or DOM element) from the local AutoNumeric element list, using the DOM element as the key
+anElement.global.removeObject(domElementOrAutoNumericObject, true); // Idem above, but keep the current AutoNumeric object in the local list if it's removed by itself
 anElement.global.empty(); // Remove all elements from the shared list, effectively emptying it
+anElement.global.empty(true); // Idem above, but instead of completely emptying the local list of each AutoNumeric objects, each one of those keeps itself in its own local list
 [anElement0, anElement1, anElement2, anElement3] = anElement.global.elements(); // Return an array containing all the AutoNumeric elements that have been initialized by each other
 anElement.global.getList(); // Return the `Map` object directly
 anElement.global.size(); // Return the number of elements in the local AutoNumeric element list

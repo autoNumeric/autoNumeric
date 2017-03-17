@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "4.0.0-beta.2"
++ Fix issue #413 Manage the drag 'n drop event so that the text dropped in the AutoNumeric element gets formatted accordingly
+
 ### "4.0.0-beta.1"
 + Up the current `next` version to `v4` instead of `v3`, just because.
 + Add unit tests for the new `options.*` methods

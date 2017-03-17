@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.1
+ * @version      4.0.0-beta.2
  * @date         2017-03-16 UTC 22:00
  *
  * @author       Bob Knothe
@@ -722,7 +722,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.1';
+        return '4.0.0-beta.2';
     }
 
     /**
@@ -875,6 +875,7 @@ class AutoNumeric {
         this._onFormSubmitFunc = e => { this._onFormSubmit(e); };
         this._onKeydownGlobalFunc = e => { this._onKeydownGlobal(e); };
         this._onKeyupGlobalFunc = e => { this._onKeyupGlobal(e); };
+        this._onDropFunc = e => { this._onDrop(e); };
 
         // Add the event listeners
         this.domElement.addEventListener('focusin', this._onFocusInAndMouseEnterFunc, false);
@@ -888,6 +889,7 @@ class AutoNumeric {
         this.domElement.addEventListener('blur', this._onBlurFunc, false);
         this.domElement.addEventListener('paste', this._onPasteFunc, false);
         this.domElement.addEventListener('wheel', this._onWheelFunc, false);
+        this.domElement.addEventListener('drop', this._onDropFunc, false);
 
         const parentForm = this.form();
         if (!AutoNumericHelper.isNull(parentForm)) {
@@ -4805,6 +4807,18 @@ class AutoNumeric {
             // There is no need to take into account the fact that the number count could be different at the end of the wheel event ; it would be too complex and most of the time unreliable
             this._setSelection(selectionStart, selectionEnd);
         }
+    }
+
+    /**
+     * Handler for 'drop' event
+     *
+     * @param {DragEvent} e
+     */
+    _onDrop(e) {
+        e.preventDefault();
+        const droppedText = e.dataTransfer.getData('text/plain');
+        const cleanedValue = this.unformatOther(droppedText);
+        this.set(cleanedValue);
     }
 
     /**

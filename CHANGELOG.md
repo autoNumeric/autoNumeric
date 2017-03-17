@@ -1,5 +1,14 @@
 ### Change log for autoNumeric:
 
+### "4.0.0-beta.1"
++ Up the current `next` version to `v4` instead of `v3`, just because.
++ Add unit tests for the new `options.*` methods
++ Fix the issue where having `emptyInputBehavior` equal to `always` would not reformat the AutoNumeric element correctly if its value is set to the empty string `''`. 
++ Fix the issue where having `emptyInputBehavior` equal to `zero` would not reformat the AutoNumeric element correctly if its value is set to the empty string `''`. 
++ Fix the `_mergeCurrencySignNegativePositiveSignAndValue()` function that did not manage all `negativePositiveSignPlacement` combinations.
++ Simplify the `_mergeCurrencySignNegativePositiveSignAndValue()` function.
++ Add function chaining to the `options.*` methods.
+
 ### "3.0.0-beta.14"
 + Add unit tests for the new `global.*` features
 + Fix issue #412 Using `set('')` does not respect the `emptyInputBehavior` option when it's set to `'always'`

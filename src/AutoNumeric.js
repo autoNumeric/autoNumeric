@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      3.0.0-beta.14
- * @date         2017-03-14 UTC 11:30
+ * @version      4.0.0-beta.1
+ * @date         2017-03-16 UTC 22:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
@@ -120,9 +120,7 @@ class AutoNumeric {
                 this._createEventListeners();
             }
 
-            if (this.isInputElement && this.settings.readOnly) {
-                this.domElement.readOnly = true;
-            }
+            this._setReadOnly();
         }
 
         // Save the initial values (html attribute + element.value) for the pristine test
@@ -496,115 +494,224 @@ class AutoNumeric {
          * For each options, we define if we need to reformat the element content (does changing the options should change the way its value is displayed?).
          * If yes, then we use the `update()` for force a reformat, otherwise, we just update the `settings` object.
          */
-        this.options = { //FIXME à tester -->
-            digitGroupSeparator          : digitGroupSeparator => {
-                this.update({ digitGroupSeparator });
-            },
-            noSeparatorOnFocus           : noSeparatorOnFocus => {
-                this.update({ noSeparatorOnFocus });
-            },
-            digitalGroupSpacing          : digitalGroupSpacing => {
-                this.update({ digitalGroupSpacing });
-            },
-            decimalCharacter             : decimalCharacter => {
-                this.update({ decimalCharacter });
-            },
-            decimalCharacterAlternative  : decimalCharacterAlternative => {
-                this.settings.decimalCharacterAlternative = decimalCharacterAlternative; //FIXME à tester
-            },
-            currencySymbol               : currencySymbol => {
-                this.update({ currencySymbol });
-            },
-            currencySymbolPlacement      : currencySymbolPlacement => {
-                this.update({ currencySymbolPlacement });
-            },
-            negativePositiveSignPlacement: negativePositiveSignPlacement => {
-                this.update({ negativePositiveSignPlacement });
-            },
-            showPositiveSign             : showPositiveSign => {
-                this.update({ showPositiveSign });
-            },
-            suffixText                   : suffixText => {
-                this.update({ suffixText });
-            },
-            overrideMinMaxLimits         : overrideMinMaxLimits => {
-                this.update({ overrideMinMaxLimits });
-            },
-            maximumValue                 : maximumValue => {
-                this.update({ maximumValue });
-            },
-            minimumValue                 : minimumValue => {
-                this.update({ minimumValue });
-            },
-            decimalPlacesOverride        : decimalPlacesOverride => {
-                this.update({ decimalPlacesOverride });
-            },
-            decimalPlacesShownOnFocus    : decimalPlacesShownOnFocus => {
-                this.update({ decimalPlacesShownOnFocus });
-            },
-            scaleDivisor                 : scaleDivisor => {
-                this.update({ scaleDivisor });
-            },
-            scaleDecimalPlaces           : scaleDecimalPlaces => {
-                this.update({ scaleDecimalPlaces });
-            },
-            scaleSymbol                  : scaleSymbol => {
-                this.update({ scaleSymbol });
-            },
-            saveValueToSessionStorage    : saveValueToSessionStorage => {
-                this.update({ saveValueToSessionStorage });
-            },
-            onInvalidPaste               : onInvalidPaste => {
-                this.settings.onInvalidPaste = onInvalidPaste; //FIXME à tester
-            },
-            roundingMethod               : roundingMethod => {
-                this.update({ roundingMethod });
+        this.options = {
+            /**
+             * Reset any options set previously, by overwriting them with the default settings
+             *
+             * @returns {AutoNumeric}
+             */
+            reset                        : () => {
+                delete this.settings;
+                this.settings = {};
+                this.update(AutoNumeric.defaultSettings);
+
+                return this;
             },
             allowDecimalPadding          : allowDecimalPadding => {
                 this.update({ allowDecimalPadding });
+
+                return this;
             },
-            negativeBracketsTypeOnBlur   : negativeBracketsTypeOnBlur => {
-                this.update({ negativeBracketsTypeOnBlur });
+            createLocalList                : createLocalList => {
+                this.settings.createLocalList = createLocalList; //FIXME à tester
+
+                return this;
             },
-            emptyInputBehavior           : emptyInputBehavior => {
-                this.update({ emptyInputBehavior });
+            currencySymbol               : currencySymbol => {
+                this.update({ currencySymbol });
+
+                return this;
             },
-            leadingZero                  : leadingZero => {
-                this.update({ leadingZero });
+            currencySymbolPlacement      : currencySymbolPlacement => {
+                this.update({ currencySymbolPlacement });
+
+                return this;
             },
-            formatOnPageLoad             : formatOnPageLoad => {
-                this.settings.formatOnPageLoad = formatOnPageLoad; //FIXME à tester
+            decimalCharacter             : decimalCharacter => {
+                this.update({ decimalCharacter });
+
+                return this;
             },
-            selectNumberOnly             : selectNumberOnly => {
-                this.settings.selectNumberOnly = selectNumberOnly; //FIXME à tester
+            decimalCharacterAlternative  : decimalCharacterAlternative => {
+                this.settings.decimalCharacterAlternative = decimalCharacterAlternative; //FIXME à tester
+
+                return this;
+            },
+            decimalPlacesOverride        : decimalPlacesOverride => {
+                this.update({ decimalPlacesOverride });
+
+                return this;
+            },
+            decimalPlacesShownOnFocus    : decimalPlacesShownOnFocus => {
+                this.update({ decimalPlacesShownOnFocus });
+
+                return this;
             },
             defaultValueOverride         : defaultValueOverride => {
                 this.update({ defaultValueOverride });
+
+                return this;
             },
-            unformatOnSubmit             : unformatOnSubmit => {
-                this.settings.unformatOnSubmit = unformatOnSubmit; //FIXME à tester
+            digitalGroupSpacing          : digitalGroupSpacing => {
+                this.update({ digitalGroupSpacing });
+
+                return this;
             },
-            outputFormat                 : outputFormat => {
-                this.settings.outputFormat = outputFormat; //FIXME à tester
+            digitGroupSeparator          : digitGroupSeparator => {
+                this.update({ digitGroupSeparator });
+
+                return this;
+            },
+            emptyInputBehavior           : emptyInputBehavior => {
+                this.update({ emptyInputBehavior });
+
+                return this;
+            },
+            failOnUnknownOption          : failOnUnknownOption => {
+                this.settings.failOnUnknownOption = failOnUnknownOption; //FIXME à tester
+
+                return this;
+            },
+            formatOnPageLoad             : formatOnPageLoad => {
+                this.settings.formatOnPageLoad = formatOnPageLoad; //FIXME à tester
+
+                return this;
             },
             isCancellable                : isCancellable => {
                 this.settings.isCancellable = isCancellable; //FIXME à tester
+
+                return this;
+            },
+            leadingZero                  : leadingZero => {
+                this.update({ leadingZero });
+
+                return this;
+            },
+            maximumValue                 : maximumValue => {
+                this.update({ maximumValue });
+
+                return this;
+            },
+            minimumValue                 : minimumValue => {
+                this.update({ minimumValue });
+
+                return this;
             },
             modifyValueOnWheel           : modifyValueOnWheel => {
                 this.settings.modifyValueOnWheel = modifyValueOnWheel; //FIXME à tester
+
+                return this;
             },
-            wheelStep                    : wheelStep => {
-                this.settings.wheelStep = wheelStep; //FIXME à tester
+            negativeBracketsTypeOnBlur   : negativeBracketsTypeOnBlur => {
+                this.update({ negativeBracketsTypeOnBlur });
+
+                return this;
+            },
+            negativePositiveSignPlacement: negativePositiveSignPlacement => {
+                this.update({ negativePositiveSignPlacement });
+
+                return this;
+            },
+            noEventListeners             : noEventListeners => { //FIXME à tester
+                if (noEventListeners === AutoNumeric.options.noEventListeners.noEvents && this.settings.noEventListeners === AutoNumeric.options.noEventListeners.addEvents) {
+                    // Remove the events once
+                    this._removeEventListeners();
+                }
+
+                this.update({ noEventListeners });
+
+                return this;
+            },
+            noSeparatorOnFocus           : noSeparatorOnFocus => {
+                this.update({ noSeparatorOnFocus });
+
+                return this;
+            },
+            onInvalidPaste               : onInvalidPaste => {
+                this.settings.onInvalidPaste = onInvalidPaste; //FIXME à tester
+
+                return this;
+            },
+            outputFormat                 : outputFormat => {
+                this.settings.outputFormat = outputFormat;
+
+                return this;
+            },
+            overrideMinMaxLimits         : overrideMinMaxLimits => {
+                this.update({ overrideMinMaxLimits });
+
+                return this;
+            },
+            readOnly                     : readOnly => { //FIXME à tester
+                this.settings.readOnly = readOnly;
+                this._setReadOnly();
+
+                return this;
+            },
+            roundingMethod               : roundingMethod => {
+                this.update({ roundingMethod });
+
+                return this;
+            },
+            saveValueToSessionStorage    : saveValueToSessionStorage => {
+                this.update({ saveValueToSessionStorage });
+
+                return this;
+            },
+            scaleDecimalPlaces           : scaleDecimalPlaces => {
+                this.update({ scaleDecimalPlaces });
+
+                return this;
+            },
+            scaleDivisor                 : scaleDivisor => {
+                this.update({ scaleDivisor });
+
+                return this;
+            },
+            scaleSymbol                  : scaleSymbol => {
+                this.update({ scaleSymbol });
+
+                return this;
+            },
+            selectNumberOnly             : selectNumberOnly => {
+                this.settings.selectNumberOnly = selectNumberOnly; //FIXME à tester
+
+                return this;
             },
             serializeSpaces              : serializeSpaces => {
                 this.settings.serializeSpaces = serializeSpaces; //FIXME à tester
+
+                return this;
+            },
+            showPositiveSign             : showPositiveSign => {
+                this.update({ showPositiveSign });
+
+                return this;
             },
             showWarnings                 : showWarnings => {
                 this.settings.showWarnings = showWarnings; //FIXME à tester
+
+                return this;
             },
-            //FIXME Add the noEventListeners and readOnly options too?
-            failOnUnknownOption          : failOnUnknownOption => {
-                this.settings.failOnUnknownOption = failOnUnknownOption; //FIXME à tester
+            suffixText                   : suffixText => {
+                this.update({ suffixText });
+
+                return this;
+            },
+            unformatOnHover              : unformatOnHover => {
+                this.settings.unformatOnHover = unformatOnHover; //FIXME à tester
+
+                return this;
+            },
+            unformatOnSubmit             : unformatOnSubmit => {
+                this.settings.unformatOnSubmit = unformatOnSubmit; //FIXME à tester
+
+                return this;
+            },
+            wheelStep                    : wheelStep => {
+                this.settings.wheelStep = wheelStep; //FIXME à tester
+
+                return this;
             },
         };
     }
@@ -615,7 +722,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '3.0.0-beta.14';
+        return '4.0.0-beta.1';
     }
 
     /**
@@ -820,6 +927,17 @@ class AutoNumeric {
         }
     }
 
+    /**
+     * Set the element attribute 'readonly' according to the current settings.
+     *
+     * @private
+     */
+    _setReadOnly() {
+        if (this.isInputElement && this.settings.readOnly) {
+            this.domElement.readOnly = true;
+        }
+    }
+
     // This are the public function available on each autoNumeric-managed element
 
     /**
@@ -850,9 +968,8 @@ class AutoNumeric {
         }
 
         // Reformat the input value with the new settings
-        if (AutoNumericHelper.getElementValue(this.domElement) !== '') {
-            this.set(numericString);
-        }
+        // Note: we always `set`, even when `numericString` is the empty string '', since `emptyInputBehavior` (set to `always` or `zero`) can change how the empty input is formatted
+        this.set(numericString);
 
         return this;
     }
@@ -903,6 +1020,11 @@ class AutoNumeric {
             this.settings.rawValue = '';
 
             return this;
+        }
+        
+        if (value === '' && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {
+            // Keep the value zero inside the element
+            value = 0;
         }
 
         if (value !== '') {
@@ -982,6 +1104,7 @@ class AutoNumeric {
                 return this;
             }
         } else {
+            // Here, value === ''
             let result;
             if (this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.always) {
                 // Keep the currency symbol as per emptyInputBehavior
@@ -3351,70 +3474,49 @@ class AutoNumeric {
      * @private
      */
     static _mergeCurrencySignNegativePositiveSignAndValue(inputValue, settings, isValueNegative, isZeroOrHasNoValue) {
+        let signToUse = '';
+        if (isValueNegative) {
+            signToUse = settings.negativeSignCharacter;
+        } else if (settings.showPositiveSign && !isZeroOrHasNoValue) {
+            signToUse = settings.positiveSignCharacter;
+        }
+
         let result;
         if (settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix) {
-            if (isValueNegative) {
+            if (settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.none &&
+                (isValueNegative || (!isValueNegative && settings.showPositiveSign && !isZeroOrHasNoValue))) {
                 switch (settings.negativePositiveSignPlacement) {
+                    case AutoNumeric.options.negativePositiveSignPlacement.prefix:
                     case AutoNumeric.options.negativePositiveSignPlacement.left:
-                        result = `${settings.negativeSignCharacter}${settings.currencySymbol}${inputValue}`;
+                        result = `${signToUse}${settings.currencySymbol}${inputValue}`;
                         break;
                     case AutoNumeric.options.negativePositiveSignPlacement.right:
-                        result = `${settings.currencySymbol}${settings.negativeSignCharacter}${inputValue}`;
+                        result = `${settings.currencySymbol}${signToUse}${inputValue}`;
                         break;
                     case AutoNumeric.options.negativePositiveSignPlacement.suffix:
-                        result = `${settings.currencySymbol}${inputValue}${settings.negativeSignCharacter}`;
+                        result = `${settings.currencySymbol}${inputValue}${signToUse}`;
                         settings.trailingNegative = true;
                         break;
-                    default :
-                        AutoNumericHelper.throwError(`The 'negativePositiveSignPlacement' options is invalid.`);
-                }
-            } else if (settings.showPositiveSign && !isZeroOrHasNoValue) {
-                switch (settings.negativePositiveSignPlacement) {
-                    case AutoNumeric.options.negativePositiveSignPlacement.left:
-                        result = `${settings.positiveSignCharacter}${settings.currencySymbol}${inputValue}`;
-                        break;
-                    case AutoNumeric.options.negativePositiveSignPlacement.right:
-                        result = `${settings.currencySymbol}${settings.positiveSignCharacter}${inputValue}`;
-                        break;
-                    case AutoNumeric.options.negativePositiveSignPlacement.suffix:
-                        result = `${settings.currencySymbol}${inputValue}${settings.positiveSignCharacter}`;
-                        break;
-                    default :
-                        AutoNumericHelper.throwError(`The 'negativePositiveSignPlacement' options is invalid.`);
                 }
             } else {
                 result = settings.currencySymbol + inputValue;
             }
         } else if (settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
-            if (isValueNegative) {
+            if (settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.none &&
+                (isValueNegative || (!isValueNegative && settings.showPositiveSign && !isZeroOrHasNoValue))) {
                 switch (settings.negativePositiveSignPlacement) {
+                    case AutoNumeric.options.negativePositiveSignPlacement.suffix:
                     case AutoNumeric.options.negativePositiveSignPlacement.right:
-                        result = `${inputValue}${settings.currencySymbol}${settings.negativeSignCharacter}`;
+                        result = `${inputValue}${settings.currencySymbol}${signToUse}`;
                         settings.trailingNegative = true;
                         break;
                     case AutoNumeric.options.negativePositiveSignPlacement.left:
-                        result = `${inputValue}${settings.negativeSignCharacter}${settings.currencySymbol}`;
+                        result = `${inputValue}${signToUse}${settings.currencySymbol}`;
                         settings.trailingNegative = true;
                         break;
                     case AutoNumeric.options.negativePositiveSignPlacement.prefix:
-                        result = `${settings.negativeSignCharacter}${inputValue}${settings.currencySymbol}`;
+                        result = `${signToUse}${inputValue}${settings.currencySymbol}`;
                         break;
-                    default :
-                        AutoNumericHelper.throwError(`The 'negativePositiveSignPlacement' options is invalid.`);
-                }
-            } else if (settings.showPositiveSign && !isZeroOrHasNoValue) {
-                switch (settings.negativePositiveSignPlacement) {
-                    case AutoNumeric.options.negativePositiveSignPlacement.right:
-                        result = `${inputValue}${settings.currencySymbol}${settings.positiveSignCharacter}`;
-                        break;
-                    case AutoNumeric.options.negativePositiveSignPlacement.left:
-                        result = `${inputValue}${settings.positiveSignCharacter}${settings.currencySymbol}`;
-                        break;
-                    case AutoNumeric.options.negativePositiveSignPlacement.prefix:
-                        result = `${settings.positiveSignCharacter}${inputValue}${settings.currencySymbol}`;
-                        break;
-                    default :
-                        AutoNumericHelper.throwError(`The 'negativePositiveSignPlacement' options is invalid.`);
                 }
             } else {
                 result = inputValue + settings.currencySymbol;
@@ -6621,8 +6723,8 @@ AutoNumeric.defaultSettings = {
     negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
 
     /* Defines if the element should have event listeners activated on it.
-     * By default, those event listeners are only added to <input> elements, but not on the other html tags.
-     * This allows to initialize <input> elements without any event listeners.
+     * By default, those event listeners are only added to <input> elements and html element with the `contenteditable` attribute set to `true`, but not on the other html tags.
+     * This allows to initialize elements without any event listeners.
      * Warning: Since AutoNumeric will not check the input content after its initialization, using some autoNumeric methods will probably leads to formatting problems.
      */
     noEventListeners: AutoNumeric.options.noEventListeners.addEvents,

@@ -2524,6 +2524,118 @@ describe(`autoNumeric initialization calls`, () => {
     });
 });
 
+describe('autoNumeric `options.*` calls', () => {
+    let aNInput;
+    let newInput;
+
+    beforeEach(() => { // Initialization
+        newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+    });
+
+    afterEach(() => { // Un-initialization
+        aNInput.remove();
+        document.body.removeChild(newInput);
+    });
+
+    it('should correctly update the single option', () => {
+        aNInput = new AutoNumeric(newInput, 1146789.02, AutoNumeric.predefinedOptions.French);
+        expect(aNInput.getNumericString()).toEqual('1146789.02');
+        expect(aNInput.getFormatted()).toEqual('1.146.789,02\u202f€');
+
+        aNInput.options.digitGroupSeparator(AutoNumeric.options.digitGroupSeparator.apostrophe);
+        expect(aNInput.getFormatted()).toEqual(`1'146'789,02\u202f€`);
+        aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.two);
+        expect(aNInput.getFormatted()).toEqual(`11'46'789,02\u202f€`);
+        aNInput.options.decimalCharacter(AutoNumeric.options.decimalCharacter.middleDot);
+        expect(aNInput.getFormatted()).toEqual(`11'46'789·02\u202f€`);
+        aNInput.options.currencySymbol(AutoNumeric.options.currencySymbol.franc);
+        expect(aNInput.getFormatted()).toEqual(`11'46'789·02₣`);
+        aNInput.options.currencySymbolPlacement(AutoNumeric.options.currencySymbolPlacement.prefix);
+        expect(aNInput.getFormatted()).toEqual(`₣11'46'789·02`);
+        aNInput.options.showPositiveSign(AutoNumeric.options.showPositiveSign.show);
+        expect(aNInput.getFormatted()).toEqual(`+₣11'46'789·02`);
+
+        aNInput.options.reset().french().set(-1234567.89);
+        expect(aNInput.getFormatted()).toEqual('-1.234.567,89\u202f€');
+        aNInput.options.negativePositiveSignPlacement(AutoNumeric.options.negativePositiveSignPlacement.suffix);
+        expect(aNInput.getFormatted()).toEqual('1.234.567,89\u202f€-');
+        aNInput.options.suffixText(AutoNumeric.options.suffixText.percentage);
+        expect(aNInput.getFormatted()).toEqual('1.234.567,89\u202f€-%');
+        aNInput.options.suffixText(AutoNumeric.options.suffixText.none);
+        expect(aNInput.getFormatted()).toEqual('1.234.567,89\u202f€-');
+
+
+        expect(() => aNInput.set(12345.67)).not.toThrow();
+        expect(() => aNInput.options.maximumValue(AutoNumeric.options.maximumValue.zero)).toThrow();
+        expect(() => aNInput.set(10)).toThrow();
+        expect(() => aNInput.set(-1234567.89)).not.toThrow();
+        aNInput.options.minimumValue(AutoNumeric.options.minimumValue.oneBillion);
+        expect(() => aNInput.set(-4567.89)).not.toThrow();
+        spyOn(console, 'warn');
+        aNInput.options.maximumValue(10000);
+        expect(() => aNInput.options.minimumValue(AutoNumeric.options.minimumValue.zero)).toThrow();
+        expect(() => aNInput.set(4567.89)).not.toThrow();
+        expect(console.warn).toHaveBeenCalled();
+        expect(() => aNInput.set(-1)).toThrow();
+
+        aNInput.options.reset().french().set(-1234567.89);
+        aNInput.options.decimalPlacesOverride(4);
+        expect(aNInput.getFormatted()).toEqual('-1.234.567,8900\u202f€');
+        aNInput.options.scaleDivisor(AutoNumeric.options.scaleDivisor.percentage);
+        aNInput.options.scaleDecimalPlaces(3);
+        aNInput.options.scaleSymbol(AutoNumeric.options.scaleSymbol.percentage);
+        expect(aNInput.getFormatted()).toEqual('-12.345,679\u202f€%');
+
+        aNInput.options.reset().french().set(-1234567.846);
+        expect(aNInput.getFormatted()).toEqual('-1.234.567,85\u202f€');
+        //FIXME Test all the rounding methods
+        aNInput.options.roundingMethod(AutoNumeric.options.roundingMethod.downRoundTowardZero);
+        aNInput.set(-1234567.846);
+        expect(aNInput.getFormatted()).toEqual('-1.234.567,84\u202f€');
+
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.padding);
+        aNInput.set(-1234567);
+        expect(aNInput.getFormatted()).toEqual('-1.234.567,00\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.noPadding);
+        expect(aNInput.getFormatted()).toEqual('-1.234.567\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.padding);
+
+        aNInput.set('');
+        aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.focus);
+        expect(aNInput.getFormatted()).toEqual('');
+        aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.press);
+        expect(aNInput.getFormatted()).toEqual('');
+        aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.always);
+        expect(aNInput.getFormatted()).toEqual('\u202f€');
+        aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.zero);
+        expect(aNInput.getFormatted()).toEqual('0,00\u202f€');
+
+        aNInput.options.reset().french().set(-1234567.89);
+        aNInput.options.leadingZero(AutoNumeric.options.leadingZero.deny);
+        aNInput.set('000001.2345');
+        expect(aNInput.getFormatted()).toEqual('1,23\u202f€');
+        aNInput.options.leadingZero(AutoNumeric.options.leadingZero.keep);
+        expect(aNInput.getFormatted()).toEqual('1,23\u202f€');
+        aNInput.set('000001.2345');
+        expect(aNInput.getFormatted()).toEqual('000.001,23\u202f€');
+
+        aNInput.set(-12356.78);
+        expect(aNInput.getLocalized()).toEqual('-12356.78');
+        aNInput.options.outputFormat(AutoNumeric.options.outputFormat.dotNegative);
+        expect(aNInput.getLocalized()).toEqual('12356.78-');
+        aNInput.options.outputFormat(AutoNumeric.options.outputFormat.negativeComma);
+        expect(aNInput.getLocalized()).toEqual('-12356,78');
+
+        // Test function chaining on `options.*`
+        aNInput.options.reset().french().set(6666);
+        expect(aNInput.getFormatted()).toEqual('6.666,00\u202f€');
+        aNInput.options.digitGroupSeparator(AutoNumeric.options.digitGroupSeparator.narrowNoBreakSpace)
+            .options.decimalCharacter(AutoNumeric.options.decimalCharacter.decimalSeparatorKeySymbol);
+        expect(aNInput.getFormatted()).toEqual('6\u202f666⎖00\u202f€');
+    });
+});
+
 describe(`autoNumeric 'getNumericString', 'getLocalized' and 'getNumber' methods`, () => {
     let aNInput;
     let newInput;

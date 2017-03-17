@@ -12,7 +12,7 @@ autoNumeric is a standalone Javascript library that provides live *as-you-type* 
 <br>
 [![Gitter chat][gitter-image]][gitter-url]
 
-The latest stable branch is [3.*](https://github.com/BobKnothe/autoNumeric/tree/master).<br>For older stable versions, please take a look [here](#older-versions), while for the latest development version, check the `next` [branch](https://github.com/BobKnothe/autoNumeric/tree/next).<br><br>
+The latest stable branch is [4.*](https://github.com/BobKnothe/autoNumeric/tree/master).<br>For older stable versions, please take a look [here](#older-versions), while for the latest development version, check the `next` [branch](https://github.com/BobKnothe/autoNumeric/tree/next).<br><br>
 Moreover, you can take a look at what could be the next features coming to autoNumeric on our [project](https://github.com/BobKnothe/autoNumeric/projects) page *(feel free to participate!)*.
 
 #### Highlights
@@ -356,6 +356,12 @@ anElement.update(AutoNumeric.getPredefinedOptions().NorthAmerican); // Update th
 ```js
 anElement.options.minimumValue('12343567.89');
 anElement.options.allowDecimalPadding(false);
+```
+
+At any point, you can reset the options by calling the `options.reset()` method.
+This effectively drop any previous options you could have set, then load back the default settings.
+```js
+anElement.options.reset();
 ```
 
 Lastly, the option object can be accessed directly, thus allowing to query each options globally too

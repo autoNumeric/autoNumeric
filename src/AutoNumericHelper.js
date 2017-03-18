@@ -1137,6 +1137,11 @@ export default class AutoNumericHelper {
      * @returns {*}
      */
     static trimPaddedZerosFromDecimalPlaces(numericString) {
+        numericString = String(numericString);
+        if (numericString === '') {
+            return '';
+        }
+
         const [integerPart, decimalPart] = numericString.split('.');
         if (this.isUndefinedOrNullOrEmpty(decimalPart)) {
             return integerPart;

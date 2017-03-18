@@ -1176,42 +1176,9 @@ class AutoNumeric {
      * @returns {string}
      */
     getNumericString() {
-        let value = AutoNumericHelper.getElementValue(this.domElement);
-
-        if (this.settings.decimalPlacesShownOnFocus || this.settings.scaleDivisor) {
-            value = this.settings.rawValue;
-        } else {
-            // Test if the value is negative
-            const isValueNegative = AutoNumericHelper.isNegative(value);
-
-            if (!(/\d/).test(value) && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus) {
-                return '';
-            }
-
-            if (value !== '' && this.settings.negativeBracketsTypeOnBlur !== null) {
-                value = this.constructor._removeBrackets(value, this.settings);
-            }
-
-            if (this.runOnce || this.settings.formatOnPageLoad === false) {
-                // Strips trailing negative symbol
-                value = this.constructor._stripAllNonNumberCharacters(value, this.settings, true);
-                // Trims leading and trailing zeros when leadingZero does NOT equal "keep".
-                value = this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.'));
-
-                // Places the negative symbol in front of the trailing negative
-                if (this.settings.trailingNegative && isValueNegative && !AutoNumericHelper.isNegative(value) && Number(value) !== 0) {
-                    value = `-${value}`;
-                }
-            }
-
-            if (value !== '' || (value === '' && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero)) {
-                value = this._modifyNegativeSignAndDecimalCharacterForRawValue(value);
-            }
-        }
-
         // Always return a numeric string
         // The following statement gets rid of the trailing zeros in the decimal places since the current method does not pad decimals
-        return AutoNumericHelper.trimPaddedZerosFromDecimalPlaces(value);
+        return AutoNumericHelper.trimPaddedZerosFromDecimalPlaces(this.settings.rawValue);
     }
 
     /**

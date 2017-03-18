@@ -3391,11 +3391,6 @@ class AutoNumeric {
             inputValue = this._stripAllNonNumberCharacters(inputValue, settings, false);
         }
 
-        //TODO This function `addGroupSeparators()` add group separators. Adding the negative sign as well is out of its scope. Move that to another function.
-        if (settings.trailingNegative && !AutoNumericHelper.isNegative(inputValue)) {
-            inputValue = '-' + inputValue;
-        }
-
         const empty = this._checkEmpty(inputValue, settings, true);
         const isValueNegative = AutoNumericHelper.isNegative(inputValue);
         const isZeroOrHasNoValue = AutoNumericHelper.isZeroOrHasNoValue(inputValue);
@@ -4242,8 +4237,7 @@ class AutoNumeric {
         }
 
         if ((e.type === 'mouseleave' && !this.isFocused) || e.type === 'blur') {
-            let value = AutoNumericHelper.getElementValue(e.target);
-            const origValue = value;
+            const origValue = this.settings.rawValue;
             this.settings.hasFocus = false;
 
             if (this.settings.saveValueToSessionStorage) {
@@ -4262,16 +4256,10 @@ class AutoNumeric {
                 this.settings.negativeBracketsTypeOnBlur = this.originalNegativeBracketsTypeOnBlur;
             }
 
-            value = this.constructor._stripAllNonNumberCharacters(value, this.settings, true);
-
-            if (value !== '') {
-                if (this.settings.trailingNegative && !AutoNumericHelper.isNegative(value)) {
-                    value = '-' + value;
-                    this.settings.trailingNegative = false;
-                }
-
-                const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(value, this.settings);
-                if (this.constructor._checkEmpty(value, this.settings, false) === null && minTest && maxTest) {
+            let value = this.settings.rawValue;
+            if (this.settings.rawValue !== '') {
+                const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(this.settings.rawValue, this.settings);
+                if (this.constructor._checkEmpty(this.settings.rawValue, this.settings, false) === null && minTest && maxTest) {
                     value = this._modifyNegativeSignAndDecimalCharacterForRawValue(value);
                     this.settings.rawValue = this._cleanLeadingTrailingZeros(value);
 
@@ -4290,8 +4278,6 @@ class AutoNumeric {
                     if (!maxTest) {
                         AutoNumericHelper.triggerEvent('autoNumeric:maxExceeded', this.domElement);
                     }
-
-                    value = this.settings.rawValue;
                 }
             } else {
                 if (this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {

@@ -32,6 +32,9 @@
 
 // Note : A list of named keys can be found here : https://github.com/webdriverio/webdriverio/blob/master/lib/helpers/constants.js#L67
 
+// High default timeout need when debugging the tests
+/* eslint no-undef: 0 */
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
 //-----------------------------------------------------------------------------
 // ---- Configuration
@@ -1268,6 +1271,71 @@ describe('Negative numbers & brackets notations', () => {
         expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('(1.234,57 €)');
         expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('(1.234,57 €)');
         expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('(1.234,57 €)');
+    });
+
+    it('should correctly remove the brackets when the value is set to a positive one (Issue #414)', () => {
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+        const negativeBracketsInput2 = $(selectors.negativeBracketsInput2);
+        const negativeBracketsInput3 = $(selectors.negativeBracketsInput3);
+        const negativeBracketsInput4 = $(selectors.negativeBracketsInput4);
+        const negativeBracketsInput5 = $(selectors.negativeBracketsInput5);
+        const negativeBracketsInput6 = $(selectors.negativeBracketsInput6);
+        const negativeBracketsInput7 = $(selectors.negativeBracketsInput7);
+        const negativeBracketsInput8 = $(selectors.negativeBracketsInput8);
+
+        // Focus in the input
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+        browser.keys(['Escape', 'Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+
+        negativeBracketsInput2.click();
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57-');
+        browser.keys(['Escape', 'Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+
+        negativeBracketsInput3.click();
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ -1.234,57');
+        browser.keys(['Escape', 'Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+
+        negativeBracketsInput4.click();
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('-€ 1.234,57');
+        browser.keys(['Escape', 'Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+
+        negativeBracketsInput5.click();
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+        browser.keys(['Escape', 'Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+
+        negativeBracketsInput6.click();
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57- €');
+        browser.keys(['Escape', 'Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+
+        negativeBracketsInput7.click();
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €-');
+        browser.keys(['Escape', 'Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+
+        negativeBracketsInput8.click();
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('-1.234,57 €');
+        browser.keys(['Escape', 'Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
+
+        // Focus elsewhere
+        $(selectors.negativeBrackets1).click();
+
+        // Check that the values are correctly formatted when unfocused
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
     });
 });
 

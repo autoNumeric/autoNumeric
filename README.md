@@ -73,7 +73,7 @@ Simply include **autoNumeric** in your html `<header>` tag.<br>No other files or
 ```html
 <script src="autoNumeric.min.js" type="text/javascript"></script>
 <!-- ...or, you may also directly use a CDN :-->
-<script src="https://cdn.jsdelivr.net/autonumeric/3.0.0/autoNumeric.min.js"></script>
+<script src="https://cdn.jsdelivr.net/autonumeric/4.0.0/autoNumeric.min.js"></script>
 ```
 
 #### In another script
@@ -299,7 +299,7 @@ An AutoNumeric object can be initialized in various ways.
 
 It always takes either a DOM element reference as its first argument, or a css string selector.<br>
 *Note: only one element can be selected this way, since under the hood `document.querySelector` is called, and this only return one element.*<br>
-*If you need to be able to select and initialize multiple elements in one call, then consider using the static `AutoNumeric.multiple()` function*
+*If you need to be able to select and initialize multiple elements in one call, then consider using the static [`AutoNumeric.multiple()`](#initialize-multiple-autonumeric-objects-at-once) function*
 
 ```js
 anElement = new AutoNumeric(domElement); // With the default options
@@ -323,7 +323,7 @@ anElement = new AutoNumeric('.myCssClass > input', 12345.789, { options });
 anElement = new AutoNumeric('.myCssClass > input', null, { options }); // With a null initial value
 anElement = new AutoNumeric('.myCssClass > input', 12345.789).french({ options });
 ```
-*Note: AutoNumeric also accepts a limited tag list that it will format on page load, but without adding any event listeners*
+*Note: AutoNumeric also accepts a [limited tag list](#on-other-dom-elements) that it will format on page load, but without adding any event listeners if their `contenteditable` attribute is not set to `true`*
 
 ### Initialize multiple AutoNumeric objects at once
 If you know you want to initialize multiple elements in one call, you must then use the static `AutoNumeric.multiple()` function:
@@ -543,11 +543,18 @@ For the following methods, the callback is mandatory:
 Most of those functions can be chained which allow to be less verbose and more concise.
 
 ```js
+// On one element
 anElement.french()
          .set(42)
          .update({ options })
          .formSubmitJsonNumericString(callback)
          .clear();
+
+// On multiple elements
+anElement.global.set(72)
+         .global.clear()
+         .set(25)
+         .global.getNumericString();
 ```
 
 #### Static methods

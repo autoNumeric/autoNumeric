@@ -3541,6 +3541,7 @@ class AutoNumeric {
             settings.roundingMethod === AutoNumeric.options.roundingMethod.downToNext05) {
             switch (settings.roundingMethod) {
                 case AutoNumeric.options.roundingMethod.toNearest05:
+                case AutoNumeric.options.roundingMethod.toNearest05Alt:
                     inputValue = (Math.round(inputValue * 20) / 20).toString();
                     break;
                 case AutoNumeric.options.roundingMethod.upToNext05:

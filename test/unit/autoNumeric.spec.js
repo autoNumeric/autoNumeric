@@ -2636,6 +2636,314 @@ describe('autoNumeric `options.*` calls', () => {
     });
 });
 
+describe(`autoNumeric 'roundingMethod' option`, () => {
+    let aNInput;
+    let newInput;
+
+    beforeEach(() => { // Initialization
+        newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+        aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+    });
+
+    afterEach(() => { // Un-initialization
+        aNInput.remove();
+        document.body.removeChild(newInput);
+    });
+
+    it('should round correctly with the method halfUpSymmetric', () => {
+        expect(aNInput.getSettings().roundingMethod).toEqual(AutoNumeric.options.roundingMethod.halfUpSymmetric);
+        // Positive values
+        aNInput.set(1119.444);
+        expect(aNInput.getFormatted()).toEqual('1,119.44');
+        aNInput.set(1119.445);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.995);
+        expect(aNInput.getFormatted()).toEqual('1,120.00');
+        // Negative values
+        aNInput.set(-1119.444);
+        expect(aNInput.getFormatted()).toEqual('-1,119.44');
+        aNInput.set(-1119.445);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.995);
+        expect(aNInput.getFormatted()).toEqual('-1,120.00');
+    });
+
+    it('should round correctly with the method halfUpAsymmetric', () => {
+        aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.halfUpAsymmetric });
+        // Positive values
+        aNInput.set(1119.444);
+        expect(aNInput.getFormatted()).toEqual('1,119.44');
+        aNInput.set(1119.445);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.995);
+        expect(aNInput.getFormatted()).toEqual('1,120.00');
+        // Negative values
+        aNInput.set(-1119.444);
+        expect(aNInput.getFormatted()).toEqual('-1,119.44');
+        aNInput.set(-1119.445);
+        expect(aNInput.getFormatted()).toEqual('-1,119.44');
+        aNInput.set(-1119.995);
+        expect(aNInput.getFormatted()).toEqual('-1,119.99');
+    });
+
+    it('should round correctly with the method halfDownSymmetric', () => {
+        aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.halfDownSymmetric });
+        // Positive values
+        aNInput.set(1119.444);
+        expect(aNInput.getFormatted()).toEqual('1,119.44');
+        aNInput.set(1119.445);
+        expect(aNInput.getFormatted()).toEqual('1,119.44');
+        aNInput.set(1119.995);
+        expect(aNInput.getFormatted()).toEqual('1,119.99');
+        // Negative values
+        aNInput.set(-1119.444);
+        expect(aNInput.getFormatted()).toEqual('-1,119.44');
+        aNInput.set(-1119.445);
+        expect(aNInput.getFormatted()).toEqual('-1,119.44');
+        aNInput.set(-1119.995);
+        expect(aNInput.getFormatted()).toEqual('-1,119.99');
+    });
+
+    it('should round correctly with the method halfDownAsymmetric', () => {
+        aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.halfDownAsymmetric });
+        // Positive values
+        aNInput.set(1119.444);
+        expect(aNInput.getFormatted()).toEqual('1,119.44');
+        aNInput.set(1119.445);
+        expect(aNInput.getFormatted()).toEqual('1,119.44');
+        aNInput.set(1119.995);
+        expect(aNInput.getFormatted()).toEqual('1,119.99');
+        // Negative values
+        aNInput.set(-1119.444);
+        expect(aNInput.getFormatted()).toEqual('-1,119.44');
+        aNInput.set(-1119.445);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.995);
+        expect(aNInput.getFormatted()).toEqual('-1,120.00');
+    });
+
+    it('should round correctly with the method halfEvenBankersRounding', () => {
+        aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.halfEvenBankersRounding });
+        // Positive values
+        aNInput.set(1119.444);
+        expect(aNInput.getFormatted()).toEqual('1,119.44');
+        aNInput.set(1119.445);
+        expect(aNInput.getFormatted()).toEqual('1,119.44');
+        aNInput.set(1119.446);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.454);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.455);
+        expect(aNInput.getFormatted()).toEqual('1,119.46');
+        aNInput.set(1119.456);
+        expect(aNInput.getFormatted()).toEqual('1,119.46');
+        aNInput.set(1119.994);
+        expect(aNInput.getFormatted()).toEqual('1,119.99');
+        aNInput.set(1119.995);
+        expect(aNInput.getFormatted()).toEqual('1,120.00');
+        // Negative values
+        aNInput.set(-1119.444);
+        expect(aNInput.getFormatted()).toEqual('-1,119.44');
+        aNInput.set(-1119.445);
+        expect(aNInput.getFormatted()).toEqual('-1,119.44');
+        aNInput.set(-1119.446);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.454);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.455);
+        expect(aNInput.getFormatted()).toEqual('-1,119.46');
+        aNInput.set(-1119.456);
+        expect(aNInput.getFormatted()).toEqual('-1,119.46');
+        aNInput.set(-1119.994);
+        expect(aNInput.getFormatted()).toEqual('-1,119.99');
+        aNInput.set(-1119.995);
+        expect(aNInput.getFormatted()).toEqual('-1,120.00');
+    });
+
+    it('should round correctly with the method upRoundAwayFromZero', () => {
+        aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.upRoundAwayFromZero });
+        // Positive values
+        aNInput.set(1119.444);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.445);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.995);
+        expect(aNInput.getFormatted()).toEqual('1,120.00');
+        // Negative values
+        aNInput.set(-1119.444);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.445);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.995);
+        expect(aNInput.getFormatted()).toEqual('-1,120.00');
+    });
+
+    it('should round correctly with the method downRoundTowardZero', () => {
+        aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.downRoundTowardZero });
+        // Positive values
+        aNInput.set(1119.444);
+        expect(aNInput.getFormatted()).toEqual('1,119.44');
+        aNInput.set(1119.445);
+        expect(aNInput.getFormatted()).toEqual('1,119.44');
+        aNInput.set(1119.995);
+        expect(aNInput.getFormatted()).toEqual('1,119.99');
+        // Negative values
+        aNInput.set(-1119.444);
+        expect(aNInput.getFormatted()).toEqual('-1,119.44');
+        aNInput.set(-1119.445);
+        expect(aNInput.getFormatted()).toEqual('-1,119.44');
+        aNInput.set(-1119.995);
+        expect(aNInput.getFormatted()).toEqual('-1,119.99');
+    });
+
+    it('should round correctly with the method toCeilingTowardPositiveInfinity', () => {
+        aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.toCeilingTowardPositiveInfinity });
+        // Positive values
+        aNInput.set(1119.444);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.445);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.995);
+        expect(aNInput.getFormatted()).toEqual('1,120.00');
+        // Negative values
+        aNInput.set(-1119.444);
+        expect(aNInput.getFormatted()).toEqual('-1,119.44');
+        aNInput.set(-1119.445);
+        expect(aNInput.getFormatted()).toEqual('-1,119.44');
+        aNInput.set(-1119.995);
+        expect(aNInput.getFormatted()).toEqual('-1,119.99');
+    });
+
+    it('should round correctly with the method toFloorTowardNegativeInfinity', () => {
+        aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.toFloorTowardNegativeInfinity });
+        // Positive values
+        aNInput.set(1119.444);
+        expect(aNInput.getFormatted()).toEqual('1,119.44');
+        aNInput.set(1119.445);
+        expect(aNInput.getFormatted()).toEqual('1,119.44');
+        aNInput.set(1119.995);
+        expect(aNInput.getFormatted()).toEqual('1,119.99');
+        // Negative values
+        aNInput.set(-1119.444);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.445);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.995);
+        expect(aNInput.getFormatted()).toEqual('-1,120.00');
+    });
+
+    it('should round correctly with the method toNearest05', () => {
+        aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.toNearest05 });
+        // Positive values
+        aNInput.set(1119.474);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.475);
+        expect(aNInput.getFormatted()).toEqual('1,119.50');
+        aNInput.set(1119.995);
+        expect(aNInput.getFormatted()).toEqual('1,120.00');
+        // Negative values
+        aNInput.set(-1119.474);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.475);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.476);
+        expect(aNInput.getFormatted()).toEqual('-1,119.50');
+        aNInput.set(-1119.995);
+        expect(aNInput.getFormatted()).toEqual('-1,120.00');
+    });
+
+    it('should round correctly with the method toNearest05Alt', () => {
+        aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.toNearest05Alt });
+        // Positive values
+        aNInput.set(1119.474);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.475);
+        expect(aNInput.getFormatted()).toEqual('1,119.50');
+        aNInput.set(1119.995);
+        expect(aNInput.getFormatted()).toEqual('1,120.00');
+        // Negative values
+        aNInput.set(-1119.474);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.475);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.476);
+        expect(aNInput.getFormatted()).toEqual('-1,119.50');
+        aNInput.set(-1119.995);
+        expect(aNInput.getFormatted()).toEqual('-1,120.00');
+    });
+
+    it('should round correctly with the method upToNext05', () => {
+        aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.upToNext05 });
+        // Positive values
+        aNInput.set(1119.44);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.45);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.451);
+        expect(aNInput.getFormatted()).toEqual('1,119.50');
+        aNInput.set(1119.46);
+        expect(aNInput.getFormatted()).toEqual('1,119.50');
+        aNInput.set(1119.99);
+        expect(aNInput.getFormatted()).toEqual('1,120.00');
+        // Negative values
+        aNInput.set(-1119.44);
+        expect(aNInput.getFormatted()).toEqual('-1,119.40');
+        aNInput.set(-1119.449);
+        expect(aNInput.getFormatted()).toEqual('-1,119.40');
+        aNInput.set(-1119.45);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.46);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.47);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.48);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.499);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.999);
+        expect(aNInput.getFormatted()).toEqual('-1,119.95');
+    });
+
+    it('should round correctly with the method downToNext05', () => {
+        aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.downToNext05 });
+        // Positive values
+        aNInput.set(1119.44);
+        expect(aNInput.getFormatted()).toEqual('1,119.40');
+        aNInput.set(1119.45);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.451);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.46);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.499);
+        expect(aNInput.getFormatted()).toEqual('1,119.45');
+        aNInput.set(1119.99);
+        expect(aNInput.getFormatted()).toEqual('1,119.95');
+        aNInput.set(1119.999);
+        expect(aNInput.getFormatted()).toEqual('1,119.95');
+        // Negative values
+        aNInput.set(-1119.44);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.449);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.45);
+        expect(aNInput.getFormatted()).toEqual('-1,119.45');
+        aNInput.set(-1119.451);
+        expect(aNInput.getFormatted()).toEqual('-1,119.50');
+        aNInput.set(-1119.46);
+        expect(aNInput.getFormatted()).toEqual('-1,119.50');
+        aNInput.set(-1119.47);
+        expect(aNInput.getFormatted()).toEqual('-1,119.50');
+        aNInput.set(-1119.48);
+        expect(aNInput.getFormatted()).toEqual('-1,119.50');
+        aNInput.set(-1119.499);
+        expect(aNInput.getFormatted()).toEqual('-1,119.50');
+        aNInput.set(-1119.999);
+        expect(aNInput.getFormatted()).toEqual('-1,120.00');
+    });
+});
+
 describe(`autoNumeric 'getNumericString', 'getLocalized' and 'getNumber' methods`, () => {
     let aNInput;
     let newInput;

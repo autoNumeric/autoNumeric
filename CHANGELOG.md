@@ -1,5 +1,10 @@
 ### Change log for autoNumeric:
 
+### "2.0.10"
++ Fix issue #417 Error thrown in PhantomJS 2.1.1 on Linux under CI Environment
++ Fix the end-to-end tests for issue #403
++ Fix the webdriver.io configuration for the links to jQuery and AutoNumeric libraries
+
 ### "2.0.9"
 + Fix issue #401 autoNumeric 2.0.8 prevents IE11 from entering the decimal character from the numpad
 + Fix issue #403 autoNumeric 2.0.8 scaling option when the divisor is less than zero and the input receives focus multiple times  

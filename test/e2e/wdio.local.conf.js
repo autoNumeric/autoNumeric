@@ -131,7 +131,7 @@ exports.config = {
         // Libraries
         {
             mount: '/jquery',
-            path: './node_modules/jquery/dist/jquery.min.js',
+            path: './node_modules/jquery/dist/jquery.js',
         },
         {
             mount: '/autonumeric',

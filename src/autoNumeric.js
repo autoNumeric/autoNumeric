@@ -1,8 +1,8 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0.9
- * @date         2017-02-28 UTC 14:00
+ * @version      2.0.10
+ * @date         2017-03-20 UTC 00:30
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and other Github users,
@@ -990,7 +990,7 @@ if (typeof define === 'function' && define.amd) {
      */
     function character(event) {
         if (typeof event.key === 'undefined' || event.key === 'Unidentified') {
-            return String.fromCharCode(this.keyCodeNumber(event));
+            return String.fromCharCode(keyCodeNumber(event));
         } else {
             // Special case for obsolete browsers like IE that return the old names
             let result;

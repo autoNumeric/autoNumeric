@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.2
- * @date         2017-03-16 UTC 22:00
+ * @version      4.0.0-beta.3
+ * @date         2017-03-24 UTC 01:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
@@ -104,6 +104,11 @@ class AutoNumeric {
         // Store the additional attributes inside the AutoNumeric object
         // Note: This variable is needed and not a duplicate of `initialValueOnKeydown` nor `valueOnFocus` since it serves a different purpose and has a different lifecycle
         this.savedCancellableValue = null;
+
+        // Initialize the undo/redo variables
+        this.historyTable = []; // Keep track of *all* valid states of the element value
+        this.historyTableIndex = -1; // Pointer to the current undo/redo state. This will be set to '0' during initialization since it first adds itself.
+        this.onGoingRedo = false; // Variable that keeps track if a 'redo' is ongoing (in order to prevent an 'undo' to be launch when releasing the shift key before the ctrl key after a 'redo' shortcut)
 
         // Set the initial value if it exists and if the `formatOnPageLoad` option will allow it
         if (!this.runOnce && this.settings.formatOnPageLoad) {
@@ -722,7 +727,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.2';
+        return '4.0.0-beta.3';
     }
 
     /**
@@ -940,6 +945,226 @@ class AutoNumeric {
         }
     }
 
+    /**
+     * Save the current raw value into the history table, along with the selection information.
+     *
+     * If the user has done some undos and tries to enter:
+     * - a new and different number than the 'next' state, this drops the rest of the history table
+     * - the very same number that result in the same rawValue than the 'next' state, we only move the history table pointer to the next state
+     *
+     * @private
+     */
+    _historyTableAdd() {
+        //TODO Add a `this.settings.saveSelectionsIntoHistory` option to prevent saving the selections (in order to gain performance)
+        const isEmptyHistoryTable = this.historyTable.length === 0;
+        // Only add a new value if it's different than the previous one (to prevent infinitely adding values on mouseover for instance)
+        if (isEmptyHistoryTable || this.settings.rawValue !== this._historyTableCurrentValueUsed()) {
+            // Trim the history table if the user changed the value of an intermediary state
+            let addNewHistoryState = true;
+            if (!isEmptyHistoryTable) {
+                // If some undo has been done and the user type the exact same data than the next entry after the current history pointer, do no drop the rest of the 'redo' list, and just advance the historyTableIndex
+                const nextHistoryStateIndex = this.historyTableIndex + 1;
+                if (nextHistoryStateIndex < this.historyTable.length && this.settings.rawValue === this.historyTable[nextHistoryStateIndex].value) {
+                    // If the character input result in the same state than the next one, do not remove the next history states nor add a new one
+                    addNewHistoryState = false;
+                } else {
+                    // First remove anything that is after the current index
+                    AutoNumericHelper.arrayTrim(this.historyTable, this.historyTableIndex + 1);
+                }
+            }
+
+            // Update the history pointer
+            this.historyTableIndex++;
+
+            // Add the new history state, if needed
+            if (addNewHistoryState) {
+                // Save the selection info
+                const selection = AutoNumericHelper.getElementSelection(this.domElement);
+                this.selectionStart = selection.start;
+                this.selectionEnd = selection.end;
+
+                // Then add the new raw value
+                this.historyTable.push({
+                    // Save the rawValue and selection start/end
+                    value: this.settings.rawValue,
+                    // The selection for this element is temporary, and will be updated when the next history state will be recorded.
+                    // That way, we are always sure we save the last caret or selection positions just before the value is changed. Otherwise we would only save those positions when the value is first changed, and would not take into account that the user could move the caret around afterward.
+                    // For instance, this is needed if the user change the element value, and immediately undo it ; if he then does a redo, he'll see the value and the right selection
+                    // To sum up; The selection position are not always +1 character, since it could also be '2' if a group separator is added when entering one character. That's why the current history state caret/selection position is updated on each `keyup` event.
+                    start: this.selectionStart + 1, // Here we add one since the user added one character too
+                    end  : this.selectionEnd + 1,
+                });
+
+                // Update the selection in the previous entry, in order to keep track of the updated caret/selection positions
+                if (this.historyTable.length > 1) {
+                    this.historyTable[this.historyTableIndex - 1].start = this.selectionStart;
+                    this.historyTable[this.historyTableIndex - 1].end = this.selectionEnd;
+                }
+            }
+
+            // Limit the history table size according to the `historySize` option
+            if (this.historyTable.length > this.settings.historySize) {
+                this._historyTableForget();
+            }
+        }
+    }
+
+    /**
+     * Debug function for the history table
+     * @private
+     */
+    /*
+    _debugHistoryTable() {
+        let i = 0;
+        let mark;
+        this.historyTable.forEach(history => {
+            if (this.historyTableIndex === i) {
+                mark = '> ';
+            } else {
+                mark = '';
+            }
+            console.log(`${mark}${i++}: ${history.value} ${history.start}|${history.end} [onGoingRedo: ${this.onGoingRedo}]`); //DEBUG
+        });
+    }
+    */
+
+    /**
+     * 'Undo' or 'Redo' the last/next user entry in the history table.
+     * This does not modify the history table, only the pointer to the current state.
+     *
+     * @param {boolean} undo If set to `true`, then this function does an 'Undo', otherwise it does a 'Redo'
+     * @private
+     */
+    _historyTableUndoOrRedo(undo = true) {
+        let check;
+        if (undo) {
+            // Only 'undo' if there are some info to undo
+            check = this.historyTableIndex > 0;
+            if (check) {
+                this.historyTableIndex--;
+            }
+        } else {
+            // Only 'redo' if there are some info to redo at the end of the history table
+            check = this.historyTableIndex + 1 < this.historyTable.length;
+            if (check) {
+                this.historyTableIndex++;
+            }
+        }
+
+        if (check) {
+            // Set the value back
+            const undoInfo = this.historyTable[this.historyTableIndex];
+            this.set(undoInfo.value, null, false); // next or previous raw value
+
+            // Set the selection back
+            AutoNumericHelper.setElementSelection(this.domElement, undoInfo.start, undoInfo.end);
+        }
+    }
+
+    /**
+     * 'Undo' the last user entry by going back one entry in the history table.
+     * This keeps the following entries in order to allow for a 'redo'.
+     * This does not modify the history table, only the pointer to the current state.
+     * @private
+     */
+    _historyTableUndo() {
+        this._historyTableUndoOrRedo(true);
+    }
+
+    /**
+     * 'Redo' the next user entry in the history table.
+     * This does not modify the history table, only the pointer to the current state.
+     * @private
+     */
+    _historyTableRedo() {
+        this._historyTableUndoOrRedo(false);
+    }
+
+    /**
+     * Reset the history table to its initial state, and select the value.
+     * @private
+     */
+    /*
+    resetHistoryTable() { //FIXME Test this
+        this.set(this.settings.rawValue, null, false);
+        this.select();
+        const selection = AutoNumericHelper.getElementSelection(this.domElement);
+        this.historyTableIndex = 0;
+        this.historyTable = [{
+            // Save the rawValue and selection start/end
+            value: this.settings.rawValue,
+            start: selection.start,
+            end  : selection.end,
+        }];
+    }
+    */
+
+    /**
+     * Make the history table forget its first N elements, shifting its indexes in the process.
+     * `N` being given as the `numberOfEntriesToForget` parameter.
+     *
+     * @param {Number} numberOfEntriesToForget
+     * @returns {object|Array<object>} The discarded objects, in an Array.
+     * @private
+     */
+    _historyTableForget(numberOfEntriesToForget = 1) {
+        const shiftedAway = [];
+        for (let i = 0; i < numberOfEntriesToForget; i++) {
+            shiftedAway.push(this.historyTable.shift());
+            // Update the history table index accordingly
+            this.historyTableIndex--;
+            if (this.historyTableIndex < 0) {
+                // In case this function is called more times than there is states in the history table
+                this.historyTableIndex = 0;
+            }
+        }
+
+        if (shiftedAway.length === 1) {
+            return shiftedAway[0];
+        }
+
+        return shiftedAway;
+    }
+
+    /**
+     * Return the currently used value from the history table.
+     *
+     * @returns {string|number}
+     * @private
+     */
+    _historyTableCurrentValueUsed() {
+        let indexToUse = this.historyTableIndex;
+        if (indexToUse < 0) {
+            indexToUse = 0;
+        }
+
+        let result;
+        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(this.historyTable[indexToUse])) {
+            result = '';
+        } else {
+            result = this.historyTable[indexToUse].value;
+        }
+
+        return result;
+    }
+
+    /**
+     * Save the raw value inside the AutoNumeric object.
+     *
+     * @param {number|string} rawValue The numeric value as understood by Javascript like a `Number`
+     * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history array, otherwise it is not
+     * @private
+     */
+    _setRawValue(rawValue, saveChangeToHistory = true) {
+        // Update the raw value
+        this.settings.rawValue = rawValue;
+
+        if (saveChangeToHistory) {
+            // Save in the history the last known raw value and formatted result selection
+            this._historyTableAdd();
+        }
+    }
+
     // This are the public function available on each autoNumeric-managed element
 
     /**
@@ -1000,9 +1225,10 @@ class AutoNumeric {
      *
      * @param {number|string} newValue The value must be a number or a numeric string
      * @param {object} options A settings object that will override the current settings. Note: the update is done only if the `newValue` is defined.
+     * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history table
      * @returns {AutoNumeric}
      */
-    set(newValue, options = null) {
+    set(newValue, options = null, saveChangeToHistory = true) {
         //TODO Add the `saveSettings` options. If `true`, then when `options` is passed, then it overwrite the current `this.settings`. If `false` the `options` are only used once and `this.settings` is not modified
         if (newValue === null || AutoNumericHelper.isUndefined(newValue)) {
             return this;
@@ -1019,7 +1245,7 @@ class AutoNumeric {
         let value = this.constructor._toNumericValue(newValue, this.settings);
         if (isNaN(Number(value))) {
             AutoNumericHelper.setElementValue(this.domElement, '');
-            this.settings.rawValue = '';
+            this._setRawValue('', saveChangeToHistory);
 
             return this;
         }
@@ -1053,7 +1279,7 @@ class AutoNumeric {
 
                 if (this.settings.scaleDivisor && !this.settings.hasFocus) {
                     value = this.constructor._roundValue(value, this.settings);
-                    this.settings.rawValue = this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.'));
+                    this._setRawValue(this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.')), saveChangeToHistory);
                     value = this.constructor._toNumericValue(value, this.settings);
                     value = value / this.settings.scaleDivisor;
                     value = value.toString();
@@ -1072,7 +1298,7 @@ class AutoNumeric {
 
                 // Stores rawValue including the decimalPlacesShownOnFocus
                 if (!this.settings.scaleDivisor) {
-                    this.settings.rawValue = this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.'));
+                    this._setRawValue(this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.')), saveChangeToHistory);
                 }
 
                 value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
@@ -1086,7 +1312,7 @@ class AutoNumeric {
                     this._saveValueToPersistentStorage('set');
                 }
             } else {
-                this.settings.rawValue = '';
+                this._setRawValue('', saveChangeToHistory);
                 this._saveValueToPersistentStorage('remove');
                 const attemptedValue = value;
                 value = '';
@@ -1106,7 +1332,7 @@ class AutoNumeric {
                 return this;
             }
         } else {
-            // Here, value === ''
+            // Here, `value` equal the empty string `''`
             let result;
             if (this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.always) {
                 // Keep the currency symbol as per emptyInputBehavior
@@ -1116,7 +1342,7 @@ class AutoNumeric {
             }
 
             AutoNumericHelper.setElementValue(this.domElement, result);
-            this.settings.rawValue = '';
+            this._setRawValue('', saveChangeToHistory);
 
             return this;
         }
@@ -1142,7 +1368,7 @@ class AutoNumeric {
         AutoNumericHelper.setElementValue(this.domElement, value);
 
         // Update the rawValue
-        this.settings.rawValue = value; // Doing this without any test can lead to badly formatted rawValue
+        this._setRawValue(value); // Doing this without any test can lead to badly formatted rawValue
 
         if (!AutoNumericHelper.isNull(options)) {
             this._setSettings(options, true); // We do not call `update` here since this would call `set` too
@@ -2574,6 +2800,10 @@ class AutoNumeric {
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.formatOnPageLoad) && !AutoNumericHelper.isBoolean(options.formatOnPageLoad)) {
             AutoNumericHelper.throwError(`The format on initialization option 'formatOnPageLoad' is invalid ; it should be either 'false' or 'true', [${options.formatOnPageLoad}] given.`);
+        }
+
+        if (!testPositiveInteger.test(options.historySize) || options.historySize === 0) {
+            AutoNumericHelper.throwError(`The history size option 'historySize' is invalid ; it should be a positive integer, [${options.historySize}] given.`);
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.selectNumberOnly) && !AutoNumericHelper.isBoolean(options.selectNumberOnly)) {
@@ -4145,6 +4375,35 @@ class AutoNumeric {
             return;
         }
 
+        // Manage the undo/redo events
+        if (this.eventKey === AutoNumericEnum.keyName.Z || this.eventKey === AutoNumericEnum.keyName.z) {
+            if (e.ctrlKey && e.shiftKey) {
+                // Redo
+                e.preventDefault();
+                this._historyTableRedo();
+                this.onGoingRedo = true;
+
+                return;
+            } else if (e.ctrlKey && !e.shiftKey) {
+                if (this.onGoingRedo) {
+                    // Prevent an 'undo' to be launch when releasing the shift key before the ctrl key after a 'redo' shortcut
+                    this.onGoingRedo = false;
+                } else {
+                    e.preventDefault();
+                    // Undo
+                    this._historyTableUndo();
+
+                    return;
+                }
+            }
+        }
+        
+        if (this.onGoingRedo && (e.ctrlKey || e.shiftKey)) {
+            // Special case where if the user had done `Control+Shift+z`, then release `z`, keeping `Control` or `Shift` pressed, then `this.onGoingRedo` is never changed back to `false` when the user release `Control` or `Shift`
+            this.onGoingRedo = false;
+        } 
+
+        // Manage the reformat when hovered with the Alt key pressed
         if (this.eventKey === AutoNumericEnum.keyName.Alt && this.hoveredWithAlt) {
             this.constructor._reformatAltHovered(this);
 
@@ -4190,6 +4449,15 @@ class AutoNumeric {
             //FIXME This event is not sent when pasting valid values
             AutoNumericHelper.triggerEvent('autoNumeric:formatted', e.target);
         }
+
+        // Update the selection of the current element of the history table
+        if (this.historyTable.length > 1) {
+            const selection = AutoNumericHelper.getElementSelection(this.domElement);
+            this.selectionStart = selection.start;
+            this.selectionEnd = selection.end;
+            this.historyTable[this.historyTableIndex].start = this.selectionStart;
+            this.historyTable[this.historyTableIndex].end = this.selectionEnd;
+        }
     }
 
     /**
@@ -4198,6 +4466,7 @@ class AutoNumeric {
      * @param {Event} e
      */
     _onFocusOutAndMouseLeave(e) {
+        //FIXME Do not call `set()` if the current raw value is the same as the one we are trying to set (currently, on focus out, `set()` is always called, even if the value has not changed
         if (this.settings.unformatOnHover && e.type === 'mouseleave' && this.hoveredWithAlt) {
             this.constructor._reformatAltHovered(this);
 
@@ -4229,7 +4498,7 @@ class AutoNumeric {
                 const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(this.settings.rawValue, this.settings);
                 if (this.constructor._checkEmpty(this.settings.rawValue, this.settings, false) === null && minTest && maxTest) {
                     value = this._modifyNegativeSignAndDecimalCharacterForRawValue(value);
-                    this.settings.rawValue = this._cleanLeadingTrailingZeros(value);
+                    this._setRawValue(this._cleanLeadingTrailingZeros(value));
 
                     if (this.settings.scaleDivisor) {
                         value = value / this.settings.scaleDivisor;
@@ -4249,10 +4518,10 @@ class AutoNumeric {
                 }
             } else {
                 if (this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {
-                    this.settings.rawValue = '0';
+                    this._setRawValue('0');
                     value = this.constructor._roundValue('0', this.settings);
                 } else {
-                    this.settings.rawValue = '';
+                    this._setRawValue('');
                 }
             }
 
@@ -4824,7 +5093,7 @@ class AutoNumeric {
      * @returns {boolean}
      * @private
      */
-    _isElementTagSupported() { //FIXME à tester
+    _isElementTagSupported() {
         if (!AutoNumericHelper.isElement(this.domElement)) {
             AutoNumericHelper.throwError(`The DOM element is not valid, ${this.domElement} given.`);
         }
@@ -4838,7 +5107,7 @@ class AutoNumeric {
      * @returns {boolean}
      * @private
      */
-    _isInputElement() { //FIXME à tester
+    _isInputElement() {
         return this.domElement.tagName.toLowerCase() === 'input';
     }
 
@@ -4848,7 +5117,7 @@ class AutoNumeric {
      * @returns {boolean}
      * @throws
      */
-    _isInputTypeSupported() { //FIXME à tester
+    _isInputTypeSupported() {
         return (this.domElement.type === 'text' ||
                 this.domElement.type === 'hidden' ||
                 this.domElement.type === 'tel' ||
@@ -4875,6 +5144,7 @@ class AutoNumeric {
             if (!this._isInputTypeSupported()) {
                 AutoNumericHelper.throwError(`The input type "${this.domElement.type}" is not supported by autoNumeric`);
             }
+
             this.isInputElement = true;
         } else {
             this.isInputElement = false;
@@ -4932,7 +5202,7 @@ class AutoNumeric {
                     (currentValue !== '' && this.domElement.getAttribute('type') === 'hidden' && !AutoNumericHelper.isNumber(unLocalizedCurrentValue))) {
                     if ((this.settings.decimalPlacesShownOnFocus !== null && this.settings.saveValueToSessionStorage) ||
                         (this.settings.scaleDivisor && this.settings.saveValueToSessionStorage)) {
-                        this.settings.rawValue = this._saveValueToPersistentStorage('get');
+                        this._setRawValue(this._saveValueToPersistentStorage('get'));
                     }
 
                     // If the decimalPlacesShownOnFocus value should NOT be saved in sessionStorage
@@ -4949,9 +5219,9 @@ class AutoNumeric {
                             (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.prefix && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix)) &&
                             this.settings.negativeSignCharacter !== '' &&
                             AutoNumericHelper.isNegative(currentValue)) {
-                            this.settings.rawValue = this.settings.negativeSignCharacter + this.constructor._stripAllNonNumberCharacters(toStrip, this.settings, true);
+                            this._setRawValue(this.settings.negativeSignCharacter + this.constructor._stripAllNonNumberCharacters(toStrip, this.settings, true));
                         } else {
-                            this.settings.rawValue = this.constructor._stripAllNonNumberCharacters(toStrip, this.settings, true);
+                            this._setRawValue(this.constructor._stripAllNonNumberCharacters(toStrip, this.settings, true));
                         }
                     }
 
@@ -4964,6 +5234,7 @@ class AutoNumeric {
                     case AutoNumeric.options.emptyInputBehavior.focus:
                         setValue = false;
                         break;
+                    //TODO What about the `AutoNumeric.options.emptyInputBehavior.press` value?
                     case AutoNumeric.options.emptyInputBehavior.always:
                         AutoNumericHelper.setElementValue(this.domElement, this.settings.currencySymbol);
                         setValue = false;
@@ -5107,7 +5378,7 @@ class AutoNumeric {
                 }
 
                 // Convert numbers in options to strings
-                //TODO if a value is already of type 'Number', shouldn't we keep it as a number for further manipulation, instead of using a string?
+                //TODO Only transform the values of type 'Number' to 'String' if it's a currency number (so that we can have big numbers). Do not convert other numbers (ie. `historySize`)
                 if (typeof value === 'number') {
                     this.settings[key] = value.toString();
                 }
@@ -5180,6 +5451,7 @@ class AutoNumeric {
             emptyInputBehavior                : true,
             leadingZero                       : true,
             formatOnPageLoad                  : true,
+            historySize                       : true,
             selectNumberOnly                  : true,
             defaultValueOverride              : true,
             unformatOnSubmit                  : true,
@@ -5537,9 +5809,9 @@ class AutoNumeric {
             //TODO Check if we need to replace the hard-coded ',' with settings.decimalCharacter
             const testValue = (AutoNumericHelper.contains(this.newValue, ',')) ? this.newValue.replace(',', '.') : this.newValue;
             if (testValue === '' || testValue === this.settings.negativeSignCharacter) {
-                this.settings.rawValue = (this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) ? '0' : '';
+                this._setRawValue((this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) ? '0' : '');
             } else {
-                this.settings.rawValue = this._cleanLeadingTrailingZeros(testValue);
+                this._setRawValue(this._cleanLeadingTrailingZeros(testValue));
             }
 
             if (position > this.newValue.length) {
@@ -5694,6 +5966,7 @@ class AutoNumeric {
             if (this.settings.selectNumberOnly) {
                 // `preventDefault()` is used here to prevent the browser to first select all the input text (including the currency sign), otherwise we would see that whole selection first in a flash, then the selection with only the number part without the currency sign.
                 e.preventDefault();
+                //TODO replace `selectNumber` by `select`?
                 this.selectNumber();
             }
 
@@ -5721,7 +5994,11 @@ class AutoNumeric {
         }
 
         if (e.ctrlKey || e.metaKey) {
-            return true;
+            if (this.eventKey === AutoNumericEnum.keyName.Z || this.eventKey === AutoNumericEnum.keyName.z) {
+                return false;
+            } else {
+                return true;
+            }
         }
 
         // Jump over the thousand separator
@@ -6370,6 +6647,14 @@ AutoNumeric.options = {
         format     : true,
         doNotFormat: false,
     },
+    historySize                  : {
+        verySmall: 5,
+        small    : 10,
+        medium   : 20,
+        large    : 50,
+        veryLarge: 100,
+        insane   : Number.MAX_SAFE_INTEGER,
+    },
     isCancellable                : {
         cancellable   : true,
         notCancellable: false,
@@ -6622,6 +6907,11 @@ AutoNumeric.defaultSettings = {
      * false = will not format the default value on initialization
      */
     formatOnPageLoad: AutoNumeric.options.formatOnPageLoad.format,
+
+    /* Set the undo/redo history table size.
+     * Each record keeps the raw value as well and the last known caret/selection positions.
+     */
+    historySize: AutoNumeric.options.historySize.medium,
 
     /* Allow the user to 'cancel' and undo the changes he made to the given autonumeric-managed element, by pressing the 'Escape' key.
      * Whenever the user 'validate' the input (either by hitting 'Enter', or blurring the element), the new value is saved for subsequent 'cancellation'.

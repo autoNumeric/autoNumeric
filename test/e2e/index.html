@@ -475,6 +475,22 @@
 			<input id="remove1" type="text" value="2468.42">
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Undo & redo functions</p>
+			<div>
+				<div>
+					<input id="undoRedo1" type="text" value="1357.92">
+					<p id="undoRedo2" contenteditable="true">1357.92</p>
+					<input id="undoRedo3" type="text" value="12340">
+				</div>
+				<div>
+					<input id="undoRedo4" type="text" value="">
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -861,6 +877,18 @@
 
     //-------------- Testing the remove() function
     new AutoNumeric('#remove1').french();
+
+    //-------------- Testing the undo and redo functions
+    new AutoNumeric('#undoRedo1').french();
+    new AutoNumeric('#undoRedo2').french();
+    new AutoNumeric('#undoRedo3', {
+        digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.dot,
+        decimalCharacter: AutoNumeric.options.decimalCharacter.comma,
+	    minimumValue : 0,
+	    maximumValue : 99999999,
+        historySize: AutoNumeric.options.historySize.verySmall,
+    });
+    new AutoNumeric('#undoRedo4');
 </script>
 </body>
 </html>

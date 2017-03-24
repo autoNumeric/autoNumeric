@@ -104,6 +104,10 @@ const selectors = {
     negativeBracketsInput7            : '#negativeBrackets_7',
     negativeBracketsInput8            : '#negativeBrackets_8',
     remove1                           : '#remove1',
+    undoRedo1                         : '#undoRedo1',
+    undoRedo2                         : '#undoRedo2',
+    undoRedo3                         : '#undoRedo3',
+    undoRedo4                         : '#undoRedo4',
 };
 
 //-----------------------------------------------------------------------------
@@ -1366,5 +1370,718 @@ describe('remove() function', () => {
         expect(browser.getValue(selectors.remove1)).toEqual('1.152.468,42 €');
         browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Delete', 'Delete']);
         expect(browser.getValue(selectors.remove1)).toEqual('1.15468,42 €');
+    });
+});
+
+describe('undo and redo functions', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €');
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.357,92 €');
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('12.340');
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('');
+    });
+
+    it('should undo the user inputs correctly on <input> elements', () => {
+        let inputCaretPosition;
+        const undoRedoInput = $(selectors.undoRedo1);
+
+        // Focus in the input
+        undoRedoInput.click();
+
+        // Enter some characters to build the history table
+        browser.keys(['Home', '0']); // Input a character that will be dropped and won't be set in the history list
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['1']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.357,92 €'); // 1|1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        browser.keys(['ArrowRight', '2']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.357,92 €'); // 11.|357,92 € -> 112|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['4']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(5);
+
+        browser.keys(['ArrowRight', 'ArrowRight', '6']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 1.124.|357,92 € -> 1.124.3|57,92 € -> 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+
+        // Undos
+        browser.keys(['Control', 'z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.357,92 €'); // 112|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.357,92 €'); // 11.|357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['z']); // This makes sure we cannot go back too far
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+    });
+
+    it('should redo the user inputs correctly on <input> elements, when releasing the Shift then Control key', () => {
+        let inputCaretPosition;
+        // Redos (releasing the keys shift, then ctrl)
+        browser.keys(['Control', 'Shift', 'z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.357,92 €'); // 11.|357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.357,92 €'); // 112|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['z']); // This makes sure we cannot go back too far
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Shift']); // Release the Shift key
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+    });
+
+    it('should redo the user inputs correctly on <input> elements, when releasing the Control then Shift key', () => {
+        let inputCaretPosition;
+        // Undos some more to test the last redos with the specific key release order
+        browser.keys(['Control', 'z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.357,92 €'); // 112|.357,92 €
+        browser.keys(['Control']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.357,92 €'); // 112|.357,92 €
+
+        // Redos (releasing the keys ctrl, then shift)
+        browser.keys(['Control', 'Shift', 'z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Shift']); // Release the Shift key
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+    });
+
+    it('should save the very last known caret/selection position correctly, even if a group separator is added', () => {
+        let inputCaretPosition;
+
+        browser.keys(['1']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.436.157,92 €'); // 112.436.1|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(9);
+
+        browser.keys(['2']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.361.257,92 €'); // 1.124.361.2|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Undo
+        browser.keys(['Control', 'z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.436.157,92 €'); // 112.436.1|57,92 €
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.436.157,92 €'); // 112.436.1|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(9);
+
+        // Redo
+        browser.keys(['Control', 'Shift', 'z', 'Shift', 'Control']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.361.257,92 €'); // 1.124.361.2|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+    });
+
+    it('should respect the `historySize` option', () => {
+        let inputCaretPosition;
+        const undoRedoInput = $(selectors.undoRedo3);
+
+        // Focus in the input
+        undoRedoInput.click();
+
+        // Enter some characters to build the history table
+        browser.keys(['Home', 'ArrowRight', 'Shift', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Shift', '5']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('1.540'); // 1|2.3|40 -> 1.5|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['Home', 'Shift', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Shift', '6']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('640'); // 1.5|40 -> 6|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        browser.keys(['Backspace']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('40'); // 6|40 -> |40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['2']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('240'); // |40 -> 2|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        browser.keys(['8']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('2.840'); // 2|40 -> 2.8|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+
+        // Undos
+        browser.keys(['Control', 'zzzzz', 'Control']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('1.540'); // 1.5|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }).value;
+        expect(inputCaretPosition.start).toEqual(0);
+        expect(inputCaretPosition.end).toEqual(3);
+
+
+        // Redos
+        browser.keys(['Control', 'Shift', 'zzzzz', 'Shift', 'Control']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('2.840'); // 2.8|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+
+        // Input more numbers so that the history size overflow
+        browser.keys(['Home', '6']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('62.840'); // |2.840 -> 6|2.840
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        // Undo to the max history size
+        browser.keys(['Control', 'zzzzz', 'Control']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('640'); // 6|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        // Try to undo once more ; this stays on the same state, since the first one got deleted
+        browser.keys(['Control', 'z', 'Control']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('640'); // 6|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        // Try to redo more states that there is in the history table should only return the last state
+        browser.keys(['Control', 'Shift', 'zzzzzzzzz', 'Shift', 'Control']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('62.840');
+    });
+
+    it('should keep the redo history if the use re-enter the same redo information that do not change the intermediary states', () => {
+        const undoRedoInput = $(selectors.undoRedo4);
+
+        // Focus in the input
+        undoRedoInput.click();
+
+        // Enter some characters to build the history table
+        browser.keys(['End', '1234567890']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('1,234,567,890');
+
+        // Undos some states in order to stop at an intermediary state where there are multiple potential redo states after the current history pointer
+        browser.keys(['Control', 'zzzz', 'Control']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('123,456.00');
+
+        // Enter the exact same data that would result in the same next saved state
+        browser.keys(['7']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('1,234,567.00');
+
+        // ...and test if the rest of the history stable is still there by doing some redos
+        browser.keys(['Control', 'Shift', 'z']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('12,345,678.00');
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('123,456,789.00');
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('1,234,567,890.00');
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('1,234,567,890.00');
+        browser.keys(['Shift', 'Control']); // Release the 'Control' and 'Shift' keys
+    });
+
+    xit('should undo the user inputs correctly on non-input elements', () => { //FIXME This does not work under FF 45.8...
+        let inputCaretPosition;
+        const undoRedoElement = $(selectors.undoRedo2);
+
+        // Focus in the input
+        undoRedoElement.click();
+
+        // Enter some characters to build the history table
+        browser.keys(['Home', '0']); // Input a character that will be dropped and won't be set in the history list
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['1']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.357,92 €'); // 1|1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        browser.keys(['ArrowRight', '2']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('112.357,92 €'); // 11.|357,92 € -> 112|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['4']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.124.357,92 €'); // 1.124|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(5);
+
+        browser.keys(['ArrowRight', 'ArrowRight', '6']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 1.124.|357,92 € -> 1.124.3|57,92 € -> 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+
+        // Undos
+        browser.keys(['Control', 'z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('112.357,92 €'); // 112|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.357,92 €'); // 11.|357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['z']); // This makes sure we cannot go back too far
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+    });
+
+    xit('should redo the user inputs correctly on non-input elements, when releasing the Shift then Control key', () => { //FIXME This does not work under FF 45.8...
+        let inputCaretPosition;
+        // Redos (releasing the keys shift, then ctrl)
+        browser.keys(['Control', 'Shift', 'z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.357,92 €'); // 11.|357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('112.357,92 €'); // 112|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['z']); // This makes sure we cannot go back too far
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Shift']); // Release the Shift key
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+    });
+
+    xit('should redo the user inputs correctly on non-input elements, when releasing the Control then Shift key', () => { //FIXME This does not work under FF 45.8...
+        let inputCaretPosition;
+        // Undos some more to test the last redos with the specific key release order
+        browser.keys(['Control', 'z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('112.357,92 €'); // 112|.357,92 €
+        browser.keys(['Control']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('112.357,92 €'); // 112|.357,92 €
+
+        // Redos (releasing the keys ctrl, then shift)
+        browser.keys(['Control', 'Shift', 'z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Shift']); // Release the Shift key
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
     });
 });

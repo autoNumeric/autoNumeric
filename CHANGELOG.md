@@ -1,5 +1,15 @@
 ### Change log for autoNumeric:
 
+### "4.0.0-beta.3"
++ Fix issue #415 Support undo and redo actions
++ Add a new `historySize` option that allows to set how many undo states each AutoNumeric object should keep in memory.
++ Always use the `_setRawValue()` function to set the `rawValue` ; directly setting `this.settings.rawValue = 'foo'` is not allowed anymore.
++ Modify the `set()` function signature by allowing to pass a third parameter to prevent saving the changed state to the history table.
++ Update the `keyName` enumeration with the capitalized letters.
++ Upgrade the `getElementSelection()` helper function in order to support contenteditable-enabled elements and hidden inputs.
++ Add an `arrayTrim()` helper function that trim the start of an array.
++ Create undo/redo end-to-end tests.
+
 ### "4.0.0-beta.2"
 + Fix issue #413 Manage the drag 'n drop event so that the text dropped in the AutoNumeric element gets formatted accordingly
 

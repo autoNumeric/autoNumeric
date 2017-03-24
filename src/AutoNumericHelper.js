@@ -597,23 +597,41 @@ export default class AutoNumericHelper {
     }
 
     /**
-     * Cross browser routine for getting selected range/cursor position
+     * Cross browser routine for getting selected range/cursor position.
+     * Note: this also works with edge cases like contenteditable-enabled elements, and hidden inputs.
      *
      * @param {HTMLInputElement|EventTarget} element
      * @returns {{}}
      */
     static getElementSelection(element) {
         const position = {};
-        if (this.isUndefined(element.selectionStart)) {
-            const selection = window.getSelection();
-            const selectionInfo = selection.getRangeAt(0);
-            position.start = selectionInfo.startOffset;
-            position.end = selectionInfo.endOffset;
-            position.length = position.end - position.start;
-        } else {
-            position.start = element.selectionStart;
-            position.end = element.selectionEnd;
-            position.length = position.end - position.start;
+
+        let isSelectionStartUndefined;
+        try {
+            isSelectionStartUndefined = this.isUndefined(element.selectionStart);
+        } catch (error) {
+            isSelectionStartUndefined = false;
+        }
+
+        try {
+            if (isSelectionStartUndefined) {
+                const selection = window.getSelection();
+                const selectionInfo = selection.getRangeAt(0);
+                position.start = selectionInfo.startOffset;
+                position.end = selectionInfo.endOffset;
+                position.length = position.end - position.start;
+            } else {
+                position.start = element.selectionStart;
+                position.end = element.selectionEnd;
+                position.length = position.end - position.start;
+            }
+        } catch (error) {
+            // Manages the cases where :
+            // - the 'contenteditable' elements that have no selections
+            // - the <input> element is of type 'hidden'
+            position.start = 0;
+            position.end = 0;
+            position.length = 0;
         }
 
         return position;
@@ -1167,6 +1185,30 @@ export default class AutoNumericHelper {
     static getHoveredElement() {
         const hoveredElements = [...document.querySelectorAll(':hover')];
         return hoveredElements[hoveredElements.length - 1];
+    }
+
+    /**
+     * Return the given array trimmed to the given length.
+     * @example arrayTrim([1, 2, 3, 4], 2) -> [1, 2]
+     *
+     * @param {Array} array
+     * @param {Number} length
+     * @returns {*}
+     */
+    static arrayTrim(array, length) {
+        const arrLength = array.length;
+        if (arrLength === 0 || length > arrLength) {
+            // Also manage the case where `length` is higher than the current length
+            return array;
+        }
+
+        if (length < 0) {
+            return [];
+        }
+
+        array.length = parseInt(length, 10);
+
+        return array;
     }
 
     /**

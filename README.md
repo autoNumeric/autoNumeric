@@ -171,6 +171,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | `emptyInputBehavior`| Define what to display when the input value is empty (possible options are `focus`, `press`, `always` and `zero`) | `'focus'` |
 | `failOnUnknownOption `| This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object. | `false` |
 | `formatOnPageLoad`| Determine if the default value will be formatted on initialization | `true` |
+| `historySize`| Determine how many undo states an AutoNumeric object should keep in memory | `20` |
 | `isCancellable`| Determine if the user can *'cancel'* the last modifications done to the element value when using the `Escape` key | `true` |
 | `leadingZero`| Controls the leading zero behavior (possible options are `allow`, `deny` and `keep`) | `'deny'` |
 | `maximumValue` | Maximum possible value | `'9999999999999.99'` |
@@ -388,6 +389,7 @@ Then you'll be able to access either the methods on the instantiated AutoNumeric
 | :----------------: | :-----------:  | :-----------:  |
 | `set` | Set the value (that will be formatted immediately) | `anElement.set(42.76);` |
 | `set` | Set the value and update the setting in one go | `anElement.set(42.76, { options });` |
+| `set` | Set the value, but do not save the new state in the history table (used for undo/redo actions) | `anElement.set(42.76, { options }, false);` |
 | `setUnformatted` | Set the value (that will not be formatted immediately) | `anElement.setUnformatted(42.76);` |
 | `setUnformatted` | Set the value and update the setting in one go (the value will not be formatted immediately) | `anElement.setUnformatted(42.76, { options });` |
 | `getNumericString` | Return the unformatted number as a string | `anElement.getNumericString();` |

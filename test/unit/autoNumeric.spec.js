@@ -94,6 +94,7 @@ describe('The autoNumeric object', () => {
             emptyInputBehavior           : 'focus',
             failOnUnknownOption          : false,
             formatOnPageLoad             : true,
+            historySize                  : 20,
             isCancellable                : true,
             leadingZero                  : 'deny',
             maximumValue                 : '9999999999999.99',
@@ -239,6 +240,7 @@ describe('The autoNumeric object', () => {
             expect(defaultSettings.emptyInputBehavior        ).toEqual(aNInputSettings.emptyInputBehavior        );
             expect(defaultSettings.leadingZero               ).toEqual(aNInputSettings.leadingZero               );
             expect(defaultSettings.formatOnPageLoad          ).toEqual(aNInputSettings.formatOnPageLoad          );
+            expect(String(defaultSettings.historySize)       ).toEqual(aNInputSettings.historySize               );
             expect(defaultSettings.selectNumberOnly          ).toEqual(aNInputSettings.selectNumberOnly          );
             expect(defaultSettings.defaultValueOverride      ).toEqual(aNInputSettings.defaultValueOverride      );
             expect(defaultSettings.unformatOnSubmit          ).toEqual(aNInputSettings.unformatOnSubmit          );
@@ -4155,6 +4157,14 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ formatOnPageLoad: 'true' })).not.toThrow();
             expect(() => AutoNumeric.validate({ formatOnPageLoad: 'false' })).not.toThrow();
 
+            expect(() => AutoNumeric.validate({ historySize: 1 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ historySize: 10 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ historySize: 1000 })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ historySize: '1' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ historySize: '10' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ historySize: '1000' })).not.toThrow();
+
             expect(() => AutoNumeric.validate({ selectNumberOnly: true })).not.toThrow();
             expect(() => AutoNumeric.validate({ selectNumberOnly: false })).not.toThrow();
             expect(() => AutoNumeric.validate({ selectNumberOnly: 'true' })).not.toThrow();
@@ -4439,6 +4449,16 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ formatOnPageLoad: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ formatOnPageLoad: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ formatOnPageLoad: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ historySize: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: -1 })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: 5.34 })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: -5.34 })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: true })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: false })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: null })).toThrow();
 
             expect(() => AutoNumeric.validate({ selectNumberOnly: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ selectNumberOnly: 1 })).toThrow();

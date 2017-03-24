@@ -2951,7 +2951,7 @@ class AutoNumeric {
         const [minTest, maxTest] = this._checkIfInRangeWithOverrideOption(valueString, settings);
         if (!minTest || !maxTest) {
             // Throw a custom event
-            AutoNumericHelper.triggerEvent('autoFormat.autoNumeric', document, 'Range test failed');
+            AutoNumericHelper.triggerEvent('autoNumeric:formatted', document, 'Range test failed');
             AutoNumericHelper.throwError(`The value [${valueString}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`);
         }
 

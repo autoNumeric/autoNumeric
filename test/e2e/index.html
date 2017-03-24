@@ -491,6 +491,16 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #423</p>
+			<div>
+				<input id="issue_423a" type="text" placeholder="#423" value="">
+				<input id="issue_423b" type="text" placeholder="#423" value="">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -889,6 +899,15 @@
         historySize: AutoNumeric.options.historySize.verySmall,
     });
     new AutoNumeric('#undoRedo4');
+
+    //-------------- Issue #423
+    new AutoNumeric('#issue_423a', {
+        leadingZero: AutoNumeric.options.leadingZero.keep,
+        digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator,
+        maximumValue: '99999',
+        decimalPlacesOverride: 0,
+        allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.noPadding,
+    });
 </script>
 </body>
 </html>

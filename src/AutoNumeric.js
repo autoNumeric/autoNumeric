@@ -3464,8 +3464,9 @@ class AutoNumeric {
             s = '-' + s;
         }
 
-        // Convert any arabic numbers to latin ones
-        const temp = AutoNumericHelper.arabicToLatinNumbers(s, true, false, false);
+        // Convert arabic numbers to latin ones, if any
+        const convertToNumber = settings.leadingZero !== AutoNumeric.options.leadingZero.keep;
+        const temp = AutoNumericHelper.arabicToLatinNumbers(s, convertToNumber, false, false);
         if (!isNaN(temp)) {
             s = temp.toString();
         }

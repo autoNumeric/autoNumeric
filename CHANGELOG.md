@@ -12,6 +12,7 @@
 + Reorganize the `set()` function to keep logical steps together.
 + Rename the old `autoFormat.autoNumeric` event to the already used `autoNumeric:formatted` to keep the names consistent.
 + Sort the option list in the `_convertOldOptionsToNewOnes()` function.
++ Fix issue #423 `leadingZero` set to `keep` does not keep the leading zeros under Chrome
 
 ### "4.0.0-beta.2"
 + Fix issue #413 Manage the drag 'n drop event so that the text dropped in the AutoNumeric element gets formatted accordingly

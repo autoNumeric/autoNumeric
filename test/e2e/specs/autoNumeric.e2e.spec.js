@@ -108,6 +108,8 @@ const selectors = {
     undoRedo2                         : '#undoRedo2',
     undoRedo3                         : '#undoRedo3',
     undoRedo4                         : '#undoRedo4',
+    issue423a                         : '#issue_423a',
+    issue423b                         : '#issue_423b',
 };
 
 //-----------------------------------------------------------------------------
@@ -2083,5 +2085,45 @@ describe('undo and redo functions', () => {
             return position.start;
         }).value;
         expect(inputCaretPosition).toEqual(8);
+    });
+});
+
+describe('Issue #423', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue423a)).toEqual('');
+    });
+
+    it('should keep zeros when losing focus and coming back to the element', () => {
+        const inputA = $(selectors.issue423a);
+        const inputB = $(selectors.issue423b);
+
+        // Focus in the input
+        inputA.click();
+
+        // Input the numbers
+        browser.keys(['00123']);
+        expect(browser.getValue(selectors.issue423a)).toEqual('00123');
+
+        // Lose the focus
+        inputB.click();
+        expect(browser.getValue(selectors.issue423a)).toEqual('00123');
+
+        // Focus back in the input
+        inputA.click();
+        expect(browser.getValue(selectors.issue423a)).toEqual('00123');
+    });
+
+    it('should automatically overwrite zeros on the left-hand side when adding numbers', () => {
+        // Input the numbers
+        browser.keys(['End', '4']);
+        expect(browser.getValue(selectors.issue423a)).toEqual('01234');
+        browser.keys(['5']);
+        expect(browser.getValue(selectors.issue423a)).toEqual('12345');
+
+        // Try to add more numbers, that will be dropped due to the length constraint on the input
+        browser.keys(['6']);
+        expect(browser.getValue(selectors.issue423a)).toEqual('12345');
     });
 });

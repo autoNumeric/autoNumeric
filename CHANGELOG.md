@@ -9,6 +9,7 @@
 + Upgrade the `getElementSelection()` helper function in order to support contenteditable-enabled elements and hidden inputs.
 + Add an `arrayTrim()` helper function that trim the start of an array.
 + Create undo/redo end-to-end tests.
++ Reorganize the `set()` function to keep logical steps together.
 
 ### "4.0.0-beta.2"
 + Fix issue #413 Manage the drag 'n drop event so that the text dropped in the AutoNumeric element gets formatted accordingly

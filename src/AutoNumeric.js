@@ -1311,6 +1311,14 @@ class AutoNumeric {
                 if (this.settings.saveValueToSessionStorage && (this.settings.decimalPlacesShownOnFocus || this.settings.scaleDivisor)) {
                     this._saveValueToPersistentStorage('set');
                 }
+
+                if (!this.settings.hasFocus && this.settings.scaleSymbol) {
+                    value = value + this.settings.scaleSymbol;
+                }
+
+                AutoNumericHelper.setElementValue(this.domElement, value);
+
+                return this;
             } else {
                 this._setRawValue('', saveChangeToHistory);
                 this._saveValueToPersistentStorage('remove');
@@ -1346,14 +1354,6 @@ class AutoNumeric {
 
             return this;
         }
-
-        if (!this.settings.hasFocus && this.settings.scaleSymbol) {
-            value = value + this.settings.scaleSymbol;
-        }
-
-        AutoNumericHelper.setElementValue(this.domElement, value);
-
-        return this;
     }
 
     /**
@@ -4397,11 +4397,11 @@ class AutoNumeric {
                 }
             }
         }
-        
+
         if (this.onGoingRedo && (e.ctrlKey || e.shiftKey)) {
             // Special case where if the user had done `Control+Shift+z`, then release `z`, keeping `Control` or `Shift` pressed, then `this.onGoingRedo` is never changed back to `false` when the user release `Control` or `Shift`
             this.onGoingRedo = false;
-        } 
+        }
 
         // Manage the reformat when hovered with the Alt key pressed
         if (this.eventKey === AutoNumericEnum.keyName.Alt && this.hoveredWithAlt) {

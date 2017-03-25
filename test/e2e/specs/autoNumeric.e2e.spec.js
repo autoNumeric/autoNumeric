@@ -110,6 +110,9 @@ const selectors = {
     undoRedo4                         : '#undoRedo4',
     issue423a                         : '#issue_423a',
     issue423b                         : '#issue_423b',
+    issue409a                         : '#issue_409a',
+    issue409n                         : '#issue_409n',
+    issue409f                         : '#issue_409f',
 };
 
 //-----------------------------------------------------------------------------
@@ -2125,5 +2128,83 @@ describe('Issue #423', () => {
         // Try to add more numbers, that will be dropped due to the length constraint on the input
         browser.keys(['6']);
         expect(browser.getValue(selectors.issue423a)).toEqual('12345');
+    });
+});
+
+describe('Issue #409', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue409a)).toEqual('500.40');
+        expect(browser.getValue(selectors.issue409n)).toEqual('500.4');
+        expect(browser.getValue(selectors.issue409f)).toEqual('500.40');
+    });
+
+    it('should keep or remove zeros when losing focus and coming back to the element', () => {
+        const inputA = $(selectors.issue409a);
+        const inputN = $(selectors.issue409n);
+        const inputF = $(selectors.issue409f);
+
+        // Focus on the first input that we want to test
+        inputA.click();
+
+        // Modify the value to an integer
+        browser.keys(['End', 'Backspace', 'Backspace']);
+        inputN.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409a)).toEqual('500.00');
+
+        // Modify the value to an integer
+        browser.keys(['End', 'Backspace']);
+        inputF.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409n)).toEqual('500');
+
+        // Modify the value to float
+        browser.keys(['End', 'Backspace']);
+        inputA.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409f)).toEqual('500.40');
+
+        // Modify the value to an integer
+        inputF.click();
+        browser.keys(['End', 'Backspace', 'Backspace']);
+        inputA.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409f)).toEqual('500');
+    });
+
+    it('should keep or remove zeros when adding back the decimal part, and losing focus and coming back to the element', () => {
+        const inputA = $(selectors.issue409a);
+        const inputN = $(selectors.issue409n);
+        const inputF = $(selectors.issue409f);
+
+        // Focus on the first input that we want to test
+        inputA.click();
+
+        // Modify the value to a float
+        browser.keys(['End', 'ArrowLeft', 'Backspace', '2']);
+        inputN.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409a)).toEqual('500.20');
+        inputA.click();
+        browser.keys(['End', 'Backspace', 'Backspace', '2']);
+        inputN.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409a)).toEqual('500.20');
+
+        // Check that the value is converted to an integer by dropping the last dot character
+        browser.keys(['End', '.']);
+        inputF.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409n)).toEqual('500');
+        inputN.click();
+        // Modify the value to a float
+        browser.keys(['End', '.', '2']);
+        inputF.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409n)).toEqual('500.2');
+
+        // Modify the value to float
+        browser.keys(['End', '.']);
+        inputA.click(); // Focus out of the input so that it reformat itself
+        // Check that the value is converted to an integer by dropping the last dot character
+        expect(browser.getValue(selectors.issue409f)).toEqual('500');
+        inputF.click();
+        browser.keys(['End', '.', '2']);
+        inputA.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409f)).toEqual('500.20');
     });
 });

@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.3
+ * @version      4.0.0-beta.4
  * @date         2017-03-24 UTC 01:00
  *
  * @author       Bob Knothe
@@ -727,7 +727,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.3';
+        return '4.0.0-beta.4';
     }
 
     /**
@@ -2761,8 +2761,10 @@ class AutoNumeric {
             AutoNumericHelper.throwError(`The rounding method option 'roundingMethod' is invalid ; it should either be 'S', 'A', 's', 'a', 'B', 'U', 'D', 'C', 'F', 'N05', 'CHF', 'U05' or 'D05' (cf. documentation), [${options.roundingMethod}] given.`);
         }
 
-        if (!AutoNumericHelper.isTrueOrFalseString(options.allowDecimalPadding) && !AutoNumericHelper.isBoolean(options.allowDecimalPadding)) {
-            AutoNumericHelper.throwError(`The control decimal padding option 'allowDecimalPadding' is invalid ; it should be either 'false' or 'true', [${options.allowDecimalPadding}] given.`);
+        if (!AutoNumericHelper.isTrueOrFalseString(options.allowDecimalPadding) &&
+            !AutoNumericHelper.isBoolean(options.allowDecimalPadding) &&
+            options.allowDecimalPadding !== AutoNumeric.options.allowDecimalPadding.floats) {
+            AutoNumericHelper.throwError(`The control decimal padding option 'allowDecimalPadding' is invalid ; it should be either 'false', 'true' or 'floats', [${options.allowDecimalPadding}] given.`);
         }
 
         if (!AutoNumericHelper.isNull(options.negativeBracketsTypeOnBlur) && !AutoNumericHelper.isInArray(options.negativeBracketsTypeOnBlur, [
@@ -3725,12 +3727,12 @@ class AutoNumeric {
      * Truncate not needed zeros
      *
      * @param {string} roundedInputValue
-     * @param {int} temporaryDecimalPlacesOverride
+     * @param {int} decimalPlacesOverride
      * @returns {void|XML|string|*}
      */
-    static _truncateZeros(roundedInputValue, temporaryDecimalPlacesOverride) {
+    static _truncateZeros(roundedInputValue, decimalPlacesOverride) {
         let regex;
-        switch (temporaryDecimalPlacesOverride) {
+        switch (decimalPlacesOverride) {
             case 0:
                 // Prevents padding - removes trailing zeros until the first significant digit is encountered
                 regex = /(\.(?:\d*[1-9])?)0*$/;
@@ -3741,12 +3743,12 @@ class AutoNumeric {
                 break;
             default :
                 // Removes access zeros to the decimalPlacesOverride length when allowDecimalPadding is set to true
-                regex = new RegExp(`(\\.\\d{${temporaryDecimalPlacesOverride}}(?:\\d*[1-9])?)0*`);
+                regex = new RegExp(`(\\.\\d{${decimalPlacesOverride}}(?:\\d*[1-9])?)0*`);
         }
 
         // If there are no decimal places, we don't need a decimal point at the end
         roundedInputValue = roundedInputValue.replace(regex, '$1');
-        if (temporaryDecimalPlacesOverride === 0) {
+        if (decimalPlacesOverride === 0) {
             roundedInputValue = roundedInputValue.replace(/\.$/, '');
         }
 
@@ -3765,6 +3767,7 @@ class AutoNumeric {
      */
     static _roundValue(inputValue, settings) {
         //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
+        //TODO Divide this function to make it easier to understand
         inputValue = (inputValue === '') ? '0' : inputValue.toString();
         if (settings.roundingMethod === AutoNumeric.options.roundingMethod.toNearest05 ||
             settings.roundingMethod === AutoNumeric.options.roundingMethod.toNearest05Alt ||
@@ -3794,19 +3797,8 @@ class AutoNumeric {
             return result;
         }
 
-        let inputValueRounded = '';
-        let i = 0;
+        // Checks if `inputValue` is a negative value
         let negativeSign = '';
-        let temporaryDecimalPlacesOverride;
-
-        // sets the truncate zero method
-        if (settings.allowDecimalPadding) {
-            temporaryDecimalPlacesOverride = settings.decimalPlacesOverride;
-        } else {
-            temporaryDecimalPlacesOverride = 0;
-        }
-
-        // Checks if the inputValue (input Value) is a negative value
         if (AutoNumericHelper.isNegativeStrict(inputValue)) {
             negativeSign = '-';
 
@@ -3825,37 +3817,54 @@ class AutoNumeric {
         }
 
         // Trims leading zero's as needed
-        if ((Number(inputValue) > 0 && settings.leadingZero !== AutoNumeric.options.leadingZero.keep) || (inputValue.length > 0 && settings.leadingZero === AutoNumeric.options.leadingZero.allow)) {
+        if ((Number(inputValue) > 0 && settings.leadingZero !== AutoNumeric.options.leadingZero.keep) ||
+            (inputValue.length > 0 && settings.leadingZero === AutoNumeric.options.leadingZero.allow)) {
             inputValue = inputValue.replace(/^0*(\d)/, '$1');
         }
 
-        const dPos = inputValue.lastIndexOf('.');
-        const inputValueHasADot = dPos === -1;
+        const decimalCharacterPosition = inputValue.lastIndexOf('.');
+        const inputValueHasADot = decimalCharacterPosition === -1;
+        const [, decimalPart] = inputValue.split('.'); // Here the decimal character is always a period '.'
+        const hasDecimals = decimalPart > 0;
+
+        if (!hasDecimals &&
+            (settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.never ||
+            settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.floats)) {
+            return (Number(inputValue) === 0) ? inputValue : negativeSign + inputValue;
+        }
 
         // Virtual decimal position
-        const vdPos = inputValueHasADot ? inputValue.length - 1 : dPos;
+        const virtualDecimalPosition = inputValueHasADot ? inputValue.length - 1 : decimalCharacterPosition;
+
+        // Sets the truncate zero method
+        let temporaryDecimalPlacesOverride;
+        if (settings.allowDecimalPadding) {
+            temporaryDecimalPlacesOverride = settings.decimalPlacesOverride;
+        } else {
+            temporaryDecimalPlacesOverride = 0;
+        }
 
         // Checks decimal places to determine if rounding is required :
+        let inputValueRounded = '';
+        let checkDecimalPlaces = (inputValue.length - 1) - virtualDecimalPosition;
         // Check if no rounding is required
-        let cDec = (inputValue.length - 1) - vdPos;
-
-        if (cDec <= settings.decimalPlacesOverride) {
+        if (checkDecimalPlaces <= settings.decimalPlacesOverride) {
             // Check if we need to pad with zeros
             inputValueRounded = inputValue;
-            if (cDec < temporaryDecimalPlacesOverride) {
+            if (checkDecimalPlaces < temporaryDecimalPlacesOverride) {
                 if (inputValueHasADot) {
                     inputValueRounded += settings.decimalCharacter;
                 }
 
                 let zeros = '000000';
-                while (cDec < temporaryDecimalPlacesOverride) {
-                    zeros = zeros.substring(0, temporaryDecimalPlacesOverride - cDec);
+                while (checkDecimalPlaces < temporaryDecimalPlacesOverride) {
+                    zeros = zeros.substring(0, temporaryDecimalPlacesOverride - checkDecimalPlaces);
                     inputValueRounded += zeros;
-                    cDec += zeros.length;
+                    checkDecimalPlaces += zeros.length;
                 }
-            } else if (cDec > temporaryDecimalPlacesOverride) {
+            } else if (checkDecimalPlaces > temporaryDecimalPlacesOverride) {
                 inputValueRounded = this._truncateZeros(inputValueRounded, temporaryDecimalPlacesOverride);
-            } else if (cDec === 0 && temporaryDecimalPlacesOverride === 0) {
+            } else if (checkDecimalPlaces === 0 && temporaryDecimalPlacesOverride === 0) {
                 inputValueRounded = inputValueRounded.replace(/\.$/, '');
             }
 
@@ -3867,12 +3876,12 @@ class AutoNumeric {
         if (inputValueHasADot) {
             roundedStrLength = settings.decimalPlacesOverride - 1;
         } else {
-            roundedStrLength = settings.decimalPlacesOverride + dPos;
+            roundedStrLength = settings.decimalPlacesOverride + decimalCharacterPosition;
         }
 
         const tRound = Number(inputValue.charAt(roundedStrLength + 1));
         const odd = (inputValue.charAt(roundedStrLength) === '.') ? (inputValue.charAt(roundedStrLength - 1) % 2) : (inputValue.charAt(roundedStrLength) % 2);
-        let inpuValueArray = inputValue.substring(0, roundedStrLength + 1).split('');
+        let inputValueArray = inputValue.substring(0, roundedStrLength + 1).split('');
 
         if ((tRound > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpSymmetric)                                         || // Round half up symmetric
             (tRound > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpAsymmetric && negativeSign === '')                 || // Round half up asymmetric positive values
@@ -3886,25 +3895,25 @@ class AutoNumeric {
             (tRound > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.toFloorTowardNegativeInfinity && negativeSign === '-')   ||
             (tRound > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.upRoundAwayFromZero)) {                                     // Round up away from zero
             // Round up the last digit if required, and continue until no more 9's are found
-            for (i = (inpuValueArray.length - 1); i >= 0; i -= 1) {
-                if (inpuValueArray[i] !== '.') {
-                    inpuValueArray[i] = +inpuValueArray[i] + 1;
-                    if (inpuValueArray[i] < 10) {
+            for (let i = (inputValueArray.length - 1); i >= 0; i -= 1) {
+                if (inputValueArray[i] !== '.') {
+                    inputValueArray[i] = +inputValueArray[i] + 1;
+                    if (inputValueArray[i] < 10) {
                         break;
                     }
 
                     if (i > 0) {
-                        inpuValueArray[i] = '0';
+                        inputValueArray[i] = '0';
                     }
                 }
             }
         }
 
         // Reconstruct the string, converting any 10's to 0's
-        inpuValueArray = inpuValueArray.slice(0, roundedStrLength + 1);
+        inputValueArray = inputValueArray.slice(0, roundedStrLength + 1);
 
         // Return the rounded value
-        inputValueRounded = this._truncateZeros(inpuValueArray.join(''), temporaryDecimalPlacesOverride);
+        inputValueRounded = this._truncateZeros(inputValueArray.join(''), temporaryDecimalPlacesOverride);
 
         return (Number(inputValueRounded) === 0) ? inputValueRounded : negativeSign + inputValueRounded;
     }
@@ -4531,7 +4540,10 @@ class AutoNumeric {
                 groupedValue = this.constructor._addGroupSeparators(value, this.settings);
             }
 
-            if (groupedValue !== origValue) {
+            // Testing for `allowDecimalPadding.never` is needed to make sure we do not keep a trailing decimalCharacter (like '500.') in the element, since the raw value would still be a rightly formatted integer ('500')
+            if (groupedValue !== origValue ||
+                this.settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.never ||
+                this.settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.floats) {
                 if (this.settings.scaleSymbol) {
                     groupedValue = `${groupedValue}${this.settings.scaleSymbol}`;
                 }
@@ -6537,8 +6549,9 @@ class AutoNumeric {
  */
 AutoNumeric.options = {
     allowDecimalPadding          : {
-        padding  : true,
-        noPadding: false,
+        always: true,
+        never : false,
+        floats: 'floats',
     },
     createLocalList              : {
         createList     : true,
@@ -6808,13 +6821,12 @@ AutoNumeric.options = {
  */
 AutoNumeric.defaultSettings = {
     /* Allow padding the decimal places with zeros
-     * allowDecimalPadding: true - always Pad decimals with zeros
-     * allowDecimalPadding: false - does not pad with zeros.
+     * `true`   : always pad decimals with zeros
+     * `false`  : never pad with zeros
+     * `'floats'` : pad with zeros only when there are decimals
      * Note: setting allowDecimalPadding to 'false' will override the 'decimalPlacesOverride' setting.
-     *
-     * thanks to Jonas Johansson for the suggestion
      */
-    allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.padding,
+    allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.always,
 
     /* Defines if a local list of AutoNumeric objects should be kept when initializing this object.
      * This list is used by the `global.*` functions.
@@ -7201,9 +7213,9 @@ AutoNumeric.predefinedOptions = {
     integer:    { minimumValue: AutoNumeric.options.minimumValue.tenTrillionsNoDecimals, maximumValue: AutoNumeric.options.maximumValue.tenTrillionsNoDecimals },
     integerPos: { minimumValue: AutoNumeric.options.minimumValue.zero                  , maximumValue: AutoNumeric.options.maximumValue.tenTrillionsNoDecimals },
     integerNeg: { minimumValue: AutoNumeric.options.minimumValue.tenTrillionsNoDecimals, maximumValue: AutoNumeric.options.maximumValue.zero                   },
-    float:      { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.noPadding },
-    floatPos:   { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.noPadding, minimumValue: AutoNumeric.options.minimumValue.zero        , maximumValue: AutoNumeric.options.maximumValue.tenTrillions },
-    floatNeg:   { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.noPadding, minimumValue: AutoNumeric.options.minimumValue.tenTrillions, maximumValue: AutoNumeric.options.maximumValue.zero         },
+    float:      { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never },
+    floatPos:   { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, minimumValue: AutoNumeric.options.minimumValue.zero        , maximumValue: AutoNumeric.options.maximumValue.tenTrillions },
+    floatNeg:   { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, minimumValue: AutoNumeric.options.minimumValue.tenTrillions, maximumValue: AutoNumeric.options.maximumValue.zero         },
     numeric: {
         digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator,
         decimalCharacter   : AutoNumeric.options.decimalCharacter.dot,

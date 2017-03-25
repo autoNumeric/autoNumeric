@@ -2311,7 +2311,7 @@ describe(`autoNumeric initialization calls`, () => {
 
         aNInput.set(15.001);
         expect(aNInput.getFormatted()).toEqual('15');
-        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.padding);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
         expect(aNInput.getFormatted()).toEqual('15.00');
     });
 
@@ -2591,17 +2591,20 @@ describe('autoNumeric `options.*` calls', () => {
 
         aNInput.options.reset().french().set(-1234567.846);
         expect(aNInput.getFormatted()).toEqual('-1.234.567,85\u202f€');
-        //FIXME Test all the rounding methods
         aNInput.options.roundingMethod(AutoNumeric.options.roundingMethod.downRoundTowardZero);
         aNInput.set(-1234567.846);
         expect(aNInput.getFormatted()).toEqual('-1.234.567,84\u202f€');
 
-        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.padding);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
         aNInput.set(-1234567);
         expect(aNInput.getFormatted()).toEqual('-1.234.567,00\u202f€');
-        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.noPadding);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
         expect(aNInput.getFormatted()).toEqual('-1.234.567\u202f€');
-        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.padding);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('-1.234.567\u202f€');
+        aNInput.set(-1234567.8);
+        expect(aNInput.getFormatted()).toEqual('-1.234.567,80\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
 
         aNInput.set('');
         aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.focus);
@@ -2960,7 +2963,6 @@ describe(`autoNumeric 'getNumericString', 'getLocalized' and 'getNumber' methods
         aNInput.remove();
         document.body.removeChild(newInput);
     });
-
 
     it('should return an unformatted value, (without having any option specified)', () => {
         // With an integer
@@ -3846,6 +3848,169 @@ describe(`autoNumeric 'form*' methods`, () => {
     //FIXME à terminer : formUnformat, formReformat, formSubmitString*
 });
 
+describe('The `allowDecimalPadding` option', () => {
+    let aNInput;
+    let newInput;
+
+    beforeEach(() => { // Initialization
+        newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+    });
+
+    afterEach(() => { // Un-initialization
+        aNInput.remove();
+        document.body.removeChild(newInput);
+    });
+
+    it('should show / hide decimal places correctly on positive numbers without a currency sign', () => {
+        spyOn(console, 'warn');
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().float);
+
+        aNInput.set(15.001);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('15.00');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('15');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('15');
+
+        aNInput.set(15.20);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('15.20');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('15.2');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('15.20');
+
+        aNInput.set(15);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('15.00');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('15');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('15');
+
+        aNInput.set(0);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('0.00');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('0');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('0');
+
+        aNInput.set('');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('');
+    });
+
+    it('should show / hide decimal places correctly on negative numbers without a currency sign', () => {
+        spyOn(console, 'warn');
+        aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().float);
+
+        aNInput.set(-15.001);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('-15.00');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('-15');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('-15');
+
+        aNInput.set(-15.20);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('-15.20');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('-15.2');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('-15.20');
+
+        aNInput.set(-15);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('-15.00');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('-15');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('-15');
+    });
+
+    it('should show / hide decimal places correctly on positive numbers with a currency sign', () => {
+        spyOn(console, 'warn');
+        aNInput = new AutoNumeric(newInput).french();
+
+        aNInput.set(15.001);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('15,00\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('15\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('15\u202f€');
+
+        aNInput.set(15.20);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('15,20\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('15,2\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('15,20\u202f€');
+
+        aNInput.set(15);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('15,00\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('15\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('15\u202f€');
+
+        aNInput.set(0);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('0,00\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('0\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('0\u202f€');
+
+        aNInput.set('');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('');
+    });
+
+    it('should show / hide decimal places correctly on negative numbers with a currency sign', () => {
+        spyOn(console, 'warn');
+        aNInput = new AutoNumeric(newInput).french();
+
+        aNInput.set(-15.001);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('-15,00\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('-15\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('-15\u202f€');
+
+        aNInput.set(-15.20);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('-15,20\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('-15,2\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('-15,20\u202f€');
+
+        aNInput.set(-15);
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+        expect(aNInput.getFormatted()).toEqual('-15,00\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+        expect(aNInput.getFormatted()).toEqual('-15\u202f€');
+        aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+        expect(aNInput.getFormatted()).toEqual('-15\u202f€');
+    });
+});
+
 //TODO Complete the tests in order to test every single method separately
 
 //-----------------------------------------------------------------------------
@@ -4136,6 +4301,7 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ allowDecimalPadding: false })).not.toThrow();
             expect(() => AutoNumeric.validate({ allowDecimalPadding: 'true' })).not.toThrow();
             expect(() => AutoNumeric.validate({ allowDecimalPadding: 'false' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: null })).not.toThrow();
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '(,)' })).not.toThrow();
@@ -4248,7 +4414,7 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow(); // This will output 2 warnings
             expect(() => AutoNumeric.validate({ decimalPlacesOverride: '2', minimumValue: '0', maximumValue: '20' })).not.toThrow(); // This will output a warning
 
-            expect(() => AutoNumeric.validate({ allowDecimalPadding: false, decimalPlacesOverride: '2' })).not.toThrow(); // This will output a warning
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, decimalPlacesOverride: '2' })).not.toThrow(); // This will output a warning
             expect(console.warn).toHaveBeenCalled();
             expect(console.warn).toHaveBeenCalledTimes(7);
         });

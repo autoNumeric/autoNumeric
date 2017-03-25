@@ -501,6 +501,17 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #409</p>
+			<div>
+				<input id="issue_409a" type="text" placeholder="#409" value="">
+				<input id="issue_409n" type="text" placeholder="#409" value="">
+				<input id="issue_409f" type="text" placeholder="#409" value="">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -663,7 +674,7 @@
     new AutoNumeric('#issue_302', { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '\u00a0€', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', leadingZero: 'deny' });
 
     //-------------- Issue #226
-    new AutoNumeric('#issue_226', { allowDecimalPadding: false, formatOnPageLoad: false, minimumValue: '0', leadingZero: 'deny', maximumValue: '2147483647', decimalPlacesOverride: '0' });
+    new AutoNumeric('#issue_226', { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, formatOnPageLoad: false, minimumValue: '0', leadingZero: 'deny', maximumValue: '2147483647', decimalPlacesOverride: '0' });
 
     //-------------- Issue #187
     new AutoNumeric('#issue_187');
@@ -820,7 +831,7 @@
     new AutoNumeric('#issue_322');
 
     //-------------- Issue #250
-    new AutoNumeric('#issue_250', { decimalPlacesOverride: 2, allowDecimalPadding: false, minimumValue: '2', maximumValue: '999999999' });
+    new AutoNumeric('#issue_250', { decimalPlacesOverride: 2, allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, minimumValue: '2', maximumValue: '999999999' });
 
     //-------------- Issue #317
     new AutoNumeric('#issue_317', { leadingZero: 'deny', decimalCharacterAlternative: ',' });
@@ -893,21 +904,26 @@
     new AutoNumeric('#undoRedo2').french();
     new AutoNumeric('#undoRedo3', {
         digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.dot,
-        decimalCharacter: AutoNumeric.options.decimalCharacter.comma,
-	    minimumValue : 0,
-	    maximumValue : 99999999,
-        historySize: AutoNumeric.options.historySize.verySmall,
+        decimalCharacter   : AutoNumeric.options.decimalCharacter.comma,
+        minimumValue       : 0,
+        maximumValue       : 99999999,
+        historySize        : AutoNumeric.options.historySize.verySmall,
     });
     new AutoNumeric('#undoRedo4');
 
     //-------------- Issue #423
     new AutoNumeric('#issue_423a', {
-        leadingZero: AutoNumeric.options.leadingZero.keep,
-        digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator,
-        maximumValue: '99999',
+        leadingZero          : AutoNumeric.options.leadingZero.keep,
+        digitGroupSeparator  : AutoNumeric.options.digitGroupSeparator.noSeparator,
+        maximumValue         : '99999',
         decimalPlacesOverride: 0,
-        allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.noPadding,
+        allowDecimalPadding  : AutoNumeric.options.allowDecimalPadding.never,
     });
+
+    //-------------- Issue #409
+    new AutoNumeric('#issue_409a', 500.40, { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.always });
+    new AutoNumeric('#issue_409n', 500.40, { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never });
+    new AutoNumeric('#issue_409f', 500.40, { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats });
 </script>
 </body>
 </html>

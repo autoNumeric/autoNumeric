@@ -157,7 +157,7 @@ Multiple options allow you to customize precisely how a form input will format y
 
 | Option           | Description | Default Value |
 | :---------------- | :-----------:  | :-----------:  |
-| `allowDecimalPadding`| Allow padding the decimal places with zeros | `true` |
+| `allowDecimalPadding`| Allow padding the decimal places with zeros. If set to `'floats'`, padding is only done when there are some decimals. | `true` |
 | `createLocalList` | Determine if a local list of AutoNumeric objects must be kept when initializing the elements and others | `true` |
 | `currencySymbol` | Currency symbol | `''` |
 | `currencySymbolPlacement` | Placement of the currency sign, relative to the number (as a prefix or a suffix) | `'p'` |

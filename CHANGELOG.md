@@ -3,6 +3,7 @@
 ### "4.0.0-beta.4"
 + Fix issue #409 Do not add decimal padding when a number without decimals has been inserted
 + Fix an issue when you have `allowDecimalPadding` set to `never`, then if you delete the decimal places leaving the decimal character, it would not drop that dangling decimal character on focus out.
++ Fix issue #418 Complete the documentation with the AutoNumeric event lifecycle
 
 ### "4.0.0-beta.3"
 + Fix issue #415 Support undo and redo actions

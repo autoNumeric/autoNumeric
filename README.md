@@ -37,18 +37,27 @@ const autoNumericOptionsEuro = {
 // Initialization
 new AutoNumeric(domElement, autoNumericOptionsEuro);
 ```
-- User experience oriented ; using autoNumeric just feels right and natural
+- User experience oriented ; using autoNumeric just feels right and natural, specially with the new function chaining feature
+```js
+anElement.french()
+         .set(42)
+         .update({ options })
+         .formSubmitJsonNumericString(callback)
+         .clear();
+```
 - Supports most international numeric formats and currencies<br>*(If the one you use is not supported yet, open an [issue](https://github.com/BobKnothe/autoNumeric/issues/new) and we'll add it as soon as possible!)*
 
 *And also:*
 - Any number of different formats can be used at the same time on the same page.<br>Each input can be configured by either setting the options as HTML5 data attributes, or directly passed as an argument in the Javascript code
 - The settings can easily be changed at *any* time using the `update` method or via a callback
-- autoNumeric supports `input` elements as well as most text elements, allowing you to place formatted numbers and currencies on just about any part of your page
+- autoNumeric supports `input` elements as well as most text elements with the `contenteditable` attribute, allowing you to place formatted numbers and currencies on just about any part of your pages
 - AutoNumeric elements can be linked together allowing you to perform one action on multiple elements at once
-- 7 pre-defined [currency options](#predefined-language-options) allows you to directly use autoNumeric by skipping the option configuration step
+- 8 pre-defined [currency options](#predefined-language-options) as well as 31 [common options](#predefined-common-options) allows you to directly use autoNumeric by skipping the option configuration step
 - 26 built-in [methods](#methods) gives you the flexibility needed to use autoNumeric to its maximum potential
+- 22 [global methods](#perform-actions-globally-on-a-shared-list-of-autonumeric-elements) that allows to control sets of AutoNumeric-managed elements at once
 - 21 additional [methods](#methods) specialized for managing form submission
-- More than 40 [options](#options) allows you to customize the output format
+- 13 [static functions](#static-methods) provided by the `AutoNumeric` class
+- And more than 40 [options](#options) allows you to customize the output format
 
 With that said, autoNumeric supports most international numeric formats and currencies including those used in Europe, Asia, and North and South America.
 
@@ -585,6 +594,64 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 | `test` | Test if the given domElement is already managed by AutoNumeric (if it is initialized) | `AutoNumeric.test(domElement);` |
 | `version` | Return the AutoNumeric version number (for debugging purpose) | `AutoNumeric.version();` |
 
+
+## Event lifecycle
+AutoNumeric elements are transparent to the native `input` and `change` events, which means those are correctly sent when using an `<input>` element managed by AutoNumeric.<br>
+In addition to the native events, custom events sent by AutoNumeric elements allows you to hook into the formatting lifecycle, as you see fit.
+
+Following are listed how AutoNumeric react to different types of key inputs.
+
+By default a 'normal' printable character input (ie. `'2'` or `','`) will result in those events, in that specific order:
+1. `'keydown'`
+1. `'autoNumeric:minExceeded'` or `'autoNumeric:maxExceeded'` if there was a range problem
+1. `'keypress'` (this is deprecated and will be removed *soon*)
+1. `'input'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'` when all the formatting is done
+
+When inputting a modifier key (ie. `Control`), we get:
+1. `'keydown'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
+
+If `Delete` or `backspace` is entered, the following events are sent:
+1. `'keydown'`
+1. `'input'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
+
+If `Enter` is entered and the value has not changed, the following events are sent:
+1. `'keydown'`
+1. `'keypress'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
+
+If `Enter` is entered and the value has been changed, the following events are sent:
+1. `'keydown'`
+1. `'keypress'`
+1. `'change'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
+
+When a `paste` is done with the mouse, the following events are sent:
+1. `'input'`
+1. `'keydown'`
+1. `'input'`
+1. `'keyup'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
+
+And when a `paste` is done with the keyboard shortcut (ie `ctrl+v`), the following events are sent:
+1. `'keydown'`
+1. `'keydown'`
+1. `'input'`
+1. `'keyup'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
+
+Finally, the `'change'` event is sent on `blur` if the value has been changed since the `focus` one.
+
+*Note: the `AutoNumeric.format()` static function does trigger an `'autoNumeric:formatted'` event if the value that the user is trying to format is outside the `minimumValue` and `maximumValue` range, with the `detail` attribute containing the range error message.*
 
 ## Questions
 For questions and support please use the [Gitter chat room](https://gitter.im/autoNumeric/Lobby) or IRC on Freenode #autoNumeric.<br>The issue list of this repository is **exclusively** for bug reports and feature requests.

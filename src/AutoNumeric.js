@@ -4409,7 +4409,7 @@ class AutoNumeric {
         }
 
         if (this.onGoingRedo && (e.ctrlKey || e.shiftKey)) {
-            // Special case where if the user had done `Control+Shift+z`, then release `z`, keeping `Control` or `Shift` pressed, then `this.onGoingRedo` is never changed back to `false` when the user release `Control` or `Shift`
+            // Special case where if the user has entered `Control+Shift+z`, then release `z`, keeping `Control` or `Shift` pressed, then `this.onGoingRedo` is never changed back to `false` when the user release `Control` or `Shift`
             this.onGoingRedo = false;
         }
 

@@ -203,6 +203,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | `selectNumberOnly`| Determine if the select all keyboard command will select the complete input text, or only the input numeric value | `false` |
 | `showPositiveSign` | Allow the positive sign symbol `+` to be displayed for positive numbers | `false` |
 | `showWarnings`| Defines if warnings should be shown | `true` |
+| `styleRules`| Defines the rules that calculate the CSS class(es) to apply on the element, based on the raw unformatted value.<br>This can also be used to call callbacks whenever the `rawValue` is updated. | `null` |
 | `suffixText` | Additional text suffix that is added after the number | `''` |
 | `unformatOnHover`| Defines if the element value should be unformatted when the user hover his mouse over it while holding the `Alt` key | `true` |
 | `unformatOnSubmit`| Removes formatting on submit event | `false` |
@@ -299,6 +300,79 @@ Moreover, autoNumeric provides the following common options:
 You can set those pre-defined options like so:
 ```js
 new AutoNumeric('.mySelector > input', AutoNumeric.getPredefinedOptions().integerPos);
+```
+
+##### Predefined style rules
+
+With the `styleRules` option, you can define the rules that add or remove the CSS class(es) from the element, based on the raw unformatted value.<br>This option can also be used to define custom callbacks in the `userDefined` attribute, that will be called whenever the `rawValue` is updated.
+
+Predefined styles are available so you do not have to create them:
+
+###### Positive and negative
+Sets the `'autoNumeric-positive'` css class whenever the raw value is positive.<br>
+Sets the `'autoNumeric-negative'` css class whenever the raw value is negative.
+```js
+new AutoNumeric(domElement, { styleRules: AutoNumeric.options.styleRules.positiveNegative });
+```
+
+###### Range from 0 to 100, in 4 steps
+Sets the `'autoNumeric-red'` css class whenever the raw value is between `0` and `25` excluded.<br>
+Sets the `'autoNumeric-orange'` css class whenever the raw value is between `25` and `50` excluded.<br>
+Sets the `'autoNumeric-yellow'` css class whenever the raw value is between `50` and `75` excluded.<br>
+Sets the `'autoNumeric-green'` css class whenever the raw value is between `75` and `100` excluded.
+```js
+new AutoNumeric(domElement, { styleRules: AutoNumeric.options.styleRules.range0To100With4Steps });
+```
+
+###### Odd and even
+Sets the `'autoNumeric-even'` css class whenever the raw value is even.<br>
+Sets the `'autoNumeric-odd'` css class whenever the raw value is odd.
+```js
+new AutoNumeric(domElement, { styleRules: AutoNumeric.options.styleRules.evenOdd });
+```
+
+###### Small range around zero, from -1 to 1
+Sets the `'autoNumeric-small-negative'` css class whenever the raw value is between `-1` and `0` excluded.<br>
+Sets the `'autoNumeric-zero'` css class whenever the raw value is equal to `0`.<br>
+Sets the `'autoNumeric-small-positive'` css class whenever the raw value is between `0` excluded and `1`.
+```js
+new AutoNumeric(domElement, { styleRules: AutoNumeric.options.styleRules.rangeSmallAndZero });
+```
+
+###### Custom callbacks
+Custom callbacks can be defined and will be called every time the *raw value* is updated.<br>
+You can add as many callbacks you want in the `userDefined` attribute of the `styleRules` object in the options.<br>
+Each `userDefined` array entry should at least provide a function as the `callback` attribute.<br>
+This `callback` function is passed the `rawValue` as the single parameter (except if `classes` is `null` or `undefined`, see below).
+
+Depending of what type of data the `callback` function returns, and what the content of the `classes` attribute is, it will either uses CSS class names defined in the `classes` attribute, or just call the `callback` with the current AutoNumeric object passed as a parameter if `classes` is `null` or `undefined`.
+
+| # | Callback return type | `classes` content | Result |
+| :----------------: | :----------------: | :-----------: | :-----------:  |
+| 1 | a `boolean` | a single `String` | If `true`, add the single class defined in `classes`. If `false` removes it. |
+| 2 | a `boolean` | an `Array` with 2 values (array indexes) | If `true`, add the first element of the array, otherwise the second |
+| 3 | an `integer` | an `Array` with multiple values (array indexes) | Will add the selected CSS class `classes[index]`, and remove the others |
+| 4 | an `Array` of `integer` | an `Array` with multiple values (array indexes) | Will add *all* the given selected CSS classes, and remove the others |
+| 5 | ∅ | `null` or `undefined` | There, the callback have access to the current AutoNumeric object passed as its argument, which means you are free to do *whatever you want* from here! |
+
+See the following examples:
+```js
+const options = {
+    styleRules : {
+        userDefined: [
+            // 1) If 'classes' is a string, set it if `true`, remove it if `false`
+            { callback: rawValue => { return true; }, classes: 'thisIsTrue' },
+            // 2) If 'classes' is an array with only 2 elements, set the first class if `true`, the second if `false`
+            { callback: rawValue => rawValue % 2 === 0, classes: ['autoNumeric-even', 'autoNumeric-odd'] },
+            // 3) Return only one index to use on the `classes` array (here, 'class3')
+            { callback: rawValue => { return 2; }, classes: ['class1', 'class2', 'class3'] },
+            // 4) Return an array of indexes to use on the `classes` array (here, 'class1' and 'class3')
+            { callback: rawValue => { return [0, 2]; }, classes: ['class1', 'class2', 'class3'] },
+            // 5) If 'classes' is `undefined` or `null`, then the callback is called with the AutoNumeric object passed as a parameter
+            { callback: anElement => { return anElement.getFormatted(); } },
+        ],
+    },
+}
 ```
 
 ## Initialization

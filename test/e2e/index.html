@@ -118,6 +118,65 @@
 			color           : lime;
 			text-decoration : underline;
 		}
+
+		/* AutoNumeric pre-defined colors */
+		.autoNumeric-positive {
+			color : #1CDF44 !important;
+			border-color: #1CDF44 !important;
+			border-style: dashed !important;
+		}
+
+		.autoNumeric-negative {
+			color : #EE2445 !important;
+			border-color: #EE2445 !important;
+		}
+
+		.autoNumeric-red {
+			background-color: red !important;
+			color : white !important;
+		}
+
+		.autoNumeric-orange {
+			background-color: #FF9220 !important;
+			color : white !important;
+		}
+
+		.autoNumeric-yellow {
+			background-color: yellow !important;
+			color : #333 !important;
+		}
+
+		.autoNumeric-green {
+			background-color: forestgreen !important;
+			color: white !important;
+		}
+
+		.autoNumeric-even {
+			border-color: mediumvioletred !important;
+			background-color: lightpink !important;
+			color: #662043 !important;
+		}
+
+		.autoNumeric-odd {
+			font-style: italic !important;
+			background-color: lightgoldenrodyellow !important;
+			color: #243D66 !important;
+		}
+
+		.autoNumeric-small-negative {
+			background-color: black !important;
+			color: aquamarine !important;
+		}
+
+		.autoNumeric-zero {
+			background-color: deepskyblue !important;
+			color: #006 !important;
+		}
+
+		.autoNumeric-small-positive {
+			background-color: whitesmoke !important;
+			color: #F692FF !important;
+		}
 	</style>
 	<!-- Used by the end-to-end server spin up for the tests : -->
 	<script src="/autonumeric"></script>
@@ -509,6 +568,36 @@
 				<input id="issue_409a" type="text" placeholder="#409" value="">
 				<input id="issue_409n" type="text" placeholder="#409" value="">
 				<input id="issue_409f" type="text" placeholder="#409" value="">
+			</div>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #416 Style rules</p>
+			<div>
+				<div>
+					<input id="issue_416_1" type="text" value="1">
+				</div>
+				<div>
+					<input id="issue_416_2" type="text" value="-2">
+					<input id="issue_416_3" type="text" value="3">
+				</div>
+				<div>
+					<input id="issue_416_4" type="text" value="4">
+					<input id="issue_416_5" type="text" value="5">
+				</div>
+				<div>
+					<input id="issue_416_6" type="text" value="0">
+					<input id="issue_416_7" type="text" value="25">
+					<input id="issue_416_8" type="text" value="50">
+					<input id="issue_416_9" type="text" value="99">
+				</div>
+				<div>
+					<input id="issue_416_10" type="text" value="-1">
+					<input id="issue_416_11" type="text" value="0">
+					<input id="issue_416_12" type="text" value="0.08">
+				</div>
 			</div>
 		</div>
 	</div>
@@ -924,6 +1013,20 @@
     new AutoNumeric('#issue_409a', 500.40, { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.always });
     new AutoNumeric('#issue_409n', 500.40, { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never });
     new AutoNumeric('#issue_409f', 500.40, { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats });
+
+    //-------------- Issue #416
+    new AutoNumeric('#issue_416_1', { styleRules: AutoNumeric.options.styleRules.none });
+    new AutoNumeric('#issue_416_2', { styleRules: AutoNumeric.options.styleRules.positiveNegative });
+    new AutoNumeric('#issue_416_3', { styleRules: AutoNumeric.options.styleRules.positiveNegative });
+    new AutoNumeric('#issue_416_4', { styleRules: AutoNumeric.options.styleRules.evenOdd });
+    new AutoNumeric('#issue_416_5', { styleRules: AutoNumeric.options.styleRules.evenOdd });
+    new AutoNumeric('#issue_416_6', { styleRules: AutoNumeric.options.styleRules.range0To100With4Steps });
+    new AutoNumeric('#issue_416_7', { styleRules: AutoNumeric.options.styleRules.range0To100With4Steps });
+    new AutoNumeric('#issue_416_8', { styleRules: AutoNumeric.options.styleRules.range0To100With4Steps });
+    new AutoNumeric('#issue_416_9', { styleRules: AutoNumeric.options.styleRules.range0To100With4Steps });
+    new AutoNumeric('#issue_416_10', { styleRules: AutoNumeric.options.styleRules.rangeSmallAndZero });
+    new AutoNumeric('#issue_416_11', { styleRules: AutoNumeric.options.styleRules.rangeSmallAndZero });
+    new AutoNumeric('#issue_416_12', { styleRules: AutoNumeric.options.styleRules.rangeSmallAndZero });
 </script>
 </body>
 </html>

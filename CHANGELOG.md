@@ -1,5 +1,10 @@
 ### Change log for autoNumeric:
 
+### "4.0.0-beta.5"
++ Fix issue #416 Add support for changing the element style based on rules
++ Add the `styleRules` option that allows to modify the element style based on the raw value, but also to call any callbacks whenever this raw value change
++ Reorganize the `set()` function so that the formatted value is set before setting the `rawValue`. That way if a callback invoked by a `styleRules` modify the raw value, it'll be set correctly, since the previous `set()` call would have already changed the element value via `setElementValue()`.
+
 ### "4.0.0-beta.4"
 + Fix issue #409 Do not add decimal padding when a number without decimals has been inserted
 + Fix an issue when you have `allowDecimalPadding` set to `never`, then if you delete the decimal places leaving the decimal character, it would not drop that dangling decimal character on focus out.

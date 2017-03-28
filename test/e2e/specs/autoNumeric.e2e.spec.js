@@ -113,6 +113,18 @@ const selectors = {
     issue409a                         : '#issue_409a',
     issue409n                         : '#issue_409n',
     issue409f                         : '#issue_409f',
+    issue416Input1                    : '#issue_416_1',
+    issue416Input2                    : '#issue_416_2',
+    issue416Input3                    : '#issue_416_3',
+    issue416Input4                    : '#issue_416_4',
+    issue416Input5                    : '#issue_416_5',
+    issue416Input6                    : '#issue_416_6',
+    issue416Input7                    : '#issue_416_7',
+    issue416Input8                    : '#issue_416_8',
+    issue416Input9                    : '#issue_416_9',
+    issue416Input10                   : '#issue_416_10',
+    issue416Input11                   : '#issue_416_11',
+    issue416Input12                   : '#issue_416_12',
 };
 
 //-----------------------------------------------------------------------------
@@ -2206,5 +2218,162 @@ describe('Issue #409', () => {
         browser.keys(['End', '.', '2']);
         inputA.click(); // Focus out of the input so that it reformat itself
         expect(browser.getValue(selectors.issue409f)).toEqual('500.20');
+    });
+});
+
+describe('Issue #416', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        // none
+        expect(browser.getValue(selectors.issue416Input1)).toEqual('1.00');
+        // positiveNegative
+        expect(browser.getValue(selectors.issue416Input2)).toEqual('-2.00');
+        expect(browser.getValue(selectors.issue416Input3)).toEqual('3.00');
+        // evenOdd
+        expect(browser.getValue(selectors.issue416Input4)).toEqual('4.00');
+        expect(browser.getValue(selectors.issue416Input5)).toEqual('5.00');
+        // range0To100With4Steps
+        expect(browser.getValue(selectors.issue416Input6)).toEqual('0.00');
+        expect(browser.getValue(selectors.issue416Input7)).toEqual('25.00');
+        expect(browser.getValue(selectors.issue416Input8)).toEqual('50.00');
+        expect(browser.getValue(selectors.issue416Input9)).toEqual('99.00');
+        // rangeSmallAndZero
+        expect(browser.getValue(selectors.issue416Input10)).toEqual('-1.00');
+        expect(browser.getValue(selectors.issue416Input11)).toEqual('0.00');
+        expect(browser.getValue(selectors.issue416Input12)).toEqual('0.08');
+    });
+
+    it('should correctly change the CSS positive/negative classes', () => {
+        const input2 = $(selectors.issue416Input2);
+        const input3 = $(selectors.issue416Input3);
+
+        input2.click();
+        browser.keys(['Home', '-----']);
+        input3.click();
+        browser.keys(['Home', '-----']);
+    });
+
+    it('should correctly change the CSS odd/even classes', () => {
+        const input4 = $(selectors.issue416Input4);
+        const input5 = $(selectors.issue416Input5);
+
+        input4.click();
+        browser.keys(['Home', 'ArrowRight', 'ArrowLeft', '1']);
+        expect(browser.getValue(selectors.issue416Input4)).toEqual('41.00');
+        input5.click();
+        browser.keys(['Home', 'ArrowRight', 'ArrowLeft', '2']);
+        expect(browser.getValue(selectors.issue416Input5)).toEqual('52.00');
+    });
+
+    it('should correctly change the CSS ranges classes', () => {
+        // Not really a test, but it's pretty ;)
+        const input6 = $(selectors.issue416Input6);
+        const input7 = $(selectors.issue416Input7);
+        const input8 = $(selectors.issue416Input8);
+        const input9 = $(selectors.issue416Input9);
+
+        // One cycle
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+
+        // Second cycle
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+    });
+
+    it('should correctly change the CSS `rangeSmallAndZero` classes', () => {
+        // Ditto
+        const input10 = $(selectors.issue416Input10);
+        const input11 = $(selectors.issue416Input11);
+        const input12 = $(selectors.issue416Input12);
+
+        // One cycle
+        input10.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input11.click();
+        browser.keys(['Control', 'a', 'Control', '1']);
+        input12.click();
+        browser.keys(['Control', 'a', 'Control', '-1']);
+
+        input10.click();
+        browser.keys(['Control', 'a', 'Control', '1']);
+        input11.click();
+        browser.keys(['Control', 'a', 'Control', '-1']);
+        input12.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+
+        input10.click();
+        browser.keys(['Control', 'a', 'Control', '-1']);
+        input11.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input12.click();
+        browser.keys(['Control', 'a', 'Control', '1']);
     });
 });

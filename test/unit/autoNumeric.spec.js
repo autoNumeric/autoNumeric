@@ -33,6 +33,7 @@
 /* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach, spyOn */
 
 import AutoNumeric from '../../src/AutoNumeric';
+import AutoNumericHelper from '../../src/AutoNumericHelper';
 
 // The autoNumeric tests :
 
@@ -117,6 +118,7 @@ describe('The autoNumeric object', () => {
             serializeSpaces              : '+',
             showPositiveSign             : false,
             showWarnings                 : true,
+            styleRules                   : null,
             suffixText                   : '',
             unformatOnHover              : true,
             unformatOnSubmit             : false,
@@ -205,20 +207,12 @@ describe('The autoNumeric object', () => {
                 }
             } */
 
-            expect(defaultSettings.digitGroupSeparator        ).toEqual(aNInputSettings.digitGroupSeparator        );
-            expect(defaultSettings.noSeparatorOnFocus         ).toEqual(aNInputSettings.noSeparatorOnFocus         );
-            expect(defaultSettings.digitalGroupSpacing        ).toEqual(aNInputSettings.digitalGroupSpacing        );
-            expect(defaultSettings.decimalCharacter           ).toEqual(aNInputSettings.decimalCharacter           );
-            expect(defaultSettings.decimalCharacterAlternative).toEqual(aNInputSettings.decimalCharacterAlternative);
+            expect(defaultSettings.allowDecimalPadding        ).toEqual(aNInputSettings.allowDecimalPadding        );
+            expect(defaultSettings.createLocalList            ).toEqual(aNInputSettings.createLocalList            );
             expect(defaultSettings.currencySymbol             ).toEqual(aNInputSettings.currencySymbol             );
             expect(defaultSettings.currencySymbolPlacement    ).toEqual(aNInputSettings.currencySymbolPlacement    );
-
-            // Special case for `negativePositiveSignPlacement`, see the related tests
-            // expect(defaultSettings.negativePositiveSignPlacement).toEqual(aNInputSettings.negativePositiveSignPlacement);
-            expect(defaultSettings.suffixText                   ).toEqual(aNInputSettings.suffixText                   );
-            expect(defaultSettings.overrideMinMaxLimits         ).toEqual(aNInputSettings.overrideMinMaxLimits         );
-            expect(defaultSettings.maximumValue                 ).toEqual(aNInputSettings.maximumValue                 );
-            expect(defaultSettings.minimumValue                 ).toEqual(aNInputSettings.minimumValue                 );
+            expect(defaultSettings.decimalCharacter           ).toEqual(aNInputSettings.decimalCharacter           );
+            expect(defaultSettings.decimalCharacterAlternative).toEqual(aNInputSettings.decimalCharacterAlternative);
 
             // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue number of decimals
             const [, decimalPart] = aNInputSettings.minimumValue.split('.');
@@ -229,23 +223,42 @@ describe('The autoNumeric object', () => {
             expect(decimalPartLength).toEqual(2);
             expect(aNInputSettings.decimalPlacesOverride).toEqual(decimalPartLength);
 
-            expect(defaultSettings.decimalPlacesShownOnFocus ).toEqual(aNInputSettings.decimalPlacesShownOnFocus );
-            expect(defaultSettings.scaleDivisor              ).toEqual(aNInputSettings.scaleDivisor              );
-            expect(defaultSettings.scaleDecimalPlaces        ).toEqual(aNInputSettings.scaleDecimalPlaces        );
-            expect(defaultSettings.scaleSymbol               ).toEqual(aNInputSettings.scaleSymbol               );
-            expect(defaultSettings.saveValueToSessionStorage ).toEqual(aNInputSettings.saveValueToSessionStorage );
-            expect(defaultSettings.roundingMethod            ).toEqual(aNInputSettings.roundingMethod            );
-            expect(defaultSettings.allowDecimalPadding       ).toEqual(aNInputSettings.allowDecimalPadding       );
-            expect(defaultSettings.negativeBracketsTypeOnBlur).toEqual(aNInputSettings.negativeBracketsTypeOnBlur);
-            expect(defaultSettings.emptyInputBehavior        ).toEqual(aNInputSettings.emptyInputBehavior        );
-            expect(defaultSettings.leadingZero               ).toEqual(aNInputSettings.leadingZero               );
-            expect(defaultSettings.formatOnPageLoad          ).toEqual(aNInputSettings.formatOnPageLoad          );
-            expect(String(defaultSettings.historySize)       ).toEqual(aNInputSettings.historySize               );
-            expect(defaultSettings.selectNumberOnly          ).toEqual(aNInputSettings.selectNumberOnly          );
-            expect(defaultSettings.defaultValueOverride      ).toEqual(aNInputSettings.defaultValueOverride      );
-            expect(defaultSettings.unformatOnSubmit          ).toEqual(aNInputSettings.unformatOnSubmit          );
-            expect(defaultSettings.outputFormat              ).toEqual(aNInputSettings.outputFormat              );
-            expect(defaultSettings.showWarnings              ).toEqual(aNInputSettings.showWarnings              );
+            expect(defaultSettings.decimalPlacesShownOnFocus ).toEqual(aNInputSettings.decimalPlacesShownOnFocus  );
+            expect(defaultSettings.defaultValueOverride      ).toEqual(aNInputSettings.defaultValueOverride       );
+            expect(defaultSettings.digitalGroupSpacing       ).toEqual(aNInputSettings.digitalGroupSpacing        );
+            expect(defaultSettings.digitGroupSeparator       ).toEqual(aNInputSettings.digitGroupSeparator        );
+            expect(defaultSettings.emptyInputBehavior        ).toEqual(aNInputSettings.emptyInputBehavior         );
+            expect(defaultSettings.failOnUnknownOption       ).toEqual(aNInputSettings.failOnUnknownOption        );
+            expect(defaultSettings.formatOnPageLoad          ).toEqual(aNInputSettings.formatOnPageLoad           );
+            expect(String(defaultSettings.historySize)       ).toEqual(aNInputSettings.historySize                );
+            expect(defaultSettings.isCancellable             ).toEqual(aNInputSettings.isCancellable              );
+            expect(defaultSettings.leadingZero               ).toEqual(aNInputSettings.leadingZero                );
+            expect(defaultSettings.maximumValue              ).toEqual(aNInputSettings.maximumValue               );
+            expect(defaultSettings.minimumValue              ).toEqual(aNInputSettings.minimumValue               );
+            expect(defaultSettings.modifyValueOnWheel        ).toEqual(aNInputSettings.modifyValueOnWheel         );
+            expect(defaultSettings.negativeBracketsTypeOnBlur).toEqual(aNInputSettings.negativeBracketsTypeOnBlur );
+            // Special case for `negativePositiveSignPlacement`, see the related tests
+            // expect(defaultSettings.negativePositiveSignPlacement).toEqual(aNInputSettings.negativePositiveSignPlacement);
+            expect(defaultSettings.noEventListeners          ).toEqual(aNInputSettings.noEventListeners           );
+            expect(defaultSettings.noSeparatorOnFocus        ).toEqual(aNInputSettings.noSeparatorOnFocus         );
+            expect(defaultSettings.onInvalidPaste            ).toEqual(aNInputSettings.onInvalidPaste             );
+            expect(defaultSettings.outputFormat              ).toEqual(aNInputSettings.outputFormat               );
+            expect(defaultSettings.overrideMinMaxLimits      ).toEqual(aNInputSettings.overrideMinMaxLimits       );
+            expect(defaultSettings.readOnly                  ).toEqual(aNInputSettings.readOnly                   );
+            expect(defaultSettings.roundingMethod            ).toEqual(aNInputSettings.roundingMethod             );
+            expect(defaultSettings.saveValueToSessionStorage ).toEqual(aNInputSettings.saveValueToSessionStorage  );
+            expect(defaultSettings.scaleDecimalPlaces        ).toEqual(aNInputSettings.scaleDecimalPlaces         );
+            expect(defaultSettings.scaleDivisor              ).toEqual(aNInputSettings.scaleDivisor               );
+            expect(defaultSettings.scaleSymbol               ).toEqual(aNInputSettings.scaleSymbol                );
+            expect(defaultSettings.selectNumberOnly          ).toEqual(aNInputSettings.selectNumberOnly           );
+            expect(defaultSettings.serializeSpaces           ).toEqual(aNInputSettings.serializeSpaces            );
+            expect(defaultSettings.showPositiveSign          ).toEqual(aNInputSettings.showPositiveSign           );
+            expect(defaultSettings.showWarnings              ).toEqual(aNInputSettings.showWarnings               );
+            expect(defaultSettings.styleRules                ).toEqual(aNInputSettings.styleRules                 );
+            expect(defaultSettings.suffixText                ).toEqual(aNInputSettings.suffixText                 );
+            expect(defaultSettings.unformatOnHover           ).toEqual(aNInputSettings.unformatOnHover            );
+            expect(defaultSettings.unformatOnSubmit          ).toEqual(aNInputSettings.unformatOnSubmit           );
+            expect(defaultSettings.wheelStep                 ).toEqual(aNInputSettings.wheelStep                  );
         });
 
         it('should update the options values accordingly', () => {
@@ -1892,7 +1905,7 @@ describe('The autoNumeric object', () => {
         });
     });
 
-    describe('initialization methods', () => { //FIXME à terminer -->
+    describe('initialization methods', () => {
         let newInput;
         const options = { decimalCharacter: ',', digitGroupSeparator: '.' };
 
@@ -2048,7 +2061,7 @@ describe('The autoNumeric object', () => {
             expect(an.getFormatted()).toEqual('12.300,79 €');
             an.french({ currencySymbol : '#' });
             expect(an.getFormatted()).toEqual('12.300,79#');
-            // expect(() => new AutoNumeric('input', 12300.789).french(options)).not.toThrow(); //FIXME uncomment
+            expect(() => new AutoNumeric('input', 12300.789).french(options)).not.toThrow();
         });
 
         it('should correctly initialize the AutoNumeric element', () => {
@@ -2588,6 +2601,17 @@ describe('autoNumeric `options.*` calls', () => {
         aNInput.options.scaleDecimalPlaces(3);
         aNInput.options.scaleSymbol(AutoNumeric.options.scaleSymbol.percentage);
         expect(aNInput.getFormatted()).toEqual('-12.345,679\u202f€%');
+
+        aNInput.options.reset().french();
+        expect(aNInput.node().classList.contains('neg')).toEqual(false);
+        expect(aNInput.node().classList.contains('pos')).toEqual(false);
+        aNInput.options.styleRules({ positive: 'pos', negative: 'neg' }).set(-10);
+        expect(aNInput.getFormatted()).toEqual('-10,00\u202f€');
+        expect(aNInput.node().classList.contains('neg')).toEqual(true);
+        expect(aNInput.node().classList.contains('pos')).toEqual(false);
+        aNInput.set(10);
+        expect(aNInput.node().classList.contains('neg')).toEqual(false);
+        expect(aNInput.node().classList.contains('pos')).toEqual(true);
 
         aNInput.options.reset().french().set(-1234567.846);
         expect(aNInput.getFormatted()).toEqual('-1.234.567,85\u202f€');
@@ -4011,6 +4035,436 @@ describe('The `allowDecimalPadding` option', () => {
     });
 });
 
+describe(`autoNumeric 'styleRules' methods`, () => {
+    let aNInput;
+    let newInput;
+
+    beforeEach(() => { // Initialization
+        newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+        aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+    });
+
+    afterEach(() => { // Un-initialization
+        aNInput.nuke();
+    });
+
+    it('should add / remove the positive CSS class', () => {
+        aNInput = new AutoNumeric(newInput, {
+            styleRules: {
+                positive: 'autoNumeric-positive',
+                negative: null,
+            },
+        });
+
+        aNInput.set(10);
+        expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(true);
+        aNInput.set(-10);
+        expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(false);
+        aNInput.set(-0.01);
+        expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(false);
+        aNInput.set(0.01);
+        expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(true);
+        aNInput.set(0);
+        expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(true);
+    });
+
+    it('should add / remove the negative CSS class', () => {
+        aNInput = new AutoNumeric(newInput, {
+            styleRules: {
+                positive: null,
+                negative: 'autoNumeric-negative',
+            },
+        });
+
+        aNInput.set(10);
+        expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(false);
+        aNInput.set(-10);
+        expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(true);
+        aNInput.set(-0.01);
+        expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(true);
+        aNInput.set(0.01);
+        expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(false);
+        aNInput.set(0);
+        expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(false);
+    });
+
+    it('should add / remove CSS classes based on multiple ranges', () => {
+        aNInput = new AutoNumeric(newInput, {
+            styleRules: {
+                positive: null,
+                negative: null,
+                ranges     : [
+                    { min: 0, max: 25, class: 'autoNumeric-red' },
+                    { min: 25, max: 50, class: 'autoNumeric-orange' },
+                    { min: 50, max: 75, class: 'autoNumeric-yellow' },
+                    { min: 75, max: Number.MAX_SAFE_INTEGER, class: 'autoNumeric-green' },
+                ],
+            },
+        });
+
+        aNInput.set(-10);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(0);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(0.01);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(24.99);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(25);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(25.01);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(49.99);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(50);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(50.01);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(74.99);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(75);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(true);
+        aNInput.set(75.01);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(true);
+        aNInput.set(100);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(true);
+    });
+
+    it('should add / remove the CSS class based on user defined callbacks', () => {
+        aNInput = new AutoNumeric(newInput, {
+            styleRules: {
+                ranges  : null,
+                userDefined: [
+                    // If 'classes' is a string, set it if `true`, remove it if `false`
+                    { callback: rawValue => (8.25 < rawValue && rawValue <= 8.42), classes: 'between8AndDecimals' },
+
+                    // If 'classes' is an array with only 2 elements, set the first class if `true`, the second if `false`
+                    { callback: rawValue => rawValue % 2 === 0, classes: ['autoNumeric-even', 'autoNumeric-odd'] },
+
+                    // Return a single array index to use
+                    { callback: rawValue => {
+                        if (10 <= rawValue && rawValue < 12) {
+                            return 0;
+                        }
+                        if (24 <= rawValue && rawValue < 26) {
+                            return 1;
+                        }
+                        if (42 <= rawValue && rawValue < 69) {
+                            return 2;
+                        }
+
+                        return null;  // In case the rawValue is outside those ranges
+                    }, classes: ['one1', 'one2', 'one3'] },
+
+                    // Return an array of array indexes to use
+                    { callback: rawValue => {
+                        if (90 <= rawValue && rawValue < 100) {
+                            return [0, 1];
+                        }
+                        if (rawValue >= 120) {
+                            return [1, 2];
+                        }
+
+                        return null; // In case the rawValue is not valid
+                    }, classes: ['multiple1', 'multiple2', 'multiple3'] },
+
+                    // If 'classes' is `undefined` or `null`, then the callback is called with the AutoNumeric object as a parameter
+                    {
+                        callback: anElement => {
+                            if (anElement.getNumber() === 666) {
+                                if (anElement.getFormatted() !== '666.00') {
+                                    AutoNumericHelper.throwError('Whoops, the formatted value has not been updated correctly!');
+                                }
+
+                                // Make sure that `set()` called within a callback is correctly taken into account.
+                                // The `set()` method organisation make sure that all changes are already made when `_setRawValue` is called and the raw value or element value are not changed afterward
+                                // This allows the user to modify the AutoNumeric object within this callback, without having to first wait for the `set()` method to finish
+                                anElement.set(667);
+                                if (anElement.getFormatted() !== '667.00') {
+                                    AutoNumericHelper.throwError('Whoops, the formatted value has not been updated correctly!');
+                                }
+
+                                if (anElement.getNumber() !== 667) {
+                                    AutoNumericHelper.throwError('Whoops, the raw value has not been updated correctly!');
+                                }
+                            }
+                        },
+                    },
+                ],
+            },
+        });
+
+        // If 'classes' is a string, set it if `true`, remove it if `false`
+        aNInput.set(8.249);
+        expect(aNInput.node().classList.contains('between8AndDecimals')).toEqual(false);
+        aNInput.set(8.25);
+        expect(aNInput.node().classList.contains('between8AndDecimals')).toEqual(false);
+        aNInput.set(8.26);
+        expect(aNInput.node().classList.contains('between8AndDecimals')).toEqual(true);
+        aNInput.set(8.42);
+        expect(aNInput.node().classList.contains('between8AndDecimals')).toEqual(true);
+        aNInput.set(8.424);
+        expect(aNInput.node().classList.contains('between8AndDecimals')).toEqual(true); // Rounding happens!
+        aNInput.set(8.43);
+        expect(aNInput.node().classList.contains('between8AndDecimals')).toEqual(false);
+
+        // If 'classes' is an array with only 2 elements, set the first class if `true`, the second if `false`
+        aNInput.set(1);
+        expect(aNInput.node().classList.contains('autoNumeric-even')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-odd')).toEqual(true);
+        aNInput.set(2);
+        expect(aNInput.node().classList.contains('autoNumeric-even')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-odd')).toEqual(false);
+        aNInput.set(3);
+        expect(aNInput.node().classList.contains('autoNumeric-even')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-odd')).toEqual(true);
+        aNInput.set(4);
+        expect(aNInput.node().classList.contains('autoNumeric-even')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-odd')).toEqual(false);
+
+        // return a single array index to use
+        aNInput.set(9);
+        expect(aNInput.node().classList.contains('one1')).toEqual(false);
+        expect(aNInput.node().classList.contains('one2')).toEqual(false);
+        expect(aNInput.node().classList.contains('one3')).toEqual(false);
+        aNInput.set(10);
+        expect(aNInput.node().classList.contains('one1')).toEqual(true);
+        expect(aNInput.node().classList.contains('one2')).toEqual(false);
+        expect(aNInput.node().classList.contains('one3')).toEqual(false);
+        aNInput.set(11);
+        expect(aNInput.node().classList.contains('one1')).toEqual(true);
+        expect(aNInput.node().classList.contains('one2')).toEqual(false);
+        expect(aNInput.node().classList.contains('one3')).toEqual(false);
+        aNInput.set(12);
+        expect(aNInput.node().classList.contains('one1')).toEqual(false);
+        expect(aNInput.node().classList.contains('one2')).toEqual(false);
+        expect(aNInput.node().classList.contains('one3')).toEqual(false);
+        aNInput.set(23.99);
+        expect(aNInput.node().classList.contains('one1')).toEqual(false);
+        expect(aNInput.node().classList.contains('one2')).toEqual(false);
+        expect(aNInput.node().classList.contains('one3')).toEqual(false);
+        aNInput.set(24);
+        expect(aNInput.node().classList.contains('one1')).toEqual(false);
+        expect(aNInput.node().classList.contains('one2')).toEqual(true);
+        expect(aNInput.node().classList.contains('one3')).toEqual(false);
+        aNInput.set(25);
+        expect(aNInput.node().classList.contains('one1')).toEqual(false);
+        expect(aNInput.node().classList.contains('one2')).toEqual(true);
+        expect(aNInput.node().classList.contains('one3')).toEqual(false);
+        aNInput.set(25.99);
+        expect(aNInput.node().classList.contains('one1')).toEqual(false);
+        expect(aNInput.node().classList.contains('one2')).toEqual(true);
+        expect(aNInput.node().classList.contains('one3')).toEqual(false);
+        aNInput.set(26);
+        expect(aNInput.node().classList.contains('one1')).toEqual(false);
+        expect(aNInput.node().classList.contains('one2')).toEqual(false);
+        expect(aNInput.node().classList.contains('one3')).toEqual(false);
+        aNInput.set(41.99);
+        expect(aNInput.node().classList.contains('one1')).toEqual(false);
+        expect(aNInput.node().classList.contains('one2')).toEqual(false);
+        expect(aNInput.node().classList.contains('one3')).toEqual(false);
+        aNInput.set(42);
+        expect(aNInput.node().classList.contains('one1')).toEqual(false);
+        expect(aNInput.node().classList.contains('one2')).toEqual(false);
+        expect(aNInput.node().classList.contains('one3')).toEqual(true);
+        aNInput.set(68);
+        expect(aNInput.node().classList.contains('one1')).toEqual(false);
+        expect(aNInput.node().classList.contains('one2')).toEqual(false);
+        expect(aNInput.node().classList.contains('one3')).toEqual(true);
+        aNInput.set(69);
+        expect(aNInput.node().classList.contains('one1')).toEqual(false);
+        expect(aNInput.node().classList.contains('one2')).toEqual(false);
+        expect(aNInput.node().classList.contains('one3')).toEqual(false);
+
+        // return an array of array indexes to use
+        aNInput.set(89);
+        expect(aNInput.node().classList.contains('multiple1')).toEqual(false);
+        expect(aNInput.node().classList.contains('multiple2')).toEqual(false);
+        expect(aNInput.node().classList.contains('multiple3')).toEqual(false);
+        aNInput.set(90);
+        expect(aNInput.node().classList.contains('multiple1')).toEqual(true);
+        expect(aNInput.node().classList.contains('multiple2')).toEqual(true);
+        expect(aNInput.node().classList.contains('multiple3')).toEqual(false);
+        aNInput.set(99.99);
+        expect(aNInput.node().classList.contains('multiple1')).toEqual(true);
+        expect(aNInput.node().classList.contains('multiple2')).toEqual(true);
+        expect(aNInput.node().classList.contains('multiple3')).toEqual(false);
+        aNInput.set(100);
+        expect(aNInput.node().classList.contains('multiple1')).toEqual(false);
+        expect(aNInput.node().classList.contains('multiple2')).toEqual(false);
+        expect(aNInput.node().classList.contains('multiple3')).toEqual(false);
+        aNInput.set(119.99);
+        expect(aNInput.node().classList.contains('multiple1')).toEqual(false);
+        expect(aNInput.node().classList.contains('multiple2')).toEqual(false);
+        expect(aNInput.node().classList.contains('multiple3')).toEqual(false);
+        aNInput.set(120);
+        expect(aNInput.node().classList.contains('multiple1')).toEqual(false);
+        expect(aNInput.node().classList.contains('multiple2')).toEqual(true);
+        expect(aNInput.node().classList.contains('multiple3')).toEqual(true);
+        aNInput.set(2000);
+        expect(aNInput.node().classList.contains('multiple1')).toEqual(false);
+        expect(aNInput.node().classList.contains('multiple2')).toEqual(true);
+        expect(aNInput.node().classList.contains('multiple3')).toEqual(true);
+
+        // If 'classes' is `undefined` or `null`, then the callback is called with the AutoNumeric object as a parameter
+        expect(() => aNInput.set(666)).not.toThrow();
+        expect(aNInput.getFormatted()).toEqual('667.00'); // This is normal, the value has been changed within the callback
+    });
+
+    it('should add / remove the CSS class based on the userDefined `range0To100With4Steps` callback', () => {
+        aNInput = new AutoNumeric(newInput, { styleRules: AutoNumeric.options.styleRules.range0To100With4Steps });
+
+        aNInput.set(-1);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(0);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(24);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(25);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(49);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(50);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(74);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        aNInput.set(75);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(true);
+        aNInput.set(99);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(true);
+        aNInput.set(100);
+        expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+    });
+
+    it('should add / remove the CSS class based on the userDefined `positiveNegative` callback', () => {
+        aNInput = new AutoNumeric(newInput, { styleRules: AutoNumeric.options.styleRules.positiveNegative });
+
+        aNInput.set(-1);
+        expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(true);
+        aNInput.set(0);
+        expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(false);
+        aNInput.set(1);
+        expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(false);
+    });
+
+    it('should add / remove the CSS class based on the userDefined `evenOdd` callback', () => {
+        aNInput = new AutoNumeric(newInput, { styleRules: AutoNumeric.options.styleRules.evenOdd });
+
+        aNInput.set(1);
+        expect(aNInput.node().classList.contains('autoNumeric-even')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-odd')).toEqual(true);
+        aNInput.set(2);
+        expect(aNInput.node().classList.contains('autoNumeric-even')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-odd')).toEqual(false);
+    });
+
+    it('should add / remove the CSS class based on the userDefined `rangeSmallAndZero` callback', () => {
+        aNInput = new AutoNumeric(newInput, { styleRules: AutoNumeric.options.styleRules.rangeSmallAndZero });
+
+        aNInput.set(-2);
+        expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(false);
+        aNInput.set(-1);
+        expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(false);
+        aNInput.set(-0.01);
+        expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(false);
+        aNInput.set(0);
+        expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(true);
+        expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(false);
+        aNInput.set(0.01);
+        expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(true);
+        aNInput.set(1);
+        expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(true);
+        aNInput.set(2);
+        expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(false);
+        expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(false);
+    });
+});
+
 //TODO Complete the tests in order to test every single method separately
 
 //-----------------------------------------------------------------------------
@@ -4209,6 +4663,19 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ showPositiveSign: false })).not.toThrow();
             expect(() => AutoNumeric.validate({ showPositiveSign: 'true' })).not.toThrow();
             expect(() => AutoNumeric.validate({ showPositiveSign: 'false' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ styleRules: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: { positive: null } })).not.toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: { negative: null } })).not.toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: { ranges: null } })).not.toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: { userDefined: null } })).not.toThrow();
+            expect(() => AutoNumeric.validate({
+                styleRules: {
+                    userDefined: [
+                        { callback: () => {} },
+                    ],
+                },
+            })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ suffixText: '' })).not.toThrow();
             expect(() => AutoNumeric.validate({ suffixText: 'foobar' })).not.toThrow();
@@ -4482,6 +4949,18 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ showPositiveSign: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ showPositiveSign: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ showPositiveSign: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ styleRules: { } })).toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: true })).toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({
+                styleRules: {
+                    userDefined: [
+                        { callback: 'foobar' },
+                    ],
+                },
+            })).toThrow();
 
             expect(() => AutoNumeric.validate({ suffixText: '-foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ suffixText: 'foo-bar' })).toThrow();

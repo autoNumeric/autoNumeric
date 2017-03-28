@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.4
+ * @version      4.0.0-beta.5
  * @date         2017-03-24 UTC 01:00
  *
  * @author       Bob Knothe
@@ -98,6 +98,7 @@ class AutoNumeric {
 
         // Generate the settings
         this._setSettings(userOptions, false);
+        //TODO If `styleRules` is not null, add by default a class 'autoNumeric' that adds transition to color, background-color, border-color properties
         // Check if the DOM element is supported
         this._checkElement();
 
@@ -698,6 +699,11 @@ class AutoNumeric {
 
                 return this;
             },
+            styleRules                   : styleRules => {
+                this.update({ styleRules });
+
+                return this;
+            },
             suffixText                   : suffixText => {
                 this.update({ suffixText });
 
@@ -727,7 +733,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.4';
+        return '4.0.0-beta.5';
     }
 
     /**
@@ -1159,10 +1165,139 @@ class AutoNumeric {
         // Update the raw value
         this.settings.rawValue = rawValue;
 
+        // Change the element style or use the relevant callbacks
+        this._parseStyleRules();
+
         if (saveChangeToHistory) {
             // Save in the history the last known raw value and formatted result selection
             this._historyTableAdd();
         }
+    }
+
+    /**
+     * Parse the `styleRules` option and run the test for each given rules, either pre-defined ones like `positive`, `negative` and `ranges`, or user defined callbacks within the `userDefined` attribute.
+     * @private
+     */
+    _parseStyleRules() {
+        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.styleRules) || this.settings.rawValue === '') {
+            return;
+        }
+
+        // 'positive' attribute
+        if (!AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.styleRules.positive)) {
+            if (this.settings.rawValue >= 0) {
+                this._addCSSClass(this.settings.styleRules.positive);
+            } else {
+                this._removeCSSClass(this.settings.styleRules.positive);
+            }
+        }
+
+        // 'negative' attribute
+        if (!AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.styleRules.negative)) {
+            if (this.settings.rawValue < 0) {
+                this._addCSSClass(this.settings.styleRules.negative);
+            } else {
+                this._removeCSSClass(this.settings.styleRules.negative);
+            }
+        }
+
+        // 'ranges' attribute
+        if (!AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.styleRules.ranges) && this.settings.styleRules.ranges.length !== 0) {
+            this.settings.styleRules.ranges.forEach(range => {
+                if (this.settings.rawValue >= range.min && this.settings.rawValue < range.max) {
+                    this._addCSSClass(range.class);
+                } else {
+                    this._removeCSSClass(range.class);
+                }
+            });
+        }
+
+        // 'userDefined' attribute
+        //TODO Also pass the old raw value as a parameter, and not only the new raw value
+        if (!AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.styleRules.userDefined) && this.settings.styleRules.userDefined.length !== 0) {
+            this.settings.styleRules.userDefined.forEach(userObject => {
+                if (AutoNumericHelper.isFunction(userObject.callback)) {
+                    // Test for the type of the `classes` attribute, which changes the function behavior
+                    if (AutoNumericHelper.isString(userObject.classes)) {
+                        // If 'classes' is a string, set it if `true`, remove it if `false`
+                        if (userObject.callback(this.settings.rawValue)) {
+                            this._addCSSClass(userObject.classes);
+                        } else {
+                            this._removeCSSClass(userObject.classes);
+                        }
+                    } else if (AutoNumericHelper.isArray(userObject.classes)) {
+                        if (userObject.classes.length === 2) {
+                            // If 'classes' is an array with only 2 elements, set the first class if `true`, the second if `false`
+                            if (userObject.callback(this.settings.rawValue)) {
+                                this._addCSSClass(userObject.classes[0]);
+                                this._removeCSSClass(userObject.classes[1]);
+                            } else {
+                                this._removeCSSClass(userObject.classes[0]);
+                                this._addCSSClass(userObject.classes[1]);
+                            }
+                        } else if (userObject.classes.length > 2) {
+                            // The callback returns an array of indexes to use on the `classes` array
+                            const callbackResult = userObject.callback(this.settings.rawValue);
+                            if (AutoNumericHelper.isArray(callbackResult)) {
+                                // If multiple indexes are returned
+                                userObject.classes.forEach((userClass, index) => {
+                                    if (AutoNumericHelper.isInArray(index, callbackResult)) {
+                                        this._addCSSClass(userClass);
+                                    } else {
+                                        this._removeCSSClass(userClass);
+                                    }
+                                });
+                            } else if (AutoNumericHelper.isInt(callbackResult)) {
+                                // If only one index is returned
+                                userObject.classes.forEach((userClass, index) => {
+                                    if (index === callbackResult) {
+                                        this._addCSSClass(userClass);
+                                    } else {
+                                        this._removeCSSClass(userClass);
+                                    }
+                                });
+                            } else if (AutoNumericHelper.isNull(callbackResult)) {
+                                // Remove all the classes
+                                userObject.classes.forEach(userClass => {
+                                    this._removeCSSClass(userClass);
+                                });
+                            } else {
+                                AutoNumericHelper.throwError(`The callback result is not an array nor a valid array index, ${typeof callbackResult} given.`);
+                            }
+                        } else {
+                            AutoNumericHelper.throwError('The classes attribute is not valid for the `styleRules` option.');
+                        }
+                    } else if (AutoNumericHelper.isUndefinedOrNullOrEmpty(userObject.classes)) {
+                        // If 'classes' is `undefined` or `null`, then the callback is called with the AutoNumeric object passed as a parameter
+                        userObject.callback(this);
+                    } else {
+                        AutoNumericHelper.throwError('The callback/classes structure is not valid for the `styleRules` option.');
+                    }
+                } else {
+                    AutoNumericHelper.warning(`The given \`styleRules\` callback is not a function, ${typeof callback} given.`);
+                }
+            });
+        }
+    }
+
+    /**
+     * Add the given CSS class to the DOM element.
+     *
+     * @param {string} cssClassName
+     * @private
+     */
+    _addCSSClass(cssClassName) {
+        this.domElement.classList.add(cssClassName);
+    }
+
+    /**
+     * Remove the given CSS class from the DOM element.
+     *
+     * @param {string} cssClassName
+     * @private
+     */
+    _removeCSSClass(cssClassName) {
+        this.domElement.classList.remove(cssClassName);
     }
 
     // This are the public function available on each autoNumeric-managed element
@@ -1277,12 +1412,14 @@ class AutoNumeric {
                     this.settings.decimalPlacesOverride = tempDecimal;
                 }
 
+                let rawValue;
                 if (this.settings.scaleDivisor && !this.settings.hasFocus) {
                     value = this.constructor._roundValue(value, this.settings);
-                    this._setRawValue(this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.')), saveChangeToHistory);
+                    rawValue = this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.')); // Move the `setRawValue` call after the `setElementValue` one
                     value = this.constructor._toNumericValue(value, this.settings);
                     value = value / this.settings.scaleDivisor;
                     value = value.toString();
+
                     if (this.settings.scaleDecimalPlaces) {
                         tempDecimal = this.settings.decimalPlacesOverride;
                         this.settings.decimalPlacesOverride = Number(this.settings.scaleDecimalPlaces);
@@ -1298,30 +1435,31 @@ class AutoNumeric {
 
                 // Stores rawValue including the decimalPlacesShownOnFocus
                 if (!this.settings.scaleDivisor) {
-                    this._setRawValue(this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.')), saveChangeToHistory);
+                    //TODO Find a better way to prevent potentially overwriting the `rawValue` variable (that could have already been set few lines above)
+                    rawValue = this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.'));
                 }
 
                 value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
-                value = this.constructor._addGroupSeparators(value, this.settings);
-
-                if (this.settings.scaleDivisor && this.settings.scaleDecimalPlaces && !this.settings.hasFocus) {
-                    this.settings.decimalPlacesOverride = tempDecimal;
+                value = this.constructor._addGroupSeparators(value, this.settings, rawValue);
+                if (!this.settings.hasFocus && this.settings.scaleSymbol) {
+                    value = value + this.settings.scaleSymbol;
                 }
 
                 if (this.settings.saveValueToSessionStorage && (this.settings.decimalPlacesShownOnFocus || this.settings.scaleDivisor)) {
                     this._saveValueToPersistentStorage('set');
                 }
 
-                if (!this.settings.hasFocus && this.settings.scaleSymbol) {
-                    value = value + this.settings.scaleSymbol;
+                // Set back the `decimalPlacesOverride` option to its original value
+                if (this.settings.scaleDivisor && this.settings.scaleDecimalPlaces && !this.settings.hasFocus) {
+                    this.settings.decimalPlacesOverride = tempDecimal;
                 }
 
+                // Here we make sure to call `_setRawValue` *after* `setElementValue` so that if `_setRawValue` calls a callback that modify the rawValue, the new value is set correctly (after `setElementValue` briefly set its value first) //TODO If `_setRawValue` calls a callback that modify the raw value or the formatted value, do not call `setElementValue` from this `set()` call
                 AutoNumericHelper.setElementValue(this.domElement, value);
+                this._setRawValue(rawValue, saveChangeToHistory);
 
                 return this;
             } else {
-                this._setRawValue('', saveChangeToHistory);
-                this._saveValueToPersistentStorage('remove');
                 const attemptedValue = value;
                 value = '';
 
@@ -1335,7 +1473,9 @@ class AutoNumeric {
 
                 AutoNumericHelper.throwError(`The value [${attemptedValue}] being set falls outside of the minimumValue [${this.settings.minimumValue}] and maximumValue [${this.settings.maximumValue}] range set for this element`);
 
+                this._saveValueToPersistentStorage('remove');
                 AutoNumericHelper.setElementValue(this.domElement, '');
+                this._setRawValue('', saveChangeToHistory);
 
                 return this;
             }
@@ -2859,6 +2999,26 @@ class AutoNumeric {
             AutoNumericHelper.throwError(`The option 'noEventListeners' that prevent the creation of event listeners is invalid ; it should be either 'false' or 'true', [${options.noEventListeners}] given.`);
         }
 
+        if (!AutoNumericHelper.isNull(options.styleRules) &&
+            !(AutoNumericHelper.isObject(options.styleRules) &&
+            ((options.styleRules.hasOwnProperty('positive') ||
+            options.styleRules.hasOwnProperty('negative') ||
+            options.styleRules.hasOwnProperty('ranges') ||
+            options.styleRules.hasOwnProperty('userDefined'))))) {
+            AutoNumericHelper.throwError(`The option 'styleRules' is invalid ; it should be a correctly structured object, with one or more 'positive', 'negative', 'ranges' or 'userDefined' attributes, [${options.styleRules}] given.`);
+        }
+
+        // Deeper tests of the `styleRules` object : Check that the callback, if defined, is a function
+        if (!AutoNumericHelper.isNull(options.styleRules) &&
+            options.styleRules.hasOwnProperty('userDefined') &&
+            !AutoNumericHelper.isNull(options.styleRules.userDefined)) {
+            options.styleRules.userDefined.forEach(rule => {
+                if (rule.hasOwnProperty('callback') && !AutoNumericHelper.isFunction(rule.callback)) {
+                    AutoNumericHelper.throwError(`The callback defined in the \`userDefined\` attribute is not a function, ${typeof rule.callback} given.`);
+                }
+            });
+        }
+
         if (!AutoNumericHelper.isTrueOrFalseString(options.readOnly) && !AutoNumericHelper.isBoolean(options.readOnly)) {
             AutoNumericHelper.throwError(`The option 'readOnly' is invalid ; it should be either 'false' or 'true', [${options.readOnly}] given.`);
         }
@@ -3583,9 +3743,10 @@ class AutoNumeric {
      *
      * @param {string} inputValue
      * @param {object} settings
+     * @param {number|string|null} rawValue If this is set, then this rawValue is used instead of the one passed through the `settings` object. This is useful is some very specific cases where we need to set the raw value *after* settings the formatted value, using the `_addGroupSeparators()` method.
      * @returns {*}
      */
-    static _addGroupSeparators(inputValue, settings) {
+    static _addGroupSeparators(inputValue, settings, rawValue = null) {
         //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
         if (settings.strip) {
             inputValue = this._stripAllNonNumberCharacters(inputValue, settings, false);
@@ -3648,10 +3809,15 @@ class AutoNumeric {
 
         settings.trailingNegative = false;
         // Add back the negative sign and the currency symbol, at the right position
-        inputValue = AutoNumeric._mergeCurrencySignNegativePositiveSignAndValue(inputValue, settings, isValueNegative, isZeroOrHasNoValue);
+        inputValue = AutoNumeric._mergeCurrencySignNegativePositiveSignAndValue(inputValue, settings, isValueNegative, isZeroOrHasNoValue); //TODO this function is called again in `_toggleNegativeBracket` ; let's DRY this
+
+        if (AutoNumericHelper.isNull(rawValue)) {
+            // If the raw value is not forced, use the default one from the settings object
+            rawValue = settings.rawValue;
+        }
 
         // Toggle the negative sign and brackets
-        if (settings.negativeBracketsTypeOnBlur !== null && (settings.rawValue < 0 || AutoNumericHelper.isNegativeStrict(inputValue))) {
+        if (settings.negativeBracketsTypeOnBlur !== null && (rawValue < 0 || AutoNumericHelper.isNegativeStrict(inputValue))) {
             inputValue = this._toggleNegativeBracket(inputValue, settings);
         }
 
@@ -5474,6 +5640,7 @@ class AutoNumeric {
             serializeSpaces                   : true,
             showPositiveSign                  : true,
             showWarnings                      : true,
+            styleRules                        : true,
             suffixText                        : true,
             unformatOnHover                   : true,
             unformatOnSubmit                  : true,
@@ -6794,6 +6961,49 @@ AutoNumeric.options = {
         show: true,
         hide: false,
     },
+    styleRules                   : {
+        none: null,
+        positiveNegative : {
+            positive: 'autoNumeric-positive',
+            negative: 'autoNumeric-negative',
+        },
+        range0To100With4Steps : {
+            ranges     : [
+                { min: 0,  max: 25,  class: 'autoNumeric-red' },
+                { min: 25, max: 50,  class: 'autoNumeric-orange' },
+                { min: 50, max: 75,  class: 'autoNumeric-yellow' },
+                { min: 75, max: 100, class: 'autoNumeric-green' },
+            ],
+        },
+        evenOdd : {
+            userDefined: [
+                { callback: rawValue => rawValue % 2 === 0, classes: ['autoNumeric-even', 'autoNumeric-odd'] },
+            ],
+        },
+        rangeSmallAndZero : {
+            userDefined: [
+                {
+                    callback: rawValue => {
+                        if (rawValue >= -1 && rawValue < 0) {
+                            return 0;
+                        }
+                        if (Number(rawValue) === 0) {
+                            return 1;
+                        }
+                        if (rawValue > 0 && rawValue <= 1) {
+                            return 2;
+                        }
+
+                        return null;  // In case the rawValue is outside those ranges
+                    }, classes: [
+                        'autoNumeric-small-negative',
+                        'autoNumeric-zero',
+                        'autoNumeric-small-positive',
+                    ],
+                },
+            ],
+        },
+    },
     suffixText                   : {
         none: '',
         percentage: '%',
@@ -7119,6 +7329,35 @@ AutoNumeric.defaultSettings = {
      * false => no warnings are shown, only the thrown errors
      */
     showWarnings: AutoNumeric.options.showWarnings.show,
+
+    /* Defines the rules that calculate the CSS class(es) to apply on the element, based on the raw unformatted value.
+     * This can also be used to call callbacks whenever the `rawValue` is updated.
+     * Important: all callbacks must return `null` if no ranges/userDefined classes are selected
+     * @example
+     * {
+     *     positive   : 'autoNumeric-positive', // Or `null` to not use it
+     *     negative   : 'autoNumeric-negative',
+     *     ranges     : [
+     *         { min: 0, max: 25, class: 'autoNumeric-red' },
+     *         { min: 25, max: 50, class: 'autoNumeric-orange' },
+     *         { min: 50, max: 75, class: 'autoNumeric-yellow' },
+     *         { min: 75, max: Number.MAX_SAFE_INTEGER, class: 'autoNumeric-green' },
+     *     ],
+     *     userDefined: [
+     *         // If 'classes' is a string, set it if `true`, remove it if `false`
+     *         { callback: rawValue => { return true; }, classes: 'thisIsTrue' },
+     *         // If 'classes' is an array with only 2 elements, set the first class if `true`, the second if `false`
+     *         { callback: rawValue => rawValue % 2 === 0, classes: ['autoNumeric-even', 'autoNumeric-odd'] },
+     *         // Return only one index to use on the `classes` array (here, 'class3')
+     *         { callback: rawValue => { return 2; }, classes: ['class1', 'class2', 'class3'] },
+     *         // Return an array of indexes to use on the `classes` array (here, 'class1' and 'class3')
+     *         { callback: rawValue => { return [0, 2]; }, classes: ['class1', 'class2', 'class3'] },
+     *         // If 'classes' is `undefined` or `null`, then the callback is called with the AutoNumeric object passed as a parameter
+     *         { callback: anElement => { return anElement.getFormatted(); } },
+     *     ],
+     * }
+     */
+    styleRules: AutoNumeric.options.styleRules.none,
 
     /* Additional suffix
      * Must be in quotes suffixText: 'gross', a space is allowed suffixText: ' dollars'

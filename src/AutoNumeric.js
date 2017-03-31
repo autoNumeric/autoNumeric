@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.6
- * @date         2017-03-31 UTC 10:00
+ * @version      4.0.0-beta.7
+ * @date         2017-03-31 UTC 22:22
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
@@ -733,7 +733,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.6';
+        return '4.0.0-beta.7';
     }
 
     /**
@@ -3147,7 +3147,13 @@ class AutoNumeric {
      * @param {object} options
      * @returns {*}
      */
-    static unformat(numericStringOrDomElement, options = null) { //FIXME à tester
+    static unformat(numericStringOrDomElement, options = null) {
+        //TODO Allow passing multiple options objects, the latter overwriting the settings from the previous ones
+        if (AutoNumericHelper.isNumberStrict(numericStringOrDomElement)) {
+            // Giving an unformatted value should return the same unformatted value, whatever the options passed as a parameter
+            return numericStringOrDomElement;
+        }
+
         let value;
         if (AutoNumericHelper.isElement(numericStringOrDomElement)) {
             value = AutoNumericHelper.getElementValue(numericStringOrDomElement);
@@ -3159,31 +3165,37 @@ class AutoNumeric {
             return null;
         }
 
-        // Giving an unformatted value should return the same unformatted value, whatever the options passed as a parameter
-        if (AutoNumericHelper.isNumber(value)) {
-            return Number(value);
-        }
-
-        if (AutoNumericHelper.isArray(value) || AutoNumericHelper.isObject(value)) { //TODO Complete the test to throw when given a wrongly formatted number (ie. 'foobar')
+        if (AutoNumericHelper.isArray(value) || AutoNumericHelper.isObject(value)) {
             // Check the validity of the `value` parameter
             AutoNumericHelper.throwError(`A number or a string representing a number is needed to be able to unformat it, [${value}] given.`);
         }
 
         const settings = Object.assign({}, this.getDefaultConfig(), options);
-        const allowed = `-0123456789\\${settings.decimalCharacter}`;
-        const unwantedCharacters = new RegExp(`[^${allowed}]`, 'gi');
+        if (AutoNumericHelper.isNull(settings.decimalPlacesOverride)) {
+            settings.decimalPlacesOverride = this._maximumVMinAndVMaxDecimalLength(settings.minimumValue, settings.maximumValue);
+        }
         value = value.toString();
 
-        // This checks is a negative sign is anywhere in the `value`, not just on the very first character (ie. '12345.67-')
+        // This checks if a negative sign is anywhere in the `value`, not just on the very first character (ie. '12345.67-')
         if (AutoNumericHelper.isNegative(value)) {
             settings.negativeSignCharacter = '-';
-        } else if (settings.negativeBracketsTypeOnBlur && settings.negativeBracketsTypeOnBlur.split(',')[0] === value.charAt(0)) {
-            settings.negativeSignCharacter = '-';
-            value = this._removeBrackets(value, settings);
+        } else if (!AutoNumericHelper.isNull(settings.negativeBracketsTypeOnBlur)) {
+            [settings.firstBracket, settings.lastBracket] = settings.negativeBracketsTypeOnBlur.split(',');
+            if (value.charAt(0) === settings.firstBracket &&
+                value.charAt(value.length - 1) === settings.lastBracket) {
+                settings.negativeSignCharacter = '-';
+                value = this._removeBrackets(value, settings, false);
+            }
         }
 
-        value = value.replace(unwantedCharacters, '');
-        value = value.replace(settings.decimalCharacter, '.');
+        value = this._convertToNumericString(value, settings);
+        const unwantedCharacters = new RegExp(`[^+-0123456789.]`, 'gi');
+        if (unwantedCharacters.test(value)) {
+            return NaN;
+        }
+
+        value = this._roundValue(value, settings);
+        value = value.replace(settings.decimalCharacter, '.'); // Here we need to convert back the decimal character to a period since `_roundValue` adds it in some cases
         value = this._toLocale(value, settings.outputFormat);
 
         return value;
@@ -3572,10 +3584,11 @@ class AutoNumeric {
      *
      * @param {string} value
      * @param {object} settings
+     * @param {boolean} rearrangeSignsAndValueOrder If set to `true`, then only the brackets are remove and a negative sign is added, without reordering the negative sign, currency symbol and value according to the settings.
      * @returns {string}
      * @private
      */
-    static _removeBrackets(value, settings) {
+    static _removeBrackets(value, settings, rearrangeSignsAndValueOrder = true) {
         let result;
         if (!AutoNumericHelper.isNull(settings.negativeBracketsTypeOnBlur) && value.charAt(0) === settings.firstBracket) {
             // Remove the brackets if they are present
@@ -3583,9 +3596,14 @@ class AutoNumeric {
             result = result.replace(settings.lastBracket, '');
 
             // Add back the negative sign at the right place
-            // First we need to remove the currency symbol from the value, since we want to be able to add back the negative sign at the right place (including between the value and the currency sign)
-            result = result.replace(settings.currencySymbol, '');
-            result = this._mergeCurrencySignNegativePositiveSignAndValue(result, settings, true, false); //TODO This assume the value is negative and non-empty. Is this always the case?
+            if (rearrangeSignsAndValueOrder) {
+                // First we need to remove the currency symbol from the value, since we want to be able to add back the negative sign at the right place (including between the value and the currency sign)
+                result = result.replace(settings.currencySymbol, '');
+                result = this._mergeCurrencySignNegativePositiveSignAndValue(result, settings, true, false); //TODO This assume the value is negative and non-empty. Is this always the case?
+            } else {
+                // Here we only want to add the negative sign since we removed the brackets, without reordering
+                result = '-' + result;
+            }
         } else {
             result = value;
         }

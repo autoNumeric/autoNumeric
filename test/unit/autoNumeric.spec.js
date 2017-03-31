@@ -4471,21 +4471,38 @@ describe(`autoNumeric 'styleRules' methods`, () => {
 //---- Static functions
 
 describe('Static autoNumeric functions', () => {
-    describe('`unformat` should unformat', () => {
-        it('with default options', () => {
-            expect(AutoNumeric.unformat('$1,234.56')).toEqual('1234.56');
-            expect(AutoNumeric.unformat('$123.45')).toEqual('123.45');
-            expect(AutoNumeric.unformat('$0.00')).toEqual('0.00');
+    describe('`unformat`', () => {
+        it('should unformat with default options', () => {
+            expect(AutoNumeric.unformat('$1,234.56')).toEqual(NaN);
+            expect(AutoNumeric.unformat('$123.45')).toEqual(NaN);
+            expect(AutoNumeric.unformat('$0.00')).toEqual(NaN);
+            expect(AutoNumeric.unformat(0)).not.toEqual('0.00'); //XXX This is false because 'real' non-numeric numbers are directly returned
+            expect(AutoNumeric.unformat(0)).toEqual(0);
 
-            expect(AutoNumeric.unformat('$1,234.56', { outputFormat : 'number' })).toEqual(1234.56);
-            expect(AutoNumeric.unformat('$123.45', { outputFormat : 'number' })).toEqual(123.45);
-            expect(AutoNumeric.unformat('$0.00', { outputFormat : 'number' })).toEqual(0);
+            expect(AutoNumeric.unformat('$1,234.56', { outputFormat : 'number' })).toEqual(NaN);
+            expect(AutoNumeric.unformat('$123.45', { outputFormat : 'number' })).toEqual(NaN);
+            expect(AutoNumeric.unformat('$0.00', { outputFormat : 'number' })).toEqual(NaN);
             expect(AutoNumeric.unformat(null)).toEqual(null);
             expect(AutoNumeric.unformat(1234.56, { outputFormat : 'number' })).toEqual(1234.56);
             expect(AutoNumeric.unformat(0, { outputFormat : 'number' })).toEqual(0);
         });
 
-        it('with user options', () => {
+        it('should unformat with a currency symbol options', () => {
+            expect(AutoNumeric.unformat('$1,234.56', { currencySymbol: '$' })).toEqual('1234.56');
+            expect(AutoNumeric.unformat('$123.45', { currencySymbol: '$' })).toEqual('123.45');
+            expect(AutoNumeric.unformat('$0.00', { currencySymbol: '$' })).toEqual('0.00');
+            expect(AutoNumeric.unformat(0, { currencySymbol: '$' })).not.toEqual('0.00'); //XXX This is false because 'real' non-numeric numbers are directly returned
+            expect(AutoNumeric.unformat(0, { currencySymbol: '$' })).toEqual(0);
+
+            expect(AutoNumeric.unformat('$1,234.56', { outputFormat : 'number', currencySymbol: '$' })).toEqual(1234.56);
+            expect(AutoNumeric.unformat('$123.45', { outputFormat : 'number', currencySymbol: '$' })).toEqual(123.45);
+            expect(AutoNumeric.unformat('$0.00', { outputFormat : 'number', currencySymbol: '$' })).toEqual(0);
+            expect(AutoNumeric.unformat(null)).toEqual(null);
+            expect(AutoNumeric.unformat(1234.56, { outputFormat : 'number', currencySymbol: '$' })).toEqual(1234.56);
+            expect(AutoNumeric.unformat(0, { outputFormat : 'number', currencySymbol: '$' })).toEqual(0);
+        });
+
+        it('should unformat with user options', () => {
             expect(AutoNumeric.unformat('1.234,56 €', autoNumericOptionsEuroNumber)).toEqual(1234.56);
             expect(AutoNumeric.unformat('123,45 €', autoNumericOptionsEuroNumber)).toEqual(123.45);
             expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);
@@ -4496,7 +4513,7 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.unformat(null, autoNumericOptionsEuro)).toEqual(null);
         });
 
-        it(`and return a 'real' number, whatever options are passed as an argument`, () => {
+        it(`should return a 'real' number, whatever options are passed as an argument`, () => {
             expect(AutoNumeric.unformat(1234.56)).toEqual(1234.56);
             expect(AutoNumeric.unformat(0)).toEqual(0);
 
@@ -4509,10 +4526,192 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
             expect(console.warn).toHaveBeenCalled();
         });
+
+        it('should fail unformatting wrong parameters', () => {
+            expect(AutoNumeric.unformat('foobar')).toEqual(NaN);
+            expect(() => AutoNumeric.unformat([1234])).toThrow();
+            expect(() => AutoNumeric.unformat({})).toThrow();
+            expect(() => AutoNumeric.unformat({ val: 1234 })).toThrow();
+            expect(() => AutoNumeric.unformat([])).toThrow();
+        });
+
+        it('should unformat brackets and negative (localized) values', () => {
+            // Negative values
+            expect(AutoNumeric.unformat('-1.234,56 €', autoNumericOptionsEuroNumber)).toEqual(-1234.56);
+            expect(AutoNumeric.unformat('-123,45 €', autoNumericOptionsEuroNumber)).toEqual(-123.45);
+            expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);
+
+            expect(AutoNumeric.unformat('-1.234,56 €', autoNumericOptionsEuro)).toEqual('-1234.56');
+            expect(AutoNumeric.unformat('-123,45 €', autoNumericOptionsEuro)).toEqual('-123.45');
+            expect(AutoNumeric.unformat('0.00 €', autoNumericOptionsEuro)).toEqual('0.00');
+
+            expect(AutoNumeric.unformat('-1234.56')).toEqual('-1234.56');
+            expect(AutoNumeric.unformat('-123.45')).toEqual('-123.45');
+            expect(AutoNumeric.unformat('0.00')).toEqual('0.00');
+
+            // Negative values with brackets
+            const options = {
+                digitGroupSeparator        : '.',
+                decimalCharacter           : ',',
+                decimalCharacterAlternative: '.',
+                currencySymbol             : ' €',
+                currencySymbolPlacement    : 's',
+                roundingMethod             : 'U',
+                outputFormat               : 'number',
+                negativeBracketsTypeOnBlur : AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses,
+            };
+            expect(AutoNumeric.unformat('(1.234,56 €)', options)).toEqual(-1234.56);
+            expect(AutoNumeric.unformat('(123,45 €)', options)).toEqual(-123.45);
+            expect(AutoNumeric.unformat('(0,00 €)', options)).toEqual(0);
+        });
+
+        it('should unformat correctly when there are no decimal places', () => {
+            const options1 = {
+                maximumValue: '9999.99',
+                minimumValue: '0',
+            };
+            expect(AutoNumeric.unformat('4000', options1)).toEqual('4000.00');
+            expect(AutoNumeric.unformat(4000, options1)).toEqual(4000);
+            expect(AutoNumeric.unformat('4000.123', options1)).toEqual('4000.12');
+            expect(AutoNumeric.unformat(4000.123, options1)).toEqual(4000.123);
+
+            const options2 = {
+                maximumValue: '9999.99',
+                minimumValue: '0',
+                decimalPlacesOverride : 0,
+            };
+            expect(AutoNumeric.unformat('4000', options2)).toEqual('4000');
+            expect(AutoNumeric.unformat(4000, options2)).toEqual(4000);
+            expect(AutoNumeric.unformat('4000.123', options2)).toEqual('4000');
+            expect(AutoNumeric.unformat(4000.123, options2)).toEqual(4000.123);
+
+            const options3 = {
+                maximumValue: '9999',
+                minimumValue: '0',
+            };
+            expect(AutoNumeric.unformat('4000', options3)).toEqual('4000');
+            expect(AutoNumeric.unformat(4000, options3)).toEqual(4000);
+            expect(AutoNumeric.unformat('4000.123', options3)).toEqual('4000');
+            expect(AutoNumeric.unformat(4000.123, options3)).toEqual(4000.123);
+        });
+
+        //TODO Add the tests for the localized values (positive and negative)
     });
 
-    describe('`format` should format', () => {
-        it('with default options', () => {
+    describe('`unformat` should unformat correctly when a decimal character or group separator is defined in the `options` (cf. issue #427)', () => {
+        it('with a `digitGroupSeparator` found in the source', () => {
+            const options1 = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '9999.99',
+                minimumValue: '0',
+            };
+            expect(AutoNumeric.unformat('4.000', options1)).toEqual('4000.00');
+            expect(AutoNumeric.unformat(4000, options1)).toEqual(4000);
+
+            const options2a = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '9999.99',
+                minimumValue: '0',
+                allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never,
+            };
+            expect(AutoNumeric.unformat('4.000', options2a)).toEqual('4000');
+            expect(AutoNumeric.unformat('4.000,6', options2a)).toEqual('4000.6');
+
+            const options2b = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '9999.99',
+                minimumValue: '0',
+                allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats,
+            };
+            expect(AutoNumeric.unformat('4.000', options2b)).toEqual('4000');
+            expect(AutoNumeric.unformat('4.000,6', options2b)).toEqual('4000.60');
+
+            const options2c = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '9999.99',
+                minimumValue: '0',
+                allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.always,
+            };
+            expect(AutoNumeric.unformat('4.000', options2c)).toEqual('4000.00');
+            expect(AutoNumeric.unformat('4.000,6', options2c)).toEqual('4000.60');
+
+            const options3 = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '9999.99',
+                minimumValue: '0',
+                outputFormat: AutoNumeric.options.outputFormat.number,
+            };
+            expect(AutoNumeric.unformat('4.000', options3)).toEqual(4000);
+            expect(AutoNumeric.unformat(4000, options3)).toEqual(4000);
+        });
+
+        it('with a `decimalCharacter` found in the source', () => {
+            const options1 = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '99999.99',
+                minimumValue: '0',
+            };
+            expect(AutoNumeric.unformat('4,123', options1)).toEqual('4.12');
+            expect(AutoNumeric.unformat(4.12, options1)).toEqual(4.12);
+
+            const options2 = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '99999.99',
+                minimumValue: '0',
+                outputFormat: AutoNumeric.options.outputFormat.number,
+            };
+            expect(AutoNumeric.unformat('4,123', options2)).toEqual(4.12);
+            expect(AutoNumeric.unformat(4.12, options2)).toEqual(4.12);
+        });
+
+        it('with a `leadingZero` set to `keep` in the options', () => {
+            const options1 = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '99999.99',
+                minimumValue: '0',
+                leadingZero: AutoNumeric.options.leadingZero.keep,
+            };
+            expect(AutoNumeric.unformat('00004', options1)).toEqual('00004.00');
+
+            const options2 = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '99999',
+                minimumValue: '0',
+                leadingZero: AutoNumeric.options.leadingZero.keep,
+            };
+            expect(AutoNumeric.unformat('00004', options2)).toEqual('00004');
+
+            const options1Deny = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '99999.99',
+                minimumValue: '0',
+                leadingZero: AutoNumeric.options.leadingZero.deny,
+            };
+            expect(AutoNumeric.unformat('00004', options1Deny)).toEqual('4.00');
+
+            const options2Deny = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '99999',
+                minimumValue: '0',
+                leadingZero: AutoNumeric.options.leadingZero.deny,
+            };
+            expect(AutoNumeric.unformat('00004', options2Deny)).toEqual('4');
+        });
+    });
+
+    describe('`format`', () => {
+        it('should format with default options', () => {
             expect(AutoNumeric.format(1234.56)).toEqual('1,234.56');
             expect(AutoNumeric.format('1234.56')).toEqual('1,234.56');
             expect(AutoNumeric.format(123.45)).toEqual('123.45');
@@ -4523,7 +4722,7 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.format(undefined)).toEqual(null);
         });
 
-        it('with user options', () => {
+        it('should format with user options', () => {
             expect(AutoNumeric.format(1234.56, autoNumericOptionsEuro)).toEqual('1.234,56 €');
             expect(AutoNumeric.format('1.234,56 €', autoNumericOptionsEuro)).toEqual('1.234,56 €');
             expect(AutoNumeric.format('1234.56', autoNumericOptionsEuro)).toEqual('1.234,56 €');
@@ -4545,33 +4744,25 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
             expect(console.warn).toHaveBeenCalled();
         });
-    });
 
-    it('`format` should fail formatting wrong parameters', () => {
-        spyOn(console, 'warn');
-        expect(() => AutoNumeric.format('foobar')).toThrow();
-        expect(() => AutoNumeric.format([1234])).toThrow();
-        expect(() => AutoNumeric.format({})).toThrow();
-        expect(() => AutoNumeric.format({ val: 1234 })).toThrow();
-        expect(() => AutoNumeric.format([])).toThrow();
-        expect(console.warn).toHaveBeenCalledTimes(1);
-    });
+        it('should fail formatting wrong parameters', () => {
+            spyOn(console, 'warn');
+            expect(() => AutoNumeric.format('foobar')).toThrow();
+            expect(() => AutoNumeric.format([1234])).toThrow();
+            expect(() => AutoNumeric.format({})).toThrow();
+            expect(() => AutoNumeric.format({ val: 1234 })).toThrow();
+            expect(() => AutoNumeric.format([])).toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(1);
+        });
 
-    it('`format` should fail when trying to format a localized string with the wrong options', () => {
-        spyOn(console, 'warn');
-        expect(() => AutoNumeric.format('$1,234.56', autoNumericOptionsEuro)).toThrow();
-        expect(() => AutoNumeric.format('$123.45', autoNumericOptionsEuro)).toThrow();
-        expect(() => AutoNumeric.format('1.234,56 €', autoNumericOptionsDollar)).toThrow();
-        expect(() => AutoNumeric.format('123,45 €', autoNumericOptionsDollar)).toThrow();
-        expect(console.warn).toHaveBeenCalledTimes(4);
-    });
-
-    it('`unformat` should fail unformatting wrong parameters', () => {
-        // expect(() => AutoNumeric.unformat('foobar')).toThrow(); //FIXME This should throw
-        expect(() => AutoNumeric.unformat([1234])).toThrow();
-        expect(() => AutoNumeric.unformat({})).toThrow();
-        expect(() => AutoNumeric.unformat({ val: 1234 })).toThrow();
-        expect(() => AutoNumeric.unformat([])).toThrow();
+        it('should fail when trying to format a localized string with the wrong options', () => {
+            spyOn(console, 'warn');
+            expect(() => AutoNumeric.format('$1,234.56', autoNumericOptionsEuro)).toThrow();
+            expect(() => AutoNumeric.format('$123.45', autoNumericOptionsEuro)).toThrow();
+            expect(() => AutoNumeric.format('1.234,56 €', autoNumericOptionsDollar)).toThrow();
+            expect(() => AutoNumeric.format('123,45 €', autoNumericOptionsDollar)).toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(4);
+        });
     });
 
     describe('`validate`', () => {

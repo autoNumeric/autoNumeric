@@ -136,6 +136,16 @@ export default class AutoNumericHelper {
     }
 
     /**
+     * Return `true` if the parameter is a real number (and not a numeric string).
+     *
+     * @param {*} n
+     * @returns {boolean}
+     */
+    static isNumberStrict(n) {
+        return typeof n === 'number';
+    }
+
+    /**
      * Return `true` if the parameter is a number (or a number written as a string).
      *
      * @param {*} n

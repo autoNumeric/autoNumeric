@@ -1,5 +1,12 @@
 ### Change log for autoNumeric:
 
+### "4.0.0-beta.7"
++ Fix issue #427 `autoUnformat()` converts `digitGroupSeparator` set to `.` as the decimal character
++ Modify `AutoNumeric.unformat()` so that 'real' javascript number are always directly returned, without taking into account the options passed (as it was supposed to do previously).
++ Correctly take into account the number of decimal places, the negative brackets, rounding and the suffix text options when unformatting with `AutoNumeric.unformat()`.
++ Complete the `AutoNumeric.unformat()` unit tests.
++ Modify `_removeBrackets()` so that we can only remove the brackets, without reordering the negative sign, currency symbol and value according to the settings.
+
 ### "4.0.0-beta.6"
 + Fix issue #414 Changing the value of an element from negative to positive is not possible for some specific configuration of brackets, for the second time.
 + Remove the need to keep an ambiguous `settings.trailingNegative` variable, that was used for other things that its names suggests.

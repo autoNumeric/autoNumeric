@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.5
- * @date         2017-03-24 UTC 01:00
+ * @version      4.0.0-beta.6
+ * @date         2017-03-31 UTC 10:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
@@ -733,7 +733,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.5';
+        return '4.0.0-beta.6';
     }
 
     /**
@@ -876,11 +876,11 @@ class AutoNumeric {
         // That would not be possible if we used closures directly in the event handler declarations
         this._onFocusInAndMouseEnterFunc = e => { this._onFocusInAndMouseEnter(e); };
         this._onFocusFunc = () => { this._onFocus(); };
-        this._onFocusOutAndMouseLeaveFunc = e => { this._onFocusOutAndMouseLeave(e); };
         this._onKeydownFunc = e => { this._onKeydown(e); };
         this._onKeypressFunc = e => { this._onKeypress(e); };
         this._onKeyupFunc = e => { this._onKeyup(e); };
         this._onBlurFunc = e => { this._onBlur(e); };
+        this._onFocusOutAndMouseLeaveFunc = e => { this._onFocusOutAndMouseLeave(e); };
         this._onPasteFunc = e => { this._onPaste(e); };
         this._onWheelFunc = e => { this._onWheel(e); };
         this._onFormSubmitFunc = e => { this._onFormSubmit(e); };
@@ -889,15 +889,15 @@ class AutoNumeric {
         this._onDropFunc = e => { this._onDrop(e); };
 
         // Add the event listeners
-        this.domElement.addEventListener('focusin', this._onFocusInAndMouseEnterFunc, false);
+        this.domElement.addEventListener('focus', this._onFocusInAndMouseEnterFunc, false);
         this.domElement.addEventListener('focus', this._onFocusFunc, false);
         this.domElement.addEventListener('mouseenter', this._onFocusInAndMouseEnterFunc, false);
-        this.domElement.addEventListener('blur', this._onFocusOutAndMouseLeaveFunc, false);
-        this.domElement.addEventListener('mouseleave', this._onFocusOutAndMouseLeaveFunc, false);
         this.domElement.addEventListener('keydown', this._onKeydownFunc, false);
         this.domElement.addEventListener('keypress', this._onKeypressFunc, false);
         this.domElement.addEventListener('keyup', this._onKeyupFunc, false);
         this.domElement.addEventListener('blur', this._onBlurFunc, false);
+        this.domElement.addEventListener('blur', this._onFocusOutAndMouseLeaveFunc, false);
+        this.domElement.addEventListener('mouseleave', this._onFocusOutAndMouseLeaveFunc, false);
         this.domElement.addEventListener('paste', this._onPasteFunc, false);
         this.domElement.addEventListener('wheel', this._onWheelFunc, false);
         this.domElement.addEventListener('drop', this._onDropFunc, false);
@@ -919,7 +919,7 @@ class AutoNumeric {
      * @private
      */
     _removeEventListeners() { //FIXME à tester
-        this.domElement.removeEventListener('focusin', this._onFocusInAndMouseEnterFunc, false);
+        this.domElement.removeEventListener('focus', this._onFocusInAndMouseEnterFunc, false);
         this.domElement.removeEventListener('focus', this._onFocusFunc, false);
         this.domElement.removeEventListener('mouseenter', this._onFocusInAndMouseEnterFunc, false);
         this.domElement.removeEventListener('blur', this._onFocusOutAndMouseLeaveFunc, false);
@@ -1374,9 +1374,6 @@ class AutoNumeric {
             this._setSettings(options, true); // We do not call `update` here since this would call `set` too
         }
 
-        // Reset the trailing negative settings, since it's possible the previous value was negative, but not the newly set one
-        this.settings.trailingNegative = false; //TODO Use a separate variable to store that info (`this.tempEditing` object for instance?)
-
         let value = this.constructor._toNumericValue(newValue, this.settings);
         if (isNaN(Number(value))) {
             AutoNumericHelper.setElementValue(this.domElement, '');
@@ -1413,9 +1410,9 @@ class AutoNumeric {
                 }
 
                 let rawValue;
-                if (this.settings.scaleDivisor && !this.settings.hasFocus) {
+                if (this.settings.scaleDivisor && !this.isFocused) {
                     value = this.constructor._roundValue(value, this.settings);
-                    rawValue = this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.')); // Move the `setRawValue` call after the `setElementValue` one
+                    rawValue = this._trimLeadingAndTrailingZeros(value.replace(this.settings.decimalCharacter, '.')); // Move the `setRawValue` call after the `setElementValue` one
                     value = this.constructor._toNumericValue(value, this.settings);
                     value = value / this.settings.scaleDivisor;
                     value = value.toString();
@@ -1436,12 +1433,12 @@ class AutoNumeric {
                 // Stores rawValue including the decimalPlacesShownOnFocus
                 if (!this.settings.scaleDivisor) {
                     //TODO Find a better way to prevent potentially overwriting the `rawValue` variable (that could have already been set few lines above)
-                    rawValue = this._cleanLeadingTrailingZeros(value.replace(this.settings.decimalCharacter, '.'));
+                    rawValue = this._trimLeadingAndTrailingZeros(value.replace(this.settings.decimalCharacter, '.'));
                 }
 
                 value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
-                value = this.constructor._addGroupSeparators(value, this.settings, rawValue);
-                if (!this.settings.hasFocus && this.settings.scaleSymbol) {
+                value = this.constructor._addGroupSeparators(value, this.settings, this.isFocused, rawValue);
+                if (!this.isFocused && this.settings.scaleSymbol) {
                     value = value + this.settings.scaleSymbol;
                 }
 
@@ -1450,7 +1447,7 @@ class AutoNumeric {
                 }
 
                 // Set back the `decimalPlacesOverride` option to its original value
-                if (this.settings.scaleDivisor && this.settings.scaleDecimalPlaces && !this.settings.hasFocus) {
+                if (this.settings.scaleDivisor && this.settings.scaleDecimalPlaces && !this.isFocused) {
                     this.settings.decimalPlacesOverride = tempDecimal;
                 }
 
@@ -3091,10 +3088,11 @@ class AutoNumeric {
         }
 
         // Initiate a very basic settings object
-        const settings = Object.assign({}, this.getDefaultConfig(), { strip: false }, options);
+        const settings = Object.assign({}, this.getDefaultConfig(), options);
         if (valueOrDomElement < 0) {
             settings.negativeSignCharacter = '-';
         }
+
         const regex = {};
         this._cachesUsualRegularExpressions(settings, regex); // This is needed by `_stripAllNonNumberCharacters` that uses those regex
 
@@ -3120,7 +3118,7 @@ class AutoNumeric {
         // Everything is ok, proceed to rounding, formatting and grouping
         valueString = this._roundValue(valueString, settings);
         valueString = this._modifyNegativeSignAndDecimalCharacterForFormattedValue(valueString, settings);
-        valueString = this._addGroupSeparators(valueString, settings);
+        valueString = this._addGroupSeparators(valueString, settings, false);
 
         return valueString;
     }
@@ -3171,7 +3169,7 @@ class AutoNumeric {
             AutoNumericHelper.throwError(`A number or a string representing a number is needed to be able to unformat it, [${value}] given.`);
         }
 
-        const settings = Object.assign({}, this.getDefaultConfig(), { strip: false }, options);
+        const settings = Object.assign({}, this.getDefaultConfig(), options);
         const allowed = `-0123456789\\${settings.decimalCharacter}`;
         const unwantedCharacters = new RegExp(`[^${allowed}]`, 'gi');
         value = value.toString();
@@ -3442,15 +3440,28 @@ class AutoNumeric {
     }
 
     /**
+     * Keep track if the settings configuration leads to a trailing negative sign (only when the raw value is negative), so we do not have to test the settings values every time we need to know that.
+     * `isTrailingNegative` is set to `true` if the settings result in a trailing negative character, `false` otherwise.
+     * Note: This returns `true` even if the raw value is positive.
+     * @private
+     */
+    _setTrailingNegativeSignInfo() {
+        this.isTrailingNegative = (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix) ||
+        (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix &&
+        (this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.left || this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.right));
+    }
+
+    /**
      * Strip all unwanted non-number characters.
      * This keeps the numbers, the negative sign as well as the custom decimal character.
      *
      * @param {string} s
      * @param {object} settings
-     * @param {boolean} leftOrAll
+     * @param {boolean} stripZeros If set to `false`, then the leading zero(s) are not stripped, otherwise if set to `true`, the `leadingZero` option is followed
+     * @param {boolean} isFocused If the element is focused, then this is `true`
      * @returns {string|*}
      */
-    static _stripAllNonNumberCharacters(s, settings, leftOrAll) {
+    static _stripAllNonNumberCharacters(s, settings, stripZeros, isFocused) {
         //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
         //TODO This function is called 10 times (sic!) on each key input, couldn't we lower that number? cf. issue #325
         //TODO Refactor this with `convertToNumericString()` if possible?
@@ -3463,19 +3474,15 @@ class AutoNumeric {
         if (settings.suffixText) {
             // Remove suffix
             while (AutoNumericHelper.contains(s, settings.suffixText)) {
+                //TODO Why use a `while` here?
                 s = s.replace(settings.suffixText, '');
             }
         }
 
+        //TODO Remove the positive sign too?
+
         // First replace anything before digits
         s = s.replace(settings.skipFirstAutoStrip, '$1$2');
-
-        if ((settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix ||
-            (settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix && settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.prefix)) &&
-            AutoNumericHelper.isNegative(s) &&
-            s !== '') {
-            settings.trailingNegative = true;
-        }
 
         // Then replace anything after digits
         s = s.replace(settings.skipLastAutoStrip, '$1');
@@ -3491,29 +3498,29 @@ class AutoNumeric {
         s = m ? [m[1], m[2], m[3]].join('') : '';
 
         if (settings.leadingZero === AutoNumeric.options.leadingZero.allow || settings.leadingZero === AutoNumeric.options.leadingZero.keep) {
-            let nSign = '';
+            let negativeSign = '';
             const [integerPart, decimalPart] = s.split(settings.decimalCharacter);
             let modifiedIntegerPart = integerPart;
             if (AutoNumericHelper.contains(modifiedIntegerPart, settings.negativeSignCharacter)) {
-                nSign = settings.negativeSignCharacter;
+                negativeSign = settings.negativeSignCharacter;
                 modifiedIntegerPart = modifiedIntegerPart.replace(settings.negativeSignCharacter, '');
             }
 
             // Strip leading zero on positive value if need
-            if (nSign === '' && modifiedIntegerPart.length > settings.mIntPos && modifiedIntegerPart.charAt(0) === '0') {
+            if (negativeSign === '' && modifiedIntegerPart.length > settings.mIntPos && modifiedIntegerPart.charAt(0) === '0') {
                 modifiedIntegerPart = modifiedIntegerPart.slice(1);
             }
 
             // Strip leading zero on negative value if need
-            if (nSign !== '' && modifiedIntegerPart.length > settings.mIntNeg && modifiedIntegerPart.charAt(0) === '0') {
+            if (negativeSign !== '' && modifiedIntegerPart.length > settings.mIntNeg && modifiedIntegerPart.charAt(0) === '0') {
                 modifiedIntegerPart = modifiedIntegerPart.slice(1);
             }
 
-            s = `${nSign}${modifiedIntegerPart}${AutoNumericHelper.isUndefined(decimalPart)?'':settings.decimalCharacter + decimalPart}`;
+            s = `${negativeSign}${modifiedIntegerPart}${AutoNumericHelper.isUndefined(decimalPart)?'':settings.decimalCharacter + decimalPart}`;
         }
 
-        if ((leftOrAll && settings.leadingZero === AutoNumeric.options.leadingZero.deny) ||
-            (!settings.hasFocus && settings.leadingZero === AutoNumeric.options.leadingZero.allow)) {
+        if ((stripZeros && settings.leadingZero === AutoNumeric.options.leadingZero.deny) ||
+            (!isFocused && settings.leadingZero === AutoNumeric.options.leadingZero.allow)) {
             s = s.replace(settings.stripReg, '$1$2');
         }
 
@@ -3521,17 +3528,18 @@ class AutoNumeric {
     }
 
     /**
-     * Sets or removes brackets on negative values, depending on the focus state.
-     * The focus state is 'stored' in the settings object under the `settings.hasFocus` attribute.
+     * Sets or removes brackets on negative values, depending on the focus state, which is passed as `isFocused`.
+     * The focus state is 'stored' in that object property.
      *
      * @param {string} value
      * @param {object} settings
+     * @param {boolean} isFocused
      * @returns {*}
      */
-    static _toggleNegativeBracket(value, settings) {
+    static _toggleNegativeBracket(value, settings, isFocused) {
         //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
         let result;
-        if (settings.hasFocus) {
+        if (isFocused) {
             result = this._removeBrackets(value, settings);
         } else {
             result = this._addBrackets(value, settings);
@@ -3620,6 +3628,11 @@ class AutoNumeric {
             s = s.replace(settings.decimalCharacter, '.');
         }
 
+        // Remove the suffixText
+        if (settings.suffixText !== AutoNumeric.options.suffixText.none) {
+            s = s.replace(settings.suffixText, '');
+        }
+
         // Move the trailing negative sign to the right position, if any
         if (AutoNumericHelper.isNegative(s) && s.lastIndexOf('-') === s.length - 1) {
             s = s.replace('-', '');
@@ -3687,9 +3700,11 @@ class AutoNumeric {
         if (this.settings.decimalCharacter !== '.') {
             s = s.replace(this.settings.decimalCharacter, '.');
         }
+
         if (this.settings.negativeSignCharacter !== '-' && this.settings.negativeSignCharacter !== '') {
             s = s.replace(this.settings.negativeSignCharacter, '-');
         }
+
         if (!s.match(/\d/)) {
             // The default value returned by `get` is not formatted with decimals
             s += '0';
@@ -3710,6 +3725,7 @@ class AutoNumeric {
         if (settings.negativeSignCharacter !== '-' && settings.negativeSignCharacter !== '') {
             s = s.replace('-', settings.negativeSignCharacter);
         }
+
         if (settings.decimalCharacter !== '.') {
             s = s.replace('.', settings.decimalCharacter);
         }
@@ -3743,17 +3759,17 @@ class AutoNumeric {
      *
      * @param {string} inputValue
      * @param {object} settings
+     * @param {boolean} isFocused
      * @param {number|string|null} rawValue If this is set, then this rawValue is used instead of the one passed through the `settings` object. This is useful is some very specific cases where we need to set the raw value *after* settings the formatted value, using the `_addGroupSeparators()` method.
      * @returns {*}
      */
-    static _addGroupSeparators(inputValue, settings, rawValue = null) {
+    static _addGroupSeparators(inputValue, settings, isFocused, rawValue = null) {
         //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
-        if (settings.strip) {
-            inputValue = this._stripAllNonNumberCharacters(inputValue, settings, false);
-        }
+        const isValueNegative = AutoNumericHelper.isNegative(inputValue) || AutoNumericHelper.isNegativeWithBrackets(inputValue, settings.firstBracket, settings.lastBracket); // Test if the value is negative before removing the negative sign
+
+        inputValue = this._stripAllNonNumberCharacters(inputValue, settings, false, isFocused);
 
         const empty = this._checkEmpty(inputValue, settings, true);
-        const isValueNegative = AutoNumericHelper.isNegative(inputValue);
         const isZeroOrHasNoValue = AutoNumericHelper.isZeroOrHasNoValue(inputValue);
 
         // Temporarily remove the negative sign if present
@@ -3807,8 +3823,7 @@ class AutoNumeric {
             inputValue = integerPart;
         }
 
-        settings.trailingNegative = false;
-        // Add back the negative sign and the currency symbol, at the right position
+        // Add back the negative/positive sign and the currency symbol, at the right positions
         inputValue = AutoNumeric._mergeCurrencySignNegativePositiveSignAndValue(inputValue, settings, isValueNegative, isZeroOrHasNoValue); //TODO this function is called again in `_toggleNegativeBracket` ; let's DRY this
 
         if (AutoNumericHelper.isNull(rawValue)) {
@@ -3818,10 +3833,17 @@ class AutoNumeric {
 
         // Toggle the negative sign and brackets
         if (settings.negativeBracketsTypeOnBlur !== null && (rawValue < 0 || AutoNumericHelper.isNegativeStrict(inputValue))) {
-            inputValue = this._toggleNegativeBracket(inputValue, settings);
+            inputValue = this._toggleNegativeBracket(inputValue, settings, isFocused);
         }
 
-        return inputValue + settings.suffixText;
+        let result;
+        if (settings.suffixText) {
+            result = inputValue + settings.suffixText;
+        } else {
+            result = inputValue;
+        }
+
+        return result;
     }
 
     /**
@@ -3858,7 +3880,6 @@ class AutoNumeric {
                         break;
                     case AutoNumeric.options.negativePositiveSignPlacement.suffix:
                         result = `${settings.currencySymbol}${inputValue}${signToUse}`;
-                        settings.trailingNegative = true;
                         break;
                 }
             } else {
@@ -3871,11 +3892,9 @@ class AutoNumeric {
                     case AutoNumeric.options.negativePositiveSignPlacement.suffix:
                     case AutoNumeric.options.negativePositiveSignPlacement.right:
                         result = `${inputValue}${settings.currencySymbol}${signToUse}`;
-                        settings.trailingNegative = true;
                         break;
                     case AutoNumeric.options.negativePositiveSignPlacement.left:
                         result = `${inputValue}${signToUse}${settings.currencySymbol}`;
-                        settings.trailingNegative = true;
                         break;
                     case AutoNumeric.options.negativePositiveSignPlacement.prefix:
                         result = `${signToUse}${inputValue}${settings.currencySymbol}`;
@@ -4092,13 +4111,15 @@ class AutoNumeric {
      * @param {boolean} isPaste
      * @returns {*}
      */
-    static _truncateDecimal(s, settings, isPaste) {
-        s = (isPaste) ? this._roundValue(s, settings) : s;
+    static _truncateDecimalPlaces(s, settings, isPaste) {
+        if (isPaste) {
+            s = this._roundValue(s, settings);
+        }
 
         if (settings.decimalCharacter && settings.decimalPlacesOverride) {
             const [integerPart, decimalPart] = s.split(settings.decimalCharacter);
 
-            // truncate decimal part to satisfying length since we would round it anyway
+            // Truncate the decimal part to the satisfying length since we would round it anyway
             if (decimalPart && decimalPart.length > settings.decimalPlacesOverride) {
                 if (settings.decimalPlacesOverride > 0) {
                     const modifiedDecimalPart = decimalPart.substring(0, settings.decimalPlacesOverride);
@@ -4201,12 +4222,13 @@ class AutoNumeric {
     }
 
     /**
-     * properly formats the string to a numeric when leadingZero does not 'keep'.
+     * Removes any zeros in excess in the front and back of the given `value`, according to the `settings`.
+     * This also manages the cases where the decimal point is on the far left or far right of the `value`.
      *
      * @param {string} value
      * @returns {string}
      */
-    _cleanLeadingTrailingZeros(value) {
+    _trimLeadingAndTrailingZeros(value) {
         // Return the empty string is the value is already empty. This prevent converting that value to '0'.
         if (value === '') {
             return '';
@@ -4218,16 +4240,17 @@ class AutoNumeric {
                 return '0';
             }
 
-            // Trim leading zero's - leaves one zero to the left of the decimal point
+            // Trim the leading zeros, while leaving one zero to the left of the decimal point if needed
             value = value.replace(/^(-)?0+(?=\d)/g,'$1');
-
-            //TODO remove this from that function and use `trimPaddedZerosFromDecimalPlaces()` instead. Also create a new `trailingZero` option.
-            if (AutoNumericHelper.contains(value, '.')) {
-                // Trims trailing zeros after the decimal point
-                value = value.replace(/(\.[0-9]*?)0+$/, '$1');
-            }
         }
-        // Strips trailing decimal point
+
+        //TODO remove this from that function and use `trimPaddedZerosFromDecimalPlaces()` instead
+        // Trim the trailing zeros after the last decimal place not being a zero (ie. 1.2300 -> 1.23)
+        if (AutoNumericHelper.contains(value, '.')) {
+            value = value.replace(/(\.[0-9]*?)0+$/, '$1');
+        }
+
+        // Remove any trailing decimal point
         value = value.replace(/\.$/, '');
 
         return value;
@@ -4287,25 +4310,17 @@ class AutoNumeric {
             return;
         }
 
-        if (e.type === 'focusin' && this.settings.unformatOnHover && this.hoveredWithAlt) {
+        if (e.type === 'focus' && this.settings.unformatOnHover && this.hoveredWithAlt) {
             this.constructor._reformatAltHovered(this);
         }
 
-        if (e.type === 'focusin' || e.type === 'mouseenter' && !this.isFocused && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus) {
-            this.settings.hasFocus = true;
-
-            if (this.settings.negativeBracketsTypeOnBlur !== null && this.settings.negativeSignCharacter !== '') {
-                AutoNumericHelper.setElementValue(this.domElement, this.constructor._removeBrackets(AutoNumericHelper.getElementValue(e.target), this.settings));
+        if (e.type === 'focus' || e.type === 'mouseenter' && !this.isFocused && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus) {
+            if (this.settings.rawValue < 0 && this.settings.negativeBracketsTypeOnBlur !== null && this.settings.negativeSignCharacter !== '') { //FIXME this is called a second time in _addGroupSeparators too. Prevent this
+                // Only remove the brackets if the value is negative
+                AutoNumericHelper.setElementValue(this.domElement, this.constructor._removeBrackets(AutoNumericHelper.getElementValue(this.domElement), this.settings));
             }
 
-            // clean the value to compare to rawValue
-            let result = this.constructor._stripAllNonNumberCharacters(AutoNumericHelper.getElementValue(e.target), this.settings, true);
-            result = this.constructor._convertToNumericString(result, this.settings);
-            result = this._cleanLeadingTrailingZeros(result);
-            if (this.settings.trailingNegative) {
-                result = `-${result}`;
-            }
-
+            // Check if the element value needs to be changed
             let updateElementValue = false;
             if (this.settings.decimalPlacesShownOnFocus) {
                 this.settings.decimalPlacesOverride = this.settings.decimalPlacesShownOnFocus;
@@ -4319,13 +4334,11 @@ class AutoNumeric {
                 this.settings.currencySymbol = '';
                 this.settings.suffixText = '';
                 updateElementValue = true;
-            } else if (result !== this.settings.rawValue) {
-                this.set(result); // This update the rawValue
             }
 
             if (updateElementValue) {
                 const roundedValue = this.constructor._roundValue(this.settings.rawValue, this.settings);
-                AutoNumericHelper.setElementValue(this.domElement, this.constructor._addGroupSeparators(roundedValue, this.settings));
+                AutoNumericHelper.setElementValue(this.domElement, this.constructor._addGroupSeparators(roundedValue, this.settings, this.isFocused));
             }
 
             // In order to send a 'native' change event when blurring the input, we need to first store the initial input value on focus.
@@ -4453,7 +4466,7 @@ class AutoNumeric {
 
         this._updateInternalProperties(e);
 
-        if (this._skipAlways(e)) {
+        if (this._processNonPrintableKeysAndShortcuts(e)) {
             this.processed = true;
 
             return;
@@ -4497,7 +4510,7 @@ class AutoNumeric {
         const processed = this.processed;
         this._updateInternalProperties(e);
 
-        if (this._skipAlways(e)) {
+        if (this._processNonPrintableKeysAndShortcuts(e)) {
             return;
         }
 
@@ -4588,7 +4601,7 @@ class AutoNumeric {
 
         this._updateInternalProperties(e);
 
-        const skip = this._skipAlways(e);
+        const skip = this._processNonPrintableKeysAndShortcuts(e);
         delete this.valuePartsBeforePaste;
         const targetValue = AutoNumericHelper.getElementValue(e.target);
         if (skip || targetValue === '') {
@@ -4642,6 +4655,7 @@ class AutoNumeric {
      * @param {Event} e
      */
     _onFocusOutAndMouseLeave(e) {
+        //TODO Create separate handlers for blur and mouseleave
         //FIXME Do not call `set()` if the current raw value is the same as the one we are trying to set (currently, on focus out, `set()` is always called, even if the value has not changed
         if (this.settings.unformatOnHover && e.type === 'mouseleave' && this.hoveredWithAlt) {
             this.constructor._reformatAltHovered(this);
@@ -4651,7 +4665,6 @@ class AutoNumeric {
 
         if ((e.type === 'mouseleave' && !this.isFocused) || e.type === 'blur') {
             const origValue = this.settings.rawValue;
-            this.settings.hasFocus = false;
 
             if (this.settings.saveValueToSessionStorage) {
                 this._saveValueToPersistentStorage('set');
@@ -4674,7 +4687,7 @@ class AutoNumeric {
                 const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(this.settings.rawValue, this.settings);
                 if (this.constructor._checkEmpty(this.settings.rawValue, this.settings, false) === null && minTest && maxTest) {
                     value = this._modifyNegativeSignAndDecimalCharacterForRawValue(value);
-                    this._setRawValue(this._cleanLeadingTrailingZeros(value));
+                    this._setRawValue(this._trimLeadingAndTrailingZeros(value));
 
                     if (this.settings.scaleDivisor) {
                         value = value / this.settings.scaleDivisor;
@@ -4703,7 +4716,7 @@ class AutoNumeric {
 
             let groupedValue = this.constructor._checkEmpty(value, this.settings, false);
             if (groupedValue === null) {
-                groupedValue = this.constructor._addGroupSeparators(value, this.settings);
+                groupedValue = this.constructor._addGroupSeparators(value, this.settings, this.isFocused);
             }
 
             // Testing for `allowDecimalPadding.never` is needed to make sure we do not keep a trailing decimalCharacter (like '500.') in the element, since the raw value would still be a rightly formatted integer ('500')
@@ -5398,9 +5411,9 @@ class AutoNumeric {
                             (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.prefix && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix)) &&
                             this.settings.negativeSignCharacter !== '' &&
                             AutoNumericHelper.isNegative(currentValue)) {
-                            this._setRawValue(this.settings.negativeSignCharacter + this.constructor._stripAllNonNumberCharacters(toStrip, this.settings, true));
+                            this._setRawValue(this.settings.negativeSignCharacter + this.constructor._stripAllNonNumberCharacters(toStrip, this.settings, true, this.isFocused));
                         } else {
-                            this._setRawValue(this.constructor._stripAllNonNumberCharacters(toStrip, this.settings, true));
+                            this._setRawValue(this.constructor._stripAllNonNumberCharacters(toStrip, this.settings, true, this.isFocused));
                         }
                     }
 
@@ -5649,7 +5662,6 @@ class AutoNumeric {
             // Additional information that are added to the `settings` object :
             //FIXME Find a way to exclude those internal data from the settings object (ideally by using another object, or better yet, class attributes) -->
             allowedAutoStrip                  : true,
-            hasFocus                          : true,
             mIntNeg                           : true,
             mIntPos                           : true,
             negativeSignCharacter             : true,
@@ -5658,9 +5670,7 @@ class AutoNumeric {
             rawValue                          : true,
             skipFirstAutoStrip                : true,
             skipLastAutoStrip                 : true,
-            strip                             : true,
             stripReg                          : true,
-            trailingNegative                  : true,
         };
 
         for (const option in options) {
@@ -5706,12 +5716,7 @@ class AutoNumeric {
             // The settings are generated for the first time
             this.settings = {};
             // If we couldn't grab any settings, create them from the default ones and combine them with the options passed as a parameter as well as with the HTML5 `data-*` info (via `this.domElement.dataset`), if any.
-            this._mergeSettings(this.constructor.getDefaultConfig(), this.domElement.dataset, options, {
-                hasFocus        : false,
-                rawValue        : '',
-                trailingNegative: false,
-                strip           : true,
-            });
+            this._mergeSettings(this.constructor.getDefaultConfig(), this.domElement.dataset, options, { rawValue : '' });
             this.caretFix = false;
             this.throwInput = true; // Throw input event
             this.allowedTagList = AutoNumericEnum.allowedTagList;
@@ -5734,6 +5739,7 @@ class AutoNumeric {
         this._calculateVMinAndVMaxIntegerSizes();
         this._correctDecimalPlacesOverrideOption();
         this._setAlternativeDecimalSeparatorCharacter();
+        this._setTrailingNegativeSignInfo();
         this.regex = {}; // Create the object that will store the regular expressions
         this.constructor._cachesUsualRegularExpressions(this.settings, this.regex);
         this._setBrackets();
@@ -5789,7 +5795,7 @@ class AutoNumeric {
      * @returns {string|void|XML|*}
      */
     _preparePastedText(text) {
-        return this.constructor._stripAllNonNumberCharacters(text, this.settings, true).replace(this.settings.decimalCharacter, '.');
+        return this.constructor._stripAllNonNumberCharacters(text, this.settings, true, this.isFocused).replace(this.settings.decimalCharacter, '.');
     }
 
     /**
@@ -5902,23 +5908,25 @@ class AutoNumeric {
     _getUnformattedLeftAndRightPartAroundTheSelection() {
         let [left, right] = this._getLeftAndRightPartAroundTheSelection();
         if (left === '' && right === '') {
-            this.settings.trailingNegative = false;
+            return ['', ''];
         }
 
-        // If changing the sign and `left` is equal to the number zero - prevents stripping the leading zeros
+        // If changing the sign and `left` is equal to the number zero, prevent stripping the leading zero(s)
         let stripZeros = true;
         if (this.eventKey === AutoNumericEnum.keyName.Hyphen && Number(left) === 0) {
             stripZeros = false;
         }
 
-        left = AutoNumeric._stripAllNonNumberCharacters(left, this.settings, stripZeros);
-        right = AutoNumeric._stripAllNonNumberCharacters(right, this.settings, false);
-
-        if (this.settings.trailingNegative && !AutoNumericHelper.isNegative(left)) {
+        if (this.isTrailingNegative &&
+            AutoNumericHelper.isNegative(right) &&
+            !AutoNumericHelper.isNegative(left)) {
+            // Only set the negative sign if the value is negative
             left = '-' + left;
-            right = (right === '-') ? '' : right;
-            this.settings.trailingNegative = false;
+            right = right.replace(this.settings.negativeSignCharacter, '');
         }
+
+        left = AutoNumeric._stripAllNonNumberCharacters(left, this.settings, stripZeros, this.isFocused);
+        right = AutoNumeric._stripAllNonNumberCharacters(right, this.settings, false, this.isFocused);
 
         return [left, right];
     }
@@ -5928,48 +5936,53 @@ class AutoNumeric {
      *
      * @param {string} left
      * @param {string} right
-     * @returns {[*,*]}
+     * @returns {[*,*,*]}
      * @private
      */
     _normalizeParts(left, right) {
+        //TODO Refactor with `_getUnformattedLeftAndRightPartAroundTheSelection` which share a lot of similar code
         // if changing the sign and left is equal to the number zero - prevents stripping the leading zeros
         let stripZeros = true;
         if (this.eventKey === AutoNumericEnum.keyName.Hyphen && Number(left) === 0) {
             stripZeros = false;
         }
-        left = AutoNumeric._stripAllNonNumberCharacters(left, this.settings, stripZeros);
 
-        // If right is not empty and first character is not decimalCharacter
-        right = AutoNumeric._stripAllNonNumberCharacters(right, this.settings, false);
+        if (this.isTrailingNegative &&
+            AutoNumericHelper.isNegative(right) &&
+            !AutoNumericHelper.isNegative(left)) {
+            // Only set the negative sign if the value is negative
+            left = '-' + left;
+            right = right.replace(this.settings.negativeSignCharacter, '');
+        }
+
+        left = AutoNumeric._stripAllNonNumberCharacters(left, this.settings, stripZeros, this.isFocused);
+        right = AutoNumeric._stripAllNonNumberCharacters(right, this.settings, false, this.isFocused);
 
         // Prevents multiple leading zeros from being entered
         if (this.settings.leadingZero === AutoNumeric.options.leadingZero.deny &&
             (this.eventKey === AutoNumericEnum.keyName.num0 || this.eventKey === AutoNumericEnum.keyName.numpad0) &&
             Number(left) === 0 &&
-            !AutoNumericHelper.contains(left, this.settings.decimalCharacter)  && right !== '') {
+            // If `right` is not empty and the first character is not `decimalCharacter`
+            !AutoNumericHelper.contains(left, this.settings.decimalCharacter) && right !== '') {
             left = left.substring(0, left.length - 1);
         }
 
-        if (this.settings.trailingNegative && !AutoNumericHelper.isNegative(left)) {
-            left = '-' + left;
-            this.settings.trailingNegative = false;
-        }
-
-        // Insert zero if has leading dot
-        this.newValue = left + right;
+        // Insert zero there is a leading dot
+        let newValue = left + right;
         if (this.settings.decimalCharacter) {
-            const m = this.newValue.match(new RegExp(`^${this.regex.aNegRegAutoStrip}\\${this.settings.decimalCharacter}`));
+            const m = newValue.match(new RegExp(`^${this.regex.aNegRegAutoStrip}\\${this.settings.decimalCharacter}`));
             if (m) {
                 left = left.replace(m[1], m[1] + '0');
-                this.newValue = left + right;
+                newValue = left + right;
             }
         }
 
-        return [left, right];
+        return [left, right, newValue];
     }
 
     /**
      * Set part of number to value while keeping the cursor position. //TODO What about the cursor selection?
+     * This function also sets the raw value.
      *
      * @param {string} left
      * @param {string} right
@@ -5978,37 +5991,36 @@ class AutoNumeric {
      * @private
      */
     _setValueParts(left, right, isPaste = false) {
-        //TODO Use destructuring here to make `parts` semantically more meaningful
-        const parts = this._normalizeParts(left, right);
-        const [minTest, maxTest] = AutoNumeric._checkIfInRangeWithOverrideOption(this.newValue, this.settings);
-        let position = parts[0].length;
-        this.newValue = parts.join('');
+        const [normalizedLeft, normalizedRight, normalizedNewValue] = this._normalizeParts(left, right);
+        const [minTest, maxTest] = AutoNumeric._checkIfInRangeWithOverrideOption(normalizedNewValue, this.settings);
+        let position = normalizedLeft.length;
+        let newValue = normalizedNewValue;
 
         if (minTest && maxTest) {
-            this.newValue = AutoNumeric._truncateDecimal(this.newValue, this.settings, isPaste);
+            newValue = AutoNumeric._truncateDecimalPlaces(newValue, this.settings, isPaste);
             //TODO Check if we need to replace the hard-coded ',' with settings.decimalCharacter
-            const testValue = (AutoNumericHelper.contains(this.newValue, ',')) ? this.newValue.replace(',', '.') : this.newValue;
+            const testValue = (AutoNumericHelper.contains(newValue, ',')) ? newValue.replace(',', '.') : newValue;
             if (testValue === '' || testValue === this.settings.negativeSignCharacter) {
                 this._setRawValue((this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) ? '0' : '');
             } else {
-                this._setRawValue(this._cleanLeadingTrailingZeros(testValue));
+                this._setRawValue(this._trimLeadingAndTrailingZeros(testValue));
             }
 
-            if (position > this.newValue.length) {
-                position = this.newValue.length;
+            if (position > newValue.length) {
+                position = newValue.length;
             }
 
             // Make sure when the user enter a '0' on the far left with a leading zero option set to 'deny', that the caret does not moves since the input is dropped (fix issue #283)
-            if (position === 1 && parts[0] === '0' && this.settings.leadingZero === AutoNumeric.options.leadingZero.deny) {
+            if (position === 1 && normalizedLeft === '0' && this.settings.leadingZero === AutoNumeric.options.leadingZero.deny) {
                 // If the user enter `0`, then the caret is put on the right side of it (Fix issue #299)
-                if (parts[1] === '' || parts[0] === '0' && parts[1] !== '') {
+                if (normalizedRight === '' || normalizedLeft === '0' && normalizedRight !== '') {
                     position = 1;
                 } else {
                     position = 0;
                 }
             }
 
-            AutoNumericHelper.setElementValue(this.domElement, this.newValue);
+            AutoNumericHelper.setElementValue(this.domElement, newValue);
             this._setCaretPosition(position);
 
             return true;
@@ -6090,7 +6102,7 @@ class AutoNumeric {
             // Try to strip the pasted value first
             delete this.valuePartsBeforePaste;
 
-            const modifiedLeftPart = left.substr(0, oldParts[0].length) + AutoNumeric._stripAllNonNumberCharacters(left.substr(oldParts[0].length), this.settings, true);
+            const modifiedLeftPart = left.substr(0, oldParts[0].length) + AutoNumeric._stripAllNonNumberCharacters(left.substr(oldParts[0].length), this.settings, true, this.isFocused);
             if (!this._setValueParts(modifiedLeftPart, right, true)) {
                 AutoNumericHelper.setElementValue(this.domElement, oldParts.join(''));
                 this._setCaretPosition(oldParts[0].length);
@@ -6120,14 +6132,14 @@ class AutoNumeric {
     }
 
     /**
+     * Process copying, cutting and pasting, as well as undo/redoing and cursor moving.
      * Return `true` if further processing should not be performed.
-     * Process pasting, cursor moving and skipping of not interesting keys.
      *
      * @param {KeyboardEvent} e
      * @returns {boolean}
      * @private
      */
-    _skipAlways(e) {
+    _processNonPrintableKeysAndShortcuts(e) {
         // Catch the ctrl up on ctrl-v
         if (((e.ctrlKey || e.metaKey) && e.type === 'keyup' && !AutoNumericHelper.isUndefined(this.valuePartsBeforePaste)) || (e.shiftKey && this.eventKey === AutoNumericEnum.keyName.Insert)) {
             //TODO Move this test inside the `onKeyup` handler
@@ -6290,9 +6302,7 @@ class AutoNumeric {
                 this.throwInput = false;
             }
 
-            if (((this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix) ||
-                (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix && (this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.left || this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.right))) &&
-                AutoNumericHelper.isNegative(AutoNumericHelper.getElementValue(this.domElement))) {
+            if (this.isTrailingNegative && AutoNumericHelper.isNegative(AutoNumericHelper.getElementValue(this.domElement))) {
                 [left, right] = this._processCharacterDeletionIfTrailingNegativeSign([left, right]);
             } else {
                 if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
@@ -6312,7 +6322,7 @@ class AutoNumeric {
     /**
      * Return `true` if the key is allowed.
      * This function decides if the key pressed should be dropped or accepted, and modify the value 'on-the-fly' accordingly.
-     * This functions also modify the value on-the-fly. //TODO This should use another function in order to separate the test and the modification
+     * //TODO This should use another function in order to separate the test and the modification
      *
      * @returns {boolean}
      */
@@ -6334,7 +6344,7 @@ class AutoNumeric {
                 return true;
             }
 
-            // Do not allow decimal character if other decimal character present
+            // Do not allow a decimal character if another decimal character is already present
             if (AutoNumericHelper.contains(left, this.settings.decimalCharacter)) {
                 return true;
             }
@@ -6352,38 +6362,18 @@ class AutoNumeric {
             return true;
         }
 
-        // Prevent minus if not allowed
+        // Prevent entering the minus sign if it's not allowed (Note: `this.settings.negativeSignCharacter` is only set if the minimumValue or maximumValue is lower than zero, allowing negative numbers to be entered)
         if ((this.eventKey === '-' || this.eventKey === '+') && this.settings.negativeSignCharacter === '-') {
-            if (!this.settings) {
-                return true;
-            }
-
-            // Caret is always after minus
-            if ((this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix) ||
-                (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix && this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.prefix)) {
-                if (left === '' && AutoNumericHelper.contains(right, this.settings.negativeSignCharacter)) {
-                    left = this.settings.negativeSignCharacter;
-                    right = right.substring(1, right.length);
-                }
-
-                // Change number sign, remove part if should
-                if (AutoNumericHelper.isNegativeStrict(left) || AutoNumericHelper.contains(left, this.settings.negativeSignCharacter)) {
-                    left = left.substring(1, left.length);
-                } else {
-                    left = (this.eventKey === '-') ? this.settings.negativeSignCharacter + left : left;
-                }
+            if (left === '' && AutoNumericHelper.contains(right, this.settings.negativeSignCharacter)) {
+                // The value is originally negative (with a trailing negative sign)
+                right = right.replace(this.settings.negativeSignCharacter, '');
+            } else if (AutoNumericHelper.isNegative(left)) {
+                // The value is originally negative (with a leading negative sign)
+                // Remove the negative sign, effectively converting the value to a positive one
+                left = left.replace('-', ''); //TODO replace with '+' if `showPositiveSign`?
             } else {
-                if (left === '' && AutoNumericHelper.contains(right, this.settings.negativeSignCharacter)) {
-                    left = this.settings.negativeSignCharacter;
-                    right = right.substring(1, right.length);
-                }
-
-                // Change number sign, remove part if should
-                if (left.charAt(0) === this.settings.negativeSignCharacter) {
-                    left = left.substring(1, left.length);
-                } else {
-                    left = (this.eventKey === '-') ? this.settings.negativeSignCharacter + left : left;
-                }
+                // The value is originally positive
+                left = this.settings.negativeSignCharacter + left;
             }
 
             this._setValueParts(left, right);
@@ -6448,7 +6438,7 @@ class AutoNumeric {
             left = negativeSign + left;
         }
 
-        const value = this.constructor._addGroupSeparators(elementValue, this.settings);
+        const value = this.constructor._addGroupSeparators(elementValue, this.settings, this.isFocused);
         let position = value.length;
         if (value) {
             // Prepare regexp which searches for cursor position from unformatted left part
@@ -6713,6 +6703,7 @@ class AutoNumeric {
 
 /**
  * Options values enumeration
+ * //TODO Move the descriptions from `defaultSettings` to here
  */
 AutoNumeric.options = {
     allowDecimalPadding          : {

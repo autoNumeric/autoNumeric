@@ -279,7 +279,7 @@ describe('Issue #327 (using inputs from issue #183)', () => {
         expect(browser.getValue(selectors.issue183error)).toEqual('12.345.678,00000 €');
     });
 
-    xit(`should get the entire input selected when using the 'tab' key`, () => { //FIXME Uncomment later since this should work with modern browsers
+    xit(`should get the entire input selected when using the 'tab' key`, () => { //FIXME Uncomment later since this should work with modern browsers (this does not work under FF 45.8)
         browser.url(testUrl);
 
         // Focus in that first input
@@ -904,7 +904,7 @@ describe('Issue #387', () => {
         expect(browser.getValue(selectors.issue387inputCancellableNumOnly)).toEqual('$220,242.76');
     });
 
-    xit('should select only the numbers on focus, without the currency symbol', () => { //FIXME Uncomment later since this should work with modern browsers
+    xit('should select only the numbers on focus, without the currency symbol', () => { //FIXME Uncomment later since this should work with modern browsers (this does not work under FF 45.8)
         // Focus in the first input
         const input = $(selectors.issue387inputCancellable);
         input.click();
@@ -1252,7 +1252,69 @@ describe('Negative numbers & brackets notations', () => {
         expect(browser.getValue(selectors.negativeBrackets1)).toEqual('1.352.468,24 €');
     });
 
-    it('should hide the parenthesis on focus for each variations of the currency and negative sign placements', () => {
+    xit('should toggle to positive and negative values when inputting `-` or `+`', () => {
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+        const negativeBracketsInput5 = $(selectors.negativeBracketsInput5);
+
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+        browser.keys(['Home', '-']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57'); //FIXME This is working manually, but not when using selenium under Firefox 45.8
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+
+        negativeBracketsInput5.click();
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+        browser.keys(['Home', '-']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+    });
+
+    it('should hide the parenthesis on focus, via tabbing, for each variations of the currency and negative sign placements', () => {
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+
+        // Focus in the input
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57-');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ -1.234,57');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('-€ 1.234,57');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57- €');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €-');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('-1.234,57 €');
+
+        // Focus elsewhere
+        $(selectors.negativeBrackets1).click();
+
+        // Check that the values are back with the parenthesis
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('(1.234,57 €)');
+    });
+
+    it('should hide the parenthesis on focus, via mouse clicks, for each variations of the currency and negative sign placements', () => {
         const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
         const negativeBracketsInput2 = $(selectors.negativeBracketsInput2);
         const negativeBracketsInput3 = $(selectors.negativeBracketsInput3);
@@ -1294,7 +1356,7 @@ describe('Negative numbers & brackets notations', () => {
         expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('(1.234,57 €)');
     });
 
-    it('should correctly remove the brackets when the value is set to a positive one (Issue #414)', () => {
+    it('should correctly remove the brackets when the value is set to a positive one, when the caret in on the far left (Issue #414)', () => {
         const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
         const negativeBracketsInput2 = $(selectors.negativeBracketsInput2);
         const negativeBracketsInput3 = $(selectors.negativeBracketsInput3);
@@ -1307,42 +1369,188 @@ describe('Negative numbers & brackets notations', () => {
         // Focus in the input
         negativeBracketsInput1.click();
         expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
-        browser.keys(['Escape', 'Home', '+']);
+        browser.keys(['Home', '+']);
         expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
 
         negativeBracketsInput2.click();
         expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57-');
-        browser.keys(['Escape', 'Home', '+']);
+        browser.keys(['Home', '+']);
         expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
 
         negativeBracketsInput3.click();
         expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ -1.234,57');
-        browser.keys(['Escape', 'Home', '+']);
+        browser.keys(['Home', '+']);
         expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
 
         negativeBracketsInput4.click();
         expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('-€ 1.234,57');
-        browser.keys(['Escape', 'Home', '+']);
+        browser.keys(['Home', '+']);
         expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
 
         negativeBracketsInput5.click();
         expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
-        browser.keys(['Escape', 'Home', '+']);
+        browser.keys(['Home', '+']);
         expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
 
         negativeBracketsInput6.click();
         expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57- €');
-        browser.keys(['Escape', 'Home', '+']);
+        browser.keys(['Home', '+']);
         expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
 
         negativeBracketsInput7.click();
         expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €-');
-        browser.keys(['Escape', 'Home', '+']);
+        browser.keys(['Home', '+']);
         expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
 
         negativeBracketsInput8.click();
         expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('-1.234,57 €');
-        browser.keys(['Escape', 'Home', '+']);
+        browser.keys(['Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
+
+        // Focus elsewhere
+        $(selectors.negativeBrackets1).click();
+
+        // Check that the values are correctly formatted when unfocused
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
+    });
+
+    it('should correctly keep the positive value when tabbing between the inputs (Issue #414)', () => {
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+
+        // Focus in the input
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
+        browser.keys(['Shift', 'Tab', 'Shift']);
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
+    });
+
+    xit('should correctly change back the element value to negative ones, with tabbing (Issue #414)', () => {
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+
+        // Focus in the input
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
+        browser.keys(['Home', '-']);
+
+        // Focus elsewhere
+        $(selectors.negativeBrackets1).click();
+
+        // Check that the values are correctly formatted when unfocused
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('(1.234,57)'); //FIXME This is working manually, but not when using selenium under Firefox 45.8
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('(1.234,57 €)');
+    });
+
+    xit('should correctly remove the brackets when the value is set to a positive one, when the caret in on the far right (Issue #414)', () => { //FIXME Currently, the user need to type the negative sign two times for it to be taken into account. This needs to be fixed!
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+        const negativeBracketsInput2 = $(selectors.negativeBracketsInput2);
+        const negativeBracketsInput3 = $(selectors.negativeBracketsInput3);
+        const negativeBracketsInput4 = $(selectors.negativeBracketsInput4);
+        const negativeBracketsInput5 = $(selectors.negativeBracketsInput5);
+        const negativeBracketsInput6 = $(selectors.negativeBracketsInput6);
+        const negativeBracketsInput7 = $(selectors.negativeBracketsInput7);
+        const negativeBracketsInput8 = $(selectors.negativeBracketsInput8);
+
+        // Focus in the input
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+
+        negativeBracketsInput2.click();
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57-');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+
+        negativeBracketsInput3.click();
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ -1.234,57');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+
+        negativeBracketsInput4.click();
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('-€ 1.234,57');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+
+        negativeBracketsInput5.click();
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+
+        negativeBracketsInput6.click();
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57- €');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+
+        negativeBracketsInput7.click();
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €-');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+
+        negativeBracketsInput8.click();
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('-1.234,57 €');
+        browser.keys(['End', '+']);
         expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
 
         // Focus elsewhere

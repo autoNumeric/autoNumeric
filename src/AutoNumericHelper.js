@@ -426,21 +426,33 @@ export default class AutoNumericHelper {
     }
 
     /**
-     * Return `true` if the given string contains a negative sign :
+     * Return `true` if the given number is negative, or if the given string contains a negative sign :
      * - everywhere in the string (by default), or
      * - on the first character only if the `checkEverywhere` parameter is set to `false`.
      *
-     * @param {string} numericString A number represented by a string
+     * @param {number|string} numberOrNumericString A Number, or a number represented by a string
      * @param {boolean} checkEverywhere If TRUE, then the negative sign is search everywhere in the numeric string (this is needed for instance if the string is '1234.56-')
      * @returns {boolean}
      */
-    static isNegative(numericString, checkEverywhere = true) {
-        //TODO Use the `negativeSignCharacter` from the settings here
-        if (checkEverywhere) {
-            return this.contains(numericString, '-');
+    static isNegative(numberOrNumericString, checkEverywhere = true) {
+        if (numberOrNumericString === '-') {
+            return true;
         }
 
-        return this.isNegativeStrict(numericString);
+        if (numberOrNumericString === '') {
+            return false;
+        }
+
+        //TODO Use the `negativeSignCharacter` from the settings here
+        if (AutoNumericHelper.isNumber(numberOrNumericString)) {
+            return numberOrNumericString < 0;
+        }
+
+        if (checkEverywhere) {
+            return this.contains(numberOrNumericString, '-');
+        }
+
+        return this.isNegativeStrict(numberOrNumericString);
     }
 
     /**
@@ -457,6 +469,18 @@ export default class AutoNumericHelper {
     static isNegativeStrict(numericString) {
         //TODO Using the `negativeSignCharacter` from the settings here
         return numericString.charAt(0) === '-';
+    }
+
+    /**
+     * Return `true` if the very first character is the opening bracket, and if the rest of the `valueString` also has the closing bracket.
+     *
+     * @param {string} valueString
+     * @param {string} leftBracket
+     * @param {string} rightBracket
+     * @returns {boolean}
+     */
+    static isNegativeWithBrackets(valueString, leftBracket, rightBracket) {
+        return valueString.charAt(0) === leftBracket && this.contains(valueString, rightBracket);
     }
 
     /**

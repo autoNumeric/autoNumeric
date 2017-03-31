@@ -1,5 +1,25 @@
 ### Change log for autoNumeric:
 
+### "4.0.0-beta.6"
++ Fix issue #414 Changing the value of an element from negative to positive is not possible for some specific configuration of brackets, for the second time.
++ Remove the need to keep an ambiguous `settings.trailingNegative` variable, that was used for other things that its names suggests.
++ Extract the `_isTrailingNegative` test to its own function.
++ Fix `_convertToNumericString()` to make it remove the `suffixText` as well.
++ Use array destructuring to simplify the `_setValueParts()` function.
++ Remove the attribute `newValue` polluting `this`, which allow to explicitly pass the needed information.
++ Merge `this.settings.hasFocus` into `this.isFocused`.
++ Remove the need for the `this.settings.strip` variable.
++ Modify the event listener from `'focusin'` to `'focus'`, in order to prepare for the merge of `_onFocusInAndMouseEnter()` and `_onFocus()` handlers.
++ Modify `_cleanLeadingTrailingZeros()` so that the trailing zeroes if correctly done, even if `leadingZero` is set to `keep`.
++ Rename `_cleanLeadingTrailingZeros()` to `_trimLeadingAndTrailingZeros()`.
++ Change the `_addGroupSeparators()` signature so that the focused state is explicitly passed as a parameter, instead of piggy-backing on the settings object.
++ Add a `_setTrailingNegativeSignInfo()` function that parse the settings and initialize once the `this.isTrailingNegative` property if the negative sign should be trailing for negative values.
++ Rename the `leftOrAll` parameter from `_stripAllNonNumberCharacters()` to a more meaningful `stripZeros`.
++ Simplify a test in `_truncateDecimalPlaces()`.
++ Rename `_skipAlways()` to `_processNonPrintableKeysAndShortcuts()`.
++ Add cases to the helper function `isNegative()` to make it more efficient.
++ Add a new `isNegativeWithBrackets()` helper function that tests if the given value is a negative with brackets.
+
 ### "4.0.0-beta.5"
 + Fix issue #416 Add support for changing the element style based on rules
 + Add the `styleRules` option that allows to modify the element style based on the raw value, but also to call any callbacks whenever this raw value change

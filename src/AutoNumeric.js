@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.7
+ * @version      4.0.0-beta.8
  * @date         2017-03-31 UTC 22:22
  *
  * @author       Bob Knothe
@@ -16,7 +16,7 @@
  *               Note : Some functions are borrowed from big.js
  * @link         https://github.com/MikeMcl/big.js/
  *
- * Please report any bugs to https://github.com/BobKnothe/autoNumeric
+ * Please report any bugs to https://github.com/autoNumeric/autoNumeric
  *
  * @license      Released under the MIT License
  * @link         http://www.opensource.org/licenses/mit-license.php
@@ -733,7 +733,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.7';
+        return '4.0.0-beta.8';
     }
 
     /**

@@ -1,6 +1,7 @@
 AutoNumeric authors are:
 - *BobKnothe* - Robert Knothe
 - *AlexandreBonneau* - Alexandre Bonneau
+- *funny-falcon* - Sokolov Yura
 - *rhyek* - Carlos Gonzales
 - *neyestrabelli* - Ney Estrabelli
 - *chery-qualset-hcd-ca-gov*
@@ -19,4 +20,4 @@ AutoNumeric authors are:
 - *SvenTo*
 - *CoryFoy* - Cory Foy
 
-(ordered by [Github](https://github.com/BobKnothe/autoNumeric/graphs/contributors) on 2016-12-01)
+(ordered by [Github](https://github.com/autoNumeric/autoNumeric/graphs/contributors) on 2016-12-01)

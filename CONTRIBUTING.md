@@ -3,9 +3,9 @@ Contributors and pull requests are welcome.<br>Feel free to [contact](#questions
 
 ### Get the latest source
 ```sh
-git clone -b next https://github.com/BobKnothe/autoNumeric.git
+git clone -b next https://github.com/autoNumeric/autoNumeric.git
 # or the following if you are authentified on github :
-# `git clone -b next git@github.com:BobKnothe/autoNumeric.git`
+# `git clone -b next git@github.com:autoNumeric/autoNumeric.git`
 ```
 
 ### Make your changes

@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "4.0.0-beta.8"
++ Fix issue #248 Create the `autoNumeric` organization, and move the repository to it
+
 ### "4.0.0-beta.7"
 + Fix issue #427 `autoUnformat()` converts `digitGroupSeparator` set to `.` as the decimal character
 + Modify `AutoNumeric.unformat()` so that 'real' javascript number are always directly returned, without taking into account the options passed (as it was supposed to do previously).

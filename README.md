@@ -12,8 +12,8 @@ autoNumeric is a standalone Javascript library that provides live *as-you-type* 
 <br>
 [![Gitter chat][gitter-image]][gitter-url]
 
-The latest stable branch is [4.*](https://github.com/BobKnothe/autoNumeric/tree/master).<br>For older stable versions, please take a look [here](#older-versions), while for the latest development version, check the `next` [branch](https://github.com/BobKnothe/autoNumeric/tree/next).<br><br>
-Moreover, you can take a look at what could be the next features coming to autoNumeric on our [project](https://github.com/BobKnothe/autoNumeric/projects) page *(feel free to participate!)*.
+The latest stable branch is [4.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>For older stable versions, please take a look [here](#older-versions), while for the latest development version, check the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br><br>
+Moreover, you can take a look at what could be the next features coming to autoNumeric on our [project](https://github.com/autoNumeric/autoNumeric/projects) page *(feel free to participate!)*.
 
 #### Highlights
 autoNumeric main features are :
@@ -45,7 +45,7 @@ anElement.french()
          .formSubmitJsonNumericString(callback)
          .clear();
 ```
-- Supports most international numeric formats and currencies<br>*(If the one you use is not supported yet, open an [issue](https://github.com/BobKnothe/autoNumeric/issues/new) and we'll add it as soon as possible!)*
+- Supports most international numeric formats and currencies<br>*(If the one you use is not supported yet, open an [issue](https://github.com/autoNumeric/autoNumeric/issues/new) and we'll add it as soon as possible!)*
 
 *And also:*
 - Any number of different formats can be used at the same time on the same page.<br>Each input can be configured by either setting the options as HTML5 data attributes, or directly passed as an argument in the Javascript code
@@ -256,7 +256,7 @@ Currently, the predefined language options are:
 | :cn: | `Chinese` |
 | <span>&#x1f1e7;&#x1f1f7;</span> | `Brazilian` |
 
-If you feel a common currency option is missing, please [create a pull request](https://github.com/BobKnothe/autoNumeric/compare) and we'll add it!
+If you feel a common currency option is missing, please [create a pull request](https://github.com/autoNumeric/autoNumeric/compare) and we'll add it!
 
 ##### Predefined common options
 
@@ -737,19 +737,19 @@ Contributors and pull requests are welcome.<br>Feel free to [contact](#questions
 For more information about how to contribute, please check the [CONTRIBUTING](CONTRIBUTING.md) file which has more details about it.
 
 In a nutshell :
-- Get the latest source `git clone -b next https://github.com/BobKnothe/autoNumeric.git && cd autoNumeric && yarn install`
+- Get the latest source `git clone -b next https://github.com/autoNumeric/autoNumeric.git && cd autoNumeric && yarn install`
 - Make you changes
 - Lint, build, and run tests `yarn lint && yarn build && yarn test`
 - Create a pull request, and we'll check it out as soon as possible!
 
 Again, be sure to check the [CONTRIBUTING](CONTRIBUTING.md) file for more details.<br>
-Also, feel free to follow our RSS feeds on [master](https://github.com/BobKnothe/autoNumeric/commits/master.atom) and [next](https://github.com/BobKnothe/autoNumeric/commits/next.atom) to keep up with the latest commits.
+Also, feel free to follow our RSS feeds on [master](https://github.com/autoNumeric/autoNumeric/commits/master.atom) and [next](https://github.com/autoNumeric/autoNumeric/commits/next.atom) to keep up with the latest commits.
 
 ### Dependencies
 None!
 
 ## Older versions
-The previous stable autoNumeric version v1.9.46 can be found [here](https://github.com/BobKnothe/autoNumeric/releases/tag/1.9.46), and the v2 branch can be found [here](https://github.com/BobKnothe/autoNumeric/releases/tag/v2.0.7).
+The previous stable autoNumeric version v1.9.46 can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/1.9.46), and the v2 branch can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/v2.0.7).
 
 ## Related projects
 For integration into [Rails](http://rubyonrails.org/) projects, you can use the [autonumeric-rails](https://github.com/randoum/autonumeric-rails) project.
@@ -759,7 +759,7 @@ The old and outdated documentation can be found in the [Documentation](Documenta
 For some examples and an option code generator for the old v1.9.* version, take a look [here](http://www.decorplanit.com/plugin/).
 
 ## Licence
-autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source project, and its authors are credited in [AUTHORS.md](https://github.com/BobKnothe/autoNumeric/blob/master/AUTHORS.md).
+autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source project, and its authors are credited in [AUTHORS.md](https://github.com/autoNumeric/autoNumeric/blob/master/AUTHORS.md).
 
 ****
 
@@ -774,12 +774,12 @@ Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] *(Robert)* 
 [npm-url]: https://npmjs.org/package/autonumeric
 [nodei-image]: https://nodei.co/npm/autonumeric.png?downloads=true&downloadRank=true&stars=true
 [nodei-url]: https://nodei.co/npm/autonumeric
-[travis-url]: https://travis-ci.org/BobKnothe/autoNumeric
-[travis-image]: https://img.shields.io/travis/BobKnothe/autoNumeric.svg
-[snyk-image]: https://snyk.io/test/github/BobKnothe/autoNumeric/badge.svg
-[snyk-url]: https://snyk.io/test/github/BobKnothe/autoNumeric
-[coveralls-image]: https://coveralls.io/repos/github/BobKnothe/autoNumeric/badge.svg?branch=next
-[coveralls-url]: https://coveralls.io/github/BobKnothe/autoNumeric?branch=next
+[travis-url]: https://travis-ci.org/autoNumeric/autoNumeric
+[travis-image]: https://img.shields.io/travis/autoNumeric/autoNumeric.svg
+[snyk-image]: https://snyk.io/test/github/autoNumeric/autoNumeric/badge.svg
+[snyk-url]: https://snyk.io/test/github/autoNumeric/autoNumeric
+[coveralls-image]: https://coveralls.io/repos/github/autoNumeric/autoNumeric/badge.svg?branch=next
+[coveralls-url]: https://coveralls.io/github/autoNumeric/autoNumeric?branch=next
 [paypal-image]: http://img.shields.io/badge/paypal-donate-brightgreen.svg
 [paypal-url]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NCW5699RY8NN2
 [patreon-url]: https://www.patreon.com/user?u=4810062

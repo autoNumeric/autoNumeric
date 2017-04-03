@@ -614,6 +614,7 @@ describe('The autoNumeric object', () => {
             expect(() => aNInput.formatOther(27368)).not.toThrow();
             expect(() => aNInput.unformatOther('1.234.789,89 €')).not.toThrow();
             expect(() => aNInput.init(otherDomElement)).not.toThrow();
+            AutoNumeric.getAutoNumericElement(otherDomElement).remove(); // This prevent reinitializing an already initialized DOM element
             expect(() => aNInput.init(otherDomElement, false)).not.toThrow();
 
             // Calling the pre-defined options
@@ -626,6 +627,7 @@ describe('The autoNumeric object', () => {
             expect(() => aNInput.chinese()).not.toThrow();
             expect(() => aNInput.brazilian()).not.toThrow();
 
+            document.body.removeChild(yetAnotherDomElement);
             document.body.removeChild(otherDomElement);
         });
 
@@ -2061,6 +2063,7 @@ describe('The autoNumeric object', () => {
             expect(an.getFormatted()).toEqual('12.300,79 €');
             an.french({ currencySymbol : '#' });
             expect(an.getFormatted()).toEqual('12.300,79#');
+            an.remove(); // This prevent reinitializing an already initialized DOM element
             expect(() => new AutoNumeric('input', 12300.789).french(options)).not.toThrow();
         });
 
@@ -4100,7 +4103,6 @@ describe(`autoNumeric 'styleRules' methods`, () => {
     beforeEach(() => { // Initialization
         newInput = document.createElement('input');
         document.body.appendChild(newInput);
-        aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
     });
 
     afterEach(() => { // Un-initialization

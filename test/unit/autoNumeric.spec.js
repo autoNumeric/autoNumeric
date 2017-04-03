@@ -4035,6 +4035,64 @@ describe('The `allowDecimalPadding` option', () => {
     });
 });
 
+describe('The `emptyInputBehavior` option', () => {
+    it('should fail the validation when `zero` is used in a range that does not contain this value (cf. issue #425)', () => {
+        spyOn(console, 'warn');
+
+        // Initialization
+        const newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+
+        // minimumValue side
+        expect(() => new AutoNumeric(newInput, {
+            emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+            minimumValue: -1,
+            maximumValue: 10,
+        })).not.toThrow();
+
+        expect(() => new AutoNumeric(newInput, {
+            emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+            minimumValue: 0,
+            maximumValue: 10,
+        })).not.toThrow();
+
+        expect(() => new AutoNumeric(newInput, {
+            emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+            minimumValue: 1,
+            maximumValue: 10,
+        })).toThrow();
+
+        // maximumValue side
+        expect(() => new AutoNumeric(newInput, {
+            emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+            minimumValue: -10,
+            maximumValue: 1,
+        })).not.toThrow();
+
+        expect(() => new AutoNumeric(newInput, {
+            emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+            minimumValue: -10,
+            maximumValue: 0,
+        })).not.toThrow();
+
+        expect(() => new AutoNumeric(newInput, {
+            emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+            minimumValue: -10,
+            maximumValue: -1,
+        })).toThrow();
+
+        // Special case
+        expect(() => new AutoNumeric(newInput, {
+            emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+            minimumValue: 0,
+            maximumValue: 0,
+        })).not.toThrow();
+
+        // Un-initialization
+        document.body.removeChild(newInput);
+    });
+});
+
 describe(`autoNumeric 'styleRules' methods`, () => {
     let aNInput;
     let newInput;

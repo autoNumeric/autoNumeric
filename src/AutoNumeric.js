@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.8
- * @date         2017-03-31 UTC 22:22
+ * @version      4.0.0-beta.9
+ * @date         2017-04-02 UTC 23:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
@@ -733,7 +733,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.8';
+        return '4.0.0-beta.9';
     }
 
     /**
@@ -2927,6 +2927,11 @@ class AutoNumeric {
             AutoNumeric.options.emptyInputBehavior.zero,
         ])) {
             AutoNumericHelper.throwError(`The display on empty string option 'emptyInputBehavior' is invalid ; it should either be 'focus', 'press', 'always' or 'zero', [${options.emptyInputBehavior}] given.`);
+        }
+
+        if (options.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero &&
+            (options.minimumValue > 0 || options.maximumValue < 0)) {
+            AutoNumericHelper.throwError(`The 'emptyInputBehavior' option is set to 'zero', but this value is outside of the range defined by 'minimumValue' and 'maximumValue' [${options.minimumValue}, ${options.maximumValue}].`);
         }
 
         if (!AutoNumericHelper.isInArray(options.leadingZero, [

@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "4.0.0-beta.9"
++ Fix issue #425 The `minimumValue` and `maximumValue` options are not respected when `emptyInputBehavior` is set to `'zero'`
+
 ### "4.0.0-beta.8"
 + Fix issue #248 Create the `autoNumeric` organization, and move the repository to it
 

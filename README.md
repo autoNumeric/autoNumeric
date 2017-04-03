@@ -749,7 +749,7 @@ Also, feel free to follow our RSS feeds on [master](https://github.com/autoNumer
 None!
 
 ## Older versions
-The previous stable autoNumeric version v1.9.46 can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/1.9.46), and the v2 branch can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/v2.0.7).
+The previous stable autoNumeric version v1.9.46 can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/1.9.46), and the v2 branch can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/v2.0.10).
 
 ## Related projects
 For integration into [Rails](http://rubyonrails.org/) projects, you can use the [autonumeric-rails](https://github.com/randoum/autonumeric-rails) project.

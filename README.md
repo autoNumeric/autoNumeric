@@ -761,6 +761,9 @@ For some examples and an option code generator for the old v1.9.* version, take 
 ## Licence
 autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source project, and its authors are credited in [AUTHORS.md](https://github.com/autoNumeric/autoNumeric/blob/master/AUTHORS.md).
 
+## Support
+We'd like to thank [JetBrains](https://www.jetbrains.com/) supporting us by providing open-source licences of their tools.
+
 ****
 
 Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] *(Robert)* or Patreon [![Donate][patreon-image]][patreon-url] *(Alexandre)* to support autoNumeric development.

@@ -771,7 +771,7 @@ Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] *(Robert)* 
 
 [downloads-image]: http://img.shields.io/npm/dm/autonumeric.svg
 [downloads-url]: http://badge.fury.io/js/autonumeric
-[gitter-image]: https://img.shields.io/badge/gitter-autonumeric%2Flobby-brightgreen.svg
+[gitter-image]: https://img.shields.io/badge/gitter-autoNumeric%2FautoNumeric-brightgreen.svg
 [gitter-url]: https://gitter.im/autoNumeric/autoNumeric
 [npm-image]: https://img.shields.io/npm/v/autonumeric.svg
 [npm-url]: https://npmjs.org/package/autonumeric

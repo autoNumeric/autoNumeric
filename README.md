@@ -166,48 +166,48 @@ Multiple options allow you to customize precisely how a form input will format y
 
 | Option           | Description | Default Value |
 | :---------------- | :-----------:  | :-----------:  |
-| `allowDecimalPadding`| Allow padding the decimal places with zeros. If set to `'floats'`, padding is only done when there are some decimals. | `true` |
+| `allowDecimalPadding` | Allow padding the decimal places with zeros. If set to `'floats'`, padding is only done when there are some decimals. | `true` |
 | `createLocalList` | Determine if a local list of AutoNumeric objects must be kept when initializing the elements and others | `true` |
 | `currencySymbol` | Currency symbol | `''` |
 | `currencySymbolPlacement` | Placement of the currency sign, relative to the number (as a prefix or a suffix) | `'p'` |
 | `decimalCharacter` | Decimal separator character | `'.'` |
 | `decimalCharacterAlternative` | Allow to declare alternative decimal separator which is automatically replaced by the *real* decimal character (useful in countries where the keyboard numeric pad have a period as the decimal character) | `null` |
 | `decimalPlacesOverride` | Maximum number of decimal places (used to override decimal places set by the minimumValue & maximumValue values) | `null` |
-| `decimalPlacesShownOnFocus`| Expanded decimal places visible when input has focus | `null` |
-| `defaultValueOverride`| Helper option for the ASP.NET-specific postback issue | `null` |
+| `decimalPlacesShownOnFocus` | Expanded decimal places visible when input has focus | `null` |
+| `defaultValueOverride` | Helper option for the ASP.NET-specific postback issue | `null` |
 | `digitalGroupSpacing` | Digital grouping for the thousand separator | `'3'` |
 | `digitGroupSeparator` | Thousand separator character  | `','` |
-| `emptyInputBehavior`| Define what to display when the input value is empty (possible options are `focus`, `press`, `always` and `zero`) | `'focus'` |
-| `failOnUnknownOption `| This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object. | `false` |
-| `formatOnPageLoad`| Determine if the default value will be formatted on initialization | `true` |
-| `historySize`| Determine how many undo states an AutoNumeric object should keep in memory | `20` |
-| `isCancellable`| Determine if the user can *'cancel'* the last modifications done to the element value when using the `Escape` key | `true` |
-| `leadingZero`| Controls the leading zero behavior (possible options are `allow`, `deny` and `keep`) | `'deny'` |
+| `emptyInputBehavior` | Define what to display when the input value is empty (possible options are `focus`, `press`, `always` and `zero`) | `'focus'` |
+| `failOnUnknownOption ` | This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object. | `false` |
+| `formatOnPageLoad` | Determine if the default value will be formatted on initialization | `true` |
+| `historySize` | Determine how many undo states an AutoNumeric object should keep in memory | `20` |
+| `isCancellable` | Determine if the user can *'cancel'* the last modifications done to the element value when using the `Escape` key | `true` |
+| `leadingZero` | Controls the leading zero behavior (possible options are `allow`, `deny` and `keep`) | `'deny'` |
 | `maximumValue` | Maximum possible value | `'9999999999999.99'` |
 | `minimumValue` | Minimum possible value | `'-9999999999999.99'` |
-| `modifyValueOnWheel`| Determine if the element value can be incremented / decremented with the mouse wheel. The wheel behavior is modified with the `wheelStep` option. | `true` |
-| `negativeBracketsTypeOnBlur`| Adds brackets `[]`, parenthesis `()`, curly braces `{}` or `<>` on negative values when unfocused | `null` |
+| `modifyValueOnWheel` | Determine if the element value can be incremented / decremented with the mouse wheel. The wheel behavior is modified with the `wheelStep` option. | `true` |
+| `negativeBracketsTypeOnBlur` | Adds brackets `[]`, parenthesis `()`, curly braces `{}` or `<>` on negative values when unfocused | `null` |
 | `negativePositiveSignPlacement` | Placement of negative/positive sign relative to the currency symbol (possible options are `l` (left), `r` (right), `p` (prefix) and `s` (suffix)) | `null` |
 | `noEventListeners` | Defines if the element should have event listeners activated on it | `false` |
 | `noSeparatorOnFocus` | Remove the thousand separator, currency symbol and suffix on focus | `false` |
-| `onInvalidPaste`| Manage how autoNumeric react when the user tries to paste an invalid number (possible options are `error`, `ignore`, `clamp`, `truncate` or `replace`) | `'error'` |
-| `outputFormat`| Defines the localized output format of the `get`, `getString` & `getArray` methods | `null` |
+| `onInvalidPaste` | Manage how autoNumeric react when the user tries to paste an invalid number (possible options are `error`, `ignore`, `clamp`, `truncate` or `replace`) | `'error'` |
+| `outputFormat` | Defines the localized output format of the `get`, `getString` & `getArray` methods | `null` |
 | `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor` and `ignore`) | `null` |
 | `readOnly` | Defines if the `<input>` element should be set as read only on initialization | `false` |
-| `roundingMethod`| Method used for rounding (possible options are `S`, `A`, `s`, `a`, `B`, `U`, `D`, `C`, `F`, `N05`, `U05` or `D05`) | `'S'` |
-| `saveValueToSessionStorage`| Allow the `decimalPlacesShownOnFocus` value to be saved into session storage | `false` |
-| `scaleDecimalPlaces`| The number of decimal places when unfocused | `null` |
-| `scaleDivisor`| This option decides the onfocus value and places the result in the input on focusout | `null` |
-| `scaleSymbol`| Symbol placed as a suffix when unfocused | `null` |
-| `serializeSpaces`| Defines how the serialize functions should treat spaces when serializing (convert them to `'%20'` or `'+'`) | `'+'` |
-| `selectNumberOnly`| Determine if the select all keyboard command will select the complete input text, or only the input numeric value | `false` |
+| `roundingMethod` | Method used for rounding (possible options are `S`, `A`, `s`, `a`, `B`, `U`, `D`, `C`, `F`, `N05`, `U05` or `D05`) | `'S'` |
+| `saveValueToSessionStorage` | Allow the `decimalPlacesShownOnFocus` value to be saved into session storage | `false` |
+| `scaleDecimalPlaces` | The number of decimal places when unfocused | `null` |
+| `scaleDivisor` | This option decides the onfocus value and places the result in the input on focusout | `null` |
+| `scaleSymbol` | Symbol placed as a suffix when unfocused | `null` |
+| `serializeSpaces` | Defines how the serialize functions should treat spaces when serializing (convert them to `'%20'` or `'+'`) | `'+'` |
+| `selectNumberOnly` | Determine if the select all keyboard command will select the complete input text, or only the input numeric value | `false` |
 | `showPositiveSign` | Allow the positive sign symbol `+` to be displayed for positive numbers | `false` |
-| `showWarnings`| Defines if warnings should be shown | `true` |
-| `styleRules`| Defines the rules that calculate the CSS class(es) to apply on the element, based on the raw unformatted value.<br>This can also be used to call callbacks whenever the `rawValue` is updated. | `null` |
+| `showWarnings` | Defines if warnings should be shown | `true` |
+| `styleRules` | Defines the rules that calculate the CSS class(es) to apply on the element, based on the raw unformatted value.<br>This can also be used to call callbacks whenever the `rawValue` is updated. | `null` |
 | `suffixText` | Additional text suffix that is added after the number | `''` |
-| `unformatOnHover`| Defines if the element value should be unformatted when the user hover his mouse over it while holding the `Alt` key | `true` |
-| `unformatOnSubmit`| Removes formatting on submit event | `false` |
-| `wheelStep`| Used in conjonction with the `modifyValueOnWheel` option, this allow to either define a *fixed* step (ie. `1000`), or a *progressive* one | `'progressive'` |
+| `unformatOnHover` | Defines if the element value should be unformatted when the user hover his mouse over it while holding the `Alt` key | `true` |
+| `unformatOnSubmit` | Removes formatting on submit event | `false` |
+| `wheelStep` | Used in conjonction with the `modifyValueOnWheel` option, this allow to either define a *fixed* step (ie. `1000`), or a *progressive* one | `'progressive'` |
 
 
 ###### noEventListeners
@@ -466,7 +466,7 @@ Then you'll be able to access either the methods on the instantiated AutoNumeric
 
 #### Instantiated methods
 
-##### Usual functions on each autoNumeric-managed element
+##### Usual functions available on an autoNumeric-managed element
 
 | Method           | Description | Call example |
 | :----------------: | :-----------:  | :-----------:  |
@@ -728,7 +728,7 @@ Finally, the `'change'` event is sent on `blur` if the value has been changed si
 *Note: the `AutoNumeric.format()` static function does trigger an `'autoNumeric:formatted'` event if the value that the user is trying to format is outside the `minimumValue` and `maximumValue` range, with the `detail` attribute containing the range error message.*
 
 ## Questions
-For questions and support please use the [Gitter chat room](https://gitter.im/autoNumeric/Lobby) or IRC on Freenode #autoNumeric.<br>The issue list of this repository is **exclusively** for bug reports and feature requests.
+For questions and support please use the [Gitter chat room](https://gitter.im/autoNumeric/autoNumeric) or IRC on Freenode #autoNumeric.<br>The issue list of this repository is **exclusively** for bug reports and feature requests.
 
 ****
 
@@ -772,7 +772,7 @@ Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] *(Robert)* 
 [downloads-image]: http://img.shields.io/npm/dm/autonumeric.svg
 [downloads-url]: http://badge.fury.io/js/autonumeric
 [gitter-image]: https://img.shields.io/badge/gitter-autonumeric%2Flobby-brightgreen.svg
-[gitter-url]: https://gitter.im/autonumeric/lobby
+[gitter-url]: https://gitter.im/autoNumeric/autoNumeric
 [npm-image]: https://img.shields.io/npm/v/autonumeric.svg
 [npm-url]: https://npmjs.org/package/autonumeric
 [nodei-image]: https://nodei.co/npm/autonumeric.png?downloads=true&downloadRank=true&stars=true

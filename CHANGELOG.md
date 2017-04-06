@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "2.0.11"
++ Fix issue #248 Create the `autoNumeric` organization, and move the repository to it
+
 ### "2.0.10"
 + Fix issue #417 Error thrown in PhantomJS 2.1.1 on Linux under CI Environment
 + Fix the end-to-end tests for issue #403

@@ -1,6 +1,6 @@
 {
   "name": "autonumeric",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "description": "autoNumeric is a library that provides live *as-you-type* formatting for international numbers and currencies. It supports most International numeric formats and currencies including those used in Europe, Asia, and North and South America.",
   "main": "src/autoNumeric.js",
   "readmeFilename": "README.MD",
@@ -129,14 +129,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BobKnothe/autoNumeric.git"
+    "url": "git+https://github.com/autoNumeric/autoNumeric.git"
   },
   "bugs": {
-    "url": "https://github.com/BobKnothe/autoNumeric/issues"
+    "url": "https://github.com/autoNumeric/autoNumeric/issues"
   },
   "autoupdate": {
     "source": "git",
-    "target": "git://github.com/BobKnothe/autoNumeric.git",
+    "target": "git://github.com/autoNumeric/autoNumeric.git",
     "basePath": "",
     "files": [
       "src/autoNumeric.js"

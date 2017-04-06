@@ -1,8 +1,8 @@
 /**
  *               autoNumeric.js
  *
- * @version      2.0.10
- * @date         2017-03-20 UTC 00:30
+ * @version      2.0.11
+ * @date         2017-04-06 UTC 21:30
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and other Github users,
@@ -16,7 +16,7 @@
  *               Note : Some functions are borrowed from big.js
  * @link         https://github.com/MikeMcl/big.js/
  *
- * Please report any bugs to https://github.com/BobKnothe/autoNumeric
+ * Please report any bugs to https://github.com/autoNumeric/autoNumeric
  *
  * @license      Released under the MIT License
  * @link         http://www.opensource.org/licenses/mit-license.php

@@ -12,8 +12,8 @@ autoNumeric is a library that provides live *as-you-type* formatting for interna
 <br>
 [![Gitter chat][gitter-image]][gitter-url]
 
-The latest stable branch is [2.*](https://github.com/BobKnothe/autoNumeric/tree/master).<br>For older stable versions, please take a look [here](#older-versions), while for the latest development version, check the `next` [branch](https://github.com/BobKnothe/autoNumeric/tree/next).<br><br>
-Moreover, you can take a look at what could be the next features coming to autoNumeric on our [project](https://github.com/BobKnothe/autoNumeric/projects) page *(feel free to participate!)*.
+The latest stable branch is [2.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>For older stable versions, please take a look [here](#older-versions), while for the latest development version, check the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br><br>
+Moreover, you can take a look at what could be the next features coming to autoNumeric on our [project](https://github.com/autoNumeric/autoNumeric/projects) page *(feel free to participate!)*.
 
 #### Highlights
 autoNumeric main features are :
@@ -38,7 +38,7 @@ const autoNumericOptionsEuro = {
 $('.myInput').autoNumeric('init', autoNumericOptionsEuro);
 ```
 - User experience oriented ; using autoNumeric just feels right and natural
-- Supports most international numeric formats and currencies<br>*(If the one you use is not supported yet, open an [issue](https://github.com/BobKnothe/autoNumeric/issues/new) and we'll add it as soon as possible!)*
+- Supports most international numeric formats and currencies<br>*(If the one you use is not supported yet, open an [issue](https://github.com/autoNumeric/autoNumeric/issues/new) and we'll add it as soon as possible!)*
 
 *And also:*
 - Any number of different formats can be used at the same time on the same page.<br>Each input can be configured by either setting the options as HTML5 data attributes, or directly passed as an argument in the Javascript code
@@ -226,9 +226,9 @@ Contributors and pull requests are welcome.<br>Feel free to [contact](#questions
 
 ### Get the latest source
 ```sh
-git clone -b next https://github.com/BobKnothe/autoNumeric.git
+git clone -b next https://github.com/autoNumeric/autoNumeric.git
 # or the following if you are authentified on github :
-# `git clone -b next git@github.com:BobKnothe/autoNumeric.git`
+# `git clone -b next git@github.com:autoNumeric/autoNumeric.git`
 ```
 
 ### Make your changes
@@ -305,10 +305,10 @@ Your commit must not contain any generated files (ie. files in the `/dist/` dire
 
 ### Dependencies
 Currently, autoNumeric depends on jQuery (which is pretty logical since it's a jQuery plugin ;P).<br>
-Some work is [in progress](https://github.com/BobKnothe/autoNumeric/issues/244) to provide a jQuery-free version of autoNumeric.
+Some work is [in progress](https://github.com/autoNumeric/autoNumeric/issues/244) to provide a jQuery-free version of autoNumeric.
 
 ## Older versions
-The previous stable autoNumeric version v1.9.46 can be found [here](https://github.com/BobKnothe/autoNumeric/releases/tag/1.9.46).
+The previous stable autoNumeric version v1.9.46 can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/1.9.46).
 
 ## Related projects
 For integration into [Rails](http://rubyonrails.org/) projects, you can use the [autonumeric-rails](https://github.com/randoum/autonumeric-rails) project.
@@ -318,7 +318,7 @@ A more detailed documentation can be found in the [Documentation](Documentation.
 For more examples and an option code generator (that may be outdated), take a look [here](http://www.decorplanit.com/plugin/).
 
 ## Licence
-autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source project, and its authors are credited in [AUTHORS.md](https://github.com/BobKnothe/autoNumeric/blob/master/AUTHORS.md).
+autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source project, and its authors are credited in [AUTHORS.md](https://github.com/autoNumeric/autoNumeric/blob/master/AUTHORS.md).
 
 ****
 
@@ -329,16 +329,18 @@ Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] or [Patreon
 [downloads-url]: http://badge.fury.io/js/autonumeric
 [gitter-image]: https://img.shields.io/badge/gitter-autonumeric%2Flobby-brightgreen.svg
 [gitter-url]: https://gitter.im/autonumeric/lobby
+[gitter-image]: https://img.shields.io/badge/gitter-autoNumeric%2FautoNumeric-brightgreen.svg
+[gitter-url]: https://gitter.im/autoNumeric/autoNumeric
 [npm-image]: https://img.shields.io/npm/v/autonumeric.svg
 [npm-url]: https://npmjs.org/package/autonumeric
 [nodei-image]: https://nodei.co/npm/autonumeric.png?downloads=true&downloadRank=true&stars=true
 [nodei-url]: https://nodei.co/npm/autonumeric
-[travis-url]: https://travis-ci.org/BobKnothe/autoNumeric
-[travis-image]: https://img.shields.io/travis/BobKnothe/autoNumeric.svg
-[snyk-image]: https://snyk.io/test/github/BobKnothe/autoNumeric/badge.svg
-[snyk-url]: https://snyk.io/test/github/BobKnothe/autoNumeric
-[coveralls-image]: https://coveralls.io/repos/github/BobKnothe/autoNumeric/badge.svg?branch=next
-[coveralls-url]: https://coveralls.io/github/BobKnothe/autoNumeric?branch=next
+[travis-url]: https://travis-ci.org/autoNumeric/autoNumeric
+[travis-image]: https://img.shields.io/travis/autoNumeric/autoNumeric.svg
+[snyk-image]: https://snyk.io/test/github/autoNumeric/autoNumeric/badge.svg
+[snyk-url]: https://snyk.io/test/github/autoNumeric/autoNumeric
+[coveralls-image]: https://coveralls.io/repos/github/autoNumeric/autoNumeric/badge.svg?branch=next
+[coveralls-url]: https://coveralls.io/github/autoNumeric/autoNumeric?branch=next
 [paypal-image]: http://img.shields.io/badge/paypal-donate-brightgreen.svg
 [paypal-url]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NCW5699RY8NN2
 [patreon-url]: https://www.patreon.com/user?u=4810062

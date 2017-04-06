@@ -19,4 +19,4 @@ AutoNumeric authors are:
 - *SvenTo*
 - *CoryFoy* - Cory Foy
 
-(ordered by [Github](https://github.com/BobKnothe/autoNumeric/graphs/contributors) on 2016-12-01)
+(ordered by [Github](https://github.com/autoNumeric/autoNumeric/graphs/contributors) on 2016-12-01)

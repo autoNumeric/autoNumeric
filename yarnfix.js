@@ -36,7 +36,7 @@
 
 /*
  * This is a hack to circumvent the problem when calling `test -e node_modules/phantomjs-prebuilt/install.js && node node_modules/phantomjs-prebuilt/install.js; true` on windows environment.
- * cf. issue #384 (https://github.com/BobKnothe/autoNumeric/issues/384)
+ * cf. issue #384 (https://github.com/autoNumeric/autoNumeric/issues/384)
  */
 const exec = require('child_process').exec;
 const fs = require('fs');

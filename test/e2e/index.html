@@ -600,6 +600,24 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Option updates</p>
+			<div>
+				<input id="optionUpdate1" type="text" placeholder="" value="">
+				<input id="optionUpdate2" type="text" placeholder="" value="">
+				<input id="optionUpdate3" type="text" placeholder="" value="">
+			</div>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">decimalPlacesShownOnFocus and selections</p>
+			<input id="selection1" type="text" value="">
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1028,6 +1046,16 @@
     new AutoNumeric('#issue_416_10', { styleRules: AutoNumeric.options.styleRules.rangeSmallAndZero });
     new AutoNumeric('#issue_416_11', { styleRules: AutoNumeric.options.styleRules.rangeSmallAndZero });
     new AutoNumeric('#issue_416_12', { styleRules: AutoNumeric.options.styleRules.rangeSmallAndZero });
+
+    //-------------- Option updates
+    new AutoNumeric('#optionUpdate1', 2222.22).french();
+    new AutoNumeric('#optionUpdate2', 4444.66).french().options.decimalCharacterAlternative('*');
+    new AutoNumeric('#optionUpdate3', 8888.00).northAmerican().options.decimalCharacterAlternative(AutoNumeric.options.decimalCharacterAlternative.none);
+
+    //-------------- decimalPlacesShownOnFocus and selections
+    new AutoNumeric('#selection1')
+	    .french()
+	    .set(12266.1234567, { minimumValue: '0', maximumValue: '9999999.9999999', decimalPlacesOverride: 3, decimalPlacesShownOnFocus: 6 });
 </script>
 </body>
 </html>

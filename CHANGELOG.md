@@ -1,5 +1,14 @@
 ### Change log for autoNumeric:
 
+### "4.0.0-beta.10"
++ Reorganize the existing unit tests and add more to extend the coverage
++ Add a new `setValue()` method that allow the user to set any values, without any controls from AutoNumeric.
++ Replace all the calls to `setElementValue` then `_setRawValue` with either `setValue()` or `_setElementAndRawValue()`, so that this call order is respected.
++ Rewrite `setUnformatted()` so that it checks and validates the value given by the user.
++ Fix `options.createLocalList()` so that modifying the option will create/delete the local list accordingly.
++ Fix `selectDecimal()` so that the decimals are correctly selected when `decimalPlacesShownOnFocus` is used.
++ Add a thin unbreakable space`\u202f` in front of `%` in the predefined options `percentageEU*` (as per the [typographic rules](https://fr.wikipedia.org/wiki/Pourcentage#Notation)).
+
 ### "4.0.0-beta.9"
 + Fix issue #425 The `minimumValue` and `maximumValue` options are not respected when `emptyInputBehavior` is set to `'zero'`
 

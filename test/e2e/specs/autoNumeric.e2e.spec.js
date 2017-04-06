@@ -125,6 +125,10 @@ const selectors = {
     issue416Input10                   : '#issue_416_10',
     issue416Input11                   : '#issue_416_11',
     issue416Input12                   : '#issue_416_12',
+    optionUpdate1                     : '#optionUpdate1',
+    optionUpdate2                     : '#optionUpdate2',
+    optionUpdate3                     : '#optionUpdate3',
+    selection1                        : '#selection1',
 };
 
 //-----------------------------------------------------------------------------
@@ -652,7 +656,6 @@ describe('Issue #326', () => {
         expect(browser.getValue(selectors.issue326input)).toEqual('1.234,57 €');
     });
 });
-
 
 describe('Issue #322', () => {
     it('should test for default values, and focus on it', () => {
@@ -2583,5 +2586,92 @@ describe('Issue #416', () => {
         browser.keys(['Control', 'a', 'Control', '0']);
         input12.click();
         browser.keys(['Control', 'a', 'Control', '1']);
+    });
+});
+
+xdescribe('Options updates', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.optionUpdate1)).toEqual('2.222,22 €');
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('4.444,66 €');
+        expect(browser.getValue(selectors.optionUpdate3)).toEqual('$8,888.00');
+    });
+
+    it('should update the `decimalCharacterAlternative` option (cf. issue #432)', () => {
+        const input1 = $(selectors.optionUpdate1);
+        input1.click();
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'Delete']);
+        expect(browser.getValue(selectors.optionUpdate1)).toEqual('222.222 €');
+        browser.keys([',']);
+        expect(browser.getValue(selectors.optionUpdate1)).toEqual('2.222,22 €');
+        browser.keys(['Backspace']);
+        expect(browser.getValue(selectors.optionUpdate1)).toEqual('222.222 €');
+        browser.keys(['.']);
+        expect(browser.getValue(selectors.optionUpdate1)).toEqual('2.222,22 €');
+
+
+        const input2 = $(selectors.optionUpdate2);
+        input2.click();
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'Delete']);
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('444.466 €');
+        browser.keys([',']);
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('4.444,66 €');
+        browser.keys(['Backspace']);
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('444.466 €');
+        browser.keys(['*']);
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('4.444,66 €');
+        browser.keys(['Backspace']);
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('444.466 €');
+
+        // Update the option
+        const anElementVersion = browser.execute(() => {
+            const input = document.querySelector('#optionUpdate2');
+            const anElement = AutoNumeric.getAutoNumericElement(input);
+            anElement.options.decimalCharacterAlternative('#');
+            return anElement.getSettings().rawValue;
+        }).value;
+        expect(anElementVersion).toEqual('444466');
+        browser.keys(['*']); // Ignored
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('444.466 €');
+        browser.keys(['#']);
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('4.444,66 €'); //FIXME This fails under Firefox 45.8
+
+
+        const input3 = $(selectors.optionUpdate3);
+        input3.click();
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'Delete']);
+        expect(browser.getValue(selectors.optionUpdate3)).toEqual('$888,800');
+        browser.keys(['.']);
+        expect(browser.getValue(selectors.optionUpdate3)).toEqual('$8,888.00');
+        browser.keys(['Backspace']);
+        expect(browser.getValue(selectors.optionUpdate3)).toEqual('$888,800');
+        browser.keys([',']); // Ignored
+        expect(browser.getValue(selectors.optionUpdate3)).toEqual('$888,800'); //FIXME This should work (issue #432)
+    });
+});
+
+xdescribe('`decimalPlacesShownOnFocus` and selections', () => { //FIXME Fix that test
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.selection1)).toEqual('12.266,123\u202f€');
+    });
+
+    it('should select the decimals correctly regarding the `decimalPlacesShownOnFocus` option', () => {
+        const input1 = $(selectors.selection1);
+
+        // Focus on the input
+        input1.click();
+
+        // Check the text selection in the first input
+        const inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selection1');
+            const anElement = AutoNumeric.getAutoNumericElement(input);
+            anElement.selectDecimal();
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }).value;
+        expect(inputCaretPosition.start).toEqual(7);
+        expect(inputCaretPosition.end).toEqual(13);
     });
 });

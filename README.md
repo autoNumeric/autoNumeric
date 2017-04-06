@@ -670,6 +670,7 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 
 
 ## Event lifecycle
+
 AutoNumeric elements are transparent to the native `input` and `change` events, which means those are correctly sent when using an `<input>` element managed by AutoNumeric.<br>
 In addition to the native events, custom events sent by AutoNumeric elements allows you to hook into the formatting lifecycle, as you see fit.
 

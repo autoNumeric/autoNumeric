@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.9
- * @date         2017-04-02 UTC 23:00
+ * @version      4.0.0-beta.10
+ * @date         2017-04-06 UTC 21:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
@@ -519,7 +519,16 @@ class AutoNumeric {
                 return this;
             },
             createLocalList                : createLocalList => {
-                this.settings.createLocalList = createLocalList; //FIXME à tester
+                this.settings.createLocalList = createLocalList;
+
+                // Delete the local list when this is set to `false`, create it if this is set to `true` and there is not pre-existing list
+                if (this.settings.createLocalList) {
+                    if (!this._hasLocalList()) {
+                        this._createLocalList();
+                    }
+                } else {
+                    this._deleteLocalList();
+                }
 
                 return this;
             },
@@ -539,7 +548,7 @@ class AutoNumeric {
                 return this;
             },
             decimalCharacterAlternative  : decimalCharacterAlternative => {
-                this.settings.decimalCharacterAlternative = decimalCharacterAlternative; //FIXME à tester
+                this.settings.decimalCharacterAlternative = decimalCharacterAlternative;
 
                 return this;
             },
@@ -733,7 +742,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.9';
+        return '4.0.0-beta.10';
     }
 
     /**
@@ -1362,6 +1371,7 @@ class AutoNumeric {
      * @param {object} options A settings object that will override the current settings. Note: the update is done only if the `newValue` is defined.
      * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history table
      * @returns {AutoNumeric}
+     * @throws
      */
     set(newValue, options = null, saveChangeToHistory = true) {
         //TODO Add the `saveSettings` options. If `true`, then when `options` is passed, then it overwrite the current `this.settings`. If `false` the `options` are only used once and `this.settings` is not modified
@@ -1376,8 +1386,7 @@ class AutoNumeric {
 
         let value = this.constructor._toNumericValue(newValue, this.settings);
         if (isNaN(Number(value))) {
-            AutoNumericHelper.setElementValue(this.domElement, '');
-            this._setRawValue('', saveChangeToHistory);
+            this.setValue('', saveChangeToHistory);
 
             return this;
         }
@@ -1451,9 +1460,7 @@ class AutoNumeric {
                     this.settings.decimalPlacesOverride = tempDecimal;
                 }
 
-                // Here we make sure to call `_setRawValue` *after* `setElementValue` so that if `_setRawValue` calls a callback that modify the rawValue, the new value is set correctly (after `setElementValue` briefly set its value first) //TODO If `_setRawValue` calls a callback that modify the raw value or the formatted value, do not call `setElementValue` from this `set()` call
-                AutoNumericHelper.setElementValue(this.domElement, value);
-                this._setRawValue(rawValue, saveChangeToHistory);
+                this._setElementAndRawValue(value, rawValue, saveChangeToHistory);
 
                 return this;
             } else {
@@ -1471,8 +1478,7 @@ class AutoNumeric {
                 AutoNumericHelper.throwError(`The value [${attemptedValue}] being set falls outside of the minimumValue [${this.settings.minimumValue}] and maximumValue [${this.settings.maximumValue}] range set for this element`);
 
                 this._saveValueToPersistentStorage('remove');
-                AutoNumericHelper.setElementValue(this.domElement, '');
-                this._setRawValue('', saveChangeToHistory);
+                this.setValue('', saveChangeToHistory);
 
                 return this;
             }
@@ -1486,8 +1492,7 @@ class AutoNumeric {
                 result = '';
             }
 
-            AutoNumericHelper.setElementValue(this.domElement, result);
-            this._setRawValue('', saveChangeToHistory);
+            this._setElementAndRawValue(result, '', saveChangeToHistory);
 
             return this;
         }
@@ -1500,16 +1505,74 @@ class AutoNumeric {
      * @param {number|string} value
      * @param {object} options
      * @returns {AutoNumeric}
+     * @throws
      */
     setUnformatted(value, options = null) {
-        AutoNumericHelper.setElementValue(this.domElement, value);
+        //TODO Should we use `AutoNumeric.unformat()` here and set the unformatted result in case `value` is formatted?
+        if (value === null || AutoNumericHelper.isUndefined(value)) {
+            return this;
+        }
 
-        // Update the rawValue
-        this._setRawValue(value); // Doing this without any test can lead to badly formatted rawValue
-
+        // The options update is done only if the `value` is not null
         if (!AutoNumericHelper.isNull(options)) {
             this._setSettings(options, true); // We do not call `update` here since this would call `set` too
         }
+
+        const strippedValue = this.constructor._removeBrackets(value, this.settings);
+        let normalizedValue = this.constructor._stripAllNonNumberCharacters(strippedValue, this.settings, true, this.isFocused);
+        normalizedValue = normalizedValue.replace(this.settings.decimalCharacter, '.');
+        if (!AutoNumericHelper.isNumber(normalizedValue)) {
+            AutoNumericHelper.throwError(`The value is not a valid one, it's not a numeric string nor a recognized currency.`);
+        }
+
+        const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(normalizedValue, this.settings);
+        if (minTest && maxTest) {
+            // If the `normalizedValue` is in the range
+            this.setValue(value);
+        } else {
+            AutoNumericHelper.throwError(`The value is out of the range limits [${this.settings.minimumValue}, ${this.settings.maximumValue}].`);
+        }
+
+        return this;
+    }
+
+    /**
+     * Set the given value directly as the DOM element value, without formatting it beforehand, and without checking its validity.
+     *
+     * @param {string|number|null} value
+     * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history array, otherwise it is not
+     * @returns {AutoNumeric}
+     */
+    setValue(value, saveChangeToHistory = true) {
+        this._setElementAndRawValue(value, saveChangeToHistory);
+
+        return this;
+    }
+
+    /**
+     * Set the given value on the DOM element, and the raw value on `this.settings.rawValue`, if both are given.
+     * If only one value is given, then both the DOM element value and the raw value are set with that value.
+     * The third argument `saveChangeToHistory` defines if the change should be recorded in the history array.
+     * Note: if the second argument `rawValue` is a boolean, we consider that is really is the `saveChangeToHistory` argument.
+     *
+     * @param {number|string} elementValue
+     * @param {number|string|null|boolean} rawValue
+     * @param {boolean} saveChangeToHistory
+     * @returns {AutoNumeric}
+     * @private
+     */
+    _setElementAndRawValue(elementValue, rawValue = null, saveChangeToHistory = true) {
+        if (AutoNumericHelper.isNull(rawValue)) {
+            rawValue = elementValue;
+        } else if (AutoNumericHelper.isBoolean(rawValue)) {
+            saveChangeToHistory = rawValue;
+            rawValue = elementValue;
+        }
+
+        //XXX The order here is important ; the value should first be set on the element, then and only then we should update the raw value
+        // In the `set()` function, we make sure to call `_setRawValue` *after* `setElementValue` so that if `_setRawValue` calls a callback that modify the `rawValue`, then the new value is set correctly (after `setElementValue` briefly set its value first)
+        AutoNumericHelper.setElementValue(this.domElement, elementValue);
+        this._setRawValue(rawValue, saveChangeToHistory);
 
         return this;
     }
@@ -1824,16 +1887,17 @@ class AutoNumeric {
             end = 0;
         } else {
             // A decimal character has been found
-            start = start + 1; // We add 1 to exclude the decimal character
+            start = start + 1; // We add 1 to exclude the decimal character from the selection
 
             let decimalCount;
-            if (this.settings.decimalPlacesShownOnFocus !== null) {
-                decimalCount = this.settings.decimalPlacesShownOnFocus;
-            } else {
+            if (this.settings.decimalPlacesShownOnFocus === null ||
+                (this.settings.decimalPlacesShownOnFocus !== null && !this.isFocused)) {
                 decimalCount = this.settings.decimalPlacesOverride;
+            } else {
+                decimalCount = this.settings.decimalPlacesShownOnFocus;
             }
 
-            end = start + decimalCount;
+            end = start + Number(decimalCount);
         }
 
         AutoNumericHelper.setElementSelection(this.domElement, start, end);
@@ -1959,6 +2023,7 @@ class AutoNumeric {
             else {
                 result = AutoNumeric.unformat(elementValue, settingsToUse);
             }
+
             AutoNumericHelper.setElementValue(valueOrStringOrElement, result); //TODO Use `unformatAndSet` and `formatAndSet`instead
 
             return null;
@@ -2005,7 +2070,7 @@ class AutoNumeric {
             newAutoNumericElement._setLocalList(this._getLocalList());
 
             // 2) Add the new element to that existing list
-            this._addToLocalList(domElement, newAutoNumericElement); // Here we use the new AutoNumeric object reference to add to the local list, since we'll need the reference to `this` in the methods to points to that new AutoNumeric object. //FIXME à terminer : rework the comment that is now out-dated
+            this._addToLocalList(domElement, newAutoNumericElement); // Here we use the *new* AutoNumeric object reference to add to the local list, since we'll need the reference to `this` in the methods to points to that new AutoNumeric object.
             this.settings.createLocalList = originalCreateLocalListSetting;
         }
 
@@ -2474,7 +2539,7 @@ class AutoNumeric {
      * @param {HTMLElement} domElement
      * @returns {boolean}
      */
-    static test(domElement) { //FIXME à tester
+    static test(domElement) {
         return this._isInGlobalList(domElement);
     }
 
@@ -2599,7 +2664,6 @@ class AutoNumeric {
      */
     _deleteLocalList() {
         delete this.autoNumericLocalList;
-        //TODO Manage the side effects if this list is undefined (what if we later try to access/modify it?)
     }
 
     /**
@@ -2649,7 +2713,7 @@ class AutoNumeric {
         if (!AutoNumericHelper.isUndefined(this.autoNumericLocalList)) {
             this.autoNumericLocalList.set(domElement, autoNumericObject); // Use the DOM element as key, and the AutoNumeric object as the value
         } else {
-            AutoNumericHelper.throwError(`The local list provided does not exists. [${this.autoNumericLocalList}] given.`);
+            AutoNumericHelper.throwError(`The local list provided does not exists when trying to add an element. [${this.autoNumericLocalList}] given.`);
         }
     }
 
@@ -2662,8 +2726,8 @@ class AutoNumeric {
     _removeFromLocalList(domElement) {
         if (!AutoNumericHelper.isUndefined(this.autoNumericLocalList)) {
             this.autoNumericLocalList.delete(domElement);
-        } else {
-            AutoNumericHelper.throwError(`The local list provided does not exists. [${this.autoNumericLocalList}] given.`);
+        } else if (this.settings.createLocalList) {
+            AutoNumericHelper.throwError(`The local list provided does not exists when trying to remove an element. [${this.autoNumericLocalList}] given.`);
         }
     }
 
@@ -3488,6 +3552,7 @@ class AutoNumeric {
             // Remove currency sign
             s = s.replace(settings.currencySymbol, '');
         }
+
         if (settings.suffixText) {
             // Remove suffix
             while (AutoNumericHelper.contains(s, settings.suffixText)) {
@@ -4473,6 +4538,7 @@ class AutoNumeric {
 
             // ..and lastly we update the caret selection, even if the option `isCancellable` is false
             this.select();
+            //TODO Add an option to select either the integer or decimal part with `Esc`
         }
 
         // The "enter" key throws a `change` event if the value has changed since the `focus` event
@@ -7510,7 +7576,7 @@ AutoNumeric.predefinedOptions.euroSpaceNeg.negativePositiveSignPlacement = AutoN
 
 AutoNumeric.predefinedOptions.percentageEU2dec = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.French);
 AutoNumeric.predefinedOptions.percentageEU2dec.currencySymbol = AutoNumeric.options.currencySymbol.none;
-AutoNumeric.predefinedOptions.percentageEU2dec.suffixText = AutoNumeric.options.suffixText.percentage;
+AutoNumeric.predefinedOptions.percentageEU2dec.suffixText = `\u202f${AutoNumeric.options.suffixText.percentage}`;
 AutoNumeric.predefinedOptions.percentageEU2decPos = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageEU2dec);
 AutoNumeric.predefinedOptions.percentageEU2decPos.minimumValue = '0.00';
 AutoNumeric.predefinedOptions.percentageEU2decNeg = AutoNumericHelper.cloneObject(AutoNumeric.predefinedOptions.percentageEU2dec);

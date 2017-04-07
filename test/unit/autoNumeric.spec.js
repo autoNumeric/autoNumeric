@@ -3318,7 +3318,7 @@ describe('Instantiated autoNumeric functions', () => {
             document.body.removeChild(newInput);
         });
 
-        fit('should select only the decimal part', () => {
+        it('should select only the decimal part', () => {
             expect(aNInput.getNumericString()).toEqual('');
             aNInput.set(2172834.234);
             expect(aNInput.getNumericString()).toEqual('2172834.23');

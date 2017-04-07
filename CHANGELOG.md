@@ -1,5 +1,13 @@
 ### Change log for autoNumeric:
 
+### "2.0.12"
++ Add Android Chrome mobile (version 57) support (note: so far, not all android browsers are supported)
++ Fix issue #404 On the Android browser, inserted numbers are doubled if the user press the keys quickly on the virtual keyboard
++ Fix issue #250 The `maximumValue` and `minimumValue` options are not taken into account on Android
++ Add the special keyCode 229 used by Android browsers as `keyCode.AndroidDefault`
++ Fix the `onPaste` handler throwing an error for uninitialized variables
++ Complete the `arabicToLatinNumbers()` function to return more quickly if not arabic numbers are found
+
 ### "2.0.11"
 + Fix issue #248 Create the `autoNumeric` organization, and move the repository to it
 

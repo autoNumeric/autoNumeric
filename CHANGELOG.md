@@ -4,6 +4,7 @@
 + Add Android Chrome mobile (version 57) support (note: so far, not all android browsers are supported)
 + Fix issue #404 On the Android browser, inserted numbers are doubled if the user press the keys quickly on the virtual keyboard
 + Fix issue #250 The `maximumValue` and `minimumValue` options are not taken into account on Android
++ Fix issue #264 Entering the `decimalCharacterAlternative` is not taken into account on Android Chrome
 + Add the special keyCode 229 used by Android browsers as `keyCode.AndroidDefault`
 + Fix the `onPaste` handler throwing an error for uninitialized variables
 + Complete the `arabicToLatinNumbers()` function to return more quickly if not arabic numbers are found

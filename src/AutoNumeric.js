@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.10
+ * @version      4.0.0-beta.11
  * @date         2017-04-06 UTC 21:00
  *
  * @author       Bob Knothe
@@ -742,7 +742,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.10';
+        return '4.0.0-beta.11';
     }
 
     /**
@@ -887,6 +887,7 @@ class AutoNumeric {
         this._onFocusFunc = () => { this._onFocus(); };
         this._onKeydownFunc = e => { this._onKeydown(e); };
         this._onKeypressFunc = e => { this._onKeypress(e); };
+        this._onInputFunc = e => { this._onInput(e); };
         this._onKeyupFunc = e => { this._onKeyup(e); };
         this._onBlurFunc = e => { this._onBlur(e); };
         this._onFocusOutAndMouseLeaveFunc = e => { this._onFocusOutAndMouseLeave(e); };
@@ -903,6 +904,7 @@ class AutoNumeric {
         this.domElement.addEventListener('mouseenter', this._onFocusInAndMouseEnterFunc, false);
         this.domElement.addEventListener('keydown', this._onKeydownFunc, false);
         this.domElement.addEventListener('keypress', this._onKeypressFunc, false);
+        this.domElement.addEventListener('input', this._onInputFunc, false);
         this.domElement.addEventListener('keyup', this._onKeyupFunc, false);
         this.domElement.addEventListener('blur', this._onBlurFunc, false);
         this.domElement.addEventListener('blur', this._onFocusOutAndMouseLeaveFunc, false);
@@ -935,6 +937,7 @@ class AutoNumeric {
         this.domElement.removeEventListener('mouseleave', this._onFocusOutAndMouseLeaveFunc, false);
         this.domElement.removeEventListener('keydown', this._onKeydownFunc, false);
         this.domElement.removeEventListener('keypress', this._onKeypressFunc, false);
+        this.domElement.removeEventListener('input', this._onInputFunc, false);
         this.domElement.removeEventListener('keyup', this._onKeyupFunc, false);
         this.domElement.removeEventListener('blur', this._onBlurFunc, false);
         this.domElement.removeEventListener('paste', this._onPasteFunc, false);
@@ -4640,6 +4643,75 @@ class AutoNumeric {
     }
 
     /**
+     * Handler for 'input' events.
+     * Handling this event instead of `keypress` is needed in order to support android devices.
+     *
+     * @param {Event} e
+     */
+    _onInput(e) { //FIXME à tester
+        const value = AutoNumericHelper.getElementValue(this.domElement);
+
+        // Fix the caret position on keyup in the `_formatValue()` function
+        this.androidSelectionStart = null;
+
+        if (this.eventKey === AutoNumericEnum.keyName.AndroidDefault) {
+            let selection = AutoNumericHelper.getElementSelection(this.domElement);
+            // The keyCode is equal to the default Android Chrome one (which is always equal to `keyCode.AndroidDefault`)
+            if (value.length > this.lastVal.length || value.length >= this.lastVal.length - selection.length) {
+                // Determine the keycode of the character that was entered, and overwrite the faulty `eventKeyCode` info with it
+                this.eventKey = value.charCodeAt(selection.start);
+
+                // Capture the actual character entered, and update the `eventKey` with it (instead of the Android default one)
+                this.eventKey = value.charAt(selection.start);
+
+                // Check if the given character should be inserted, and if so, do insert it into the current element value
+                const isCharacterInsertionAllowed = this._processCharacterInsertion();
+
+                if (isCharacterInsertionAllowed) {
+                    // Allowed character entered (number, decimal or plus/minus sign)
+                    this._formatValue(e);
+
+                    selection = AutoNumericHelper.getElementSelection(this.domElement); //TODO is this needed a second time?
+                    // Capture the new caret position. This is required because on keyup, `_updateAutoNumericHolderEventKeycode()` captures the old caret position
+                    //TODO Check if this is an Android bug or an autoNumeric one
+                    this.androidSelectionStart = selection.start;
+
+                    const decimalCharacterPosition = AutoNumericHelper.getElementValue(this.domElement).indexOf(this.settings.decimalCharacter);
+                    const hasDecimalCharacter = decimalCharacterPosition === -1;
+
+                    // Move the caret to the right if the `androidCharEntered` is the decimal character or if it's on the left of the caret position
+                    if (this.eventKey === this.settings.decimalCharacter ||
+                        !hasDecimalCharacter && decimalCharacterPosition < this.androidSelectionStart) {
+                        this.androidSelectionStart = selection.start + 1;
+                    }
+
+                    if (selection.length > value.length) {
+                        // Position the caret right now before the 'keyup' event in order to prevent the caret from jumping around
+                        this._setCaretPosition(this.androidSelectionStart);
+                    }
+
+                    this.lastVal = AutoNumericHelper.getElementValue(this.domElement);
+
+                    return;
+                } else {
+                    // The entered character is not allowed ; overwrite the new invalid value with the previous valid one, and set back the caret/selection
+                    AutoNumericHelper.setElementValue(this.lastVal); //TODO Update the rawValue here too via _setValue()?
+                    AutoNumericHelper.setElementSelection(this.domElement, selection.start, selection.end);
+                    this.androidSelectionStart = selection.start;
+                }
+
+                e.preventDefault(); //TODO Check how that is affecting the normal trigger of the input event
+
+                this.formatted = false;
+            } else {
+                // Character deleted
+                //XXX The change in length could also be the result of the `Delete` key, but there usually are no such key in the Android virtual keyboards
+                this.eventKey = AutoNumericEnum.keyName.Backspace;
+            }
+        }
+    }
+
+    /**
      * Handler for 'keyup' events.
      * The user just released any key, hence one event is sent.
      *
@@ -4692,8 +4764,9 @@ class AutoNumeric {
 
         const skip = this._processNonPrintableKeysAndShortcuts(e);
         delete this.valuePartsBeforePaste;
+        const isOnAndroid = this.androidSelectionStart !== null;
         const targetValue = AutoNumericHelper.getElementValue(e.target);
-        if (skip || targetValue === '') {
+        if (skip && !isOnAndroid || targetValue === '') {
             return;
         }
 
@@ -4898,6 +4971,8 @@ class AutoNumeric {
         }
 
         let leftPartContainedADot = false;
+        let leftPart;
+        let rightPart;
         switch (this.settings.onInvalidPaste) {
             /* 4a. Truncate paste behavior:
              * Insert as many numbers as possible on the right hand side of the caret from the pasted text content, until the input reach its range limit.
@@ -4935,8 +5010,8 @@ class AutoNumeric {
                     //TODO Quid if the negative sign is not on the left (negativePositiveSignPlacement and currencySymbolPlacement)?
                 }
 
-                let leftPart = result.slice(0, caretPositionOnInitialTextAfterPasting);
-                let rightPart = result.slice(caretPositionOnInitialTextAfterPasting, result.length);
+                leftPart = result.slice(0, caretPositionOnInitialTextAfterPasting);
+                rightPart = result.slice(caretPositionOnInitialTextAfterPasting, result.length);
                 if (pastedText === '.') {
                     if (AutoNumericHelper.contains(leftPart, '.')) {
                         // If I remove a dot here, then I need to update the caret position (decrement it by 1) when positioning it
@@ -4944,6 +5019,7 @@ class AutoNumeric {
                         leftPartContainedADot = true;
                         leftPart = leftPart.replace('.', '');
                     }
+                    
                     rightPart = rightPart.replace('.', '');
                 }
                 // -- Here, we are good to go to continue on the same basis
@@ -5811,6 +5887,7 @@ class AutoNumeric {
             this.allowedTagList = AutoNumericEnum.allowedTagList;
             this.runOnce = false;
             this.hoveredWithAlt = false; // Keep tracks if the current aN element is hovered by the mouse cursor while `Alt` is pressed
+            this.androidSelectionStart = null; // If `null`, then we are not on an Android device (the keyCode is not always equal to 229)
         }
 
         // Modify the user settings to make them 'exploitable'
@@ -5951,6 +6028,7 @@ class AutoNumeric {
      * @private
      */
     _setSelection(start, end) {
+        //TODO use this function to replace the direct calls to `setElementSelection()`, wherever possible
         start = Math.max(start, 0);
         end = Math.min(end, AutoNumericHelper.getElementValue(this.domElement).length);
         this.selection = {
@@ -6417,7 +6495,9 @@ class AutoNumeric {
      */
     _processCharacterInsertion() {
         let [left, right] = this._getUnformattedLeftAndRightPartAroundTheSelection();
-        this.throwInput = true;
+        if (this.eventKey !== AutoNumericEnum.keyName.AndroidDefault) {
+            this.throwInput = true;
+        }
 
         // Start rules when the decimal character key is pressed always use numeric pad dot to insert decimal separator
         // Do not allow decimal character if no decimal part allowed
@@ -6621,6 +6701,13 @@ class AutoNumeric {
             value === elementValue && (this.eventKey === AutoNumericEnum.keyName.num0 || this.eventKey === AutoNumericEnum.keyName.numpad0)) {
             AutoNumericHelper.setElementValue(this.domElement, value);
             this._setCaretPosition(position);
+        }
+
+        if (this.androidSelectionStart !== null) {
+            // If an Android browser is detected, fix the caret position
+            // Unfortunately this does not fix all android browsers, only Android Chrome currently.
+            // This is due to the fact those provide different order of events and/or keycodes thrown (this is a real mess :|).
+            this._setCaretPosition(this.androidSelectionStart);
         }
 
         this.formatted = true; //TODO Rename `this.formatted` to `this._formatExecuted`, since it's possible this function does not need to format anything (in the case where the keycode is dropped for instance)

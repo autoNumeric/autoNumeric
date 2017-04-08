@@ -46,6 +46,7 @@ anElement.french()
          .clear();
 ```
 - Supports most international numeric formats and currencies<br>*(If the one you use is not supported yet, open an [issue](https://github.com/autoNumeric/autoNumeric/issues/new) and we'll add it as soon as possible!)*
+- The mobile Android Chrome browser is now partially supported!
 
 *And also:*
 - Any number of different formats can be used at the same time on the same page.<br>Each input can be configured by either setting the options as HTML5 data attributes, or directly passed as an argument in the Javascript code

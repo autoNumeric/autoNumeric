@@ -4827,7 +4827,7 @@ describe('Static autoNumeric functions', () => {
 
             expect(AutoNumeric.unformat('-1.234,56 €', autoNumericOptionsEuro)).toEqual('-1234.56');
             expect(AutoNumeric.unformat('-123,45 €', autoNumericOptionsEuro)).toEqual('-123.45');
-            expect(AutoNumeric.unformat('0.00 €', autoNumericOptionsEuro)).toEqual('0.00');
+            expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuro)).toEqual('0.00');
 
             expect(AutoNumeric.unformat('-1234.56')).toEqual('-1234.56');
             expect(AutoNumeric.unformat('-123.45')).toEqual('-123.45');

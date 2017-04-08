@@ -1,5 +1,16 @@
 ### Change log for autoNumeric:
 
+### "4.0.0-beta.11"
++ Merge the Android support from `2.0.12` into `4.0.0-beta.*`
+
+### "2.0.12"
++ Add Android Chrome mobile (version 57) support (note: so far, not all android browsers are supported)
++ Fix issue #404 On the Android browser, inserted numbers are doubled if the user press the keys quickly on the virtual keyboard
++ Fix issue #250 The `maximumValue` and `minimumValue` options are not taken into account on Android
++ Add the special keyCode 229 used by Android browsers as `keyCode.AndroidDefault`
++ Fix the `onPaste` handler throwing an error for uninitialized variables
++ Complete the `arabicToLatinNumbers()` function to return more quickly if no arabic numbers are found
+
 ### "4.0.0-beta.10"
 + Reorganize the existing unit tests and add more to extend the coverage
 + Add a new `setValue()` method that allow the user to set any values, without any controls from AutoNumeric.
@@ -11,6 +22,9 @@
 
 ### "4.0.0-beta.9"
 + Fix issue #425 The `minimumValue` and `maximumValue` options are not respected when `emptyInputBehavior` is set to `'zero'`
+
+### "2.0.11"
++ Fix issue #248 Create the `autoNumeric` organization, and move the repository to it
 
 ### "4.0.0-beta.8"
 + Fix issue #248 Create the `autoNumeric` organization, and move the repository to it

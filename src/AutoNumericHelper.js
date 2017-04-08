@@ -314,6 +314,10 @@ export default class AutoNumericHelper {
             //XXX The selenium geckodriver do not understand `event.key`, hence when using it, we need to rely on the old deprecated `keyCode` attribute, cf. upstream issue https://github.com/mozilla/geckodriver/issues/440
             // Use the old deprecated keyCode property, if the new `key` one is not supported
             const keyCode = this.keyCodeNumber(event);
+            if (keyCode === AutoNumericEnum.keyCode.AndroidDefault) {
+                return AutoNumericEnum.keyName.AndroidDefault;
+            }
+
             const potentialResult = AutoNumericEnum.fromCharCodeKeyCode[keyCode];
             if (!AutoNumericHelper.isUndefinedOrNullOrEmpty(potentialResult)) {
                 // Since `String.fromCharCode` do not return named keys for some keys ('Escape' and 'Enter' for instance), we convert the characters to the key names
@@ -856,6 +860,15 @@ export default class AutoNumericHelper {
         let result = arabicNumbers.toString();
         if (result === '') {
             return arabicNumbers;
+        }
+
+        if (result.match(/[٠١٢٣٤٥٦٧٨٩۴۵۶]/g) === null) {
+            // If no Arabic/Persian numbers are found, return the numeric string or number directly
+            if (returnANumber) {
+                result = Number(result);
+            }
+
+            return result;
         }
 
         if (parseDecimalCharacter) {

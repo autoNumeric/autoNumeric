@@ -190,6 +190,7 @@ const AutoNumericEnum = {
         Quote:          222,
         Command:        224,
         AltGraph:       225,
+        AndroidDefault: 229, // Android Chrome returns the same keycode number 229 for all keys pressed
     },
 
     /**
@@ -206,6 +207,7 @@ const AutoNumericEnum = {
     keyName: {
         // Special values
         Unidentified:   'Unidentified',
+        AndroidDefault: 'AndroidDefault',
 
         // Modifier keys
         Alt:            'Alt',

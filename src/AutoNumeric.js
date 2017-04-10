@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.11
+ * @version      4.0.0-beta.12
  * @date         2017-04-10 UTC 20:00
  *
  * @author       Bob Knothe
@@ -742,7 +742,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.11';
+        return '4.0.0-beta.12';
     }
 
     /**
@@ -4421,6 +4421,7 @@ class AutoNumeric {
                 this.settings.decimalPlacesOverride = Number(this.originalDecimalPlacesOverride);
                 updateElementValue = true;
             } else if (this.settings.noSeparatorOnFocus) {
+                //TODO Use a `this.settingsOverride` object instead of modifying the `this.settings` object
                 this.settings.digitGroupSeparator = '';
                 this.settings.currencySymbol = '';
                 this.settings.suffixText = '';
@@ -4429,7 +4430,11 @@ class AutoNumeric {
 
             if (updateElementValue) {
                 const roundedValue = this.constructor._roundValue(this.settings.rawValue, this.settings);
-                AutoNumericHelper.setElementValue(this.domElement, this.constructor._addGroupSeparators(roundedValue, this.settings, this.isFocused));
+                if (this.settings.noSeparatorOnFocus) {
+                    AutoNumericHelper.setElementValue(this.domElement, roundedValue.replace('.', this.settings.decimalCharacter));
+                } else {
+                    AutoNumericHelper.setElementValue(this.domElement, this.constructor._addGroupSeparators(roundedValue, this.settings, this.isFocused));
+                }
             }
 
             // In order to send a 'native' change event when blurring the input, we need to first store the initial input value on focus.

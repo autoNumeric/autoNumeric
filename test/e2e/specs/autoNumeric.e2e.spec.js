@@ -129,6 +129,8 @@ const selectors = {
     optionUpdate2                     : '#optionUpdate2',
     optionUpdate3                     : '#optionUpdate3',
     selection1                        : '#selection1',
+    noSeparatorOnFocusInput1          : '#noSeparatorOnFocus1',
+    noSeparatorOnFocusInput2          : '#noSeparatorOnFocus2',
 };
 
 //-----------------------------------------------------------------------------
@@ -2673,5 +2675,29 @@ xdescribe('`decimalPlacesShownOnFocus` and selections', () => { //FIXME Fix that
         }).value;
         expect(inputCaretPosition.start).toEqual(7);
         expect(inputCaretPosition.end).toEqual(13);
+    });
+});
+
+describe('`noSeparatorOnFocusInput` option', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.noSeparatorOnFocusInput1)).toEqual('-246.813,58\u202f€ loan');
+        expect(browser.getValue(selectors.noSeparatorOnFocusInput2)).toEqual('$-246,813.58 interest');
+    });
+
+    it('should show the unformatted value on focus', () => {
+        const input1 = $(selectors.noSeparatorOnFocusInput1);
+        const input2 = $(selectors.noSeparatorOnFocusInput2);
+
+        // Focus on the first input
+        input1.click();
+        expect(browser.getValue(selectors.noSeparatorOnFocusInput1)).toEqual('-246813,58');
+        expect(browser.getValue(selectors.noSeparatorOnFocusInput2)).toEqual('$-246,813.58 interest');
+
+        // Blur the first input, and focus on the second
+        input2.click();
+        expect(browser.getValue(selectors.noSeparatorOnFocusInput1)).toEqual('-246.813,58\u202f€ loan');
+        expect(browser.getValue(selectors.noSeparatorOnFocusInput2)).toEqual('-246813.58');
     });
 });

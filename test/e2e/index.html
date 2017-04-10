@@ -618,6 +618,16 @@
 			<input id="selection1" type="text" value="">
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">noSeparatorOnFocus option</p>
+			<div>
+				<input id="noSeparatorOnFocus1" type="text" value="">
+				<input id="noSeparatorOnFocus2" type="text" value="">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1056,6 +1066,12 @@
     new AutoNumeric('#selection1')
 	    .french()
 	    .set(12266.1234567, { minimumValue: '0', maximumValue: '9999999.9999999', decimalPlacesOverride: 3, decimalPlacesShownOnFocus: 6 });
+
+    //-------------- noSeparatorOnFocus option
+    new AutoNumeric('#noSeparatorOnFocus1').french()
+	    .set(-246813.58, { noSeparatorOnFocus: AutoNumeric.options.noSeparatorOnFocus.noSeparator, suffixText: ' loan' });
+    new AutoNumeric('#noSeparatorOnFocus2').northAmerican()
+	    .set(-246813.58, { noSeparatorOnFocus: AutoNumeric.options.noSeparatorOnFocus.noSeparator, suffixText: ' interest' });
 </script>
 </body>
 </html>

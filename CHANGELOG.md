@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "4.0.0-beta.12"
++ Fix issue #434 Using `noSeparatorOnFocus` set to `noSeparator` should not remove the decimal character on focus
+
 ### "4.0.0-beta.11"
 + Merge the Android support from `2.0.12` into `4.0.0-beta.*`
 

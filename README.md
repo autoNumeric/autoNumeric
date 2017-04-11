@@ -744,14 +744,14 @@ In a nutshell :
 - Lint, build, and run tests `yarn lint && yarn build && yarn test`
 - Create a pull request, and we'll check it out as soon as possible!
 
-Again, be sure to check the [CONTRIBUTING](CONTRIBUTING.md) file for more details.<br>
+Again, be sure to check the [CONTRIBUTING](CONTRIBUTING.md) guidelines for more details.<br>
 Also, feel free to follow our RSS feeds on [master](https://github.com/autoNumeric/autoNumeric/commits/master.atom) and [next](https://github.com/autoNumeric/autoNumeric/commits/next.atom) to keep up with the latest commits.
 
 ### Dependencies
 None!
 
 ## Older versions
-The previous stable autoNumeric version v1.9.46 can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/1.9.46), and the v2 branch can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/v2.0.10).
+The previous stable autoNumeric version `v1.9.46` can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/1.9.46), and the `v2.*` branch can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/v2.0.12).
 
 ## Related projects
 For integration into [Rails](http://rubyonrails.org/) projects, you can use the [autonumeric-rails](https://github.com/randoum/autonumeric-rails) project.

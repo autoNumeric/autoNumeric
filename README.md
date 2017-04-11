@@ -531,12 +531,14 @@ This allows to format or unformat numbers, strings or directly other DOM element
 
 Once you have an AutoNumeric element already setup correctly with the right options, you can use it as many times you want to initialize as many other DOM elements as needed (this works only on elements that can be managed by autoNumeric).
 
-Whenever `init` is used to initialize other DOM element, a shared 'local' list of those elements is stored in the AutoNumeric objects.<br>This allows for neat things like modifying all those *linked* AutoNumeric elements globally, with one call.
+Whenever `init` is used to initialize other DOM elements, a shared 'local' list of those elements is stored in the AutoNumeric objects.<br>This allows for neat things like modifying all those *linked* AutoNumeric elements globally, with one call.
 
 | Method           | Description | Call example |
 | :----------------: | :-----------:  | :-----------:  |
-| `init` | Use an existing AutoNumeric element to initialize another DOM element with the same options | `const anElement2 = anElement.init(domElement2);` |
+| `init` | Use an existing AutoNumeric element to initialize another single DOM element with the same options | `const anElement2 = anElement.init(domElement2);` |
 | `init` | If `true` is set as the second argument, then the newly generated AutoNumeric element will not share the same local element list as `anElement` | `const anElement2 = anElement.init(domElement2, true);` |
+| `init` | Use an existing AutoNumeric element to initialize multiple other DOM elements from an Array, with the same options | `const anElementsArray = anElement.init([domElement2, domElement3, domElement4]);` |
+| `init` | Use an existing AutoNumeric element to initialize multiple other DOM elements from a CSS selector, with the same options | `const anElementsArray = anElement.init('.currency');` |
 
 
 ##### Perform actions globally on a shared list of AutoNumeric elements

@@ -70,9 +70,9 @@ With that said, autoNumeric supports most international numeric formats and curr
 You can install autoNumeric with your preferred dependency manager:
 ```bash
 # with `yarn` :
-yarn add autonumeric
+yarn add autonumeric --save
 # or with `npm` :
-npm install autonumeric
+npm install autonumeric --save
 ```
 
 ### How to use?

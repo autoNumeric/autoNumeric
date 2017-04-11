@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.12
- * @date         2017-04-10 UTC 20:00
+ * @version      4.0.0-beta.13
+ * @date         2017-04-11 UTC 23:30
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
@@ -742,7 +742,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.12';
+        return '4.0.0-beta.13';
     }
 
     /**
@@ -2044,40 +2044,73 @@ class AutoNumeric {
     }
 
     /**
-     * Use the current AutoNumeric element settings to initialize the DOM element given as a parameter.
-     * Doing so will *link* the two AutoNumeric elements since they will share the same local AutoNumeric element list.
+     * Use the current AutoNumeric element settings to initialize the DOM element(s) given as a parameter.
+     * Doing so will *link* the AutoNumeric elements together since they will share the same local AutoNumeric element list.
      * (cf. prototype pattern : https://en.wikipedia.org/wiki/Prototype_pattern)
+     *
+     * You can `init` either a single DOM element (in that case an AutoNumeric object will be returned), or an array of DOM elements or a string that will be used as a CSS selector. In the latter cases, an array of AutoNumeric objects will then be returned (or an empty array if nothing gets selected by the CSS selector).
      *
      * Use case : Once you have an AutoNumeric element already setup correctly with the right options, you can use it as many times you want to initialize as many other DOM elements as needed.
      * Note : this works only on elements that can be managed by autoNumeric.
      *
-     * @param {HTMLElement|HTMLInputElement} domElement
+     * @param {HTMLElement|HTMLInputElement|Array<HTMLElement|HTMLInputElement>|string} domElementOrArrayOrString
      * @param {boolean} attached If set to `false`, then the newly generated AutoNumeric element will not share the same local element list
-     * @returns {AutoNumeric}
+     * @returns {AutoNumeric|[AutoNumeric]}
      */
-    init(domElement, attached = true) {
-        // Initialize the new AutoNumeric element
-        //TODO Use a special call that would prevent calling `_createLocalList` (since we'll delete that list just after if attached == false)
-        const originalCreateLocalListSetting = this.settings.createLocalList;
-        if (attached) {
-            // Temporary variable to know if we should create the local list during the initialization (since we'll remove it afterwards)
-            this.settings.createLocalList = false;
+    init(domElementOrArrayOrString, attached = true) {
+        let returnASingleAutoNumericObject = false; // By default, this function returns an array of AutoNumeric objects
+        let domElementsArray = [];
+        if (AutoNumericHelper.isString(domElementOrArrayOrString)) {
+            domElementsArray = [... document.querySelectorAll(domElementOrArrayOrString)]; // Convert a NodeList to an Array
+        } else if (AutoNumericHelper.isElement(domElementOrArrayOrString)) {
+            domElementsArray.push(domElementOrArrayOrString);
+            returnASingleAutoNumericObject = true; // Special case when only one DOM element is passed as a parameter
+        } else if (AutoNumericHelper.isArray(domElementOrArrayOrString)) {
+            domElementsArray = domElementOrArrayOrString;
+        } else {
+            AutoNumericHelper.throwError(`The given parameters to the 'init' function are invalid.`);
         }
 
-        const newAutoNumericElement =  new AutoNumeric(domElement, AutoNumericHelper.getElementValue(domElement), this.settings);
-
-        // Set the common shared local list if needed
-        // If the user wants to create a detached new AutoNumeric element, then skip the following step that bind the two elements together by default
-        if (attached) {
-            // 1) Set the local list reference to point to the initializer's one
-            newAutoNumericElement._setLocalList(this._getLocalList());
-
-            // 2) Add the new element to that existing list
-            this._addToLocalList(domElement, newAutoNumericElement); // Here we use the *new* AutoNumeric object reference to add to the local list, since we'll need the reference to `this` in the methods to points to that new AutoNumeric object.
-            this.settings.createLocalList = originalCreateLocalListSetting;
+        if (domElementsArray.length === 0) {
+            AutoNumericHelper.warning(`No valid DOM elements were given hence no AutoNumeric object were instantiated.`);
+            return [];
         }
 
-        return newAutoNumericElement;
+        const currentLocalList = this._getLocalList();
+        const autoNumericObjectsArray = [];
+
+        // Instantiate (and link depending on `attached`) each AutoNumeric objects
+        domElementsArray.forEach(domElement => {
+            // Initialize the new AutoNumeric element
+            const originalCreateLocalListSetting = this.settings.createLocalList;
+            if (attached) {
+                // Temporary variable to know if we should create the local list during the initialization (since we'll remove it afterwards)
+                this.settings.createLocalList = false;
+            }
+
+            const newAutoNumericElement =  new AutoNumeric(domElement, AutoNumericHelper.getElementValue(domElement), this.settings);
+
+            // Set the common shared local list if needed
+            // If the user wants to create a detached new AutoNumeric element, then skip the following step that bind the two elements together by default
+            if (attached) {
+                // 1) Set the local list reference to point to the initializer's one
+                newAutoNumericElement._setLocalList(currentLocalList);
+
+                // 2) Add the new element to that existing list
+                this._addToLocalList(domElement, newAutoNumericElement); // Here we use the *new* AutoNumeric object reference to add to the local list, since we'll need the reference to `this` in the methods to points to that new AutoNumeric object.
+                this.settings.createLocalList = originalCreateLocalListSetting;
+            }
+
+            autoNumericObjectsArray.push(newAutoNumericElement);
+        });
+
+        if (returnASingleAutoNumericObject) {
+            // If a single DOM element was used as the parameter, then we return an AutoNumeric object directly
+            return autoNumericObjectsArray[0];
+        }
+
+        // ...otherwise we return an Array of AutoNumeric objects
+        return autoNumericObjectsArray;
     }
 
     /**

@@ -3951,6 +3951,72 @@ describe('`global.*` functions', () => {
             document.body.removeChild(newInput5);
         });
 
+        it('should initialize multiple DOM elements stored in an Array, from an existing AutoNumeric object', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const newAnElements = anElement1.init([newInput2, newInput3, newInput4, newInput5]);
+            const [anElement2, anElement3, anElement4, anElement5] = newAnElements;
+
+            expect(anElement1.set(22).getFormatted()).toEqual('22,00 €');
+            expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+            expect(anElement3.set(187568.243).getFormatted()).toEqual('187 568,24 €');
+            expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            expect(anElement5.set(1028.005).getFormatted()).toEqual('1 028,01 €');
+            expect(anElement4.global.size()).toEqual(5);
+
+            // Then test that those elements share the same local list
+            anElement2.global.set(1223355.66);
+            expect(anElement1.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement2.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement4.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement5.getFormatted()).toEqual('1 223 355,66 €');
+
+            // ...and that removing one from the list is taken into account
+            anElement3.global.removeObject(newInput3);
+            expect(anElement4.global.size()).toEqual(4);
+            anElement2.global.set(42);
+            expect(anElement1.getFormatted()).toEqual('42,00 €');
+            expect(anElement2.getFormatted()).toEqual('42,00 €');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement4.getFormatted()).toEqual('42,00 €');
+            expect(anElement5.getFormatted()).toEqual('42,00 €');
+        });
+
+        it('should initialize multiple DOM elements selected with a CSS selector, from an existing AutoNumeric object', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            newInput2.classList.add('testingCSSSelector');
+            newInput3.classList.add('testingCSSSelector');
+            newInput4.classList.add('testingCSSSelector');
+            newInput5.classList.add('testingCSSSelector');
+            const newAnElements = anElement1.init('.testingCSSSelector');
+            const [anElement2, anElement3, anElement4, anElement5] = newAnElements;
+
+            expect(anElement1.set(22).getFormatted()).toEqual('22,00 €');
+            expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+            expect(anElement3.set(187568.243).getFormatted()).toEqual('187 568,24 €');
+            expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            expect(anElement5.set(1028.005).getFormatted()).toEqual('1 028,01 €');
+            expect(anElement4.global.size()).toEqual(5);
+
+            // Then test that those elements share the same local list
+            anElement2.global.set(1223355.66);
+            expect(anElement1.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement2.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement4.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement5.getFormatted()).toEqual('1 223 355,66 €');
+
+            // ...and that removing one from the list is taken into account
+            anElement3.global.removeObject(newInput3);
+            expect(anElement4.global.size()).toEqual(4);
+            anElement2.global.set(42);
+            expect(anElement1.getFormatted()).toEqual('42,00 €');
+            expect(anElement2.getFormatted()).toEqual('42,00 €');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement4.getFormatted()).toEqual('42,00 €');
+            expect(anElement5.getFormatted()).toEqual('42,00 €');
+        });
+
         it('should initialize other DOM element from an existing AutoNumeric object, and `set` the values globally across those elements', () => {
             const anElement1 = new AutoNumeric(newInput1, options);
             const anElement2 = anElement1.init(newInput2);

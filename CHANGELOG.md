@@ -1,5 +1,8 @@
 ### Change log for autoNumeric:
 
+### "4.0.0-beta.13"
++ Modify `init()` so that it allows the user to also pass an array of DOM elements, or a CSS selector as its first argument (cf. issue #388 comments)
+
 ### "4.0.0-beta.12"
 + Fix issue #434 Using `noSeparatorOnFocus` set to `noSeparator` should not remove the decimal character on focus
 

@@ -3598,10 +3598,7 @@ class AutoNumeric {
 
         if (settings.suffixText) {
             // Remove suffix
-            while (AutoNumericHelper.contains(s, settings.suffixText)) {
-                //TODO Why use a `while` here?
-                s = s.replace(settings.suffixText, '');
-            }
+            s = s.replace(settings.suffixText, '');
         }
 
         //TODO Remove the positive sign too?

@@ -9,6 +9,7 @@
 + Split the `_checkEmpty()` function into `_isElementValueEmptyOrOnlyTheNegativeSign()` and `_orderValueCurrencySymbolAndSuffixText()`. Both new functions only do one thing and one thing only, allowing the code to be rewrote in a clearer way.
 + Delete the `_checkEmpty()` function.
 + Simplify `_roundValue()` to make it more legible ; This is done by extracting `_roundCloseTo05()`, `_prepareValueForRounding()` and `_shouldRoundUp()`.
++ Remove an unnecessary `while` loop in `_stripAllNonNumberCharacters()`
 
 ### 4.0.0-beta.13
 + Modify `init()` so that it allows the user to also pass an array of DOM elements, or a CSS selector as its first argument (cf. issue #388 comments)

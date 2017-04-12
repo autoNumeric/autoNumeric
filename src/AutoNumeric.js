@@ -3248,11 +3248,10 @@ class AutoNumeric {
      * This basically allows to get the unformatted value without first having to initialize an AutoNumeric object.
      *
      * @param {string|number|HTMLElement|HTMLInputElement} numericStringOrDomElement
-     * @param {object} options
+     * @param {object|null} options
      * @returns {*}
      */
-    static unformat(numericStringOrDomElement, options = null) {
-        //TODO Allow passing multiple options objects, the latter overwriting the settings from the previous ones
+    static unformat(numericStringOrDomElement, ...options) {
         if (AutoNumericHelper.isNumberStrict(numericStringOrDomElement)) {
             // Giving an unformatted value should return the same unformatted value, whatever the options passed as a parameter
             return numericStringOrDomElement;
@@ -3274,7 +3273,16 @@ class AutoNumeric {
             AutoNumericHelper.throwError(`A number or a string representing a number is needed to be able to unformat it, [${value}] given.`);
         }
 
-        const settings = Object.assign({}, this.getDefaultConfig(), options);
+        let optionsToUse = {};
+        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(options) || options.length === 0) {
+            optionsToUse = null;
+        } else if (options.length >= 1) {
+            options.forEach(optionObject => {
+                Object.assign(optionsToUse, optionObject);
+            });
+        }
+
+        const settings = Object.assign({}, this.getDefaultConfig(), optionsToUse);
         if (AutoNumericHelper.isNull(settings.decimalPlacesOverride)) {
             settings.decimalPlacesOverride = this._maximumVMinAndVMaxDecimalLength(settings.minimumValue, settings.maximumValue);
         }

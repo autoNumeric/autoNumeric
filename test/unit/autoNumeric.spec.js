@@ -4908,6 +4908,17 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.unformat(null, autoNumericOptionsEuro)).toEqual(null);
         });
 
+        it('should unformat with multiple user options overwriting each other in the right order', () => {
+            expect(AutoNumeric.unformat('241800,02 €', AutoNumeric.getPredefinedOptions().French, { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator })).toEqual('241800.02');
+            expect(AutoNumeric.unformat('241800,02 $',
+                // eslint-disable-next-line
+                AutoNumeric.getPredefinedOptions().French,
+                { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                { digitGroupSeparator: AutoNumeric.options.currencySymbol.pound },
+                { digitGroupSeparator: AutoNumeric.options.currencySymbol.dollar }
+            )).toEqual('241800.02');
+        });
+
         it(`should return a 'real' number, whatever options are passed as an argument`, () => {
             expect(AutoNumeric.unformat(1234.56)).toEqual(1234.56);
             expect(AutoNumeric.unformat(0)).toEqual(0);

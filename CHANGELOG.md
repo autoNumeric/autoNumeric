@@ -3,6 +3,9 @@
 ### 4.0.0-beta.14
 + Add more bracket types to the `negativeBracketsTypeOnBlur` option ('〈,〉', '｢,｣', '⸤,⸥', '⟦,⟧', '‹,›' and '«,»')
 + Reformat the changelog, fix some typos
++ Modify the static `unformat()` signature to allow multiple options objects to be passed as arguments.
+  Each more option object overwrite the previous ones.
+  This allows to correctly unformat currencies that have a predefined option as its base, but has been slightly modified (ie. `AutoNumeric.unformat('241800,02 €', AutoNumeric.getPredefinedOptions().French, { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator })`, and still get the right result).
 
 ### 4.0.0-beta.13
 + Modify `init()` so that it allows the user to also pass an array of DOM elements, or a CSS selector as its first argument (cf. issue #388 comments)

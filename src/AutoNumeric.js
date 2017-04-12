@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.13
- * @date         2017-04-11 UTC 23:30
+ * @version      4.0.0-beta.14
+ * @date         2017-04-12 UTC 00:30
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
@@ -742,7 +742,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.13';
+        return '4.0.0-beta.14';
     }
 
     /**
@@ -3009,15 +3009,14 @@ class AutoNumeric {
             AutoNumeric.options.negativeBracketsTypeOnBlur.brackets,
             AutoNumeric.options.negativeBracketsTypeOnBlur.chevrons,
             AutoNumeric.options.negativeBracketsTypeOnBlur.curlyBraces,
-            //TODO Add the following brackets :
-            // '〈,〉'
-            // '｢,｣'
-            // '⸤,⸥'
-            // '⟦,⟧'
-            // '‹,›'
-            // '«,»'
+            AutoNumeric.options.negativeBracketsTypeOnBlur.angleBrackets,
+            AutoNumeric.options.negativeBracketsTypeOnBlur.japaneseQuotationMarks,
+            AutoNumeric.options.negativeBracketsTypeOnBlur.halfBrackets,
+            AutoNumeric.options.negativeBracketsTypeOnBlur.whiteSquareBrackets,
+            AutoNumeric.options.negativeBracketsTypeOnBlur.quotationMarks,
+            AutoNumeric.options.negativeBracketsTypeOnBlur.guillemets,
         ])) {
-            AutoNumericHelper.throwError(`The brackets for negative values option 'negativeBracketsTypeOnBlur' is invalid ; it should either be '(,)', '[,]', '<,>' or '{,}', [${options.negativeBracketsTypeOnBlur}] given.`);
+            AutoNumericHelper.throwError(`The brackets for negative values option 'negativeBracketsTypeOnBlur' is invalid ; it should either be '(,)', '[,]', '<,>', '{,}', '〈,〉', '｢,｣', '⸤,⸥', '⟦,⟧', '‹,›' or '«,»', [${options.negativeBracketsTypeOnBlur}] given.`);
         }
 
         if (!AutoNumericHelper.isInArray(options.emptyInputBehavior, [
@@ -7187,12 +7186,18 @@ AutoNumeric.options = {
      * Those brackets are visible only when the field does NOT have the focus.
      * The left and right symbols should be enclosed in quotes and separated by a comma.
      */
-    negativeBracketsTypeOnBlur   : {
-        parentheses: '(,)',
-        brackets   : '[,]',
-        chevrons   : '<,>',
-        curlyBraces: '{,}',
-        none       : null, // This is the default value, which deactivate this feature
+    negativeBracketsTypeOnBlur: {
+        parentheses           : '(,)',
+        brackets              : '[,]',
+        chevrons              : '<,>',
+        curlyBraces           : '{,}',
+        angleBrackets         : '〈,〉',
+        japaneseQuotationMarks: '｢,｣',
+        halfBrackets          : '⸤,⸥',
+        whiteSquareBrackets   : '⟦,⟧',
+        quotationMarks        : '‹,›',
+        guillemets            : '«,»',
+        none                  : null, // This is the default value, which deactivate this feature
     },
 
     /* Placement of the negative/positive sign relative to the `currencySymbol` option.

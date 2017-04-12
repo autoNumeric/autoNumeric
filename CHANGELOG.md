@@ -1,6 +1,7 @@
 ## Changelog for autoNumeric
 
 ### 4.0.0-beta.14
++ Add more bracket types to the `negativeBracketsTypeOnBlur` option ('〈,〉', '｢,｣', '⸤,⸥', '⟦,⟧', '‹,›' and '«,»')
 + Reformat the changelog, fix some typos
 
 ### 4.0.0-beta.13

@@ -2091,6 +2091,52 @@ describe('autoNumeric options and `options.*` methods', () => {
         });
     });
 
+    describe('`negativeBracketsTypeOnBlur` option', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.nuke();
+        });
+
+        it('should show brackets on negative numbers', () => {
+            aNInput = new AutoNumeric(newInput, { negativeBracketsTypeOnBlur: AutoNumeric.options.negativeBracketsTypeOnBlur.angleBrackets });
+            aNInput.french();
+            aNInput.set(2500.01);
+            expect(aNInput.getFormatted()).toEqual('2.500,01\u202f€');
+            aNInput.set(-2500.01);
+            expect(aNInput.getFormatted()).toEqual('〈2.500,01\u202f€〉');
+
+            // Update the option
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
+            expect(aNInput.getFormatted()).toEqual('(2.500,01\u202f€)');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.brackets);
+            expect(aNInput.getFormatted()).toEqual('[2.500,01\u202f€]');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.chevrons);
+            expect(aNInput.getFormatted()).toEqual('<2.500,01\u202f€>');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.curlyBraces);
+            expect(aNInput.getFormatted()).toEqual('{2.500,01\u202f€}');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.japaneseQuotationMarks);
+            expect(aNInput.getFormatted()).toEqual('｢2.500,01\u202f€｣');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.halfBrackets);
+            expect(aNInput.getFormatted()).toEqual('⸤2.500,01\u202f€⸥');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.whiteSquareBrackets);
+            expect(aNInput.getFormatted()).toEqual('⟦2.500,01\u202f€⟧');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.quotationMarks);
+            expect(aNInput.getFormatted()).toEqual('‹2.500,01\u202f€›');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.guillemets);
+            expect(aNInput.getFormatted()).toEqual('«2.500,01\u202f€»');
+
+            aNInput.set(1234.70);
+            expect(aNInput.getFormatted()).toEqual('1.234,70\u202f€');
+        });
+    });
+
     //TODO Complete the tests in order to test every single option separately:
     /*
      decimalCharacterAlternative -> cf. end-to-end tests
@@ -2101,7 +2147,6 @@ describe('autoNumeric options and `options.*` methods', () => {
      historySize
      isCancellable
      modifyValueOnWheel
-     negativeBracketsTypeOnBlur
      noEventListeners
      noSeparatorOnFocus
      onInvalidPaste
@@ -5320,6 +5365,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '[,]' })).not.toThrow();
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '<,>' })).not.toThrow();
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '{,}' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '〈,〉' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '｢,｣' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '⸤,⸥' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '⟦,⟧' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '‹,›' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '«,»' })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 'focus' })).not.toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 'press' })).not.toThrow();

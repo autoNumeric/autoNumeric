@@ -3969,8 +3969,8 @@ class AutoNumeric {
         }
 
         // Add back the negative/positive sign and the currency symbol, at the right positions
-        inputValue = AutoNumeric._mergeCurrencySignNegativePositiveSignAndValue(inputValue, settings, isValueNegative, isZeroOrHasNoValue); //TODO this function is called again in `_toggleNegativeBracket` ; let's DRY this
-
+        inputValue = AutoNumeric._mergeCurrencySignNegativePositiveSignAndValue(inputValue, settings, isValueNegative, isZeroOrHasNoValue); //TODO this function is called again in `_toggleNegativeBracket` if the brackets are removed; let's DRY this
+        
         if (AutoNumericHelper.isNull(rawValue)) {
             // If the raw value is not forced, use the default one from the settings object
             rawValue = settings.rawValue;
@@ -4103,60 +4103,16 @@ class AutoNumeric {
             settings.roundingMethod === AutoNumeric.options.roundingMethod.toNearest05Alt ||
             settings.roundingMethod === AutoNumeric.options.roundingMethod.upToNext05 ||
             settings.roundingMethod === AutoNumeric.options.roundingMethod.downToNext05) {
-            switch (settings.roundingMethod) {
-                case AutoNumeric.options.roundingMethod.toNearest05:
-                case AutoNumeric.options.roundingMethod.toNearest05Alt:
-                    inputValue = (Math.round(inputValue * 20) / 20).toString();
-                    break;
-                case AutoNumeric.options.roundingMethod.upToNext05:
-                    inputValue = (Math.ceil(inputValue * 20) / 20).toString();
-                    break;
-                default :
-                    inputValue = (Math.floor(inputValue * 20) / 20).toString();
-            }
-
-            let result;
-            if (!AutoNumericHelper.contains(inputValue, '.')) {
-                result = inputValue + '.00';
-            } else if (inputValue.length - inputValue.indexOf('.') < 3) {
-                result = inputValue + '0';
-            } else {
-                result = inputValue;
-            }
-
-            return result;
+            return this._roundCloseTo05(inputValue, settings);
         }
 
-        // Checks if `inputValue` is a negative value
-        let negativeSign = '';
-        if (AutoNumericHelper.isNegativeStrict(inputValue)) {
-            negativeSign = '-';
-
-            // Removes the negative sign that will be added back later if required
-            inputValue = inputValue.replace('-', '');
-        }
-
-        // Append a zero if the first character is not a digit (then it is likely to be a dot)
-        if (!inputValue.match(/^\d/)) {
-            inputValue = '0' + inputValue;
-        }
-
-        // Determines if the value is equal to zero. If it is, remove the negative sign
-        if (Number(inputValue) === 0) {
-            negativeSign = '';
-        }
-
-        // Trims leading zero's as needed
-        if ((Number(inputValue) > 0 && settings.leadingZero !== AutoNumeric.options.leadingZero.keep) ||
-            (inputValue.length > 0 && settings.leadingZero === AutoNumeric.options.leadingZero.allow)) {
-            inputValue = inputValue.replace(/^0*(\d)/, '$1');
-        }
+        const [negativeSign, preparedValue] = AutoNumeric._prepareValueForRounding(inputValue, settings);
+        inputValue = preparedValue;
 
         const decimalCharacterPosition = inputValue.lastIndexOf('.');
         const inputValueHasADot = decimalCharacterPosition === -1;
         const [, decimalPart] = inputValue.split('.'); // Here the decimal character is always a period '.'
         const hasDecimals = decimalPart > 0;
-
         if (!hasDecimals &&
             (settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.never ||
             settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.floats)) {
@@ -4209,21 +4165,16 @@ class AutoNumeric {
             roundedStrLength = settings.decimalPlacesOverride + decimalCharacterPosition;
         }
 
-        const tRound = Number(inputValue.charAt(roundedStrLength + 1));
-        const odd = (inputValue.charAt(roundedStrLength) === '.') ? (inputValue.charAt(roundedStrLength - 1) % 2) : (inputValue.charAt(roundedStrLength) % 2);
+        const lastDigit = Number(inputValue.charAt(roundedStrLength + 1));
         let inputValueArray = inputValue.substring(0, roundedStrLength + 1).split('');
+        let odd;
+        if (inputValue.charAt(roundedStrLength) === '.') {
+            odd = inputValue.charAt(roundedStrLength - 1) % 2;
+        } else {
+            odd = inputValue.charAt(roundedStrLength) % 2;
+        }
 
-        if ((tRound > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpSymmetric)                                         || // Round half up symmetric
-            (tRound > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpAsymmetric && negativeSign === '')                 || // Round half up asymmetric positive values
-            (tRound > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpAsymmetric && negativeSign === '-')                || // Round half up asymmetric negative values
-            (tRound > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfDownSymmetric)                                       || // Round half down symmetric
-            (tRound > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfDownAsymmetric && negativeSign === '')               || // Round half down asymmetric positive values
-            (tRound > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfDownAsymmetric && negativeSign === '-')              || // Round half down asymmetric negative values
-            (tRound > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfEvenBankersRounding)                                 ||
-            (tRound === 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfEvenBankersRounding && odd === 1)                  ||
-            (tRound > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.toCeilingTowardPositiveInfinity && negativeSign === '')  ||
-            (tRound > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.toFloorTowardNegativeInfinity && negativeSign === '-')   ||
-            (tRound > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.upRoundAwayFromZero)) {                                     // Round up away from zero
+        if (this._shouldRoundUp(lastDigit, settings, negativeSign, odd)) {
             // Round up the last digit if required, and continue until no more 9's are found
             for (let i = (inputValueArray.length - 1); i >= 0; i -= 1) {
                 if (inputValueArray[i] !== '.') {
@@ -4246,6 +4197,101 @@ class AutoNumeric {
         inputValueRounded = this._truncateZeros(inputValueArray.join(''), temporaryDecimalPlacesOverride);
 
         return (Number(inputValueRounded) === 0) ? inputValueRounded : negativeSign + inputValueRounded;
+    }
+
+    /**
+     * Round the `value` when the rounding method deals with '.05'
+     *
+     * @param {string} value
+     * @param {object} settings
+     * @returns {string}
+     * @private
+     */
+    static _roundCloseTo05(value, settings) {
+        switch (settings.roundingMethod) {
+            case AutoNumeric.options.roundingMethod.toNearest05:
+            case AutoNumeric.options.roundingMethod.toNearest05Alt:
+                value = (Math.round(value * 20) / 20).toString();
+                break;
+            case AutoNumeric.options.roundingMethod.upToNext05:
+                value = (Math.ceil(value * 20) / 20).toString();
+                break;
+            default :
+                value = (Math.floor(value * 20) / 20).toString();
+        }
+
+        let result;
+        if (!AutoNumericHelper.contains(value, '.')) {
+            result = value + '.00';
+        } else if (value.length - value.indexOf('.') < 3) {
+            result = value + '0';
+        } else {
+            result = value;
+        }
+
+        return result;
+    }
+
+    /**
+     * Modify the given `value` in order to make it usable for the rest of the rounding function.
+     * This convert the `value` to a positive one, trim any leading zeros and make sure it does not starts with a leading dot.
+     *
+     * @param {string} value
+     * @param {object} settings
+     * @returns {[string, string]}
+     * @private
+     */
+    static _prepareValueForRounding(value, settings) {
+        // Checks if `inputValue` is a negative value
+        let negativeSign = '';
+        if (AutoNumericHelper.isNegativeStrict(value)) {
+            negativeSign = '-';
+
+            // Removes the negative sign that will be added back later if required
+            value = value.replace('-', '');
+        }
+
+        // Append a zero if the first character is not a digit (then it is likely a dot)
+        if (!value.match(/^\d/)) {
+            value = '0' + value;
+        }
+
+        // Determines if the value is equal to zero. If it is, remove the negative sign
+        if (Number(value) === 0) {
+            negativeSign = '';
+        }
+
+        // Trims leading zero's as needed
+        if ((Number(value) > 0 && settings.leadingZero !== AutoNumeric.options.leadingZero.keep) ||
+            (value.length > 0 && settings.leadingZero === AutoNumeric.options.leadingZero.allow)) {
+            value = value.replace(/^0*(\d)/, '$1');
+        }
+
+        return [negativeSign, value];
+    }
+
+    /**
+     * Return `true` if a round up should be done given the last digit, the settings and other information about the value.
+     * 
+     * @param {number} lastDigit
+     * @param {object} settings
+     * @param {string} negativeSign
+     * @param {number} odd
+     * @returns {boolean}
+     * @private
+     */
+    static _shouldRoundUp(lastDigit, settings, negativeSign, odd) {
+        return (lastDigit > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpSymmetric)                                     || // Round half up symmetric
+            (lastDigit > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpAsymmetric && negativeSign === '')                || // Round half up asymmetric positive values
+            (lastDigit > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpAsymmetric && negativeSign === '-')               || // Round half up asymmetric negative values
+            (lastDigit > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfDownSymmetric)                                      || // Round half down symmetric
+            (lastDigit > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfDownAsymmetric && negativeSign === '')              || // Round half down asymmetric positive values
+            (lastDigit > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfDownAsymmetric && negativeSign === '-')             || // Round half down asymmetric negative values
+            (lastDigit > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfEvenBankersRounding)                                ||
+            (lastDigit === 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfEvenBankersRounding && odd === 1)                 ||
+            (lastDigit > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.toCeilingTowardPositiveInfinity && negativeSign === '') ||
+            (lastDigit > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.toFloorTowardNegativeInfinity && negativeSign === '-')  ||
+            (lastDigit > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.upRoundAwayFromZero);                                      // Round up away from zero
     }
 
     /**

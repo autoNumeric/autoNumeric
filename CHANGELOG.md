@@ -1,15 +1,18 @@
-### Change log for autoNumeric:
+## Changelog for autoNumeric
 
-### "4.0.0-beta.13"
+### 4.0.0-beta.14
++ Reformat the changelog, fix some typos
+
+### 4.0.0-beta.13
 + Modify `init()` so that it allows the user to also pass an array of DOM elements, or a CSS selector as its first argument (cf. issue #388 comments)
 
-### "4.0.0-beta.12"
+### 4.0.0-beta.12
 + Fix issue #434 Using `noSeparatorOnFocus` set to `noSeparator` should not remove the decimal character on focus
 
-### "4.0.0-beta.11"
+### 4.0.0-beta.11
 + Merge the Android support from `2.0.12` into `4.0.0-beta.*`
 
-### "2.0.12"
+### 2.0.12
 + Add Android Chrome mobile (version 57) support (note: so far, not all android browsers are supported)
 + Fix issue #404 On the Android browser, inserted numbers are doubled if the user press the keys quickly on the virtual keyboard
 + Fix issue #250 The `maximumValue` and `minimumValue` options are not taken into account on Android
@@ -17,7 +20,7 @@
 + Fix the `onPaste` handler throwing an error for uninitialized variables
 + Complete the `arabicToLatinNumbers()` function to return more quickly if no arabic numbers are found
 
-### "4.0.0-beta.10"
+### 4.0.0-beta.10
 + Reorganize the existing unit tests and add more to extend the coverage
 + Add a new `setValue()` method that allow the user to set any values, without any controls from AutoNumeric.
 + Replace all the calls to `setElementValue` then `_setRawValue` with either `setValue()` or `_setElementAndRawValue()`, so that this call order is respected.
@@ -26,23 +29,23 @@
 + Fix `selectDecimal()` so that the decimals are correctly selected when `decimalPlacesShownOnFocus` is used.
 + Add a thin unbreakable space`\u202f` in front of `%` in the predefined options `percentageEU*` (as per the [typographic rules](https://fr.wikipedia.org/wiki/Pourcentage#Notation)).
 
-### "4.0.0-beta.9"
+### 4.0.0-beta.9
 + Fix issue #425 The `minimumValue` and `maximumValue` options are not respected when `emptyInputBehavior` is set to `'zero'`
 
-### "2.0.11"
+### 2.0.11
 + Fix issue #248 Create the `autoNumeric` organization, and move the repository to it
 
-### "4.0.0-beta.8"
+### 4.0.0-beta.8
 + Fix issue #248 Create the `autoNumeric` organization, and move the repository to it
 
-### "4.0.0-beta.7"
+### 4.0.0-beta.7
 + Fix issue #427 `autoUnformat()` converts `digitGroupSeparator` set to `.` as the decimal character
 + Modify `AutoNumeric.unformat()` so that 'real' javascript number are always directly returned, without taking into account the options passed (as it was supposed to do previously).
 + Correctly take into account the number of decimal places, the negative brackets, rounding and the suffix text options when unformatting with `AutoNumeric.unformat()`.
 + Complete the `AutoNumeric.unformat()` unit tests.
 + Modify `_removeBrackets()` so that we can only remove the brackets, without reordering the negative sign, currency symbol and value according to the settings.
 
-### "4.0.0-beta.6"
+### 4.0.0-beta.6
 + Fix issue #414 Changing the value of an element from negative to positive is not possible for some specific configuration of brackets, for the second time.
 + Remove the need to keep an ambiguous `settings.trailingNegative` variable, that was used for other things that its names suggests.
 + Extract the `_isTrailingNegative` test to its own function.
@@ -62,17 +65,17 @@
 + Add cases to the helper function `isNegative()` to make it more efficient.
 + Add a new `isNegativeWithBrackets()` helper function that tests if the given value is a negative with brackets.
 
-### "4.0.0-beta.5"
+### 4.0.0-beta.5
 + Fix issue #416 Add support for changing the element style based on rules
 + Add the `styleRules` option that allows to modify the element style based on the raw value, but also to call any callbacks whenever this raw value change
 + Reorganize the `set()` function so that the formatted value is set before setting the `rawValue`. That way if a callback invoked by a `styleRules` modify the raw value, it'll be set correctly, since the previous `set()` call would have already changed the element value via `setElementValue()`.
 
-### "4.0.0-beta.4"
+### 4.0.0-beta.4
 + Fix issue #409 Do not add decimal padding when a number without decimals has been inserted
 + Fix an issue when you have `allowDecimalPadding` set to `never`, then if you delete the decimal places leaving the decimal character, it would not drop that dangling decimal character on focus out.
 + Fix issue #418 Complete the documentation with the AutoNumeric event lifecycle
 
-### "4.0.0-beta.3"
+### 4.0.0-beta.3
 + Fix issue #415 Support undo and redo actions
 + Add a new `historySize` option that allows to set how many undo states each AutoNumeric object should keep in memory.
 + Always use the `_setRawValue()` function to set the `rawValue` ; directly setting `this.settings.rawValue = 'foo'` is not allowed anymore.
@@ -86,10 +89,10 @@
 + Sort the option list in the `_convertOldOptionsToNewOnes()` function.
 + Fix issue #423 `leadingZero` set to `keep` does not keep the leading zeros under Chrome
 
-### "4.0.0-beta.2"
+### 4.0.0-beta.2
 + Fix issue #413 Manage the drag 'n drop event so that the text dropped in the AutoNumeric element gets formatted accordingly
 
-### "4.0.0-beta.1"
+### 4.0.0-beta.1
 + Up the current `next` version to `v4` instead of `v3`, just because.
 + Add unit tests for the new `options.*` methods
 + Fix the issue where having `emptyInputBehavior` equal to `always` would not reformat the AutoNumeric element correctly if its value is set to the empty string `''`. 
@@ -98,7 +101,7 @@
 + Simplify the `_mergeCurrencySignNegativePositiveSignAndValue()` function.
 + Add function chaining to the `options.*` methods.
 
-### "3.0.0-beta.14"
+### 3.0.0-beta.14
 + Add unit tests for the new `global.*` features
 + Fix issue #412 Using `set('')` does not respect the `emptyInputBehavior` option when it's set to `'always'`
 + Add a `createLocalList` option which allow to control whether a local list of AutoNumeric objects should be saved on initializations.
@@ -116,16 +119,16 @@
 + Add a `_hasLocalList()` method that tests if the AutoNumeric element has a local list and that it has at least one element in it (itself usually).
 
 
-### "3.0.0-beta.13"
+### 3.0.0-beta.13
 + Fix issue #411 Add the pre-defined Brazilian language configuration
 
-### "3.0.0-beta.12"
+### 3.0.0-beta.12
 + Refactor the hard-coded option values with the `AutoNumeric.options` object attribute values
 
-### "3.0.0-beta.11"
+### 3.0.0-beta.11
 + Fix issue #320 Use `event.key` instead of `event.keyCode` and `event.which` since those two attributes are deprecated
 
-### "3.0.0-beta.10"
+### 3.0.0-beta.10
 + Add lots of pre-defined options.
 + Those options are `dotDecimalCharCommaSeparator`, `commaDecimalCharDotSeparator`, `integer`, `integerPos`, `integerNeg`, `float`, `floatPos`, `floatNeg`, `numeric`, `numericPos`, `numericNeg`, `euro`, `euroPos`, `euroNeg`, `euroSpace`, `euroSpacePos`, `euroSpaceNeg`, `percentageEU2dec`, `percentageEU2decPos`, `percentageEU2decNeg`, `percentageEU3dec`, `percentageEU3decPos`, `percentageEU3decNeg`, `dollar`, `dollarPos`, `dollarNeg`, `percentageUS2dec`, `percentageUS2decPos`, `percentageUS2decNeg`, `percentageUS3dec`, `percentageUS3decPos` and `percentageUS3decNeg`.
 + Add the unit tests for those pre-defined options.
@@ -145,7 +148,7 @@
 + Update the end-to-end tests that test the element value selection on focus, to reflect the change to the default value for `selectNumberOnly`.
 + Update the unit tests to correct the rounding on some values that used the previous default one defined in `AutoNumeric.languageOptions.French`.
   
-### "3.0.0-beta.9"
+### 3.0.0-beta.9
 + Fix and removes some TODOs and FIXMEs
 + Remove some debug messages.
 + Remove the need to initialize the `savedCancellableValue` variable when unneeded.
@@ -158,27 +161,27 @@
 + Move away from the `this.settings` object the following variables : `caretFix`, `throwInput`, `tagList`, `originalDecimalPlacesOverride`, `originalAllowDecimalPadding`, `originalNegativeBracketsTypeOnBlur`, `originalDigitGroupSeparator`, `originalCurrencySymbol`, `originalSuffixText` and `aNegRegAutoStrip`.
 + Refactor some tests in `_formatValue()`.
 
-### "3.0.0-beta.8"
+### 3.0.0-beta.8
 + Fix issue #408 Allow brackets and parenthesis to be added for negative numbers on any combination of `currencySymbolPlacement` and `negativePositiveSignPlacement` values
 
-### "3.0.0-beta.7"
+### 3.0.0-beta.7
 + Rename autoNumeric.js to AutoNumeric.js (since it's now a module)
 
-### "3.0.0-beta.6"
+### 3.0.0-beta.6
 + Finish merging the fixes for #403 and #401 into v3, and fix the introduced bugs
 + Make sure that if an element is focused, and a `mouseleave` event is captured, we do not unformat the element value (with the scale options).
 + Make sure if the element value is empty, that the scaleDivisor option do not convert it to `'0.00'` on `mouseenter`.
 + Remove a ternary operator which lead to a variable overwriting itself.
 + Fix the end-to-end tests which test the percentage with the scale options.
 
-### "2.0.9"
+### 2.0.9
 + Fix issue #401 autoNumeric 2.0.8 prevents IE11 from entering the decimal character from the numpad
 + Fix issue #403 autoNumeric 2.0.8 scaling option when the divisor is less than zero and the input receives focus multiple times
 
-### "3.0.0-beta.5"
+### 3.0.0-beta.5
 + Fix issue #395 Allow to show the unformatted value when hovering over the element and pressing `Alt`
 
-### "3.0.0-beta.4"
+### 3.0.0-beta.4
 + Fix issue #396 Allow autoNumeric to manage user inputs in `contentEditable`-enabled elements
 + Simplify the `_formatDefaultValueOnPageLoad()` method signature.
 + Simplify how the `update()` function retrieve the current raw value and one of its test.
@@ -186,7 +189,7 @@
 + Rewrite the `getElementSelection()` and `setElementSelection()` functions in order to manage non-input DOM elements.
 + Strengthen `getElementValue()` when managing non-input DOM elements.
 
-### "3.0.0-beta.3"
+### 3.0.0-beta.3
 + Fix issue #399 Fully convert autoNumeric to an ES6 module
 + Fix issue #398 Finish removing all jQuery dependencies
 + Fix issue #244 \[Feature request] Remove the jQuery dependency
@@ -307,12 +310,12 @@
 + Add unit tests to check the `.form*` methods.
 + Add the `babel-plugin-transform-object-assign` dev dependency in order to be able to use `Object.assign()` in the ES6 source.
 
-### "3.0.0-beta.2"
+### 3.0.0-beta.2
 + Fix issue #393 Add an option `modifyValueOnWheel` that allow the user to use mouse wheel to increment/decrement the element value
 + The related `wheelStep` option allows to either define a *fixed* step (ie. `1000`), or a *progressive* one calculated based on the current element value
 + Fix issue #397 Create enumerations for every options that allows only a set of values
 
-### "3.0.0-beta.1"
+### 3.0.0-beta.1
 + Fix issue #387 Add a 'cancellable' feature
 + It's now possible to select the whole input by hitting the `Escape` key (if no changes have been made to the element value, otherwise this will cancel those changes if the `isCancellable` is set to `true`)
 + Fix issue #391 The currency symbol is selected when focusing on an input via the `Tab` key, when `selectNumberOnly` is set to `true`
@@ -322,66 +325,66 @@
 + Modify the `setElementSelection()` calls to simplify them with the ability to use one argument instead of two when the `start` and `end` position are the same.
 + Add a feature where when the user hit 'Escape', the element content is selected (cf. issue #387).
 
-### "2.0.8"
+### 2.0.8
 + Fix issue #389 autoNumeric 2.0.7 npm packages causes build error with typescriptify + browserify
 
-### "2.0.5", "2.0.6" & "2.0.7"
+### 2.0.5", "2.0.6" & "2.0.7
 + Fix issue #384 `npm install` for version 2.0.4 does not work on Windows machines
 
-### "2.0.2", "2.0.3" & "2.0.4"
+### 2.0.2", "2.0.3" & "2.0.4
 + Fix issue #377 The `dist` files in the last publish to npmjs were not rebuilt with the fixes pushed to 2.0.1
 + Fix issue #373 The `dist` files are not included when publishing to npmjs
 + Fix issue #371 The currency symbol is not removed on blur with the default `emptyInputBehavior` value `focus`
 + Fix issue #367 The package.json "postinstall" task does not find the target file when not using the dev dependencies
 
-### "2.0.1"
+### 2.0.1
 + Fix issue #373 The `dist` files are not included when publishing to npmjs
 
-### "2.0.0"
+### 2.0.0
 + Release autoNumeric version `2.0.0`, enjoy! (¬‿¬) :tada:
 + The old options names are being deprecated, and will be removed *soon* ; update your scripts with the [new ones](README.md#options)!
 + Please be sure to read the updated [readme](README.md) in order to know what else has changed. 
 
-### "2.0.0-beta.25"
+### 2.0.0-beta.25
 + Fix issue #310 Setup Webdriver.io for end-to-end (e2e) testing
 
-### "2.0.0-beta.24"
+### 2.0.0-beta.24
 + Fix issue #326 Pasting a single decimal character into an input that has none does not work
 + Fix issue #322 Pasting a string containing a comma set the caret position at the wrong position
 
-### "2.0.0-beta.23"
+### 2.0.0-beta.23
 + Fix issue #354 Setup automated coverage tests (with Coveralls)
 
-### "2.0.0-beta.22"
+### 2.0.0-beta.22
 + Fix issue #345 Setup continuous integration testing (with Travis CI)
 
-### "2.0.0-beta.21"
+### 2.0.0-beta.21
 + Fix issue #346 Add a `showPositiveSign` option to display the positive sign wherever needed
 
-### "2.0.0-beta.20"
+### 2.0.0-beta.20
 + Fix issue #341 Add some default options in the `languageOption` object
 + Fix issue #328 Switch from `npm` to `yarn`
 
-### "2.0.0-beta.19"
+### 2.0.0-beta.19
 + Allow using `set` with Arabic and Persian numbers (ie. `aNInput.autoNumeric('set', '١٠٢٣٤٥٦٧.٨٩');`)
 + Allow using Arabic and Persian numbers (used in Arabic languages) in the html `value` attribute
 + Allow pasting Arabic and Persian numbers (that will get converted to latin numbers on the fly)
 
-### "2.0.0-beta.18"
+### 2.0.0-beta.18
 + Fix issue #330 The `negativePositiveSignPlacement` option can be ignored in some cases
 + Fix issue #339 `get` returns `'0'` when the input is empty even if `emptyInputBehavior` is not equal to `'zero'`
 
-### "2.0.0-beta.17"
+### 2.0.0-beta.17
 + Fix issue #317 Jump over the decimal character when trying to enter a number and the integer part limit has already been attained
 + Fix issue #319 'get' returns wrong value when the value has a trailing negative sign
 + Fix issue #327 When focusing on an input via the `Tab` key, the value is not always selected 
 
-### "2.0.0-beta.16"
+### 2.0.0-beta.16
 + Fix issue #321 Allows more international decimal characters and grouping separators :
  + Allowed grouping separator : `','`, `'.'`, `'٬'`, `'˙'`, `"'"`, `' '`, `'\u2009'`, `'\u202f'`, `'\u00a0'` and `''`
  + Allowed decimal characters : `'.'`, `','`, `'·'`, `'⎖'` and `'٫'`
 
-### "2.0.0-beta.15"
+### 2.0.0-beta.15
 + Fix FireFox on issue #306 that allows the caret to move right when all zero present in the decimals
 + Fix issue #318 `this.selection` can be uninitialized if you focus on an input via the `Tab` key.
 + Add the `keyName` object that list the key values as defined is the KeyboardEvent Key_Values.
@@ -396,10 +399,10 @@
 + Modify `_processCharacterInsertion()` so that it take the event as an argument, and therefore can directly use `e.key`.
 + Simplify `_formatValue()` tests.
 
-### "2.0.0-beta.14"
+### 2.0.0-beta.14
 + Fix issue #306 when { leadingZero: 'deny' } and proper caret placement
 
-### "2.0.0-beta.13"
+### 2.0.0-beta.13
 + Fix issue #228 Do not modify the current selection when trying to input an invalid character
 + Mass rename functions to gives them a more explicit name :
 
@@ -418,21 +421,21 @@
 | _signPosition()   | -> | _getSignPosition()                                       |
 | _formatQuick()    | -> | _formatValue()                                           |
 
-### "2.0.0-beta.12"
+### 2.0.0-beta.12
 + Modify the `validate()` function to show a warning when `decimalPlacesOverride` is greater than `decimalPlacesShownOnFocus`.
 + Implement feature request #183 that manage invalid results when trying to paste any number. This adds the `onInvalidPaste` option that can accept the `error`, `ignore`, `clamp`, `truncate` and `replace` value.
 + Rename `autoStrip()` to `stripAllNonNumberCharacters()`.
 + Upgrade the `setElementSelection()` function so that it can accept only one caret position.
 + Add a `failOnUnknownOption` option which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object.
 
-### "2.0.0-beta.11"
+### 2.0.0-beta.11
 + Fix typos and missing characters that prevented building the library.
 
-### "2.0.0-beta.10"
+### 2.0.0-beta.10
 + Fix issue #302 `leadingZero` option `deny` does not function correctly and deletes some of the zero to the right of the caret
 + Fix issue #303 When focusing on an input having `currencySymbolPlacement` set as `p` (prefix)
 
-### "2.0.0-beta.9"
+### 2.0.0-beta.9
 + Rename the old options name to more explicit ones :
 
 | Old name         |          | New name |
@@ -470,7 +473,7 @@
 + Update `README.md` accordingly
 + Complete the tests to make sure using old option names will output a warning about them being deprecated
 
-### "2.0.0-beta.8"
+### 2.0.0-beta.8
 + Fix issue #292 where native input and change events are not sent correctly.
 + Add a `isNumber()` helper function to test if a value is a number, or a string representing a number.
 + Add a `isInt()` helper function to test if a value is a 'real' integer.
@@ -517,18 +520,18 @@
 + Comment out the default Jasmine test in order to see a 100% success without any skipped tests.
 + Fix the `clean:build` npm script so that it does not try to remove an inexistant folder.
 
-### "2.0.0-beta.7"
+### 2.0.0-beta.7
 + Add "mouseenter" & "mouseleave" handlers to enable viewing the extended values for "eDec", "scaleDivisor" & "nSep" options.
 + Add third parameter to the "autoGet" call in "onFocusOutAndMouseLeave" function
 
-### "2.0.0-beta.6"
+### 2.0.0-beta.6
 + Rename the `localOutput` setting to `outputType`, and add an option 'number' that makes `getLocalized` always return a Number, instead of a string.
 + Modify the `get` function so that it always returns a valid Number or string representing a number that Javascript can interpret.
 + Add a `getLocalized` function that return the raw value of the input, but can also return the value localized with a decimal point and negative sign placement chosen by the user (basically, it replace the old `get` behavior if any user wants it back).
 + Modify the `pNeg` default value based on the `aSign` and `pSign` values. This leads to better user experience when setting a currency symbol without setting `pNeg`.
 + Errors are now always thrown. The `debug` option now only affects the warning messages (used for non-critical errors).
 
-### "2.0.0-beta.5"
+### 2.0.0-beta.5
 + Add a `validate()` method that checks if the given options object is valid.
 + Reorganize the `init` function code to check for critical error first, before doing other calculus.
 + Add a `areSettingsValid()` method that return true if the options object is valid.
@@ -536,24 +539,24 @@
 + Add a `warning()` method that output warning message to the console.
 + Rename `originalSettings` to `keepOriginalSettings` to better convey what this function is doing.
 
-### "2.0.0-beta.4"
+### 2.0.0-beta.4
 + Removed the index.html file
 + Additional mods/fixes to the scaling options
 + Additional mods/fixes to the "nSep" to also handle the "aSuffix"
 + Fixed the "mRound" default
 
-### "2.0.0-beta.3"
-+ fixed nSep option which removes the Currency symbom and thousand seperator on focusin
-+ changed the defaulys of scaleDivisor, scaleDecimal & scaleSymbol to null
+### 2.0.0-beta.3
++ fixed nSep option which removes the Currency symbol and thousand separator on focusin
++ changed the defaults for scaleDivisor, scaleDecimal & scaleSymbol to null
 
-### "2.0.0-beta.2"
-+ modified the scaling o[tiona and seperated the options
+### 2.0.0-beta.2
++ Modify the scaling options and separate them
 + aScale - removed
 + scaleDivisor added
 + scaleDecimal added
 + scaleSymbol added
 
-### Version 2.0.0-beta.0 released 2016-11-16
+### 2.0.0-beta.0 (released 2016-11-16)
 + Prepare the code base for future Jasmine tests
 + Add initial babel support
 + Add uglify and npm-build-process support
@@ -594,41 +597,41 @@
 + Merged a mod that makes the defaults public and overridable - Thanks Peter Boccia
 + Fixed page reload when the thousand separator is a period `.`
 
-### Version 1.9.46 released 2016-09-11
+### 1.9.46 (released 2016-09-11)
 + Fixed tab in key // thanks movalz issue #212
-+ Fixed the cusor position when tabbing in Chrome // thanks Dennis Smith issue #221
++ Fixed the cursor position when tabbing in Chrome // thanks Dennis Smith issue #221
 + Fixed the destroy method // thanks brunoporto & Mabusto issue #225
 + Fixed the readme file to show correct $.extend defaults // thanks  gayan85 issue #229 
 
-### Version 1.9.45 released 2016-06-13
+### 1.9.45 (released 2016-06-13)
 + Modified the "set" method to handle NaN
 
-### Version 1.9.44 released 2016-06-06
+### 1.9.44 (released 2016-06-06)
 + Fixed destroy method
 + Added Typings support - thanks bcherny 
 
-### Version 1.9.43 released 2015-12-19
+### 1.9.43 (released 2015-12-19)
 + UMD support
 
-### Version 1.9.42 released 2015-11-20
+### 1.9.42 (released 2015-11-20)
 + Fixed bug when pasting using  ctrl & v keys
 
-### Version 1.9.41 released 2015-11-2
+### 1.9.41 (released 2015-11-02)
 + Fixed bug that allowed two currency symbols - thanks Mic Biert
 
-### Version 1.9.40 released 2015-10-25
-+ Fixed bug when pasting value and the decimal seperator is a comma ","
+### 1.9.40 (released 2015-10-25)
++ Fixed bug when pasting value and the decimal separator is a comma ","
 + Modified the "destroy" method so that an error is not thrown if the "init" method has not been called previously
 
-### Version 1.9.39
+### 1.9.39
 + Fixed 'aForm'option.
 + Updated the readme file
 
-### Version 1.9.38
+### 1.9.38
 + Added / fixed option to address asp.Net WebForm postback.
 + please see the readme section on default settings & options 
 
-### Version 1.9.37
+### 1.9.37
 + Added / fixed support for asp.Net WebForm postback.
 + During postback the default value is re-rendered showing the updated value
 + Because autoNumeric cannot distinguish between a page re-load and asp.net form postback, the following HTML data attribute is REQUIRED (data-an-default="same value as the value attribute") to prevent errors on postback
@@ -637,159 +640,152 @@
 <input type="text" id="someID" value="1234.56" data-an-default="1234.56">
 ```
 
-### Version 1.9.36
+### 1.9.36
 + Rewrote the "getString" & "getArray" methods to index successful elements and inputs that are controlled by autoNumeric. This ensures the proper input index is used when replacing the formatted value.
 + Added support for FireFox for Mac meta key "keycode 224" - Thanks Ney Estrabelli
 
-### Version 1.9.35
+### 1.9.35
 + Revert 'set' back to version 1.9.34
 
-### Version 1.9.34
+### 1.9.34
 + Modified the 'set', 'getString' & 'getArray' methods
 + Modified the 'nBracket' function
 + General code clean up
 
-### Version 1.9.33
+### 1.9.33
 + Fixed bug in "ctrl + v" paste event introduced in 1.9.32
 
-### Version 1.9.32
+### 1.9.32
 + Fixed bug when the "update" method is called in the "onfocus" event
 + Fixed the "getString" & "getArray" methods when multiple inputs share the same name - Thanks Retromax
 + Fixed bug in "ctrl + v" paste event to properly round
 
-### Version 1.9.31
+### 1.9.31
 + never officially release
 
-### Version 1.9.30
+### 1.9.30
 + Fixed bug introduced 1.9.29 too interested in Ohio State vs. Oregon
 
-### Version 1.9.29
+### 1.9.29
 + Fixed bug introduced in 1.9.27
 
-### Version 1.9.28
+### 1.9.28
 + Fixed focusout event when the thousand separator is a period "." and only one is present "x.xxx" with not other alpha characters.
 
-### Version 1.9.27
-+ Merged a mod that makes the defaults public and over ridable - Thanks Peter Boccia
+### 1.9.27
++ Merged a mod that makes the defaults public and overridable - Thanks Peter Boccia
 + Fixed page reload when the thousand separator is a period "."
 
-### Version 1.9.26
+### 1.9.26
 + Fixed "getString" & "getArray" methods when multiple forms having some shared named inputs
 
-#### Version 1.9.25
+### 1.9.25
 + Fixed mRound option "round-half-even"
 + Modified the "set" method to not throw an error when trying to "set" a null value
 
-#### Version 1.9.24
+### 1.9.24
 + Changed the case on the supported elements
-+ This was required because jQuery.prop('tagName') returns upper-case on html5 pages and returns lower-case on xmhtl pages
++ This was required because jQuery.prop('tagName') returns upper-case on html5 pages and returns lower-case on xhtml pages
 
-#### Version 1.9.23
+### 1.9.23
 + Merged mod on the "getString" method
 
-#### Version 1.9.22
+### 1.9.22
 + Fixed a bug when a negative value uses brackets and currency sign on page reload thanks to Allen Dumaine
 + Additional mods to the "set" method.
 + Eliminated lastSetValue setting
 
-#### Version 1.9.21
+### 1.9.21
 + Mod to checkValue function to handle empty string - thanks to jedichenbin.
 + If CHF rounding is used decimal is automatically set to 2 places
 
-#### Version 1.9.20
+### 1.9.20
 + Fixed issue for very small numbers - thanks to jedichenbin.
 
-#### Version 1.9.18
+### 1.9.18
 + Added input type="tel" support.
 + Added support for Swiss currency rounding to the nearest ".00 or .05"
 + Fixed bug in Round-Half-Even "Bankers Rounding"
 
-#### Version 1.9.18
+### 1.9.18
 + Fixed formatting on page load for text elements.
 
-#### Version 1.9.17
+### 1.9.17
 + Fixed leading zero on page load when option lZero is set to 'keep'.
 
-#### Version 1.9.16
+### 1.9.16
 + Fixed the checkValue function when vary small numbers in scientific notation are passed via the set method.
 + Modified the rounding method so zero value is not returned with a negative sign
 
-#### Version 1.9.15
+### 1.9.15
 + Fixed bug introduced in version 1.9.14
 
-#### Version 1.9.14
+### 1.9.14
 + Added additional supported tags ('b', 'caption', 'cite', 'code', 'dd', 'del', 'div', 'dfn', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ins', 'kdb', 'label', 'li', 'output', 'p', 'q', 's', 'sample', 'span', 'strong', 'td', 'th', 'u', 'var')
 + Moved the routine that tests for supported tags
 + General code clean-up
 
-#### Version 1.9.13
+### 1.9.13
 + Fixed the "get" method when the input receives focus for a second time.
 
-#### Version 1.9.12
+### 1.9.12
 + Fixed brackets on page load when the decimal character is a comma.
 
-#### Version 1.9.11
+### 1.9.11
 + Another mod to the 'set' method.
 
-#### Version 1.9.10
+### 1.9.10
 + Fixed the 'set' method to handle page reload using the back button.
 
-#### Version 1.9.9
+### 1.9.9
 + Fixed how non-input tags default value is handled.  When the default is an empty string and aSign is not empty the return value is now and empty string.
 + Modified how default values are handled when the decimal character equals ',' comma. Your default value can now use either a a period '.' or comma ',' as the decimal separator
 + Modified the caret placement on focusin (tab in). If only the currency sign is visible the caret is placed in the proper location depending on the sign placement (prefix or suffix).
 
-#### Version 1.9.8
+### 1.9.8
 + Changed bind / unbind to on / off.
 + added lastSetValue to settings - this saves the unrounded value from the set method - $('selector').data('autoNumeric').lastSetValue; - helpful when you need to change the rounding accuracy
 
-#### Version 1.9.7
+### 1.9.7
 + Modified /fixed the format default values on page ready.
 + Fixed the caret position when jumping over the thousand separator with back arrow.
 
-#### Version 1.9.6
+### 1.9.6
 + Fixed bug introduced in 1.9.3 with shift key.
-+ additional modification to the processKeypress function that automatically inserts a negative sign when vMax less tham or equal to 0 and vMin is less tham vMax.
++ additional modification to the processKeypress function that automatically inserts a negative sign when vMax less than or equal to 0 and vMin is less than vMax.
 
-#### Version 1.9.5
+### 1.9.5
 + Modified processKeypress function to automatically insert a negative sign when vMax <=0 and vMin < 0.
 + Changed the getSting and getArray functions to use decodeURIComponent() instead of unescape() which is depreciated
 
-#### Version 1.9.4
+### 1.9.4
 + Merged issue #11 - Both getString and getArray were using escaped versions of the name from jQuery's serialization. So this change wraps the name finder with quotes and unescapes the name.Fixed a bug in autoCode that corrects the pasted values and page re-load - Thanks Cory.
 + Merged issue #12 - If a input is readonly during "init", autocomplete won't work if the input is enabled later. This commit should fix the Problem - Thanks Sven.
 
-#### Version 1.9.3
-
+### 1.9.3
 + Fixed a bug in autoCode function that corrects pasted values and page re-load
 + Added support for "shift" + "insert" paste key combination
 
-#### Version 1.9.2
-
+### 1.9.2
 + Modified the "checkValue" function - eliminated redundant code
 + Modified the "update" method include calling the "getHolder" function which updates the regular expressions
 + Modified the "getHolder function so the regular expressions are updated
 + Modified the "set" method to convert value from number to string
 
-#### Version 1.9.1
-
+### 1.9.1
 + Modified the checkValue function to handle values as text with the exception of values less than "0.000001 and greater than -1"
 
-#### Version 1.9.0
-
+### 1.9.0
 + Fixed a rounding error when the integers were 15 or more digits in length
 + Added "use strict";
 
-#### version 1.8.9
+### 1.8.9
++ Fixed the "get" and "set" methods by moving the settings.oEvent property to ensure the error message would be thrown if the element had not been initialized prior to calling the "get" and "set" methods
 
-+ Fixed the "get" and "set" methods by moving the settings.oEvent property to ensure the error message would be thrown if the element had not been inialized prior to calling the "get" and "set" methods
-
-#### Version 1.8.8
-
+### 1.8.8
 + Fixed the "init" when there is a default and value aForm=true and the aSep and aDec are not the defaults
 
-#### Version 1.8.7
-
+### 1.8.7
 + Fixed the "getSting" method - it use to returned an error when no values were entered
 + Modified the "init" method to better handle default and pre-existing values
 + Modified the "set" method - removed the routine that checked for values less than .000001 and greater than -1 and placed it in a separate function named checkValue()
@@ -797,40 +793,28 @@
     + Added a call to the checkValue() function - this corrects returned values example - when the input value was "12." the returned value was "12." - it now returns "12"
     + When no numeric character is entered the returned value is an empty string "".
 
-#### Version 1.8.6
-
-+ Removed the error message when calling the 'init' methods multiple times. This was done when using the class selector for the 'init' method and then dynamically adding input(s) it allows you to use the same selector to init autoNumeric. **Please note:** if the input is already been initialized no changes to the option will occur you still need to use the update method to change exisiting options.
+### 1.8.6
++ Removed the error message when calling the 'init' methods multiple times. This was done when using the class selector for the 'init' method and then dynamically adding input(s) it allows you to use the same selector to init autoNumeric. **Please note:** if the input is already been initialized no changes to the option will occur you still need to use the update method to change existing options.
 + Added support for brackets '[,]', parentheses '(,)', braces '{,}' and '<,>' to the nBracket setting. **Please note:** the following format nBracket: '(,)' that the left and right symbol used to represent negative numbers must be enclosed in quote marks and separated by a comma to function properly.
 
-#### Version 1.8.5
+### 1.8.5
++ Fixed readonly - this occurred when you toggle the readonly attribute
 
-+ Fixed readonly - this occured when you toggle the readonly attribute
-
-
-#### Version 1.8.4
-
+### 1.8.4
 + Fixed the getString and getArray methods under jQuery-1.9.1
 
-
-#### version on 1.8.3
-
+### 1.8.3
 + Added input[type=hidden] support - this was done mainly for backward compatibility.
 + The "get" method now returns a numeric string - this also was done for backward compatibility.
 
-
-#### Version 1.8.2
-
+### 1.8.2
 + Allowed dGroup settings to be passed as a numeric value or text representing a numeric value
-+ Allows input fields without type that defaults to type text - Thanks Mathieu DEMONT
++ Allows input fields without type that defaults to type text - Thanks Mathieu Demont
 
-
-#### Version 1.8.1
-
+### 1.8.1
 + Modified the 'get' method so when a field is blank and the setting wEmpty:'empty' a empty string('') is returned.
 
-
-#### Version 1.8.0
-
+### 1.8.0
 + autoNumeric() 1.8.0 is not compatible with earlier versions but I believe you will find version 1.8.0's new functionality and ease of use worth the effort to convert.
 + Changed autoNumeric structure to conform to jQuery's recommended plugin development.
 + Created a single namespace and added multiple methods.

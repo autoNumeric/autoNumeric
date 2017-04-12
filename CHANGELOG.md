@@ -6,6 +6,8 @@
 + Modify the static `unformat()` signature to allow multiple options objects to be passed as arguments.
   Each more option object overwrite the previous ones.
   This allows to correctly unformat currencies that have a predefined option as its base, but has been slightly modified (ie. `AutoNumeric.unformat('241800,02 €', AutoNumeric.getPredefinedOptions().French, { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator })`, and still get the right result).
++ Split the `_checkEmpty()` function into `_isElementValueEmptyOrOnlyTheNegativeSign()` and `_orderValueCurrencySymbolAndSuffixText()`. Both new functions only do one thing and one thing only, allowing the code to be rewrote in a clearer way.
++ Delete the `_checkEmpty()` function.
 
 ### 4.0.0-beta.13
 + Modify `init()` so that it allows the user to also pass an array of DOM elements, or a CSS selector as its first argument (cf. issue #388 comments)

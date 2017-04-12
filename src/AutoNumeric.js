@@ -3865,24 +3865,39 @@ class AutoNumeric {
     }
 
     /**
-     * Private function to check for empty value
-     * //TODO Modify this function so that it return either TRUE or FALSE if the value is empty. Then create another function to return the input value if it's not empty.
+     * Return `true` if the given value is empty or is equal to the negative sign character defined in the given settings.
      *
-     * @param {string} inputValue
+     * @param {string} value
+     * @param {object} settings
+     * @returns {boolean}
+     * @private
+     */
+    static _isElementValueEmptyOrOnlyTheNegativeSign(value, settings) {
+        return value === '' || value === settings.negativeSignCharacter;
+    }
+
+    /**
+     * Return the value with the currency symbol and the suffix text ordered according to the given settings.
+     *
+     * @param {string} value
      * @param {object} settings
      * @param {boolean} signOnEmpty
      * @returns {*}
+     * @private
      */
-    static _checkEmpty(inputValue, settings, signOnEmpty) {
-        if (inputValue === '' || inputValue === settings.negativeSignCharacter) {
-            if (settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.always || signOnEmpty) {
-                return (settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.left) ? inputValue + settings.currencySymbol + settings.suffixText : settings.currencySymbol + inputValue + settings.suffixText;
+    static _orderValueCurrencySymbolAndSuffixText(value, settings, signOnEmpty) {
+        let result;
+        if (settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.always || signOnEmpty) {
+            if (settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.left) {
+                result = value + settings.currencySymbol + settings.suffixText;
+            } else {
+                result = settings.currencySymbol + value + settings.suffixText;
             }
-
-            return inputValue;
+        } else {
+            result = value;
         }
 
-        return null;
+        return result;
     }
 
     /**
@@ -3900,16 +3915,15 @@ class AutoNumeric {
 
         inputValue = this._stripAllNonNumberCharacters(inputValue, settings, false, isFocused);
 
-        const empty = this._checkEmpty(inputValue, settings, true);
+        if (this._isElementValueEmptyOrOnlyTheNegativeSign(inputValue, settings)) {
+            return this._orderValueCurrencySymbolAndSuffixText(inputValue, settings, true);
+        }
+
         const isZeroOrHasNoValue = AutoNumericHelper.isZeroOrHasNoValue(inputValue);
 
         // Temporarily remove the negative sign if present
         if (isValueNegative) {
             inputValue = inputValue.replace('-', '');
-        }
-
-        if (!AutoNumericHelper.isNull(empty)) {
-            return empty;
         }
 
         settings.digitalGroupSpacing = settings.digitalGroupSpacing.toString();
@@ -4480,12 +4494,13 @@ class AutoNumeric {
             // In order to send a 'native' change event when blurring the input, we need to first store the initial input value on focus.
             this.valueOnFocus = AutoNumericHelper.getElementValue(e.target);
             this.lastVal = this.valueOnFocus;
-            const onEmpty = this.constructor._checkEmpty(this.valueOnFocus, this.settings, true);
-            if ((onEmpty !== null && onEmpty !== '') && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus) {
-                AutoNumericHelper.setElementValue(this.domElement, onEmpty);
+            const isEmptyValue = this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(this.valueOnFocus, this.settings);
+            const orderedValue = this.constructor._orderValueCurrencySymbolAndSuffixText(this.valueOnFocus, this.settings, true);
+            if ((isEmptyValue && orderedValue !== '') && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus) {
+                AutoNumericHelper.setElementValue(this.domElement, orderedValue);
 
                 // If there is a currency symbol and its on the right hand side, then we place the caret accordingly on the far left side
-                if (onEmpty === this.settings.currencySymbol && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
+                if (orderedValue === this.settings.currencySymbol && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
                     AutoNumericHelper.setElementSelection(e.target, 0);
                 }
             } else {
@@ -4892,7 +4907,7 @@ class AutoNumeric {
             let value = this.settings.rawValue;
             if (this.settings.rawValue !== '') {
                 const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(this.settings.rawValue, this.settings);
-                if (this.constructor._checkEmpty(this.settings.rawValue, this.settings, false) === null && minTest && maxTest) {
+                if (minTest && maxTest && !this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(this.settings.rawValue, this.settings)) {
                     value = this._modifyNegativeSignAndDecimalCharacterForRawValue(value);
                     this._setRawValue(this._trimLeadingAndTrailingZeros(value));
 
@@ -4921,8 +4936,8 @@ class AutoNumeric {
                 }
             }
 
-            let groupedValue = this.constructor._checkEmpty(value, this.settings, false);
-            if (groupedValue === null) {
+            let groupedValue = this.constructor._orderValueCurrencySymbolAndSuffixText(value, this.settings, false);
+            if (!this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(value, this.settings)) {
                 groupedValue = this.constructor._addGroupSeparators(value, this.settings, this.isFocused);
             }
 

@@ -187,7 +187,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | `maximumValue` | Maximum possible value | `'9999999999999.99'` |
 | `minimumValue` | Minimum possible value | `'-9999999999999.99'` |
 | `modifyValueOnWheel` | Determine if the element value can be incremented / decremented with the mouse wheel. The wheel behavior is modified with the `wheelStep` option. | `true` |
-| `negativeBracketsTypeOnBlur` | Adds brackets `[]`, parenthesis `()`, curly braces `{}` or `<>` on negative values when unfocused | `null` |
+| `negativeBracketsTypeOnBlur` | Adds brackets `[]`, parenthesis `()`, curly braces `{}`, chevrons `<>`, angle brackets `〈,〉`, Japanese quotation marks `｢,｣`, half brackets `⸤,⸥`, white square brackets `⟦,⟧`, quotation marks `‹,›` or guillemets `«,»` on negative values when unfocused | `null` |
 | `negativePositiveSignPlacement` | Placement of negative/positive sign relative to the currency symbol (possible options are `l` (left), `r` (right), `p` (prefix) and `s` (suffix)) | `null` |
 | `noEventListeners` | Defines if the element should have event listeners activated on it | `false` |
 | `noSeparatorOnFocus` | Remove the thousand separator, currency symbol and suffix on focus | `false` |

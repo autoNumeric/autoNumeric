@@ -64,6 +64,54 @@ With that said, autoNumeric supports most international numeric formats and curr
 
 ****
 
+## Table of contents
+- [Getting started](#getting-started)
+  - [Installation](#installation)
+  - [How to use?](#how-to-use)
+    - [In the browser](#in-the-browser)
+    - [In another script](#in-another-script)
+  - [On which elements can it be used?](#on-which-elements-can-it-be-used)
+    - [On `<input>` elements](#on-input-elements)
+    - [On `contenteditable`-enabled elements](#on-contenteditable-enabled-elements)
+    - [On other DOM elements](#on-other-dom-elements)
+- [Initialization](#initialization)
+  - [Initialize one AutoNumeric object](#initialize-one-autonumeric-object)
+  - [Initialize multiple AutoNumeric objects at once](#initialize-multiple-autonumeric-objects-at-once)
+- [Options](#options)
+  - [Predefined options](#predefined-options)
+    - [Predefined language options](#predefined-language-options)
+    - [Predefined common options](#predefined-common-options)
+    - [Predefined style rules](#predefined-style-rules)
+      - [Positive and negative](#positive-and-negative)
+      - [Range from 0 to 100, in 4 steps](#range-from-0-to-100-in-4-steps)
+      - [Odd and even](#odd-and-even)
+      - [Small range around zero, from -1 to 1](#small-range-around-zero-from--1-to-1)
+      - [Custom callbacks](#custom-callbacks)
+  - [Special options](#special-options)
+    - [noEventListeners](#noeventlisteners)
+    - [readOnly](#readonly)
+  - [Options update](#options-update)
+- [Methods](#methods)
+  - [Instantiated methods](#instantiated-methods)
+    - [Set, get, format, unformat and other usual AutoNumeric functions](#set-get-format-unformat-and-other-usual-autonumeric-functions)
+    - [Un-initialize the AutoNumeric element](#un-initialize-the-autonumeric-element)
+    - [Node manipulation](#node-manipulation)
+    - [Format and unformat other numbers or DOM elements with an existing AutoNumeric element](#format-and-unformat-other-numbers-or-dom-elements-with-an-existing-autonumeric-element)
+    - [Initialize other DOM Elements](#initialize-other-dom-elements)
+    - [Perform actions globally on a shared list of AutoNumeric elements](#perform-actions-globally-on-a-shared-list-of-autonumeric-elements)
+    - [Form functions](#form-functions)
+    - [Function chaining](#function-chaining)
+  - [Static methods](#static-methods)
+- [Event lifecycle](#event-lifecycle)
+- [Questions](#questions)
+- [How to contribute?](#how-to-contribute)
+- [Dependencies](#dependencies)
+- [Older versions](#older-versions)
+- [Related projects](#related-projects)
+- [Other documentation](#other-documentation)
+- [Licence](#licence)
+- [Support](#support)
+
 ## Getting started
 
 ### Installation
@@ -162,6 +210,58 @@ const allowedTagList = [
 ]
 ```
 
+## Initialization
+
+An AutoNumeric object can be initialized in various ways.
+
+### Initialize one AutoNumeric object
+
+It always takes either a DOM element reference as its first argument, or a css string selector.<br>
+*Note: only one element can be selected this way, since under the hood `document.querySelector` is called, and this only return one element.*<br>
+*If you need to be able to select and initialize multiple elements in one call, then consider using the static [`AutoNumeric.multiple()`](#initialize-multiple-autonumeric-objects-at-once) function*
+
+```js
+anElement = new AutoNumeric(domElement); // With the default options
+anElement = new AutoNumeric(domElement, { options }); // With one option object
+anElement = new AutoNumeric(domElement).french(); // With one pre-defined language object
+anElement = new AutoNumeric(domElement).french({ options });// With one pre-defined language object and additional options that will override those defaults
+
+// ...or init and set the value in one call :
+anElement = new AutoNumeric(domElement, 12345.789); // With the default options, and an initial value
+anElement = new AutoNumeric(domElement, 12345.789, { options });
+anElement = new AutoNumeric(domElement, '12345.789', { options });
+anElement = new AutoNumeric(domElement, null, { options }); // With a null initial value
+anElement = new AutoNumeric(domElement, 12345.789).french({ options });
+anElement = new AutoNumeric(domElement, 12345.789, { options }).french({ options }); // Not really helpful, but possible
+
+// The AutoNumeric constructor class can also accept a string as a css selector. Under the hood this use `QuerySelector` and limit itself to only the first element it finds.
+anElement = new AutoNumeric('.myCssClass > input');
+anElement = new AutoNumeric('.myCssClass > input', { options });
+anElement = new AutoNumeric('.myCssClass > input', 12345.789);
+anElement = new AutoNumeric('.myCssClass > input', 12345.789, { options });
+anElement = new AutoNumeric('.myCssClass > input', null, { options }); // With a null initial value
+anElement = new AutoNumeric('.myCssClass > input', 12345.789).french({ options });
+```
+*Note: AutoNumeric also accepts a [limited tag list](#on-other-dom-elements) that it will format on page load, but without adding any event listeners if their `contenteditable` attribute is not set to `true`*
+
+### Initialize multiple AutoNumeric objects at once
+If you know you want to initialize multiple elements in one call, you must then use the static `AutoNumeric.multiple()` function:
+```js
+// Init multiple DOM elements in one call (and possibly pass multiple values that will be mapped to each DOM element)
+[anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], { options });
+[anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], 12345.789, { options });
+[anElement1, anElement2, anElement3] = AutoNumeric.multiple.french([domElement1, domElement2, domElement3], [12345.789, 234.78, null], { options });
+
+// Special case, if a <form> element is passed (or any other 'parent' (or 'root') DOM element), then autoNumeric will initialize each child `<input>` elements recursively, ignoring those referenced in the `exclude` attribute
+[anElement1, anElement2] = AutoNumeric.multiple({ rootElement: formElement }, { options });
+[anElement1, anElement2] = AutoNumeric.multiple({ rootElement: formElement, exclude : [hiddenElement, tokenElement] }, { options });
+[anElement1, anElement2] = AutoNumeric.multiple({ rootElement: formElement, exclude : [hiddenElement, tokenElement] }, [12345.789, null], { options });
+
+// If you want to select multiple elements via a css selector, then you must use the `multiple` function. Under the hood `QuerySelectorAll` is used.
+[anElement1, anElement2] = AutoNumeric.multiple('.myCssClass > input', { options }); // This always return an Array, even if there is only one element selected
+[anElement1, anElement2] = AutoNumeric.multiple('.myCssClass > input', [null, 12345.789], { options }); // Idem above, but with passing the initial values too
+```
+
 ## Options
 Multiple options allow you to customize precisely how a form input will format your key strokes as you type :
 
@@ -209,25 +309,6 @@ Multiple options allow you to customize precisely how a form input will format y
 | `unformatOnHover` | Defines if the element value should be unformatted when the user hover his mouse over it while holding the `Alt` key | `true` |
 | `unformatOnSubmit` | Removes formatting on submit event | `false` |
 | `wheelStep` | Used in conjonction with the `modifyValueOnWheel` option, this allow to either define a *fixed* step (ie. `1000`), or a *progressive* one | `'progressive'` |
-
-
-###### noEventListeners
-Using the `noEventListeners` option allow autoNumeric to only format without adding any event listeners to an input, or any other DOM elements (that the function would accept as a parameter). This would be useful for read-only values for instance.
-```js
-// Initialize without setting up any event listeners
-anElement = new AutoNumeric(domElement, 12345.789, { options }).remove(); // This is the default existing way of doing that...
-// ...but you can also directly pass a special option `noEventListeners` to prevent the initial creation of those event listeners
-anElement = new AutoNumeric(domElement, 12345.789, { noEventListeners: true });
-```
-In the latter case, it initialize the AutoNumeric element, except it does not add any event listeners. Which means it format the value only once and then let the user modify it freely.<br>*Note: The value can then be formatted via a call to `set`.*
-
-###### readOnly
-AutoNumeric can initialize an `<input>` element with the `readonly` property by setting the `readOnly` option to `true` in the settings:
-```js
-anElement = new AutoNumeric(domElement, 12345.789, { readOnly: true });
-```
-
-For more detail on how to use each options, please take a look at the detailed comments in the source code for the `defaultSettings` object.
 
 #### Predefined options
 
@@ -376,59 +457,27 @@ const options = {
 }
 ```
 
-## Initialization
+#### Special options
 
-An AutoNumeric object can be initialized in various ways.
-
-### Initialize one AutoNumeric object
-
-It always takes either a DOM element reference as its first argument, or a css string selector.<br>
-*Note: only one element can be selected this way, since under the hood `document.querySelector` is called, and this only return one element.*<br>
-*If you need to be able to select and initialize multiple elements in one call, then consider using the static [`AutoNumeric.multiple()`](#initialize-multiple-autonumeric-objects-at-once) function*
-
+###### noEventListeners
+Using the `noEventListeners` option allow autoNumeric to only format without adding any event listeners to an input, or any other DOM elements (that the function would accept as a parameter). This would be useful for read-only values for instance.
 ```js
-anElement = new AutoNumeric(domElement); // With the default options
-anElement = new AutoNumeric(domElement, { options }); // With one option object
-anElement = new AutoNumeric(domElement).french(); // With one pre-defined language object
-anElement = new AutoNumeric(domElement).french({ options });// With one pre-defined language object and additional options that will override those defaults
-
-// ...or init and set the value in one call :
-anElement = new AutoNumeric(domElement, 12345.789); // With the default options, and an initial value
-anElement = new AutoNumeric(domElement, 12345.789, { options });
-anElement = new AutoNumeric(domElement, '12345.789', { options });
-anElement = new AutoNumeric(domElement, null, { options }); // With a null initial value
-anElement = new AutoNumeric(domElement, 12345.789).french({ options });
-anElement = new AutoNumeric(domElement, 12345.789, { options }).french({ options }); // Not really helpful, but possible
-
-// The AutoNumeric constructor class can also accept a string as a css selector. Under the hood this use `QuerySelector` and limit itself to only the first element it finds.
-anElement = new AutoNumeric('.myCssClass > input');
-anElement = new AutoNumeric('.myCssClass > input', { options });
-anElement = new AutoNumeric('.myCssClass > input', 12345.789);
-anElement = new AutoNumeric('.myCssClass > input', 12345.789, { options });
-anElement = new AutoNumeric('.myCssClass > input', null, { options }); // With a null initial value
-anElement = new AutoNumeric('.myCssClass > input', 12345.789).french({ options });
+// Initialize without setting up any event listeners
+anElement = new AutoNumeric(domElement, 12345.789, { options }).remove(); // This is the default existing way of doing that...
+// ...but you can also directly pass a special option `noEventListeners` to prevent the initial creation of those event listeners
+anElement = new AutoNumeric(domElement, 12345.789, { noEventListeners: true });
 ```
-*Note: AutoNumeric also accepts a [limited tag list](#on-other-dom-elements) that it will format on page load, but without adding any event listeners if their `contenteditable` attribute is not set to `true`*
+In the latter case, it initialize the AutoNumeric element, except it does not add any event listeners. Which means it format the value only once and then let the user modify it freely.<br>*Note: The value can then be formatted via a call to `set`.*
 
-### Initialize multiple AutoNumeric objects at once
-If you know you want to initialize multiple elements in one call, you must then use the static `AutoNumeric.multiple()` function:
+###### readOnly
+AutoNumeric can initialize an `<input>` element with the `readonly` property by setting the `readOnly` option to `true` in the settings:
 ```js
-// Init multiple DOM elements in one call (and possibly pass multiple values that will be mapped to each DOM element)
-[anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], { options });
-[anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], 12345.789, { options });
-[anElement1, anElement2, anElement3] = AutoNumeric.multiple.french([domElement1, domElement2, domElement3], [12345.789, 234.78, null], { options });
-
-// Special case, if a <form> element is passed (or any other 'parent' (or 'root') DOM element), then autoNumeric will initialize each child `<input>` elements recursively, ignoring those referenced in the `exclude` attribute
-[anElement1, anElement2] = AutoNumeric.multiple({ rootElement: formElement }, { options });
-[anElement1, anElement2] = AutoNumeric.multiple({ rootElement: formElement, exclude : [hiddenElement, tokenElement] }, { options });
-[anElement1, anElement2] = AutoNumeric.multiple({ rootElement: formElement, exclude : [hiddenElement, tokenElement] }, [12345.789, null], { options });
-
-// If you want to select multiple elements via a css selector, then you must use the `multiple` function. Under the hood `QuerySelectorAll` is used.
-[anElement1, anElement2] = AutoNumeric.multiple('.myCssClass > input', { options }); // This always return an Array, even if there is only one element selected
-[anElement1, anElement2] = AutoNumeric.multiple('.myCssClass > input', [null, 12345.789], { options }); // Idem above, but with passing the initial values too
+anElement = new AutoNumeric(domElement, 12345.789, { readOnly: true });
 ```
 
-## Options update
+For more detail on how to use each options, please take a look at the detailed comments in the source code for the `defaultSettings` object.
+
+#### Options update
 Options can be added and/or modified after the initialization has been done.
 
 Either by passing an options object that contains multiple options...
@@ -465,9 +514,11 @@ import AutoNumeric from 'autoNumeric.min';
 
 Then you'll be able to access either the methods on the instantiated AutoNumeric object, or the [static functions](#static-methods) directly by using the `AutoNumeric` class.
 
-#### Instantiated methods
+### Instantiated methods
 
-##### Usual functions available on an autoNumeric-managed element
+#### Set, get, format, unformat and other usual AutoNumeric functions
+
+The following functions are available on all autoNumeric-managed elements:
 
 | Method           | Description | Call example |
 | :----------------: | :-----------:  | :-----------:  |
@@ -494,8 +545,9 @@ Then you'll be able to access either the methods on the instantiated AutoNumeric
 | `clear` | Reset the element value to the empty string '' (or the currency sign, depending on the `emptyInputBehavior` option value) | `anElement.clear();` |
 | `clear` | Reset the element value to the empty string '' as above, no matter the `emptyInputBehavior` option value | `anElement.clear(true);` |
 
+*Note: Most of them can be [chained](#function-chaining) together, if needed.*
 
-##### Un-initialize the AutoNumeric element with the following methods
+#### Un-initialize the AutoNumeric element
 
 | Method           | Description | Call example |
 | :----------------: | :-----------:  | :-----------:  |
@@ -504,7 +556,7 @@ Then you'll be able to access either the methods on the instantiated AutoNumeric
 | `nuke` | Remove the autoNumeric listeners from the element, and delete the DOM element altogether | `anElement.nuke();` |
 
 
-##### Node manipulation
+#### Node manipulation
 
 | Method           | Description | Call example |
 | :----------------: | :-----------:  | :-----------:  |
@@ -515,7 +567,9 @@ Then you'll be able to access either the methods on the instantiated AutoNumeric
 | `attach` | Attach the given AutoNumeric element to the shared local 'init' list. When doing that, by default the DOM content is left untouched. The user can force a reformat with the new shared list options by passing a second argument to `true`. | `anElement.attach(otherAnElement, reFormat = true);` |
 
 
-##### Use any AutoNumeric element to format/unformat other numbers or DOM elements
+#### Format and unformat other numbers or DOM elements with an existing AutoNumeric element
+
+You can use any AutoNumeric element to format or unformat other numbers or DOM elements.
 
 This allows to format or unformat numbers, strings or directly other DOM elements without having to specify the options each time, since the current AutoNumeric object already has those settings set.
 
@@ -527,7 +581,7 @@ This allows to format or unformat numbers, strings or directly other DOM element
 | `unformatOther` | Idem above, but apply the unformatting to the DOM element content directly | `anElement.unformatOther(domElement5, { options });` |
 
 
-##### Initialize other DOM Elements
+#### Initialize other DOM Elements
 
 Once you have an AutoNumeric element already setup correctly with the right options, you can use it as many times you want to initialize as many other DOM elements as needed (this works only on elements that can be managed by autoNumeric).
 
@@ -541,7 +595,7 @@ Whenever `init` is used to initialize other DOM elements, a shared 'local' list 
 | `init` | Use an existing AutoNumeric element to initialize multiple other DOM elements from a CSS selector, with the same options | `const anElementsArray = anElement.init('.currency');` |
 
 
-##### Perform actions globally on a shared list of AutoNumeric elements
+#### Perform actions globally on a shared list of AutoNumeric elements
 
 This local list can be used to perform global operations on all those AutoNumeric elements, with one function call.<br>
 To do so, you must call the wanted function by prefixing `.global` before the method name (ie. `anElement.global.set(42)`).<br>
@@ -581,7 +635,7 @@ anElement.global.getList(); // Return the `Map` object directly
 anElement.global.size(); // Return the number of elements in the local AutoNumeric element list
 ```
 
-##### Form functions
+#### Form functions
 
 autoNumeric elements provide special functions to manipulate the form they are a part of.
 Those special functions really work on the parent `<form>` element, instead of the `<input>` element itself. 
@@ -628,7 +682,7 @@ For the following methods, the callback is mandatory:
 
 #### Function chaining
 
-Most of those functions can be chained which allow to be less verbose and more concise.
+Most of those instantiated functions can be chained which allow to be less verbose and more concise.
 
 ```js
 // On one element
@@ -645,7 +699,7 @@ anElement.global.set(72)
          .global.getNumericString();
 ```
 
-#### Static methods
+### Static methods
 
 Without having to initialize any AutoNumeric object, you can directly use the static `AutoNumeric` class functions.
 
@@ -750,7 +804,7 @@ In a nutshell :
 Again, be sure to check the [CONTRIBUTING](CONTRIBUTING.md) guidelines for more details.<br>
 Also, feel free to follow our RSS feeds on [master](https://github.com/autoNumeric/autoNumeric/commits/master.atom) and [next](https://github.com/autoNumeric/autoNumeric/commits/next.atom) to keep up with the latest commits.
 
-### Dependencies
+## Dependencies
 None!
 
 ## Older versions
@@ -759,7 +813,7 @@ The previous stable autoNumeric version `v1.9.46` can be found [here](https://gi
 ## Related projects
 For integration into [Rails](http://rubyonrails.org/) projects, you can use the [autonumeric-rails](https://github.com/randoum/autonumeric-rails) project.
 
-## Documentation
+## Other documentation
 The old and outdated documentation can be found in the [Documentation](Documentation.md) file.<br>
 For some examples and an option code generator for the old v1.9.* version, take a look [here](http://www.decorplanit.com/plugin/).
 

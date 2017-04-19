@@ -268,6 +268,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | Option           | Description | Default Value |
 | :---------------- | :-----------:  | :-----------:  |
 | `allowDecimalPadding` | Allow padding the decimal places with zeros. If set to `'floats'`, padding is only done when there are some decimals. | `true` |
+| `caretPositionOnFocus` | Determine where should be positioned the caret on focus | `null` |
 | `createLocalList` | Determine if a local list of AutoNumeric objects must be kept when initializing the elements and others | `true` |
 | `currencySymbol` | Currency symbol | `''` |
 | `currencySymbolPlacement` | Placement of the currency sign, relative to the number (as a prefix or a suffix) | `'p'` |
@@ -298,10 +299,11 @@ Multiple options allow you to customize precisely how a form input will format y
 | `roundingMethod` | Method used for rounding (possible options are `S`, `A`, `s`, `a`, `B`, `U`, `D`, `C`, `F`, `N05`, `U05` or `D05`) | `'S'` |
 | `saveValueToSessionStorage` | Allow the `decimalPlacesShownOnFocus` value to be saved into session storage | `false` |
 | `scaleDecimalPlaces` | The number of decimal places when unfocused | `null` |
-| `scaleDivisor` | This option decides the onfocus value and places the result in the input on focusout | `null` |
-| `scaleSymbol` | Symbol placed as a suffix when unfocused | `null` |
-| `serializeSpaces` | Defines how the serialize functions should treat spaces when serializing (convert them to `'%20'` or `'+'`) | `'+'` |
+| `scaleDivisor` | Define the number that will divide the current value shown when unfocused | `null` |
+| `scaleSymbol` | Symbol placed as a suffix when unfocused | `true` |
 | `selectNumberOnly` | Determine if the select all keyboard command will select the complete input text, or only the input numeric value | `false` |
+| `selectOnFocus` | Defines if the element value should be selected on focus | `true` |
+| `serializeSpaces` | Defines how the serialize functions should treat spaces when serializing (convert them to `'%20'` or `'+'`) | `'+'` |
 | `showPositiveSign` | Allow the positive sign symbol `+` to be displayed for positive numbers | `false` |
 | `showWarnings` | Defines if warnings should be shown | `true` |
 | `styleRules` | Defines the rules that calculate the CSS class(es) to apply on the element, based on the raw unformatted value.<br>This can also be used to call callbacks whenever the `rawValue` is updated. | `null` |

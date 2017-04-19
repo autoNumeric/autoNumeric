@@ -7756,7 +7756,7 @@ AutoNumeric.options = {
         selectAll        : false,
     },
 
-    /* Defines if the element being focused should have its content selected or not.
+    /* Defines if the element value should be selected on focus.
      * Note: The selection is done using the `selectNumberOnly` option.
      */
     selectOnFocus                : {

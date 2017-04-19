@@ -1,5 +1,9 @@
 ## Changelog for autoNumeric
 
+### 4.0.0-beta.16
++ Move the options, default options and predefined options objects each in its own file.
+  Separating them from the AutoNumeric class makes that information easier to find, study and modify.
+
 ### 4.0.0-beta.15
 + Add a new option `selectOnFocus` that allow the user to choose if the value should be selected when the element is focused.
 + Add a new option `caretPositionOnFocus` that allow the user to choose where should be positioned the caret when the element is focused.
@@ -13,6 +17,7 @@
 + Add a `focusin` event handler via `_onFocusIn()`, which take care of managing the element content selection on focus.
 + Add the `_correctCaretPositionOnFocusAndSelectOnFocusOptions()` function that manage the `caretPositionOnFocus` and `selectOnFocus` options in order to prevent any conflict.
 + Strengthen `setElementSelection()` so that `element.firstChild` is checked for `null` value.
++ Add a table of contents to the readme and reorganize its chapters.
 
 ### 4.0.0-beta.14
 + Add more bracket types to the `negativeBracketsTypeOnBlur` option ('〈,〉', '｢,｣', '⸤,⸥', '⟦,⟧', '‹,›' and '«,»')

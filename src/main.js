@@ -31,6 +31,11 @@
 /* global module */
 
 import AutoNumeric from './AutoNumeric';
+import AutoNumericOptions from './AutoNumericOptions';
+import AutoNumericDefaultSettings from './AutoNumericDefaultSettings';
+import AutoNumericPredefinedOptions from './AutoNumericPredefinedOptions';
+
+/* eslint no-unused-vars: 0 */
 
 /**
  * This file serve as the main entry point to the library.

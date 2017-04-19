@@ -3,6 +3,8 @@
 ### 4.0.0-beta.16
 + Move the options, default options and predefined options objects each in its own file.
   Separating them from the AutoNumeric class makes that information easier to find, study and modify.
++ Modify the `update()` and `global.update()` function signatures so that they can accept multiple option objects, the latter overwriting the settings from the former.
+  This allows to fine tune the format settings in one go, and is specially useful when using a predefined option as the 'configuration base', and changing it slightly (ie. `anElement.update( AutoNumeric.getPredefinedOptions().French, { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator })`).
 
 ### 4.0.0-beta.15
 + Add a new option `selectOnFocus` that allow the user to choose if the value should be selected when the element is focused.

@@ -3354,6 +3354,51 @@ describe('Instantiated autoNumeric functions', () => {
         });
     });
 
+    describe('`update`', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput).french(); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.nuke();
+        });
+
+        it('should update the options with one option object', () => {
+            aNInput.set(2172834.234);
+            expect(aNInput.getFormatted()).toEqual('2.172.834,23\u202f€');
+
+            aNInput.update({ currencySymbol: AutoNumeric.options.currencySymbol.pound });
+            expect(aNInput.getFormatted()).toEqual('2.172.834,23£');
+        });
+
+        it('should update the options with multiple option objects', () => {
+            aNInput.set(2172834.234);
+            expect(aNInput.getFormatted()).toEqual('2.172.834,23\u202f€');
+
+            // Objects overwriting themselves
+            aNInput.update({ currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                { currencySymbol:  AutoNumeric.options.currencySymbol.franc });
+            expect(aNInput.getFormatted()).toEqual('2.172.834,23₣');
+
+            // Objects completing themselves
+            aNInput.update(AutoNumeric.getPredefinedOptions().NorthAmerican,
+                           {
+                               currencySymbol     : AutoNumeric.options.currencySymbol.currencySign,
+                               digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                           },
+                           {
+                               decimalCharacter       : AutoNumeric.options.decimalCharacter.decimalSeparatorKeySymbol,
+                               currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.suffix,
+                           });
+            expect(aNInput.getFormatted()).toEqual("2'172'834⎖23¤");
+        });
+    });
+
     describe('`selectDecimal`', () => {
         let aNInput;
         let newInput;
@@ -4099,6 +4144,50 @@ describe('`global.*` functions', () => {
             expect(anElement3.getFormatted()).toEqual('1 223 355,66 €');
             expect(anElement4.getFormatted()).toEqual('42,00 €');
             expect(anElement5.getFormatted()).toEqual('42,00 €');
+        });
+
+        it('should update the settings globally', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            expect(anElement1.set(22).getFormatted()).toEqual('22,00 €');
+            expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+            expect(anElement3.set(187568.243).getFormatted()).toEqual('187 568,24 €');
+            expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            expect(anElement5.set(1028.005).getFormatted()).toEqual('1 028,01 €');
+            expect(anElement4.global.size()).toEqual(5);
+
+            // Then test that those elements share the same local list
+            anElement2.global.set(1223355.66);
+            expect(anElement1.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement2.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement4.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement5.getFormatted()).toEqual('1 223 355,66 €');
+
+            // Update the elements with one option object
+            anElement3.global.update({ currencySymbol: AutoNumeric.options.currencySymbol.franc });
+            expect(anElement1.getFormatted()).toEqual('1 223 355,66₣');
+            expect(anElement2.getFormatted()).toEqual('1 223 355,66₣');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66₣');
+            expect(anElement4.getFormatted()).toEqual('1 223 355,66₣');
+            expect(anElement5.getFormatted()).toEqual('1 223 355,66₣');
+
+            // Update the elements with multiple option objects
+            anElement3.global.update({ currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                                     {
+                                         currencySymbol: AutoNumeric.options.currencySymbol.dollar,
+                                         digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                                     }
+            );
+            expect(anElement1.getFormatted()).toEqual("1'223'355,66$");
+            expect(anElement2.getFormatted()).toEqual("1'223'355,66$");
+            expect(anElement3.getFormatted()).toEqual("1'223'355,66$");
+            expect(anElement4.getFormatted()).toEqual("1'223'355,66$");
+            expect(anElement5.getFormatted()).toEqual("1'223'355,66$");
         });
 
         it('should `setUnformatted` the values globally across those elements', () => {

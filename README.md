@@ -482,13 +482,18 @@ For more detail on how to use each options, please take a look at the detailed c
 #### Options update
 Options can be added and/or modified after the initialization has been done.
 
-Either by passing an options object that contains multiple options...
+Either by passing an option object that contains multiple options,
 ```js
 anElement.update({ moreOptions });
 anElement.update(AutoNumeric.getPredefinedOptions().NorthAmerican); // Update the settings (and immediately reformat the element accordingly)
 ```
 
-...or by changing the options one by one (or by calling a pre-defined option object)
+by passing multiple option objects, the latter overwriting the settings from the former ones...
+```js
+anElement.update({ moreOptions1 }, { moreOptions2 }, { moreOptions3 });
+```
+
+...or by changing the options one by one (or by calling a pre-defined option object).
 ```js
 anElement.options.minimumValue('12343567.89');
 anElement.options.allowDecimalPadding(false);
@@ -616,6 +621,7 @@ anElement.global.unformat();
 anElement.global.unformatLocalized();
 anElement.global.unformatLocalized(forcedOutputFormat);
 anElement.global.update({ options }); // Update the settings of each autoNumeric-managed elements
+anElement.global.update({ options1 }, { options2 }, { options3 }); // Idem above, but accepts as many option objects as needed
 anElement.global.isPristine(); // Return `true` is *all* the autoNumeric-managed elements are pristine, if their raw value hasn't changed
 anElement.global.isPristine(false); // Idem as above, but also checks that the formatted value hasn't changed
 anElement.global.clear(); // Clear the value in all the autoNumeric-managed elements that are shared on this element

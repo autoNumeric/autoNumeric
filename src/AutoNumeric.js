@@ -277,11 +277,11 @@ class AutoNumeric {
             /**
              * Updates the AutoNumeric settings, and immediately format the elements accordingly, for each elements of the local AutoNumeric element list
              *
-             * @param {object} newOptions
+             * @param {object} newOptions This can be either one or more option objects
              */
-            update: newOptions => {
+            update: (...newOptions) => {
                 this.autoNumericLocalList.forEach(aNObject => {
-                    aNObject.update(newOptions);
+                    aNObject.update(...newOptions);
                 });
             },
 
@@ -1329,26 +1329,37 @@ class AutoNumeric {
 
     /**
      * Method that updates the AutoNumeric settings, and immediately format the element accordingly.
-     * The options passed as a parameter is an object that contains the settings, ie. :
+     * The options passed as parameter(s) is either one or many objects that each contains some settings, ie. :
      * {
      *     digitGroupSeparator: ".",
      *     decimalCharacter: ",",
      *     currencySymbol: '€ ',
      * }
+     * If multiple options are passed, the latter overwrite the previous ones.
      *
      * @example anElement.update({ options }) // Updates the settings
+     * @example anElement.update({ options1 }, { options2 }) // Updates the settings with multiple option objects
      *
      * @param {object} newOptions
      * @returns {AutoNumeric}
      */
-    update(newOptions) {
-        //TODO Allow multiple options to be passed, the latter overwriting the previous ones (ie. anElement.update(AutoNumeric.getPredefinedOptions().French, { selectOnFocus: AutoNumeric.options.selectOnFocus.doNotSelect })
+    update(...newOptions) {
         // Store the current unformatted input value
         const numericString = this.settings.rawValue;
 
+        // Generate a single option object with the settings from the latter overwriting those from the former
+        let optionsToUse = {};
+        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(newOptions) || newOptions.length === 0) {
+            optionsToUse = null;
+        } else if (newOptions.length >= 1) {
+            newOptions.forEach(optionObject => {
+                Object.assign(optionsToUse, optionObject);
+            });
+        }
+
         // Update the settings
         try {
-            this._setSettings(newOptions, true);
+            this._setSettings(optionsToUse, true);
         } catch (error) {
             AutoNumericHelper.throwError('Unable to update the settings, those are invalid.');
 
@@ -3295,7 +3306,7 @@ class AutoNumeric {
      * This basically allows to get the unformatted value without first having to initialize an AutoNumeric object.
      *
      * @param {string|number|HTMLElement|HTMLInputElement} numericStringOrDomElement
-     * @param {object|null} options
+     * @param {object|null} options Multiple objects can be passed, the latter overwriting the settings from the former ones
      * @returns {*}
      */
     static unformat(numericStringOrDomElement, ...options) {

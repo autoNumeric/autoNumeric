@@ -1,6 +1,6 @@
 {
   "name": "autonumeric",
-  "version": "4.0.0-beta.14",
+  "version": "4.0.0-beta.15",
   "description": "autoNumeric is a standalone Javascript library that provides live *as-you-type* formatting for international numbers and currencies. It supports most International numeric formats and currencies including those used in Europe, Asia, and North and South America.",
   "main": "src/main.js",
   "readmeFilename": "README.md",

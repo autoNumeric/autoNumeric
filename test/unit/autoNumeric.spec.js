@@ -82,6 +82,7 @@ describe('The autoNumeric object', () => {
 
         const defaultOption = {
             allowDecimalPadding          : true,
+            caretPositionOnFocus         : null,
             createLocalList              : true,
             currencySymbol               : '',
             currencySymbolPlacement      : 'p',
@@ -115,6 +116,7 @@ describe('The autoNumeric object', () => {
             scaleDivisor                 : null,
             scaleSymbol                  : null,
             selectNumberOnly             : true,
+            selectOnFocus                : true,
             serializeSpaces              : '+',
             showPositiveSign             : false,
             showWarnings                 : true,
@@ -208,6 +210,7 @@ describe('The autoNumeric object', () => {
             } */
 
             expect(defaultSettings.allowDecimalPadding        ).toEqual(aNInputSettings.allowDecimalPadding        );
+            expect(defaultSettings.caretPositionOnFocus       ).toEqual(aNInputSettings.caretPositionOnFocus       );
             expect(defaultSettings.createLocalList            ).toEqual(aNInputSettings.createLocalList            );
             expect(defaultSettings.currencySymbol             ).toEqual(aNInputSettings.currencySymbol             );
             expect(defaultSettings.currencySymbolPlacement    ).toEqual(aNInputSettings.currencySymbolPlacement    );
@@ -251,6 +254,7 @@ describe('The autoNumeric object', () => {
             expect(defaultSettings.scaleDivisor              ).toEqual(aNInputSettings.scaleDivisor               );
             expect(defaultSettings.scaleSymbol               ).toEqual(aNInputSettings.scaleSymbol                );
             expect(defaultSettings.selectNumberOnly          ).toEqual(aNInputSettings.selectNumberOnly           );
+            expect(defaultSettings.selectOnFocus             ).toEqual(aNInputSettings.selectOnFocus              );
             expect(defaultSettings.serializeSpaces           ).toEqual(aNInputSettings.serializeSpaces            );
             expect(defaultSettings.showPositiveSign          ).toEqual(aNInputSettings.showPositiveSign           );
             expect(defaultSettings.showWarnings              ).toEqual(aNInputSettings.showWarnings               );
@@ -2139,6 +2143,7 @@ describe('autoNumeric options and `options.*` methods', () => {
 
     //TODO Complete the tests in order to test every single option separately:
     /*
+     caretPositionOnFocus
      decimalCharacterAlternative -> cf. end-to-end tests
      decimalPlacesShownOnFocus
      defaultValueOverride
@@ -2154,6 +2159,7 @@ describe('autoNumeric options and `options.*` methods', () => {
      readOnly
      saveValueToSessionStorage
      selectNumberOnly
+     selectOnFocus
      serializeSpaces
      showWarnings
      unformatOnHover
@@ -5210,8 +5216,15 @@ describe('Static autoNumeric functions', () => {
         });
 
         it('should validate', () => {
+            expect(() => AutoNumeric.validate({})).not.toThrow();
             expect(() => AutoNumeric.validate(autoNumericOptionsEuro)).not.toThrow();
             expect(() => AutoNumeric.validate(autoNumericOptionsDollar)).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'start' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'end' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'decimalLeft' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'decimalRight' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: null })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ digitGroupSeparator: ',' })).not.toThrow();
             expect(() => AutoNumeric.validate({ digitGroupSeparator: '.',  decimalCharacter: ',' })).not.toThrow();
@@ -5410,6 +5423,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ selectNumberOnly: 'true' })).not.toThrow();
             expect(() => AutoNumeric.validate({ selectNumberOnly: 'false' })).not.toThrow();
 
+            expect(() => AutoNumeric.validate({ selectOnFocus: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: 'false' })).not.toThrow();
+
             expect(() => AutoNumeric.validate({ defaultValueOverride: null })).not.toThrow();
             expect(() => AutoNumeric.validate({ defaultValueOverride: '' })).not.toThrow();
             expect(() => AutoNumeric.validate({ defaultValueOverride: '42' })).not.toThrow();
@@ -5489,8 +5507,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ decimalPlacesOverride: '2', minimumValue: '0', maximumValue: '20' })).not.toThrow(); // This will output a warning
 
             expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, decimalPlacesOverride: '2' })).not.toThrow(); // This will output a warning
+
+            expect(() => AutoNumeric.validate({ selectOnFocus: AutoNumeric.options.selectOnFocus.select, caretPositionOnFocus: AutoNumeric.options.caretPositionOnFocus.decimalLeft })).not.toThrow();
+            expect(() => AutoNumeric.validate({}, true, { selectOnFocus: AutoNumeric.options.selectOnFocus.select, caretPositionOnFocus: AutoNumeric.options.caretPositionOnFocus.decimalLeft })).not.toThrow();
+
             expect(console.warn).toHaveBeenCalled();
-            expect(console.warn).toHaveBeenCalledTimes(7);
+            expect(console.warn).toHaveBeenCalledTimes(9);
         });
 
         it('should not validate', () => {
@@ -5499,10 +5521,17 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate(null)).toThrow();
             expect(() => AutoNumeric.validate('')).toThrow();
             expect(() => AutoNumeric.validate([])).toThrow();
-            expect(() => AutoNumeric.validate({})).toThrow();
             expect(() => AutoNumeric.validate([{ digitGroupSeparator: '.' }])).toThrow();
             expect(() => AutoNumeric.validate('foobar')).toThrow();
             expect(() => AutoNumeric.validate(42)).toThrow();
+
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: -42 })).toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: '-' })).toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'a' })).toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: true })).toThrow();
 
             expect(() => AutoNumeric.validate({ digitGroupSeparator: '-' })).toThrow();
             expect(() => AutoNumeric.validate({ digitGroupSeparator: '"' })).toThrow();
@@ -5717,6 +5746,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ selectNumberOnly: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ selectNumberOnly: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ selectNumberOnly: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ selectOnFocus: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: 'foobar' })).toThrow();
 
             expect(() => AutoNumeric.validate({ defaultValueOverride: [] })).toThrow();
             expect(() => AutoNumeric.validate({ defaultValueOverride: true })).toThrow();

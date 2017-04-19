@@ -179,7 +179,7 @@
 	</style>
 	<!-- Used by the end-to-end server spin up for the tests : -->
 	<script src="/autonumeric"></script>
-	<script src="../../dist/autoNumeric.min.js"></script>
+	<script src="../../dist/autoNumeric.js"></script>
 	<!-- ^ Used by the page when calling it manually directly in the browser -->
 </head>
 <body>
@@ -628,6 +628,76 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">selectOnFocus option</p>
+			<div>
+				<div>
+					<input id="selectOnFocusA" type="text" value="">
+					<input id="selectOnFocusB" type="text" value="">
+					<input id="selectOnFocusC" type="text" value="">
+					<input id="selectOnFocusD" type="text" value="">
+				</div>
+				<div>
+					<input id="selectOnFocus1" type="text" value="-246813.58">
+					<input id="selectOnFocus2" type="text" value="-246813.58">
+					<input id="selectOnFocus3" type="text" value="-246813.58">
+					<input id="selectOnFocus4" type="text" value="-246813.58">
+					<input id="selectOnFocus5" type="text" value="-246813.58">
+				</div>
+				<div>
+					<input id="selectOnFocus6" type="text" value="-246813.58">
+					<input id="selectOnFocus7" type="text" value="-246813.58">
+					<input id="selectOnFocus8" type="text" value="-246813.58">
+					<input id="selectOnFocus9" type="text" value="-246813.58">
+					<input id="selectOnFocus10" type="text" value="-246813.58">
+				</div>
+				<div>
+					<input id="selectOnFocus11" type="text" value="-246813.58">
+					<input id="selectOnFocus12" type="text" value="-246813.58">
+					<input id="selectOnFocus13" type="text" value="-246813.58">
+					<input id="selectOnFocus14" type="text" value="-246813.58">
+					<input id="selectOnFocus15" type="text" value="-246813.58">
+				</div>
+				<div>
+					<input id="selectOnFocus16" type="text" value="-246813.58">
+					<input id="selectOnFocus17" type="text" value="-246813.58">
+					<input id="selectOnFocus18" type="text" value="-246813.58">
+					<input id="selectOnFocus19" type="text" value="-246813.58">
+					<input id="selectOnFocus20" type="text" value="-246813.58">
+				</div>
+				<div>
+					<input id="selectOnFocus21" type="text" value="-246813.58">
+					<input id="selectOnFocus22" type="text" value="-246813.58">
+					<input id="selectOnFocus23" type="text" value="-246813.58">
+					<input id="selectOnFocus24" type="text" value="-246813.58">
+					<input id="selectOnFocus25" type="text" value="-246813.58">
+				</div>
+				<div>
+					<input id="selectOnFocus26" type="text" value="-246813.58">
+					<input id="selectOnFocus27" type="text" value="-246813.58">
+					<input id="selectOnFocus28" type="text" value="-246813.58">
+					<input id="selectOnFocus29" type="text" value="-246813.58">
+					<input id="selectOnFocus30" type="text" value="-246813.58">
+				</div>
+				<div>
+					<input id="selectOnFocus31" type="text" value="-246813.58">
+					<input id="selectOnFocus32" type="text" value="-246813.58">
+					<input id="selectOnFocus33" type="text" value="-246813.58">
+					<input id="selectOnFocus34" type="text" value="-246813.58">
+					<input id="selectOnFocus35" type="text" value="-246813.58">
+				</div>
+				<div>
+					<input id="selectOnFocus36" type="text" value="-246813.58">
+					<input id="selectOnFocus37" type="text" value="-246813.58">
+					<input id="selectOnFocus38" type="text" value="-246813.58">
+					<input id="selectOnFocus39" type="text" value="-246813.58">
+					<input id="selectOnFocus40" type="text" value="-246813.58">
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1072,6 +1142,382 @@
 	    .set(-246813.58, { noSeparatorOnFocus: AutoNumeric.options.noSeparatorOnFocus.noSeparator, suffixText: ' loan' });
     new AutoNumeric('#noSeparatorOnFocus2').northAmerican()
 	    .set(-246813.58, { noSeparatorOnFocus: AutoNumeric.options.noSeparatorOnFocus.noSeparator, suffixText: ' interest' });
+
+    //-------------- selectOnFocus option
+    new AutoNumeric('#selectOnFocusA').french().set(-246813.58, { selectOnFocus: AutoNumeric.options.selectOnFocus.select });
+    new AutoNumeric('#selectOnFocusB').french().set(-246813.58, { selectOnFocus: AutoNumeric.options.selectOnFocus.doNotSelect });
+    new AutoNumeric('#selectOnFocusC').northAmerican().set(-246813.58, { selectOnFocus: AutoNumeric.options.selectOnFocus.select });
+    new AutoNumeric('#selectOnFocusD').northAmerican().set(-246813.58, { selectOnFocus: AutoNumeric.options.selectOnFocus.doNotSelect });
+
+    const case1 = { // +€|12.34
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.start,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
+        showPositiveSign             : true,
+    };
+    const case2 = { // +€|12.34
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.start,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.left,
+        showPositiveSign             : true,
+    };
+    const case3 = { // €+|12.34
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.start,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
+        showPositiveSign             : true,
+    };
+    const case4 = { // €|12.34+
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.start,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+        showPositiveSign             : true,
+    };
+    const case5 = { // €|12.34
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.start,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
+        showPositiveSign             : true,
+    };
+
+    const case6 = { // +€12.34|
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.end,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
+        showPositiveSign             : true,
+    };
+    const case7 = { // +€12.34|
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.end,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.left,
+        showPositiveSign             : true,
+    };
+    const case8 = { // €+12.34|
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.end,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
+        showPositiveSign             : true,
+    };
+    const case9 = { // €12.34|+
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.end,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+        showPositiveSign             : true,
+    };
+    const case10 = { // €12.34|
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.end,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
+        showPositiveSign             : true,
+    };
+
+    const case11 = { // +€12|.34
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalLeft,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
+        showPositiveSign             : true,
+    };
+    const case12 = { // +€12|.34
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalLeft,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.left,
+        showPositiveSign             : true,
+    };
+    const case13 = { // €+12|.34
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalLeft,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
+        showPositiveSign             : true,
+    };
+    const case14 = { // €12|.34+
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalLeft,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+        showPositiveSign             : true,
+    };
+    const case15 = { // €12|.34
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalLeft,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
+        showPositiveSign             : true,
+    };
+
+    const case16 = { // +€12.|34
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalRight,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
+        showPositiveSign             : true,
+    };
+    const case17 = { // +€12.|34
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalRight,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.left,
+        showPositiveSign             : true,
+    };
+    const case18 = { // €+12.|34
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalRight,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
+        showPositiveSign             : true,
+    };
+    const case19 = { // €12.|34+
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalRight,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+        showPositiveSign             : true,
+    };
+    const case20 = { // €12.|34
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalRight,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
+        showPositiveSign             : true,
+    };
+
+    const case21 = { // |12.34€+
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.start,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
+        showPositiveSign             : true,
+    };
+    const case22 = { // |12.34€+
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.start,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.left,
+        showPositiveSign             : true,
+    };
+    const case23 = { // |12.34+€
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.start,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
+        showPositiveSign             : true,
+    };
+    const case24 = { // +|12.34€
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.start,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+        showPositiveSign             : true,
+    };
+    const case25 = { // |12.34€
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.start,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
+        showPositiveSign             : true,
+    };
+
+    const case26 = { // 12.34|€+
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.end,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
+        showPositiveSign             : true,
+    };
+    const case27 = { // 12.34|€+
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.end,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.left,
+        showPositiveSign             : true,
+    };
+    const case28 = { // 12.34|+€
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.end,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
+        showPositiveSign             : true,
+    };
+    const case29 = { // +12.34|€
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.end,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+        showPositiveSign             : true,
+    };
+    const case30 = { // 12.34|€
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.end,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
+        showPositiveSign             : true,
+    };
+
+    const case31 = { // 12|.34€+
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalLeft,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
+        showPositiveSign             : true,
+    };
+    const case32 = { // 12|.34€+
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalLeft,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.left,
+        showPositiveSign             : true,
+    };
+    const case33 = { // 12|.34+€
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalLeft,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
+        showPositiveSign             : true,
+    };
+    const case34 = { // +12|.34€
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalLeft,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+        showPositiveSign             : true,
+    };
+    const case35 = { // 12|.34€
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalLeft,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
+        showPositiveSign             : true,
+    };
+
+    const case36 = { // 12.|34€+
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalRight,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
+        showPositiveSign             : true,
+    };
+    const case37 = { // 12.|34€+
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalRight,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.left,
+        showPositiveSign             : true,
+    };
+    const case38 = { // 12.|34+€
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalRight,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
+        showPositiveSign             : true,
+    };
+    const case39 = { // +12.|34€
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalRight,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+        showPositiveSign             : true,
+    };
+    const case40 = { // 12.|34€
+        currencySymbol               : "jk",
+        selectOnFocus                : AutoNumeric.options.selectOnFocus.doNotSelect,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.decimalRight,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
+        showPositiveSign             : true,
+    };
+
+    const doNotSelectOption = { selectOnFocus: AutoNumeric.options.selectOnFocus.doNotSelect };
+    new AutoNumeric('#selectOnFocus1').french().update(doNotSelectOption).update(case1);
+    new AutoNumeric('#selectOnFocus2').french().update(doNotSelectOption).update(case2);
+    new AutoNumeric('#selectOnFocus3').french().update(doNotSelectOption).update(case3);
+    new AutoNumeric('#selectOnFocus4').french().update(doNotSelectOption).update(case4);
+    new AutoNumeric('#selectOnFocus5').french().update(doNotSelectOption).update(case5);
+    new AutoNumeric('#selectOnFocus6').french().update(doNotSelectOption).update(case6);
+    new AutoNumeric('#selectOnFocus7').french().update(doNotSelectOption).update(case7);
+    new AutoNumeric('#selectOnFocus8').french().update(doNotSelectOption).update(case8);
+    new AutoNumeric('#selectOnFocus9').french().update(doNotSelectOption).update(case9);
+    new AutoNumeric('#selectOnFocus10').french().update(doNotSelectOption).update(case10);
+    new AutoNumeric('#selectOnFocus11').french().update(doNotSelectOption).update(case11);
+    new AutoNumeric('#selectOnFocus12').french().update(doNotSelectOption).update(case12);
+    new AutoNumeric('#selectOnFocus13').french().update(doNotSelectOption).update(case13);
+    new AutoNumeric('#selectOnFocus14').french().update(doNotSelectOption).update(case14);
+    new AutoNumeric('#selectOnFocus15').french().update(doNotSelectOption).update(case15);
+    new AutoNumeric('#selectOnFocus16').french().update(doNotSelectOption).update(case16);
+    new AutoNumeric('#selectOnFocus17').french().update(doNotSelectOption).update(case17);
+    new AutoNumeric('#selectOnFocus18').french().update(doNotSelectOption).update(case18);
+    new AutoNumeric('#selectOnFocus19').french().update(doNotSelectOption).update(case19);
+    new AutoNumeric('#selectOnFocus20').french().update(doNotSelectOption).update(case20);
+    new AutoNumeric('#selectOnFocus21').french().update(doNotSelectOption).update(case21);
+    new AutoNumeric('#selectOnFocus22').french().update(doNotSelectOption).update(case22);
+    new AutoNumeric('#selectOnFocus23').french().update(doNotSelectOption).update(case23);
+    new AutoNumeric('#selectOnFocus24').french().update(doNotSelectOption).update(case24);
+    new AutoNumeric('#selectOnFocus25').french().update(doNotSelectOption).update(case25);
+    new AutoNumeric('#selectOnFocus26').french().update(doNotSelectOption).update(case26);
+    new AutoNumeric('#selectOnFocus27').french().update(doNotSelectOption).update(case27);
+    new AutoNumeric('#selectOnFocus28').french().update(doNotSelectOption).update(case28);
+    new AutoNumeric('#selectOnFocus29').french().update(doNotSelectOption).update(case29);
+    new AutoNumeric('#selectOnFocus30').french().update(doNotSelectOption).update(case30);
+    new AutoNumeric('#selectOnFocus31').french().update(doNotSelectOption).update(case31);
+    new AutoNumeric('#selectOnFocus32').french().update(doNotSelectOption).update(case32);
+    new AutoNumeric('#selectOnFocus33').french().update(doNotSelectOption).update(case33);
+    new AutoNumeric('#selectOnFocus34').french().update(doNotSelectOption).update(case34);
+    new AutoNumeric('#selectOnFocus35').french().update(doNotSelectOption).update(case35);
+    new AutoNumeric('#selectOnFocus36').french().update(doNotSelectOption).update(case36);
+    new AutoNumeric('#selectOnFocus37').french().update(doNotSelectOption).update(case37);
+    new AutoNumeric('#selectOnFocus38').french().update(doNotSelectOption).update(case38);
+    new AutoNumeric('#selectOnFocus39').french().update(doNotSelectOption).update(case39);
+    new AutoNumeric('#selectOnFocus40').french().update(doNotSelectOption).update(case40);
 </script>
 </body>
 </html>

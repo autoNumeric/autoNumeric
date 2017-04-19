@@ -689,7 +689,7 @@ export default class AutoNumericHelper {
 
         if (this.isInputElement(element)) {
             element.setSelectionRange(start, end);
-        } else {
+        } else if (!AutoNumericHelper.isNull(element.firstChild)) {
             const range = document.createRange();
             range.setStart(element.firstChild, start);
             range.setEnd(element.firstChild, end);

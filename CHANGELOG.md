@@ -1,5 +1,19 @@
 ## Changelog for autoNumeric
 
+### 4.0.0-beta.15
++ Add a new option `selectOnFocus` that allow the user to choose if the value should be selected when the element is focused.
++ Add a new option `caretPositionOnFocus` that allow the user to choose where should be positioned the caret when the element is focused.
++ Modify how the caret is treated on focus ; if the `selectOnFocus` option is `true` then the value is selected, otherwise the caret is set at the position defined by the `caretPositionOnFocus` option.
++ `caretPositionOnFocus` can be `'start'`, `'end'`, `'decimalLeft'` and `'decimalRight'`, and will change where the caret will be positioned when the element get the focus. It can also be `null` which means the caret position is not forced.
++ The caret position is calculated by the new `_initialCaretPosition()` function.
++ Modify `validate()` so that an empty object can be used for the options, since the default settings would then be merged and used.
++ Modify the `validate()` function signature so that it accepts a third argument, the raw options passed by the user, without them having been merged with the default settings. This is useful for checking conflicting options that could be overwritten by the defaults.
++ Rewrite the call to `validate()` from `areSettingsValid()` to make it more explicit.
++ Rewrite one test condition in `_onFocusInAndMouseEnter()` so that it's not reserved only for elements that have their `emptyInputBehavior` option set to `focus` anymore.
++ Add a `focusin` event handler via `_onFocusIn()`, which take care of managing the element content selection on focus.
++ Add the `_correctCaretPositionOnFocusAndSelectOnFocusOptions()` function that manage the `caretPositionOnFocus` and `selectOnFocus` options in order to prevent any conflict.
++ Strengthen `setElementSelection()` so that `element.firstChild` is checked for `null` value.
+
 ### 4.0.0-beta.14
 + Add more bracket types to the `negativeBracketsTypeOnBlur` option ('〈,〉', '｢,｣', '⸤,⸥', '⟦,⟧', '‹,›' and '«,»')
 + Reformat the changelog, fix some typos

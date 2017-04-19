@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.14
- * @date         2017-04-12 UTC 00:30
+ * @version      4.0.0-beta.15
+ * @date         2017-04-19 UTC 08:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
@@ -518,6 +518,11 @@ class AutoNumeric {
 
                 return this;
             },
+            caretPositionOnFocus  : caretPositionOnFocus => { //FIXME à tester
+                this.settings.caretPositionOnFocus = caretPositionOnFocus;
+
+                return this;
+            },
             createLocalList                : createLocalList => {
                 this.settings.createLocalList = createLocalList;
 
@@ -693,6 +698,11 @@ class AutoNumeric {
 
                 return this;
             },
+            selectOnFocus                : selectOnFocus => {
+                this.settings.selectOnFocus = selectOnFocus; //FIXME à tester
+
+                return this;
+            },
             serializeSpaces              : serializeSpaces => {
                 this.settings.serializeSpaces = serializeSpaces; //FIXME à tester
 
@@ -742,7 +752,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.14';
+        return '4.0.0-beta.15';
     }
 
     /**
@@ -883,6 +893,7 @@ class AutoNumeric {
     _createEventListeners() {
         // Create references to the event handler functions, so we can then cleanly removes those listeners if needed
         // That would not be possible if we used closures directly in the event handler declarations
+        this._onFocusInFunc = e => { this._onFocusIn(e); };
         this._onFocusInAndMouseEnterFunc = e => { this._onFocusInAndMouseEnter(e); };
         this._onFocusFunc = () => { this._onFocus(); };
         this._onKeydownFunc = e => { this._onKeydown(e); };
@@ -899,6 +910,7 @@ class AutoNumeric {
         this._onDropFunc = e => { this._onDrop(e); };
 
         // Add the event listeners
+        this.domElement.addEventListener('focusin', this._onFocusInFunc, false);
         this.domElement.addEventListener('focus', this._onFocusInAndMouseEnterFunc, false);
         this.domElement.addEventListener('focus', this._onFocusFunc, false);
         this.domElement.addEventListener('mouseenter', this._onFocusInAndMouseEnterFunc, false);
@@ -930,6 +942,7 @@ class AutoNumeric {
      * @private
      */
     _removeEventListeners() { //FIXME à tester
+        this.domElement.removeEventListener('focusin', this._onFocusInFunc, false);
         this.domElement.removeEventListener('focus', this._onFocusInAndMouseEnterFunc, false);
         this.domElement.removeEventListener('focus', this._onFocusFunc, false);
         this.domElement.removeEventListener('mouseenter', this._onFocusInAndMouseEnterFunc, false);
@@ -1329,6 +1342,7 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     update(newOptions) {
+        //TODO Allow multiple options to be passed, the latter overwriting the previous ones (ie. anElement.update(AutoNumeric.getPredefinedOptions().French, { selectOnFocus: AutoNumeric.options.selectOnFocus.doNotSelect })
         // Store the current unformatted input value
         const numericString = this.settings.rawValue;
 
@@ -2803,12 +2817,18 @@ class AutoNumeric {
      * This function is lenient since it only tests the settings properties ; it ignores any other properties the options object could have.
      *
      * @param {*} userOptions
-     * @param {Boolean} shouldExtendDefaultOptions If TRUE, then this function will extends the `userOptions` passed by the user, with the default options.
+     * @param {Boolean} shouldExtendDefaultOptions If `true`, then this function will extends the `userOptions` passed by the user, with the default options.
+     * @param {object|null} originalOptions The user can pass the original options (and not the one that are generated from the default settings and the various usability corrections), in order to add compatibility and conflicts checks.
      * @throws Error This throws if the `userOptions` are not valid
      */
-    static validate(userOptions, shouldExtendDefaultOptions = true) {
-        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(userOptions) || !AutoNumericHelper.isObject(userOptions) || AutoNumericHelper.isEmptyObj(userOptions)) {
+    static validate(userOptions, shouldExtendDefaultOptions = true, originalOptions = null) {
+        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(userOptions) || !AutoNumericHelper.isObject(userOptions)) {
             AutoNumericHelper.throwError(`The userOptions are invalid ; it should be a valid object, [${userOptions}] given.`);
+        }
+
+        const isOriginalOptionAnObject = AutoNumericHelper.isObject(originalOptions);
+        if (!isOriginalOptionAnObject && !AutoNumericHelper.isNull(originalOptions)) {
+            AutoNumericHelper.throwError(`The 'originalOptions' parameter is invalid ; it should either be a valid option object or \`null\`, [${userOptions}] given.`);
         }
 
         // If the user used old options, we convert them to new ones
@@ -2837,6 +2857,39 @@ class AutoNumeric {
         const testPositiveFloatOrInteger = /^[0-9]+(\.?[0-9]+)?$/;
 
         // Then tests the options individually
+        if (!AutoNumericHelper.isTrueOrFalseString(options.allowDecimalPadding) &&
+            !AutoNumericHelper.isBoolean(options.allowDecimalPadding) &&
+            options.allowDecimalPadding !== AutoNumeric.options.allowDecimalPadding.floats) {
+            AutoNumericHelper.throwError(`The control decimal padding option 'allowDecimalPadding' is invalid ; it should be either 'false', 'true' or 'floats', [${options.allowDecimalPadding}] given.`);
+        }
+
+        if (!options.allowDecimalPadding && !AutoNumericHelper.isNull(options.decimalPlacesOverride)) {
+            AutoNumericHelper.warning(`Setting 'allowDecimalPadding' to [false] will override the current 'decimalPlacesOverride' setting [${options.decimalPlacesOverride}].`, options.showWarnings);
+        }
+
+        if (!AutoNumericHelper.isNull(options.caretPositionOnFocus) && !AutoNumericHelper.isInArray(options.caretPositionOnFocus, [
+            AutoNumeric.options.caretPositionOnFocus.start,
+            AutoNumeric.options.caretPositionOnFocus.end,
+            AutoNumeric.options.caretPositionOnFocus.decimalLeft,
+            AutoNumeric.options.caretPositionOnFocus.decimalRight,
+        ])) {
+            AutoNumericHelper.throwError(`The display on empty string option 'caretPositionOnFocus' is invalid ; it should either be \`null\`, 'focus', 'press', 'always' or 'zero', [${options.caretPositionOnFocus}] given.`);
+        }
+
+        // Special case here for `caretPositionOnFocus` and `selectOnFocus` where we need to check the original non-tempered version of the options in order to check for conflicts, since using the default settings remove those and would prevent us warning the user that his option object is not correct.
+        let optionsToUse;
+        if (isOriginalOptionAnObject) {
+            optionsToUse = originalOptions;
+        } else {
+            optionsToUse = this._correctCaretPositionOnFocusAndSelectOnFocusOptions(userOptions);
+        }
+
+        if (!AutoNumericHelper.isNull(optionsToUse) &&
+            ((optionsToUse.caretPositionOnFocus !== AutoNumeric.options.caretPositionOnFocus.doNoForceCaretPosition &&
+            optionsToUse.selectOnFocus === AutoNumeric.options.selectOnFocus.select))) {
+            AutoNumericHelper.warning(`The 'selectOnFocus' option is set to 'select', which is in conflict with the 'caretPositionOnFocus' which is set to '${optionsToUse.caretPositionOnFocus}'. As a result, if this has been called when instantiating an AutoNumeric object, the 'selectOnFocus' option is forced to 'doNotSelect'.`);
+        }
+
         if (!AutoNumericHelper.isInArray(options.digitGroupSeparator, [
             AutoNumeric.options.digitGroupSeparator.comma,
             AutoNumeric.options.digitGroupSeparator.dot,
@@ -2941,10 +2994,6 @@ class AutoNumeric {
             AutoNumericHelper.warning(`Setting 'decimalPlacesOverride' to [${options.decimalPlacesOverride}] will override the decimals declared in 'minimumValue' [${options.minimumValue}] and 'maximumValue' [${options.maximumValue}].`, options.showWarnings);
         }
 
-        if (!options.allowDecimalPadding && !AutoNumericHelper.isNull(options.decimalPlacesOverride)) {
-            AutoNumericHelper.warning(`Setting 'allowDecimalPadding' to [false] will override the current 'decimalPlacesOverride' setting [${options.decimalPlacesOverride}].`, options.showWarnings);
-        }
-
         if (!AutoNumericHelper.isNull(options.decimalPlacesShownOnFocus) && (!AutoNumericHelper.isString(options.decimalPlacesShownOnFocus) || !testPositiveInteger.test(options.decimalPlacesShownOnFocus))) {
             AutoNumericHelper.throwError(`The number of expanded decimal places option 'decimalPlacesShownOnFocus' is invalid ; it should be a positive integer, [${options.decimalPlacesShownOnFocus}] given.`);
         }
@@ -2998,12 +3047,6 @@ class AutoNumeric {
             AutoNumericHelper.throwError(`The rounding method option 'roundingMethod' is invalid ; it should either be 'S', 'A', 's', 'a', 'B', 'U', 'D', 'C', 'F', 'N05', 'CHF', 'U05' or 'D05' (cf. documentation), [${options.roundingMethod}] given.`);
         }
 
-        if (!AutoNumericHelper.isTrueOrFalseString(options.allowDecimalPadding) &&
-            !AutoNumericHelper.isBoolean(options.allowDecimalPadding) &&
-            options.allowDecimalPadding !== AutoNumeric.options.allowDecimalPadding.floats) {
-            AutoNumericHelper.throwError(`The control decimal padding option 'allowDecimalPadding' is invalid ; it should be either 'false', 'true' or 'floats', [${options.allowDecimalPadding}] given.`);
-        }
-
         if (!AutoNumericHelper.isNull(options.negativeBracketsTypeOnBlur) && !AutoNumericHelper.isInArray(options.negativeBracketsTypeOnBlur, [
             AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses,
             AutoNumeric.options.negativeBracketsTypeOnBlur.brackets,
@@ -3051,6 +3094,10 @@ class AutoNumeric {
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.selectNumberOnly) && !AutoNumericHelper.isBoolean(options.selectNumberOnly)) {
             AutoNumericHelper.throwError(`The select number only option 'selectNumberOnly' is invalid ; it should be either 'false' or 'true', [${options.selectNumberOnly}] given.`);
+        }
+
+        if (!AutoNumericHelper.isTrueOrFalseString(options.selectOnFocus) && !AutoNumericHelper.isBoolean(options.selectOnFocus)) {
+            AutoNumericHelper.throwError(`The select on focus option 'selectOnFocus' is invalid ; it should be either 'false' or 'true', [${options.selectOnFocus}] given.`);
         }
 
         if (!AutoNumericHelper.isNull(options.defaultValueOverride) && (options.defaultValueOverride !== '' && !testFloatOrIntegerAndPossibleNegativeSign.test(options.defaultValueOverride))) {
@@ -3146,7 +3193,7 @@ class AutoNumeric {
     static areSettingsValid(options) { //FIXME à tester
         let isValid = true;
         try {
-            this.validate(options);
+            this.validate(options, true);
         } catch (error) {
             isValid = false;
         }
@@ -4051,6 +4098,201 @@ class AutoNumeric {
     }
 
     /**
+     * Calculate where to put the caret position on focus if the element content is not selected.
+     * This calculation is affected by the `caretPositionOnFocus` option which can be either `null`, `'start'`, `'end'`, `'decimalLeft'` or 'decimalRight'`, and will decide where to put the caret (on the left or right of the value or the decimal character, respectively) :
+     * - `null` : the caret position is not forced
+     * - `'start'` : the caret is positioned on the left hand side of the value
+     * - `'end'` : the caret is positioned on the right hand side of the value
+     * - `'decimalLeft'` : the caret is positioned on the left side of the decimal character
+     * - `'decimalRight'` : the caret is positioned on the right side of the decimal character
+     *
+     * @param {string} value The formatted string stripped of the currency symbol and negative/positive sign
+     * @returns {number}
+     * @throws
+     * @private
+     */
+    _initialCaretPosition(value) {
+        if (AutoNumericHelper.isNull(this.settings.caretPositionOnFocus)) {
+            AutoNumericHelper.throwError('`_initialCaretPosition()` should never be called when the `caretPositionOnFocus` option is `null`.');
+        }
+
+        const isValueNegative = this.settings.rawValue < 0;
+        const isZeroOrHasNoValue = AutoNumericHelper.isZeroOrHasNoValue(value);
+        const totalLength = value.length;
+
+        let valueSize = 0;
+        let integerSize = 0;
+        let hasDecimalChar = false;
+        let offsetDecimalChar = 0;
+        if (this.settings.caretPositionOnFocus !== AutoNumeric.options.caretPositionOnFocus.start) {
+            value = value.replace('-', '');
+            value = value.replace('+', '');
+            value = value.replace(this.settings.currencySymbol, '');
+            valueSize = value.length;
+            hasDecimalChar = AutoNumericHelper.contains(value, this.settings.decimalCharacter);
+
+            if (this.settings.caretPositionOnFocus === AutoNumeric.options.caretPositionOnFocus.decimalLeft ||
+                this.settings.caretPositionOnFocus === AutoNumeric.options.caretPositionOnFocus.decimalRight) {
+                if (hasDecimalChar) {
+                    integerSize = value.indexOf(this.settings.decimalCharacter);
+                    offsetDecimalChar = this.settings.decimalCharacter.length;
+                } else {
+                    integerSize = valueSize;
+                    offsetDecimalChar = 0;
+                }
+            }
+        }
+
+        let signToUse = '';
+        if (isValueNegative) {
+            signToUse = this.settings.negativeSignCharacter;
+        } else if (this.settings.showPositiveSign && !isZeroOrHasNoValue) {
+            signToUse = this.settings.positiveSignCharacter;
+        }
+        
+        const positiveNegativeSignSize = signToUse.length;
+        const currencySymbolSize = this.settings.currencySymbol.length;
+
+        // Calculate the caret position based on `currencySymbolPlacement`, `negativePositiveSignPlacement` and `caretPositionOnFocus`
+        let caretPosition;
+        if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix) {
+            if (this.settings.caretPositionOnFocus === AutoNumeric.options.caretPositionOnFocus.start) {
+                if (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.none &&
+                    (isValueNegative || (!isValueNegative && this.settings.showPositiveSign && !isZeroOrHasNoValue))) {
+                    switch (this.settings.negativePositiveSignPlacement) {
+                        case AutoNumeric.options.negativePositiveSignPlacement.prefix: // +€|12.34
+                        case AutoNumeric.options.negativePositiveSignPlacement.left:   // +€|12.34
+                        case AutoNumeric.options.negativePositiveSignPlacement.right:  // €+|12.34
+                            caretPosition = positiveNegativeSignSize + currencySymbolSize;
+                            break;
+                        case AutoNumeric.options.negativePositiveSignPlacement.suffix: // €|12.34+
+                            caretPosition = currencySymbolSize;
+                            break;
+                    }
+                } else {                                                               // €|12.34
+                    caretPosition = currencySymbolSize;
+                }
+            } else if (this.settings.caretPositionOnFocus === AutoNumeric.options.caretPositionOnFocus.end) {
+                if (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.none &&
+                    (isValueNegative || (!isValueNegative && this.settings.showPositiveSign && !isZeroOrHasNoValue))) {
+                    switch (this.settings.negativePositiveSignPlacement) {
+                        case AutoNumeric.options.negativePositiveSignPlacement.prefix: // +€12.34|
+                        case AutoNumeric.options.negativePositiveSignPlacement.left:   // +€12.34|
+                        case AutoNumeric.options.negativePositiveSignPlacement.right:  // €+12.34|
+                            caretPosition = totalLength;
+                            break;
+                        case AutoNumeric.options.negativePositiveSignPlacement.suffix: // €12.34|+
+                            caretPosition = currencySymbolSize + valueSize;
+                            break;
+                    }
+                } else {                                                               // €12.34|
+                    caretPosition = totalLength;
+                }
+            } else if (this.settings.caretPositionOnFocus === AutoNumeric.options.caretPositionOnFocus.decimalLeft) {
+                if (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.none &&
+                    (isValueNegative || (!isValueNegative && this.settings.showPositiveSign && !isZeroOrHasNoValue))) {
+                    switch (this.settings.negativePositiveSignPlacement) {
+                        case AutoNumeric.options.negativePositiveSignPlacement.prefix: // +€12|.34
+                        case AutoNumeric.options.negativePositiveSignPlacement.left:   // +€12|.34
+                        case AutoNumeric.options.negativePositiveSignPlacement.right:  // €+12|.34
+                            caretPosition = positiveNegativeSignSize + currencySymbolSize + integerSize;
+                            break;
+                        case AutoNumeric.options.negativePositiveSignPlacement.suffix: // €12|.34+
+                            caretPosition = currencySymbolSize + integerSize;
+                            break;
+                    }
+                } else {                                                               // €12|.34
+                    caretPosition = currencySymbolSize + integerSize;
+                }
+            } else if (this.settings.caretPositionOnFocus === AutoNumeric.options.caretPositionOnFocus.decimalRight) {
+                if (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.none &&
+                    (isValueNegative || (!isValueNegative && this.settings.showPositiveSign && !isZeroOrHasNoValue))) {
+                    switch (this.settings.negativePositiveSignPlacement) {
+                        case AutoNumeric.options.negativePositiveSignPlacement.prefix: // +€12.|34
+                        case AutoNumeric.options.negativePositiveSignPlacement.left:   // +€12.|34
+                        case AutoNumeric.options.negativePositiveSignPlacement.right:  // €+12.|34
+                            caretPosition = positiveNegativeSignSize + currencySymbolSize + integerSize + offsetDecimalChar;
+                            break;
+                        case AutoNumeric.options.negativePositiveSignPlacement.suffix: // €12.|34+
+                            caretPosition = currencySymbolSize + integerSize + offsetDecimalChar;
+                            break;
+                    }
+                } else {                                                               // €12.|34
+                    caretPosition = currencySymbolSize + integerSize + offsetDecimalChar;
+                }
+            }
+        } else if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
+            if (this.settings.caretPositionOnFocus === AutoNumeric.options.caretPositionOnFocus.start) {
+                if (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.none &&
+                    (isValueNegative || (!isValueNegative && this.settings.showPositiveSign && !isZeroOrHasNoValue))) {
+                    switch (this.settings.negativePositiveSignPlacement) {
+                        case AutoNumeric.options.negativePositiveSignPlacement.suffix: // |12.34€+
+                        case AutoNumeric.options.negativePositiveSignPlacement.right:  // |12.34€+
+                        case AutoNumeric.options.negativePositiveSignPlacement.left:   // |12.34+€
+                            caretPosition = 0;
+                            break;
+                        case AutoNumeric.options.negativePositiveSignPlacement.prefix: // +|12.34€
+                            caretPosition = positiveNegativeSignSize;
+                            break;
+                    }
+                } else {                                                               // |12.34€
+                    caretPosition = 0;
+                }
+            } else if (this.settings.caretPositionOnFocus === AutoNumeric.options.caretPositionOnFocus.end) {
+                if (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.none &&
+                    (isValueNegative || (!isValueNegative && this.settings.showPositiveSign && !isZeroOrHasNoValue))) {
+                    switch (this.settings.negativePositiveSignPlacement) {
+                        case AutoNumeric.options.negativePositiveSignPlacement.suffix: // 12.34|€+
+                        case AutoNumeric.options.negativePositiveSignPlacement.right:  // 12.34|€+
+                        case AutoNumeric.options.negativePositiveSignPlacement.left:   // 12.34|+€
+                            caretPosition = valueSize;
+                            break;
+                        case AutoNumeric.options.negativePositiveSignPlacement.prefix: // +12.34|€
+                            caretPosition = positiveNegativeSignSize + valueSize;
+                            break;
+                    }
+                } else {                                                               // 12.34|€
+                    caretPosition = valueSize;
+                }
+            } else if (this.settings.caretPositionOnFocus === AutoNumeric.options.caretPositionOnFocus.decimalLeft) {
+                if (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.none &&
+                    (isValueNegative || (!isValueNegative && this.settings.showPositiveSign && !isZeroOrHasNoValue))) {
+                    switch (this.settings.negativePositiveSignPlacement) {
+                        case AutoNumeric.options.negativePositiveSignPlacement.suffix: // 12|.34€+
+                        case AutoNumeric.options.negativePositiveSignPlacement.right:  // 12|.34€+
+                        case AutoNumeric.options.negativePositiveSignPlacement.left:   // 12|.34+€
+                            caretPosition = integerSize;
+                            break;
+                        case AutoNumeric.options.negativePositiveSignPlacement.prefix: // +12|.34€
+                            caretPosition = positiveNegativeSignSize + integerSize;
+                            break;
+                    }
+                } else {                                                               // 12|.34€
+                    caretPosition = integerSize;
+                }
+            } else if (this.settings.caretPositionOnFocus === AutoNumeric.options.caretPositionOnFocus.decimalRight) {
+                if (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.none &&
+                    (isValueNegative || (!isValueNegative && this.settings.showPositiveSign && !isZeroOrHasNoValue))) {
+                    switch (this.settings.negativePositiveSignPlacement) {
+                        case AutoNumeric.options.negativePositiveSignPlacement.suffix: // 12.|34€+
+                        case AutoNumeric.options.negativePositiveSignPlacement.right:  // 12.|34€+
+                        case AutoNumeric.options.negativePositiveSignPlacement.left:   // 12.|34+€
+                            caretPosition = integerSize + offsetDecimalChar;
+                            break;
+                        case AutoNumeric.options.negativePositiveSignPlacement.prefix: // +12.|34€
+                            caretPosition = positiveNegativeSignSize + integerSize + offsetDecimalChar;
+                            break;
+                    }
+                } else {                                                               // 12.|34€
+                    caretPosition = integerSize + offsetDecimalChar;
+                }
+            }
+        }
+
+        return caretPosition;
+    }
+
+    /**
      * Truncate not needed zeros
      *
      * @param {string} roundedInputValue
@@ -4449,6 +4691,7 @@ class AutoNumeric {
      *
      * @param {string} action
      * @returns {*}
+     * @private
      */
     _saveValueToPersistentStorage(action) {
         if (this.settings.saveValueToSessionStorage) {
@@ -4490,6 +4733,7 @@ class AutoNumeric {
      * Handler for 'focusin' and 'mouseenter' events
      *
      * @param {Event} e
+     * @private
      */
     _onFocusInAndMouseEnter(e) {
         if (this.settings.unformatOnHover && e.type === 'mouseenter' && e.altKey) {
@@ -4502,13 +4746,14 @@ class AutoNumeric {
             this.constructor._reformatAltHovered(this);
         }
 
-        if (e.type === 'focus' || e.type === 'mouseenter' && !this.isFocused && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus) {
-            if (this.settings.rawValue < 0 && this.settings.negativeBracketsTypeOnBlur !== null && this.settings.negativeSignCharacter !== '') { //FIXME this is called a second time in _addGroupSeparators too. Prevent this
+        if (e.type === 'focus' || e.type === 'mouseenter' && !this.isFocused) {
+            if (this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus &&
+                this.settings.rawValue < 0 && this.settings.negativeBracketsTypeOnBlur !== null && this.settings.negativeSignCharacter !== '') { //FIXME this is called a second time in _addGroupSeparators too. Prevent this
                 // Only remove the brackets if the value is negative
                 AutoNumericHelper.setElementValue(this.domElement, this.constructor._removeBrackets(AutoNumericHelper.getElementValue(this.domElement), this.settings));
             }
 
-            // Check if the element value needs to be changed
+            // Check if the element value needs to be changed by the number of decimal places to show on focus, the scaleDecimal* options or no separator on focus option
             let updateElementValue = false;
             if (this.settings.decimalPlacesShownOnFocus) {
                 this.settings.decimalPlacesOverride = this.settings.decimalPlacesShownOnFocus;
@@ -4546,10 +4791,6 @@ class AutoNumeric {
                 if (orderedValue === this.settings.currencySymbol && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
                     AutoNumericHelper.setElementSelection(e.target, 0);
                 }
-            } else {
-                // Otherwise by default the whole input content is selected on focus (following the `selectNumberOnly` option)
-                //XXX Firefox <47 does not respect this selection...Oh well.
-                this.select();
             }
         }
     }
@@ -4557,6 +4798,7 @@ class AutoNumeric {
     /**
      * Handler for the 'focus' event.
      * We update the info of the focused state in the `this.isFocused` variable when the element gets focused.
+     * @private
      */
     _onFocus() {
         if (this.settings.isCancellable) {
@@ -4566,6 +4808,24 @@ class AutoNumeric {
 
         // We keep track if the element is currently focused
         this.isFocused = true;
+    }
+
+    /**
+     * Handler for the 'focusin' event.
+     * This is called before the 'focus' event, and is necessary to change the selection on focus under Firefox for instance.
+     *
+     * @param {Event} e
+     * @private
+     */
+    _onFocusIn(e) {
+        if (this.settings.selectOnFocus) {
+            // The whole input content is selected on focus (following the `selectOnFocus` and `selectNumberOnly` options)
+            //XXX Firefox <47 does not respect this selection...Oh well.
+            this.select();
+        } else {
+            // Or we decide where to put the caret using the `caretPositionOnFocus` option
+            AutoNumericHelper.setElementSelection(e.target, this._initialCaretPosition(AutoNumericHelper.getElementValue(this.domElement)));
+        }
     }
 
     /**
@@ -5754,6 +6014,31 @@ class AutoNumeric {
     }
 
     /**
+     * Correct the `caretPositionOnFocus` and `selectOnFocus` options, since setting both leads to a conflict.
+     *
+     * @param {object} options The options passed as an argument by the user
+     * @returns {object}
+     * @private
+     */
+    static _correctCaretPositionOnFocusAndSelectOnFocusOptions(options) {
+        if (AutoNumericHelper.isNull(options)) {
+            return null;
+        }
+
+        // If the user has set the `caretPositionOnFocus` option, do not set `selectOnFocus` to `true` by default
+        if (!AutoNumericHelper.isUndefinedOrNullOrEmpty(options.caretPositionOnFocus) && AutoNumericHelper.isUndefinedOrNullOrEmpty(options.selectOnFocus)) {
+            options.selectOnFocus = AutoNumeric.options.selectOnFocus.doNotSelect;
+        }
+
+        // If the user has set the `selectOnFocus` option to `true`, set `caretPositionOnFocus` to `doNoForceCaretPosition`
+        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(options.caretPositionOnFocus) && !AutoNumericHelper.isUndefinedOrNullOrEmpty(options.selectOnFocus) && options.selectOnFocus === AutoNumeric.options.selectOnFocus.select) {
+            options.caretPositionOnFocus = AutoNumeric.options.caretPositionOnFocus.doNoForceCaretPosition;
+        }
+
+        return options;
+    }
+
+    /**
      * Analyze and save the minimumValue and maximumValue integer size for later uses
      */
     _calculateVMinAndVMaxIntegerSizes() {
@@ -5886,6 +6171,7 @@ class AutoNumeric {
 
             // Current options :
             allowDecimalPadding               : true,
+            caretPositionOnFocus              : true,
             createLocalList                   : true,
             currencySymbol                    : true,
             currencySymbolPlacement           : true,
@@ -5919,6 +6205,7 @@ class AutoNumeric {
             scaleDivisor                      : true,
             scaleSymbol                       : true,
             selectNumberOnly                  : true,
+            selectOnFocus                     : true,
             serializeSpaces                   : true,
             showPositiveSign                  : true,
             showWarnings                      : true,
@@ -5990,7 +6277,7 @@ class AutoNumeric {
             this.throwInput = true; // Throw input event
             this.allowedTagList = AutoNumericEnum.allowedTagList;
             this.runOnce = false;
-            this.hoveredWithAlt = false; // Keep tracks if the current aN element is hovered by the mouse cursor while `Alt` is pressed
+            this.hoveredWithAlt = false; // Keep tracks if the current AutoNumeric element is hovered by the mouse cursor while `Alt` is pressed
             this.androidSelectionStart = null; // If `null`, then we are not on an Android device (the keyCode is not always equal to 229)
         }
 
@@ -5999,6 +6286,10 @@ class AutoNumeric {
 
         // Improve the `negativePositiveSignPlacement` option if needed
         this._correctNegativePositiveSignPlacementOption();
+
+        // Set the `caretPositionOnFocus` and `selectOnFocus` options so that they do not conflict, if one of those have been set manually by the user.
+        // If order to check that, we take a look at the original options the user passed as an argument, not `this.settings` that have been merged with the default settings.
+        this.settings = this.constructor._correctCaretPositionOnFocusAndSelectOnFocusOptions(this.settings);
 
         // Set the negative and positive signs, as needed
         this.settings.negativeSignCharacter = this.settings.minimumValue < 0 ? '-' : '';
@@ -6015,7 +6306,7 @@ class AutoNumeric {
         this._setBrackets();
 
         // Validate the settings. Both tests throws if necessary.
-        this.constructor.validate(this.settings, false);
+        this.constructor.validate(this.settings, false, options);
         if (AutoNumericHelper.isEmptyObj(this.settings)) {
             AutoNumericHelper.throwError('Unable to set the settings, those are invalid ; an empty object was given.');
         }
@@ -6997,6 +7288,21 @@ AutoNumeric.options = {
         floats: 'floats',
     },
 
+    /* Defines where should be positioned the caret on focus
+     * null : Do not enforce any caret positioning on focus (this is needed when using `selectOnFocus`)
+     * `'start'` : put the caret of the far left side of the value (excluding the positive/negative sign and currency symbol, if any)
+     * `'end'` : put the caret of the far right side of the value (excluding the positive/negative sign and currency symbol, if any)
+     * `'decimalLeft'` : put the caret of the left of the decimal character if any
+     * `'decimalRight'` : put the caret of the right of the decimal character if any
+     */
+    caretPositionOnFocus          : {
+        start                 : 'start',
+        end                   : 'end',
+        decimalLeft           : 'decimalLeft',
+        decimalRight          : 'decimalRight',
+        doNoForceCaretPosition: null,
+    },
+
     /* Defines if a local list of AutoNumeric objects should be kept when initializing this object.
      * This list is used by the `global.*` functions.
      */
@@ -7450,6 +7756,14 @@ AutoNumeric.options = {
         selectAll        : false,
     },
 
+    /* Defines if the element being focused should have its content selected or not.
+     * Note: The selection is done using the `selectNumberOnly` option.
+     */
+    selectOnFocus                : {
+        select     : true,
+        doNotSelect: false,
+    },
+
     /* Defines how the serialize functions should treat the spaces.
      * Those spaces ' ' can either be converted to the plus sign '+', which is the default, or to '%20'.
      * Both values being valid per the spec (http://www.w3.org/Addressing/URL/uri-spec.html).
@@ -7605,6 +7919,7 @@ AutoNumeric.options = {
  */
 AutoNumeric.defaultSettings = {
     allowDecimalPadding          : AutoNumeric.options.allowDecimalPadding.always,
+    caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.doNoForceCaretPosition,
     createLocalList              : AutoNumeric.options.createLocalList.createList,
     currencySymbol               : AutoNumeric.options.currencySymbol.none,
     currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
@@ -7639,6 +7954,7 @@ AutoNumeric.defaultSettings = {
     scaleDivisor                 : AutoNumeric.options.scaleDivisor.doNotActivateTheScalingOption,
     scaleSymbol                  : AutoNumeric.options.scaleSymbol.none,
     selectNumberOnly             : AutoNumeric.options.selectNumberOnly.selectNumbersOnly,
+    selectOnFocus                : AutoNumeric.options.selectOnFocus.select,
     serializeSpaces              : AutoNumeric.options.serializeSpaces.plus,
     showPositiveSign             : AutoNumeric.options.showPositiveSign.hide,
     showWarnings                 : AutoNumeric.options.showWarnings.show,

@@ -131,6 +131,50 @@ const selectors = {
     selection1                        : '#selection1',
     noSeparatorOnFocusInput1          : '#noSeparatorOnFocus1',
     noSeparatorOnFocusInput2          : '#noSeparatorOnFocus2',
+    selectOnFocusA                    : '#selectOnFocusA',
+    selectOnFocusB                    : '#selectOnFocusB',
+    selectOnFocusC                    : '#selectOnFocusC',
+    selectOnFocusD                    : '#selectOnFocusD',
+    selectOnFocus1                    : '#selectOnFocus1',
+    selectOnFocus2                    : '#selectOnFocus2',
+    selectOnFocus3                    : '#selectOnFocus3',
+    selectOnFocus4                    : '#selectOnFocus4',
+    selectOnFocus5                    : '#selectOnFocus5',
+    selectOnFocus6                    : '#selectOnFocus6',
+    selectOnFocus7                    : '#selectOnFocus7',
+    selectOnFocus8                    : '#selectOnFocus8',
+    selectOnFocus9                    : '#selectOnFocus9',
+    selectOnFocus10                   : '#selectOnFocus10',
+    selectOnFocus11                   : '#selectOnFocus11',
+    selectOnFocus12                   : '#selectOnFocus12',
+    selectOnFocus13                   : '#selectOnFocus13',
+    selectOnFocus14                   : '#selectOnFocus14',
+    selectOnFocus15                   : '#selectOnFocus15',
+    selectOnFocus16                   : '#selectOnFocus16',
+    selectOnFocus17                   : '#selectOnFocus17',
+    selectOnFocus18                   : '#selectOnFocus18',
+    selectOnFocus19                   : '#selectOnFocus19',
+    selectOnFocus20                   : '#selectOnFocus20',
+    selectOnFocus21                   : '#selectOnFocus21',
+    selectOnFocus22                   : '#selectOnFocus22',
+    selectOnFocus23                   : '#selectOnFocus23',
+    selectOnFocus24                   : '#selectOnFocus24',
+    selectOnFocus25                   : '#selectOnFocus25',
+    selectOnFocus26                   : '#selectOnFocus26',
+    selectOnFocus27                   : '#selectOnFocus27',
+    selectOnFocus28                   : '#selectOnFocus28',
+    selectOnFocus29                   : '#selectOnFocus29',
+    selectOnFocus30                   : '#selectOnFocus30',
+    selectOnFocus31                   : '#selectOnFocus31',
+    selectOnFocus32                   : '#selectOnFocus32',
+    selectOnFocus33                   : '#selectOnFocus33',
+    selectOnFocus34                   : '#selectOnFocus34',
+    selectOnFocus35                   : '#selectOnFocus35',
+    selectOnFocus36                   : '#selectOnFocus36',
+    selectOnFocus37                   : '#selectOnFocus37',
+    selectOnFocus38                   : '#selectOnFocus38',
+    selectOnFocus39                   : '#selectOnFocus39',
+    selectOnFocus40                   : '#selectOnFocus40',
 };
 
 //-----------------------------------------------------------------------------
@@ -2699,5 +2743,396 @@ describe('`noSeparatorOnFocusInput` option', () => {
         input2.click();
         expect(browser.getValue(selectors.noSeparatorOnFocusInput1)).toEqual('-246.813,58\u202f€ loan');
         expect(browser.getValue(selectors.noSeparatorOnFocusInput2)).toEqual('-246813.58');
+    });
+});
+
+describe('`caretPositionOnFocus` option', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.selectOnFocus1)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus2)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus3)).toEqual('jk-246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus4)).toEqual('jk246.813,58-');
+        expect(browser.getValue(selectors.selectOnFocus5)).toEqual('-jk246.813,58');
+
+        expect(browser.getValue(selectors.selectOnFocus6)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus7)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus8)).toEqual('jk-246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus9)).toEqual('jk246.813,58-');
+        expect(browser.getValue(selectors.selectOnFocus10)).toEqual('-jk246.813,58');
+
+        expect(browser.getValue(selectors.selectOnFocus11)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus12)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus13)).toEqual('jk-246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus14)).toEqual('jk246.813,58-');
+        expect(browser.getValue(selectors.selectOnFocus15)).toEqual('-jk246.813,58');
+
+        expect(browser.getValue(selectors.selectOnFocus16)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus17)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus18)).toEqual('jk-246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus19)).toEqual('jk246.813,58-');
+        expect(browser.getValue(selectors.selectOnFocus20)).toEqual('-jk246.813,58');
+
+
+        expect(browser.getValue(selectors.selectOnFocus21)).toEqual('-246.813,58jk');
+        expect(browser.getValue(selectors.selectOnFocus22)).toEqual('246.813,58-jk');
+        expect(browser.getValue(selectors.selectOnFocus23)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus24)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus25)).toEqual('-246.813,58jk');
+
+        expect(browser.getValue(selectors.selectOnFocus26)).toEqual('-246.813,58jk');
+        expect(browser.getValue(selectors.selectOnFocus27)).toEqual('246.813,58-jk');
+        expect(browser.getValue(selectors.selectOnFocus28)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus29)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus30)).toEqual('-246.813,58jk');
+
+        expect(browser.getValue(selectors.selectOnFocus31)).toEqual('-246.813,58jk');
+        expect(browser.getValue(selectors.selectOnFocus32)).toEqual('246.813,58-jk');
+        expect(browser.getValue(selectors.selectOnFocus33)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus34)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus35)).toEqual('-246.813,58jk');
+
+        expect(browser.getValue(selectors.selectOnFocus36)).toEqual('-246.813,58jk');
+        expect(browser.getValue(selectors.selectOnFocus37)).toEqual('246.813,58-jk');
+        expect(browser.getValue(selectors.selectOnFocus38)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus39)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus40)).toEqual('-246.813,58jk');
+    });
+
+    xit('should position the caret correctly on focus', () => {
+        let inputCaretPosition;
+        const inputD = $(selectors.selectOnFocusD);
+
+        // Focus on the input before the input series
+        inputD.click();
+
+        // Serie 1
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);  //XXX This does not work under Firefox 45.7, but does under firefox 53. Since we only support the browsers last version - 2, let's ignore it.
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus2');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus4');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(2);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus5');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        // Serie 2
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus6');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(13);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus7');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(13);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus8');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(13);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus9');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(12);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus10');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(13);
+
+        // Serie 3
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus11');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus12');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus13');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus14');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(9);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus15');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Serie 4
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus16');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus17');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus18');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus19');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus20');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Serie 5
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus21');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus22');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus23');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus24');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus25');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        // Serie 6
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus26');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus27');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus28');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus29');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus30');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Serie 7
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus31');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus32');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus33');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus34');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus35');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        // Serie 8
+        // Focus on the input and check the caret position -246.813,58jk
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus36');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(9);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus37');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus38');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus39');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus40');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(9);
     });
 });

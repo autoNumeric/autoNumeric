@@ -1,6 +1,13 @@
 ## How to contribute?
 Contributors and pull requests are welcome.<br>Feel free to [contact](#questions) us for any questions.
 
+### Junior jobs
+
+Every contribution are welcomed, whatever their sizes.<br>
+If you want to contribute to a dynamic and welcoming open-source project, be sure to check our *easy-to-start-with* junior jobs, either by checking the issues for the tag [*Junior jobs*](https://github.com/autoNumeric/autoNumeric/issues?q=is%3Aissue+is%3Aopen+label%3A%22Junior+Jobs%22), or by searching for the `//TODO` and `//FIXME` strings directly in the source (there are plenty awaiting for you right now!).
+
+Happy coding :>
+
 ### Get the latest source
 ```sh
 git clone -b next https://github.com/autoNumeric/autoNumeric.git

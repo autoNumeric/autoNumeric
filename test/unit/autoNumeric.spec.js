@@ -3340,8 +3340,8 @@ describe('Instantiated autoNumeric functions', () => {
 
         it('should set the given values (element and raw value) without formatting it, and without checking it', () => {
             aNInput.french();
-            aNInput._setElementAndRawValue('elementValue', 'rawValue');
-            expect(aNInput.getFormatted()).toEqual('elementValue');
+            aNInput._setElementAndRawValue('newElementValue', 'rawValue');
+            expect(aNInput.getFormatted()).toEqual('newElementValue');
             expect(aNInput.getSettings().rawValue).toEqual('rawValue');
 
             aNInput._setElementAndRawValue('sameValue');
@@ -5957,5 +5957,49 @@ describe(`The static options object`, () => {
         expect(AutoNumeric.options.decimalCharacter.middleDot).toEqual('·');
         expect(AutoNumeric.options.decimalCharacterAlternative.none).toBeNull();
         expect(AutoNumeric.options.currencySymbol.none).toEqual('');
+    });
+});
+
+describe(`The AutoNumeric event lifecycle`, () => {
+    let aNInput;
+    let newInput;
+    let customFunction;
+
+    beforeEach(() => { // Initialization
+        newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+        aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+
+        customFunction = { // Dummy function used for spying
+            formattedEvent(value) {
+                // console.log(`formattedEvent called!`); //DEBUG
+                return value;
+            },
+        };
+    });
+
+    afterEach(() => { // Un-initialization
+        aNInput.nuke();
+    });
+
+    it(`should send the 'autoNumeric:formatted' event when formatting is done`, () => {
+        newInput.addEventListener('autoNumeric:formatted', e => customFunction.formattedEvent(e));
+        spyOn(customFunction, 'formattedEvent');
+
+        aNInput.set(2000);
+        expect(customFunction.formattedEvent).toHaveBeenCalled();
+        aNInput.french();
+        expect(customFunction.formattedEvent).toHaveBeenCalledTimes(2);
+        aNInput.set('');
+        expect(customFunction.formattedEvent).toHaveBeenCalledTimes(3);
+        aNInput.set(-5600.78);
+        expect(customFunction.formattedEvent).toHaveBeenCalledTimes(4);
+        expect(aNInput.getFormatted()).toEqual('-5.600,78 €');
+        aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.curlyBraces);
+        expect(aNInput.getFormatted()).toEqual('{5.600,78 €}');
+        expect(customFunction.formattedEvent).toHaveBeenCalledTimes(5);
+        aNInput.node().focus();
+        expect(customFunction.formattedEvent).toHaveBeenCalledTimes(6);
+        expect(aNInput.getFormatted()).toEqual('-5.600,78 €');
     });
 });

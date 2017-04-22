@@ -206,6 +206,15 @@
 
 	<div class="testSuite">
 		<div class="test">
+			<p class="description">AutoNumeric events</p>
+			<div>
+				<input id="autoNumericEventInput" type="text" placeholder="AutoNumeric events" value="2222">
+			</div>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
 			<div>
 				<p class="description">Non input tags</p>
 				<p id="tag_p1">0.0214</p>
@@ -1518,6 +1527,14 @@
     new AutoNumeric('#selectOnFocus38').french().update(doNotSelectOption).update(case38);
     new AutoNumeric('#selectOnFocus39').french().update(doNotSelectOption).update(case39);
     new AutoNumeric('#selectOnFocus40').french().update(doNotSelectOption).update(case40);
+
+    //-------------- AutoNumeric events
+    new AutoNumeric('#autoNumericEventInput');
+    const autoNumericEventInput = document.querySelector('#autoNumericEventInput');
+    autoNumericEventInput.addEventListener('autoNumeric:formatted', e => {
+        console.log(`'autoNumeric:formatted' sent with`, e); //DEBUG
+    });
+
 </script>
 </body>
 </html>

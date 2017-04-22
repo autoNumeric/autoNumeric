@@ -1,6 +1,5 @@
 /**
- * Babel + Webpack workaround for autoNumeric
- *
+ * Options for autoNumeric.js
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
  * @copyright © 2017 Alexandre Bonneau
  *
@@ -28,21 +27,19 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/* global module */
-
 import AutoNumeric from './AutoNumeric';
-import AutoNumericEvents from './AutoNumericEvents';
-import AutoNumericOptions from './AutoNumericOptions';
-import AutoNumericDefaultSettings from './AutoNumericDefaultSettings';
-import AutoNumericPredefinedOptions from './AutoNumericPredefinedOptions';
-
-/* eslint no-unused-vars: 0 */
 
 /**
- * This file serve as the main entry point to the library.
- * cf. workaround detailed here http://stackoverflow.com/a/33683495/2834898
+ * Event list managed by AutoNumeric
  *
- * @type {AutoNumeric}
+ * @type {{formatted: string, minRangeExceeded: string, maxRangeExceeded: string, native: {input: string, change: string}}}
  */
-module.exports = AutoNumeric;
-//TODO Also export the AutoNumericEnum module
+AutoNumeric.events = {
+    formatted       : 'autoNumeric:formatted',
+    minRangeExceeded: 'autoNumeric:minExceeded',
+    maxRangeExceeded: 'autoNumeric:maxExceeded',
+    native          : {
+        input : 'input',
+        change: 'change',
+    },
+};

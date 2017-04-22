@@ -5,6 +5,10 @@
   Separating them from the AutoNumeric class makes that information easier to find, study and modify.
 + Modify the `update()` and `global.update()` function signatures so that they can accept multiple option objects, the latter overwriting the settings from the former.
   This allows to fine tune the format settings in one go, and is specially useful when using a predefined option as the 'configuration base', and changing it slightly (ie. `anElement.update( AutoNumeric.getPredefinedOptions().French, { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator })`).
++ Fix the `'autoNumeric:formatted'` event not being correctly sent if the AutoNumeric element was formatted without a `keyup` event.
+  The event is now correctly sent when the value is set to empty, or when using `unformat()`, `unformatLocalized()` and `wipe()`, as well as when the user uses the wheel event to change the element value, or the `alt + mouse hover` feature, or just hover the element that has a `negativeBracketsTypeOnBlur` option set, or on the initial format on load.
++ Fix the fact that `'autoNumeric:formatted'` was not sent when pasting valid values.
++ Gather the AutoNumeric event names in a single configuration variable `AutoNumeric.events`.
 
 ### 4.0.0-beta.15
 + Add a new option `selectOnFocus` that allow the user to choose if the value should be selected when the element is focused.

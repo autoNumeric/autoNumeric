@@ -1180,26 +1180,6 @@ class AutoNumeric {
     }
 
     /**
-     * Save the raw value inside the AutoNumeric object.
-     *
-     * @param {number|string} rawValue The numeric value as understood by Javascript like a `Number`
-     * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history array, otherwise it is not
-     * @private
-     */
-    _setRawValue(rawValue, saveChangeToHistory = true) {
-        // Update the raw value
-        this.settings.rawValue = rawValue;
-
-        // Change the element style or use the relevant callbacks
-        this._parseStyleRules();
-
-        if (saveChangeToHistory) {
-            // Save in the history the last known raw value and formatted result selection
-            this._historyTableAdd();
-        }
-    }
-
-    /**
      * Parse the `styleRules` option and run the test for each given rules, either pre-defined ones like `positive`, `negative` and `ranges`, or user defined callbacks within the `userDefined` attribute.
      * @private
      */
@@ -1496,11 +1476,11 @@ class AutoNumeric {
                 value = '';
 
                 if (!minTest) {
-                    AutoNumericHelper.triggerEvent('autoNumeric:minExceeded', this.domElement);
+                    AutoNumericHelper.triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
                 }
 
                 if (!maxTest) {
-                    AutoNumericHelper.triggerEvent('autoNumeric:maxExceeded', this.domElement);
+                    AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
                 }
 
                 AutoNumericHelper.throwError(`The value [${attemptedValue}] being set falls outside of the minimumValue [${this.settings.minimumValue}] and maximumValue [${this.settings.maximumValue}] range set for this element`);
@@ -1567,12 +1547,54 @@ class AutoNumeric {
     /**
      * Set the given value directly as the DOM element value, without formatting it beforehand, and without checking its validity.
      *
-     * @param {string|number|null} value
+     * @param {string|number|null} newValue The new value to set on the element
      * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history array, otherwise it is not
      * @returns {AutoNumeric}
      */
-    setValue(value, saveChangeToHistory = true) {
-        this._setElementAndRawValue(value, saveChangeToHistory);
+    setValue(newValue, saveChangeToHistory = true) {
+        this._setElementAndRawValue(newValue, saveChangeToHistory);
+
+        return this;
+    }
+
+    /**
+     * Save the raw value inside the AutoNumeric object.
+     *
+     * @param {number|string} rawValue The numeric value as understood by Javascript like a `Number`
+     * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history array, otherwise it is not
+     * @private
+     */
+    _setRawValue(rawValue, saveChangeToHistory = true) {
+        // Update the raw value
+        this.settings.rawValue = rawValue;
+
+        // Change the element style or use the relevant callbacks
+        this._parseStyleRules();
+
+        if (saveChangeToHistory) {
+            // Save in the history the last known raw value and formatted result selection
+            this._historyTableAdd();
+        }
+    }
+
+    /**
+     * Set the given value on the DOM element, without affecting the `rawValue`.
+     * This send an 'autoNumeric:formatted' event if the new value is different than the old one.
+     *
+     * @param {number|string} newElementValue
+     * @returns {AutoNumeric}
+     * @private
+     */
+    _setElementValue(newElementValue) {
+        //TODO Use an internal attribute to track the current value of the element `formattedValue` (like its counterpart `rawValue`). This would allow us to avoid calling `getElementValue` many times
+        // `oldElementValue` is the previous value that will be overwritten. This is used to decide if an event should be sent or not.
+        const oldElementValue = AutoNumericHelper.getElementValue(this.domElement);
+
+        if (newElementValue !== oldElementValue) {
+            // Only update the value if it's different from the current one
+            AutoNumericHelper.setElementValue(this.domElement, newElementValue);
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, this.domElement, { oldValue: oldElementValue, newValue: newElementValue });
+        }
 
         return this;
     }
@@ -1583,23 +1605,23 @@ class AutoNumeric {
      * The third argument `saveChangeToHistory` defines if the change should be recorded in the history array.
      * Note: if the second argument `rawValue` is a boolean, we consider that is really is the `saveChangeToHistory` argument.
      *
-     * @param {number|string} elementValue
+     * @param {number|string} newElementValue
      * @param {number|string|null|boolean} rawValue
      * @param {boolean} saveChangeToHistory
      * @returns {AutoNumeric}
      * @private
      */
-    _setElementAndRawValue(elementValue, rawValue = null, saveChangeToHistory = true) {
+    _setElementAndRawValue(newElementValue, rawValue = null, saveChangeToHistory = true) {
         if (AutoNumericHelper.isNull(rawValue)) {
-            rawValue = elementValue;
+            rawValue = newElementValue;
         } else if (AutoNumericHelper.isBoolean(rawValue)) {
             saveChangeToHistory = rawValue;
-            rawValue = elementValue;
+            rawValue = newElementValue;
         }
 
         //XXX The order here is important ; the value should first be set on the element, then and only then we should update the raw value
         // In the `set()` function, we make sure to call `_setRawValue` *after* `setElementValue` so that if `_setRawValue` calls a callback that modify the `rawValue`, then the new value is set correctly (after `setElementValue` briefly set its value first)
-        AutoNumericHelper.setElementValue(this.domElement, elementValue);
+        this._setElementValue(newElementValue);
         this._setRawValue(rawValue, saveChangeToHistory);
 
         return this;
@@ -1727,7 +1749,7 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     unformat() {
-        AutoNumericHelper.setElementValue(this.domElement, this.getNumericString());
+        this._setElementValue(this.getNumericString());
 
         return this;
     }
@@ -1742,7 +1764,7 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     unformatLocalized(forcedOutputFormat = null) {
-        AutoNumericHelper.setElementValue(this.domElement, this.getLocalized(forcedOutputFormat));
+        this._setElementValue(this.getLocalized(forcedOutputFormat));
 
         return this;
     }
@@ -2182,7 +2204,7 @@ class AutoNumeric {
      * @example anElement.wipe()
      */
     wipe() {
-        AutoNumericHelper.setElementValue(this.domElement, '');
+        this._setElementValue('');
         this.remove();
     }
 
@@ -3273,7 +3295,7 @@ class AutoNumeric {
         const [minTest, maxTest] = this._checkIfInRangeWithOverrideOption(valueString, settings);
         if (!minTest || !maxTest) {
             // Throw a custom event
-            AutoNumericHelper.triggerEvent('autoNumeric:formatted', document, 'Range test failed');
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, document, 'Range test failed');
             AutoNumericHelper.throwError(`The value [${valueString}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`);
         }
 
@@ -4747,6 +4769,9 @@ class AutoNumeric {
      * @private
      */
     _onFocusInAndMouseEnter(e) {
+        //TODO `AutoNumericHelper.setElementValue` is called 3 times sequentially here, fix that
+        const initialElementValue = AutoNumericHelper.getElementValue(this.domElement);
+        
         if (this.settings.unformatOnHover && e.type === 'mouseenter' && e.altKey) {
             this.constructor._unformatAltHovered(this);
 
@@ -4803,6 +4828,10 @@ class AutoNumeric {
                     AutoNumericHelper.setElementSelection(e.target, 0);
                 }
             }
+        }
+
+        if (AutoNumericHelper.getElementValue(this.domElement) !== initialElementValue) {
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, this.domElement, { oldValue: initialElementValue, newValue: AutoNumericHelper.getElementValue(this.domElement) });
         }
     }
 
@@ -4909,7 +4938,7 @@ class AutoNumeric {
                     // Do not set the value again if it has not changed
                     this.set(this.savedCancellableValue);
                     // And we need to send an 'input' event when setting back the initial value in order to make other scripts aware of the value change...
-                    AutoNumericHelper.triggerEvent('input', e.target);
+                    AutoNumericHelper.triggerEvent(AutoNumeric.events.native.input, e.target);
                 }
             }
 
@@ -4921,7 +4950,7 @@ class AutoNumeric {
         // The "enter" key throws a `change` event if the value has changed since the `focus` event
         let targetValue = AutoNumericHelper.getElementValue(e.target);
         if (this.eventKey === AutoNumericEnum.keyName.Enter && this.valueOnFocus !== targetValue) {
-            AutoNumericHelper.triggerEvent('change', e.target);
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.native.change, e.target);
             this.valueOnFocus = targetValue;
 
             if (this.settings.isCancellable) {
@@ -4948,7 +4977,7 @@ class AutoNumeric {
             targetValue = AutoNumericHelper.getElementValue(e.target); // Update the value since it could have been changed during the deletion
             if ((targetValue !== this.lastVal) && this.throwInput) {
                 // Throw an input event when a character deletion is detected
-                AutoNumericHelper.triggerEvent('input', e.target);
+                AutoNumericHelper.triggerEvent(AutoNumeric.events.native.input, e.target);
                 e.preventDefault(); // ...and immediately prevent the browser to delete a second character
             }
 
@@ -4992,7 +5021,7 @@ class AutoNumeric {
             const targetValue = AutoNumericHelper.getElementValue(e.target);
             if ((targetValue !== this.lastVal) && this.throwInput) {
                 // Throws input event on adding a character
-                AutoNumericHelper.triggerEvent('input', e.target);
+                AutoNumericHelper.triggerEvent(AutoNumeric.events.native.input, e.target);
                 e.preventDefault(); // ...and immediately prevent the browser to add a second character
             } else {
                 if ((this.eventKey === this.settings.decimalCharacter || this.eventKey === this.settings.decimalCharacterAlternative) &&
@@ -5171,8 +5200,7 @@ class AutoNumeric {
 
         // If the input value has changed during the key press event chain, an event is sent to alert that a formatting has been done (cf. Issue #187)
         if (targetValue !== this.initialValueOnKeydown) {
-            //FIXME This event is not sent when pasting valid values
-            AutoNumericHelper.triggerEvent('autoNumeric:formatted', e.target);
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, e.target, { oldValue: this.initialValueOnKeydown, newValue: targetValue }); //TODO Do I need to remove this since we now send this event on `set()`?
         }
 
         // Update the selection of the current element of the history table
@@ -5235,10 +5263,10 @@ class AutoNumeric {
                     value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
                 } else {
                     if (!minTest) {
-                        AutoNumericHelper.triggerEvent('autoNumeric:minExceeded', this.domElement);
+                        AutoNumericHelper.triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
                     }
                     if (!maxTest) {
-                        AutoNumericHelper.triggerEvent('autoNumeric:maxExceeded', this.domElement);
+                        AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
                     }
                 }
             } else {
@@ -5263,11 +5291,11 @@ class AutoNumeric {
                     groupedValue = `${groupedValue}${this.settings.scaleSymbol}`;
                 }
 
-                AutoNumericHelper.setElementValue(this.domElement, groupedValue);
+                this._setElementValue(groupedValue);
             }
 
             if (groupedValue !== this.valueOnFocus) {
-                AutoNumericHelper.triggerEvent('change', this.domElement);
+                AutoNumericHelper.triggerEvent(AutoNumeric.events.native.change, this.domElement);
                 delete this.valueOnFocus;
             }
         }
@@ -5667,7 +5695,7 @@ class AutoNumeric {
         // 8. We make sure we send an input event only if the result is different than the initial value before the paste
         if (valueHasBeenSet && initialFormattedValue !== targetValue) {
             // On a 'normal' non-autoNumeric input, an `input` event is sent when a paste is done. We mimic that.
-            AutoNumericHelper.triggerEvent('input', e.target);
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.native.input, e.target);
         }
     }
 
@@ -5679,7 +5707,7 @@ class AutoNumeric {
      */
     _onBlur(e) {
         if (AutoNumericHelper.getElementValue(e.target) !== this.valueOnFocus) {
-            AutoNumericHelper.triggerEvent('change', e.target);
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.native.change, e.target);
         }
 
         // Keep track if the element is currently focused
@@ -5780,7 +5808,7 @@ class AutoNumeric {
      */
     _onFormSubmit() {
         if (this.settings.unformatOnSubmit) {
-            AutoNumericHelper.setElementValue(this.domElement, this.settings.rawValue);
+            this._setElementValue(this.settings.rawValue);
         }
     }
 
@@ -5967,7 +5995,7 @@ class AutoNumeric {
                         break;
                     //TODO What about the `AutoNumeric.options.emptyInputBehavior.press` value?
                     case AutoNumeric.options.emptyInputBehavior.always:
-                        AutoNumericHelper.setElementValue(this.domElement, this.settings.currencySymbol);
+                        this._setElementValue(this.settings.currencySymbol);
                         setValue = false;
                         break;
                     case AutoNumeric.options.emptyInputBehavior.zero:
@@ -6600,9 +6628,9 @@ class AutoNumeric {
         }
 
         if (!minTest) {
-            AutoNumericHelper.triggerEvent('autoNumeric:minExceeded', this.domElement);
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
         } else if (!maxTest) {
-            AutoNumericHelper.triggerEvent('autoNumeric:maxExceeded', this.domElement);
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
         }
 
         return false;
@@ -7105,7 +7133,7 @@ class AutoNumeric {
         // Only update the value if it has changed. This prevents modifying the selection, if any.
         if (value !== elementValue ||
             value === elementValue && (this.eventKey === AutoNumericEnum.keyName.num0 || this.eventKey === AutoNumericEnum.keyName.numpad0)) {
-            AutoNumericHelper.setElementValue(this.domElement, value);
+            this._setElementValue(value);
             this._setCaretPosition(position);
         }
 

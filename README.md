@@ -749,6 +749,7 @@ By default a 'normal' printable character input (ie. `'2'` or `','`) will result
 1. `'input'`
 1. `'keyup'`
 1. `'autoNumeric:formatted'` when all the formatting is done
+  - Note: The `event` variable in the event handler provide access to the old and new value in `{ detail : { oldValue: 1, newValue: 2 } }`
 
 When inputting a modifier key (ie. `Control`), we get:
 1. `'keydown'`

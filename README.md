@@ -808,6 +808,7 @@ In a nutshell :
 - Get the latest source `git clone -b next https://github.com/autoNumeric/autoNumeric.git && cd autoNumeric && yarn install`
 - Make you changes
 - Lint, build, and run tests `yarn lint && yarn build && yarn test`
+  - If you encounter any linting problems, you can try to automatically fix those with `yarn lintfix` 
 - Create a pull request, and we'll check it out as soon as possible!
 
 Again, be sure to check the [CONTRIBUTING](CONTRIBUTING.md) guidelines for more details.<br>

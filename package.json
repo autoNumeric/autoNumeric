@@ -117,6 +117,7 @@
     "clean:log": "rimraf npm-debug.log selenium-debug.log test/e2e/selenium.log yarn-error.log",
     "clean": "yarn clean:build && yarn clean:coverage && yarn clean:log && yarn clean:e2e",
     "lint": "eslint --ext .js src test/unit test/e2e",
+    "lintfix": "eslint --fix --ext .js src test/unit test/e2e",
     "test": "yarn test:unit && yarn test:e2e",
     "test:unit": "karma start karma.conf.js --single-run",
     "test:unitp": "karma start karma.conf.js --single-run --browsers PhantomJS",

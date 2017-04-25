@@ -75,8 +75,11 @@ yarn lint
 ```
 If any errors are shown, you can try to automatically correct them by running :
 ```sh
-# Use the path of the faulty file there :
+# Use the path of the faulty file to fix only this particular file :
 ./node_modules/eslint/bin/eslint.js --fix src/AutoNumeric.js
+
+# Or try to fix all errors in all files once with
+yarn lintfix
 ```
 
 #### How to push?

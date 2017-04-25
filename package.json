@@ -107,6 +107,7 @@
     "webpack": "latest"
   },
   "scripts": {
+    "authors": "sh tools/authors.sh",
     "postinstall": "node yarnfix.js",
     "build:dev": "webpack src/AutoNumeric.js dist/autoNumeric.js --config config/webpack.config.dev.js",
     "build:prd": "webpack src/AutoNumeric.js dist/autoNumeric.min.js --config config/webpack.config.prd.js",

@@ -5,7 +5,7 @@
  * @date         2017-04-19 UTC 09:00
  *
  * @author       Bob Knothe
- * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS.md
+ * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS
  * @copyright    2009 Robert J. Knothe http://www.decorplanit.com/plugin/
  * @since        2009-08-09
  *

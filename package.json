@@ -141,8 +141,12 @@
     "basePath": "",
     "files": [
       "src/AutoNumeric.js",
+      "src/AutoNumericDefaultSettings.js",
       "src/AutoNumericEnum.js",
+      "src/AutoNumericEvents.js",
       "src/AutoNumericHelper.js",
+      "src/AutoNumericOptions.js",
+      "src/AutoNumericPredefinedOptions.js",
       "src/main.js"
     ]
   }

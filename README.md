@@ -715,6 +715,7 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 | :---------------- | :-----------:  | :-----------:  |
 | `validate` | Check if the given option object is valid, and that each option is valid as well. This throws an error if it's not. | `AutoNumeric.validate({ options })` |
 | `areSettingsValid` | Return true in the settings are valid | `AutoNumeric.areSettingsValid({ options })` |
+| `getAutoNumericElement` | Return the AutoNumeric object that manages the given DOM element | `AutoNumeric.getAutoNumericElement(domElement)` |
 | `getDefaultConfig` | Return the default autoNumeric settings | `AutoNumeric.getDefaultConfig()` |
 | `getPredefinedOptions` | Return all the predefined options in one object | `AutoNumeric.getPredefinedOptions()` |
 | `getPredefinedOptions` | Return a specific pre-defined language option object | `AutoNumeric.getPredefinedOptions().French` |

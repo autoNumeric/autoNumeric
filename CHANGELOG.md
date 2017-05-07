@@ -9,6 +9,7 @@
   The event is now correctly sent when the value is set to empty, or when using `unformat()`, `unformatLocalized()` and `wipe()`, as well as when the user uses the wheel event to change the element value, or the `alt + mouse hover` feature, or just hover the element that has a `negativeBracketsTypeOnBlur` option set, or on the initial format on load.
 + Fix the fact that `'autoNumeric:formatted'` was not sent when pasting valid values.
 + Gather the AutoNumeric event names in a single configuration variable `AutoNumeric.events`.
++ Modify the default percentage pre-defined option `wheelStep` to `0.01` so that the wheel step is more logical when manipulating a small number.
 
 ### 4.0.0-beta.15
 + Add a new option `selectOnFocus` that allow the user to choose if the value should be selected when the element is focused.

@@ -10,6 +10,7 @@
 + Fix the fact that `'autoNumeric:formatted'` was not sent when pasting valid values.
 + Gather the AutoNumeric event names in a single configuration variable `AutoNumeric.events`.
 + Modify the default percentage pre-defined option `wheelStep` to `0.01` so that the wheel step is more logical when manipulating a small number.
++ Fix issue #442 Setting `unformatOnSubmit` to `true` does not unformat the element on the form' `submit` event
 
 ### 4.0.0-beta.15
 + Add a new option `selectOnFocus` that allow the user to choose if the value should be selected when the element is focused.

@@ -904,7 +904,7 @@ class AutoNumeric {
         this._onFocusOutAndMouseLeaveFunc = e => { this._onFocusOutAndMouseLeave(e); };
         this._onPasteFunc = e => { this._onPaste(e); };
         this._onWheelFunc = e => { this._onWheel(e); };
-        this._onFormSubmitFunc = e => { this._onFormSubmit(e); };
+        this._onFormSubmitFunc = () => { this._onFormSubmit(); };
         this._onKeydownGlobalFunc = e => { this._onKeydownGlobal(e); };
         this._onKeyupGlobalFunc = e => { this._onKeyupGlobal(e); };
         this._onDropFunc = e => { this._onDrop(e); };
@@ -925,9 +925,9 @@ class AutoNumeric {
         this.domElement.addEventListener('wheel', this._onWheelFunc, false);
         this.domElement.addEventListener('drop', this._onDropFunc, false);
 
-        const parentForm = this.form();
-        if (!AutoNumericHelper.isNull(parentForm)) {
-            parentForm.addEventListener('submit.autoNumeric', this._onFormSubmitFunc, false); //FIXME à tester
+        this.parentForm = this.form();
+        if (!AutoNumericHelper.isNull(this.parentForm)) {
+            this.parentForm.addEventListener('submit', this._onFormSubmitFunc, false);
         }
 
         // Create one global event listener for the keyup event on the document object, which will be shared by all the autoNumeric elements
@@ -961,7 +961,7 @@ class AutoNumeric {
 
         const parentForm = this.form();
         if (!AutoNumericHelper.isNull(parentForm)) {
-            parentForm.removeEventListener('submit.autoNumeric', this._onFormSubmitFunc, false);
+            parentForm.removeEventListener('submit', this._onFormSubmitFunc, false);
         }
     }
 
@@ -5804,12 +5804,17 @@ class AutoNumeric {
     }
 
     /**
-     * Handler for 'submit' events happening on the parent <form> element
+     * Handler for 'submit' events happening on the parent <form> element.
+     * If `unformatOnSubmit` is set to `true`, the element value is first unformatted before the form is submitted.
+     *
+     * @returns {boolean}
      */
     _onFormSubmit() {
         if (this.settings.unformatOnSubmit) {
             this._setElementValue(this.settings.rawValue);
         }
+
+        return true;
     }
 
     /**

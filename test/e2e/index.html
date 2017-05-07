@@ -707,6 +707,18 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #442</p>
+			<div>
+				<form action="#" id="issue_442_form">
+					<input id="issue_442" type="text" placeholder="#442" value="12345.67">
+					<input id="issue_442_submit" type="submit" value="Submit">
+				</form>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1534,6 +1546,15 @@
     autoNumericEventInput.addEventListener('autoNumeric:formatted', e => {
         console.log(`'autoNumeric:formatted' sent with`, e); //DEBUG
     });
+
+    //-------------- Issue #442
+    new AutoNumeric('#issue_442', {
+        unformatOnSubmit: AutoNumeric.options.unformatOnSubmit.unformat,
+    }).french();
+    const form442 = document.getElementById('issue_442_form');
+    form442.onsubmit = function(e) {
+        e.preventDefault();
+    }
 
 </script>
 </body>

@@ -175,6 +175,8 @@ const selectors = {
     selectOnFocus38                   : '#selectOnFocus38',
     selectOnFocus39                   : '#selectOnFocus39',
     selectOnFocus40                   : '#selectOnFocus40',
+    issue442                          : '#issue_442',
+    issue442Submit                    : '#issue_442_submit',
 };
 
 //-----------------------------------------------------------------------------
@@ -3134,5 +3136,20 @@ describe('`caretPositionOnFocus` option', () => {
             return input.selectionStart;
         }).value;
         expect(inputCaretPosition).toEqual(9);
+    });
+});
+
+describe('`unformatOnSubmit` option', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue442)).toEqual('12.345,67\u202f€');
+    });
+
+    it('should unformat on submit', () => {
+        const submitButton = $(selectors.issue442Submit);
+
+        submitButton.click(); // Submit the form by clicking on the submit button
+        expect(browser.getValue(selectors.issue442)).toEqual('12345.67');
     });
 });

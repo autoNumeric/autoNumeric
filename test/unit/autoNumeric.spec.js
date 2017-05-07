@@ -2141,6 +2141,41 @@ describe('autoNumeric options and `options.*` methods', () => {
         });
     });
 
+    /*
+    describe('`unformatOnSubmit` option', () => {
+        it('should unformat on submit', () => {
+            // Create the form elements
+            const newInput = document.createElement('input');
+            const formElement = document.createElement('form');
+            const submitButton = document.createElement('input');
+            submitButton.type = 'submit';
+            document.body.appendChild(formElement);
+            formElement.appendChild(newInput);
+            formElement.appendChild(submitButton);
+
+            // Init the AutoNumeric element
+            const aNInput = new AutoNumeric(newInput, { unformatOnSubmit: AutoNumeric.options.unformatOnSubmit.unformat }).french();
+            aNInput.set(12345.67);
+            expect(aNInput.getFormatted()).toEqual('12.345,67\u202f€');
+
+            // Testing the submit event
+            formElement.onsubmit = function(e) {
+                console.log('form submitted!');
+                e.preventDefault();
+            };
+
+            // Submit and test the unformatted value
+            formElement.submit(); //XXX In most browsers, the 'submit' event is only sent when the submit button is *clicked*, so this does not work, yet
+            expect(aNInput.getFormatted()).toEqual('12345.67');
+
+            // Remove the elements
+            aNInput.nuke();
+            formElement.removeChild(submitButton);
+            document.body.removeChild(formElement);
+        });
+    });
+    */
+
     //TODO Complete the tests in order to test every single option separately:
     /*
      caretPositionOnFocus
@@ -2163,7 +2198,6 @@ describe('autoNumeric options and `options.*` methods', () => {
      serializeSpaces
      showWarnings
      unformatOnHover
-     unformatOnSubmit
      wheelStep
      */
 });

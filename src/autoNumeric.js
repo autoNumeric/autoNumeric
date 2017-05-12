@@ -3605,7 +3605,7 @@ if (typeof define === 'function' && define.amd) {
         e.preventDefault();
 
         // cross-browser compatible
-        let rawPastedText = (window.clipboardData ? window.clipboardData.getData("text") : e.clipboardData.getData("text/plain"));
+        let rawPastedText = (window.clipboardData ? window.clipboardData.getData('text') : e.clipboardData.getData('text/plain'));
 
         // 0. Special case if the user has selected all the input text before pasting
         const initialFormattedValue = e.target.value;

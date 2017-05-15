@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # This script generate the AUTHORS file
 # In case of duplicates, update the `.mailmap` file

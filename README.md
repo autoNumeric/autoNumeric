@@ -537,7 +537,7 @@ The following functions are available on all autoNumeric-managed elements:
 | `getNumericString` | Return the unformatted number as a string | `anElement.getNumericString();` |
 | `get` | Alias for the `.getNumericString()` method | `anElement.get();` |
 | `getFormatted` | Return the formatted string | `anElement.getFormatted();` |
-| `getNumber` | Return the unformatted number as a number | `anElement.getNumber();` |
+| `getNumber` | Return the unformatted number as a number (**Warning**: If you are manipulating a number bigger than [`Number.MAX_SAFE_INTEGER`](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER), you **will** encounter problems if you try to retrieve it as a number and not a string) | `anElement.getNumber();` |
 | `getLocalized` | Return the localized unformatted number as a string | `anElement.getLocalized();` |
 | `getLocalized` | Return the localized unformatted number as a string, using the outputFormat option override passed as a parameter | `anElement.getLocalized(forcedOutputFormat);` |
 | `reformat` | Force the element to reformat its value again (in case the formatting has been lost) | `anElement.reformat();` |

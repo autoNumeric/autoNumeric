@@ -730,7 +730,7 @@ export default class AutoNumericHelper {
      */
     static isWheelUpEvent(wheelEvent) {
         if (!wheelEvent.deltaY) {
-            this.throwError(`The event passed as a parameter is not a wheel event, ${wheelEvent.type} given.`);
+            this.throwError(`The event passed as a parameter is not a valid wheel event, '${wheelEvent.type}' given.`);
         }
 
         return wheelEvent.deltaY < 0;
@@ -744,7 +744,7 @@ export default class AutoNumericHelper {
      */
     static isWheelDownEvent(wheelEvent) {
         if (!wheelEvent.deltaY) {
-            this.throwError(`The event passed as a parameter is not a wheel event, ${wheelEvent.type} given.`);
+            this.throwError(`The event passed as a parameter is not a valid wheel event, '${wheelEvent.type}' given.`);
         }
 
         return wheelEvent.deltaY > 0;

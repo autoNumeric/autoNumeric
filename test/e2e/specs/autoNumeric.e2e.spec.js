@@ -177,6 +177,8 @@ const selectors = {
     selectOnFocus40                   : '#selectOnFocus40',
     issue442                          : '#issue_442',
     issue442Submit                    : '#issue_442_submit',
+    issue447                          : '#issue_447',
+    result447                         : '#result_447',
 };
 
 //-----------------------------------------------------------------------------
@@ -3151,5 +3153,43 @@ describe('`unformatOnSubmit` option', () => {
 
         submitButton.click(); // Submit the form by clicking on the submit button
         expect(browser.getValue(selectors.issue442)).toEqual('12345.67');
+    });
+});
+
+describe('`emptyInputBehavior` option', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue447)).toEqual('');
+    });
+
+    it('should detect a `null` value after using `set()`', () => {
+        expect(browser.getText(selectors.result447)).toEqual('Input value is null');
+    });
+
+    it('should change the `rawValue` to `null` when emptied', () => {
+        const issue447 = $(selectors.issue447);
+
+        issue447.click(); // Focus on the input element
+        expect(browser.getValue(selectors.issue447)).toEqual('');
+        browser.keys('1234');
+        expect(browser.getValue(selectors.issue447)).toEqual('1,234');
+        browser.keys('End');
+        browser.keys('Backspace');
+        expect(browser.getValue(selectors.issue447)).toEqual('123');
+        browser.keys('Backspace');
+        expect(browser.getValue(selectors.issue447)).toEqual('12');
+        browser.keys('Backspace');
+        expect(browser.getValue(selectors.issue447)).toEqual('1');
+        browser.keys('Backspace');
+        expect(browser.getValue(selectors.issue447)).toEqual('');
+
+        // Then we test if the rawValue is correctly set to `null`
+        const result = browser.execute(() => {
+            const input = document.querySelector('#issue_447');
+            const an = AutoNumeric.getAutoNumericElement(input);
+            return an.getNumber();
+        }).value;
+        expect(result).toBeNull();
     });
 });

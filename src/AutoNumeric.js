@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.16
- * @date         2017-04-19 UTC 09:00
+ * @version      4.0.0-beta.17
+ * @date         2017-05-24 UTC 23:59
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS
@@ -97,6 +97,7 @@ class AutoNumeric {
         this.domElement = domElement;
 
         // Generate the settings
+        this.defaultRawValue = ''; // The default raw value to set when initializing an AutoNumeric object
         this._setSettings(userOptions, false);
         //TODO If `styleRules` is not null, add by default a class 'autoNumeric' that adds transition to color, background-color, border-color properties
         // Check if the DOM element is supported
@@ -508,7 +509,7 @@ class AutoNumeric {
              */
             reset                        : () => {
                 delete this.settings;
-                this.settings = {};
+                this.settings = { rawValue : this.defaultRawValue }; // Here we pass the default rawValue in order to prevent showing a warning that we try to set an `undefined` value
                 this.update(AutoNumeric.defaultSettings);
 
                 return this;
@@ -518,12 +519,12 @@ class AutoNumeric {
 
                 return this;
             },
-            caretPositionOnFocus  : caretPositionOnFocus => { //FIXME à tester
+            caretPositionOnFocus         : caretPositionOnFocus => { //FIXME à tester
                 this.settings.caretPositionOnFocus = caretPositionOnFocus;
 
                 return this;
             },
-            createLocalList                : createLocalList => {
+            createLocalList              : createLocalList => {
                 this.settings.createLocalList = createLocalList;
 
                 // Delete the local list when this is set to `false`, create it if this is set to `true` and there is not pre-existing list
@@ -583,6 +584,14 @@ class AutoNumeric {
                 return this;
             },
             emptyInputBehavior           : emptyInputBehavior => {
+                if (this.settings.rawValue === null && emptyInputBehavior !== AutoNumeric.options.emptyInputBehavior.null) {
+                    // Special case : if the current `rawValue` is `null` and the `emptyInputBehavior` is changed to something else than `'null'`, then it makes that `rawValue` invalid.
+                    // Here we can either prevent the option update and throw an error, or still accept the option update and update the value from `null` to `''`.
+                    // We cannot keep `rawValue` to `null` since if `emptyInputBehavior` is not set to `null`, lots of function assume `rawValue` is a string.
+                    AutoNumericHelper.warning(`You are trying to modify the \`emptyInputBehavior\` option to something different than \`'null'\` (${emptyInputBehavior}), but the element raw value is currently set to \`null\`. This would result in an invalid rawValue. In order to fix that, the element value has been changed to the empty string \`''\`.`, this.settings.showWarnings);
+                    this.settings.rawValue = '';
+                }
+
                 this.update({ emptyInputBehavior });
 
                 return this;
@@ -752,7 +761,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.16';
+        return '4.0.0-beta.17';
     }
 
     /**
@@ -1374,8 +1383,9 @@ class AutoNumeric {
      * @example anElement.set('12345.67') // Formats the value
      * @example anElement.set(12345.67) // Formats the value
      * @example anElement.set(12345.67, { decimalCharacter : ',' }) // Update the settings and formats the value in one go
+     * @example anElement.set(null) // Set the rawValue and element value to `null`
      *
-     * @param {number|string} newValue The value must be a number or a numeric string
+     * @param {number|string|null} newValue The value must be a number, a numeric string or `null` (if `emptyInputBehavior` is set to `'null'`)
      * @param {object} options A settings object that will override the current settings. Note: the update is done only if the `newValue` is defined.
      * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history table
      * @returns {AutoNumeric}
@@ -1383,16 +1393,31 @@ class AutoNumeric {
      */
     set(newValue, options = null, saveChangeToHistory = true) {
         //TODO Add the `saveSettings` options. If `true`, then when `options` is passed, then it overwrite the current `this.settings`. If `false` the `options` are only used once and `this.settings` is not modified
-        if (newValue === null || AutoNumericHelper.isUndefined(newValue)) {
+        if (AutoNumericHelper.isUndefined(newValue)) {
+            AutoNumericHelper.warning(`Your are trying to set an 'undefined' value ; an error could have occurred.`, this.settings.showWarnings);
             return this;
         }
 
-        // The options update is done only if the `newValue` is not null
+        // The options update is done only if the `newValue` is not `undefined`
         if (!AutoNumericHelper.isNull(options)) {
             this._setSettings(options, true); // We do not call `update` here since this would call `set` too
         }
 
-        let value = this.constructor._toNumericValue(newValue, this.settings);
+        if (newValue === null && this.settings.emptyInputBehavior !== AutoNumeric.options.emptyInputBehavior.null) {
+            AutoNumericHelper.warning(`Your are trying to set the \`null\` value while the \`emptyInputBehavior\` option is set to ${this.settings.emptyInputBehavior}. If you want to be able to set the \`null\` value, you need to change the 'emptyInputBehavior' option to \`'null'\`.`, this.settings.showWarnings);
+            return this;
+        }
+
+        let value;
+        if (newValue === null) {
+            // Here this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.null
+            this._setElementAndRawValue(null, null, saveChangeToHistory);
+            this._saveValueToPersistentStorage('set');
+
+            return this;
+        }
+
+        value = this.constructor._toNumericValue(newValue, this.settings);
         if (isNaN(Number(value))) {
             this.setValue('', saveChangeToHistory);
 
@@ -1460,6 +1485,7 @@ class AutoNumeric {
                 }
 
                 if (this.settings.saveValueToSessionStorage && (this.settings.decimalPlacesShownOnFocus || this.settings.scaleDivisor)) {
+                    //TODO Remove the test on `saveValueToSessionStorage`; it's already done in the following method
                     this._saveValueToPersistentStorage('set');
                 }
 
@@ -1605,7 +1631,7 @@ class AutoNumeric {
      * The third argument `saveChangeToHistory` defines if the change should be recorded in the history array.
      * Note: if the second argument `rawValue` is a boolean, we consider that is really is the `saveChangeToHistory` argument.
      *
-     * @param {number|string} newElementValue
+     * @param {number|string|null} newElementValue
      * @param {number|string|null|boolean} rawValue
      * @param {boolean} saveChangeToHistory
      * @returns {AutoNumeric}
@@ -1679,9 +1705,13 @@ class AutoNumeric {
      *
      * @usage anElement.getNumber()
      *
-     * @returns {number}
+     * @returns {number|null}
      */
     getNumber() {
+        if (this.settings.rawValue === null) {
+            return null;
+        }
+
         const value = this.getNumericString();
 
         return this.constructor._toLocale(value, 'number');
@@ -3100,8 +3130,9 @@ class AutoNumeric {
             AutoNumeric.options.emptyInputBehavior.press,
             AutoNumeric.options.emptyInputBehavior.always,
             AutoNumeric.options.emptyInputBehavior.zero,
+            AutoNumeric.options.emptyInputBehavior.null,
         ])) {
-            AutoNumericHelper.throwError(`The display on empty string option 'emptyInputBehavior' is invalid ; it should either be 'focus', 'press', 'always' or 'zero', [${options.emptyInputBehavior}] given.`);
+            AutoNumericHelper.throwError(`The display on empty string option 'emptyInputBehavior' is invalid ; it should either be 'focus', 'press', 'always', 'zero' or 'null', [${options.emptyInputBehavior}] given.`);
         }
 
         if (options.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero &&
@@ -6325,7 +6356,7 @@ class AutoNumeric {
             // The settings are generated for the first time
             this.settings = {};
             // If we couldn't grab any settings, create them from the default ones and combine them with the options passed as a parameter as well as with the HTML5 `data-*` info (via `this.domElement.dataset`), if any.
-            this._mergeSettings(this.constructor.getDefaultConfig(), this.domElement.dataset, options, { rawValue : '' });
+            this._mergeSettings(this.constructor.getDefaultConfig(), this.domElement.dataset, options, { rawValue : this.defaultRawValue });
             this.caretFix = false;
             this.throwInput = true; // Throw input event
             this.allowedTagList = AutoNumericEnum.allowedTagList;
@@ -6616,7 +6647,19 @@ class AutoNumeric {
             //TODO Check if we need to replace the hard-coded ',' with settings.decimalCharacter
             const testValue = (AutoNumericHelper.contains(newValue, ',')) ? newValue.replace(',', '.') : newValue;
             if (testValue === '' || testValue === this.settings.negativeSignCharacter) {
-                this._setRawValue((this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) ? '0' : '');
+                let valueToSetOnEmpty;
+                switch (this.settings.emptyInputBehavior) {
+                    case AutoNumeric.options.emptyInputBehavior.zero:
+                        valueToSetOnEmpty = '0';
+                        break;
+                    case AutoNumeric.options.emptyInputBehavior.null:
+                        valueToSetOnEmpty = null;
+                        break;
+                    default :
+                        valueToSetOnEmpty = '';
+                }
+
+                this._setRawValue(valueToSetOnEmpty);
             } else {
                 this._setRawValue(this._trimLeadingAndTrailingZeros(testValue));
             }

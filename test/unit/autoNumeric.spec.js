@@ -1069,10 +1069,19 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual('-1.234.567,80\u202f€');
             aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
 
-            aNInput.set('');
+            aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.null);
+            aNInput.set(null);
+            expect(aNInput.getFormatted()).toEqual('');
+            expect(aNInput.getNumber()).toEqual(null);
+            // Special case where changing the `emptyInputBehavior` option to something different from `AutoNumeric.options.emptyInputBehavior.null` while the rawValue is equal to `null`, modify that rawValue to '' automatically
             aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.focus);
             expect(aNInput.getFormatted()).toEqual('');
+            expect(aNInput.getNumber()).toEqual(0);
+
+            aNInput.set('');
             aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.press);
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.focus);
             expect(aNInput.getFormatted()).toEqual('');
             aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.always);
             expect(aNInput.getFormatted()).toEqual('\u202f€');
@@ -1630,6 +1639,66 @@ describe('autoNumeric options and `options.*` methods', () => {
 
             // Un-initialization
             document.body.removeChild(newInput);
+        });
+
+        describe('used with the `null` value (cf. issue #447 and #446)', () => {
+            let aNInput;
+            let newInput;
+
+            beforeEach(() => { // Initialization
+                newInput = document.createElement('input');
+                document.body.appendChild(newInput);
+            });
+
+            afterEach(() => { // Un-initialization
+                aNInput.nuke();
+            });
+
+            it('should allow for `null` value if set to `\'null\'`', () => {
+                aNInput = new AutoNumeric(newInput, { emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
+                aNInput.set(null);
+                expect(aNInput.getFormatted()).toEqual('');
+                expect(aNInput.getNumber()).toEqual(null);
+            });
+
+            it('should not allow for `null` value if set to something different than `\'null\'`', () => {
+                spyOn(console, 'warn');
+
+                aNInput = new AutoNumeric(newInput, { emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.focus });
+                aNInput.set(null);
+                expect(aNInput.getFormatted()).toEqual('');
+                expect(aNInput.getNumber()).toEqual(0);
+                expect(console.warn).toHaveBeenCalled();
+                expect(console.warn).toHaveBeenCalledTimes(1);
+            });
+
+            it(`should modify the rawValue to \`''\` when switching from \`null\` to a different option value`, () => {
+                spyOn(console, 'warn');
+
+                aNInput = new AutoNumeric(newInput, { emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
+                aNInput.set(null);
+                expect(aNInput.getFormatted()).toEqual('');
+                expect(aNInput.getNumber()).toEqual(null);
+
+                // Modify the options while `rawValue` is `null`
+                aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.always);
+                expect(aNInput.getFormatted()).toEqual('');
+                expect(aNInput.getNumber()).toEqual(0);
+                expect(console.warn).toHaveBeenCalled();
+                expect(console.warn).toHaveBeenCalledTimes(1);
+            });
+
+            it('should not allow initializing an AutoNumeric object with the `null` value, but will default to the `\'\'` value', () => {
+                // This is not allowed since using `null` for the initial value means that AutoNumeric needs to use the current html value instead of `null`
+                aNInput = new AutoNumeric(newInput, null, { emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
+                expect(aNInput.getFormatted()).toEqual('');
+                expect(aNInput.getNumber()).toEqual(0);
+
+                // Verification when setting the rawValue after the initialization
+                aNInput.set(null);
+                expect(aNInput.getFormatted()).toEqual('');
+                expect(aNInput.getNumber()).toEqual(null);
+            });
         });
     });
 
@@ -5523,6 +5592,7 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 'press' })).not.toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 'always' })).not.toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 'zero' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: 'null' })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ leadingZero: 'allow' })).not.toThrow();
             expect(() => AutoNumeric.validate({ leadingZero: 'deny' })).not.toThrow();
@@ -5839,6 +5909,7 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ emptyInputBehavior: '-5' })).toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 5 })).toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: null })).toThrow();
 
             expect(() => AutoNumeric.validate({ leadingZero: [] })).toThrow();
             expect(() => AutoNumeric.validate({ leadingZero: true })).toThrow();

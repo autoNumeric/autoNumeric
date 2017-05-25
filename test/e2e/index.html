@@ -719,6 +719,14 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #447</p>
+			<input id="issue_447" type="text" placeholder="#447" value="">
+			<p id="result_447">Testing value for `null`</p>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1554,6 +1562,14 @@
     const form442 = document.getElementById('issue_442_form');
     form442.onsubmit = function(e) {
         e.preventDefault();
+    };
+
+    //-------------- Issue #447
+    const result447 = document.getElementById('result_447');
+    const anElement447 = new AutoNumeric('#issue_447', { emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
+    anElement447.set(null);
+    if (anElement447.getNumber() === null) {
+        result447.textContent = 'Input value is null';
     }
 
 </script>

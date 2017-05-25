@@ -1,5 +1,13 @@
 ## Changelog for autoNumeric
 
+### 4.0.0-beta.17
++ Fix issue #447 Add a new `'null'` options to the `emptyInputBehavior` setting 
++ Add the `this.defaultRawValue` variable that store the hard-coded default raw value used during the initialization and reset.  
++ When using the option `{ emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null }`, the user can now explicitly set the AutoNumeric value to `null` (using `anElement.set(null)` for instance).
+  Additionally, when this option is set, if the AutoNumeric element is emptied, then `rawValue` is set to `null`.
+  Note: if the current raw value is equal to `null`, changing the `emptyInputBehavior` option to something different than `null` will update the rawValue to `''`.
+  **Known limitation** : Initializing an AutoNumeric object with the `null` value is not allowed since using `null` for the initial value means that AutoNumeric needs to use the current html value instead of `null`.
+
 ### 4.0.0-beta.16
 + Move the options, default options and predefined options objects each in its own file.
   Separating them from the AutoNumeric class makes that information easier to find, study and modify.

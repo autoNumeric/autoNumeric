@@ -94,11 +94,13 @@ With that said, autoNumeric supports most international numeric formats and curr
 - [Methods](#methods)
   - [Instantiated methods](#instantiated-methods)
     - [Set, get, format, unformat and other usual AutoNumeric functions](#set-get-format-unformat-and-other-usual-autonumeric-functions)
+      - [Using callback functions with `get*` methods](#using-callback-functions-with-get-methods)
     - [Un-initialize the AutoNumeric element](#un-initialize-the-autonumeric-element)
     - [Node manipulation](#node-manipulation)
     - [Format and unformat other numbers or DOM elements with an existing AutoNumeric element](#format-and-unformat-other-numbers-or-dom-elements-with-an-existing-autonumeric-element)
     - [Initialize other DOM Elements](#initialize-other-dom-elements)
     - [Perform actions globally on a shared list of AutoNumeric elements](#perform-actions-globally-on-a-shared-list-of-autonumeric-elements)
+      - [Using callback functions with `global.get*` methods](#using-callback-functions-with-global.get-methods)
     - [Form functions](#form-functions)
     - [Function chaining](#function-chaining)
   - [Static methods](#static-methods)
@@ -540,6 +542,9 @@ The following functions are available on all autoNumeric-managed elements:
 | `getNumber` | Return the unformatted number as a number (**Warning**: If you are manipulating a number bigger than [`Number.MAX_SAFE_INTEGER`](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER), you **will** encounter problems if you try to retrieve it as a number and not a string) | `anElement.getNumber();` |
 | `getLocalized` | Return the localized unformatted number as a string | `anElement.getLocalized();` |
 | `getLocalized` | Return the localized unformatted number as a string, using the outputFormat option override passed as a parameter | `anElement.getLocalized(forcedOutputFormat);` |
+| `getLocalized` | Idem above, but with a callback function and a forced outputFormat | `anElement.getLocalized(forcedOutputFormat, callback);` |
+| `getLocalized` | Idem above, but with a callback function | `anElement.getLocalized(callback);` |
+| `get*` | Pass the result of the `get*` function to the given callback, see [here](#using-callback-functions-with-get-methods) | `anElement.get*(funcCallback);` |
 | `reformat` | Force the element to reformat its value again (in case the formatting has been lost) | `anElement.reformat();` |
 | `unformat` | Remove the formatting and keep only the raw unformatted value in the element (as a numeric string) | `anElement.unformat();` |
 | `unformatLocalized` | Remove the formatting and keep only the localized unformatted value in the element | `anElement.unformatLocalized();` |
@@ -553,6 +558,32 @@ The following functions are available on all autoNumeric-managed elements:
 | `clear` | Reset the element value to the empty string '' as above, no matter the `emptyInputBehavior` option value | `anElement.clear(true);` |
 
 *Note: Most of them can be [chained](#function-chaining) together, if needed.*
+
+##### Using callback functions with `get*` methods
+
+All `get*` methods can accept a callback function as its argument (those methods being `get`, `getNumericString`, `getFormatted`, `getNumber` and `getLocalized`).
+That callback is passed two parameters, the result of the `get*` method as its first argument, and the AutoNumeric object as its second.
+
+This allows you to directly use the result of the `get*` functions without having to declare a temporary variable like so:
+```js
+function sendToServer(value) {
+    ajax(value);
+}
+
+console.log(`The value ${anElement.getNumber(sendToServer)} as been sent to the server.`);
+```
+
+In other words,
+```js
+// Using:
+anElement.getNumericString(funcCallback);
+
+// Is equivalent to doing:
+const result = anElement.getNumericString();
+funcCallback(result, anElement);
+```
+
+*Note: The callback function behavior is slightly different when called on [multiple elements](#perform-actions-globally-on-a-shared-list-of-autonumeric-elements) via `global.get*` methods.*
 
 #### Un-initialize the AutoNumeric element
 
@@ -641,6 +672,20 @@ anElement.global.empty(true); // Idem above, but instead of completely emptying 
 [anElement0, anElement1, anElement2, anElement3] = anElement.global.elements(); // Return an array containing all the AutoNumeric elements that have been initialized by each other
 anElement.global.getList(); // Return the `Map` object directly
 anElement.global.size(); // Return the number of elements in the local AutoNumeric element list
+```
+
+##### Using callback functions with `global.get*` methods
+
+Like for their `get*` methods [counterparts](#using-callback-functions-with-get-methods), `global.get*` methods accepts a callback function.
+However, the callback is executed only **once** and is passed an array of the `get*` function results as its first argument, while the AutoNumeric object being passed as its second one.
+
+```js
+// Using:
+anElement.global.getNumericString(funcCallback);
+
+// Is equivalent to doing:
+const [result1, result2, result3] = anElement.global.getNumericString();
+funcCallback([result1, result2, result3], anElement);
 ```
 
 #### Form functions

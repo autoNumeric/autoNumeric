@@ -1,5 +1,10 @@
 ## Changelog for autoNumeric
 
+### 4.0.0-beta.18
++ Modify the `get*` methods to allow passing them a callback function.
++ The callback is then executed on the `get*` method result, or the `global.get*` method array of result.
++ The callback is passed the result of the `get*` functions as its first argument, and the current AutoNumeric object as its second.
+
 ### 4.0.0-beta.17
 + Fix issue #447 Add a new `'null'` options to the `emptyInputBehavior` setting 
 + Add the `this.defaultRawValue` variable that store the hard-coded default raw value used during the initialization and reset.  

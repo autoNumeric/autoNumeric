@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.17
- * @date         2017-05-27 UTC 04:00
+ * @version      4.0.0-beta.18
+ * @date         2017-05-27 UTC 08:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS
@@ -181,14 +181,16 @@ class AutoNumeric {
             /**
              * This is an alias of the `getNumericString()` function, and should not be used anymore.
              *
+             * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
              * @returns {Array<string>}
              * @deprecated
              */
-            get: () => {
+            get: (callback = null) => {
                 const result = [];
                 this.autoNumericLocalList.forEach(aNObject => {
                     result.push(aNObject.get());
                 });
+                this._executeCallback(result, callback);
 
                 return result;
             },
@@ -196,13 +198,15 @@ class AutoNumeric {
             /**
              * Return an array of the unformatted values (as a string) of each AutoNumeric element of the local AutoNumeric element list
              *
+             * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
              * @returns {Array<string>}
              */
-            getNumericString: () => {
+            getNumericString: (callback = null) => {
                 const result = [];
                 this.autoNumericLocalList.forEach(aNObject => {
                     result.push(aNObject.getNumericString());
                 });
+                this._executeCallback(result, callback);
 
                 return result;
             },
@@ -210,13 +214,15 @@ class AutoNumeric {
             /**
              * Return an array of the current formatted values (as a string) of each AutoNumeric element of the local AutoNumeric element list
              *
+             * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
              * @returns {Array<string>}
              */
-            getFormatted: () => {
+            getFormatted: (callback = null) => {
                 const result = [];
                 this.autoNumericLocalList.forEach(aNObject => {
                     result.push(aNObject.getFormatted());
                 });
+                this._executeCallback(result, callback);
 
                 return result;
             },
@@ -224,13 +230,15 @@ class AutoNumeric {
             /**
              * Return an array of the element unformatted values (as a real Javascript number), for each element of the local AutoNumeric element list
              *
+             * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
              * @returns {Array<number>}
              */
-            getNumber: () => {
+            getNumber: (callback = null) => {
                 const result = [];
                 this.autoNumericLocalList.forEach(aNObject => {
                     result.push(aNObject.getNumber());
                 });
+                this._executeCallback(result, callback);
 
                 return result;
             },
@@ -238,13 +246,15 @@ class AutoNumeric {
             /**
              * Returns the unformatted values (following the `outputFormat` setting) of each element of the local AutoNumeric element list into an array
              *
+             * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
              * @returns {Array<string>}
              */
-            getLocalized: () => {
+            getLocalized: (callback = null) => {
                 const result = [];
                 this.autoNumericLocalList.forEach(aNObject => {
                     result.push(aNObject.getLocalized());
                 });
+                this._executeCallback(result, callback);
 
                 return result;
             },
@@ -764,7 +774,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.17';
+        return '4.0.0-beta.18';
     }
 
     /**
@@ -1654,6 +1664,19 @@ class AutoNumeric {
     }
 
     /**
+     * Execute the given callback function using the given result as its first parameter, and the AutoNumeric object as its second.
+     *
+     * @param {number|string|Array|null} result
+     * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
+     * @private
+     */
+    _executeCallback(result, callback) {
+        if (!AutoNumericHelper.isNull(callback) && AutoNumericHelper.isFunction(callback)) {
+            callback(result, this);
+        }
+    }
+
+    /**
      * Alias of the `getNumericString()` function.
      * Developers should use one of the more explicit function names to get what they want :
      * - a numeric string : `getNumericString()`
@@ -1663,11 +1686,13 @@ class AutoNumeric {
      *
      * @usage anElement.get();
      *
+     * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
+     *
      * @deprecated
      * @returns {string}
      */
-    get() {
-        return this.getNumericString();
+    get(callback = null) {
+        return this.getNumericString(callback);
     }
 
     /**
@@ -1675,12 +1700,17 @@ class AutoNumeric {
      *
      * @usage anElement.getNumericString();
      *
+     * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
+     *
      * @returns {string}
      */
-    getNumericString() {
+    getNumericString(callback = null) {
         // Always return a numeric string
         // The following statement gets rid of the trailing zeros in the decimal places since the current method does not pad decimals
-        return AutoNumericHelper.trimPaddedZerosFromDecimalPlaces(this.settings.rawValue);
+        const result = AutoNumericHelper.trimPaddedZerosFromDecimalPlaces(this.settings.rawValue);
+        this._executeCallback(result, callback);
+
+        return result;
     }
 
     /**
@@ -1688,15 +1718,20 @@ class AutoNumeric {
      *
      * @usage anElement.getFormatted()
      *
+     * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
+     *
      * @returns {string}
      */
-    getFormatted() {
+    getFormatted(callback = null) {
         if (!('value' in this.domElement || 'textContent' in this.domElement)) {
             // Make sure `.value` or `.textContent' exists before trying to access those properties
             AutoNumericHelper.throwError('Unable to get the formatted string from the element.');
         }
 
-        return AutoNumericHelper.getElementValue(this.domElement);
+        const result = AutoNumericHelper.getElementValue(this.domElement);
+        this._executeCallback(result, callback);
+
+        return result;
     }
 
     /**
@@ -1705,16 +1740,21 @@ class AutoNumeric {
      *
      * @usage anElement.getNumber()
      *
+     * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
+     *
      * @returns {number|null}
      */
-    getNumber() {
+    getNumber(callback = null) {
+        let result;
         if (this.settings.rawValue === null) {
-            return null;
+            result = null;
+        } else {
+            result = this.constructor._toLocale(this.getNumericString(), 'number');
         }
 
-        const value = this.getNumericString();
+        this._executeCallback(result, callback);
 
-        return this.constructor._toLocale(value, 'number');
+        return result;
     }
 
     /**
@@ -1727,10 +1767,19 @@ class AutoNumeric {
      *
      * @usage anElement.getLocalized();
      *
-     * @param {null|string} forcedOutputFormat If set to something different than `null`, then this is used as an overriding outputFormat option
+     * @param {null|string|function} forcedOutputFormat If set to something different than `null`, then this is used as an overriding outputFormat option
+     * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
+     *
      * @returns {*}
      */
-    getLocalized(forcedOutputFormat = null) {
+    getLocalized(forcedOutputFormat = null, callback = null) {
+        // First, check if only a callback has been passed, and if so, sanitize the parameters
+        if (AutoNumericHelper.isFunction(forcedOutputFormat) && AutoNumericHelper.isNull(callback)) {
+            callback = forcedOutputFormat;
+            forcedOutputFormat = null;
+        }
+
+        // Then get the localized value
         let value;
         if (AutoNumericHelper.isEmptyString(this.settings.rawValue)) {
             value = '';
@@ -1751,7 +1800,10 @@ class AutoNumeric {
             outputFormatToUse = forcedOutputFormat;
         }
 
-        return this.constructor._toLocale(value, outputFormatToUse);
+        const result = this.constructor._toLocale(value, outputFormatToUse);
+        this._executeCallback(result, callback);
+
+        return result;
     }
 
     /**

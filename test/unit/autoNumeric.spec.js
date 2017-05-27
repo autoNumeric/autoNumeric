@@ -3174,6 +3174,101 @@ describe('Instantiated autoNumeric functions', () => {
             aNInput.set('9007199254740991000000'); // A very big number
             expect(aNInput.getNumericString()).toEqual('9007199254740991000000');
         });
+
+        it('should execute the given callback with the `get*` methods result', () => {
+            let counter = 0;
+            function incrementCounter() {
+                counter++;
+            }
+
+            aNInput.set(42);
+            expect(aNInput.getNumericString()).toEqual('42');
+            expect(aNInput.getNumber()).toEqual(42);
+
+            expect(counter).toEqual(0);
+            expect(aNInput.get(incrementCounter)).toEqual('42');
+            expect(counter).toEqual(1);
+            expect(aNInput.getNumericString(incrementCounter)).toEqual('42');
+            expect(counter).toEqual(2);
+            expect(aNInput.getFormatted(incrementCounter)).toEqual('42.00');
+            expect(counter).toEqual(3);
+            expect(aNInput.getNumber(incrementCounter)).toEqual(42);
+            expect(counter).toEqual(4);
+            expect(aNInput.getLocalized(null, incrementCounter)).toEqual('42');
+            expect(counter).toEqual(5);
+            expect(aNInput.getLocalized(incrementCounter)).toEqual('42');
+            expect(counter).toEqual(6);
+            aNInput.set(42.61);
+            expect(aNInput.getLocalized(AutoNumeric.options.outputFormat.comma, incrementCounter)).toEqual('42,61');
+            expect(counter).toEqual(7);
+        });
+
+        it('should execute the given callback with the `global.get*` methods result', () => {
+            // Initialization
+            const newInput1 = document.createElement('input');
+            const newInput2 = document.createElement('input');
+            const newInput3 = document.createElement('input');
+            document.body.appendChild(newInput1);
+            document.body.appendChild(newInput2);
+            document.body.appendChild(newInput3);
+
+            let concatenate = 0;
+            let callCount = 0;
+            function concatenateAndCallCount(arrValues) {
+                concatenate = arrValues.reduce((count, val) => {
+                    return count + val;
+                });
+                callCount++;
+            }
+
+            // Setting the default value
+            const anElement1 = new AutoNumeric(newInput1).french();
+            const [anElement2, anElement3] = anElement1.init([newInput2, newInput3]);
+            anElement1.set(111);
+            anElement2.set(222);
+            anElement3.set(333);
+
+            // Testing the callback
+            expect(callCount).toEqual(0);
+            expect(concatenate).toEqual(0);
+            const resultNumber = anElement1.global.getNumber();
+            expect(resultNumber).toEqual([111, 222, 333]);
+            expect(callCount).toEqual(0);
+            expect(concatenate).toEqual(0);
+            expect(anElement1.global.getNumber(concatenateAndCallCount)).toEqual([111, 222, 333]);
+            expect(callCount).toEqual(1);
+            expect(concatenate).toEqual(666); // 111+222+333
+
+            anElement1.set(1);
+            anElement2.set(2);
+            anElement3.set(3);
+            expect(anElement1.global.get(concatenateAndCallCount)).toEqual(['1', '2', '3']);
+            expect(callCount).toEqual(2);
+            expect(concatenate).toEqual('123');
+
+            anElement1.set(-1);
+            anElement2.set(0);
+            anElement3.set(6);
+            expect(anElement1.global.getNumericString(concatenateAndCallCount)).toEqual(['-1', '0', '6']);
+            expect(callCount).toEqual(3);
+            expect(concatenate).toEqual('-106');
+
+            expect(anElement1.global.getFormatted(concatenateAndCallCount)).toEqual(['-1,00\u202f€', '0,00\u202f€', '6,00\u202f€']);
+            expect(callCount).toEqual(4);
+            expect(concatenate).toEqual('-1,00\u202f€0,00\u202f€6,00\u202f€');
+
+            anElement1.set(22.67);
+            anElement2.set(-20.07).options.outputFormat(AutoNumeric.options.outputFormat.commaNegative);
+            anElement3.set(14.06);
+            expect(anElement1.global.getLocalized(concatenateAndCallCount)).toEqual(['22.67', '20,07-', '14.06']);
+            expect(callCount).toEqual(5);
+            expect(concatenate).toEqual('22.6720,07-14.06');
+
+            // Un-initialization
+            document.body.removeChild(newInput1);
+            document.body.removeChild(newInput2);
+            document.body.removeChild(newInput3);
+        });
     });
 
     describe(`getNumericString`, () => {

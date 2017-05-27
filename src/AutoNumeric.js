@@ -1485,8 +1485,7 @@ class AutoNumeric {
                     value = value + this.settings.scaleSymbol;
                 }
 
-                if (this.settings.saveValueToSessionStorage && (this.settings.decimalPlacesShownOnFocus || this.settings.scaleDivisor)) {
-                    //TODO Remove the test on `saveValueToSessionStorage`; it's already done in the following method
+                if (this.settings.decimalPlacesShownOnFocus || this.settings.scaleDivisor) {
                     this._saveValueToPersistentStorage('set');
                 }
 
@@ -4814,6 +4813,7 @@ class AutoNumeric {
                 }
             }
         }
+        //FIXME What to return if `this.settings.saveValueToSessionStorage` is `false`?
     }
 
     /**
@@ -5244,7 +5244,7 @@ class AutoNumeric {
         }
 
         // Saves the extended decimal to preserve the data when navigating away from the page
-        if (this.settings.decimalPlacesShownOnFocus !== null && this.settings.saveValueToSessionStorage) {
+        if (this.settings.decimalPlacesShownOnFocus !== null) {
             this._saveValueToPersistentStorage('set');
         }
 
@@ -5283,10 +5283,7 @@ class AutoNumeric {
 
         if ((e.type === 'mouseleave' && !this.isFocused) || e.type === 'blur') {
             const origValue = this.settings.rawValue;
-
-            if (this.settings.saveValueToSessionStorage) {
-                this._saveValueToPersistentStorage('set');
-            }
+            this._saveValueToPersistentStorage('set');
 
             if (this.settings.noSeparatorOnFocus === true) {
                 this.settings.digitGroupSeparator = this.originalDigitGroupSeparator;
@@ -6027,8 +6024,7 @@ class AutoNumeric {
                 if ((this.settings.defaultValueOverride !== null && this.settings.defaultValueOverride.toString() !== currentValue) ||
                     (this.settings.defaultValueOverride === null && currentValue !== '' && currentValue !== this.domElement.getAttribute('value')) ||
                     (currentValue !== '' && this.domElement.getAttribute('type') === 'hidden' && !AutoNumericHelper.isNumber(unLocalizedCurrentValue))) {
-                    if ((this.settings.decimalPlacesShownOnFocus !== null && this.settings.saveValueToSessionStorage) ||
-                        (this.settings.scaleDivisor && this.settings.saveValueToSessionStorage)) {
+                    if (this.settings.saveValueToSessionStorage && (this.settings.decimalPlacesShownOnFocus !== null || this.settings.scaleDivisor)) {
                         this._setRawValue(this._saveValueToPersistentStorage('get'));
                     }
 

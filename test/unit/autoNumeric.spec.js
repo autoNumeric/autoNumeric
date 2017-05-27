@@ -3215,9 +3215,7 @@ describe('Instantiated autoNumeric functions', () => {
             let concatenate = 0;
             let callCount = 0;
             function concatenateAndCallCount(arrValues) {
-                concatenate = arrValues.reduce((count, val) => {
-                    return count + val;
-                });
+                concatenate = arrValues.reduce((count, val) => count + val);
                 callCount++;
             }
 

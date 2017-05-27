@@ -570,7 +570,7 @@ function sendToServer(value) {
     ajax(value);
 }
 
-console.log(`The value ${anElement.getNumber(sendToServer)} as been sent to the server.`);
+console.log(`The value ${anElement.getNumber(sendToServer)} has been sent to the server.`);
 ```
 
 In other words,

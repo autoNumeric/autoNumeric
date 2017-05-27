@@ -100,7 +100,7 @@ With that said, autoNumeric supports most international numeric formats and curr
     - [Format and unformat other numbers or DOM elements with an existing AutoNumeric element](#format-and-unformat-other-numbers-or-dom-elements-with-an-existing-autonumeric-element)
     - [Initialize other DOM Elements](#initialize-other-dom-elements)
     - [Perform actions globally on a shared list of AutoNumeric elements](#perform-actions-globally-on-a-shared-list-of-autonumeric-elements)
-      - [Using callback functions with `global.get*` methods](#using-callback-functions-with-global.get-methods)
+      - [Using callback functions with `global.get*` methods](#using-callback-functions-with-globalget-methods)
     - [Form functions](#form-functions)
     - [Function chaining](#function-chaining)
   - [Static methods](#static-methods)

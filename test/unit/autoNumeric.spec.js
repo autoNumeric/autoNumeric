@@ -758,6 +758,7 @@ describe('The autoNumeric object', () => {
             expect(() => aNInput._processCharacterDeletion()).toThrow();
             expect(() => aNInput._processCharacterInsertion()).toThrow();
             expect(() => aNInput._formatValue()).toThrow();
+            expect(() => aNInput._getParentForm()).toThrow();
         });
         */
 
@@ -4087,7 +4088,30 @@ describe('Instantiated autoNumeric functions', () => {
             expect(anInput1.formJsonLocalized()).toEqual(jsonResult2);
         });
 
-        //FIXME à terminer : formUnformat, formReformat, formSubmit*
+        it(`should modify the parent form reference if it's changed and \`form()\` is 'forced'`, () => {
+            // Get the initial parent form element reference
+            const initialForm = anInput1.form();
+            initialForm.id = 'initialForm';
+
+            // Modify the parent form
+            const secondForm = document.createElement('form');
+            secondForm.id = 'secondForm';
+            document.body.appendChild(secondForm);
+            secondForm.appendChild(input1);
+
+            // Get the parent form reference
+            const sameInitialParentForm = anInput1.form();
+            expect(initialForm.id).toEqual(sameInitialParentForm.id);
+            const newParentForm = anInput1.form(true);
+            expect(initialForm.id).not.toEqual(newParentForm.id);
+            expect(newParentForm.id).toEqual(secondForm.id);
+
+            // Un-initialize the form element
+            form.appendChild(input1);
+            document.body.removeChild(secondForm);
+        });
+
+        //FIXME Add the tests for : formUnformat, formReformat, formSubmit*
     });
 
     //TODO Complete the tests in order to test every single method separately:

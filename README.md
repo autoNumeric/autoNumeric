@@ -650,7 +650,8 @@ Those special functions really work on the parent `<form>` element, instead of t
 
 | Method           | Description | Call example |
 | :----------------: | :-----------:  | :-----------:  |
-| `form` | Return a reference to the parent <form> element, `null` if it does not exist | `anElement.form();` |
+| `form` | Return a reference to the parent `<form>` element, `null` if it does not exist | `anElement.form();` |
+| `form(forcedSearch)` | Idem above, but will force a new search for the parent `<form>` element, discarding any previously found one | `anElement.form(true);` |
 | `formNumericString` | Return a string in standard URL-encoded notation with the form input values being unformatted | `anElement.formNumericString();` |
 | `formFormatted` | Return a string in standard URL-encoded notation with the form input values being formatted | `anElement.formFormatted();` |
 | `formLocalized` | Return a string in standard URL-encoded notation with the form input values, with localized values | `anElement.formLocalized();` |

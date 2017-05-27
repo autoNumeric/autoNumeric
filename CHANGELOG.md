@@ -7,6 +7,8 @@
   Additionally, when this option is set, if the AutoNumeric element is emptied, then `rawValue` is set to `null`.
   Note: if the current raw value is equal to `null`, changing the `emptyInputBehavior` option to something different than `null` will update the rawValue to `''`.
   **Known limitation** : Initializing an AutoNumeric object with the `null` value is not allowed since using `null` for the initial value means that AutoNumeric needs to use the current html value instead of `null`.
++ Fix issue #448 When searching for the parent form element, the tagName can be undefined.
++ The `form()` method now accepts a `true` argument that will force it to discard the current parent form and search for a new one.
 
 ### 4.0.0-beta.16
 + Move the options, default options and predefined options objects each in its own file.

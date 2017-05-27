@@ -2,7 +2,7 @@
  *               AutoNumeric.js
  *
  * @version      4.0.0-beta.17
- * @date         2017-05-24 UTC 23:59
+ * @date         2017-05-27 UTC 02:20
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS
@@ -111,6 +111,9 @@ class AutoNumeric {
         this.historyTable = []; // Keep track of *all* valid states of the element value
         this.historyTableIndex = -1; // Pointer to the current undo/redo state. This will be set to '0' during initialization since it first adds itself.
         this.onGoingRedo = false; // Variable that keeps track if a 'redo' is ongoing (in order to prevent an 'undo' to be launch when releasing the shift key before the ctrl key after a 'redo' shortcut)
+
+        // Initialize the parent form element, if any
+        this.parentForm = this._getParentForm();
 
         // Set the initial value if it exists and if the `formatOnPageLoad` option will allow it
         if (!this.runOnce && this.settings.formatOnPageLoad) {
@@ -934,7 +937,6 @@ class AutoNumeric {
         this.domElement.addEventListener('wheel', this._onWheelFunc, false);
         this.domElement.addEventListener('drop', this._onDropFunc, false);
 
-        this.parentForm = this.form();
         if (!AutoNumericHelper.isNull(this.parentForm)) {
             this.parentForm.addEventListener('submit', this._onFormSubmitFunc, false);
         }
@@ -968,9 +970,8 @@ class AutoNumeric {
         document.removeEventListener('keydown', this._onKeydownGlobalFunc, false);
         document.removeEventListener('keyup', this._onKeyupGlobalFunc, false);
 
-        const parentForm = this.form();
-        if (!AutoNumericHelper.isNull(parentForm)) {
-            parentForm.removeEventListener('submit', this._onFormSubmitFunc, false);
+        if (!AutoNumericHelper.isNull(this.parentForm)) {
+            this.parentForm.removeEventListener('submit', this._onFormSubmitFunc, false);
         }
     }
 
@@ -2251,12 +2252,29 @@ class AutoNumeric {
     // Special functions that really work on the parent <form> element, instead of the <input> element itself
 
     /**
-     * Return a reference to the parent <form> element if it exists, otherwise return `null`
+     * Return a reference to the parent <form> element if it exists, otherwise return `null`.
+     * If the parent form element as already been found, this directly return a reference to it.
+     * However, you can force AutoNumeric to search again for its reference by passing `true` as a parameter to this method.
+     * This method updates the `this.parentForm` attribute.
      *
+     * @param {boolean} forceSearch If set to `true`, the parent form is searched again, even if `this.parentForm` is already set.
      * @returns {HTMLFormElement|null}
      */
-    form() {
-        //TODO Store a reference to the parent <form> in `this.form` so we do not have to search it on each call?
+    form(forceSearch = false) {
+        if (forceSearch || AutoNumericHelper.isUndefinedOrNullOrEmpty(this.parentForm)) {
+            this.parentForm = this._getParentForm();
+        }
+
+        return this.parentForm;
+    }
+
+    /**
+     * Return a reference to the parent <form> element if it exists, otherwise return `null`.
+     *
+     * @returns {HTMLFormElement|null}
+     * @private
+     */
+    _getParentForm() {
         if (this.domElement.tagName.toLowerCase() === 'body') {
             return null;
         }
@@ -2270,9 +2288,14 @@ class AutoNumeric {
                 return null;
             }
 
-            tagName = node.tagName.toLowerCase();
+            if (node.tagName) {
+                tagName = node.tagName.toLowerCase();
+            } else {
+                tagName = '';
+            }
 
             if (tagName === 'body') {
+                // Get out of the loop if we get up to the `<body>` element
                 break;
             }
         } while (tagName !== 'form');

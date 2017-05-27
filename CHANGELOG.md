@@ -9,6 +9,7 @@
   **Known limitation** : Initializing an AutoNumeric object with the `null` value is not allowed since using `null` for the initial value means that AutoNumeric needs to use the current html value instead of `null`.
 + Fix issue #448 When searching for the parent form element, the tagName can be undefined.
 + The `form()` method now accepts a `true` argument that will force it to discard the current parent form and search for a new one.
++ Enforce the use of `settings.showWarnings` for most calls to `AutoNumericHelper.warning()`, wherever possible.
 
 ### 4.0.0-beta.16
 + Move the options, default options and predefined options objects each in its own file.

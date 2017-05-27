@@ -2,7 +2,7 @@
  *               AutoNumeric.js
  *
  * @version      4.0.0-beta.17
- * @date         2017-05-27 UTC 02:20
+ * @date         2017-05-27 UTC 04:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS
@@ -1289,7 +1289,7 @@ class AutoNumeric {
                         AutoNumericHelper.throwError('The callback/classes structure is not valid for the `styleRules` option.');
                     }
                 } else {
-                    AutoNumericHelper.warning(`The given \`styleRules\` callback is not a function, ${typeof callback} given.`);
+                    AutoNumericHelper.warning(`The given \`styleRules\` callback is not a function, ${typeof callback} given.`, this.settings.showWarnings);
                 }
             });
         }
@@ -2149,7 +2149,8 @@ class AutoNumeric {
         }
 
         if (domElementsArray.length === 0) {
-            AutoNumericHelper.warning(`No valid DOM elements were given hence no AutoNumeric object were instantiated.`);
+            AutoNumericHelper.warning(`No valid DOM elements were given hence no AutoNumeric object were instantiated.`, true);
+
             return [];
         }
 
@@ -2734,7 +2735,7 @@ class AutoNumeric {
                 return;
             } else {
                 // Print a warning to warn that the domElement already has a reference in the global map (but we cannot for sure starts deleting those old references since they could still be used by another AutoNumeric object)
-                AutoNumericHelper.warning(`A reference to the DOM element you just initialized already exists in the global AutoNumeric element list. Please make sure to not initialize the same DOM element multiple times.`);
+                AutoNumericHelper.warning(`A reference to the DOM element you just initialized already exists in the global AutoNumeric element list. Please make sure to not initialize the same DOM element multiple times.`, autoNumericObject.getSettings().showWarnings);
             }
         }
 
@@ -2972,7 +2973,7 @@ class AutoNumeric {
         if (!AutoNumericHelper.isNull(optionsToUse) &&
             ((optionsToUse.caretPositionOnFocus !== AutoNumeric.options.caretPositionOnFocus.doNoForceCaretPosition &&
             optionsToUse.selectOnFocus === AutoNumeric.options.selectOnFocus.select))) {
-            AutoNumericHelper.warning(`The 'selectOnFocus' option is set to 'select', which is in conflict with the 'caretPositionOnFocus' which is set to '${optionsToUse.caretPositionOnFocus}'. As a result, if this has been called when instantiating an AutoNumeric object, the 'selectOnFocus' option is forced to 'doNotSelect'.`);
+            AutoNumericHelper.warning(`The 'selectOnFocus' option is set to 'select', which is in conflict with the 'caretPositionOnFocus' which is set to '${optionsToUse.caretPositionOnFocus}'. As a result, if this has been called when instantiating an AutoNumeric object, the 'selectOnFocus' option is forced to 'doNotSelect'.`, options.showWarnings);
         }
 
         if (!AutoNumericHelper.isInArray(options.digitGroupSeparator, [
@@ -6341,7 +6342,7 @@ class AutoNumeric {
 
                 if (oldOptionsConverter.hasOwnProperty(option)) {
                     // Else we have an 'old' option name
-                    AutoNumericHelper.warning(`You are using the deprecated option name '${option}'. Please use '${oldOptionsConverter[option]}' instead from now on. The old option name will be dropped soon.`, true);
+                    AutoNumericHelper.warning(`You are using the deprecated option name '${option}'. Please use '${oldOptionsConverter[option]}' instead from now on. The old option name will be dropped very soon™.`, true);
 
                     // Then we modify the initial option object to use the new options instead of the old ones
                     options[oldOptionsConverter[option]] = options[option];
@@ -6444,7 +6445,7 @@ class AutoNumeric {
 
             // If the result is still not a numeric string, then we throw a warning
             if (!AutoNumericHelper.isNumber(Number(result))) {
-                AutoNumericHelper.warning(`The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`, settings.showWarnings);
+                AutoNumericHelper.warning(`The value "${value}" being 'set' is not numeric and therefore cannot be used appropriately.`, settings.showWarnings);
                 result = NaN;
             }
         }
@@ -7429,7 +7430,13 @@ AutoNumeric.multiple = (arg1, initialValue = null, options = null) => {
     }
 
     if (arg1.length === 0) {
-        AutoNumericHelper.warning(`No valid DOM elements were given hence no AutoNumeric object were instantiated.`);
+        let showWarnings = true;
+        if (!AutoNumericHelper.isNull(options) && AutoNumericHelper.isBoolean(options.showWarnings)) {
+            showWarnings = options.showWarnings;
+        }
+
+        AutoNumericHelper.warning(`No valid DOM elements were given hence no AutoNumeric object were instantiated.`, showWarnings);
+
         return [];
     }
 

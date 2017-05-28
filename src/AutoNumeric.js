@@ -135,6 +135,11 @@ class AutoNumeric {
 
         // Save the initial values (html attribute + element.value) for the pristine test
         this._saveInitialValues(initialValue);
+        
+        // Setup the data for the persistent storage solution (ie. sessionStorage or cookies)
+        this.sessionStorageAvailable = this.constructor._storageTest();
+        this.storageNamePrefix = 'AUTO_'; // The prefix for the raw value storage name variable can be modified here
+        this._setPersistentStorageName();
 
         // --------------------------------------------------------
         // -------------- Tracking
@@ -1423,7 +1428,7 @@ class AutoNumeric {
         if (newValue === null) {
             // Here this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.null
             this._setElementAndRawValue(null, null, saveChangeToHistory);
-            this._saveValueToPersistentStorage('set');
+            this._saveValueToPersistentStorage();
 
             return this;
         }
@@ -1496,7 +1501,7 @@ class AutoNumeric {
                 }
 
                 if (this.settings.decimalPlacesShownOnFocus || this.settings.scaleDivisor) {
-                    this._saveValueToPersistentStorage('set');
+                    this._saveValueToPersistentStorage();
                 }
 
                 // Set back the `decimalPlacesOverride` option to its original value
@@ -1521,7 +1526,7 @@ class AutoNumeric {
 
                 AutoNumericHelper.throwError(`The value [${attemptedValue}] being set falls outside of the minimumValue [${this.settings.minimumValue}] and maximumValue [${this.settings.maximumValue}] range set for this element`);
 
-                this._saveValueToPersistentStorage('remove');
+                this._removeValueFromPersistentStorage();
                 this.setValue('', saveChangeToHistory);
 
                 return this;
@@ -2271,7 +2276,7 @@ class AutoNumeric {
      * @example anElement.remove()
      */
     remove() {
-        this._saveValueToPersistentStorage('remove');
+        this._removeValueFromPersistentStorage();
         this._removeEventListeners();
 
         // Also remove the element from the local AutoNumeric list
@@ -4826,47 +4831,72 @@ class AutoNumeric {
     }
 
     /**
-     * Creates or removes sessionStorage or cookie depending on what the browser is supporting.
+     * Generate the name for the persistent stored data variable
+     * @private
+     */
+    _setPersistentStorageName() {
+        if (this.settings.saveValueToSessionStorage) {
+            if (this.domElement.name !== '' && !AutoNumericHelper.isUndefined(this.domElement.name)) {
+                this.rawValueStorageName = `${this.storageNamePrefix}${decodeURIComponent(this.domElement.name)}`;
+            } else {
+                this.rawValueStorageName = `${this.storageNamePrefix}${this.domElement.id}`;
+            }
+        }
+    }
+
+    /**
+     * Save the raw Value into sessionStorage or a cookie depending on what the browser is supporting.
+     * @private
+     */
+    _saveValueToPersistentStorage() {
+        if (this.settings.saveValueToSessionStorage) {
+            if (this.sessionStorageAvailable) {
+                sessionStorage.setItem(this.rawValueStorageName, this.settings.rawValue);
+            } else {
+                // Use cookies for obsolete browsers that do not support sessionStorage (ie. IE 6 & 7)
+                document.cookie = `${this.rawValueStorageName}=${this.settings.rawValue}; expires= ; path=/`;
+            }
+        }
+    }
+
+    /**
+     * Retrieve the raw value from sessionStorage or the cookie depending on what the browser is supporting.
      *
-     * @param {string} action
      * @returns {*}
      * @private
      */
-    _saveValueToPersistentStorage(action) {
+    _getValueFromPersistentStorage() {
         if (this.settings.saveValueToSessionStorage) {
-            const storedName = (this.domElement.name !== '' && !AutoNumericHelper.isUndefined(this.domElement.name)) ?`AUTO_${decodeURIComponent(this.domElement.name)}` :`AUTO_${this.domElement.id}`;
-            let date;
-            let expires;
-
-            // Sets cookie for browser that do not support sessionStorage IE 6 & IE 7
-            if (this._storageTest() === false) {
-                switch (action) {
-                    case 'set':
-                        document.cookie = `${storedName}=${this.settings.rawValue}; expires= ; path=/`;
-                        break;
-                    case 'remove':
-                        date = new Date();
-                        date.setTime(date.getTime() + (-1 * 24 * 60 * 60 * 1000));
-                        expires = '; expires=' + date.toUTCString(); // Note : `toGMTString()` has been deprecated (cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toGMTString)
-                        document.cookie = `${storedName}='' ;${expires}; path=/`;
-                        break;
-                    case 'get':
-                        return this._readCookie(storedName);
-                }
+            let result;
+            if (this.sessionStorageAvailable) {
+                result = sessionStorage.getItem(this.rawValueStorageName);
             } else {
-                switch (action) {
-                    case 'set':
-                        sessionStorage.setItem(storedName, this.settings.rawValue);
-                        break;
-                    case 'remove':
-                        sessionStorage.removeItem(storedName);
-                        break;
-                    case 'get':
-                        return sessionStorage.getItem(storedName);
-                }
+                result = this._readCookie(this.rawValueStorageName);
+            }
+
+            return result;
+        }
+
+        AutoNumericHelper.warning('`_getValueFromPersistentStorage()` is called but `settings.saveValueToSessionStorage` is false. There must be an error that needs fixing.', this.settings.showWarnings);
+
+        return null;
+    }
+
+    /**
+     * Remove the raw value data from sessionStorage or the cookie depending on what the browser is supporting.
+     * @private
+     */
+    _removeValueFromPersistentStorage() {
+        if (this.settings.saveValueToSessionStorage) {
+            if (this.sessionStorageAvailable) {
+                sessionStorage.removeItem(this.rawValueStorageName);
+            } else {
+                const date = new Date();
+                date.setTime(date.getTime() - 86400000); // -86400000 === -1 * 24 * 60 * 60 * 1000
+                const expires = `; expires=${date.toUTCString()}`;
+                document.cookie = `${this.rawValueStorageName}='' ;${expires}; path=/`;
             }
         }
-        //FIXME What to return if `this.settings.saveValueToSessionStorage` is `false`?
     }
 
     /**
@@ -5298,7 +5328,7 @@ class AutoNumeric {
 
         // Saves the extended decimal to preserve the data when navigating away from the page
         if (this.settings.decimalPlacesShownOnFocus !== null) {
-            this._saveValueToPersistentStorage('set');
+            this._saveValueToPersistentStorage();
         }
 
         if (!this.formatted) {  //TODO Is this line needed? Considering that onKeydown and onKeypress both finish by setting it to false...
@@ -5336,7 +5366,7 @@ class AutoNumeric {
 
         if ((e.type === 'mouseleave' && !this.isFocused) || e.type === 'blur') {
             const origValue = this.settings.rawValue;
-            this._saveValueToPersistentStorage('set');
+            this._saveValueToPersistentStorage();
 
             if (this.settings.noSeparatorOnFocus === true) {
                 this.settings.digitGroupSeparator = this.originalDigitGroupSeparator;
@@ -6078,7 +6108,7 @@ class AutoNumeric {
                     (this.settings.defaultValueOverride === null && currentValue !== '' && currentValue !== this.domElement.getAttribute('value')) ||
                     (currentValue !== '' && this.domElement.getAttribute('type') === 'hidden' && !AutoNumericHelper.isNumber(unLocalizedCurrentValue))) {
                     if (this.settings.saveValueToSessionStorage && (this.settings.decimalPlacesShownOnFocus !== null || this.settings.scaleDivisor)) {
-                        this._setRawValue(this._saveValueToPersistentStorage('get'));
+                        this._setRawValue(this._getValueFromPersistentStorage());
                     }
 
                     // If the decimalPlacesShownOnFocus value should NOT be saved in sessionStorage

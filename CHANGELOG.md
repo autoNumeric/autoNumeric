@@ -4,6 +4,9 @@
 + Modify the `get*` methods to allow passing them a callback function.
 + The callback is then executed on the `get*` method result, or the `global.get*` method array of result.
 + The callback is passed the result of the `get*` functions as its first argument, and the current AutoNumeric object as its second.
++ Split the `_saveValueToPersistentStorage()` method in three : `_saveValueToPersistentStorage()` to save the raw value to persistent storage, `_getValueFromPersistentStorage()` to retrieve that data, and `_removeValueFromPersistentStorage()` to delete it.
++ From now on, the `_storageTest` is only done once, and the result is kept in `this.sessionStorageAvailable`, and the storage variable name is also generated once and kept in `this.rawValueStorageName`.
++ You can now modify the raw value storage name variable prefix by modifying the `this.storageNamePrefix` attribute. Currently it defaults to `'AUTO_'`;
 
 ### 4.0.0-beta.17
 + Fix issue #447 Add a new `'null'` options to the `emptyInputBehavior` setting 

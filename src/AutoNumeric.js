@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.18
- * @date         2017-05-27 UTC 08:00
+ * @version      4.0.0-beta.19
+ * @date         2017-05-29 UTC 23:23
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS
@@ -779,7 +779,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.18';
+        return '4.0.0-beta.19';
     }
 
     /**
@@ -3940,7 +3940,7 @@ class AutoNumeric {
         s = s.replace(settings.currencySymbol, '');
 
         // Remove the grouping separators (thousands separators usually)
-        s = s.replace(settings.digitGroupSeparator, '');
+        s = s.replace(new RegExp(`[${settings.digitGroupSeparator}]`, 'g'), '');
 
         // Replace the decimal character by a dot
         if (settings.decimalCharacter !== '.') {

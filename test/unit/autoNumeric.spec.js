@@ -5183,6 +5183,7 @@ describe('Static autoNumeric functions', () => {
 
     describe('`unformat`', () => {
         it('should unformat with default options', () => {
+            expect(AutoNumeric.unformat('$1,234,567.89')).toEqual(NaN);
             expect(AutoNumeric.unformat('$1,234.56')).toEqual(NaN);
             expect(AutoNumeric.unformat('$123.45')).toEqual(NaN);
             expect(AutoNumeric.unformat('$0.00')).toEqual(NaN);
@@ -5198,6 +5199,7 @@ describe('Static autoNumeric functions', () => {
         });
 
         it('should unformat with a currency symbol options', () => {
+            expect(AutoNumeric.unformat('$1,234,567.89', { currencySymbol: '$' })).toEqual('1234567.89');
             expect(AutoNumeric.unformat('$1,234.56', { currencySymbol: '$' })).toEqual('1234.56');
             expect(AutoNumeric.unformat('$123.45', { currencySymbol: '$' })).toEqual('123.45');
             expect(AutoNumeric.unformat('$0.00', { currencySymbol: '$' })).toEqual('0.00');
@@ -5213,6 +5215,7 @@ describe('Static autoNumeric functions', () => {
         });
 
         it('should unformat with user options', () => {
+            expect(AutoNumeric.unformat('1.234.567,89 €', autoNumericOptionsEuroNumber)).toEqual(1234567.89);
             expect(AutoNumeric.unformat('1.234,56 €', autoNumericOptionsEuroNumber)).toEqual(1234.56);
             expect(AutoNumeric.unformat('123,45 €', autoNumericOptionsEuroNumber)).toEqual(123.45);
             expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);
@@ -5314,6 +5317,10 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.unformat(4000, options3)).toEqual(4000);
             expect(AutoNumeric.unformat('4000.123', options3)).toEqual('4000');
             expect(AutoNumeric.unformat(4000.123, options3)).toEqual(4000.123);
+        });
+
+        it('should handle multiple digit group separators', () => { // cf. issue #449
+            expect(AutoNumeric.unformat('$12,345,678.90', AutoNumeric.getPredefinedOptions().dollar)).toEqual('12345678.90');
         });
 
         //TODO Add the tests for the localized values (positive and negative)

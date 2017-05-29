@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.0.0-beta.19
++ Fix issue #449 `AutoNumeric.unformat()` only removes the first instance of `settings.digitGroupSeparator`
+
 ### 4.0.0-beta.18
 + Modify the `get*` methods to allow passing them a callback function.
 + The callback is then executed on the `get*` method result, or the `global.get*` method array of result.

@@ -869,7 +869,16 @@ The previous stable autoNumeric version `v1.9.46` can be found [here](https://gi
 
 ## Related projects
 For integration into [Rails](http://rubyonrails.org/) projects, you can use the [autonumeric-rails](https://github.com/randoum/autonumeric-rails) project.
-For integration with PHP Yii2, take a look at the [extead/yii2-autonumeric](https://github.com/extead/yii2-autonumeric) or [haifahrul/yii2-autonumeric](https://github.com/haifahrul/yii2-autonumeric) projects.
+
+For integration with [PHP](http://php.net/) Yii2, take a look at the [extead/yii2-autonumeric](https://github.com/extead/yii2-autonumeric) or [haifahrul/yii2-autonumeric](https://github.com/haifahrul/yii2-autonumeric) projects.
+
+For integration into Javascript frameworks, you can use:
+- Vue.js with the [vue-autonumeric component](https://github.com/autoNumeric/vue-autoNumeric),
+- Angular with the [angular-currency](https://github.com/BuffCoder/angular-currency) directive,
+- Meteor with [meteor-autonumeric](https://github.com/gibson/meteor-autonumeric), and
+- Ember with [ember-autonumeric](https://github.com/ykaragol/ember-autonumeric).
+
+*Note: Some of those projects may lag with the latest AutoNumeric stable version, or even be incomplete*
 
 ## Other documentation
 The old and outdated documentation can be found in the [Documentation](Documentation.md) file.<br>

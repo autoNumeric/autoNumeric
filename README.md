@@ -869,6 +869,7 @@ The previous stable autoNumeric version `v1.9.46` can be found [here](https://gi
 
 ## Related projects
 For integration into [Rails](http://rubyonrails.org/) projects, you can use the [autonumeric-rails](https://github.com/randoum/autonumeric-rails) project.
+For integration with PHP Yii2, take a look at the [extead/yii2-autonumeric](https://github.com/extead/yii2-autonumeric) or [haifahrul/yii2-autonumeric](https://github.com/haifahrul/yii2-autonumeric) projects.
 
 ## Other documentation
 The old and outdated documentation can be found in the [Documentation](Documentation.md) file.<br>

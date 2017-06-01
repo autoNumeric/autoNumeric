@@ -225,6 +225,7 @@ It always takes either a DOM element reference as its first argument, or a css s
 ```js
 anElement = new AutoNumeric(domElement); // With the default options
 anElement = new AutoNumeric(domElement, { options }); // With one option object
+anElement = new AutoNumeric(domElement, [{ options1 }, 'euroPos', { options2 }]); // With multiple option objects (the latest option overwriting the previous ones)
 anElement = new AutoNumeric(domElement).french(); // With one pre-defined language object
 anElement = new AutoNumeric(domElement).french({ options });// With one pre-defined language object and additional options that will override those defaults
 
@@ -239,6 +240,7 @@ anElement = new AutoNumeric(domElement, 12345.789, { options }).french({ options
 // The AutoNumeric constructor class can also accept a string as a css selector. Under the hood this use `QuerySelector` and limit itself to only the first element it finds.
 anElement = new AutoNumeric('.myCssClass > input');
 anElement = new AutoNumeric('.myCssClass > input', { options });
+anElement = new AutoNumeric('.myCssClass > input', [{ options1 }, 'euroPos', { options2 }]);
 anElement = new AutoNumeric('.myCssClass > input', 12345.789);
 anElement = new AutoNumeric('.myCssClass > input', 12345.789, { options });
 anElement = new AutoNumeric('.myCssClass > input', null, { options }); // With a null initial value
@@ -251,8 +253,11 @@ If you know you want to initialize multiple elements in one call, you must then 
 ```js
 // Init multiple DOM elements in one call (and possibly pass multiple values that will be mapped to each DOM element)
 [anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], { options });
+[anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], [{ options }, 'euroPos']);
 [anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], 12345.789, { options });
+[anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], 12345.789, [{ options }, 'euroPos']);
 [anElement1, anElement2, anElement3] = AutoNumeric.multiple.french([domElement1, domElement2, domElement3], [12345.789, 234.78, null], { options });
+[anElement1, anElement2, anElement3] = AutoNumeric.multiple.french([domElement1, domElement2, domElement3], [12345.789, 234.78, null], [{ options }, 'euroPos']);
 
 // Special case, if a <form> element is passed (or any other 'parent' (or 'root') DOM element), then autoNumeric will initialize each child `<input>` elements recursively, ignoring those referenced in the `exclude` attribute
 [anElement1, anElement2] = AutoNumeric.multiple({ rootElement: formElement }, { options });
@@ -263,6 +268,8 @@ If you know you want to initialize multiple elements in one call, you must then 
 [anElement1, anElement2] = AutoNumeric.multiple('.myCssClass > input', { options }); // This always return an Array, even if there is only one element selected
 [anElement1, anElement2] = AutoNumeric.multiple('.myCssClass > input', [null, 12345.789], { options }); // Idem above, but with passing the initial values too
 ```
+
+*Note: Using an array of option objects / pre-defined names will always merge those settings. The resulting setting objet will then be applied to all the selected elements ; they will share the exact same settings.*
 
 ## Options
 Multiple options allow you to customize precisely how a form input will format your key strokes as you type :
@@ -778,6 +785,7 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 | `localize` | Unformat and localize the given formatted string with the given options. This returns a string. | `AutoNumeric.localize('1.234,56 €', { options });` |
 | `localize` | Idem as above, but return the localized DOM element value. This does *not* update that element value. | `AutoNumeric.localize(domElement, { options });` |
 | `localizeAndSet` | Unformat and localize the `domElement` value with the given options and returns the localized value as a string. This function does update that element value with the newly localized value in the process. | `AutoNumeric.localizeAndSet(domElement, { options });` |
+| `mergeOptions` | Accepts an array of option objects and / or pre-defined option names, and return a single option object where the latter element overwrite the settings from the previous ones | `AutoNumeric.mergeOptions(['euro', { currencySymbol: '#' }]);` |
 | `test` | Test if the given domElement is already managed by AutoNumeric (if it is initialized) | `AutoNumeric.test(domElement);` |
 | `version` | Return the AutoNumeric version number (for debugging purpose) | `AutoNumeric.version();` |
 

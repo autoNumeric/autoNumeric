@@ -1,5 +1,12 @@
 ## Changelog for autoNumeric
 
+### 4.0.0-beta.20
++ Allow initializing an AutoNumeric element with an array of options objects or pre-defined option names.
+  The latter options in the array will overwrite the previous ones.
+  The array can contains either option objects, or pre-defined option names as a string (ie. `'euroPos'`).
+  Both the initialization methods `new AutoNumeric()` and `AutoNumeric.multiple()` support using arrays of options.
++ Add a static `AutoNumeric.mergeOptions()` function that accepts an array of option objects and / or pre-defined option names, and return a single option object where the latter element overwrite the settings from the previous ones.
+
 ### 4.0.0-beta.19
 + Fix issue #449 `AutoNumeric.unformat()` only removes the first instance of `settings.digitGroupSeparator`
 

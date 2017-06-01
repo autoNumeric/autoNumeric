@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.19
- * @date         2017-05-29 UTC 23:23
+ * @version      4.0.0-beta.20
+ * @date         2017-06-01 UTC 08:00
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS
@@ -779,7 +779,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.19';
+        return '4.0.0-beta.20';
     }
 
     /**
@@ -807,11 +807,13 @@ class AutoNumeric {
         const isArg1String = AutoNumericHelper.isString(arg1);
 
         const isArg2Object = AutoNumericHelper.isObject(arg2);
+        const isArg2Array = Array.isArray(arg2) && arg2.length > 0;
         const isArg2Number = AutoNumericHelper.isNumberOrArabic(arg2) || arg2 === '';
         const isArg2Null = AutoNumericHelper.isNull(arg2);
         const isArg2EmptyString = AutoNumericHelper.isEmptyString(arg2);
 
         const isArg3Object = AutoNumericHelper.isObject(arg3);
+        const isArg3Array = Array.isArray(arg3) && arg3.length > 0;
         const isArg3Null = AutoNumericHelper.isNull(arg3);
 
         // Given the parameters passed, sort the data and return a stable state before the initialization
@@ -819,6 +821,7 @@ class AutoNumeric {
         let userOptions;
         let initialValue;
 
+        //TODO Simplify those tests -->
         if (isArg1Element && isArg2Null && isArg3Null) {
             // new AutoNumeric(domElement); // With the default options
             domElement = arg1;
@@ -835,11 +838,21 @@ class AutoNumeric {
             domElement = arg1;
             initialValue = null;
             userOptions = arg2;
+        } else if (isArg1Element && isArg2Array && isArg3Null) {
+            // new AutoNumeric(domElement, [{ options1 }, { options2 }]); // With multiple option objects (the latest option overwriting the previous ones)
+            domElement = arg1;
+            initialValue = null;
+            userOptions = this.mergeOptions(arg2);
         } else if (isArg1Element && (isArg2Null || isArg2EmptyString) && isArg3Object) {
             // new AutoNumeric(domElement, null, { options }); // With one option object
             domElement = arg1;
             initialValue = null;
             userOptions = arg3;
+        } else if (isArg1Element && (isArg2Null || isArg2EmptyString) && isArg3Array) {
+            // new AutoNumeric(domElement, null, [{ options1 }, { options2 }]); // With multiple option objects
+            domElement = arg1;
+            initialValue = null;
+            userOptions = this.mergeOptions(arg3);
         } else if (isArg1String && isArg2Null && isArg3Null) {
             // new AutoNumeric('.myCssClass > input');
             domElement = document.querySelector(arg1);
@@ -850,11 +863,21 @@ class AutoNumeric {
             domElement = document.querySelector(arg1);
             initialValue = null;
             userOptions = arg2;
+        } else if (isArg1String && isArg2Array && isArg3Null) {
+            // new AutoNumeric('.myCssClass > input', [{ options1 }, { options2 }]); // With multiple option objects
+            domElement = document.querySelector(arg1);
+            initialValue = null;
+            userOptions = this.mergeOptions(arg2);
         } else if (isArg1String && (isArg2Null || isArg2EmptyString) && isArg3Object) {
             // new AutoNumeric('.myCssClass > input', null, { options });
             domElement = document.querySelector(arg1);
             initialValue = null;
             userOptions = arg3;
+        } else if (isArg1String && (isArg2Null || isArg2EmptyString) && isArg3Array) {
+            // new AutoNumeric('.myCssClass > input', null, [{ options1 }, { options2 }]); // With multiple option objects
+            domElement = document.querySelector(arg1);
+            initialValue = null;
+            userOptions = this.mergeOptions(arg3);
         } else if (isArg1String && isArg2Number && isArg3Null) {
             // new AutoNumeric('.myCssClass > input', 12345.789);
             // new AutoNumeric('.myCssClass > input', '12345.789');
@@ -885,6 +908,46 @@ class AutoNumeric {
         }
 
         return { domElement, initialValue, userOptions };
+    }
+
+    /**
+     * Merge the option objects found in the given array `optionsArray`.
+     * If a `string` is found, then we try to get the related pre-defined option using that string as its name.
+     * When merging the options, the latest option overwrite any previously set. This allows to fine tune a pre-defined option for instance.
+     *
+     * @param {Array<object|string>} optionsArray
+     * @returns {{}}
+     */
+    static mergeOptions(optionsArray) {
+        // This allows the user to use multiple options (strings or objects) in an array, and overwrite the previous one with the next option element ; this is useful to tune the wanted format
+        const mergedOptions = {};
+        optionsArray.forEach(optionObjectOrPredefinedOptionString => {
+            Object.assign(mergedOptions, this._getOptionObject(optionObjectOrPredefinedOptionString));
+        });
+
+        return mergedOptions;
+    }
+
+    /**
+     * Return an option object based on the given parameter.
+     * If `optionObjectOrPredefinedName` is as string, then we retrieve the pre-defined option object, if it's an object, we use it as is.
+     *
+     * @param {object|string} optionObjectOrPredefinedName
+     * @returns {object}
+     */
+    static _getOptionObject(optionObjectOrPredefinedName) {
+        let options;
+        if (AutoNumericHelper.isString(optionObjectOrPredefinedName)) {
+            options = AutoNumeric.getPredefinedOptions()[optionObjectOrPredefinedName];
+            if (options === void(0) || options === null) {
+                // If the given pre-defined name does not exist, warn that something is wrong, and continue the execution of the initialization
+                AutoNumericHelper.warning(`The given pre-defined option [${optionObjectOrPredefinedName}] is not recognized by autoNumeric. Please check that pre-defined option name.`, true);
+            }
+        } else { // A `settings` object
+            options = optionObjectOrPredefinedName;
+        }
+
+        return options;
     }
 
     /**
@@ -7475,7 +7538,7 @@ class AutoNumeric {
  *
  * @param {string|Array|{ rootElement: HTMLElement }|{ rootElement: HTMLElement, exclude: Array<HTMLInputElement>}} arg1
  * @param {number|Array|object|null} initialValue
- * @param {object|null} options
+ * @param {object|Array|null} options
  * @returns {Array}
  */
 AutoNumeric.multiple = (arg1, initialValue = null, options = null) => {
@@ -7522,11 +7585,56 @@ AutoNumeric.multiple = (arg1, initialValue = null, options = null) => {
         return [];
     }
 
-    // Initialize the initial values
+    // At this point, we know `arg1` is an array of DOM elements
+
+    // This function can be initialized with two types of array, one for the initial values, and/or one for the options.
+    // So we need to find out if an array is detected if the user passed an array of initial values, or an array of options
+    // Therefore, we analyze the content of the arrays for the second and third arguments
+    // ...for the second parameter :
     const isInitialValueArray = AutoNumericHelper.isArray(initialValue);
+    const isInitialValueArrayAndNotEmpty = isInitialValueArray && initialValue.length >= 1;
+    let secondArgumentIsInitialValueArray = false;
+    let secondArgumentIsOptionArray = false;
+    // Any of the arrays can be either an array of initial values, or an array of option object/pre-defined option names
+    if (isInitialValueArrayAndNotEmpty) {
+        const typeOfFirstArrayElement = typeof Number(initialValue[0]);
+        // First we test the second argument
+        secondArgumentIsInitialValueArray = typeOfFirstArrayElement === 'number' && !isNaN(Number(initialValue[0]));
+
+        if (!secondArgumentIsInitialValueArray) {
+            // If the second argument is an array, but not an array of values, check if it's instead an array of options/pre-defined option names
+            if (typeOfFirstArrayElement === 'string' || isNaN(typeOfFirstArrayElement) || typeOfFirstArrayElement === 'object') {
+                secondArgumentIsOptionArray = true;
+            }
+        }
+    }
+
+    // ...for the third parameter :
+    const isOptionsArrayAndNotEmpty = AutoNumericHelper.isArray(options) && options.length >= 1;
+    let thirdArgumentIsOptionArray = false;
+    if (isOptionsArrayAndNotEmpty) {
+        const typeOfFirstArrayElement = typeof options[0];
+        if (typeOfFirstArrayElement === 'string' || typeOfFirstArrayElement === 'object') {
+            // If the third argument is an array of options/pre-defined option names
+            thirdArgumentIsOptionArray = true;
+        }
+    }
+
+    // Depending of our findings, we generate the options variable to use `optionsToUse`, either directly, or merged
+    let optionsToUse;
+    if (secondArgumentIsOptionArray) {
+        optionsToUse = AutoNumeric.mergeOptions(initialValue);
+    } else if (thirdArgumentIsOptionArray) {
+        optionsToUse = AutoNumeric.mergeOptions(options);
+    } else {
+        optionsToUse = options;
+    }
+
+
+    // Initialize the initial values
     const isInitialValueNumber = AutoNumericHelper.isNumber(initialValue);
     let initialValueArraySize;
-    if (isInitialValueArray) {
+    if (secondArgumentIsInitialValueArray) {
         initialValueArraySize = initialValue.length;
     }
 
@@ -7534,11 +7642,11 @@ AutoNumeric.multiple = (arg1, initialValue = null, options = null) => {
     arg1.forEach((domElement, index) => {
         if (isInitialValueNumber) {
             // We set the same value for each elements
-            result.push(new AutoNumeric(domElement, initialValue, options));
-        } else if (isInitialValueArray && index <= initialValueArraySize) {
-            result.push(new AutoNumeric(domElement, initialValue[index], options));
+            result.push(new AutoNumeric(domElement, initialValue, optionsToUse));
+        } else if (secondArgumentIsInitialValueArray && index <= initialValueArraySize) {
+            result.push(new AutoNumeric(domElement, initialValue[index], optionsToUse));
         } else {
-            result.push(new AutoNumeric(domElement, null, options));
+            result.push(new AutoNumeric(domElement, null, optionsToUse));
         }
     });
 

@@ -900,6 +900,82 @@ describe('The autoNumeric object', () => {
             expect(() => new AutoNumeric(newInput, options)).not.toThrow(); // With one option object
         });
 
+        it('should correctly initialize the AutoNumeric element when passed an array of options', () => {
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric(newInput, [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('#1 234 567·89');
+        });
+
+        it('should correctly initialize the AutoNumeric element when passed an array of options with pre-defined option names', () => {
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric(newInput, [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                'euro',
+                {
+                    currencySymbol     : '!',
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('1.234.567,89!');
+        });
+
+        it('should ignore unknown pre-defined option name when initializing the AutoNumeric element with an array of options with pre-defined option names', () => {
+            spyOn(console, 'warn');
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric(newInput, [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                'euro',
+                {
+                    currencySymbol     : '!',
+                },
+                'foobar',
+            ])).not.toThrow(); // With multiple option objects
+            expect(console.warn).toHaveBeenCalled();
+            expect(console.warn).toHaveBeenCalledTimes(1);
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('1.234.567,89!');
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric(newInput, null, options)).not.toThrow(); // With one option object and a null initial value
+        });
+
+        it('should correctly initialize the AutoNumeric element when passed an array of options', () => {
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric(newInput, null, [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('#1 234 567·89');
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric(newInput, '', options)).not.toThrow(); // With one option object and an empty initial value
+        });
+
         it('should correctly initialize the AutoNumeric element', () => {
             expect(() => new AutoNumeric(newInput).french()).not.toThrow(); // With one pre-defined language object
         });
@@ -938,12 +1014,44 @@ describe('The autoNumeric object', () => {
             expect(() => new AutoNumeric('input', options)).not.toThrow();
         });
 
+        it('should correctly initialize the AutoNumeric element when passed an array of options', () => {
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric('input', [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('#1 234 567·89');
+        });
+
         it('should correctly initialize the AutoNumeric element', () => {
             expect(() => new AutoNumeric('input', 12345.789)).not.toThrow();
         });
 
         it('should correctly initialize the AutoNumeric element', () => {
             expect(() => new AutoNumeric('input', 12345.789, options)).not.toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element when passed an array of options', () => {
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric('input', null, [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('#1 234 567·89');
         });
 
         it('should correctly initialize the AutoNumeric element', () => {
@@ -2728,7 +2836,7 @@ describe('Initialization calls', () => {
         });
     });
 
-    describe('Initialize multiple AutoNumeric objects with one call to `AutoNumeric.multiple`', () => { //FIXME à terminer
+    describe('Initialize multiple AutoNumeric objects with one call to `AutoNumeric.multiple`', () => {
         describe('initialization methods with the `multiple()` function', () => {
             let newInput1;
             let newInput2;
@@ -2928,6 +3036,51 @@ describe('Initialization calls', () => {
                 expect(anElement1.getFormatted()).toEqual('187 568,24 €');
                 expect(anElement2.getFormatted()).toEqual('13 568,24 €');
                 expect(anElement4.getFormatted()).toEqual('');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with an array of elements and an array of options as the second argument', () => {
+                const [anElement2, anElement3, anElement4, anElement5] = AutoNumeric.multiple(
+                    [newInput2, newInput3, newInput4, newInput5],
+                    [
+                        'dollar',
+                        {
+                            currencySymbol: AutoNumeric.options.currencySymbol.franc,
+                            currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.suffix,
+                        },
+                    ]
+                );
+                expect(anElement2.getFormatted()).toEqual('');
+                expect(anElement3.getFormatted()).toEqual('');
+                expect(anElement4.getFormatted()).toEqual('');
+                expect(anElement5.getFormatted()).toEqual('');
+
+                expect(anElement2.set(13568.243).getFormatted()).toEqual('13,568.24₣');
+                expect(anElement3.set(187568.243).getFormatted()).toEqual('187,568.24₣');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21,613,568.24₣');
+                expect(anElement5.set(1028.005).getFormatted()).toEqual('1,028.01₣');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with an array of elements and an array of options as the third argument', () => {
+                const [anElement2, anElement3, anElement4, anElement5] = AutoNumeric.multiple(
+                    [newInput2, newInput3, newInput4, newInput5],
+                    null, // Initial values
+                    [
+                        'dollar',
+                        {
+                            currencySymbol: AutoNumeric.options.currencySymbol.franc,
+                            currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.suffix,
+                        },
+                    ]
+                );
+                expect(anElement2.getFormatted()).toEqual('');
+                expect(anElement3.getFormatted()).toEqual('');
+                expect(anElement4.getFormatted()).toEqual('');
+                expect(anElement5.getFormatted()).toEqual('');
+
+                expect(anElement2.set(13568.243).getFormatted()).toEqual('13,568.24₣');
+                expect(anElement3.set(187568.243).getFormatted()).toEqual('187,568.24₣');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21,613,568.24₣');
+                expect(anElement5.set(1028.005).getFormatted()).toEqual('1,028.01₣');
             });
         });
 

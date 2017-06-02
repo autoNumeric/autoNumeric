@@ -2,7 +2,7 @@
  *               AutoNumeric.js
  *
  * @version      4.0.0-beta.20
- * @date         2017-06-01 UTC 08:00
+ * @date         2017-06-02 UTC 08:40
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS
@@ -3428,6 +3428,35 @@ class AutoNumeric {
     }
 
     /**
+     * Analyse the given array `options` and return a single 'merged' option objet.
+     * `options` can be `null`, or an array of an option objects, or an array containing another array of option objects / strings (pre-defined option names)
+     *
+     * @param {null|Array<object|Array<string|object>>} options
+     * @returns {null|object}
+     * @private
+     */
+    static _generateOptionsObjectFromOptionsArray(options) {
+        let optionsResult;
+        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(options) || options.length === 0) {
+            optionsResult = null;
+        } else {
+            optionsResult = {};
+            if (options.length === 1 && Array.isArray(options[0])) {
+                options[0].forEach(optionObject => {
+                    // Using `_getOptionObject()` allows using pre-defined names in the `options` array
+                    Object.assign(optionsResult, this._getOptionObject(optionObject));
+                });
+            } else if (options.length >= 1) {
+                options.forEach(optionObject => {
+                    Object.assign(optionsResult, optionObject);
+                });
+            }
+        }
+
+        return optionsResult;
+    }
+
+    /**
      * Format the given number (or numeric string) with the given options. This returns the formatted value as a string.
      * This can also format the give DOM element value with the given options and returns the formatted value as a string.
      * Note : This function does update that element value with the newly formatted value in the process.
@@ -3436,7 +3465,7 @@ class AutoNumeric {
      * @param {object|null} options
      * @returns {string|null}
      */
-    static format(valueOrDomElement, options = null) { //FIXME à tester
+    static format(valueOrDomElement, ...options) {
         if (AutoNumericHelper.isUndefined(valueOrDomElement) || valueOrDomElement === null) {
             return null;
         }
@@ -3445,8 +3474,11 @@ class AutoNumeric {
             AutoNumericHelper.throwError(`The value "${valueOrDomElement}" being "set" is not numeric and therefore cannot be used appropriately.`);
         }
 
+        // Manage options
+        const optionsToUse = this._generateOptionsObjectFromOptionsArray(options);
+
         // Initiate a very basic settings object
-        const settings = Object.assign({}, this.getDefaultConfig(), options);
+        const settings = Object.assign({}, this.getDefaultConfig(), optionsToUse);
         if (valueOrDomElement < 0) {
             settings.negativeSignCharacter = '-';
         }
@@ -3527,15 +3559,10 @@ class AutoNumeric {
             AutoNumericHelper.throwError(`A number or a string representing a number is needed to be able to unformat it, [${value}] given.`);
         }
 
-        let optionsToUse = {};
-        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(options) || options.length === 0) {
-            optionsToUse = null;
-        } else if (options.length >= 1) {
-            options.forEach(optionObject => {
-                Object.assign(optionsToUse, optionObject);
-            });
-        }
+        // Manage options
+        const optionsToUse = this._generateOptionsObjectFromOptionsArray(options);
 
+        // Generate the settings
         const settings = Object.assign({}, this.getDefaultConfig(), optionsToUse);
         if (AutoNumericHelper.isNull(settings.decimalPlacesOverride)) {
             settings.decimalPlacesOverride = this._maximumVMinAndVMaxDecimalLength(settings.minimumValue, settings.maximumValue);

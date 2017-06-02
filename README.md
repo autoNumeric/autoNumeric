@@ -57,7 +57,7 @@ anElement.french()
 - 26 built-in [methods](#methods) gives you the flexibility needed to use autoNumeric to its maximum potential
 - 22 [global methods](#perform-actions-globally-on-a-shared-list-of-autonumeric-elements) that allows to control sets of AutoNumeric-managed elements at once
 - 21 additional [methods](#methods) specialized for managing form submission
-- 13 [static functions](#static-methods) provided by the `AutoNumeric` class
+- 14 [static functions](#static-methods) provided by the `AutoNumeric` class
 - And more than 40 [options](#options) allows you to customize the output format
 
 With that said, autoNumeric supports most international numeric formats and currencies including those used in Europe, Asia, and North and South America.
@@ -774,10 +774,13 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 | `getPredefinedOptions` | Return a specific pre-defined language option object | `AutoNumeric.getPredefinedOptions().French` |
 | `format` | Format the given number with the given options. This returns the formatted value as a string. | `AutoNumeric.format(12345.21, { options });` |
 | `format` | Idem above, but using a numeric string as the first parameter | `AutoNumeric.format('12345.21', { options });` |
+| `format` | Idem above, but you can pass as many option objects you want to this function, the latter overwriting the previous ones. This allows to correctly format currencies that have a predefined option as its base, but has been slightly modified.  | `AutoNumeric.format('12345.21', { options1 }, { options2 });` |
+| `format` | Idem above, using multiple option objects in one array. This way allows for using a pre-defined option name.  | `AutoNumeric.format('12345.21', [{ options1 }, 'euroPos', { options2 }]);` |
 | `format` | Format the `domElement` *`value`* (or *`textContent`*) with the given options and returns the formatted value as a string. This does *not* update that element value. | `AutoNumeric.format(domElement, { options });` |
 | `formatAndSet` | Format the `domElement` value with the given options and returns the formatted value as a string. This function does update that element value with the newly formatted value in the process. | `AutoNumeric.formatAndSet(domElement, { options });` |
 | `unformat` | Unformat the given formatted string with the given options. This returns a numeric string. | `AutoNumeric.unformat('1.234,56 €', { options });` |
 | `unformat` | Idem above, but you can pass as many option objects you want to this function, the latter overwriting the previous ones. This allows to correctly unformat currencies that have a predefined option as its base, but has been slightly modified. | `AutoNumeric.unformat('241800,02 €', AutoNumeric.getPredefinedOptions().French, { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator });` |
+| `unformat` | Idem above, using multiple option objects in one array. This way allows for using a pre-defined option name. | `AutoNumeric.unformat('1.234,56 €', [{ options1 }, 'euroPos', { options2 }]);` |
 | `unformat` | Unformat the `domElement` value with the given options and returns the unformatted numeric string. This does *not* update that element value. | `AutoNumeric.unformat(domElement, { options });` |
 | `unformatAndSet` | Unformat the `domElement` value with the given options and returns the unformatted value as a numeric string. This function does update that element value with the newly unformatted value in the process. | `AutoNumeric.unformatAndSet(domElement, { options });` |
 | `unformatAndSet` | Recursively unformat all the autoNumeric-managed elements that are a child to the `referenceToTheDomElement` element given as a parameter (this is usually the parent `<form>` element) | `AutoNumeric.unformatAndSet(referenceToTheDomElement);` |

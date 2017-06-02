@@ -5385,8 +5385,40 @@ describe('Static autoNumeric functions', () => {
                 // eslint-disable-next-line
                 AutoNumeric.getPredefinedOptions().French,
                 { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
-                { digitGroupSeparator: AutoNumeric.options.currencySymbol.pound },
-                { digitGroupSeparator: AutoNumeric.options.currencySymbol.dollar }
+                { currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                { currencySymbol: AutoNumeric.options.currencySymbol.dollar }
+            )).toEqual('241800.02');
+        });
+
+        it('should unformat with multiple user options in one array, overwriting each other in the right order', () => {
+            expect(AutoNumeric.unformat('241800,02 €',
+                                        [
+                                            AutoNumeric.getPredefinedOptions().French,
+                                            { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                                        ])).toEqual('241800.02');
+            expect(AutoNumeric.unformat('241800,02 $',
+                                        [
+                                            AutoNumeric.getPredefinedOptions().French,
+                                            { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                                            { currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                                            { currencySymbol: AutoNumeric.options.currencySymbol.dollar },
+                                        ]
+            )).toEqual('241800.02');
+        });
+
+        it('should unformat with multiple user options in one array, with named pre-defined options', () => {
+            expect(AutoNumeric.unformat('241800,02 €',
+                                        [
+                                            'euro',
+                                            { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                                        ])).toEqual('241800.02');
+            expect(AutoNumeric.unformat('241800,02 $',
+                                        [
+                                            'euro',
+                                            { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                                            { currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                                            { currencySymbol: AutoNumeric.options.currencySymbol.dollar },
+                                        ]
             )).toEqual('241800.02');
         });
 
@@ -5618,6 +5650,32 @@ describe('Static autoNumeric functions', () => {
 
             expect(AutoNumeric.format(null, autoNumericOptionsEuro)).toEqual(null);
             expect(AutoNumeric.format(undefined, autoNumericOptionsEuro)).toEqual(null);
+        });
+
+        it('should format with multiple options', () => {
+            expect(AutoNumeric.format(241800.02, [
+                AutoNumeric.getPredefinedOptions().French,
+                { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+            ])).toEqual('241800,02 €');
+            expect(AutoNumeric.format(241800.02, [
+                AutoNumeric.getPredefinedOptions().French,
+                { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                { currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                { currencySymbol: AutoNumeric.options.currencySymbol.dollar },
+            ])).toEqual('241800,02$');
+        });
+
+        it('should format with multiple options, with named pre-defined options', () => {
+            expect(AutoNumeric.format(241800.02, [
+                'euro',
+                { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+            ])).toEqual('241800,02 €');
+            expect(AutoNumeric.format(241800.02, [
+                'euro',
+                { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                { currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                { currencySymbol: AutoNumeric.options.currencySymbol.dollar },
+            ])).toEqual('241800,02$');
         });
 
         it('should only send a warning, and not throw', () => {

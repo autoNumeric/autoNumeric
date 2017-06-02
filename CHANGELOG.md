@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.0.0-beta.21
++ Set the read-only mode on the default settings, enumerations, events, options and pre-defined options objects.
+
 ### 4.0.0-beta.20
 + Allow initializing an AutoNumeric element with an array of options objects or pre-defined option names.
   The latter options in the array will overwrite the previous ones.

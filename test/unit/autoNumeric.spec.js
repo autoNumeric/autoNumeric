@@ -33,6 +33,7 @@
 /* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach, spyOn */
 
 import AutoNumeric from '../../src/AutoNumeric';
+import AutoNumericEnum from '../../src/AutoNumericEnum';
 import AutoNumericHelper from '../../src/AutoNumericHelper';
 
 // The autoNumeric tests :
@@ -144,6 +145,31 @@ describe('The autoNumeric object', () => {
 
             // Global test
             expect(defaultSettings).toEqual(defaultOption);
+        });
+
+        it('should prevent modifying the default settings object', () => {
+            expect(() => { AutoNumeric.defaultSettings = {}; }).toThrow();
+        });
+
+        it('should prevent modifying the enumeration objects', () => {
+            expect(() => { AutoNumericEnum.allowedTagList = ['foobar']; }).toThrow();
+            expect(() => { AutoNumericEnum.keyCode = {}; }).toThrow();
+            expect(() => { AutoNumericEnum.fromCharCodeKeyCode = []; }).toThrow();
+            expect(() => { AutoNumericEnum.fromCharCodeKeyCode[91] = 'foobar'; }).not.toThrow();
+            AutoNumericEnum.fromCharCodeKeyCode[91] = 'OS'; // Put back the initial value
+            expect(() => { AutoNumericEnum.keyName = {}; }).toThrow();
+        });
+
+        it('should prevent modifying the events object', () => {
+            expect(() => { AutoNumeric.events = {}; }).toThrow();
+        });
+
+        it('should prevent modifying the options object', () => {
+            expect(() => { AutoNumeric.options = {}; }).toThrow();
+        });
+
+        it('should prevent modifying the predefinedOptions object', () => {
+            expect(() => { AutoNumeric.predefinedOptions = {}; }).toThrow();
         });
 
         it('should return the predefined language options', () => {

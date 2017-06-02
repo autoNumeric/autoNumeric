@@ -34,12 +34,16 @@ import AutoNumeric from './AutoNumeric';
  *
  * @type {{formatted: string, minRangeExceeded: string, maxRangeExceeded: string, native: {input: string, change: string}}}
  */
-AutoNumeric.events = {
-    formatted       : 'autoNumeric:formatted',
-    minRangeExceeded: 'autoNumeric:minExceeded',
-    maxRangeExceeded: 'autoNumeric:maxExceeded',
-    native          : {
-        input : 'input',
-        change: 'change',
+Object.defineProperty(AutoNumeric, 'events', {
+    get() {
+        return {
+            formatted       : 'autoNumeric:formatted',
+            minRangeExceeded: 'autoNumeric:minExceeded',
+            maxRangeExceeded: 'autoNumeric:maxExceeded',
+            native          : {
+                input : 'input',
+                change: 'change',
+            },
+        };
     },
-};
+});

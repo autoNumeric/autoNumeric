@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.20
- * @date         2017-06-02 UTC 08:40
+ * @version      4.0.0-beta.21
+ * @date         2017-06-02 UTC 23:30
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS
@@ -779,7 +779,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.20';
+        return '4.0.0-beta.21';
     }
 
     /**

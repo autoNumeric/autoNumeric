@@ -225,6 +225,7 @@ It always takes either a DOM element reference as its first argument, or a css s
 ```js
 anElement = new AutoNumeric(domElement); // With the default options
 anElement = new AutoNumeric(domElement, { options }); // With one option object
+anElement = new AutoNumeric(domElement, 'euroPos'); // With a named pre-defined string
 anElement = new AutoNumeric(domElement, [{ options1 }, 'euroPos', { options2 }]); // With multiple option objects (the latest option overwriting the previous ones)
 anElement = new AutoNumeric(domElement).french(); // With one pre-defined language object
 anElement = new AutoNumeric(domElement).french({ options });// With one pre-defined language object and additional options that will override those defaults
@@ -233,6 +234,8 @@ anElement = new AutoNumeric(domElement).french({ options });// With one pre-defi
 anElement = new AutoNumeric(domElement, 12345.789); // With the default options, and an initial value
 anElement = new AutoNumeric(domElement, 12345.789, { options });
 anElement = new AutoNumeric(domElement, '12345.789', { options });
+anElement = new AutoNumeric(domElement, 12345.789, 'euroPos');
+anElement = new AutoNumeric(domElement, 12345.789, [{ options1 }, 'euroPos', { options2 }]);
 anElement = new AutoNumeric(domElement, null, { options }); // With a null initial value
 anElement = new AutoNumeric(domElement, 12345.789).french({ options });
 anElement = new AutoNumeric(domElement, 12345.789, { options }).french({ options }); // Not really helpful, but possible
@@ -240,9 +243,12 @@ anElement = new AutoNumeric(domElement, 12345.789, { options }).french({ options
 // The AutoNumeric constructor class can also accept a string as a css selector. Under the hood this use `QuerySelector` and limit itself to only the first element it finds.
 anElement = new AutoNumeric('.myCssClass > input');
 anElement = new AutoNumeric('.myCssClass > input', { options });
+anElement = new AutoNumeric('.myCssClass > input', 'euroPos');
 anElement = new AutoNumeric('.myCssClass > input', [{ options1 }, 'euroPos', { options2 }]);
 anElement = new AutoNumeric('.myCssClass > input', 12345.789);
 anElement = new AutoNumeric('.myCssClass > input', 12345.789, { options });
+anElement = new AutoNumeric('.myCssClass > input', 12345.789, 'euroPos');
+anElement = new AutoNumeric('.myCssClass > input', 12345.789, [{ options1 }, 'euroPos', { options2 }]);
 anElement = new AutoNumeric('.myCssClass > input', null, { options }); // With a null initial value
 anElement = new AutoNumeric('.myCssClass > input', 12345.789).french({ options });
 ```
@@ -253,6 +259,7 @@ If you know you want to initialize multiple elements in one call, you must then 
 ```js
 // Init multiple DOM elements in one call (and possibly pass multiple values that will be mapped to each DOM element)
 [anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], { options });
+[anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], 'euroPos');
 [anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], [{ options }, 'euroPos']);
 [anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], 12345.789, { options });
 [anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], 12345.789, [{ options }, 'euroPos']);

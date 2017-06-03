@@ -63,6 +63,8 @@ class AutoNumeric {
      * @example
      * anElement = new AutoNumeric(domElement); // With the default options
      * anElement = new AutoNumeric(domElement, { options }); // With one option object
+     * anElement = new AutoNumeric(domElement, 'euroPos'); // With a named pre-defined string
+     * anElement = new AutoNumeric(domElement, [{ options1 }, 'euroPos', { options2 }]); // With multiple option objects (the latest option overwriting the previous ones)
      * anElement = new AutoNumeric(domElement, null, { options }); // With one option object, and a failed initial value
      * anElement = new AutoNumeric(domElement).french(); // With one pre-defined language object
      * anElement = new AutoNumeric(domElement).french({ options });// With one pre-defined language object and additional options that will override the defaults
@@ -71,14 +73,20 @@ class AutoNumeric {
      * anElement = new AutoNumeric(domElement, 12345.789); // With the default options, and an initial value
      * anElement = new AutoNumeric(domElement, 12345.789, { options });
      * anElement = new AutoNumeric(domElement, '12345.789', { options });
+     * anElement = new AutoNumeric(domElement, 12345.789, 'euroPos');
+     * anElement = new AutoNumeric(domElement, 12345.789, [{ options1 }, 'euroPos', { options2 }]);
      * anElement = new AutoNumeric(domElement, 12345.789).french({ options });
      * anElement = new AutoNumeric(domElement, 12345.789, { options }).french({ options }); // Not really helpful, but possible
      *
      * // The AutoNumeric constructor class can also accept a string as a css selector. Under the hood this use `QuerySelector` and limit itself to only the first element it finds.
      * anElement = new AutoNumeric('.myCssClass > input');
      * anElement = new AutoNumeric('.myCssClass > input', { options });
+     * anElement = new AutoNumeric('.myCssClass > input', 'euroPos');
+     * anElement = new AutoNumeric('.myCssClass > input', [{ options1 }, 'euroPos', { options2 }]);
      * anElement = new AutoNumeric('.myCssClass > input', 12345.789);
      * anElement = new AutoNumeric('.myCssClass > input', 12345.789, { options });
+     * anElement = new AutoNumeric('.myCssClass > input', 12345.789, 'euroPos');
+     * anElement = new AutoNumeric('.myCssClass > input', 12345.789, [{ options1 }, 'euroPos', { options2 }]);
      * anElement = new AutoNumeric('.myCssClass > input', null, { options }); // With a failed initial value
      * anElement = new AutoNumeric('.myCssClass > input', 12345.789).french({ options });
      *
@@ -809,12 +817,14 @@ class AutoNumeric {
         const isArg2Object = AutoNumericHelper.isObject(arg2);
         const isArg2Array = Array.isArray(arg2) && arg2.length > 0;
         const isArg2Number = AutoNumericHelper.isNumberOrArabic(arg2) || arg2 === '';
+        const isArg2PreDefinedOptionName = this._isPreDefinedOptionValid(arg2);
         const isArg2Null = AutoNumericHelper.isNull(arg2);
         const isArg2EmptyString = AutoNumericHelper.isEmptyString(arg2);
 
         const isArg3Object = AutoNumericHelper.isObject(arg3);
         const isArg3Array = Array.isArray(arg3) && arg3.length > 0;
         const isArg3Null = AutoNumericHelper.isNull(arg3);
+        const isArg3PreDefinedOptionName = this._isPreDefinedOptionValid(arg3);
 
         // Given the parameters passed, sort the data and return a stable state before the initialization
         let domElement;
@@ -838,6 +848,11 @@ class AutoNumeric {
             domElement = arg1;
             initialValue = null;
             userOptions = arg2;
+        } else if (isArg1Element && isArg2PreDefinedOptionName && isArg3Null) {
+            // new AutoNumeric(domElement, 'euroPos'); // With one pre-defined option name
+            domElement = arg1;
+            initialValue = null;
+            userOptions = this._getOptionObject(arg2);
         } else if (isArg1Element && isArg2Array && isArg3Null) {
             // new AutoNumeric(domElement, [{ options1 }, { options2 }]); // With multiple option objects (the latest option overwriting the previous ones)
             domElement = arg1;
@@ -863,6 +878,11 @@ class AutoNumeric {
             domElement = document.querySelector(arg1);
             initialValue = null;
             userOptions = arg2;
+        } else if (isArg1String && isArg2PreDefinedOptionName && isArg3Null) {
+            // new AutoNumeric('.myCssClass > input', 'euroPos');
+            domElement = document.querySelector(arg1);
+            initialValue = null;
+            userOptions = this._getOptionObject(arg2);
         } else if (isArg1String && isArg2Array && isArg3Null) {
             // new AutoNumeric('.myCssClass > input', [{ options1 }, { options2 }]); // With multiple option objects
             domElement = document.querySelector(arg1);
@@ -892,6 +912,13 @@ class AutoNumeric {
             domElement = document.querySelector(arg1);
             initialValue = arg2;
             userOptions = arg3;
+        } else if (isArg1String && isArg2Number && isArg3PreDefinedOptionName) {
+            // new AutoNumeric('.myCssClass > input', 12345.789, 'euroPos');
+            // new AutoNumeric('.myCssClass > input', '12345.789', 'euroPos');
+            // new AutoNumeric('.myCssClass > input', '', 'euroPos');
+            domElement = document.querySelector(arg1);
+            initialValue = arg2;
+            userOptions = this._getOptionObject(arg3);
         } else if (isArg1Element && isArg2Number && isArg3Object) {
             // new AutoNumeric(domElement, 12345.789, { options });
             // new AutoNumeric(domElement, '12345.789', { options });
@@ -899,6 +926,20 @@ class AutoNumeric {
             domElement = arg1;
             initialValue = arg2;
             userOptions = arg3;
+        } else if (isArg1Element && isArg2Number && isArg3PreDefinedOptionName) {
+            // new AutoNumeric(domElement, 12345.789, 'euroPos');
+            // new AutoNumeric(domElement, '12345.789', 'euroPos');
+            // new AutoNumeric(domElement, '', 'euroPos');
+            domElement = arg1;
+            initialValue = arg2;
+            userOptions = this._getOptionObject(arg3);
+        } else if (isArg1Element && isArg2Number && isArg3Array) {
+            // new AutoNumeric(domElement, 12345.789, [{ options1 }, { options2 }]);
+            // new AutoNumeric(domElement, '12345.789', [{ options1 }, { options2 }]);
+            // new AutoNumeric(domElement, '', [{ options1 }, { options2 }]);
+            domElement = arg1;
+            initialValue = arg2;
+            userOptions = this.mergeOptions(arg3);
         } else {
             AutoNumericHelper.throwError(`The parameters given to the AutoNumeric object are not valid, '${arg1}', '${arg2}' and '${arg3}' given.`);
         }
@@ -926,6 +967,17 @@ class AutoNumeric {
         });
 
         return mergedOptions;
+    }
+
+    /**
+     * Return `true` if the given pre-defined option name is an attribute of the `AutoNumeric.predefinedOptions` object
+     *
+     * @param {string} preDefinedOptionName
+     * @returns {boolean}
+     * @private
+     */
+    static _isPreDefinedOptionValid(preDefinedOptionName) {
+        return AutoNumeric.predefinedOptions.hasOwnProperty(preDefinedOptionName);
     }
 
     /**
@@ -7562,6 +7614,24 @@ class AutoNumeric {
 
 /**
  * Initialize multiple DOM elements in one call (and possibly pass multiple values that will be mapped to each DOM element).
+ *
+ * @example
+ * // Init multiple DOM elements in one call (and possibly pass multiple values that will be mapped to each DOM element)
+ * [anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], { options });
+ * [anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], [{ options }, 'euroPos']);
+ * [anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], 12345.789, { options });
+ * [anElement1, anElement2, anElement3] = AutoNumeric.multiple([domElement1, domElement2, domElement3], 12345.789, [{ options }, 'euroPos']);
+ * [anElement1, anElement2, anElement3] = AutoNumeric.multiple.french([domElement1, domElement2, domElement3], [12345.789, 234.78, null], { options });
+ * [anElement1, anElement2, anElement3] = AutoNumeric.multiple.french([domElement1, domElement2, domElement3], [12345.789, 234.78, null], [{ options }, 'euroPos']);
+ *
+ * // Special case, if a <form> element is passed (or any other 'parent' (or 'root') DOM element), then autoNumeric will initialize each child `<input>` elements recursively, ignoring those referenced in the `exclude` attribute
+ * [anElement1, anElement2] = AutoNumeric.multiple({ rootElement: formElement }, { options });
+ * [anElement1, anElement2] = AutoNumeric.multiple({ rootElement: formElement, exclude : [hiddenElement, tokenElement] }, { options });
+ * [anElement1, anElement2] = AutoNumeric.multiple({ rootElement: formElement, exclude : [hiddenElement, tokenElement] }, [12345.789, null], { options });
+ *
+ * // If you want to select multiple elements via a css selector, then you must use the `multiple` function. Under the hood `QuerySelectorAll` is used.
+ * [anElement1, anElement2] = AutoNumeric.multiple('.myCssClass > input', { options }); // This always return an Array, even if there is only one element selected
+ * [anElement1, anElement2] = AutoNumeric.multiple('.myCssClass > input', [null, 12345.789], { options }); // Idem above, but with passing the initial values too
  *
  * @param {string|Array|{ rootElement: HTMLElement }|{ rootElement: HTMLElement, exclude: Array<HTMLInputElement>}} arg1
  * @param {number|Array|object|null} initialValue

@@ -156,7 +156,7 @@ describe('The autoNumeric object', () => {
             expect(() => { AutoNumericEnum.keyCode = {}; }).toThrow();
             expect(() => { AutoNumericEnum.fromCharCodeKeyCode = []; }).toThrow();
             expect(() => { AutoNumericEnum.fromCharCodeKeyCode[91] = 'foobar'; }).not.toThrow();
-            AutoNumericEnum.fromCharCodeKeyCode[91] = 'OS'; // Put back the initial value
+            AutoNumericEnum.fromCharCodeKeyCode[91] = 'OS'; // Set back the initial value
             expect(() => { AutoNumericEnum.keyName = {}; }).toThrow();
         });
 
@@ -926,6 +926,30 @@ describe('The autoNumeric object', () => {
             expect(() => new AutoNumeric(newInput, options)).not.toThrow(); // With one option object
         });
 
+        it('should correctly initialize the AutoNumeric element when passed a pre-defined option name', () => {
+            let anElement = null;
+
+            // new AutoNumeric(domElement, 'euroPos'); // With one pre-defined option name
+            expect(() => anElement = new AutoNumeric(newInput, 'euro')).not.toThrow();
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('1.234.567,89 €');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, 'dollar')).not.toThrow();
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('$1,234,567.89');
+
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, 'foobar')).toThrow();
+
+            // new AutoNumeric(domElement, 12345.789, 'euroPos');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, 1234567.89, 'euro')).not.toThrow();
+            expect(anElement.getFormatted()).toEqual('1.234.567,89 €');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, 1234567.89, 'dollar')).not.toThrow();
+            expect(anElement.getFormatted()).toEqual('$1,234,567.89');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, 1234567.89, 'foobar')).toThrow();
+        });
+
         it('should correctly initialize the AutoNumeric element when passed an array of options', () => {
             let anElement = null;
             expect(() => anElement = new AutoNumeric(newInput, [
@@ -998,6 +1022,53 @@ describe('The autoNumeric object', () => {
             expect(anElement.set(1234567.89).getFormatted()).toEqual('#1 234 567·89');
         });
 
+        it('should correctly initialize the AutoNumeric element when passed an array of options, and an initial value', () => {
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric(newInput, 1234567.89, [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.getFormatted()).toEqual('#1 234 567·89');
+
+
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, '1234567.89', [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.getFormatted()).toEqual('#1 234 567·89');
+
+
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, '', [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.getFormatted()).toEqual('');
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('#1 234 567·89');
+        });
+
         it('should correctly initialize the AutoNumeric element', () => {
             expect(() => new AutoNumeric(newInput, '', options)).not.toThrow(); // With one option object and an empty initial value
         });
@@ -1058,6 +1129,30 @@ describe('The autoNumeric object', () => {
 
         it('should correctly initialize the AutoNumeric element', () => {
             expect(() => new AutoNumeric('input', 12345.789)).not.toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element when passed a pre-defined option name', () => {
+            let anElement = null;
+
+            // new AutoNumeric('.myCssClass > input', 'euroPos'); // With one pre-defined option name
+            expect(() => anElement = new AutoNumeric('input', 'euro')).not.toThrow();
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('1.234.567,89 €');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric('input', 'dollar')).not.toThrow();
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('$1,234,567.89');
+
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric('input', 'foobar')).toThrow();
+
+            // new AutoNumeric('.myCssClass > input', 12345.789, 'euroPos');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric('input', 1234567.89, 'euro')).not.toThrow();
+            expect(anElement.getFormatted()).toEqual('1.234.567,89 €');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric('input', 1234567.89, 'dollar')).not.toThrow();
+            expect(anElement.getFormatted()).toEqual('$1,234,567.89');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric('input', 1234567.89, 'foobar')).toThrow();
         });
 
         it('should correctly initialize the AutoNumeric element', () => {

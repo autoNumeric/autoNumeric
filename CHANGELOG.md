@@ -4,6 +4,7 @@
 + Set the read-only mode on the default settings, enumerations, events, options and pre-defined options objects.
 + Allow using a pre-defined option name directly when initializing an AutoNumeric element
 + Fix the initialization method to accepts arrays of options object/pre-defined options when using an initial value.
++ Fix an issue related to issue #447 when the focus out action produce an error when the input raw value is set to `null`
 
 ### 4.0.0-beta.20
 + Allow initializing an AutoNumeric element with an array of options objects or pre-defined option names.

@@ -1716,7 +1716,7 @@ class AutoNumeric {
     /**
      * Save the raw value inside the AutoNumeric object.
      *
-     * @param {number|string} rawValue The numeric value as understood by Javascript like a `Number`
+     * @param {number|string|null} rawValue The numeric value as understood by Javascript like a `Number`
      * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history array, otherwise it is not
      * @private
      */
@@ -5523,7 +5523,8 @@ class AutoNumeric {
             }
 
             let value = this.settings.rawValue;
-            if (this.settings.rawValue !== '') {
+            const isRawValueNull = AutoNumericHelper.isNull(this.settings.rawValue);
+            if (this.settings.rawValue !== '' && !isRawValueNull) {
                 const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(this.settings.rawValue, this.settings);
                 if (minTest && maxTest && !this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(this.settings.rawValue, this.settings)) {
                     value = this._modifyNegativeSignAndDecimalCharacterForRawValue(value);
@@ -5545,7 +5546,7 @@ class AutoNumeric {
                         AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
                     }
                 }
-            } else {
+            } else if (this.settings.rawValue === '') {
                 if (this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {
                     this._setRawValue('0');
                     value = this.constructor._roundValue('0', this.settings);
@@ -5555,7 +5556,8 @@ class AutoNumeric {
             }
 
             let groupedValue = this.constructor._orderValueCurrencySymbolAndSuffixText(value, this.settings, false);
-            if (!this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(value, this.settings)) {
+            if (!(this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(value, this.settings) ||
+                (isRawValueNull && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.null))) {
                 groupedValue = this.constructor._addGroupSeparators(value, this.settings, this.isFocused);
             }
 

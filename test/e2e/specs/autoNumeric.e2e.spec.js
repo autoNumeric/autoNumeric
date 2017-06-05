@@ -3192,4 +3192,6 @@ describe('`emptyInputBehavior` option', () => {
         }).value;
         expect(result).toBeNull();
     });
+
+    //FIXME Test that no error are produced when hovering the input
 });

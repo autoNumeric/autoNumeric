@@ -5,6 +5,15 @@
 + Allow using a pre-defined option name directly when initializing an AutoNumeric element
 + Fix the initialization method to accepts arrays of options object/pre-defined options when using an initial value.
 + Fix an issue related to issue #447 when the focus out action produce an error when the input raw value is set to `null`
++ Fix a rare bug when `scaleSymbol` is a castable to a Number, and would be added to the formatted value, instead of concatenated.
++ Remove an unneeded temporary variable in `set()`.
++ Add more details in some JSDoc.
++ Fix `validate()` so that it throws an error early if `scaleDivisor` is wrongly set to `0`.
++ Fix `_trimLeadingAndTrailingZeros()` so that it correctly handles the `null` value.
++ Fix `_onFocusInAndMouseEnter()` so that the `decimalPlacesShownOnFocus` setting is correctly cast to a Number.
++ Fix `_onFocusOutAndMouseLeave()` so that the `null` value is correctly handle. Also fix the error message shown when the `rawValue` is not stored as a string.
++ Simplify a ternary condition into a simple `if` one.
++ Hardcode the `isFocused` state to `false` when calling `_addGroupSeparators()` in `_onFocusOutAndMouseLeave()` so that it does not rely on the order where `this.isFocused` is set back to `false`.
 
 ### 4.0.0-beta.20
 + Allow initializing an AutoNumeric element with an array of options objects or pre-defined option names.

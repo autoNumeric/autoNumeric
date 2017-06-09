@@ -1514,6 +1514,7 @@ class AutoNumeric {
      * @example anElement.set('12345.67') // Formats the value
      * @example anElement.set(12345.67) // Formats the value
      * @example anElement.set(12345.67, { decimalCharacter : ',' }) // Update the settings and formats the value in one go
+     * @example anElement.northAmerican().set('$12,345.67') // Set an already formatted value (this does not _exactly_ respect the currency symbol/negative placements, but only remove all non-numbers characters, according to the ones given in the settings)
      * @example anElement.set(null) // Set the rawValue and element value to `null`
      *
      * @param {number|string|null} newValue The value must be a number, a numeric string or `null` (if `emptyInputBehavior` is set to `'null'`)
@@ -1612,7 +1613,7 @@ class AutoNumeric {
                 value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
                 value = this.constructor._addGroupSeparators(value, this.settings, this.isFocused, rawValue);
                 if (!this.isFocused && this.settings.scaleSymbol) {
-                    value = value + this.settings.scaleSymbol;
+                    value = `${value}${this.settings.scaleSymbol}`;
                 }
 
                 if (this.settings.decimalPlacesShownOnFocus || this.settings.scaleDivisor) {
@@ -1628,9 +1629,6 @@ class AutoNumeric {
 
                 return this;
             } else {
-                const attemptedValue = value;
-                value = '';
-
                 if (!minTest) {
                     AutoNumericHelper.triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
                 }
@@ -1639,7 +1637,7 @@ class AutoNumeric {
                     AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
                 }
 
-                AutoNumericHelper.throwError(`The value [${attemptedValue}] being set falls outside of the minimumValue [${this.settings.minimumValue}] and maximumValue [${this.settings.maximumValue}] range set for this element`);
+                AutoNumericHelper.throwError(`The value [${value}] being set falls outside of the minimumValue [${this.settings.minimumValue}] and maximumValue [${this.settings.maximumValue}] range set for this element`);
 
                 this._removeValueFromPersistentStorage();
                 this.setValue('', saveChangeToHistory);
@@ -1702,6 +1700,7 @@ class AutoNumeric {
 
     /**
      * Set the given value directly as the DOM element value, without formatting it beforehand, and without checking its validity.
+     * This also updates the `rawValue` with the given `newValue`, without checking it too ; if it's not formatted like a number recognized by Javascript, this *will* likely make other AutoNumeric methods fail.
      *
      * @param {string|number|null} newValue The new value to set on the element
      * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history array, otherwise it is not
@@ -3261,8 +3260,8 @@ class AutoNumeric {
             AutoNumericHelper.warning(`The extended decimal places 'decimalPlacesShownOnFocus' [${options.decimalPlacesShownOnFocus}] should be greater than the 'decimalPlacesOverride' [${options.decimalPlacesOverride}] value. Currently, this will limit the ability of your client to manually change some of the decimal places. Do you really want to do that?`, options.showWarnings);
         }
 
-        if (!AutoNumericHelper.isNull(options.scaleDivisor) && !testPositiveFloatOrInteger.test(options.scaleDivisor)) {
-            AutoNumericHelper.throwError(`The scale divisor option 'scaleDivisor' is invalid ; it should be a positive number, preferably an integer, [${options.scaleDivisor}] given.`);
+        if (!AutoNumericHelper.isNull(options.scaleDivisor) && !testPositiveFloatOrInteger.test(options.scaleDivisor) || options.scaleDivisor === 0 || options.scaleDivisor === '0') {
+            AutoNumericHelper.throwError(`The scale divisor option 'scaleDivisor' is invalid ; it should be a positive number, preferably an integer and higher than zero, [${options.scaleDivisor}] given.`);
         }
 
         if (!AutoNumericHelper.isNull(options.scaleDecimalPlaces) && !testPositiveInteger.test(options.scaleDecimalPlaces)) {
@@ -4288,6 +4287,7 @@ class AutoNumeric {
 
         if (settings.decimalPlacesOverride !== 0 && !AutoNumericHelper.isUndefined(decimalPart)) {
             if (decimalPart.length > settings.decimalPlacesOverride) {
+                // Trim the excessive number of decimal places
                 decimalPart = decimalPart.substring(0, settings.decimalPlacesOverride);
             }
 
@@ -4854,16 +4854,16 @@ class AutoNumeric {
      * and lays between settings.minimumValue and settings.maximumValue
      * and the string length does not exceed the digits in settings.minimumValue and settings.maximumValue
      *
-     * @param {string} s
+     * @param {string} value
      * @param {object} settings
      * @returns {*}
      */
-    static _checkIfInRangeWithOverrideOption(s, settings) {
-        s = s.toString();
-        s = s.replace(',', '.');
+    static _checkIfInRangeWithOverrideOption(value, settings) {
+        value = value.toString();
+        value = value.replace(',', '.');
         const minParse = AutoNumericHelper.parseStr(settings.minimumValue);
         const maxParse = AutoNumericHelper.parseStr(settings.maximumValue);
-        const valParse = AutoNumericHelper.parseStr(s);
+        const valParse = AutoNumericHelper.parseStr(value);
 
         let result;
         switch (settings.overrideMinMaxLimits) {
@@ -4942,12 +4942,12 @@ class AutoNumeric {
      * This also manages the cases where the decimal point is on the far left or far right of the `value`.
      *
      * @param {string} value
-     * @returns {string}
+     * @returns {string|null}
      */
     _trimLeadingAndTrailingZeros(value) {
         // Return the empty string is the value is already empty. This prevent converting that value to '0'.
-        if (value === '') {
-            return '';
+        if (value === '' || value === null) {
+            return value;
         }
 
         if (this.settings.leadingZero !== AutoNumeric.options.leadingZero.keep) {
@@ -5071,7 +5071,7 @@ class AutoNumeric {
             // Check if the element value needs to be changed by the number of decimal places to show on focus, the scaleDecimal* options or no separator on focus option
             let updateElementValue = false;
             if (this.settings.decimalPlacesShownOnFocus) {
-                this.settings.decimalPlacesOverride = this.settings.decimalPlacesShownOnFocus;
+                this.settings.decimalPlacesOverride = Number(this.settings.decimalPlacesShownOnFocus);
                 updateElementValue = true;
             } else if (this.settings.scaleDivisor && this.settings.rawValue !== '') {
                 // Prevent changing the element value if it's empty (so we don't end up having a '0.000scaleSymbol' value after a mouseenter/mouseleave cycle)
@@ -5522,7 +5522,13 @@ class AutoNumeric {
                 this.settings.negativeBracketsTypeOnBlur = this.originalNegativeBracketsTypeOnBlur;
             }
 
-            let value = this.settings.rawValue;
+            let value;
+            if (AutoNumericHelper.isNull(this.settings.rawValue) || this.settings.rawValue === '') {
+                value = this.settings.rawValue;
+            } else {
+                value = String(this.settings.rawValue);
+            }
+
             const isRawValueNull = AutoNumericHelper.isNull(this.settings.rawValue);
             if (this.settings.rawValue !== '' && !isRawValueNull) {
                 const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(this.settings.rawValue, this.settings);
@@ -5530,12 +5536,14 @@ class AutoNumeric {
                     value = this._modifyNegativeSignAndDecimalCharacterForRawValue(value);
                     this._setRawValue(this._trimLeadingAndTrailingZeros(value));
 
-                    if (this.settings.scaleDivisor) {
+                    if (this.settings.scaleDivisor && !AutoNumericHelper.isNull(value)) {
                         value = value / this.settings.scaleDivisor;
                         value = value.toString();
                     }
 
-                    this.settings.decimalPlacesOverride = (this.settings.scaleDivisor && this.settings.scaleDecimalPlaces) ? Number(this.settings.scaleDecimalPlaces) : this.settings.decimalPlacesOverride;
+                    if (this.settings.scaleDivisor && this.settings.scaleDecimalPlaces) {
+                        this.settings.decimalPlacesOverride = Number(this.settings.scaleDecimalPlaces);
+                    }
                     value = this.constructor._roundValue(value, this.settings);
                     value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
                 } else {
@@ -5558,7 +5566,7 @@ class AutoNumeric {
             let groupedValue = this.constructor._orderValueCurrencySymbolAndSuffixText(value, this.settings, false);
             if (!(this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(value, this.settings) ||
                 (isRawValueNull && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.null))) {
-                groupedValue = this.constructor._addGroupSeparators(value, this.settings, this.isFocused);
+                groupedValue = this.constructor._addGroupSeparators(value, this.settings, false);
             }
 
             // Testing for `allowDecimalPadding.never` is needed to make sure we do not keep a trailing decimalCharacter (like '500.') in the element, since the raw value would still be a rightly formatted integer ('500')

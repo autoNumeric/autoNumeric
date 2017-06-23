@@ -5364,7 +5364,11 @@ class AutoNumeric {
                     // Move the caret to the right if the `androidCharEntered` is the decimal character or if it's on the left of the caret position
                     if (this.eventKey === this.settings.decimalCharacter ||
                         !hasDecimalCharacter && decimalCharacterPosition < this.androidSelectionStart) {
-                        this.androidSelectionStart = selection.start + 1;
+                        this.androidSelectionStart += this.settings.decimalCharacter.length;
+                    }
+
+                    if (this.settings.currencySymbolPlacement === 'p' && this.settings.currencySymbol.length) {
+                        this.settings.androidSelectionStart += this.settings.currencySymbol.length;
                     }
 
                     if (selection.length > value.length) {

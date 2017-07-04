@@ -295,7 +295,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | `defaultValueOverride` | Helper option for the ASP.NET-specific postback issue | `null` |
 | `digitalGroupSpacing` | Digital grouping for the thousand separator | `'3'` |
 | `digitGroupSeparator` | Thousand separator character  | `','` |
-| `emptyInputBehavior` | Define what to display when the input value is empty (possible options are `focus`, `press`, `always` and `zero`) | `'focus'` |
+| `emptyInputBehavior` | Define what to display when the input value is empty (possible options are `null`, `focus`, `press`, `always` and `zero`) | `'focus'` |
 | `failOnUnknownOption ` | This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object. | `false` |
 | `formatOnPageLoad` | Determine if the default value will be formatted on initialization | `true` |
 | `historySize` | Determine how many undo states an AutoNumeric object should keep in memory | `20` |

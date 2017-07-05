@@ -1089,6 +1089,23 @@ describe(`autoNumeric 'set' method`, () => {
         expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789,012.35');
     });
 
+    it('should set a formatted value and result in a formatted value', () => {
+        // Euros
+        aNInput.autoNumeric('update', autoNumericOptionsEuro);
+        aNInput.autoNumeric('set', '1.234,56');
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('1.234,56 €');
+        aNInput.autoNumeric('set', '6.789.012,345');
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('6.789.012,35 €'); // Rounding happens here
+
+        // Dollars
+        aNInput.autoNumeric('update', autoNumericOptionsDollar);
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789,012.35'); // First check if updating the options changed the results accordingly
+        aNInput.autoNumeric('set', '1,234.56');
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('$1,234.56');
+        aNInput.autoNumeric('set', '6,789,012.345');
+        expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789,012.35');
+    });
+
     it('should respect the minimumValue and maximumValue settings', () => {
         aNInput.autoNumeric('update', { minimumValue: '999999.99', maximumValue: '1111111111111.11' });
         expect(() => aNInput.autoNumeric('set', 999999.99)).not.toThrow();
@@ -1262,6 +1279,7 @@ describe(`autoNumeric 'getString' and 'getArray' methods`, () => {
 describe('Static autoNumeric functions', () => {
     describe('`autoUnformat` should unformat using jQuery `$.fn`', () => {
         it('with default options', () => {
+            expect($.fn.autoUnformat('$1,234,567.89')).toEqual('1234567.89');
             expect($.fn.autoUnformat('$1,234.56')).toEqual('1234.56');
             expect($.fn.autoUnformat('$123.45')).toEqual('123.45');
             expect($.fn.autoUnformat('$0.00')).toEqual('0.00');
@@ -1273,6 +1291,7 @@ describe('Static autoNumeric functions', () => {
         });
 
         it('with user options', () => {
+            expect($.fn.autoUnformat('1.234.567,89 €', autoNumericOptionsEuroNumber)).toEqual(1234567.89);
             expect($.fn.autoUnformat('1.234,56 €', autoNumericOptionsEuroNumber)).toEqual(1234.56);
             expect($.fn.autoUnformat('123,45 €', autoNumericOptionsEuroNumber)).toEqual(123.45);
             expect($.fn.autoUnformat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);
@@ -1286,6 +1305,7 @@ describe('Static autoNumeric functions', () => {
 
     describe('`unFormat` should unformat without jQuery `$.fn`', () => {
         it('with default options', () => {
+            expect(an.unFormat('$1,234,567.89')).toEqual('1234567.89');
             expect(an.unFormat('$1,234.56')).toEqual('1234.56');
             expect(an.unFormat('$123.45')).toEqual('123.45');
             expect(an.unFormat('$0.00')).toEqual('0.00');
@@ -1299,6 +1319,7 @@ describe('Static autoNumeric functions', () => {
         });
 
         it('with user options', () => {
+            expect(an.unFormat('1.234.567,89 €', autoNumericOptionsEuroNumber)).toEqual(1234567.89);
             expect(an.unFormat('1.234,56 €', autoNumericOptionsEuroNumber)).toEqual(1234.56);
             expect(an.unFormat('123,45 €', autoNumericOptionsEuroNumber)).toEqual(123.45);
             expect(an.unFormat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);

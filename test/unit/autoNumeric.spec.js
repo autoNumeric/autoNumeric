@@ -109,7 +109,6 @@ describe('The autoNumeric object', () => {
             negativeBracketsTypeOnBlur   : null,
             negativePositiveSignPlacement: null,
             noEventListeners             : false,
-            noSeparatorOnFocus           : false,
             onInvalidPaste               : 'error',
             outputFormat                 : null,
             overrideMinMaxLimits         : null,
@@ -119,6 +118,7 @@ describe('The autoNumeric object', () => {
             selectNumberOnly             : true,
             selectOnFocus                : true,
             serializeSpaces              : '+',
+            showOnlyNumbersOnFocus       : false,
             showPositiveSign             : false,
             showWarnings                 : true,
             styleRules                   : null,
@@ -261,7 +261,6 @@ describe('The autoNumeric object', () => {
             // Special case for `negativePositiveSignPlacement`, see the related tests
             // expect(defaultSettings.negativePositiveSignPlacement).toEqual(aNInputSettings.negativePositiveSignPlacement);
             expect(defaultSettings.noEventListeners          ).toEqual(aNInputSettings.noEventListeners           );
-            expect(defaultSettings.noSeparatorOnFocus        ).toEqual(aNInputSettings.noSeparatorOnFocus         );
             expect(defaultSettings.onInvalidPaste            ).toEqual(aNInputSettings.onInvalidPaste             );
             expect(defaultSettings.outputFormat              ).toEqual(aNInputSettings.outputFormat               );
             expect(defaultSettings.overrideMinMaxLimits      ).toEqual(aNInputSettings.overrideMinMaxLimits       );
@@ -271,6 +270,7 @@ describe('The autoNumeric object', () => {
             expect(defaultSettings.selectNumberOnly          ).toEqual(aNInputSettings.selectNumberOnly           );
             expect(defaultSettings.selectOnFocus             ).toEqual(aNInputSettings.selectOnFocus              );
             expect(defaultSettings.serializeSpaces           ).toEqual(aNInputSettings.serializeSpaces            );
+            expect(defaultSettings.showOnlyNumbersOnFocus    ).toEqual(aNInputSettings.showOnlyNumbersOnFocus     );
             expect(defaultSettings.showPositiveSign          ).toEqual(aNInputSettings.showPositiveSign           );
             expect(defaultSettings.showWarnings              ).toEqual(aNInputSettings.showWarnings               );
             expect(defaultSettings.styleRules                ).toEqual(aNInputSettings.styleRules                 );
@@ -2462,7 +2462,7 @@ describe('autoNumeric options and `options.*` methods', () => {
      isCancellable
      modifyValueOnWheel
      noEventListeners
-     noSeparatorOnFocus
+     showOnlyNumbersOnFocus
      onInvalidPaste
      overrideMinMaxLimits
      readOnly
@@ -5860,10 +5860,10 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ createLocalList: 'true' })).not.toThrow();
             expect(() => AutoNumeric.validate({ createLocalList: 'false' })).not.toThrow();
 
-            expect(() => AutoNumeric.validate({ noSeparatorOnFocus: false })).not.toThrow();
-            expect(() => AutoNumeric.validate({ noSeparatorOnFocus: true })).not.toThrow();
-            expect(() => AutoNumeric.validate({ noSeparatorOnFocus: 'false' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ noSeparatorOnFocus: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: 'false' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: 'true' })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: '2' })).not.toThrow();
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: '3' })).not.toThrow();
@@ -6173,9 +6173,9 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ createLocalList: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ createLocalList: 'foobar' })).toThrow();
 
-            expect(() => AutoNumeric.validate({ noSeparatorOnFocus: 'foobar' })).toThrow();
-            expect(() => AutoNumeric.validate({ noSeparatorOnFocus: 42 })).toThrow();
-            expect(() => AutoNumeric.validate({ noSeparatorOnFocus: null })).toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: null })).toThrow();
 
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: '37foo' })).toThrow();
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: null })).toThrow();

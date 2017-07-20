@@ -68,7 +68,6 @@ Object.defineProperty(AutoNumeric, 'defaultSettings', {
             negativeBracketsTypeOnBlur   : AutoNumeric.options.negativeBracketsTypeOnBlur.none,
             negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
             noEventListeners             : AutoNumeric.options.noEventListeners.addEvents,
-            noSeparatorOnFocus           : AutoNumeric.options.noSeparatorOnFocus.withSeparator,
             //TODO Shouldn't we use `truncate` as the default value?
             onInvalidPaste               : AutoNumeric.options.onInvalidPaste.error,
             outputFormat                 : AutoNumeric.options.outputFormat.none,
@@ -79,6 +78,7 @@ Object.defineProperty(AutoNumeric, 'defaultSettings', {
             selectNumberOnly             : AutoNumeric.options.selectNumberOnly.selectNumbersOnly,
             selectOnFocus                : AutoNumeric.options.selectOnFocus.select,
             serializeSpaces              : AutoNumeric.options.serializeSpaces.plus,
+            showOnlyNumbersOnFocus       : AutoNumeric.options.showOnlyNumbersOnFocus.showAll,
             showPositiveSign             : AutoNumeric.options.showPositiveSign.hide,
             showWarnings                 : AutoNumeric.options.showWarnings.show,
             styleRules                   : AutoNumeric.options.styleRules.none,

@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.0.0-beta.23
++ Fix issue #453 Rename the `noSeparatorOnFocus` option to `showOnlyNumbersOnFocus`
+
 ### 4.0.0-beta.22
 + Fix issue #454 Rewrite how the number of decimal places for the formatted and the raw values are set
 + If you relied of the number of decimals in `minimumValue` or `maximumValue` to define how many decimal places should be shown on the formatted value, or kept as the precision in the `rawValue`, you now need to explicitly define how many decimal places your want, whatever number of decimal places `minimumValue` and `maximumValue` have.

@@ -270,10 +270,10 @@ Disclaimer : This may be outdated. Please refer to the [Readme](README.md) or di
 -	digitGroupSeparator: '٬'      // Arabic thousands separator
 -	digitGroupSeparator: '˙'      // Dot above
 
-##### noSeparatorOnFocus
+##### showOnlyNumbersOnFocus
 *When true only numbers and the decimal character is visible while the input has focus*
--	noSeparatorOnFocus: false (default)
--	noSeparatorOnFocus: true 	removes currency sign and thousand seperator while the input has focus. Help on some mobile devices 
+-	showOnlyNumbersOnFocus: false (default)
+-	showOnlyNumbersOnFocus: true 	removes currency sign and thousand seperator while the input has focus. Help on some mobile devices 
 
 ##### digitalGroupSpacing
 *controls the digital grouping and the placement of the thousand separator*

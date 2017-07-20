@@ -630,10 +630,10 @@
 
 	<div class="testSuite">
 		<div class="test">
-			<p class="description">noSeparatorOnFocus option</p>
+			<p class="description">showOnlyNumbersOnFocus option</p>
 			<div>
-				<input id="noSeparatorOnFocus1" type="text" value="">
-				<input id="noSeparatorOnFocus2" type="text" value="">
+				<input id="showOnlyNumbersOnFocus1" type="text" value="">
+				<input id="showOnlyNumbersOnFocus2" type="text" value="">
 			</div>
 		</div>
 	</div>
@@ -1166,11 +1166,11 @@
 	    .french()
 	    .set(12266.1234567, { minimumValue: '0', maximumValue: '9999999', decimalPlaces: 3, decimalPlacesShownOnFocus: 6 });
 
-    //-------------- noSeparatorOnFocus option
-    new AutoNumeric('#noSeparatorOnFocus1').french()
-	    .set(-246813.58, { noSeparatorOnFocus: AutoNumeric.options.noSeparatorOnFocus.noSeparator, suffixText: ' loan' });
-    new AutoNumeric('#noSeparatorOnFocus2').northAmerican()
-	    .set(-246813.58, { noSeparatorOnFocus: AutoNumeric.options.noSeparatorOnFocus.noSeparator, suffixText: ' interest' });
+    //-------------- showOnlyNumbersOnFocus option
+    new AutoNumeric('#showOnlyNumbersOnFocus1').french()
+	    .set(-246813.58, { showOnlyNumbersOnFocus: AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers, suffixText: ' loan' });
+    new AutoNumeric('#showOnlyNumbersOnFocus2').northAmerican()
+	    .set(-246813.58, { showOnlyNumbersOnFocus: AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers, suffixText: ' interest' });
 
     //-------------- selectOnFocus option
     new AutoNumeric('#selectOnFocusA').french().set(-246813.58, { selectOnFocus: AutoNumeric.options.selectOnFocus.select });

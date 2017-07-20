@@ -431,10 +431,9 @@ Object.defineProperty(AutoNumeric, 'options', {
              * Example:
              * If the input value is '$ 1,999.88 suffix', on focus it becomes '1999.88' and back to '$ 1,999.88 suffix' on focus out.
              */
-            //TODO Rename this option to `rawValueOnFocus`
-            noSeparatorOnFocus: {
-                noSeparator  : true,
-                withSeparator: false,
+            showOnlyNumbersOnFocus: {
+                onlyNumbers: true,
+                showAll    : false,
             },
 
             /* Manage how autoNumeric react when the user tries to paste an invalid number.

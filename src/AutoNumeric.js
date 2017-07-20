@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.22
+ * @version      4.0.0-beta.23
  * @date         2017-07-20 UTC 22:22
  *
  * @author       Bob Knothe
@@ -698,11 +698,6 @@ class AutoNumeric {
 
                 return this;
             },
-            noSeparatorOnFocus           : noSeparatorOnFocus => {
-                this.update({ noSeparatorOnFocus });
-
-                return this;
-            },
             onInvalidPaste               : onInvalidPaste => {
                 this.settings.onInvalidPaste = onInvalidPaste; //FIXME à tester
 
@@ -754,6 +749,11 @@ class AutoNumeric {
 
                 return this;
             },
+            showOnlyNumbersOnFocus       : showOnlyNumbersOnFocus => {
+                this.update({ showOnlyNumbersOnFocus });
+
+                return this;
+            },
             showPositiveSign             : showPositiveSign => {
                 this.update({ showPositiveSign });
 
@@ -798,7 +798,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.22';
+        return '4.0.0-beta.23';
     }
 
     /**
@@ -3171,8 +3171,8 @@ class AutoNumeric {
             AutoNumericHelper.throwError(`The thousand separator character option 'digitGroupSeparator' is invalid ; it should be ',', '.', '٬', '˙', "'", ' ', '\u2009', '\u202f', '\u00a0' or empty (''), [${options.digitGroupSeparator}] given.`);
         }
 
-        if (!AutoNumericHelper.isTrueOrFalseString(options.noSeparatorOnFocus) && !AutoNumericHelper.isBoolean(options.noSeparatorOnFocus)) {
-            AutoNumericHelper.throwError(`The 'noSeparatorOnFocus' option is invalid ; it should be either 'false' or 'true', [${options.noSeparatorOnFocus}] given.`);
+        if (!AutoNumericHelper.isTrueOrFalseString(options.showOnlyNumbersOnFocus) && !AutoNumericHelper.isBoolean(options.showOnlyNumbersOnFocus)) {
+            AutoNumericHelper.throwError(`The 'showOnlyNumbersOnFocus' option is invalid ; it should be either 'false' or 'true', [${options.showOnlyNumbersOnFocus}] given.`);
         }
 
         if (!testPositiveInteger.test(options.digitalGroupSpacing)) {
@@ -4955,7 +4955,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
-     * Original settings saved for use when the `decimalPlacesShownOnFocus` and `noSeparatorOnFocus` options are used.
+     * Original settings saved for use when the `decimalPlacesShownOnFocus` and `showOnlyNumbersOnFocus` options are used.
      * Those original settings are used exclusively in the `focusin` and `focusout` event handlers.
      */
     _keepAnOriginalSettingsCopy() {
@@ -4965,7 +4965,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
-     * Original settings saved for use when `decimalPlacesShownOnFocus` & `noSeparatorOnFocus` options are being used.
+     * Original settings saved for use when `decimalPlacesShownOnFocus` & `showOnlyNumbersOnFocus` options are being used.
      * This is taken from Quirksmode.
      *
      * @param {string} name
@@ -5142,7 +5142,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 AutoNumericHelper.setElementValue(this.domElement, this.constructor._removeBrackets(AutoNumericHelper.getElementValue(this.domElement), this.settings));
             }
 
-            // Modify the element value according to the number of decimal places to show on focus or the `noSeparatorOnFocus` option
+            // Modify the element value according to the number of decimal places to show on focus or the `showOnlyNumbersOnFocus` option
             if (this.settings.rawValue !== '') {
                 // Round the given value according to the object state (focus/unfocused)
                 let roundedValue;
@@ -5152,7 +5152,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     roundedValue = this.constructor._roundFormattedValueShownOnBlur(this.settings.rawValue, this.settings);
                 }
 
-                if (this.settings.noSeparatorOnFocus === AutoNumeric.options.noSeparatorOnFocus.noSeparator) {
+                if (this.settings.showOnlyNumbersOnFocus === AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers) {
                     //TODO Use a `this.settingsOverride` object instead of modifying the `this.settings` object
                     this.settings.digitGroupSeparator = '';
                     this.settings.currencySymbol      = '';
@@ -5582,7 +5582,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             const origValue = this.settings.rawValue;
             this._saveValueToPersistentStorage();
 
-            if (this.settings.noSeparatorOnFocus === AutoNumeric.options.noSeparatorOnFocus.noSeparator) {
+            if (this.settings.showOnlyNumbersOnFocus === AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers) {
                 this.settings.digitGroupSeparator = this.originalDigitGroupSeparator;
                 this.settings.currencySymbol = this.originalCurrencySymbol;
                 this.settings.suffixText = this.originalSuffixText;
@@ -6568,7 +6568,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         const oldOptionsConverter = {
             // Old option names, with their corresponding new names
             aSep                              : 'digitGroupSeparator',
-            nSep                              : 'noSeparatorOnFocus',
+            nSep                              : 'showOnlyNumbersOnFocus',
             dGroup                            : 'digitalGroupSpacing',
             aDec                              : 'decimalCharacter',
             altDec                            : 'decimalCharacterAlternative',
@@ -6623,7 +6623,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             negativeBracketsTypeOnBlur        : true,
             negativePositiveSignPlacement     : true,
             noEventListeners                  : true,
-            noSeparatorOnFocus                : true,
             onInvalidPaste                    : true,
             outputFormat                      : true,
             overrideMinMaxLimits              : true,
@@ -6633,6 +6632,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             selectNumberOnly                  : true,
             selectOnFocus                     : true,
             serializeSpaces                   : true,
+            showOnlyNumbersOnFocus            : true,
             showPositiveSign                  : true,
             showWarnings                      : true,
             styleRules                        : true,
@@ -6750,7 +6750,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             AutoNumericHelper.throwError('Unable to set the settings, those are invalid ; an empty object was given.');
         }
 
-        // Original settings saved for use when decimalPlacesShownOnFocus, divisorWhenUnfocused & noSeparatorOnFocus options are being used
+        // Original settings saved for use when decimalPlacesShownOnFocus, divisorWhenUnfocused & showOnlyNumbersOnFocus options are being used
         this._keepAnOriginalSettingsCopy();
     }
 

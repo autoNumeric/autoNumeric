@@ -129,8 +129,8 @@ const selectors = {
     optionUpdate2                     : '#optionUpdate2',
     optionUpdate3                     : '#optionUpdate3',
     selection1                        : '#selection1',
-    noSeparatorOnFocusInput1          : '#noSeparatorOnFocus1',
-    noSeparatorOnFocusInput2          : '#noSeparatorOnFocus2',
+    showOnlyNumbersOnFocusInput1      : '#showOnlyNumbersOnFocus1',
+    showOnlyNumbersOnFocusInput2      : '#showOnlyNumbersOnFocus2',
     selectOnFocusA                    : '#selectOnFocusA',
     selectOnFocusB                    : '#selectOnFocusB',
     selectOnFocusC                    : '#selectOnFocusC',
@@ -2726,27 +2726,27 @@ xdescribe('`decimalPlacesShownOnFocus` and selections', () => { //FIXME Fix that
     });
 });
 
-describe('`noSeparatorOnFocusInput` option', () => {
+describe('`showOnlyNumbersOnFocus` option', () => {
     it('should test for default values', () => {
         browser.url(testUrl);
 
-        expect(browser.getValue(selectors.noSeparatorOnFocusInput1)).toEqual('-246.813,58\u202f€ loan');
-        expect(browser.getValue(selectors.noSeparatorOnFocusInput2)).toEqual('$-246,813.58 interest');
+        expect(browser.getValue(selectors.showOnlyNumbersOnFocusInput1)).toEqual('-246.813,58\u202f€ loan');
+        expect(browser.getValue(selectors.showOnlyNumbersOnFocusInput2)).toEqual('$-246,813.58 interest');
     });
 
     it('should show the unformatted value on focus', () => {
-        const input1 = $(selectors.noSeparatorOnFocusInput1);
-        const input2 = $(selectors.noSeparatorOnFocusInput2);
+        const input1 = $(selectors.showOnlyNumbersOnFocusInput1);
+        const input2 = $(selectors.showOnlyNumbersOnFocusInput2);
 
         // Focus on the first input
         input1.click();
-        expect(browser.getValue(selectors.noSeparatorOnFocusInput1)).toEqual('-246813,58');
-        expect(browser.getValue(selectors.noSeparatorOnFocusInput2)).toEqual('$-246,813.58 interest');
+        expect(browser.getValue(selectors.showOnlyNumbersOnFocusInput1)).toEqual('-246813,58');
+        expect(browser.getValue(selectors.showOnlyNumbersOnFocusInput2)).toEqual('$-246,813.58 interest');
 
         // Blur the first input, and focus on the second
         input2.click();
-        expect(browser.getValue(selectors.noSeparatorOnFocusInput1)).toEqual('-246.813,58\u202f€ loan');
-        expect(browser.getValue(selectors.noSeparatorOnFocusInput2)).toEqual('-246813.58');
+        expect(browser.getValue(selectors.showOnlyNumbersOnFocusInput1)).toEqual('-246.813,58\u202f€ loan');
+        expect(browser.getValue(selectors.showOnlyNumbersOnFocusInput2)).toEqual('-246813.58');
     });
 });
 

@@ -312,7 +312,6 @@ Multiple options allow you to customize precisely how a form input will format y
 | `negativeBracketsTypeOnBlur` | Adds brackets `[]`, parenthesis `()`, curly braces `{}`, chevrons `<>`, angle brackets `〈,〉`, Japanese quotation marks `｢,｣`, half brackets `⸤,⸥`, white square brackets `⟦,⟧`, quotation marks `‹,›` or guillemets `«,»` on negative values when unfocused | `null` |
 | `negativePositiveSignPlacement` | Placement of negative/positive sign relative to the currency symbol (possible options are `l` (left), `r` (right), `p` (prefix) and `s` (suffix)) | `null` |
 | `noEventListeners` | Defines if the element should have event listeners activated on it | `false` |
-| `noSeparatorOnFocus` | Remove the thousand separator, currency symbol and suffix on focus | `false` |
 | `onInvalidPaste` | Manage how autoNumeric react when the user tries to paste an invalid number (possible options are `error`, `ignore`, `clamp`, `truncate` or `replace`) | `'error'` |
 | `outputFormat` | Defines the localized output format of the `get`, `getString` & `getArray` methods | `null` |
 | `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor` and `ignore`) | `null` |
@@ -322,6 +321,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | `selectNumberOnly` | Determine if the select all keyboard command will select the complete input text, or only the input numeric value | `false` |
 | `selectOnFocus` | Defines if the element value should be selected on focus | `true` |
 | `serializeSpaces` | Defines how the serialize functions should treat spaces when serializing (convert them to `'%20'` or `'+'`) | `'+'` |
+| `showOnlyNumbersOnFocus` | Remove the thousand separator, currency symbol and suffix on focus | `false` |
 | `showPositiveSign` | Allow the positive sign symbol `+` to be displayed for positive numbers | `false` |
 | `showWarnings` | Defines if warnings should be shown | `true` |
 | `styleRules` | Defines the rules that calculate the CSS class(es) to apply on the element, based on the raw unformatted value.<br>This can also be used to call callbacks whenever the `rawValue` is updated. | `null` |

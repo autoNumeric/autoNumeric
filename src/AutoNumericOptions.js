@@ -35,11 +35,11 @@ import AutoNumeric from './AutoNumeric';
 Object.defineProperty(AutoNumeric, 'options', {
     get() {
         return {
-            /* Allow padding the decimal places with zeros
-             * `true`   : always pad decimals with zeros
-             * `false`  : never pad with zeros
-             * `'floats'` : pad with zeros only when there are decimals
-             * Note: setting allowDecimalPadding to 'false' will override the 'decimalPlacesOverride' setting.
+            /* Defines if the decimal places should be padded with zeroes
+             * `true`     : always pad decimals with zeros (ie. '12.3400')
+             * `false`    : never pad with zeros (ie. '12.34')
+             * `'floats'` : pad with zeroes only when there are decimals (ie. '12' and '12.3400')
+             * Note: setting allowDecimalPadding to 'false' will override the 'decimalPlaces' setting.
              */
             allowDecimalPadding: {
                 always: true,
@@ -150,14 +150,56 @@ Object.defineProperty(AutoNumeric, 'options', {
                 dot  : '.',
             },
 
-            /* Defines the maximum number of decimal places to show and keep as the precision.
-             * This is used to override the decimal places number set by the minimumValue & maximumValue values.
+            /* Defines the default number of decimal places to show on the formatted value, and keep for the precision.
+             * Incidentally, since we need to be able to show that many decimal places, this also defines the raw value precision by default.
              */
-            decimalPlacesOverride: {
-                doNotOverride: null,
+            decimalPlaces: {
+                none : 0,
+                one  : 1,
+                two  : 2,
+                three: 3,
+                four : 4,
+                five : 5,
+                six  : 6,
             },
 
-            /* Defines how many decimal places should be visible when the element has the focus
+            /* Defines how many decimal places should be kept for the raw value (ie. This is the precision for float values).
+             *
+             * If this option is set to `null` (which is the default), then the value of `decimalPlaces` is used for `decimalPlacesRawValue` as well.
+             * Note: Setting this to a lower number of decimal places than the one to be shown will lead to confusion for the users.
+             */
+            decimalPlacesRawValue: {
+                useDefault: null,
+                none      : 0,
+                one       : 1,
+                two       : 2,
+                three     : 3,
+                four      : 4,
+                five      : 5,
+                six       : 6,
+            },
+
+            /* Defines how many decimal places should be visible when the element is unfocused.
+             * If this is set to `null`, then this option is ignored, and the `decimalPlaces` option value will be used instead.
+             * This means this is optional ; if omitted the decimal places will be the same when the input has the focus.
+             *
+             * This option can be used in conjonction with the two other `scale*` options, which allows to display a different formatted value when the element is unfocused, while another formatted value is shown when focused.
+             * For those `scale*` option to have any effect, `divisorWhenUnfocused` must not be `null`.
+             */
+            decimalPlacesShownOnBlur: {
+                useDefault: null,
+                none      : 0,
+                one       : 1,
+                two       : 2,
+                three     : 3,
+                four      : 4,
+                five      : 5,
+                six       : 6,
+            },
+
+            /* Defines how many decimal places should be visible when the element has the focus.
+             * If this is set to `null`, then this option is ignored, and the `decimalPlaces` option value will be used instead.
+             *
              * Example:
              * Fon instance if `decimalPlacesShownOnFocus` is set to `5` and the default number of decimal places is `2`, then on focus `1,000.12345` will be shown, while without focus `1,000.12` will be set back.
              * Note 1: the results depends on the rounding method used.
@@ -165,6 +207,13 @@ Object.defineProperty(AutoNumeric, 'options', {
              */
             decimalPlacesShownOnFocus: {
                 useDefault: null,
+                none      : 0,
+                one       : 1,
+                two       : 2,
+                three     : 3,
+                four      : 4,
+                five      : 5,
+                six       : 6,
             },
 
             /* Helper option for ASP.NET postback
@@ -204,6 +253,20 @@ Object.defineProperty(AutoNumeric, 'options', {
                 apostrophe              : `'`,
                 arabicThousandsSeparator: '٬',
                 dotAbove                : '˙',
+            },
+
+            /* The `divisorWhenUnfocused` divide the element value on focus.
+             * On blur, the element value is multiplied back.
+             *
+             * Example : Given the option { divisorWhenUnfocused: 1000 } (or directly in the html `<input data-divisor-when-unfocused="1000">`)
+             * The divisor value does not need to be an integer, but please understand that Javascript has limited accuracy in math ; use with caution.
+             * Note: The `getNumericString` method returns the full value, including the 'hidden' decimals.
+             */
+            divisorWhenUnfocused: {
+                doNotActivateTheScalingOption: null,
+                percentage                   : 100,
+                permille                     : 1000,
+                basisPoint                   : 10000,
             },
 
             /* Defines what should be displayed in the element if the raw value is an empty string ('').
@@ -282,7 +345,7 @@ Object.defineProperty(AutoNumeric, 'options', {
              */
             maximumValue: {
                 tenTrillions          : '9999999999999.99', // 9.999.999.999.999,99 ~= 10000 billions
-                tenTrillionsNoDecimals: '9999999999999',
+                tenTrillionsNoDecimals: '9999999999999', //FIXME Update all those limits to the 'real' numbers
                 oneBillion            : '999999999.99',
                 zero                  : '0',
             },
@@ -473,42 +536,6 @@ Object.defineProperty(AutoNumeric, 'options', {
                 doNotSave: false,
             },
 
-            /* The next three options (scaleDivisor, scaleDecimalPlaces & scaleSymbol) handle scaling of the input when the input does not have focus
-             * Please note that the non-scaled value is held in data and it is advised that you use the "saveValueToSessionStorage" option to ensure retaining the value
-             * ["divisor", "decimal places", "symbol"]
-             * Example: with the following options set {scaleDivisor: '1000', scaleDecimalPlaces: '1', scaleSymbol: ' K'}
-             * Example: focusin value "1,111.11" focusout value "1.1 K"
-             */
-
-            /* The `scaleDecimalPlaces` option is the number of decimal place when not in focus - for this to work, `scaledDivisor` must not be `null`.
-             * This is optional ; if omitted the decimal places will be the same when the input has the focus.
-             */
-            scaleDecimalPlaces: {
-                doNotChangeDecimalPlaces: null,
-            },
-
-            /* The `scaleDivisor` decides the on focus value and places the result in the input on focusout
-             * Example {scaleDivisor: '1000'} or <input data-scale-divisor="1000">
-             * The divisor value - does not need to be whole number but please understand that Javascript has limited accuracy in math
-             * The "get" method returns the full value, including the 'hidden' decimals.
-             */
-            scaleDivisor: {
-                doNotActivateTheScalingOption: null,
-                percentage                   : 100,
-                permille                     : 1000,
-                basisPoint                   : 10000,
-            },
-
-            /* The `scaleSymbol` option is a symbol placed as a suffix when not in focus.
-             * This is optional too.
-             */
-            scaleSymbol: {
-                none      : null,
-                percentage: '%',
-                permille  : '‰',
-                basisPoint: '‱',
-            },
-
             /* Determine if the select all keyboard command will select the complete input text, or only the input numeric value
              * Note : If the currency symbol is between the numeric value and the negative sign, only the numeric value will be selected
              */
@@ -637,7 +664,26 @@ Object.defineProperty(AutoNumeric, 'options', {
                 basisPoint: '‱',
             },
 
+            /* The three options (divisorWhenUnfocused, decimalPlacesShownOnBlur & symbolWhenUnfocused) handle scaling of the input when the input does not have focus
+             * Please note that the non-scaled value is held in data and it is advised that you use the `saveValueToSessionStorage` option to ensure retaining the value
+             * ["divisor", "decimal places", "symbol"]
+             * Example: with the following options set {divisorWhenUnfocused: '1000', decimalPlacesShownOnBlur: '1', symbolWhenUnfocused: ' K'}
+             * Example: focusin value "1,111.11" focusout value "1.1 K"
+             */
+
+            /* The `symbolWhenUnfocused` option is a symbol placed as a suffix when not in focus.
+             * This is optional too.
+             */
+            symbolWhenUnfocused: {
+                none      : null,
+                percentage: '%',
+                permille  : '‰',
+                basisPoint: '‱',
+            },
+
             /* Defines if the element value should be unformatted when the user hover his mouse over it while holding the `Alt` key.
+             * Unformatting there means that this removes any non-number characters and displays the *raw* value, as understood by Javascript (ie. `12.34` is a valid number, while `12,34` is not).
+             *
              * We reformat back before anything else if :
              * - the user focus on the element by tabbing or clicking into it,
              * - the user releases the `Alt` key, and

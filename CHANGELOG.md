@@ -1,5 +1,42 @@
 ## Changelog for autoNumeric
 
+### 4.0.0-beta.22
++ Fix issue #454 Rewrite how the number of decimal places for the formatted and the raw values are set
++ If you relied of the number of decimals in `minimumValue` or `maximumValue` to define how many decimal places should be shown on the formatted value, or kept as the precision in the `rawValue`, you now need to explicitly define how many decimal places your want, whatever number of decimal places `minimumValue` and `maximumValue` have.
++ To do so, you now need to define at least the `decimalPlaces` option.
++ If you want, you can also separately define `decimalPlacesRawValue`, `decimalPlacesShownOnBlur` and `decimalPlacesShownOnFocus`. For more details, read on.
++ Rename `scaleDecimalPlaces` to `decimalPlacesShownOnBlur`.
++ Rename `scaleDivisor` to `divisorWhenUnfocused`.
++ Rename `scaleSymbol` to `symbolWhenUnfocused`.
++ Rename the `decimalPlacesShownOnBlur.doNotChangeDecimalPlaces` to `decimalPlacesShownOnBlur.useDefault` to be coherent with the other `decimalPlaces*` options.
++ Remove the `decimalPlacesOverride` option in favor of explicit `decimalPlaces`, `decimalPlacesShownOnBlur` and `decimalPlacesShownOnFocus` ones.
++ Add a warning message if the old `mDec` option is used (which was the equivalent of `decimalPlacesOverride`).
++ Add a `decimalPlacesRawValue` option that define the precision the user wants to keep (in the `rawValue`).
++ Remove the need for saving `decimalPlacesOverride` to temporary change it in `set()`.
++ Create 3 different rounding functions that replace the `_roundValue()` calls: `_roundFormattedValueShownOnFocus`, `_roundFormattedValueShownOnBlur` and `_roundRawValue`. This way we are more explicit in what the code is doing.
++ Modify `_setRawValue()` so that it only save the given raw value if it's different than the current one (keeping the history table clean).
++ Use template strings instead of concatenation in `_addGroupSeparators()`, `_roundValue()` and `_prepareValueForRounding()` to prevent possible wrong typecasts.
++ Fix the error shown when hovering an input whose value has been set to `null` (a `toString()` was attempted on the `null` value in the `_roundValue()` method).
++ Fix the incoherent variable name `inputValueHasADot` in `_roundValue()` to better reflect what data it holds, ie. `inputValueHasNoDot`.
++ Fix typos in the `set()` warning messages.
++ Add a warning message when try to set a value that results in `NaN`.
++ Simplify the '_onFocusInAndMouseEnter` and `_onFocusOutAndMouseLeave` event handlers.
++ Update the tests with the new changes.
++ Modify how decimal places are set.
+  Before you needed to add that many decimals to the `minimumValue` or `maximumValue`, and that maximum number of decimal place was used everywhere (except if you also defined `decimalPlacesOverride`, `decimalPlacesShownOnFocus` or `scaleDecimalPlaces`).
+  Now you need to explicitely define the number of decimal places using the `decimalPlaces` option.
+  If only `decimalPlaces` is defined, then the other `decimalPlaces*` options `decimalPlacesRawValue`, `decimalPlacesShownOnBlur` and `decimalPlacesShownOnFocus` are calculated from it.
+  This way, you can now define clearly how many decimal places needs to be shown when focused/unfocused, and as the raw value precision.
+  Note: updating the `decimalPlaces` will overwrite any `decimalPlaces*` option previously set.
++ Remove the `_maximumVMinAndVMaxDecimalLength()` since we do not set the number of decimal places this way.
++ Remove the `_correctDecimalPlacesOverrideOption()` function since `decimalPlacesOverride` is not used anymore.
++ Add a `_calculateDecimalPlaces()` static method that calculate the `decimalPlaces*` option value based on `decimalPlaces` and the `decimalPlaces*` ones.
++ Modify how updating the settings works ; before, all modifications to the settings were directly accepted and stored, then we immediately tried to `set()` back the current value with those new settings.
+  This could lead to an object state where the object value would be out of the minimum and maximum value range, ie. we would accept the range modification, then immediately throw an error since the current value would then be out of range.
+  For instance, if `minimumValue` equal `0`, `maximumValue` equal `100` and the current element value equal `50`, trying to change the `minimumValue` to `75` will fail, and the `minimumValue` will be reverted back to`0`.
+  The new behavior is leaner ; if the new settings do not pass the `validate()` method or the following `set()` call fails, then the settings are reverted to the previous valid ones.
++ In `_setValueParts()`, set the `rawValue` and the formatted element value separately, since they can have different decimal places. For instance we could imagine keeping 3 decimal places for the `rawValue`, while only 2 is shown. I then need to make sure we keep that third decimal place information into the `rawValue`, instead of trimming it like it was done before.
+
 ### 4.0.0-beta.21
 + Set the read-only mode on the default settings, enumerations, events, options and pre-defined options objects.
 + Allow using a pre-defined option name directly when initializing an AutoNumeric element

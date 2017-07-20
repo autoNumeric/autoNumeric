@@ -17,12 +17,12 @@ Moreover, you can take a look at what could be the next features coming to autoN
 
 #### Highlights
 autoNumeric main features are :
-- Easy to use and configure
+- **Easy** to use and configure
 ```js
 // Initialization
 new AutoNumeric('.myInput', { currencySymbol : '$' });
 ```
-- Very high configurability (more than 40 [options](#options) available)
+- Very **high configurability** (more than 40 [options](#options) available)
 ```js
 // The options are...optional :)
 const autoNumericOptionsEuro = {
@@ -37,7 +37,7 @@ const autoNumericOptionsEuro = {
 // Initialization
 new AutoNumeric(domElement, autoNumericOptionsEuro);
 ```
-- User experience oriented ; using autoNumeric just feels right and natural, specially with the new function chaining feature
+- User experience oriented ; using autoNumeric just **feels right and natural**, specially with the function chaining feature
 ```js
 anElement.french()
          .set(42)
@@ -45,20 +45,20 @@ anElement.french()
          .formSubmitJsonNumericString(callback)
          .clear();
 ```
-- Supports most international numeric formats and currencies<br>*(If the one you use is not supported yet, open an [issue](https://github.com/autoNumeric/autoNumeric/issues/new) and we'll add it as soon as possible!)*
+- Supports most **international** numeric formats and currencies<br>*(If the one you use is not supported yet, open an [issue](https://github.com/autoNumeric/autoNumeric/issues/new) and we'll add it as soon as possible!)*
 - The mobile Android Chrome browser is now partially supported!
 
 *And also:*
 - Any number of different formats can be used at the same time on the same page.<br>Each input can be configured by either setting the options as HTML5 data attributes, or directly passed as an argument in the Javascript code
 - The settings can easily be changed at *any* time using the `update` method or via a callback
 - autoNumeric supports `input` elements as well as most text elements with the `contenteditable` attribute, allowing you to place formatted numbers and currencies on just about any part of your pages
-- AutoNumeric elements can be linked together allowing you to perform one action on multiple elements at once
+- AutoNumeric elements *can be linked together* allowing you to perform one action on multiple elements at once
 - 8 pre-defined [currency options](#predefined-language-options) as well as 31 [common options](#predefined-common-options) allows you to directly use autoNumeric by skipping the option configuration step
-- 26 built-in [methods](#methods) gives you the flexibility needed to use autoNumeric to its maximum potential
+- 26 built-in [methods](#methods) gives you the flexibility needed to use autoNumeric to its full potential
 - 22 [global methods](#perform-actions-globally-on-a-shared-list-of-autonumeric-elements) that allows to control sets of AutoNumeric-managed elements at once
 - 21 additional [methods](#methods) specialized for managing form submission
-- 14 [static functions](#static-methods) provided by the `AutoNumeric` class
-- And more than 40 [options](#options) allows you to customize the output format
+- 15 [static functions](#static-methods) provided by the `AutoNumeric` class
+- And more than 40 [options](#options) allowing you to customize your currency format
 
 With that said, autoNumeric supports most international numeric formats and currencies including those used in Europe, Asia, and North and South America.
 
@@ -134,6 +134,8 @@ Simply include **autoNumeric** in your html `<header>` tag.<br>No other files or
 <script src="autoNumeric.min.js" type="text/javascript"></script>
 <!-- ...or, you may also directly use a CDN :-->
 <script src="https://cdn.jsdelivr.net/autonumeric/4.0.0/autoNumeric.min.js"></script>
+<!-- ...or -->
+<script src="https://unpkg.com/autonumeric@4.0.0"></script>
 ```
 
 #### In another script
@@ -290,11 +292,14 @@ Multiple options allow you to customize precisely how a form input will format y
 | `currencySymbolPlacement` | Placement of the currency sign, relative to the number (as a prefix or a suffix) | `'p'` |
 | `decimalCharacter` | Decimal separator character | `'.'` |
 | `decimalCharacterAlternative` | Allow to declare alternative decimal separator which is automatically replaced by the *real* decimal character (useful in countries where the keyboard numeric pad have a period as the decimal character) | `null` |
-| `decimalPlacesOverride` | Maximum number of decimal places (used to override decimal places set by the minimumValue & maximumValue values) | `null` |
-| `decimalPlacesShownOnFocus` | Expanded decimal places visible when input has focus | `null` |
+| `decimalPlaces` | Defines the default number of decimal places to show on the formatted value, and to keep as the precision for the `rawValue`. This can be overridden by the other `decimalPlaces*` options. | `2` |
+| `decimalPlacesRawValue` | Defines how many decimal places should be kept for the raw value. This is the precision for float values. | `null` |
+| `decimalPlacesShownOnBlur` | The number of decimal places to show when *unfocused* | `null` |
+| `decimalPlacesShownOnFocus` | The number of decimal places to show when *focused* | `null` |
 | `defaultValueOverride` | Helper option for the ASP.NET-specific postback issue | `null` |
 | `digitalGroupSpacing` | Digital grouping for the thousand separator | `'3'` |
 | `digitGroupSeparator` | Thousand separator character  | `','` |
+| `divisorWhenUnfocused` | Define the number that will divide the current value shown when unfocused | `null` |
 | `emptyInputBehavior` | Define what to display when the input value is empty (possible options are `null`, `focus`, `press`, `always` and `zero`) | `'focus'` |
 | `failOnUnknownOption ` | This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object. | `false` |
 | `formatOnPageLoad` | Determine if the default value will be formatted on initialization | `true` |
@@ -312,11 +317,8 @@ Multiple options allow you to customize precisely how a form input will format y
 | `outputFormat` | Defines the localized output format of the `get`, `getString` & `getArray` methods | `null` |
 | `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor` and `ignore`) | `null` |
 | `readOnly` | Defines if the `<input>` element should be set as read only on initialization | `false` |
-| `roundingMethod` | Method used for rounding (possible options are `S`, `A`, `s`, `a`, `B`, `U`, `D`, `C`, `F`, `N05`, `U05` or `D05`) | `'S'` |
+| `roundingMethod` | Method used for rounding. The possible options are `S` (Round-Half-Up Symmetric (default)), `A` (Round-Half-Up Asymmetric), `s` (Round-Half-Down Symmetric (lower case s)), `a` (Round-Half-Down Asymmetric (lower case a)), `B` (Round-Half-Even 'Bankers Rounding'), `U` (Round Up 'Round-Away-From-Zero'), `D` (Round Down 'Round-Toward-Zero' - same as truncate), `C` (Round to Ceiling 'Toward Positive Infinity'), `F` (Round to Floor 'Toward Negative Infinity'), `N05` (Rounds to the nearest .05 (same as `'CHF'` used in v1.9.* and still valid)), `U05` (Rounds up to next .05), `D05` (Rounds down to next .05) | `'S'` |
 | `saveValueToSessionStorage` | Allow the `decimalPlacesShownOnFocus` value to be saved into session storage | `false` |
-| `scaleDecimalPlaces` | The number of decimal places when unfocused | `null` |
-| `scaleDivisor` | Define the number that will divide the current value shown when unfocused | `null` |
-| `scaleSymbol` | Symbol placed as a suffix when unfocused | `true` |
 | `selectNumberOnly` | Determine if the select all keyboard command will select the complete input text, or only the input numeric value | `false` |
 | `selectOnFocus` | Defines if the element value should be selected on focus | `true` |
 | `serializeSpaces` | Defines how the serialize functions should treat spaces when serializing (convert them to `'%20'` or `'+'`) | `'+'` |
@@ -324,6 +326,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | `showWarnings` | Defines if warnings should be shown | `true` |
 | `styleRules` | Defines the rules that calculate the CSS class(es) to apply on the element, based on the raw unformatted value.<br>This can also be used to call callbacks whenever the `rawValue` is updated. | `null` |
 | `suffixText` | Additional text suffix that is added after the number | `''` |
+| `symbolWhenUnfocused` | Symbol placed as a suffix when unfocused. This is used in combination with the `divisorWhenUnfocused` option. | `null` |
 | `unformatOnHover` | Defines if the element value should be unformatted when the user hover his mouse over it while holding the `Alt` key | `true` |
 | `unformatOnSubmit` | Removes formatting on submit event | `false` |
 | `wheelStep` | Used in conjonction with the `modifyValueOnWheel` option, this allow to either define a *fixed* step (ie. `1000`), or a *progressive* one | `'progressive'` |
@@ -773,30 +776,31 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 
 | Method           | Description | Call example |
 | :---------------- | :-----------:  | :-----------:  |
-| `validate` | Check if the given option object is valid, and that each option is valid as well. This throws an error if it's not. | `AutoNumeric.validate({ options })` |
-| `areSettingsValid` | Return true in the settings are valid | `AutoNumeric.areSettingsValid({ options })` |
-| `getAutoNumericElement` | Return the AutoNumeric object that manages the given DOM element | `AutoNumeric.getAutoNumericElement(domElement)` |
-| `getDefaultConfig` | Return the default autoNumeric settings | `AutoNumeric.getDefaultConfig()` |
-| `getPredefinedOptions` | Return all the predefined options in one object | `AutoNumeric.getPredefinedOptions()` |
-| `getPredefinedOptions` | Return a specific pre-defined language option object | `AutoNumeric.getPredefinedOptions().French` |
+| `areSettingsValid` | Return `true` in the settings are valid | `AutoNumeric.areSettingsValid({ options })` |
 | `format` | Format the given number with the given options. This returns the formatted value as a string. | `AutoNumeric.format(12345.21, { options });` |
 | `format` | Idem above, but using a numeric string as the first parameter | `AutoNumeric.format('12345.21', { options });` |
 | `format` | Idem above, but you can pass as many option objects you want to this function, the latter overwriting the previous ones. This allows to correctly format currencies that have a predefined option as its base, but has been slightly modified.  | `AutoNumeric.format('12345.21', { options1 }, { options2 });` |
 | `format` | Idem above, using multiple option objects in one array. This way allows for using a pre-defined option name.  | `AutoNumeric.format('12345.21', [{ options1 }, 'euroPos', { options2 }]);` |
 | `format` | Format the `domElement` *`value`* (or *`textContent`*) with the given options and returns the formatted value as a string. This does *not* update that element value. | `AutoNumeric.format(domElement, { options });` |
 | `formatAndSet` | Format the `domElement` value with the given options and returns the formatted value as a string. This function does update that element value with the newly formatted value in the process. | `AutoNumeric.formatAndSet(domElement, { options });` |
-| `unformat` | Unformat the given formatted string with the given options. This returns a numeric string. | `AutoNumeric.unformat('1.234,56 €', { options });` |
+| `getAutoNumericElement` | Return the AutoNumeric object that manages the given DOM element | `AutoNumeric.getAutoNumericElement(domElement)` |
+| `getDefaultConfig` | Return the default autoNumeric settings | `AutoNumeric.getDefaultConfig()` |
+| `getPredefinedOptions` | Return all the predefined options in one object | `AutoNumeric.getPredefinedOptions()` |
+| `getPredefinedOptions` | Return a specific pre-defined language option object | `AutoNumeric.getPredefinedOptions().French` |
 | `unformat` | Idem above, but you can pass as many option objects you want to this function, the latter overwriting the previous ones. This allows to correctly unformat currencies that have a predefined option as its base, but has been slightly modified. | `AutoNumeric.unformat('241800,02 €', AutoNumeric.getPredefinedOptions().French, { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator });` |
-| `unformat` | Idem above, using multiple option objects in one array. This way allows for using a pre-defined option name. | `AutoNumeric.unformat('1.234,56 €', [{ options1 }, 'euroPos', { options2 }]);` |
-| `unformat` | Unformat the `domElement` value with the given options and returns the unformatted numeric string. This does *not* update that element value. | `AutoNumeric.unformat(domElement, { options });` |
-| `unformatAndSet` | Unformat the `domElement` value with the given options and returns the unformatted value as a numeric string. This function does update that element value with the newly unformatted value in the process. | `AutoNumeric.unformatAndSet(domElement, { options });` |
-| `unformatAndSet` | Recursively unformat all the autoNumeric-managed elements that are a child to the `referenceToTheDomElement` element given as a parameter (this is usually the parent `<form>` element) | `AutoNumeric.unformatAndSet(referenceToTheDomElement);` |
-| `reformatAndSet` | Recursively format all the autoNumeric-managed elements that are a child to the `referenceToTheDomElement` element given as a parameter (this is usually the parent `<form>` element), with the settings of each AutoNumeric elements. | `AutoNumeric.reformatAndSet(referenceToTheDomElement);` |
+| `isManagedByAutoNumeric` | Return `true` if the given DOM element has an AutoNumeric object that manages it. | `AutoNumeric.isManagedByAutoNumeric(domElement);` |
 | `localize` | Unformat and localize the given formatted string with the given options. This returns a string. | `AutoNumeric.localize('1.234,56 €', { options });` |
 | `localize` | Idem as above, but return the localized DOM element value. This does *not* update that element value. | `AutoNumeric.localize(domElement, { options });` |
 | `localizeAndSet` | Unformat and localize the `domElement` value with the given options and returns the localized value as a string. This function does update that element value with the newly localized value in the process. | `AutoNumeric.localizeAndSet(domElement, { options });` |
 | `mergeOptions` | Accepts an array of option objects and / or pre-defined option names, and return a single option object where the latter element overwrite the settings from the previous ones | `AutoNumeric.mergeOptions(['euro', { currencySymbol: '#' }]);` |
+| `reformatAndSet` | Recursively format all the autoNumeric-managed elements that are a child to the `referenceToTheDomElement` element given as a parameter (this is usually the parent `<form>` element), with the settings of each AutoNumeric elements. | `AutoNumeric.reformatAndSet(referenceToTheDomElement);` |
 | `test` | Test if the given domElement is already managed by AutoNumeric (if it is initialized) | `AutoNumeric.test(domElement);` |
+| `unformat` | Unformat the given formatted string with the given options. This returns a numeric string. | `AutoNumeric.unformat('1.234,56 €', { options });` |
+| `unformat` | Idem above, using multiple option objects in one array. This way allows for using a pre-defined option name. | `AutoNumeric.unformat('1.234,56 €', [{ options1 }, 'euroPos', { options2 }]);` |
+| `unformat` | Unformat the `domElement` value with the given options and returns the unformatted numeric string. This does *not* update that element value. | `AutoNumeric.unformat(domElement, { options });` |
+| `unformatAndSet` | Unformat the `domElement` value with the given options and returns the unformatted value as a numeric string. This function does update that element value with the newly unformatted value in the process. | `AutoNumeric.unformatAndSet(domElement, { options });` |
+| `unformatAndSet` | Recursively unformat all the autoNumeric-managed elements that are a child to the `referenceToTheDomElement` element given as a parameter (this is usually the parent `<form>` element) | `AutoNumeric.unformatAndSet(referenceToTheDomElement);` |
+| `validate` | Check if the given option object is valid, and that each option is valid as well. This throws an error if it's not. | `AutoNumeric.validate({ options })` |
 | `version` | Return the AutoNumeric version number (for debugging purpose) | `AutoNumeric.version();` |
 
 

@@ -758,7 +758,7 @@
     }, false);
 
     //-------------- Initializing AutoNumeric on non-<input> tags
-    new AutoNumeric('#tag_p1', { scaleDecimalPlaces: 3, scaleDivisor: 0.01, scaleSymbol: '%', maximumValue: '999.9999' });
+    new AutoNumeric('#tag_p1', { decimalPlacesShownOnBlur: 3, divisorWhenUnfocused: 0.01, symbolWhenUnfocused: '%', maximumValue: '999', decimalPlaces: 4 });
     new AutoNumeric('#tag_p2', 666.42).french();
     new AutoNumeric('#tag_code', AutoNumeric.getPredefinedOptions().Japanese);
     new AutoNumeric('#tag_div').northAmerican();
@@ -771,10 +771,10 @@
     const issue283Input0An = new AutoNumeric(issue283Input0, { leadingZero: 'allow' });
     issue283Input0An.set(1.12345);
 
-    const issue283Input1An = new AutoNumeric('#issue283Input1', { leadingZero: 'deny', maximumValue: '99999999.9999' });
+    const issue283Input1An = new AutoNumeric('#issue283Input1', { leadingZero: 'deny', decimalPlaces: 4 });
     issue283Input1An.set(1.12345);
 
-    new AutoNumeric('#issue283Input2', 1.12345, { digitGroupSeparator: ' ', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '%', currencySymbolPlacement: 's', roundingMethod: 'U', decimalPlacesOverride: '3', leadingZero: 'deny' });
+    new AutoNumeric('#issue283Input2', 1.12345, { digitGroupSeparator: ' ', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '%', currencySymbolPlacement: 's', roundingMethod: 'U', decimalPlaces: '3', leadingZero: 'deny' });
 
     new AutoNumeric('#issue283Input3', 8000, { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '\u00a0€', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', leadingZero: 'allow' });
     const pureIssue283Input3 = document.querySelector('#issue283Input3');
@@ -789,7 +789,7 @@
     new AutoNumeric('#issue283Input4', 8000, { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '\u00a0€', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', leadingZero: 'deny' });
 
     //-------------- Issue #295
-    const priceFormatOptions = { decimalPlacesOverride: '2', maximumValue: '999999999999.99', digitGroupSeparator: ',', decimalCharacter: '.' };
+    const priceFormatOptions = { decimalPlaces: 2, digitGroupSeparator: ',', decimalCharacter: '.' };
 
     new AutoNumeric('#firstField', priceFormatOptions); //FIXME à terminer : use the 'global' function to create both element in one call
     new AutoNumeric('#secondField', priceFormatOptions);
@@ -809,8 +809,7 @@
         currencySymbolPlacement    : 's',
         roundingMethod             : 'U',
         leadingZero                : 'deny',
-        minimumValue               : '0.00',
-        maximumValue               : '999999999999.99'
+        minimumValue               : '0',
     });
 
     //-------------- Issue #291
@@ -822,8 +821,8 @@
         currencySymbolPlacement    : 's',
         roundingMethod             : 'U',
         leadingZero                : 'deny',
-        minimumValue               : '0.00',
-        maximumValue               : '999999999999.99'
+        minimumValue               : '0',
+        maximumValue               : '999999999999'
     });
 
     //-------------- Issue #183
@@ -834,8 +833,8 @@
         currencySymbol             : '\u00a0€',
         currencySymbolPlacement    : 's',
         roundingMethod             : 'U',
-        minimumValue               : '-999999999999.99',
-        maximumValue               : '999999999999.99',
+        minimumValue               : '-999999999999',
+        maximumValue               : '999999999999',
         onInvalidPaste             : 'error',
         negativeBracketsTypeOnBlur : '(,)',
         decimalPlacesShownOnFocus  : 5
@@ -847,8 +846,8 @@
         currencySymbol             : '\u00a0€',
         currencySymbolPlacement    : 's',
         roundingMethod             : 'U',
-        minimumValue               : '-999999999999.99',
-        maximumValue               : '999999999999.99',
+        minimumValue               : '-999999999999',
+        maximumValue               : '999999999999',
         onInvalidPaste             : 'ignore'
     });
     new AutoNumeric('#issue_183_clamp', {
@@ -858,8 +857,8 @@
         currencySymbol             : '$ ',
         currencySymbolPlacement    : 'p',
         roundingMethod             : 'U',
-        minimumValue               : '-999999999999.99',
-        maximumValue               : '999999999999.99',
+        minimumValue               : '-999999999999',
+        maximumValue               : '999999999999',
         onInvalidPaste             : 'clamp'
     });
     new AutoNumeric('#issue_183_truncate', {
@@ -869,8 +868,8 @@
         currencySymbol             : '\u00a0€',
         currencySymbolPlacement    : 's',
         roundingMethod             : 'U',
-        minimumValue               : '-999999999999.99',
-        maximumValue               : '999999999999.99',
+        minimumValue               : '-999999999999',
+        maximumValue               : '999999999999',
         onInvalidPaste             : 'truncate'
     });
     new AutoNumeric('#issue_183_replace', {
@@ -880,8 +879,8 @@
         currencySymbol             : '\u00a0€',
         currencySymbolPlacement    : 's',
         roundingMethod             : 'U',
-        minimumValue               : '-999999999999.99',
-        maximumValue               : '2999999999911.99',
+        minimumValue               : '-999999999999',
+        maximumValue               : '2999999999911',
         onInvalidPaste             : 'replace'
     });
 
@@ -889,7 +888,7 @@
     new AutoNumeric('#issue_302', { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: '\u00a0€', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', leadingZero: 'deny' });
 
     //-------------- Issue #226
-    new AutoNumeric('#issue_226', { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, formatOnPageLoad: false, minimumValue: '0', leadingZero: 'deny', maximumValue: '2147483647', decimalPlacesOverride: '0' });
+    new AutoNumeric('#issue_226', { allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, formatOnPageLoad: false, minimumValue: '0', leadingZero: 'deny', maximumValue: '2147483647', decimalPlaces: '0' });
 
     //-------------- Issue #187
     new AutoNumeric('#issue_187');
@@ -902,11 +901,11 @@
 
     //-------------- Issue #306
     new AutoNumeric('#issue_306', { leadingZero: 'deny' });
-    new AutoNumeric('#issue_306decimals', { leadingZero: 'deny', maximumValue : '999999999.99999', digitGroupSeparator: '.', decimalCharacter: ',' });
-    new AutoNumeric('#issue_306decimals2', { leadingZero: 'deny', maximumValue : '999999999.99', digitGroupSeparator: '.', decimalCharacter: ',' });
+    new AutoNumeric('#issue_306decimals', { leadingZero: 'deny', digitGroupSeparator: '.', decimalCharacter: ',', decimalPlaces: 5 });
+    new AutoNumeric('#issue_306decimals2', { leadingZero: 'deny', digitGroupSeparator: '.', decimalCharacter: ',', decimalPlaces: 2 });
 
     //-------------- Issue #262
-    new AutoNumeric('#issue_262', { leadingZero: 'deny', decimalPlacesOverride:'2', roundingMethod:'D' });
+    new AutoNumeric('#issue_262', { leadingZero: 'deny', decimalPlaces:'2', roundingMethod:'D' });
 
     //-------------- Issue #321
     new AutoNumeric('#issue_321_a', { digitGroupSeparator: '٬'     , decimalCharacter: '٫', decimalCharacterAlternative: ',' });
@@ -1039,8 +1038,8 @@
         currencySymbol             : '\u00a0€',
         currencySymbolPlacement    : 's',
         roundingMethod             : 'U',
-        minimumValue               : '-999999999999.99',
-        maximumValue               : '999999999999.99',
+        minimumValue               : '-999999999999',
+        maximumValue               : '999999999999',
         onInvalidPaste             : 'ignore'
     });
 
@@ -1048,7 +1047,7 @@
     new AutoNumeric('#issue_322');
 
     //-------------- Issue #250
-    new AutoNumeric('#issue_250', { decimalPlacesOverride: 2, allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, minimumValue: '2', maximumValue: '999999999' });
+    new AutoNumeric('#issue_250', { decimalPlaces: 2, allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, minimumValue: '2', maximumValue: '999999999' });
 
     //-------------- Issue #317
     new AutoNumeric('#issue_317', { leadingZero: 'deny', decimalCharacterAlternative: ',' });
@@ -1075,9 +1074,9 @@
     new AutoNumeric('#issue_393_limitOneSideDown', { modifyValueOnWheel: true, wheelStep: 'progressive', minimumValue: '-75999', maximumValue: '-52500' });
 
     //-------------- Issue #403
-    new AutoNumeric('#issue_403a', { scaleDecimalPlaces: 2, scaleDivisor: 0.01, scaleSymbol: '%' });
-    new AutoNumeric('#issue_403b', { scaleDecimalPlaces: 3, scaleDivisor: 0.01, scaleSymbol: '%', maximumValue: '999.99999' });
-    new AutoNumeric('#issue_403c', { scaleDecimalPlaces: 5, scaleDivisor: 1000000, scaleSymbol: 'MM' });
+    new AutoNumeric('#issue_403a', { decimalPlacesShownOnBlur: 2, divisorWhenUnfocused: 0.01, symbolWhenUnfocused: '%' });
+    new AutoNumeric('#issue_403b', { decimalPlacesShownOnBlur: 3, divisorWhenUnfocused: 0.01, symbolWhenUnfocused: '%', decimalPlaces: 5 });
+    new AutoNumeric('#issue_403c', { decimalPlacesShownOnBlur: 5, divisorWhenUnfocused: 1000000, symbolWhenUnfocused: 'MM' });
 
     //-------------- noEventListeners option
     new AutoNumeric('#noEventListeners_option', { noEventListeners: true }).french();
@@ -1124,6 +1123,7 @@
         decimalCharacter   : AutoNumeric.options.decimalCharacter.comma,
         minimumValue       : 0,
         maximumValue       : 99999999,
+        decimalPlaces      : 0,
         historySize        : AutoNumeric.options.historySize.verySmall,
     });
     new AutoNumeric('#undoRedo4');
@@ -1133,7 +1133,7 @@
         leadingZero          : AutoNumeric.options.leadingZero.keep,
         digitGroupSeparator  : AutoNumeric.options.digitGroupSeparator.noSeparator,
         maximumValue         : '99999',
-        decimalPlacesOverride: 0,
+        decimalPlaces        : 0,
         allowDecimalPadding  : AutoNumeric.options.allowDecimalPadding.never,
     });
 
@@ -1164,7 +1164,7 @@
     //-------------- decimalPlacesShownOnFocus and selections
     new AutoNumeric('#selection1')
 	    .french()
-	    .set(12266.1234567, { minimumValue: '0', maximumValue: '9999999.9999999', decimalPlacesOverride: 3, decimalPlacesShownOnFocus: 6 });
+	    .set(12266.1234567, { minimumValue: '0', maximumValue: '9999999', decimalPlaces: 3, decimalPlacesShownOnFocus: 6 });
 
     //-------------- noSeparatorOnFocus option
     new AutoNumeric('#noSeparatorOnFocus1').french()

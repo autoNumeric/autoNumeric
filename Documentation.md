@@ -62,7 +62,7 @@ note: - *this can change defaults globally*
 
  /* initiates autoNumeric and passes a function */	
 																				
- $('selector').autoNumeric('init', { decimalPlacesOverride: functionName }) 
+ $('selector').autoNumeric('init', { decimalPlaces: functionName }) 
 ``` 
 
 ****
@@ -345,6 +345,7 @@ Disclaimer : This may be outdated. Please refer to the [Readme](README.md) or di
 *Note: setting the minimumValue and maximumValue to both positive or negative with situations that limits the users ability to enter the proper values*  
 
 ##### decimalPlacesOverride
+**Note: This has been deprecated in `v4`**
 *overrides the decimal places that that are set via the minimumValue/maximumValue values*
 - 	decimalPlacesOverride: null  (default method) 
 - 	decimalPlacesOverride: '4'	overides the default and allows 4 decimal places

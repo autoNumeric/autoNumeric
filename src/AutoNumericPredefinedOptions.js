@@ -57,67 +57,61 @@ const japanese = { // 日本語
 
 
 // Here we need to clone the initial objects in order to be able to edit it without affecting it
-const euroPos = AutoNumericHelper.cloneObject(euro);
-euroPos.minimumValue = '0.00';
-const euroNeg = AutoNumericHelper.cloneObject(euro);
-euroNeg.maximumValue = '0.00';
+const euroPos                         = AutoNumericHelper.cloneObject(euro);
+euroPos.minimumValue                  = 0;
+const euroNeg                         = AutoNumericHelper.cloneObject(euro);
+euroNeg.maximumValue                  = 0;
 euroNeg.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix;
 
-const euroSpace = AutoNumericHelper.cloneObject(euro);
-euroSpace.digitGroupSeparator = AutoNumeric.options.digitGroupSeparator.normalSpace;
-const euroSpacePos = AutoNumericHelper.cloneObject(euroSpace);
-euroSpacePos.minimumValue = '0.00';
-const euroSpaceNeg = AutoNumericHelper.cloneObject(euroSpace);
-euroSpaceNeg.maximumValue = '0.00';
+const euroSpace                            = AutoNumericHelper.cloneObject(euro);
+euroSpace.digitGroupSeparator              = AutoNumeric.options.digitGroupSeparator.normalSpace;
+const euroSpacePos                         = AutoNumericHelper.cloneObject(euroSpace);
+euroSpacePos.minimumValue                  = 0;
+const euroSpaceNeg                         = AutoNumericHelper.cloneObject(euroSpace);
+euroSpaceNeg.maximumValue                  = 0;
 euroSpaceNeg.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix;
 
-const percentageEU2dec = AutoNumericHelper.cloneObject(euro);
-percentageEU2dec.currencySymbol = AutoNumeric.options.currencySymbol.none;
-percentageEU2dec.suffixText = `\u202f${AutoNumeric.options.suffixText.percentage}`;
-percentageEU2dec.wheelStep = 0.01;
-const percentageEU2decPos = AutoNumericHelper.cloneObject(percentageEU2dec);
-percentageEU2decPos.minimumValue = '0.00';
-const percentageEU2decNeg = AutoNumericHelper.cloneObject(percentageEU2dec);
-percentageEU2decNeg.maximumValue = '0.00';
+const percentageEU2dec                            = AutoNumericHelper.cloneObject(euro);
+percentageEU2dec.currencySymbol                   = AutoNumeric.options.currencySymbol.none;
+percentageEU2dec.suffixText                       = `\u202f${AutoNumeric.options.suffixText.percentage}`;
+percentageEU2dec.wheelStep                        = 0.01;
+const percentageEU2decPos                         = AutoNumericHelper.cloneObject(percentageEU2dec);
+percentageEU2decPos.minimumValue                  = 0;
+const percentageEU2decNeg                         = AutoNumericHelper.cloneObject(percentageEU2dec);
+percentageEU2decNeg.maximumValue                  = 0;
 percentageEU2decNeg.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix;
 
-const percentageEU3dec = AutoNumericHelper.cloneObject(percentageEU2dec);
-percentageEU3dec.maximumValue = `${AutoNumeric.options.maximumValue.tenTrillions}9`;
-percentageEU3dec.decimalPlacesOverride = 3;
-const percentageEU3decPos = AutoNumericHelper.cloneObject(percentageEU2decPos);
-percentageEU3decPos.maximumValue = `${AutoNumeric.options.maximumValue.tenTrillions}9`;
-percentageEU3decPos.decimalPlacesOverride = 3;
-const percentageEU3decNeg = AutoNumericHelper.cloneObject(percentageEU2decNeg);
-percentageEU3decNeg.maximumValue = `${AutoNumeric.options.maximumValue.tenTrillions}9`;
-percentageEU3decNeg.decimalPlacesOverride = 3;
+const percentageEU3dec            = AutoNumericHelper.cloneObject(percentageEU2dec);
+percentageEU3dec.decimalPlaces    = 3;
+const percentageEU3decPos         = AutoNumericHelper.cloneObject(percentageEU2decPos);
+percentageEU3decPos.decimalPlaces = 3;
+const percentageEU3decNeg         = AutoNumericHelper.cloneObject(percentageEU2decNeg);
+percentageEU3decNeg.decimalPlaces = 3;
 
-const dollarPos = AutoNumericHelper.cloneObject(dollar);
-dollarPos.minimumValue = '0.00';
-const dollarNeg = AutoNumericHelper.cloneObject(dollar);
-dollarNeg.maximumValue = '0.00';
-dollarNeg.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix;
-const dollarNegBrackets = AutoNumericHelper.cloneObject(dollarNeg);
+const dollarPos                              = AutoNumericHelper.cloneObject(dollar);
+dollarPos.minimumValue                       = 0;
+const dollarNeg                              = AutoNumericHelper.cloneObject(dollar);
+dollarNeg.maximumValue                       = 0;
+dollarNeg.negativePositiveSignPlacement      = AutoNumeric.options.negativePositiveSignPlacement.prefix;
+const dollarNegBrackets                      = AutoNumericHelper.cloneObject(dollarNeg);
 dollarNegBrackets.negativeBracketsTypeOnBlur = AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses;
 
-const percentageUS2dec = AutoNumericHelper.cloneObject(dollar);
-percentageUS2dec.currencySymbol = AutoNumeric.options.currencySymbol.none;
-percentageUS2dec.suffixText = AutoNumeric.options.suffixText.percentage;
-percentageUS2dec.wheelStep = 0.01;
-const percentageUS2decPos = AutoNumericHelper.cloneObject(percentageUS2dec);
-percentageUS2decPos.minimumValue = '0.00';
-const percentageUS2decNeg = AutoNumericHelper.cloneObject(percentageUS2dec);
-percentageUS2decNeg.maximumValue = '0.00';
+const percentageUS2dec                            = AutoNumericHelper.cloneObject(dollar);
+percentageUS2dec.currencySymbol                   = AutoNumeric.options.currencySymbol.none;
+percentageUS2dec.suffixText                       = AutoNumeric.options.suffixText.percentage;
+percentageUS2dec.wheelStep                        = 0.01;
+const percentageUS2decPos                         = AutoNumericHelper.cloneObject(percentageUS2dec);
+percentageUS2decPos.minimumValue                  = 0;
+const percentageUS2decNeg                         = AutoNumericHelper.cloneObject(percentageUS2dec);
+percentageUS2decNeg.maximumValue                  = 0;
 percentageUS2decNeg.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix;
 
-const percentageUS3dec = AutoNumericHelper.cloneObject(percentageUS2dec);
-percentageUS3dec.maximumValue = `${AutoNumeric.options.maximumValue.tenTrillions}9`;
-percentageUS3dec.decimalPlacesOverride = 3;
-const percentageUS3decPos = AutoNumericHelper.cloneObject(percentageUS2decPos);
-percentageUS3decPos.maximumValue = `${AutoNumeric.options.maximumValue.tenTrillions}9`;
-percentageUS3decPos.decimalPlacesOverride = 3;
-const percentageUS3decNeg = AutoNumericHelper.cloneObject(percentageUS2decNeg);
-percentageUS3decNeg.maximumValue = `${AutoNumeric.options.maximumValue.tenTrillions}9`;
-percentageUS3decNeg.decimalPlacesOverride = 3;
+const percentageUS3dec            = AutoNumericHelper.cloneObject(percentageUS2dec);
+percentageUS3dec.decimalPlaces    = 3;
+const percentageUS3decPos         = AutoNumericHelper.cloneObject(percentageUS2decPos);
+percentageUS3decPos.decimalPlaces = 3;
+const percentageUS3decNeg         = AutoNumericHelper.cloneObject(percentageUS2decNeg);
+percentageUS3decNeg.decimalPlaces = 3;
 
 /**
  * Predefined options for the most common languages
@@ -183,29 +177,28 @@ Object.defineProperty(AutoNumeric, 'predefinedOptions', {
                 decimalCharacterAlternative: AutoNumeric.options.decimalCharacterAlternative.dot,
             },
             integer                     : {
-                minimumValue: AutoNumeric.options.minimumValue.tenTrillionsNoDecimals,
-                maximumValue: AutoNumeric.options.maximumValue.tenTrillionsNoDecimals,
+                decimalPlaces: 0,
             },
             integerPos                  : {
-                minimumValue: AutoNumeric.options.minimumValue.zero,
-                maximumValue: AutoNumeric.options.maximumValue.tenTrillionsNoDecimals,
+                minimumValue : AutoNumeric.options.minimumValue.zero,
+                decimalPlaces: 0,
             },
             integerNeg                  : {
-                minimumValue: AutoNumeric.options.minimumValue.tenTrillionsNoDecimals,
-                maximumValue: AutoNumeric.options.maximumValue.zero,
+                maximumValue : AutoNumeric.options.maximumValue.zero,
+                decimalPlaces: 0,
             },
             float                       : {
                 allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never,
             },
             floatPos                    : {
                 allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never,
-                minimumValue: AutoNumeric.options.minimumValue.zero,
-                maximumValue: AutoNumeric.options.maximumValue.tenTrillions,
+                minimumValue       : AutoNumeric.options.minimumValue.zero,
+                maximumValue       : AutoNumeric.options.maximumValue.tenTrillions,
             },
             floatNeg                    : {
                 allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never,
-                minimumValue: AutoNumeric.options.minimumValue.tenTrillions,
-                maximumValue: AutoNumeric.options.maximumValue.zero,
+                minimumValue       : AutoNumeric.options.minimumValue.tenTrillions,
+                maximumValue       : AutoNumeric.options.maximumValue.zero,
             },
             numeric                     : {
                 digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator,

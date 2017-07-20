@@ -89,11 +89,14 @@ describe('The autoNumeric object', () => {
             currencySymbolPlacement      : 'p',
             decimalCharacter             : '.',
             decimalCharacterAlternative  : null,
-            decimalPlacesOverride        : null,
+            decimalPlaces                : 2,
+            decimalPlacesRawValue        : null,
+            decimalPlacesShownOnBlur     : null,
             decimalPlacesShownOnFocus    : null,
             defaultValueOverride         : null,
             digitalGroupSpacing          : '3',
             digitGroupSeparator          : ',',
+            divisorWhenUnfocused         : null,
             emptyInputBehavior           : 'focus',
             failOnUnknownOption          : false,
             formatOnPageLoad             : true,
@@ -113,9 +116,6 @@ describe('The autoNumeric object', () => {
             readOnly                     : false,
             roundingMethod               : 'S',
             saveValueToSessionStorage    : false,
-            scaleDecimalPlaces           : null,
-            scaleDivisor                 : null,
-            scaleSymbol                  : null,
             selectNumberOnly             : true,
             selectOnFocus                : true,
             serializeSpaces              : '+',
@@ -123,6 +123,7 @@ describe('The autoNumeric object', () => {
             showWarnings                 : true,
             styleRules                   : null,
             suffixText                   : '',
+            symbolWhenUnfocused          : null,
             unformatOnHover              : true,
             unformatOnSubmit             : false,
             wheelStep                    : 'progressive',
@@ -227,7 +228,7 @@ describe('The autoNumeric object', () => {
             const defaultSettings = AutoNumeric.getDefaultConfig();
             const aNInputSettings = aNInput.getSettings();
             /* let i = 0;
-            for (let prop in defaultSettings) { //XXX This loop fails since the decimalPlacesOverride default is overridden by maximumValue/minimumValue (cf. following test cases)
+            for (const prop in defaultSettings) { //XXX This loop fails because of the `decimalPlaces*` and `negativePositiveSignPlacement` options that are calculated on creation, and because `historySize` default value is an integer instead of a string
                 i++;
                 if (defaultSettings.hasOwnProperty(prop)) {
                     console.log(`${i}: Setting ${prop} = [${defaultSettings[prop]}][${aNInputSettings[prop]}]`); //DEBUG
@@ -242,20 +243,11 @@ describe('The autoNumeric object', () => {
             expect(defaultSettings.currencySymbolPlacement    ).toEqual(aNInputSettings.currencySymbolPlacement    );
             expect(defaultSettings.decimalCharacter           ).toEqual(aNInputSettings.decimalCharacter           );
             expect(defaultSettings.decimalCharacterAlternative).toEqual(aNInputSettings.decimalCharacterAlternative);
-
-            // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue number of decimals
-            const [, decimalPart] = aNInputSettings.minimumValue.split('.');
-            let decimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                decimalPartLength = decimalPart.length;
-            }
-            expect(decimalPartLength).toEqual(2);
-            expect(aNInputSettings.decimalPlacesOverride).toEqual(decimalPartLength);
-
-            expect(defaultSettings.decimalPlacesShownOnFocus ).toEqual(aNInputSettings.decimalPlacesShownOnFocus  );
+            // Special case for the decimalPlaces* options
             expect(defaultSettings.defaultValueOverride      ).toEqual(aNInputSettings.defaultValueOverride       );
             expect(defaultSettings.digitalGroupSpacing       ).toEqual(aNInputSettings.digitalGroupSpacing        );
             expect(defaultSettings.digitGroupSeparator       ).toEqual(aNInputSettings.digitGroupSeparator        );
+            expect(defaultSettings.divisorWhenUnfocused      ).toEqual(aNInputSettings.divisorWhenUnfocused       );
             expect(defaultSettings.emptyInputBehavior        ).toEqual(aNInputSettings.emptyInputBehavior         );
             expect(defaultSettings.failOnUnknownOption       ).toEqual(aNInputSettings.failOnUnknownOption        );
             expect(defaultSettings.formatOnPageLoad          ).toEqual(aNInputSettings.formatOnPageLoad           );
@@ -276,9 +268,6 @@ describe('The autoNumeric object', () => {
             expect(defaultSettings.readOnly                  ).toEqual(aNInputSettings.readOnly                   );
             expect(defaultSettings.roundingMethod            ).toEqual(aNInputSettings.roundingMethod             );
             expect(defaultSettings.saveValueToSessionStorage ).toEqual(aNInputSettings.saveValueToSessionStorage  );
-            expect(defaultSettings.scaleDecimalPlaces        ).toEqual(aNInputSettings.scaleDecimalPlaces         );
-            expect(defaultSettings.scaleDivisor              ).toEqual(aNInputSettings.scaleDivisor               );
-            expect(defaultSettings.scaleSymbol               ).toEqual(aNInputSettings.scaleSymbol                );
             expect(defaultSettings.selectNumberOnly          ).toEqual(aNInputSettings.selectNumberOnly           );
             expect(defaultSettings.selectOnFocus             ).toEqual(aNInputSettings.selectOnFocus              );
             expect(defaultSettings.serializeSpaces           ).toEqual(aNInputSettings.serializeSpaces            );
@@ -286,9 +275,22 @@ describe('The autoNumeric object', () => {
             expect(defaultSettings.showWarnings              ).toEqual(aNInputSettings.showWarnings               );
             expect(defaultSettings.styleRules                ).toEqual(aNInputSettings.styleRules                 );
             expect(defaultSettings.suffixText                ).toEqual(aNInputSettings.suffixText                 );
+            expect(defaultSettings.symbolWhenUnfocused       ).toEqual(aNInputSettings.symbolWhenUnfocused        );
             expect(defaultSettings.unformatOnHover           ).toEqual(aNInputSettings.unformatOnHover            );
             expect(defaultSettings.unformatOnSubmit          ).toEqual(aNInputSettings.unformatOnSubmit           );
             expect(defaultSettings.wheelStep                 ).toEqual(aNInputSettings.wheelStep                  );
+        });
+
+        it('should initialize the decimal places options with the default values', () => {
+            const defaultSettings = AutoNumeric.getDefaultConfig();
+            const aNInputSettings = aNInput.getSettings();
+
+            // Special cases here where `decimalPlacesRawValue`, `decimalPlacesShownOnBlur` and `decimalPlacesShownOnFocus` are calculated based on `decimalPlaces` if they are `null`, which is the default
+            expect(defaultSettings.decimalPlaces            ).toEqual(2);
+            expect(aNInputSettings.decimalPlacesRawValue    ).toEqual(2);
+            //TODO Modify `_transformOptionsValuesToDefaultTypes()` so that the decimalPlacesShown* options are not converted to strings?
+            expect(aNInputSettings.decimalPlacesShownOnBlur ).toEqual('2');
+            expect(aNInputSettings.decimalPlacesShownOnFocus).toEqual('2');
         });
 
         it('should update the options values accordingly', () => {
@@ -389,7 +391,7 @@ describe('The autoNumeric object', () => {
         });
     });
 
-    describe('manages the `decimalPlacesOverride` configuration option specially', () => {
+    describe('manages the `decimalPlaces*` configuration option specially', () => {
         let localANInput;
         let newInput;
 
@@ -403,142 +405,38 @@ describe('The autoNumeric object', () => {
             document.body.removeChild(newInput);
         });
 
-        it('should set the default value for decimalPlacesOverride', () => {
-            // Setup
-            localANInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
-            const localANInputSettings = localANInput.getSettings();
-
-            //--------------- The tests
-            // Default value overridden
-            let [, decimalPart] = localANInputSettings.minimumValue.split('.');
-            let decimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                decimalPartLength = decimalPart.length;
-            }
-            expect(decimalPartLength).toEqual(2);
-
-            [, decimalPart] = localANInputSettings.maximumValue.split('.');
-            decimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                decimalPartLength = decimalPart.length;
-            }
-            expect(decimalPartLength).toEqual(2);
-
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(decimalPartLength); // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue decimal part
-        });
-
-        it('should set the default value for decimalPlacesOverride when minimumValue and maximumValue have different decimal sizes, maximumValue being bigger', () => {
-            // Setup
-            localANInput = new AutoNumeric(newInput, { minimumValue: '-99.99', maximumValue: '99.999' }); // Initiate the autoNumeric input
-            const localANInputSettings = localANInput.getSettings();
-
-            //--------------- The tests
-            // Default value overridden
-            let [, decimalPart] = localANInputSettings.minimumValue.split('.');
-            let minimumValueDecimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                minimumValueDecimalPartLength = decimalPart.length;
-            }
-            expect(minimumValueDecimalPartLength).toEqual(2);
-
-            [, decimalPart] = localANInputSettings.maximumValue.split('.');
-            let maximumValueDecimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                maximumValueDecimalPartLength = decimalPart.length;
-            }
-            expect(maximumValueDecimalPartLength).toEqual(3);
-
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(Math.max(minimumValueDecimalPartLength, maximumValueDecimalPartLength)); // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue decimal part
-        });
-
-        it('should set the default value for decimalPlacesOverride when minimumValue and maximumValue have different decimal sizes, minimumValue being bigger', () => {
-            // Setup
-            localANInput = new AutoNumeric(newInput, { minimumValue: '-99.999', maximumValue: '99.99' }); // Initiate the autoNumeric input
-            const localANInputSettings = localANInput.getSettings();
-
-            //--------------- The tests
-            // Default value overridden
-            let [, decimalPart] = localANInputSettings.minimumValue.split('.');
-            let minimumValueDecimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                minimumValueDecimalPartLength = decimalPart.length;
-            }
-            expect(minimumValueDecimalPartLength).toEqual(3);
-
-            [, decimalPart] = localANInputSettings.maximumValue.split('.');
-            let maximumValueDecimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                maximumValueDecimalPartLength = decimalPart.length;
-            }
-            expect(maximumValueDecimalPartLength).toEqual(2);
-
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(Math.max(minimumValueDecimalPartLength, maximumValueDecimalPartLength)); // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue decimal part
-        });
-
-        it(`should set the decimalPlacesOverride value if it's not set to 'null', overwriting minimumValue and maximumValue settings`, () => {
-            // Setup
-            spyOn(console, 'warn'); // The next statement will output a warning since we override the decimals places declared in minimumValue
-            localANInput = new AutoNumeric(newInput, { minimumValue: '-99.999', maximumValue: '99.99', decimalPlacesOverride: '4' }); // Initiate the autoNumeric input
+        it(`should show a warning when decimalPlacesRawValue is lower than decimalPlaces`, () => {
+            spyOn(console, 'warn');
+            localANInput = new AutoNumeric(newInput, { decimalPlacesRawValue: 2, decimalPlaces: 3 }); // Initiate the autoNumeric input
             expect(console.warn).toHaveBeenCalled();
             const localANInputSettings = localANInput.getSettings();
 
-            //--------------- The tests
-            // Default value overridden
-            let [, decimalPart] = localANInputSettings.minimumValue.split('.');
-            let minimumValueDecimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                minimumValueDecimalPartLength = decimalPart.length;
-            }
-            expect(minimumValueDecimalPartLength).toEqual(3);
-
-            [, decimalPart] = localANInputSettings.maximumValue.split('.');
-            let maximumValueDecimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                maximumValueDecimalPartLength = decimalPart.length;
-            }
-            expect(maximumValueDecimalPartLength).toEqual(2);
-
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(4); // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue decimal part, otherwise it takes precedence over minimumValue/maximumValue
+            expect(localANInputSettings.decimalPlaces).toEqual('3');
+            expect(localANInputSettings.decimalPlacesRawValue).toEqual('2');
         });
 
-        it(`should set the decimalPlacesOverride value, and show a warning when setting a greater decimalPlacesShownOnFocus`, () => {
+        it(`should show a warning when decimalPlacesRawValue is lower than decimalPlacesShownOnFocus`, () => {
             // Setup
-            spyOn(console, 'warn'); // The next statement will output a warning since decimalPlacesShownOnFocus is lower than decimalPlacesOverride
-            localANInput = new AutoNumeric(newInput, { minimumValue: '-99.99', maximumValue: '99.99', decimalPlacesOverride: '5', decimalPlacesShownOnFocus: '3' }); // Initiate the autoNumeric input
+            spyOn(console, 'warn');
+            localANInput = new AutoNumeric(newInput, { decimalPlacesRawValue: 2, decimalPlacesShownOnFocus: 3 }); // Initiate the autoNumeric input
             expect(console.warn).toHaveBeenCalled();
             const localANInputSettings = localANInput.getSettings();
 
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(5); // 'decimalPlacesOverride' is not overwritten by a greater decimalPlacesShownOnFocus
+            expect(localANInputSettings.decimalPlaces).toEqual('2');
+            expect(localANInputSettings.decimalPlacesShownOnFocus).toEqual('3');
+            expect(localANInputSettings.decimalPlacesRawValue).toEqual('2');
         });
 
-        it(`should set the decimalPlacesOverride value when decimalPlacesOverride is not defined, and show a warning when setting a greater decimalPlacesShownOnFocus`, () => {
+        it(`should show a warning when decimalPlacesRawValue is lower than decimalPlacesShownOnBlur`, () => {
             // Setup
-            spyOn(console, 'warn'); // The next statement will output a warning since decimalPlacesShownOnFocus is lower than decimalPlacesOverride
-            localANInput = new AutoNumeric(newInput, { minimumValue: '-99.9999', maximumValue: '99.9999', decimalPlacesShownOnFocus: '3' }); // Initiate the autoNumeric input
+            spyOn(console, 'warn');
+            localANInput = new AutoNumeric(newInput, { decimalPlacesRawValue: 2, decimalPlacesShownOnBlur: 3 }); // Initiate the autoNumeric input
             expect(console.warn).toHaveBeenCalled();
             const localANInputSettings = localANInput.getSettings();
 
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(4); // 'decimalPlacesOverride' is not overwritten by a greater decimalPlacesShownOnFocus
-        });
-
-        it(`should set the decimalPlacesOverride value, and show a warning when setting a greater decimalPlacesShownOnFocus`, () => {
-            // Setup
-            spyOn(console, 'warn'); // The next statement will output a warning since decimalPlacesShownOnFocus is lower than decimalPlacesOverride
-            localANInput = new AutoNumeric(newInput, { minimumValue: '-99.99', maximumValue: '99.99', decimalPlacesOverride: '5', decimalPlacesShownOnFocus: '3' }); // Initiate the autoNumeric input
-            expect(console.warn).toHaveBeenCalled();
-            const localANInputSettings = localANInput.getSettings();
-
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(5); // 'decimalPlacesOverride' is not overwritten by a greater decimalPlacesShownOnFocus
-        });
-
-        it(`should set the decimalPlacesOverride value when decimalPlacesOverride is not defined, and show a warning when setting a greater decimalPlacesShownOnFocus`, () => {
-            // Setup
-            spyOn(console, 'warn'); // The next statement will output a warning since decimalPlacesShownOnFocus is lower than decimalPlacesOverride
-            localANInput = new AutoNumeric(newInput, { minimumValue: '-99.9999', maximumValue: '99.9999', decimalPlacesShownOnFocus: '3' }); // Initiate the autoNumeric input
-            expect(console.warn).toHaveBeenCalled();
-            const localANInputSettings = localANInput.getSettings();
-
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(4); // 'decimalPlacesOverride' is not overwritten by a greater decimalPlacesShownOnFocus
+            expect(localANInputSettings.decimalPlaces).toEqual('2');
+            expect(localANInputSettings.decimalPlacesShownOnBlur).toEqual('3');
+            expect(localANInputSettings.decimalPlacesRawValue).toEqual('2');
         });
     });
 
@@ -861,7 +759,7 @@ describe('The autoNumeric object', () => {
             document.body.appendChild(span);
 
             expect(() => new AutoNumeric(newInput)).not.toThrow();
-            expect(new AutoNumeric(p1, { scaleDecimalPlaces: 3, scaleDivisor: 0.01, scaleSymbol: '%', maximumValue: '999.9999' }).getFormatted()).toEqual('2.140%');
+            expect(new AutoNumeric(p1, { decimalPlacesShownOnBlur: 3, decimalPlacesRawValue: 4, divisorWhenUnfocused: 0.01, symbolWhenUnfocused: '%' }).getFormatted()).toEqual('2.140%');
             expect(new AutoNumeric(p2, 666.42).french().getFormatted()).toEqual('666,42 €');
             expect(new AutoNumeric(code, AutoNumeric.getPredefinedOptions().Japanese).getFormatted()).toEqual('¥12,345.67');
             expect(new AutoNumeric(div).northAmerican().getFormatted()).toEqual('$12,345.67');
@@ -1222,10 +1120,71 @@ describe('autoNumeric options and `options.*` methods', () => {
             document.body.removeChild(newInput);
         });
 
+        it('should correctly update the minimum and maximum range values', () => {
+            //XXX Note: The user cannot modify the `minimumValue` and `maximumValue` option if the current value is out of range with those updated options. This attempt will throw an error, and the `minimumValue` or `maximumValue` option will be reverted to the previous valid ones.
+
+            // Initialize the range
+            aNInput = new AutoNumeric(newInput, AutoNumeric.predefinedOptions.French);
+            aNInput.options.minimumValue(-1000);
+            aNInput.options.maximumValue(1000);
+
+            // Test setting the value, without changing the range
+            // Test ----------Min-----[Val]-----Max----------
+            expect(() => aNInput.set(-1000)).not.toThrow();
+            expect(() => aNInput.set(1000)).not.toThrow();
+            expect(() => aNInput.set(200)).not.toThrow();
+            expect(() => aNInput.set(-400)).not.toThrow();
+
+            // Test ----------Min----------Max-----[Val]-----
+            expect(() => aNInput.set(99999)).toThrow();
+            // Test -----[Val]-----Min----------Max----------
+            expect(() => aNInput.set(-99999)).toThrow();
+
+            // Now, instead of trying to change the value directly, let's change the range while the value stays the same
+            expect(aNInput.getFormatted()).toEqual('-400,00\u202f€');
+            // Test ----------Min-----[Val]-----Max----------
+            expect(() => aNInput.options.maximumValue(200)).not.toThrow();
+            expect(() => aNInput.options.maximumValue(-399)).not.toThrow();
+            expect(() => aNInput.options.minimumValue(-500)).not.toThrow();
+            expect(() => aNInput.options.minimumValue(-401)).not.toThrow();
+            expect(() => aNInput.options.minimumValue(-400)).not.toThrow();
+
+            // Reset the range and value to make the following tests more readable
+            aNInput.options.minimumValue(-1000);
+            aNInput.options.maximumValue(1000);
+            aNInput.set('');
+
+            // Then make the tests fails by trying to move the ranges at the 'wrong' places
+            // Test ----------Max----------Min----------
+            expect(() => aNInput.options.minimumValue(2000)).toThrow();
+            expect(aNInput.getSettings().minimumValue).toEqual('-1000');
+
+            aNInput.set(222);
+            expect(aNInput.getFormatted()).toEqual('222,00\u202f€');
+
+            // Test -----[Val]-----Min----------Max----------
+            expect(() => aNInput.options.minimumValue(400)).toThrow();
+            expect(aNInput.getSettings().minimumValue).toEqual('-1000');
+            aNInput.set(224);
+            expect(aNInput.getFormatted()).toEqual('224,00\u202f€');
+            expect(() => aNInput.set(-1001)).toThrow();
+
+            // Test ----------Min----------Max-----[Val]-----
+            expect(() => aNInput.options.maximumValue(200)).toThrow();
+            expect(aNInput.getSettings().maximumValue).toEqual('1000');
+            aNInput.set(225);
+            expect(aNInput.getFormatted()).toEqual('225,00\u202f€');
+            expect(() => aNInput.set(1001)).toThrow();
+        });
+
         it('should correctly update single options and `reset()` all', () => {
             aNInput = new AutoNumeric(newInput, 1146789.02, AutoNumeric.predefinedOptions.French);
             expect(aNInput.getNumericString()).toEqual('1146789.02');
             expect(aNInput.getFormatted()).toEqual('1.146.789,02\u202f€');
+            expect(aNInput.getSettings().decimalPlaces).toEqual('2');
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual(2);
+            expect(aNInput.getSettings().decimalPlacesShownOnFocus).toEqual('2');
+            expect(aNInput.getSettings().decimalPlacesShownOnBlur).toEqual('2');
 
             aNInput.options.digitGroupSeparator(AutoNumeric.options.digitGroupSeparator.apostrophe);
             expect(aNInput.getFormatted()).toEqual(`1'146'789,02\u202f€`);
@@ -1241,6 +1200,11 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual(`+₣11'46'789·02`);
 
             aNInput.options.reset().french().set(-1234567.89);
+            expect(aNInput.getSettings().decimalPlaces).toEqual('2');
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('2');
+            expect(aNInput.getSettings().decimalPlacesShownOnFocus).toEqual('2');
+            expect(aNInput.getSettings().decimalPlacesShownOnBlur).toEqual('2');
+
             expect(aNInput.getFormatted()).toEqual('-1.234.567,89\u202f€');
             aNInput.options.negativePositiveSignPlacement(AutoNumeric.options.negativePositiveSignPlacement.suffix);
             expect(aNInput.getFormatted()).toEqual('1.234.567,89\u202f€-');
@@ -1249,26 +1213,19 @@ describe('autoNumeric options and `options.*` methods', () => {
             aNInput.options.suffixText(AutoNumeric.options.suffixText.none);
             expect(aNInput.getFormatted()).toEqual('1.234.567,89\u202f€-');
 
-
-            expect(() => aNInput.set(12345.67)).not.toThrow();
-            expect(() => aNInput.options.maximumValue(AutoNumeric.options.maximumValue.zero)).toThrow();
-            expect(() => aNInput.set(10)).toThrow();
-            expect(() => aNInput.set(-1234567.89)).not.toThrow();
-            aNInput.options.minimumValue(AutoNumeric.options.minimumValue.oneBillion);
-            expect(() => aNInput.set(-4567.89)).not.toThrow();
-            spyOn(console, 'warn');
-            aNInput.options.maximumValue(10000);
-            expect(() => aNInput.options.minimumValue(AutoNumeric.options.minimumValue.zero)).toThrow();
-            expect(() => aNInput.set(4567.89)).not.toThrow();
-            expect(console.warn).toHaveBeenCalled();
-            expect(() => aNInput.set(-1)).toThrow();
-
             aNInput.options.reset().french().set(-1234567.89);
-            aNInput.options.decimalPlacesOverride(4);
+            spyOn(console, 'warn');
+            aNInput.options.decimalPlaces(4);
+            expect(console.warn).toHaveBeenCalledTimes(1);
+            expect(aNInput.getSettings().decimalPlaces).toEqual('4');
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual(4);
+            expect(aNInput.getSettings().decimalPlacesShownOnFocus).toEqual('4');
+            expect(aNInput.getSettings().decimalPlacesShownOnBlur).toEqual('4');
+
             expect(aNInput.getFormatted()).toEqual('-1.234.567,8900\u202f€');
-            aNInput.options.scaleDivisor(AutoNumeric.options.scaleDivisor.percentage);
-            aNInput.options.scaleDecimalPlaces(3);
-            aNInput.options.scaleSymbol(AutoNumeric.options.scaleSymbol.percentage);
+            aNInput.options.divisorWhenUnfocused(AutoNumeric.options.divisorWhenUnfocused.percentage);
+            aNInput.options.decimalPlacesShownOnBlur(3);
+            aNInput.options.symbolWhenUnfocused(AutoNumeric.options.symbolWhenUnfocused.percentage);
             expect(aNInput.getFormatted()).toEqual('-12.345,679\u202f€%');
 
             aNInput.options.reset().french();
@@ -1292,8 +1249,13 @@ describe('autoNumeric options and `options.*` methods', () => {
             aNInput.set(-1234567);
             expect(aNInput.getFormatted()).toEqual('-1.234.567,00\u202f€');
             aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(console.warn).toHaveBeenCalledTimes(2);
             expect(aNInput.getFormatted()).toEqual('-1.234.567\u202f€');
+            aNInput.set(-1234567.8);
+            expect(aNInput.getFormatted()).toEqual('-1.234.567,8\u202f€');
+            aNInput.set(-1234567);
             aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(console.warn).toHaveBeenCalledTimes(3);
             expect(aNInput.getFormatted()).toEqual('-1.234.567\u202f€');
             aNInput.set(-1234567.8);
             expect(aNInput.getFormatted()).toEqual('-1.234.567,80\u202f€');
@@ -1305,6 +1267,7 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getNumber()).toEqual(null);
             // Special case where changing the `emptyInputBehavior` option to something different from `AutoNumeric.options.emptyInputBehavior.null` while the rawValue is equal to `null`, modify that rawValue to '' automatically
             aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.focus);
+            expect(console.warn).toHaveBeenCalledTimes(4);
             expect(aNInput.getFormatted()).toEqual('');
             expect(aNInput.getNumber()).toEqual(0);
 
@@ -1340,6 +1303,15 @@ describe('autoNumeric options and `options.*` methods', () => {
             aNInput.options.digitGroupSeparator(AutoNumeric.options.digitGroupSeparator.narrowNoBreakSpace)
                 .options.decimalCharacter(AutoNumeric.options.decimalCharacter.decimalSeparatorKeySymbol);
             expect(aNInput.getFormatted()).toEqual('6\u202f666⎖00\u202f€');
+        });
+
+        it('should correctly update the `decimalPlacesShownOnFocus` option', () => {
+            aNInput = new AutoNumeric(newInput, AutoNumeric.predefinedOptions.French);
+            aNInput.update({ decimalPlacesShownOnFocus : 4 }); // Note: You do not need to set `decimalPlacesRawValue`, it is taken care of automatically
+            aNInput.set(2222.12345);
+            expect(aNInput.getFormatted()).toEqual('2.222,12\u202f€');
+            aNInput.node().focus();
+            expect(aNInput.getFormatted()).toEqual('2.222,1235\u202f€');
         });
     });
 
@@ -1744,6 +1716,9 @@ describe('autoNumeric options and `options.*` methods', () => {
             aNInput = new AutoNumeric(newInput).french();
 
             aNInput.set(15.001);
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('2');
+            expect(aNInput.getSettings().rawValue).toEqual('15');
+            expect(aNInput.getNumericString()).toEqual('15'); // Note: `getNumericString()` do not pad decimals
             aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
             expect(aNInput.getFormatted()).toEqual('15,00\u202f€');
             aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
@@ -3563,9 +3538,7 @@ describe('Instantiated autoNumeric functions', () => {
         it(`should not return a negative value when inputting a positive one and minimumValue is equal to '0' (cf. issue #284)`, () => {
             const newInput = document.createElement('input');
             document.body.appendChild(newInput);
-            spyOn(console, 'warn');
-            const aNInput = new AutoNumeric(newInput, { minimumValue: '0', maximumValue: '9999', decimalPlacesOverride: '2' }); // Initiate the autoNumeric input
-            expect(console.warn).toHaveBeenCalled();
+            const aNInput = new AutoNumeric(newInput, { minimumValue: '0', maximumValue: '9999', decimalPlaces: 2 }); // Initiate the autoNumeric input
 
             expect(aNInput.getNumericString()).toEqual('');
             aNInput.set(1234);
@@ -3582,9 +3555,7 @@ describe('Instantiated autoNumeric functions', () => {
         it(`should not return a negative value when inputting a positive one and minimumValue is superior to '0' (cf. issue #284)`, () => {
             const newInput = document.createElement('input');
             document.body.appendChild(newInput);
-            spyOn(console, 'warn');
-            const aNInput = new AutoNumeric(newInput, { minimumValue: '1', maximumValue: '9999', decimalPlacesOverride: '2' }); // Initiate the autoNumeric input
-            expect(console.warn).toHaveBeenCalled();
+            const aNInput = new AutoNumeric(newInput, { minimumValue: '1', maximumValue: '9999', decimalPlaces: 2 }); // Initiate the autoNumeric input
 
             expect(aNInput.getNumericString()).toEqual('');
             aNInput.set(1234);
@@ -3742,7 +3713,7 @@ describe('Instantiated autoNumeric functions', () => {
         });
 
         it('should fail when trying to set a value outside the range limits', () => {
-            aNInput.french({ minimumValue: -50, maximumValue: 200, decimalPlacesOverride: 0 });
+            aNInput.french({ minimumValue: -50, maximumValue: 200, decimalPlaces: 0 });
 
             expect(() => aNInput.setUnformatted(-51)).toThrow();
             expect(() => aNInput.setUnformatted(-50)).not.toThrow();
@@ -3906,21 +3877,21 @@ describe('Instantiated autoNumeric functions', () => {
             expect(aNInput.node().selectionEnd).toEqual(12);
 
             // Bigger number of decimals
-            aNInput.set(12266.1234567, { minimumValue: '0', maximumValue: '9999999.9999999', decimalPlacesOverride: null });
+            aNInput.set(12266.1234567, { minimumValue: '0', maximumValue: '9999999', decimalPlaces: 7 });
             expect(aNInput.getFormatted()).toEqual('12.266,1234567\u202f€');
             aNInput.selectDecimal();
             expect(aNInput.node().selectionStart).toEqual(7);
             expect(aNInput.node().selectionEnd).toEqual(14);
 
             // No decimal part
-            aNInput.set(12266, { minimumValue: '0', maximumValue: '9999999', decimalPlacesOverride: 0 });
+            aNInput.set(12266, { minimumValue: '0', maximumValue: '9999999', decimalPlaces: 0 });
             expect(aNInput.getFormatted()).toEqual('12.266\u202f€');
             aNInput.selectDecimal();
             expect(aNInput.node().selectionStart).toEqual(0);
             expect(aNInput.node().selectionEnd).toEqual(0);
 
             // Decimal places shown on focus //FIXME Move this test to the end-to-end tests
-            /*aNInput.set(12266.1234567, { minimumValue: '0', maximumValue: '9999999.9999999', decimalPlacesOverride: 3, decimalPlacesShownOnFocus: 6 });
+            /*aNInput.set(12266.1234567, { minimumValue: '0', maximumValue: '9999999.9999999', decimalPlaces: 3, decimalPlacesShownOnFocus: 6 });
             expect(aNInput.getFormatted()).toEqual('12.266,123\u202f€');
             aNInput.selectDecimal();
             expect(aNInput.node().selectionStart).toEqual(7);
@@ -3982,25 +3953,30 @@ describe('Instantiated autoNumeric functions', () => {
             expect(aNInput.node().selectionEnd).toEqual(3);
 
             // A small integer part
-            aNInput.set(0.234, { minimumValue: '0', maximumValue: '9999999.999', decimalPlacesOverride: null });
+            aNInput.set(0.234, { minimumValue: '0', maximumValue: '9999999', decimalPlaces: 3 });
             expect(aNInput.getFormatted()).toEqual('0,234\u202f€');
             aNInput.selectInteger();
             expect(aNInput.node().selectionStart).toEqual(0);
             expect(aNInput.node().selectionEnd).toEqual(1);
 
-            // Decimal places shown on focus //FIXME Move this test to the end-to-end tests
-            /*aNInput.set(12266.1234567, { minimumValue: '0', maximumValue: '9999999.9999999', decimalPlacesOverride: 3, decimalPlacesShownOnFocus: 6 });
-             expect(aNInput.getFormatted()).toEqual('12.266,123\u202f€');
-             aNInput.selectDecimal();
-             expect(aNInput.node().selectionStart).toEqual(7);
-             expect(aNInput.node().selectionEnd).toEqual(10);
-             aNInput.node().select();
-             aNInput.selectInteger();
-             expect(aNInput.node().selectionStart).toEqual(7);
-             expect(aNInput.node().selectionEnd).toEqual(13);*/
+            // Decimal places shown on focus
+            aNInput.set(12266.1234567, { minimumValue: '0', maximumValue: '9999999', decimalPlaces: 3, decimalPlacesShownOnFocus: 6 });
+            expect(aNInput.getFormatted()).toEqual('12.266,123\u202f€');
+            aNInput.selectDecimal();
+            expect(aNInput.node().selectionStart).toEqual(7);
+            expect(aNInput.node().selectionEnd).toEqual(10);
+
+            aNInput.node().focus();
+            aNInput.selectDecimal();
+            expect(aNInput.node().selectionStart).toEqual(7);
+            expect(aNInput.node().selectionEnd).toEqual(13);
+
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(6);
 
             // Common configuration
-            aNInput.update({ suffixText: 'suffixText', minimumValue: '-9999999.99', maximumValue: '9999999.99', decimalPlacesOverride: null });
+            aNInput.update({ suffixText: 'suffixText', minimumValue: '-9999999', maximumValue: '9999999', decimalPlaces: 2 });
 
             // Test each possible combination
 
@@ -5553,7 +5529,7 @@ describe('Static autoNumeric functions', () => {
 
         it('should only send a warning, and not throw', () => {
             spyOn(console, 'warn');
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
             expect(console.warn).toHaveBeenCalled();
         });
 
@@ -5597,8 +5573,9 @@ describe('Static autoNumeric functions', () => {
 
         it('should unformat correctly when there are no decimal places', () => {
             const options1 = {
-                maximumValue: '9999.99',
-                minimumValue: '0',
+                maximumValue : '9999',
+                minimumValue : '0',
+                decimalPlaces: 2,
             };
             expect(AutoNumeric.unformat('4000', options1)).toEqual('4000.00');
             expect(AutoNumeric.unformat(4000, options1)).toEqual(4000);
@@ -5606,23 +5583,14 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.unformat(4000.123, options1)).toEqual(4000.123);
 
             const options2 = {
-                maximumValue: '9999.99',
-                minimumValue: '0',
-                decimalPlacesOverride : 0,
+                maximumValue : '9999',
+                minimumValue : '0',
+                decimalPlaces: 0,
             };
             expect(AutoNumeric.unformat('4000', options2)).toEqual('4000');
             expect(AutoNumeric.unformat(4000, options2)).toEqual(4000);
             expect(AutoNumeric.unformat('4000.123', options2)).toEqual('4000');
             expect(AutoNumeric.unformat(4000.123, options2)).toEqual(4000.123);
-
-            const options3 = {
-                maximumValue: '9999',
-                minimumValue: '0',
-            };
-            expect(AutoNumeric.unformat('4000', options3)).toEqual('4000');
-            expect(AutoNumeric.unformat(4000, options3)).toEqual(4000);
-            expect(AutoNumeric.unformat('4000.123', options3)).toEqual('4000');
-            expect(AutoNumeric.unformat(4000.123, options3)).toEqual(4000.123);
         });
 
         it('should handle multiple digit group separators', () => { // cf. issue #449
@@ -5637,7 +5605,7 @@ describe('Static autoNumeric functions', () => {
             const options1 = {
                 digitGroupSeparator: '.',
                 decimalCharacter: ',',
-                maximumValue: '9999.99',
+                maximumValue: '9999',
                 minimumValue: '0',
             };
             expect(AutoNumeric.unformat('4.000', options1)).toEqual('4000.00');
@@ -5646,7 +5614,7 @@ describe('Static autoNumeric functions', () => {
             const options2a = {
                 digitGroupSeparator: '.',
                 decimalCharacter: ',',
-                maximumValue: '9999.99',
+                maximumValue: '9999',
                 minimumValue: '0',
                 allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never,
             };
@@ -5656,7 +5624,7 @@ describe('Static autoNumeric functions', () => {
             const options2b = {
                 digitGroupSeparator: '.',
                 decimalCharacter: ',',
-                maximumValue: '9999.99',
+                maximumValue: '9999',
                 minimumValue: '0',
                 allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats,
             };
@@ -5666,7 +5634,7 @@ describe('Static autoNumeric functions', () => {
             const options2c = {
                 digitGroupSeparator: '.',
                 decimalCharacter: ',',
-                maximumValue: '9999.99',
+                maximumValue: '9999',
                 minimumValue: '0',
                 allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.always,
             };
@@ -5676,7 +5644,7 @@ describe('Static autoNumeric functions', () => {
             const options3 = {
                 digitGroupSeparator: '.',
                 decimalCharacter: ',',
-                maximumValue: '9999.99',
+                maximumValue: '9999',
                 minimumValue: '0',
                 outputFormat: AutoNumeric.options.outputFormat.number,
             };
@@ -5688,7 +5656,7 @@ describe('Static autoNumeric functions', () => {
             const options1 = {
                 digitGroupSeparator: '.',
                 decimalCharacter: ',',
-                maximumValue: '99999.99',
+                maximumValue: '99999',
                 minimumValue: '0',
             };
             expect(AutoNumeric.unformat('4,123', options1)).toEqual('4.12');
@@ -5697,7 +5665,7 @@ describe('Static autoNumeric functions', () => {
             const options2 = {
                 digitGroupSeparator: '.',
                 decimalCharacter: ',',
-                maximumValue: '99999.99',
+                maximumValue: '99999',
                 minimumValue: '0',
                 outputFormat: AutoNumeric.options.outputFormat.number,
             };
@@ -5709,7 +5677,7 @@ describe('Static autoNumeric functions', () => {
             const options1 = {
                 digitGroupSeparator: '.',
                 decimalCharacter: ',',
-                maximumValue: '99999.99',
+                maximumValue: '99999',
                 minimumValue: '0',
                 leadingZero: AutoNumeric.options.leadingZero.keep,
             };
@@ -5718,6 +5686,7 @@ describe('Static autoNumeric functions', () => {
             const options2 = {
                 digitGroupSeparator: '.',
                 decimalCharacter: ',',
+                decimalPlaces: 0,
                 maximumValue: '99999',
                 minimumValue: '0',
                 leadingZero: AutoNumeric.options.leadingZero.keep,
@@ -5727,7 +5696,7 @@ describe('Static autoNumeric functions', () => {
             const options1Deny = {
                 digitGroupSeparator: '.',
                 decimalCharacter: ',',
-                maximumValue: '99999.99',
+                maximumValue: '99999',
                 minimumValue: '0',
                 leadingZero: AutoNumeric.options.leadingZero.deny,
             };
@@ -5736,6 +5705,7 @@ describe('Static autoNumeric functions', () => {
             const options2Deny = {
                 digitGroupSeparator: '.',
                 decimalCharacter: ',',
+                decimalPlaces: 0,
                 maximumValue: '99999',
                 minimumValue: '0',
                 leadingZero: AutoNumeric.options.leadingZero.deny,
@@ -5801,7 +5771,7 @@ describe('Static autoNumeric functions', () => {
 
         it('should only send a warning, and not throw', () => {
             spyOn(console, 'warn');
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: 3, decimalPlacesShownOnFocus: 2 })).not.toThrow();
             expect(console.warn).toHaveBeenCalled();
         });
 
@@ -5974,32 +5944,41 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ minimumValue:   '0', maximumValue: '20' })).not.toThrow();
             expect(() => AutoNumeric.validate({ minimumValue:  '10', maximumValue: '20' })).not.toThrow();
 
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: null })).not.toThrow();
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '0' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: 5 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '10' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '2', minimumValue: '0', maximumValue: '20' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: 5 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: '10' })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: null })).not.toThrow();
-            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: '0' })).not.toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: 5 })).not.toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: '15' })).not.toThrow();
 
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: '2', decimalPlacesShownOnFocus: '2' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: '2', decimalPlacesShownOnFocus: '3' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '2', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '2', decimalPlacesShownOnFocus: '3' })).not.toThrow();
 
-            expect(() => AutoNumeric.validate({ scaleDivisor: null })).not.toThrow();
-            expect(() => AutoNumeric.validate({ scaleDivisor: '100' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ scaleDivisor: 100 })).not.toThrow();
-            expect(() => AutoNumeric.validate({ scaleDivisor: 45.89 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: '100' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: 100 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: 45.89 })).not.toThrow();
 
-            expect(() => AutoNumeric.validate({ scaleDecimalPlaces: null })).not.toThrow();
-            expect(() => AutoNumeric.validate({ scaleDecimalPlaces: 0 })).not.toThrow();
-            expect(() => AutoNumeric.validate({ scaleDecimalPlaces: 2 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: 0 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: 2 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: '5' })).not.toThrow();
 
-            expect(() => AutoNumeric.validate({ scaleSymbol: null })).not.toThrow();
-            expect(() => AutoNumeric.validate({ scaleSymbol: '' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ scaleSymbol: 'foobar' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ scaleSymbol: 'foo bar' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ scaleSymbol: ' foobar' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ scaleSymbol: 'foobar ' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: '' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: 'foobar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: 'foo bar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: ' foobar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: 'foobar ' })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ saveValueToSessionStorage: true })).not.toThrow();
             expect(() => AutoNumeric.validate({ saveValueToSessionStorage: false })).not.toThrow();
@@ -6027,10 +6006,7 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ roundingMethod: 'D05' })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ allowDecimalPadding: true })).not.toThrow();
-            expect(() => AutoNumeric.validate({ allowDecimalPadding: false })).not.toThrow();
             expect(() => AutoNumeric.validate({ allowDecimalPadding: 'true' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ allowDecimalPadding: 'false' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: null })).not.toThrow();
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '(,)' })).not.toThrow();
@@ -6148,17 +6124,18 @@ describe('Static autoNumeric functions', () => {
 
         it('should validate, with warnings', () => {
             spyOn(console, 'warn');
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: '0' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: '15' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: 5 })).not.toThrow();
-
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow(); // This will output 2 warnings
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: '2', minimumValue: '0', maximumValue: '20' })).not.toThrow(); // This will output a warning
-
-            expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, decimalPlacesOverride: '2' })).not.toThrow(); // This will output a warning
+            expect(() => AutoNumeric.validate({ decimalPlaces: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, decimalPlaces: '2' })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ selectOnFocus: AutoNumeric.options.selectOnFocus.select, caretPositionOnFocus: AutoNumeric.options.caretPositionOnFocus.decimalLeft })).not.toThrow();
             expect(() => AutoNumeric.validate({}, true, { selectOnFocus: AutoNumeric.options.selectOnFocus.select, caretPositionOnFocus: AutoNumeric.options.caretPositionOnFocus.decimalLeft })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: '0' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: '0' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats })).not.toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: 'false' })).not.toThrow();
 
             expect(console.warn).toHaveBeenCalled();
             expect(console.warn).toHaveBeenCalledTimes(9);
@@ -6294,33 +6271,46 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ minimumValue: '20', maximumValue:   '0' })).toThrow();
             expect(() => AutoNumeric.validate({ minimumValue: '20', maximumValue:  '10' })).toThrow();
 
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: [] })).toThrow();
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: true })).toThrow();
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: 'foobar' })).toThrow();
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: '22foobar' })).toThrow();
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: '-5' })).toThrow();
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: true })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '22foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '-5' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: null })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: 2.3 })).toThrow();
+
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: true })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: '22foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: '-5' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: 2.3 })).toThrow();
 
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: [] })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: true })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: '22foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: '-5' })).toThrow();
-            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: 5 })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: 2.3 })).toThrow();
 
-            expect(() => AutoNumeric.validate({ scaleDivisor: 'foobar' })).toThrow();
-            expect(() => AutoNumeric.validate({ scaleDivisor: true })).toThrow();
-            expect(() => AutoNumeric.validate({ scaleDivisor: -1000 })).toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: true })).toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: -1000 })).toThrow();
 
-            expect(() => AutoNumeric.validate({ scaleDecimalPlaces: -5 })).toThrow();
-            expect(() => AutoNumeric.validate({ scaleDecimalPlaces: 4.2 })).toThrow();
-            expect(() => AutoNumeric.validate({ scaleDecimalPlaces: 'foobar' })).toThrow();
-            expect(() => AutoNumeric.validate({ scaleDecimalPlaces: false })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: true })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: '22foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: '-5' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: 2.3 })).toThrow();
 
-            expect(() => AutoNumeric.validate({ scaleSymbol: true })).toThrow();
-            expect(() => AutoNumeric.validate({ scaleSymbol: 42 })).toThrow();
-            expect(() => AutoNumeric.validate({ scaleSymbol: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: true })).toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: [] })).toThrow();
 
             expect(() => AutoNumeric.validate({ saveValueToSessionStorage: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ saveValueToSessionStorage: 1 })).toThrow();
@@ -6485,13 +6475,13 @@ describe('Static autoNumeric functions', () => {
 
         it('should only send a warning, and not throw', () => {
             spyOn(console, 'warn');
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
             expect(console.warn).toHaveBeenCalled();
         });
 
         it('should only send a warning, and not throw', () => {
             spyOn(console, 'warn');
-            expect(() => AutoNumeric.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
             expect(console.warn).toHaveBeenCalled();
         });
     });
@@ -6559,7 +6549,7 @@ describe(`The AutoNumeric event lifecycle`, () => {
         aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.curlyBraces);
         expect(aNInput.getFormatted()).toEqual('{5.600,78 €}');
         expect(customFunction.formattedEvent).toHaveBeenCalledTimes(5);
-        aNInput.node().focus();
+        aNInput.node().focus(); //TODO This fails under Chrome _only_ when the tests are run with PhantomJS and Firefox. That test does not fail when running only the `test:unitc` task!?
         expect(customFunction.formattedEvent).toHaveBeenCalledTimes(6);
         expect(aNInput.getFormatted()).toEqual('-5.600,78 €');
     });

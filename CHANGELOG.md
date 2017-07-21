@@ -5,6 +5,12 @@
 + Add the missing `options.historySize()` method that allows to update the `historySize` option
 + Move the raw value from `this.settings.rawValue` to `this.rawValue`. This prevent polluting the settings object.
 + Fix issue #388 autoNumeric does not work with Browserify
++ Fix issue #461 Fixed problem on Android Chrome browsers when a currency symbol is used
+
+### 2.0.13
++ Merge the fix from issue #440 Pasting does not work in IE11 from `next` to `master`.
+  This fix the issue #465 "Unable to get property 'getData' of undefined or null reference" on paste in IE11
++ Merge the fix from issue #449 `AutoNumeric.unformat()` only removes the first instance of `settings.digitGroupSeparator` from `next` to `master`.
 
 ### 4.0.0-beta.22
 + Fix issue #454 Rewrite how the number of decimal places for the formatted and the raw values are set
@@ -142,6 +148,7 @@
 + Add Android Chrome mobile (version 57) support (note: so far, not all android browsers are supported)
 + Fix issue #404 On the Android browser, inserted numbers are doubled if the user press the keys quickly on the virtual keyboard
 + Fix issue #250 The `maximumValue` and `minimumValue` options are not taken into account on Android
++ Fix issue #264 Entering the `decimalCharacterAlternative` is not taken into account on Android Chrome
 + Add the special keyCode 229 used by Android browsers as `keyCode.AndroidDefault`
 + Fix the `onPaste` handler throwing an error for uninitialized variables
 + Complete the `arabicToLatinNumbers()` function to return more quickly if no arabic numbers are found
@@ -215,6 +222,11 @@
 + Sort the option list in the `_convertOldOptionsToNewOnes()` function.
 + Fix issue #423 `leadingZero` set to `keep` does not keep the leading zeros under Chrome
 
+### 2.0.10
++ Fix issue #417 Error thrown in PhantomJS 2.1.1 on Linux under CI Environment
++ Fix the end-to-end tests for issue #403
++ Fix the webdriver.io configuration for the links to jQuery and AutoNumeric libraries
+
 ### 4.0.0-beta.2
 + Fix issue #413 Manage the drag 'n drop event so that the text dropped in the AutoNumeric element gets formatted accordingly
 
@@ -243,7 +255,6 @@
 + Fix the `init()` method initialization process by preventing creating a local list, then removing it immediately if the user wanted a detached element. Now, the local list is just not created (Using the `createLocalList` option set to `false`).
 + Add an end-to-end test for the `remove()` method.
 + Add a `_hasLocalList()` method that tests if the AutoNumeric element has a local list and that it has at least one element in it (itself usually).
-
 
 ### 3.0.0-beta.13
 + Fix issue #411 Add the pre-defined Brazilian language configuration

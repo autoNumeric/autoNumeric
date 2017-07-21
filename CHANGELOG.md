@@ -1,5 +1,10 @@
 ### Change log for autoNumeric:
 
+### "2.0.13"
++ Merge the fix from issue #440 Pasting does not work in IE11 from `next` to `master`.
+  This fix the issue #465 "Unable to get property 'getData' of undefined or null reference" on paste in IE11
++ Merge the fix from issue #449 `AutoNumeric.unformat()` only removes the first instance of `settings.digitGroupSeparator` from `next` to `master`.
+
 ### "2.0.12"
 + Add Android Chrome mobile (version 57) support (note: so far, not all android browsers are supported)
 + Fix issue #404 On the Android browser, inserted numbers are doubled if the user press the keys quickly on the virtual keyboard

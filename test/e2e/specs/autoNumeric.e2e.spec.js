@@ -333,7 +333,7 @@ describe('Issue #327 (using inputs from issue #183)', () => {
         expect(browser.getValue(selectors.issue183error)).toEqual('12.345.678,00000 €');
     });
 
-    xit(`should get the entire input selected when using the 'tab' key`, () => { //FIXME Uncomment later since this should work with modern browsers (this does not work under FF 45.8)
+    it(`should get the entire input selected when using the 'tab' key`, () => {
         browser.url(testUrl);
 
         // Focus in that first input
@@ -869,7 +869,7 @@ describe('Issue #317', () => {
     });
 });
 
-xdescribe('Issue #303', () => { //FIXME Finish this
+describe('Issue #303', () => { //FIXME Finish this
     it('should test for default values', () => {
         browser.url(testUrl);
 
@@ -878,7 +878,7 @@ xdescribe('Issue #303', () => { //FIXME Finish this
     });
 
 
-    it('should position the caret at the right position, depending on the currencySymbolPlacement', () => {
+    xit('should position the caret at the right position, depending on the currencySymbolPlacement', () => {
         // Focus in the non-an input
         const input = $(selectors.issue303inputNonAn);
         input.click();
@@ -957,7 +957,7 @@ describe('Issue #387', () => {
         expect(browser.getValue(selectors.issue387inputCancellableNumOnly)).toEqual('$220,242.76');
     });
 
-    xit('should select only the numbers on focus, without the currency symbol', () => { //FIXME Uncomment later since this should work with modern browsers (this does not work under FF 45.8)
+    it('should select only the numbers on focus, without the currency symbol', () => {
         // Focus in the first input
         const input = $(selectors.issue387inputCancellable);
         input.click();
@@ -1057,7 +1057,7 @@ describe('Issue #387', () => {
     });
 });
 
-xdescribe('Issue #393', () => { //FIXME Finish this
+describe('Issue #393', () => { //FIXME Finish this
     it('should test for default values', () => {
         browser.url(testUrl);
 
@@ -1070,7 +1070,7 @@ xdescribe('Issue #393', () => { //FIXME Finish this
     });
     //TODO Create the tests once the mousewheel events will be managed by the Selenium server (cf. http://stackoverflow.com/questions/6735830/how-to-fire-mouse-wheel-event-in-firefox-with-javascript | https://groups.google.com/forum/#!topic/selenium-users/VyE-BB5Z2lU)
 
-    it('should increment and decrement the value with a fixed step', () => { //FIXME Finish this
+    xit('should increment and decrement the value with a fixed step', () => { //FIXME Finish this
         // Focus in the input
         const input = $(selectors.issue393inputFixed);
         input.click();
@@ -1312,7 +1312,7 @@ describe('Negative numbers & brackets notations', () => {
         negativeBracketsInput1.click();
         expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
         browser.keys(['Home', '-']);
-        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57'); //FIXME This is working manually, but not when using selenium under Firefox 45.8
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57'); //FIXME This is working manually, but not when using selenium under Firefox 52
         browser.keys(['-']);
         expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
         browser.keys(['-']);
@@ -1545,7 +1545,7 @@ describe('Negative numbers & brackets notations', () => {
         $(selectors.negativeBrackets1).click();
 
         // Check that the values are correctly formatted when unfocused
-        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('(1.234,57)'); //FIXME This is working manually, but not when using selenium under Firefox 45.8
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('(1.234,57)'); //FIXME This is working manually, but not when using selenium under Firefox 52
         expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('(1.234,57)');
         expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('(€ 1.234,57)');
         expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('(€ 1.234,57)');
@@ -2072,7 +2072,7 @@ describe('undo and redo functions', () => {
         browser.keys(['Shift', 'Control']); // Release the 'Control' and 'Shift' keys
     });
 
-    xit('should undo the user inputs correctly on non-input elements', () => { //FIXME This does not work under FF 45.8...
+    xit('should undo the user inputs correctly on non-input elements', () => { //FIXME This does not work under FF 52...
         let inputCaretPosition;
         const undoRedoElement = $(selectors.undoRedo2);
 
@@ -2215,7 +2215,7 @@ describe('undo and redo functions', () => {
         expect(inputCaretPosition).toEqual(0);
     });
 
-    xit('should redo the user inputs correctly on non-input elements, when releasing the Shift then Control key', () => { //FIXME This does not work under FF 45.8...
+    xit('should redo the user inputs correctly on non-input elements, when releasing the Shift then Control key', () => { //FIXME This does not work under FF 52...
         let inputCaretPosition;
         // Redos (releasing the keys shift, then ctrl)
         browser.keys(['Control', 'Shift', 'z']);
@@ -2303,7 +2303,7 @@ describe('undo and redo functions', () => {
         expect(inputCaretPosition).toEqual(8);
     });
 
-    xit('should redo the user inputs correctly on non-input elements, when releasing the Control then Shift key', () => { //FIXME This does not work under FF 45.8...
+    xit('should redo the user inputs correctly on non-input elements, when releasing the Control then Shift key', () => { //FIXME This does not work under FF 52...
         let inputCaretPosition;
         // Undos some more to test the last redos with the specific key release order
         browser.keys(['Control', 'z']);
@@ -2639,7 +2639,7 @@ describe('Issue #416', () => {
     });
 });
 
-xdescribe('Options updates', () => {
+describe('Options updates', () => {
     it('should test for default values', () => {
         browser.url(testUrl);
 
@@ -2648,7 +2648,7 @@ xdescribe('Options updates', () => {
         expect(browser.getValue(selectors.optionUpdate3)).toEqual('$8,888.00');
     });
 
-    it('should update the `decimalCharacterAlternative` option (cf. issue #432)', () => {
+    xit('should update the `decimalCharacterAlternative` option (cf. issue #432)', () => {
         const input1 = $(selectors.optionUpdate1);
         input1.click();
         browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'Delete']);
@@ -2679,13 +2679,13 @@ xdescribe('Options updates', () => {
             const input = document.querySelector('#optionUpdate2');
             const anElement = AutoNumeric.getAutoNumericElement(input);
             anElement.options.decimalCharacterAlternative('#');
-            return anElement.getSettings().rawValue;
+            return anElement.rawValue;
         }).value;
         expect(anElementVersion).toEqual('444466');
         browser.keys(['*']); // Ignored
         expect(browser.getValue(selectors.optionUpdate2)).toEqual('444.466 €');
         browser.keys(['#']);
-        expect(browser.getValue(selectors.optionUpdate2)).toEqual('4.444,66 €'); //FIXME This fails under Firefox 45.8
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('4.444,66 €'); //FIXME This fails under Firefox 52
 
 
         const input3 = $(selectors.optionUpdate3);
@@ -2701,7 +2701,7 @@ xdescribe('Options updates', () => {
     });
 });
 
-xdescribe('`decimalPlacesShownOnFocus` and selections', () => { //FIXME Fix that test
+describe('`decimalPlacesShownOnFocus` and selections', () => {
     it('should test for default values', () => {
         browser.url(testUrl);
 
@@ -2804,7 +2804,7 @@ describe('`caretPositionOnFocus` option', () => {
         expect(browser.getValue(selectors.selectOnFocus40)).toEqual('-246.813,58jk');
     });
 
-    xit('should position the caret correctly on focus', () => {
+    it('should position the caret correctly on focus', () => {
         let inputCaretPosition;
         const inputD = $(selectors.selectOnFocusD);
 
@@ -2818,7 +2818,7 @@ describe('`caretPositionOnFocus` option', () => {
             const input = document.querySelector('#selectOnFocus1');
             return input.selectionStart;
         }).value;
-        expect(inputCaretPosition).toEqual(3);  //XXX This does not work under Firefox 45.7, but does under firefox 53. Since we only support the browsers last version - 2, let's ignore it.
+        expect(inputCaretPosition).toEqual(3);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');

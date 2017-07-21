@@ -5358,26 +5358,15 @@ class AutoNumeric {
                     //TODO Check if this is an Android bug or an autoNumeric one
                     this.androidSelectionStart = selection.start;
 
+                    // Move the caret to the right if the `androidCharEntered` is the decimal character or if it's on the left of the caret position
                     const decimalCharacterPosition = AutoNumericHelper.getElementValue(this.domElement).indexOf(this.settings.decimalCharacter);
                     const hasDecimalCharacter = decimalCharacterPosition !== -1;
-
-                    // Move the caret to the right if the `androidCharEntered` is the decimal character or if it's on the left of the caret position
                     if (this.eventKey === this.settings.decimalCharacter ||
                         hasDecimalCharacter && decimalCharacterPosition < this.androidSelectionStart) {
                         this.androidSelectionStart += this.settings.decimalCharacter.length;
                     }
 
-                    const digitGroupSeparatorPosition = AutoNumericHelper.getElementValue(this.domElement).indexOf(this.settings.digitGroupSeparator);
-                    const hasGroupSeparator = digitGroupSeparatorPosition !== -1;
-
-                    // Move the caret to the right if the `androidCharEntered` is the group separator character
-                    // or if it's on the left of the caret position.
-                    if (this.eventKey === this.settings.digitGroupSeparator ||
-                        hasGroupSeparator && digitGroupSeparatorPosition < this.androidSelectionStart) {
-                        this.androidSelectionStart += this.settings.digitGroupSeparator.length;
-                    }
-
-                    if (this.settings.currencySymbolPlacement === 'p' && this.settings.currencySymbol.length) {
+                    if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix && this.settings.currencySymbol.length) {
                         this.androidSelectionStart += this.settings.currencySymbol.length;
                     }
 

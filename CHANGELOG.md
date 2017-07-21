@@ -2,6 +2,7 @@
 
 ### 4.0.0-beta.23
 + Fix issue #453 Rename the `noSeparatorOnFocus` option to `showOnlyNumbersOnFocus`
++ Add the missing `options.historySize()` method that allows to update the `historySize` option
 
 ### 4.0.0-beta.22
 + Fix issue #454 Rewrite how the number of decimal places for the formatted and the raw values are set

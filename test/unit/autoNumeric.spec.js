@@ -1213,6 +1213,10 @@ describe('autoNumeric options and `options.*` methods', () => {
             aNInput.options.suffixText(AutoNumeric.options.suffixText.none);
             expect(aNInput.getFormatted()).toEqual('1.234.567,89\u202f€-');
 
+            expect(aNInput.getSettings().historySize).toEqual('20');
+            aNInput.options.historySize(30);
+            expect(aNInput.getSettings().historySize).toEqual(30);
+
             aNInput.options.reset().french().set(-1234567.89);
             spyOn(console, 'warn');
             aNInput.options.decimalPlaces(4);

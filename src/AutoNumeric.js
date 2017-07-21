@@ -653,6 +653,11 @@ class AutoNumeric {
 
                 return this;
             },
+            historySize                  : historySize => {
+                this.settings.historySize = historySize;
+
+                return this;
+            },
             isCancellable                : isCancellable => {
                 this.settings.isCancellable = isCancellable; //FIXME à tester
 

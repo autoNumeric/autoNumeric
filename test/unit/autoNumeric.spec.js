@@ -460,22 +460,22 @@ describe('The autoNumeric object', () => {
             aNInput.set('1234.56');
             expect(aNInput.get()).toEqual('1234.56');
             expect(aNInput.getNumber()).toEqual(1234.56);
-            expect(aNInput.getSettings().rawValue).toEqual('1234.56');
+            expect(aNInput.rawValue).toEqual('1234.56');
 
             aNInput.set('-1234.56');
             expect(aNInput.get()).toEqual('-1234.56');
             expect(aNInput.getNumber()).toEqual(-1234.56);
-            expect(aNInput.getSettings().rawValue).toEqual('-1234.56');
+            expect(aNInput.rawValue).toEqual('-1234.56');
 
             aNInput.set('1234');
             expect(aNInput.get()).toEqual('1234');
             expect(aNInput.getNumber()).toEqual(1234);
-            expect(aNInput.getSettings().rawValue).toEqual('1234');
+            expect(aNInput.rawValue).toEqual('1234');
 
             aNInput.set('-1234');
             expect(aNInput.get()).toEqual('-1234');
             expect(aNInput.getNumber()).toEqual(-1234);
-            expect(aNInput.getSettings().rawValue).toEqual('-1234');
+            expect(aNInput.rawValue).toEqual('-1234');
         });
     });
 
@@ -1721,7 +1721,7 @@ describe('autoNumeric options and `options.*` methods', () => {
 
             aNInput.set(15.001);
             expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('2');
-            expect(aNInput.getSettings().rawValue).toEqual('15');
+            expect(aNInput.rawValue).toEqual('15');
             expect(aNInput.getNumericString()).toEqual('15'); // Note: `getNumericString()` do not pad decimals
             aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
             expect(aNInput.getFormatted()).toEqual('15,00\u202f€');
@@ -3788,15 +3788,15 @@ describe('Instantiated autoNumeric functions', () => {
             aNInput.french();
             aNInput._setElementAndRawValue('newElementValue', 'rawValue');
             expect(aNInput.getFormatted()).toEqual('newElementValue');
-            expect(aNInput.getSettings().rawValue).toEqual('rawValue');
+            expect(aNInput.rawValue).toEqual('rawValue');
 
             aNInput._setElementAndRawValue('sameValue');
             expect(aNInput.getFormatted()).toEqual('sameValue');
-            expect(aNInput.getSettings().rawValue).toEqual('sameValue');
+            expect(aNInput.rawValue).toEqual('sameValue');
 
             aNInput._setElementAndRawValue('sameValueAgain', false);
             expect(aNInput.getFormatted()).toEqual('sameValueAgain');
-            expect(aNInput.getSettings().rawValue).toEqual('sameValueAgain');
+            expect(aNInput.rawValue).toEqual('sameValueAgain');
         });
     });
 

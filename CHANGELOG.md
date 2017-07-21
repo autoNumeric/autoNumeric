@@ -3,6 +3,7 @@
 ### 4.0.0-beta.23
 + Fix issue #453 Rename the `noSeparatorOnFocus` option to `showOnlyNumbersOnFocus`
 + Add the missing `options.historySize()` method that allows to update the `historySize` option
++ Move the raw value from `this.settings.rawValue` to `this.rawValue`. This prevent polluting the settings object.
 
 ### 4.0.0-beta.22
 + Fix issue #454 Rewrite how the number of decimal places for the formatted and the raw values are set

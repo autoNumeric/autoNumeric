@@ -631,12 +631,12 @@ class AutoNumeric {
                 return this;
             },
             emptyInputBehavior           : emptyInputBehavior => {
-                if (this.settings.rawValue === null && emptyInputBehavior !== AutoNumeric.options.emptyInputBehavior.null) {
+                if (this.rawValue === null && emptyInputBehavior !== AutoNumeric.options.emptyInputBehavior.null) {
                     // Special case : if the current `rawValue` is `null` and the `emptyInputBehavior` is changed to something else than `'null'`, then it makes that `rawValue` invalid.
                     // Here we can either prevent the option update and throw an error, or still accept the option update and update the value from `null` to `''`.
                     // We cannot keep `rawValue` to `null` since if `emptyInputBehavior` is not set to `null`, lots of function assume `rawValue` is a string.
                     AutoNumericHelper.warning(`You are trying to modify the \`emptyInputBehavior\` option to something different than \`'null'\` (${emptyInputBehavior}), but the element raw value is currently set to \`null\`. This would result in an invalid rawValue. In order to fix that, the element value has been changed to the empty string \`''\`.`, this.settings.showWarnings);
-                    this.settings.rawValue = '';
+                    this.rawValue = '';
                 }
 
                 this.update({ emptyInputBehavior });
@@ -1156,13 +1156,13 @@ class AutoNumeric {
         //TODO Add a `this.settings.saveSelectionsIntoHistory` option to prevent saving the selections (in order to gain performance)
         const isEmptyHistoryTable = this.historyTable.length === 0;
         // Only add a new value if it's different than the previous one (to prevent infinitely adding values on mouseover for instance)
-        if (isEmptyHistoryTable || this.settings.rawValue !== this._historyTableCurrentValueUsed()) {
+        if (isEmptyHistoryTable || this.rawValue !== this._historyTableCurrentValueUsed()) {
             // Trim the history table if the user changed the value of an intermediary state
             let addNewHistoryState = true;
             if (!isEmptyHistoryTable) {
                 // If some undo has been done and the user type the exact same data than the next entry after the current history pointer, do no drop the rest of the 'redo' list, and just advance the historyTableIndex
                 const nextHistoryStateIndex = this.historyTableIndex + 1;
-                if (nextHistoryStateIndex < this.historyTable.length && this.settings.rawValue === this.historyTable[nextHistoryStateIndex].value) {
+                if (nextHistoryStateIndex < this.historyTable.length && this.rawValue === this.historyTable[nextHistoryStateIndex].value) {
                     // If the character input result in the same state than the next one, do not remove the next history states nor add a new one
                     addNewHistoryState = false;
                 } else {
@@ -1184,7 +1184,7 @@ class AutoNumeric {
                 // Then add the new raw value
                 this.historyTable.push({
                     // Save the rawValue and selection start/end
-                    value: this.settings.rawValue,
+                    value: this.rawValue,
                     // The selection for this element is temporary, and will be updated when the next history state will be recorded.
                     // That way, we are always sure we save the last caret or selection positions just before the value is changed. Otherwise we would only save those positions when the value is first changed, and would not take into account that the user could move the caret around afterward.
                     // For instance, this is needed if the user change the element value, and immediately undo it ; if he then does a redo, he'll see the value and the right selection
@@ -1284,13 +1284,13 @@ class AutoNumeric {
      */
     /*
     resetHistoryTable() { //FIXME Test this
-        this.set(this.settings.rawValue, null, false);
+        this.set(this.rawValue, null, false);
         this.select();
         const selection = AutoNumericHelper.getElementSelection(this.domElement);
         this.historyTableIndex = 0;
         this.historyTable = [{
             // Save the rawValue and selection start/end
-            value: this.settings.rawValue,
+            value: this.rawValue,
             start: selection.start,
             end  : selection.end,
         }];
@@ -1351,13 +1351,13 @@ class AutoNumeric {
      * @private
      */
     _parseStyleRules() {
-        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.styleRules) || this.settings.rawValue === '') {
+        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.styleRules) || this.rawValue === '') {
             return;
         }
 
         // 'positive' attribute
         if (!AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.styleRules.positive)) {
-            if (this.settings.rawValue >= 0) {
+            if (this.rawValue >= 0) {
                 this._addCSSClass(this.settings.styleRules.positive);
             } else {
                 this._removeCSSClass(this.settings.styleRules.positive);
@@ -1366,7 +1366,7 @@ class AutoNumeric {
 
         // 'negative' attribute
         if (!AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.styleRules.negative)) {
-            if (this.settings.rawValue < 0) {
+            if (this.rawValue < 0) {
                 this._addCSSClass(this.settings.styleRules.negative);
             } else {
                 this._removeCSSClass(this.settings.styleRules.negative);
@@ -1376,7 +1376,7 @@ class AutoNumeric {
         // 'ranges' attribute
         if (!AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.styleRules.ranges) && this.settings.styleRules.ranges.length !== 0) {
             this.settings.styleRules.ranges.forEach(range => {
-                if (this.settings.rawValue >= range.min && this.settings.rawValue < range.max) {
+                if (this.rawValue >= range.min && this.rawValue < range.max) {
                     this._addCSSClass(range.class);
                 } else {
                     this._removeCSSClass(range.class);
@@ -1392,7 +1392,7 @@ class AutoNumeric {
                     // Test for the type of the `classes` attribute, which changes the function behavior
                     if (AutoNumericHelper.isString(userObject.classes)) {
                         // If 'classes' is a string, set it if `true`, remove it if `false`
-                        if (userObject.callback(this.settings.rawValue)) {
+                        if (userObject.callback(this.rawValue)) {
                             this._addCSSClass(userObject.classes);
                         } else {
                             this._removeCSSClass(userObject.classes);
@@ -1400,7 +1400,7 @@ class AutoNumeric {
                     } else if (AutoNumericHelper.isArray(userObject.classes)) {
                         if (userObject.classes.length === 2) {
                             // If 'classes' is an array with only 2 elements, set the first class if `true`, the second if `false`
-                            if (userObject.callback(this.settings.rawValue)) {
+                            if (userObject.callback(this.rawValue)) {
                                 this._addCSSClass(userObject.classes[0]);
                                 this._removeCSSClass(userObject.classes[1]);
                             } else {
@@ -1409,7 +1409,7 @@ class AutoNumeric {
                             }
                         } else if (userObject.classes.length > 2) {
                             // The callback returns an array of indexes to use on the `classes` array
-                            const callbackResult = userObject.callback(this.settings.rawValue);
+                            const callbackResult = userObject.callback(this.rawValue);
                             if (AutoNumericHelper.isArray(callbackResult)) {
                                 // If multiple indexes are returned
                                 userObject.classes.forEach((userClass, index) => {
@@ -1497,7 +1497,7 @@ class AutoNumeric {
         const originalSettings = AutoNumericHelper.cloneObject(this.settings); //TODO Check that the `styleRules` option is correctly cloned (due to depth cloning limitation)
 
         // Store the current unformatted input value
-        const numericString = this.settings.rawValue;
+        const numericString = this.rawValue;
 
         // Generate a single option object with the settings from the latter overwriting those from the former
         let optionsToUse = {};
@@ -1607,8 +1607,8 @@ class AutoNumeric {
             }
 
             if (minTest && maxTest) {
-                let rawValue = this.constructor._roundRawValue(value, this.settings);
-                rawValue = this._trimLeadingAndTrailingZeros(rawValue.replace(this.settings.decimalCharacter, '.')); // Move the `setRawValue` call after the `setElementValue` one
+                let forcedRawValue = this.constructor._roundRawValue(value, this.settings);
+                forcedRawValue = this._trimLeadingAndTrailingZeros(forcedRawValue.replace(this.settings.decimalCharacter, '.')); // Move the `setRawValue` call after the `setElementValue` one
 
                 // Round the given value according to the object state (focused/unfocused)
                 if (this.isFocused) {
@@ -1623,7 +1623,7 @@ class AutoNumeric {
                 }
 
                 value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
-                value = this.constructor._addGroupSeparators(value, this.settings, this.isFocused, rawValue);
+                value = this.constructor._addGroupSeparators(value, this.settings, this.isFocused, this.rawValue, forcedRawValue);
                 if (!this.isFocused && this.settings.symbolWhenUnfocused) {
                     value = `${value}${this.settings.symbolWhenUnfocused}`;
                 }
@@ -1632,7 +1632,7 @@ class AutoNumeric {
                     this._saveValueToPersistentStorage();
                 }
 
-                this._setElementAndRawValue(value, rawValue, saveChangeToHistory);
+                this._setElementAndRawValue(value, forcedRawValue, saveChangeToHistory);
 
                 return this;
             } else {
@@ -1728,9 +1728,9 @@ class AutoNumeric {
      */
     _setRawValue(rawValue, saveChangeToHistory = true) {
         // Only set the raw value if the given value is different than the current one
-        if (this.settings.rawValue !== rawValue) { //TODO Manage the case where one value is a string while the other is a number?
+        if (this.rawValue !== rawValue) { //TODO Manage the case where one value is a string while the other is a number?
             // Update the raw value
-            this.settings.rawValue = rawValue;
+            this.rawValue = rawValue;
 
             // Change the element style or use the relevant callbacks
             this._parseStyleRules();
@@ -1765,7 +1765,7 @@ class AutoNumeric {
     }
 
     /**
-     * Set the given value on the DOM element, and the raw value on `this.settings.rawValue`, if both are given.
+     * Set the given value on the DOM element, and the raw value on `this.rawValue`, if both are given.
      * If only one value is given, then both the DOM element value and the raw value are set with that value.
      * The third argument `saveChangeToHistory` defines if the change should be recorded in the history array.
      * Note: if the second argument `rawValue` is a boolean, we consider that is really is the `saveChangeToHistory` argument.
@@ -1836,7 +1836,7 @@ class AutoNumeric {
     getNumericString(callback = null) {
         // Always return a numeric string
         // The following statement gets rid of the trailing zeros in the decimal places since the current method does not pad decimals
-        const result = AutoNumericHelper.trimPaddedZerosFromDecimalPlaces(this.settings.rawValue);
+        const result = AutoNumericHelper.trimPaddedZerosFromDecimalPlaces(this.rawValue);
         this._executeCallback(result, callback);
 
         return result;
@@ -1875,7 +1875,7 @@ class AutoNumeric {
      */
     getNumber(callback = null) {
         let result;
-        if (this.settings.rawValue === null) {
+        if (this.rawValue === null) {
             result = null;
         } else {
             result = this.constructor._toLocale(this.getNumericString(), 'number');
@@ -1910,12 +1910,12 @@ class AutoNumeric {
 
         // Then get the localized value
         let value;
-        if (AutoNumericHelper.isEmptyString(this.settings.rawValue)) {
+        if (AutoNumericHelper.isEmptyString(this.rawValue)) {
             value = '';
         } else {
-            // Here I use `this.settings.rawValue` instead of `this.getNumericString()` since the current input value could be unformatted with a localization (ie. '1234567,89-').
+            // Here I use `this.rawValue` instead of `this.getNumericString()` since the current input value could be unformatted with a localization (ie. '1234567,89-').
             // I also convert the rawValue to a number, then back to a string in order to drop the decimal part if the rawValue is an integer.
-            value = ''+Number(this.settings.rawValue);
+            value = ''+Number(this.rawValue);
         }
 
         if (value !== '' && Number(value) === 0 && this.settings.leadingZero !== AutoNumeric.options.leadingZero.keep) {
@@ -1944,8 +1944,8 @@ class AutoNumeric {
      * @returns {AutoNumeric}
      */
     reformat() {
-        // `this.settings.rawValue` is used instead of `this.domElement.value` because when the content is `unformatLocalized`, it can become a string that cannot be converted to a number easily
-        this.set(this.settings.rawValue);
+        // `this.rawValue` is used instead of `this.domElement.value` because when the content is `unformatLocalized`, it can become a string that cannot be converted to a number easily
+        this.set(this.rawValue);
 
         return this;
     }
@@ -2078,7 +2078,7 @@ class AutoNumeric {
      */
     selectInteger() {
         let start = 0;
-        const isPositive = this.settings.rawValue >= 0;
+        const isPositive = this.rawValue >= 0;
 
         // Negative or positive sign, if any
         if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix ||
@@ -3591,7 +3591,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Everything is ok, proceed to rounding, formatting and grouping
         valueString = this._roundFormattedValueShownOnFocus(valueString, settings);
         valueString = this._modifyNegativeSignAndDecimalCharacterForFormattedValue(valueString, settings);
-        valueString = this._addGroupSeparators(valueString, settings, false);
+        valueString = this._addGroupSeparators(valueString, settings, false, valueString);
 
         return valueString;
     }
@@ -4256,10 +4256,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {string} inputValue The formatted value (ie. with the `decimalCharacter` defined in the settings, not the raw value)
      * @param {object} settings
      * @param {boolean} isFocused
-     * @param {number|string|null} rawValue If this is set, then this rawValue is used instead of the one passed through the `settings` object. This is useful is some very specific cases where we need to set the raw value *after* settings the formatted value, using the `_addGroupSeparators()` method.
+     * @param {number|string|null} currentRawValue The object current raw value (`this.rawValue`)
+     * @param {number|string|null} forcedRawValue If this is set, then this rawValue is used instead of the one passed through the `settings` object. This is useful is some very specific cases where we need to set the raw value *after* settings the formatted value, using the `_addGroupSeparators()` method.
      * @returns {*}
      */
-    static _addGroupSeparators(inputValue, settings, isFocused, rawValue = null) {
+    static _addGroupSeparators(inputValue, settings, isFocused, currentRawValue, forcedRawValue = null) {
         //TODO Test if `inputValue` === '', and return '' directly if that's the case,
         //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
         const isValueNegative = AutoNumericHelper.isNegative(inputValue) || AutoNumericHelper.isNegativeWithBrackets(inputValue, settings.firstBracket, settings.lastBracket); // Test if the value is negative before removing the negative sign
@@ -4331,13 +4332,13 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Add back the negative/positive sign and the currency symbol, at the right positions
         inputValue = AutoNumeric._mergeCurrencySignNegativePositiveSignAndValue(inputValue, settings, isValueNegative, isZeroOrHasNoValue); //TODO this function is called again in `_toggleNegativeBracket` if the brackets are removed; let's DRY this
 
-        if (AutoNumericHelper.isNull(rawValue)) {
+        if (AutoNumericHelper.isNull(forcedRawValue)) {
             // If the raw value is not forced, use the default one from the settings object
-            rawValue = settings.rawValue;
+            forcedRawValue = currentRawValue;
         }
 
         // Toggle the negative sign and brackets
-        if (settings.negativeBracketsTypeOnBlur !== null && (rawValue < 0 || AutoNumericHelper.isNegativeStrict(inputValue))) {
+        if (settings.negativeBracketsTypeOnBlur !== null && (forcedRawValue < 0 || AutoNumericHelper.isNegativeStrict(inputValue))) {
             inputValue = this._toggleNegativeBracket(inputValue, settings, isFocused);
         }
 
@@ -4432,7 +4433,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             AutoNumericHelper.throwError('`_initialCaretPosition()` should never be called when the `caretPositionOnFocus` option is `null`.');
         }
 
-        const isValueNegative = this.settings.rawValue < 0;
+        const isValueNegative = this.rawValue < 0;
         const isZeroOrHasNoValue = AutoNumericHelper.isZeroOrHasNoValue(value);
         const totalLength = value.length;
 
@@ -5066,10 +5067,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     _saveValueToPersistentStorage() {
         if (this.settings.saveValueToSessionStorage) {
             if (this.sessionStorageAvailable) {
-                sessionStorage.setItem(this.rawValueStorageName, this.settings.rawValue);
+                sessionStorage.setItem(this.rawValueStorageName, this.rawValue);
             } else {
                 // Use cookies for obsolete browsers that do not support sessionStorage (ie. IE 6 & 7)
-                document.cookie = `${this.rawValueStorageName}=${this.settings.rawValue}; expires= ; path=/`;
+                document.cookie = `${this.rawValueStorageName}=${this.rawValue}; expires= ; path=/`;
             }
         }
     }
@@ -5142,19 +5143,19 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         if (e.type === 'focus' || e.type === 'mouseenter' && !this.isFocused) {
             if (this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus &&
-                this.settings.rawValue < 0 && this.settings.negativeBracketsTypeOnBlur !== null && this.settings.negativeSignCharacter !== '') { //FIXME this is called a second time in _addGroupSeparators too. Prevent this, if possible.
+                this.rawValue < 0 && this.settings.negativeBracketsTypeOnBlur !== null && this.settings.negativeSignCharacter !== '') { //FIXME this is called a second time in _addGroupSeparators too. Prevent this, if possible.
                 // Only remove the brackets if the value is negative
                 AutoNumericHelper.setElementValue(this.domElement, this.constructor._removeBrackets(AutoNumericHelper.getElementValue(this.domElement), this.settings));
             }
 
             // Modify the element value according to the number of decimal places to show on focus or the `showOnlyNumbersOnFocus` option
-            if (this.settings.rawValue !== '') {
+            if (this.rawValue !== '') {
                 // Round the given value according to the object state (focus/unfocused)
                 let roundedValue;
                 if (this.isFocused) {
-                    roundedValue = this.constructor._roundFormattedValueShownOnFocus(this.settings.rawValue, this.settings);
+                    roundedValue = this.constructor._roundFormattedValueShownOnFocus(this.rawValue, this.settings);
                 } else {
-                    roundedValue = this.constructor._roundFormattedValueShownOnBlur(this.settings.rawValue, this.settings);
+                    roundedValue = this.constructor._roundFormattedValueShownOnBlur(this.rawValue, this.settings);
                 }
 
                 if (this.settings.showOnlyNumbersOnFocus === AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers) {
@@ -5168,7 +5169,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     if (AutoNumericHelper.isNull(roundedValue)) {
                         formattedValue = '';
                     } else {
-                        formattedValue = this.constructor._addGroupSeparators(roundedValue.replace('.', this.settings.decimalCharacter), this.settings, this.isFocused);
+                        formattedValue = this.constructor._addGroupSeparators(roundedValue.replace('.', this.settings.decimalCharacter), this.settings, this.isFocused, this.rawValue);
                     }
                     AutoNumericHelper.setElementValue(this.domElement, formattedValue);
                 }
@@ -5290,7 +5291,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             if (this.settings.isCancellable) {
                 // If the user wants to cancel its modifications :
                 // We set back the saved value
-                if (this.settings.rawValue !== this.savedCancellableValue) {
+                if (this.rawValue !== this.savedCancellableValue) {
                     // Do not set the value again if it has not changed
                     this.set(this.savedCancellableValue);
                     // And we need to send an 'input' event when setting back the initial value in order to make other scripts aware of the value change...
@@ -5541,7 +5542,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         if ((targetValue === this.settings.suffixText) ||
-            (this.settings.rawValue === '' && this.settings.currencySymbol !== '' && this.settings.suffixText !== '')) {
+            (this.rawValue === '' && this.settings.currencySymbol !== '' && this.settings.suffixText !== '')) {
             AutoNumericHelper.setElementSelection(e.target, 0);
         }
 
@@ -5584,7 +5585,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         if ((e.type === 'mouseleave' && !this.isFocused) || e.type === 'blur') {
-            const origValue = this.settings.rawValue;
+            const origValue = this.rawValue;
             this._saveValueToPersistentStorage();
 
             if (this.settings.showOnlyNumbersOnFocus === AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers) {
@@ -5594,16 +5595,16 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             }
 
             let value;
-            const isRawValueNull = AutoNumericHelper.isNull(this.settings.rawValue);
-            if (isRawValueNull || this.settings.rawValue === '') {
-                value = this.settings.rawValue;
+            const isRawValueNull = AutoNumericHelper.isNull(this.rawValue);
+            if (isRawValueNull || this.rawValue === '') {
+                value = this.rawValue;
             } else {
-                value = String(this.settings.rawValue);
+                value = String(this.rawValue);
             }
 
-            if (this.settings.rawValue !== '' && !isRawValueNull) {
-                const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(this.settings.rawValue, this.settings);
-                if (minTest && maxTest && !this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(this.settings.rawValue, this.settings)) {
+            if (this.rawValue !== '' && !isRawValueNull) {
+                const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(this.rawValue, this.settings);
+                if (minTest && maxTest && !this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(this.rawValue, this.settings)) {
                     value = this._modifyNegativeSignAndDecimalCharacterForRawValue(value);
                     this._setRawValue(this._trimLeadingAndTrailingZeros(value));
 
@@ -5622,7 +5623,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                         AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
                     }
                 }
-            } else if (this.settings.rawValue === '' && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {
+            } else if (this.rawValue === '' && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {
                 this._setRawValue('0');
                 value = this.constructor._roundValue('0', this.settings, 0);
             }
@@ -5631,7 +5632,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             let groupedValue = this.constructor._orderValueCurrencySymbolAndSuffixText(value, this.settings, false);
             if (!(this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(value, this.settings) ||
                 (isRawValueNull && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.null))) {
-                groupedValue = this.constructor._addGroupSeparators(value, this.settings, false);
+                groupedValue = this.constructor._addGroupSeparators(value, this.settings, false, this.rawValue);
             }
 
             // Testing for `allowDecimalPadding.never` or `allowDecimalPadding.floats` is needed to make sure we do not keep a trailing decimalCharacter (like '500.') in the element, since the raw value would still be a correctly formatted integer ('500')
@@ -5639,7 +5640,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 origValue === '' || // This make sure we get rid on any currency symbol or suffix that might have been added on focus
                 this.settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.never ||
                 this.settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.floats) {
-                if (this.settings.symbolWhenUnfocused && this.settings.rawValue !== '' && this.settings.rawValue !== null) {
+                if (this.settings.symbolWhenUnfocused && this.rawValue !== '' && this.rawValue !== null) {
                     groupedValue = `${groupedValue}${this.settings.symbolWhenUnfocused}`;
                 }
 
@@ -6091,7 +6092,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             const selectionEnd = e.target.selectionEnd || 0;
 
             // 1) Get the unformatted value
-            const currentUnformattedValue = this.settings.rawValue;
+            const currentUnformattedValue = this.rawValue;
             let result;
             if (AutoNumericHelper.isUndefinedOrNullOrEmpty(currentUnformattedValue)) {
                 // If by default the input is empty, start at '0'
@@ -6172,7 +6173,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      */
     _onFormSubmit() {
         if (this.settings.unformatOnSubmit) {
-            this._setElementValue(this.settings.rawValue);
+            this._setElementValue(this.rawValue);
         }
 
         return true;
@@ -6655,7 +6656,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             negativeSignCharacter             : true,
             numRegAutoStrip                   : true,
             positiveSignCharacter             : true,
-            rawValue                          : true,
             skipFirstAutoStrip                : true,
             skipLastAutoStrip                 : true,
             stripReg                          : true,
@@ -6856,7 +6856,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @private
      */
     _saveCancellableValue() {
-        this.savedCancellableValue = this.settings.rawValue;
+        this.savedCancellableValue = this.rawValue;
     }
 
     /**
@@ -7472,7 +7472,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             left = negativeSign + left;
         }
 
-        const value = this.constructor._addGroupSeparators(elementValue, this.settings, this.isFocused);
+        const value = this.constructor._addGroupSeparators(elementValue, this.settings, this.isFocused, this.rawValue);
         let position = value.length;
         if (value) {
             // Prepare regexp which searches for cursor position from unformatted left part

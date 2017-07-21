@@ -1431,7 +1431,7 @@ if (typeof define === 'function' && define.amd) {
         s = s.replace(settings.currencySymbol, '');
 
         // Remove the grouping separators (thousands separators usually)
-        s = s.replace(settings.digitGroupSeparator, '');
+        s = s.replace(new RegExp(`[${settings.digitGroupSeparator}]`, 'g'), '');
 
         // Replace the decimal character by a dot
         if (settings.decimalCharacter !== '.') {

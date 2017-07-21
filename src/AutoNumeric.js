@@ -5436,13 +5436,16 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     //TODO Check if this is an Android bug or an autoNumeric one
                     this.androidSelectionStart = selection.start;
 
-                    const decimalCharacterPosition = AutoNumericHelper.getElementValue(this.domElement).indexOf(this.settings.decimalCharacter);
-                    const hasDecimalCharacter = decimalCharacterPosition === -1;
-
                     // Move the caret to the right if the `androidCharEntered` is the decimal character or if it's on the left of the caret position
+                    const decimalCharacterPosition = AutoNumericHelper.getElementValue(this.domElement).indexOf(this.settings.decimalCharacter);
+                    const hasDecimalCharacter = decimalCharacterPosition !== -1;
                     if (this.eventKey === this.settings.decimalCharacter ||
-                        !hasDecimalCharacter && decimalCharacterPosition < this.androidSelectionStart) {
-                        this.androidSelectionStart = selection.start + 1;
+                        hasDecimalCharacter && decimalCharacterPosition < this.androidSelectionStart) {
+                        this.androidSelectionStart += this.settings.decimalCharacter.length;
+                    }
+
+                    if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix && this.settings.currencySymbol.length) {
+                        this.androidSelectionStart += this.settings.currencySymbol.length;
                     }
 
                     if (selection.length > value.length) {

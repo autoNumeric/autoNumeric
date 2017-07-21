@@ -3604,7 +3604,16 @@ if (typeof define === 'function' && define.amd) {
         // The event is prevented by default, since otherwise the user would be able to paste invalid characters into the input
         e.preventDefault();
 
-        let rawPastedText = e.clipboardData.getData('text/plain');
+        let rawPastedText;
+        if (window.clipboardData && window.clipboardData.getData) {
+            // Special case for the obsolete and non-standard IE browsers 10 and 11
+            rawPastedText = window.clipboardData.getData('Text');
+        } else if (e.clipboardData && e.clipboardData.getData) {
+            // Normal case with modern browsers
+            rawPastedText = e.clipboardData.getData('text/plain');
+        } else {
+            throwError('Unable to retrieve the pasted value. Please use a modern browser (ie. Firefox or Chromium).');
+        }
 
         // 0. Special case if the user has selected all the input text before pasting
         const initialFormattedValue = e.target.value;

@@ -108,6 +108,11 @@ module.exports = function(config) {
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
         logLevel: config.LOG_INFO,
 
+        // Enable or prevent any logs to be written in the console. This is allowed by default.
+        client: {
+            captureConsole: true,
+        },
+
         // enable / disable watching file and executing tests whenever any file changes
         // autoWatch: true,
 

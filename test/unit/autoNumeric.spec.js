@@ -3882,7 +3882,7 @@ describe('Instantiated autoNumeric functions', () => {
 
             // Objects overwriting themselves
             aNInput.update({ currencySymbol: AutoNumeric.options.currencySymbol.pound },
-                { currencySymbol:  AutoNumeric.options.currencySymbol.franc });
+                           { currencySymbol:  AutoNumeric.options.currencySymbol.franc });
             expect(aNInput.getFormatted()).toEqual('2.172.834,23₣');
 
             // Objects completing themselves
@@ -5543,11 +5543,10 @@ describe('Static autoNumeric functions', () => {
         it('should unformat with multiple user options overwriting each other in the right order', () => {
             expect(AutoNumeric.unformat('241800,02 €', AutoNumeric.getPredefinedOptions().French, { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator })).toEqual('241800.02');
             expect(AutoNumeric.unformat('241800,02 $',
-                // eslint-disable-next-line
-                AutoNumeric.getPredefinedOptions().French,
-                { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
-                { currencySymbol: AutoNumeric.options.currencySymbol.pound },
-                { currencySymbol: AutoNumeric.options.currencySymbol.dollar }
+                                        AutoNumeric.getPredefinedOptions().French,
+                                        { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                                        { currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                                        { currencySymbol: AutoNumeric.options.currencySymbol.dollar }
             )).toEqual('241800.02');
         });
 

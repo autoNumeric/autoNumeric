@@ -4,8 +4,8 @@
  * @version      4.0.0-beta.23
  * @date         2017-07-28 UTC 08:30
  *
- * @author       Bob Knothe
- * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS
+ * @authors      Bob Knothe, Alexandre Bonneau
+ * @contributors Sokolov Yura and others, cf. AUTHORS
  * @copyright    2009 Robert J. Knothe http://www.decorplanit.com/plugin/
  * @since        2009-08-09
  *

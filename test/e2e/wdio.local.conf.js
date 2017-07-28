@@ -48,10 +48,12 @@ exports.config = {
         {
             browserName : 'chrome',
         },
-        /*{
+        /*
+        {
             browserName   : 'firefox', // developer version
             firefox_binary: '/home/user/.local/share/umake/web/firefox-dev/firefox', // Path to the executable
-        },*/
+        },
+        */
     ],
 
 

@@ -626,10 +626,10 @@ export default class AutoNumericHelper {
         let formattedNumberStringIndex;
         let rawNumberStringIndex = 0;
         for (formattedNumberStringIndex = 0;
-             formattedNumberStringIndex < formattedNumberStringSize &&
-             rawNumberStringIndex < rawNumberStringSize &&
-             rawNumberStringIndex < caretPositionInRawValue;
-             formattedNumberStringIndex++) {
+            formattedNumberStringIndex < formattedNumberStringSize &&
+            rawNumberStringIndex < rawNumberStringSize &&
+            rawNumberStringIndex < caretPositionInRawValue;
+            formattedNumberStringIndex++) {
             if (rawNumberString[rawNumberStringIndex] === formattedNumberString[formattedNumberStringIndex] ||
                 (rawNumberString[rawNumberStringIndex] === '.' && formattedNumberString[formattedNumberStringIndex] === decimalCharacter)) {
                 rawNumberStringIndex++;
@@ -1008,7 +1008,7 @@ export default class AutoNumericHelper {
 
         // Replace the numbers only
         result = result.replace(/[٠١٢٣٤٥٦٧٨٩]/g, d => d.charCodeAt(0) - 1632) // Arabic numbers
-                       .replace(/[۰۱۲۳۴۵۶۷۸۹]/g, d => d.charCodeAt(0) - 1776); // Persian numbers
+            .replace(/[۰۱۲۳۴۵۶۷۸۹]/g, d => d.charCodeAt(0) - 1776); // Persian numbers
 
         // `NaN` has precedence over the string `'NaN'`
         const resultAsNumber = Number(result);

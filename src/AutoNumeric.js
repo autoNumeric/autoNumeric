@@ -2,7 +2,7 @@
  *               AutoNumeric.js
  *
  * @version      4.0.0-beta.23
- * @date         2017-07-20 UTC 22:22
+ * @date         2017-07-28 UTC 08:30
  *
  * @author       Bob Knothe
  * @contributors Alexandre Bonneau, Sokolov Yura and others, cf. AUTHORS
@@ -153,6 +153,12 @@ class AutoNumeric {
         // -------------- Tracking
         // Keep track if the element is currently focused
         this.isFocused = false;
+        // Keep track if a mouse wheel event is currently ongoing
+        this.isWheelEvent = false;
+        // Keep track if a drop event is currently ongoing
+        this.isDropEvent = false;
+        // Keep track if the user is currently editing the element
+        this.isEditing = false;
 
         if (this.settings.createLocalList) {
             // Keep track of every AutoNumeric elements that this object initialized
@@ -534,6 +540,7 @@ class AutoNumeric {
              * @returns {AutoNumeric}
              */
             reset                        : () => {
+                //TODO Add a `settings` parameter so that the user can reset to a specific set of settings. This is different than update since it drops any non-default settings before using those new settings.
                 this.settings = { rawValue : this.defaultRawValue }; // Here we pass the default rawValue in order to prevent showing a warning that we try to set an `undefined` value
                 this.update(AutoNumeric.defaultSettings);
 
@@ -635,7 +642,7 @@ class AutoNumeric {
                     // Special case : if the current `rawValue` is `null` and the `emptyInputBehavior` is changed to something else than `'null'`, then it makes that `rawValue` invalid.
                     // Here we can either prevent the option update and throw an error, or still accept the option update and update the value from `null` to `''`.
                     // We cannot keep `rawValue` to `null` since if `emptyInputBehavior` is not set to `null`, lots of function assume `rawValue` is a string.
-                    AutoNumericHelper.warning(`You are trying to modify the \`emptyInputBehavior\` option to something different than \`'null'\` (${emptyInputBehavior}), but the element raw value is currently set to \`null\`. This would result in an invalid rawValue. In order to fix that, the element value has been changed to the empty string \`''\`.`, this.settings.showWarnings);
+                    AutoNumericHelper.warning(`You are trying to modify the \`emptyInputBehavior\` option to something different than \`'null'\` (${emptyInputBehavior}), but the element raw value is currently set to \`null\`. This would result in an invalid \`rawValue\`. In order to fix that, the element value has been changed to the empty string \`''\`.`, this.settings.showWarnings);
                     this.rawValue = '';
                 }
 
@@ -715,6 +722,11 @@ class AutoNumeric {
             },
             overrideMinMaxLimits         : overrideMinMaxLimits => {
                 this.update({ overrideMinMaxLimits });
+
+                return this;
+            },
+            rawValueDivisor              : rawValueDivisor => {
+                this.update({ rawValueDivisor });
 
                 return this;
             },
@@ -986,17 +998,6 @@ class AutoNumeric {
     }
 
     /**
-     * Resets the `decimalPlaces*` options to their default values.
-     * This is useful when the user update the global `decimalPlaces` option, which will in turn call the `_calculateDecimalPlaces()` method that will calculate the `decimalPlaces*` options.
-     * @private
-     */
-    _resetDecimalPlacesVariables() {
-        this.settings.decimalPlacesRawValue     = AutoNumeric.options.decimalPlacesRawValue.useDefault;
-        this.settings.decimalPlacesShownOnBlur  = AutoNumeric.options.decimalPlacesShownOnBlur.useDefault;
-        this.settings.decimalPlacesShownOnFocus = AutoNumeric.options.decimalPlacesShownOnFocus.useDefault;
-    }
-
-    /**
      * Return `true` if the given pre-defined option name is an attribute of the `AutoNumeric.predefinedOptions` object
      *
      * @param {string} preDefinedOptionName
@@ -1069,7 +1070,6 @@ class AutoNumeric {
         this._onKeypressFunc = e => { this._onKeypress(e); };
         this._onInputFunc = e => { this._onInput(e); };
         this._onKeyupFunc = e => { this._onKeyup(e); };
-        this._onBlurFunc = e => { this._onBlur(e); };
         this._onFocusOutAndMouseLeaveFunc = e => { this._onFocusOutAndMouseLeave(e); };
         this._onPasteFunc = e => { this._onPaste(e); };
         this._onWheelFunc = e => { this._onWheel(e); };
@@ -1087,7 +1087,6 @@ class AutoNumeric {
         this.domElement.addEventListener('keypress', this._onKeypressFunc, false);
         this.domElement.addEventListener('input', this._onInputFunc, false);
         this.domElement.addEventListener('keyup', this._onKeyupFunc, false);
-        this.domElement.addEventListener('blur', this._onBlurFunc, false);
         this.domElement.addEventListener('blur', this._onFocusOutAndMouseLeaveFunc, false);
         this.domElement.addEventListener('mouseleave', this._onFocusOutAndMouseLeaveFunc, false);
         this.domElement.addEventListener('paste', this._onPasteFunc, false);
@@ -1120,7 +1119,6 @@ class AutoNumeric {
         this.domElement.removeEventListener('keypress', this._onKeypressFunc, false);
         this.domElement.removeEventListener('input', this._onInputFunc, false);
         this.domElement.removeEventListener('keyup', this._onKeyupFunc, false);
-        this.domElement.removeEventListener('blur', this._onBlurFunc, false);
         this.domElement.removeEventListener('paste', this._onPasteFunc, false);
         this.domElement.removeEventListener('wheel', this._onWheelFunc, false);
 
@@ -1518,7 +1516,7 @@ class AutoNumeric {
             this.set(numericString);
         } catch (error) {
             // If the settings validation fails, then we switch back to the previous valid settings
-            this._setSettings(originalSettings, false); // `_setSettings()` is used here instead of directly doing `this.settings = originalSettings;` since lots of side variables are calculated from the settings, and we need to get those back to their previous state
+            this._setSettings(originalSettings, true); // `_setSettings()` is used here instead of directly doing `this.settings = originalSettings;` since lots of side variables are calculated from the settings, and we need to get those back to their previous state. Note: `_setSettings()` is called in the 'update' mode in order to correctly set back the `originalDecimalPlacesRawValue` value.
             AutoNumericHelper.throwError(`Unable to update the settings, those are invalid: [${error}]`);
 
             return this;
@@ -1609,6 +1607,7 @@ class AutoNumeric {
             if (minTest && maxTest) {
                 let forcedRawValue = this.constructor._roundRawValue(value, this.settings);
                 forcedRawValue = this._trimLeadingAndTrailingZeros(forcedRawValue.replace(this.settings.decimalCharacter, '.')); // Move the `setRawValue` call after the `setElementValue` one
+                value = this._getRawValueToFormat(value); // Multiply the raw value to obtain the formatted value
 
                 // Round the given value according to the object state (focused/unfocused)
                 if (this.isFocused) {
@@ -1730,7 +1729,13 @@ class AutoNumeric {
         // Only set the raw value if the given value is different than the current one
         if (this.rawValue !== rawValue) { //TODO Manage the case where one value is a string while the other is a number?
             // Update the raw value
-            this.rawValue = rawValue;
+            this.rawValue = rawValue; // By default, if the `rawValue` is changed programmatically
+
+            if ((!AutoNumericHelper.isNull(this.settings.rawValueDivisor) && this.settings.rawValueDivisor !== 0) && // Only divide if the `rawValueDivisor` option is set
+                rawValue !== '' && rawValue !== null && // Do not modify the `rawValue` if it's an empty string or null
+                this._isUserManuallyEditingTheValue()) { // If the user is manually changing the element value
+                this.rawValue /= this.settings.rawValueDivisor;
+            }
 
             // Change the element style or use the relevant callbacks
             this._parseStyleRules();
@@ -1793,6 +1798,38 @@ class AutoNumeric {
     }
 
     /**
+     * Return the multiplied raw value with the `rawValueDivisor`.
+     * This is used to display different values between the raw and formatted values.
+     *
+     * @param {number|string|null} rawValue The numeric value as understood by Javascript like a `Number`
+     * @returns {number|string|null}
+     * @private
+     */
+    _getRawValueToFormat(rawValue) {
+        let rawValueForTheElementValue;
+        if ((!AutoNumericHelper.isNull(this.settings.rawValueDivisor) && this.settings.rawValueDivisor !== 0) && // Only multiply if the `rawValueDivisor` option is set
+            rawValue !== '' && rawValue !== null) { // Do not modify the `rawValue` if it's an empty string or null
+            // !this._isUserManuallyEditingTheValue()) { // If the user is NOT manually changing the element value, but that is done programmatically
+            rawValueForTheElementValue = rawValue * this.settings.rawValueDivisor;
+        } else {
+            rawValueForTheElementValue = rawValue;
+        }
+
+        return rawValueForTheElementValue;
+    }
+
+    /**
+     * Return `true` if the user is currently modifying the element value manually.
+     *
+     * @returns {boolean}
+     * @private
+     */
+    _isUserManuallyEditingTheValue() {
+        // return (this.isFocused && this.isEditing) || this.isWheelEvent || this.isDropEvent;
+        return (this.isFocused && this.isEditing) || this.isDropEvent;
+    }
+
+    /**
      * Execute the given callback function using the given result as its first parameter, and the AutoNumeric object as its second.
      *
      * @param {number|string|Array|null} result
@@ -1818,7 +1855,7 @@ class AutoNumeric {
      * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
      *
      * @deprecated
-     * @returns {string}
+     * @returns {string|null}
      */
     get(callback = null) {
         return this.getNumericString(callback);
@@ -1826,17 +1863,24 @@ class AutoNumeric {
 
     /**
      * Return the unformatted value as a string.
+     * This can also return `null` if `rawValue` is null.
      *
      * @usage anElement.getNumericString();
      *
      * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
      *
-     * @returns {string}
+     * @returns {string|null}
      */
     getNumericString(callback = null) {
-        // Always return a numeric string
-        // The following statement gets rid of the trailing zeros in the decimal places since the current method does not pad decimals
-        const result = AutoNumericHelper.trimPaddedZerosFromDecimalPlaces(this.rawValue);
+        let result;
+        if (AutoNumericHelper.isNull(this.rawValue)) {
+            result = null;
+        } else {
+            // Always return a numeric string
+            // The following statement gets rid of the trailing zeros in the decimal places since the current method does not pad decimals
+            result = AutoNumericHelper.trimPaddedZerosFromDecimalPlaces(this.rawValue);
+        }
+
         this._executeCallback(result, callback);
 
         return result;
@@ -3133,8 +3177,8 @@ class AutoNumeric {
             options.allowDecimalPadding === 'false' || //TODO Make sure for the other options that 'false' and 'true' are correctly taken into account
             options.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.floats) &&
             (options.decimalPlaces !== AutoNumeric.options.decimalPlaces.none ||
-            options.decimalPlaces !== AutoNumeric.options.decimalPlacesShownOnBlur.none ||
-            options.decimalPlaces !== AutoNumeric.options.decimalPlacesShownOnFocus.none)) {
+            options.decimalPlacesShownOnBlur !== AutoNumeric.options.decimalPlacesShownOnBlur.none ||
+            options.decimalPlacesShownOnFocus !== AutoNumeric.options.decimalPlacesShownOnFocus.none)) {
             AutoNumericHelper.warning(`Setting 'allowDecimalPadding' to [${options.allowDecimalPadding}] will override the current 'decimalPlaces*' settings [${options.decimalPlaces}, ${options.decimalPlacesShownOnBlur} and ${options.decimalPlacesShownOnFocus}].`, options.showWarnings);
         }
 
@@ -3266,22 +3310,7 @@ class AutoNumeric {
         }
 
         // Checks if the number of decimal places for the raw value is lower than the `decimalPlaces`, `decimalPlacesShownOnFocus` and/or `decimalPlacesShownOnBlur` options
-        if (!AutoNumericHelper.isNull(options.decimalPlacesRawValue)) {
-            if (options.decimalPlacesRawValue < options.decimalPlaces) {
-                AutoNumericHelper.warning(`The number of decimal places to store in the raw value [${options.decimalPlacesRawValue}] is lower than the ones to display [${options.decimalPlaces}]. This will likely confuse your users.
-To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, or set a number of decimal places for the raw value equal of bigger than \`decimalPlaces\`.`);
-            }
-
-            if (options.decimalPlacesRawValue < options.decimalPlacesShownOnFocus) {
-                AutoNumericHelper.warning(`The number of decimal places to store in the raw value [${options.decimalPlacesRawValue}] is lower than the ones shown on focus [${options.decimalPlacesShownOnFocus}]. This will likely confuse your users.
-To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, or set a number of decimal places for the raw value equal of bigger than \`decimalPlacesShownOnFocus\`.`);
-            }
-            
-            if (options.decimalPlacesRawValue < options.decimalPlacesShownOnBlur) {
-                AutoNumericHelper.warning(`The number of decimal places to store in the raw value [${options.decimalPlacesRawValue}] is lower than the ones shown when unfocused [${options.decimalPlacesShownOnBlur}]. This will likely confuse your users.
-To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, or set a number of decimal places for the raw value equal of bigger than \`decimalPlacesShownOnBlur\`.`);
-            }
-        }
+        this._validateDecimalPlacesRawValue(options);
 
         if (!AutoNumericHelper.isNull(options.decimalPlacesShownOnFocus) &&
             !testPositiveInteger.test(String(options.decimalPlacesShownOnFocus))) {
@@ -3293,8 +3322,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             AutoNumericHelper.warning(`The extended decimal places 'decimalPlacesShownOnFocus' [${options.decimalPlacesShownOnFocus}] should be greater than the 'decimalPlaces' [${options.decimalPlaces}] value. Currently, this will limit the ability of your user to manually change some of the decimal places. Do you really want to do that?`, options.showWarnings);
         }
 
-        if (!AutoNumericHelper.isNull(options.divisorWhenUnfocused) && !testPositiveFloatOrInteger.test(options.divisorWhenUnfocused) || options.divisorWhenUnfocused === 0 || options.divisorWhenUnfocused === '0') {
-            AutoNumericHelper.throwError(`The divisor option 'divisorWhenUnfocused' is invalid ; it should be a positive number and preferably an integer, [${options.divisorWhenUnfocused}] given.`);
+        if (!AutoNumericHelper.isNull(options.divisorWhenUnfocused) &&
+            !testPositiveFloatOrInteger.test(options.divisorWhenUnfocused) ||
+            options.divisorWhenUnfocused === 0 || options.divisorWhenUnfocused === '0' ||
+            options.divisorWhenUnfocused === 1 || options.divisorWhenUnfocused === '1') {
+            AutoNumericHelper.throwError(`The divisor option 'divisorWhenUnfocused' is invalid ; it should be a positive number higher than one, preferably an integer, [${options.divisorWhenUnfocused}] given.`);
         }
 
         if (!AutoNumericHelper.isNull(options.decimalPlacesShownOnBlur) && !testPositiveInteger.test(options.decimalPlacesShownOnBlur)) {
@@ -3458,6 +3490,13 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             });
         }
 
+        if (!AutoNumericHelper.isNull(options.rawValueDivisor) &&
+            !testPositiveFloatOrInteger.test(options.rawValueDivisor) ||
+            options.rawValueDivisor === 0 || options.rawValueDivisor === '0' ||
+            options.rawValueDivisor === 1 || options.rawValueDivisor === '1') {
+            AutoNumericHelper.throwError(`The raw value divisor option 'rawValueDivisor' is invalid ; it should be a positive number higher than one, preferably an integer, [${options.rawValueDivisor}] given.`);
+        }
+
         if (!AutoNumericHelper.isTrueOrFalseString(options.readOnly) && !AutoNumericHelper.isBoolean(options.readOnly)) {
             AutoNumericHelper.throwError(`The option 'readOnly' is invalid ; it should be either 'false' or 'true', [${options.readOnly}] given.`);
         }
@@ -3472,6 +3511,32 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.createLocalList) && !AutoNumericHelper.isBoolean(options.createLocalList)) {
             AutoNumericHelper.throwError(`The debug option 'createLocalList' is invalid ; it should be either 'false' or 'true', [${options.createLocalList}] given.`);
+        }
+    }
+
+    /**
+     * Check the `decimalPlaces*` options and output the relevant warnings if some of those will get overwritten during the initialization or settings update.
+     *
+     * @param {object} options
+     * @private
+     */
+    static _validateDecimalPlacesRawValue(options) {
+        // Checks if the number of decimal places for the raw value is lower than the `decimalPlaces`, `decimalPlacesShownOnFocus` and/or `decimalPlacesShownOnBlur` options
+        if (!AutoNumericHelper.isNull(options.decimalPlacesRawValue)) {
+            if (options.decimalPlacesRawValue < options.decimalPlaces) {
+                AutoNumericHelper.warning(`The number of decimal places to store in the raw value [${options.decimalPlacesRawValue}] is lower than the ones to display [${options.decimalPlaces}]. This will likely confuse your users.
+To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, or set a number of decimal places for the raw value equal of bigger than \`decimalPlaces\`.`, options.showWarnings);
+            }
+
+            if (options.decimalPlacesRawValue < options.decimalPlacesShownOnFocus) {
+                AutoNumericHelper.warning(`The number of decimal places to store in the raw value [${options.decimalPlacesRawValue}] is lower than the ones shown on focus [${options.decimalPlacesShownOnFocus}]. This will likely confuse your users.
+To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, or set a number of decimal places for the raw value equal of bigger than \`decimalPlacesShownOnFocus\`.`, options.showWarnings);
+            }
+
+            if (options.decimalPlacesRawValue < options.decimalPlacesShownOnBlur) {
+                AutoNumericHelper.warning(`The number of decimal places to store in the raw value [${options.decimalPlacesRawValue}] is lower than the ones shown when unfocused [${options.decimalPlacesShownOnBlur}]. This will likely confuse your users.
+To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, or set a number of decimal places for the raw value equal of bigger than \`decimalPlacesShownOnBlur\`.`, options.showWarnings);
+            }
         }
     }
 
@@ -3562,7 +3627,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         const optionsToUse = this._generateOptionsObjectFromOptionsArray(options);
 
         // Initiate a very basic settings object
-        let settings = Object.assign({}, this.getDefaultConfig(), optionsToUse);
+        const settings = Object.assign({}, this.getDefaultConfig(), optionsToUse);
         if (valueOrDomElement < 0) {
             settings.negativeSignCharacter = '-';
         }
@@ -3586,7 +3651,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         // Calculate the needed decimal places
-        settings = this._calculateDecimalPlaces(settings);
+        this._calculateDecimalPlacesOnInit(settings);
 
         // Everything is ok, proceed to rounding, formatting and grouping
         valueString = this._roundFormattedValueShownOnFocus(valueString, settings);
@@ -3646,7 +3711,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         const optionsToUse = this._generateOptionsObjectFromOptionsArray(options);
 
         // Generate the settings
-        let settings = Object.assign({}, this.getDefaultConfig(), optionsToUse);
+        const settings = Object.assign({}, this.getDefaultConfig(), optionsToUse);
         value = value.toString();
 
         // This checks if a negative sign is anywhere in the `value`, not just on the very first character (ie. '12345.67-')
@@ -3667,9 +3732,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             return NaN;
         }
 
-        // Calculate the decimal places needed
-        settings = this._calculateDecimalPlaces(settings);
-
+        // Calculate the needed decimal places
+        this._calculateDecimalPlacesOnInit(settings);
+        
         value = this._roundFormattedValueShownOnFocus(value, settings);
         value = value.replace(settings.decimalCharacter, '.'); // Here we need to convert back the decimal character to a period since `_roundValue` adds it in some cases
         value = this._toLocale(value, settings.outputFormat);
@@ -5117,11 +5182,21 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Handler for 'focusin' and 'mouseenter' events
+     * On focusin, multiple things happens :
+     * - If `Alt` is pressed, unformat
+     * - Remove the separators if `showOnlyNumbersOnFocus` is set
+     * - Depending on `emptyInputBehavior`, reformat the empty formatted value
+     * - Display the correct number of decimal places (on focus/blur)
+     * - Place the caret correctly if the element is empty
+     *
+     * Note: On focusin, the `rawValue` is never changed. Only the formatted value can be modified.
      *
      * @param {Event} e
      * @private
      */
     _onFocusInAndMouseEnter(e) {
+        this.isEditing = false; // Just in case no `keyUp` event have been sent (if the user lost the focus to the window while typing)
+
         //TODO `AutoNumericHelper.setElementValue` is called 3 times sequentially here, fix that
         //TODO Create separate handlers for the focus and mouseenter events
         const initialElementValue = AutoNumericHelper.getElementValue(this.domElement);
@@ -5148,14 +5223,17 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 AutoNumericHelper.setElementValue(this.domElement, this.constructor._removeBrackets(AutoNumericHelper.getElementValue(this.domElement), this.settings));
             }
 
+            // Use the rawValue, multiplied by `rawValueDivisor` if defined
+            const rawValueToFormat = this._getRawValueToFormat(this.rawValue);
+
             // Modify the element value according to the number of decimal places to show on focus or the `showOnlyNumbersOnFocus` option
-            if (this.rawValue !== '') {
+            if (rawValueToFormat !== '') {
                 // Round the given value according to the object state (focus/unfocused)
                 let roundedValue;
                 if (this.isFocused) {
-                    roundedValue = this.constructor._roundFormattedValueShownOnFocus(this.rawValue, this.settings);
+                    roundedValue = this.constructor._roundFormattedValueShownOnFocus(rawValueToFormat, this.settings);
                 } else {
-                    roundedValue = this.constructor._roundFormattedValueShownOnBlur(this.rawValue, this.settings);
+                    roundedValue = this.constructor._roundFormattedValueShownOnBlur(rawValueToFormat, this.settings);
                 }
 
                 if (this.settings.showOnlyNumbersOnFocus === AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers) {
@@ -5169,7 +5247,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     if (AutoNumericHelper.isNull(roundedValue)) {
                         formattedValue = '';
                     } else {
-                        formattedValue = this.constructor._addGroupSeparators(roundedValue.replace('.', this.settings.decimalCharacter), this.settings, this.isFocused, this.rawValue);
+                        formattedValue = this.constructor._addGroupSeparators(roundedValue.replace('.', this.settings.decimalCharacter), this.settings, this.isFocused, rawValueToFormat);
                     }
                     AutoNumericHelper.setElementValue(this.domElement, formattedValue);
                 }
@@ -5268,6 +5346,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {KeyboardEvent} e
      */
     _onKeydown(e) {
+        this.isEditing = true; // Keep track if the user is currently editing the element manually
+
         if (!this.isFocused && this.settings.unformatOnHover && e.altKey && this.domElement === AutoNumericHelper.getHoveredElement()) {
             // Here I prevent calling _unformatAltHovered if the element is already focused, since the global 'keydown' listener will pick it up as well
             this.constructor._unformatAltHovered(this);
@@ -5481,6 +5561,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {KeyboardEvent} e
      */
     _onKeyup(e) {
+        this.isEditing = false;
+
         if (this.settings.isCancellable && this.eventKey === AutoNumericEnum.keyName.Esc) {
             // If the user wants to cancel its modifications, we drop the 'keyup' event for the Esc key
             e.preventDefault();
@@ -5575,10 +5657,18 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Handler for 'focusout' events
+     * On focusout, multiple things happens :
+     * - The element value is formatted back if the `Alt` key was pressed,
+     * - The element value is formatted back if `showOnlyNumbersOnFocus` was set to only show numbers,
+     * - The element value is multiplied by `rawValueDivisor` on `blur`
+     *
+     * Note: On focusout, the `rawValue` is never changed. Only the formatted value can be modified.
      *
      * @param {Event} e
      */
     _onFocusOutAndMouseLeave(e) {
+        this.isEditing = false; // Just in case no `keyUp` event have been sent (if the user lost the focus to the window while typing)
+
         //TODO Create separate handlers for blur and mouseleave
         //FIXME Do not call `set()` if the current raw value is the same as the one we are trying to set (currently, on focus out, `set()` is always called, even if the value has not changed
         if (this.settings.unformatOnHover && e.type === 'mouseleave' && this.hoveredWithAlt) {
@@ -5588,28 +5678,28 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         if ((e.type === 'mouseleave' && !this.isFocused) || e.type === 'blur') {
-            const origValue = this.rawValue;
             this._saveValueToPersistentStorage();
-
             if (this.settings.showOnlyNumbersOnFocus === AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers) {
                 this.settings.digitGroupSeparator = this.originalDigitGroupSeparator;
                 this.settings.currencySymbol = this.originalCurrencySymbol;
                 this.settings.suffixText = this.originalSuffixText;
             }
 
+            // Use the rawValue, multiplied by `rawValueDivisor` if defined
+            const rawValueToFormat = this._getRawValueToFormat(this.rawValue);
+
             let value;
-            const isRawValueNull = AutoNumericHelper.isNull(this.rawValue);
-            if (isRawValueNull || this.rawValue === '') {
-                value = this.rawValue;
+            const isRawValueNull = AutoNumericHelper.isNull(rawValueToFormat);
+            if (isRawValueNull || rawValueToFormat === '') {
+                value = rawValueToFormat;
             } else {
-                value = String(this.rawValue);
+                value = String(rawValueToFormat);
             }
 
-            if (this.rawValue !== '' && !isRawValueNull) {
-                const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(this.rawValue, this.settings);
-                if (minTest && maxTest && !this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(this.rawValue, this.settings)) {
+            if (rawValueToFormat !== '' && !isRawValueNull) {
+                const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(rawValueToFormat, this.settings);
+                if (minTest && maxTest && !this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(rawValueToFormat, this.settings)) {
                     value = this._modifyNegativeSignAndDecimalCharacterForRawValue(value);
-                    this._setRawValue(this._trimLeadingAndTrailingZeros(value));
 
                     if (this.settings.divisorWhenUnfocused && !AutoNumericHelper.isNull(value)) {
                         value = value / this.settings.divisorWhenUnfocused;
@@ -5626,7 +5716,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                         AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
                     }
                 }
-            } else if (this.rawValue === '' && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {
+            } else if (rawValueToFormat === '' && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {
                 this._setRawValue('0');
                 value = this.constructor._roundValue('0', this.settings, 0);
             }
@@ -5635,15 +5725,15 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             let groupedValue = this.constructor._orderValueCurrencySymbolAndSuffixText(value, this.settings, false);
             if (!(this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(value, this.settings) ||
                 (isRawValueNull && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.null))) {
-                groupedValue = this.constructor._addGroupSeparators(value, this.settings, false, this.rawValue);
+                groupedValue = this.constructor._addGroupSeparators(value, this.settings, false, rawValueToFormat);
             }
 
             // Testing for `allowDecimalPadding.never` or `allowDecimalPadding.floats` is needed to make sure we do not keep a trailing decimalCharacter (like '500.') in the element, since the raw value would still be a correctly formatted integer ('500')
-            if (groupedValue !== origValue ||
-                origValue === '' || // This make sure we get rid on any currency symbol or suffix that might have been added on focus
+            if (groupedValue !== rawValueToFormat ||
+                rawValueToFormat === '' || // This make sure we get rid on any currency symbol or suffix that might have been added on focus
                 this.settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.never ||
                 this.settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.floats) {
-                if (this.settings.symbolWhenUnfocused && this.rawValue !== '' && this.rawValue !== null) {
+                if (this.settings.symbolWhenUnfocused && rawValueToFormat !== '' && rawValueToFormat !== null) {
                     groupedValue = `${groupedValue}${this.settings.symbolWhenUnfocused}`;
                 }
 
@@ -5654,6 +5744,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 AutoNumericHelper.triggerEvent(AutoNumeric.events.native.change, this.domElement);
                 delete this.valueOnFocus;
             }
+
+            this._onBlur(e);
         }
     }
 
@@ -6071,12 +6163,14 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {Event} e
      */
     _onBlur(e) {
+        // Keep track if the element is currently focused
+        this.isFocused = false;
+        // Keep track if the user is currently editing the element
+        this.isEditing = false;
+
         if (AutoNumericHelper.getElementValue(e.target) !== this.valueOnFocus) {
             AutoNumericHelper.triggerEvent(AutoNumeric.events.native.change, e.target);
         }
-
-        // Keep track if the element is currently focused
-        this.isFocused = false;
     }
 
     /**
@@ -6090,12 +6184,15 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // If that's the case, then he can use the 'Shift' modifier key while using the mouse wheel in order to bypass the increment/decrement feature
         // This is useful on small screen where some badly configured inputs could use all the available space.
         if (!e.shiftKey && this.settings.modifyValueOnWheel) {
+            this.isWheelEvent = true; // Keep the info that we are currently managing a mouse wheel event
+
             // 0) First, save the caret position so we can set it back once the value has been changed
             const selectionStart = e.target.selectionStart || 0;
             const selectionEnd = e.target.selectionEnd || 0;
 
             // 1) Get the unformatted value
             const currentUnformattedValue = this.rawValue;
+
             let result;
             if (AutoNumericHelper.isUndefinedOrNullOrEmpty(currentUnformattedValue)) {
                 // If by default the input is empty, start at '0'
@@ -6124,18 +6221,19 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 // Fixed method
                 // This is the simplest method, where a fixed offset in added/subtracted from the current value
                 if (AutoNumericHelper.isWheelUpEvent(e)) { // Increment
-                    result = result + step;
+                    result += step;
                 } else if (AutoNumericHelper.isWheelDownEvent(e)) { // Decrement
-                    result = result - step;
+                    result -= step;
                 }
             } else {
                 // Progressive method
                 // For this method, we calculate an offset that is in relation to the size of the current number (using only the integer part size).
                 // The bigger the number, the bigger the offset (usually the number count in the integer part minus 3, except for small numbers where a different behavior is better for the user experience).
+                //TODO Known limitation : The progressive method does not play well with numbers between 0 and 1 where to modify the decimal places the rawValue first has to go from '1' to '0'
                 if (AutoNumericHelper.isWheelUpEvent(e)) { // Increment
-                    result = AutoNumericHelper.addAndRoundToNearestAuto(result);
+                    result = AutoNumericHelper.addAndRoundToNearestAuto(result, this.settings.decimalPlacesRawValue);
                 } else if (AutoNumericHelper.isWheelDownEvent(e)) { // Decrement
-                    result = AutoNumericHelper.subtractAndRoundToNearestAuto(result);
+                    result = AutoNumericHelper.subtractAndRoundToNearestAuto(result, this.settings.decimalPlacesRawValue);
                 }
             }
 
@@ -6153,6 +6251,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             // 4) Finally, we set back the caret position/selection
             // There is no need to take into account the fact that the number count could be different at the end of the wheel event ; it would be too complex and most of the time unreliable
             this._setSelection(selectionStart, selectionEnd);
+
+            this.isWheelEvent = false; // Set back the mouse wheel indicator to its default
         }
     }
 
@@ -6162,10 +6262,12 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {DragEvent} e
      */
     _onDrop(e) {
+        this.isDropEvent = true;
         e.preventDefault();
         const droppedText = e.dataTransfer.getData('text/plain');
         const cleanedValue = this.unformatOther(droppedText);
         this.set(cleanedValue);
+        this.isDropEvent = false;
     }
 
     /**
@@ -6423,9 +6525,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Correct the `caretPositionOnFocus` and `selectOnFocus` options, since setting both leads to a conflict.
+     * This method directly modifies the `options` object passed as a parameter, then returns it.
+     * It returns `null` if the given option is `null`.
      *
      * @param {object} options The options passed as an argument by the user
-     * @returns {object}
+     * @returns {object|null}
      * @private
      */
     static _correctCaretPositionOnFocusAndSelectOnFocusOptions(options) {
@@ -6449,7 +6553,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     /**
      * Calculate the number de decimal places to be used by the AutoNumeric object, for each of its state, and for its formatted and raw value.
      * By default, the `rawValue` precision is the same as the formatted value one.
-     * 
+     *
+     * This method is called during the AutoNumeric object initialization. This assumes some internal variable state.
+     *
      * This methods set the following options accordingly to their own value and the mandatory `decimalPlaces` option:
      * - decimalPlacesRawValue     (nullable)
      * - decimalPlacesShownOnBlur  (nullable)
@@ -6458,34 +6564,132 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Note: the `decimalPlaces` option is only used here and only serve to define those three previous options value.
      * AutoNumeric will then *only* use `decimalPlacesRawValue`, `decimalPlacesShownOnBlur` and `decimalPlacesShownOnFocus` from there.
      *
-     * It finally returns the modified settings object.
+     * This methods directly modifies the `settings` object passed as a parameter.
      *
-     * @param {object} settings
-     * @returns {object}
+     * @param {object} settings This is an object with the new settings to use.
      * @private
      */
-    static _calculateDecimalPlaces(settings) {
-        // Sets `decimalPlacesShownOnBlur` (previously known as `scaleDecimalPlaces`)
-        if (settings.decimalPlacesShownOnBlur === AutoNumeric.options.decimalPlacesShownOnBlur.useDefault) {
-            settings.decimalPlacesShownOnBlur = settings.decimalPlaces;
-        }
+    static _calculateDecimalPlacesOnInit(settings) {
+        // Check the `decimalPlaces*` options and output any warnings as needed, before modifying those options
+        this._validateDecimalPlacesRawValue(settings);
 
-        // Sets `decimalPlacesShownOnFocus`
-        if (settings.decimalPlacesShownOnFocus === AutoNumeric.options.decimalPlacesShownOnFocus.useDefault) {
+        // Initialization phase
+        //XXX This assumes at this stage, `settings.decimalPlaces` as been set from the default options
+
+        // Overwrite the `decimalPlaces*` values if the `decimalPlaces*` options are not set in the `settings`
+        // Sets `decimalPlacesShownOnBlur` (previously known as `scaleDecimalPlaces`)
+        if (settings.decimalPlacesShownOnFocus === AutoNumeric.options.decimalPlacesShownOnFocus.useDefault)  {
             settings.decimalPlacesShownOnFocus = settings.decimalPlaces;
         }
 
-        // Sets `decimalPlacesRawValue`
-        // If decimalPlacesRawValue is null, set `decimalPlacesRawValue` with the highest number of decimal places between decimalPlaces, decimalPlacesShownOnFocus and decimalPlacesShownOnBlur.
-        if (settings.decimalPlacesRawValue === AutoNumeric.options.decimalPlacesRawValue.useDefault) {
-            settings.decimalPlacesRawValue = Math.max(
-                settings.decimalPlaces,
-                settings.decimalPlacesShownOnBlur,
-                settings.decimalPlacesShownOnFocus
-            );
+        if (settings.decimalPlacesShownOnBlur === AutoNumeric.options.decimalPlacesShownOnBlur.useDefault)  {
+            settings.decimalPlacesShownOnBlur = settings.decimalPlaces;
         }
 
-        return settings;
+        if (settings.decimalPlacesRawValue === AutoNumeric.options.decimalPlacesRawValue.useDefault)  {
+            settings.decimalPlacesRawValue = settings.decimalPlaces;
+        }
+
+        // Add the additional decimal places to the raw value
+        let additionalDecimalPlacesRawValue = 0;
+        if (settings.rawValueDivisor && settings.rawValueDivisor !== AutoNumeric.options.rawValueDivisor.none) {
+            additionalDecimalPlacesRawValue = String(settings.rawValueDivisor).length - 1; // ie. Dividing by '100' adds 2 decimal places to the needed precision
+            if (additionalDecimalPlacesRawValue < 0) {
+                additionalDecimalPlacesRawValue = 0;
+            }
+        }
+
+        settings.decimalPlacesRawValue = Math.max(
+            Math.max(settings.decimalPlacesShownOnBlur, settings.decimalPlacesShownOnFocus) + additionalDecimalPlacesRawValue,
+            Number(settings.originalDecimalPlacesRawValue) + additionalDecimalPlacesRawValue
+        );
+    }
+
+    /**
+     * Recalculate the number de decimal places to be used by the AutoNumeric object, for each of its state, and for its formatted and raw value.
+     * By default, the `rawValue` precision is the same as the formatted value one.
+     *
+     * This method is close to the one called during initialization, `_calculateDecimalPlacesOnInit()`, but with slight difference so that the `decimalPlaces*` options are correctly updated as needed.
+     *
+     * This methods set the following options accordingly to their own value and the mandatory `decimalPlaces` option:
+     * - decimalPlacesRawValue     (nullable)
+     * - decimalPlacesShownOnBlur  (nullable)
+     * - decimalPlacesShownOnFocus (nullable)
+     *
+     * Note: the `decimalPlaces` option is only used here and only serve to define those three previous options value.
+     * AutoNumeric will then *only* use `decimalPlacesRawValue`, `decimalPlacesShownOnBlur` and `decimalPlacesShownOnFocus` from there.
+     *
+     * This methods directly modifies the `settings` object passed as a parameter.
+     *
+     * @param {object} settings This is an object with the new settings to use.
+     * @param {object} currentSettings This is the current settings (`this.settings`) used by the element.
+     * @private
+     */
+    static _calculateDecimalPlacesOnUpdate(settings, currentSettings = null) {
+        // Check the `decimalPlaces*` options and output any warnings as needed, before modifying those options
+        this._validateDecimalPlacesRawValue(settings);
+
+        // Update phase
+        if (AutoNumericHelper.isNull(currentSettings)) {
+            AutoNumericHelper.throwError(`When updating the settings, the previous ones should be passed as an argument.`);
+        }
+
+        const decimalPlacesInOptions = 'decimalPlaces' in settings;
+        if (!(decimalPlacesInOptions ||
+                'decimalPlacesRawValue' in settings ||
+                'decimalPlacesShownOnFocus' in settings ||
+                'decimalPlacesShownOnBlur' in settings ||
+                'rawValueDivisor' in settings)) {
+            // Do Nothing if no decimal places-related options are modified
+            return;
+        }
+
+        // Overwrite the `decimalPlaces*` values if the `decimalPlaces*` options are not set in the `settings`
+        if (decimalPlacesInOptions) {
+            if (!('decimalPlacesShownOnFocus' in settings) ||
+                settings.decimalPlacesShownOnFocus === AutoNumeric.options.decimalPlacesShownOnFocus.useDefault)  {
+                settings.decimalPlacesShownOnFocus = settings.decimalPlaces;
+            }
+
+            if (!('decimalPlacesShownOnBlur' in settings) ||
+                settings.decimalPlacesShownOnBlur === AutoNumeric.options.decimalPlacesShownOnBlur.useDefault)  {
+                settings.decimalPlacesShownOnBlur = settings.decimalPlaces;
+            }
+
+            if (!('decimalPlacesRawValue' in settings) ||
+                settings.decimalPlacesRawValue === AutoNumeric.options.decimalPlacesRawValue.useDefault)  {
+                settings.decimalPlacesRawValue = settings.decimalPlaces;
+            }
+        } else {
+            if (AutoNumericHelper.isUndefined(settings.decimalPlacesShownOnFocus)) {
+                settings.decimalPlacesShownOnFocus = currentSettings.decimalPlacesShownOnFocus;
+            }
+
+            if (AutoNumericHelper.isUndefined(settings.decimalPlacesShownOnBlur)) {
+                settings.decimalPlacesShownOnBlur = currentSettings.decimalPlacesShownOnBlur;
+            }
+        }
+
+        // Add the additional decimal places to the raw value
+        let additionalDecimalPlacesRawValue = 0;
+        if (settings.rawValueDivisor && settings.rawValueDivisor !== AutoNumeric.options.rawValueDivisor.none) {
+            additionalDecimalPlacesRawValue = String(settings.rawValueDivisor).length - 1; // ie. Dividing by '100' adds 2 decimal places to the needed precision
+            if (additionalDecimalPlacesRawValue < 0) {
+                additionalDecimalPlacesRawValue = 0;
+            }
+        }
+
+        if (!settings.decimalPlaces && !settings.decimalPlacesRawValue) {
+            settings.decimalPlacesRawValue = Math.max(
+                Math.max(settings.decimalPlacesShownOnBlur, settings.decimalPlacesShownOnFocus) + additionalDecimalPlacesRawValue,
+                Number(currentSettings.originalDecimalPlacesRawValue) + additionalDecimalPlacesRawValue
+            );
+        } else {
+            settings.decimalPlacesRawValue = Math.max(
+                Math.max(settings.decimalPlacesShownOnBlur, settings.decimalPlacesShownOnFocus) + additionalDecimalPlacesRawValue,
+                Number(settings.decimalPlacesRawValue) + additionalDecimalPlacesRawValue
+            );
+        }
     }
 
     /**
@@ -6635,6 +6839,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             onInvalidPaste                    : true,
             outputFormat                      : true,
             overrideMinMaxLimits              : true,
+            rawValueDivisor                   : true,
             readOnly                          : true,
             roundingMethod                    : true,
             saveValueToSessionStorage         : true,
@@ -6658,6 +6863,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             mIntPos                           : true,
             negativeSignCharacter             : true,
             numRegAutoStrip                   : true,
+            originalDecimalPlaces             : true,
+            originalDecimalPlacesRawValue     : true,
             positiveSignCharacter             : true,
             skipFirstAutoStrip                : true,
             skipLastAutoStrip                 : true,
@@ -6693,6 +6900,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     /**
      * Analyse the settings/options passed by the user, validate and clean them, then set them into `this.settings`.
      * Note: This sets the settings to `null` if somehow the settings objet is undefined or empty
+     *       If only `decimalPlaces` is defined in the option, overwrite the other decimalPlaces* options, otherwise, use those options
      *
      * @param {object} options
      * @param {boolean} update - If set to `true`, then the settings already exists and this function only updates them instead of recreating them from scratch
@@ -6706,14 +6914,21 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         if (update) {
             // The settings are updated
-            if ('decimalPlaces' in options) {
-                // If `decimalPlaces` is defined in `options`, reset the other `decimalPlaces*` options to their default value
-                this._resetDecimalPlacesVariables();
-            } else if (!('decimalPlacesRawValue' in options) && ('decimalPlacesShownOnFocus' in options || 'decimalPlacesShownOnBlur' in options)) {
-                // This force an update of the needed `decimalPlacesRawValue` precision when modifying the `decimalPlacesShown*` options
-                this.settings.decimalPlacesRawValue = AutoNumeric.options.decimalPlacesRawValue.useDefault;
+            // Update the original data, if it has changed
+            const decimalPlacesRawValueInOptions = 'decimalPlacesRawValue' in options;
+            if (decimalPlacesRawValueInOptions) {
+                this.settings.originalDecimalPlacesRawValue = options.decimalPlacesRawValue;
             }
 
+            const decimalPlacesInOptions = 'decimalPlaces' in options;
+            if (decimalPlacesInOptions) {
+                this.settings.originalDecimalPlaces = options.decimalPlaces;
+            }
+
+            // Then update all the `decimalPlaces*` options
+            this.constructor._calculateDecimalPlacesOnUpdate(options, this.settings);
+
+            // Finally generate the updated settings object to use
             this._mergeSettings(options); //TODO Check that the `styleRules` option is correctly cloned (due to depth cloning limitation)
         } else {
             // The settings are generated for the first time
@@ -6731,21 +6946,38 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Modify the user settings to make them 'exploitable'
         this._transformOptionsValuesToDefaultTypes();
 
+        // Immediately run the callbacks that could update the settings object
+        this._runCallbacksFoundInTheSettingsObject();
+
         // Improve the `negativePositiveSignPlacement` option if needed
         this._correctNegativePositiveSignPlacementOption();
 
         // Set the `caretPositionOnFocus` and `selectOnFocus` options so that they do not conflict, if one of those have been set manually by the user.
-        // If order to check that, we take a look at the original options the user passed as an argument, not `this.settings` that have been merged with the default settings.
-        this.settings = this.constructor._correctCaretPositionOnFocusAndSelectOnFocusOptions(this.settings);
+        // If order to check that, we take a look at the original options the user passed as an argument, not `this.settings` that have been merged with the default settings. //TODO Check the validity of that comment
+        this.constructor._correctCaretPositionOnFocusAndSelectOnFocusOptions(this.settings);
 
         // Set the negative and positive signs, as needed
         this.settings.negativeSignCharacter = this.settings.minimumValue < 0 ? '-' : '';
         this.settings.positiveSignCharacter = this.settings.maximumValue >= 0 ? '+' : '';
 
+        // Calculate the number of decimal places (during the element initialization)
+        if (!update) {
+            // Make sure the `originalDecimalPlaces` info is set
+            if (AutoNumericHelper.isNull(options) || !options.decimalPlaces) {
+                this.settings.originalDecimalPlaces = null;
+            } else {
+                this.settings.originalDecimalPlaces = options.decimalPlaces;
+            }
+
+            // Save the `originalDecimalPlacesRawValue` info
+            this.settings.originalDecimalPlacesRawValue = this.settings.decimalPlacesRawValue;
+
+            // Then update all the `decimalPlaces*` options
+            this.constructor._calculateDecimalPlacesOnInit(this.settings);
+        }
+
         // Additional changes to the settings object
-        this._runCallbacksFoundInTheSettingsObject();
         this._calculateVMinAndVMaxIntegerSizes();
-        this.constructor._calculateDecimalPlaces(this.settings);
         this._setAlternativeDecimalSeparatorCharacter();
         this._setTrailingNegativeSignInfo();
         this.regex = {}; // Create the object that will store the regular expressions
@@ -6753,10 +6985,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this._setBrackets();
 
         // Validate the settings. Both tests throws if necessary.
-        this.constructor.validate(this.settings, false, options);
         if (AutoNumericHelper.isEmptyObj(this.settings)) {
             AutoNumericHelper.throwError('Unable to set the settings, those are invalid ; an empty object was given.');
         }
+
+        this.constructor.validate(this.settings, false, options);
 
         // Original settings saved for use when decimalPlacesShownOnFocus, divisorWhenUnfocused & showOnlyNumbersOnFocus options are being used
         this._keepAnOriginalSettingsCopy();

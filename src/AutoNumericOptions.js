@@ -263,10 +263,10 @@ Object.defineProperty(AutoNumeric, 'options', {
              * Note: The `getNumericString` method returns the full value, including the 'hidden' decimals.
              */
             divisorWhenUnfocused: {
-                doNotActivateTheScalingOption: null,
-                percentage                   : 100,
-                permille                     : 1000,
-                basisPoint                   : 10000,
+                none      : null,
+                percentage: 100,
+                permille  : 1000,
+                basisPoint: 10000,
             },
 
             /* Defines what should be displayed in the element if the raw value is an empty string ('').
@@ -419,21 +419,11 @@ Object.defineProperty(AutoNumeric, 'options', {
             /* Defines if the element should have event listeners activated on it.
              * By default, those event listeners are only added to <input> elements and html element with the `contenteditable` attribute set to `true`, but not on the other html tags.
              * This allows to initialize elements without any event listeners.
-             * Warning: Since AutoNumeric will not check the input content after its initialization, using some autoNumeric methods will probably leads to formatting problems.
+             * Warning: Since AutoNumeric will not check the input content after its initialization, using some autoNumeric methods afterwards *will* probably leads to formatting problems.
              */
             noEventListeners: {
                 noEvents : true,
                 addEvents: false,
-            },
-
-            /* Defines if the element value should be converted to the raw value on focus (and back to the formatted on blur).
-             * If set to `true`, then autoNumeric remove the thousand separator, currency symbol and suffix on focus.
-             * Example:
-             * If the input value is '$ 1,999.88 suffix', on focus it becomes '1999.88' and back to '$ 1,999.88 suffix' on focus out.
-             */
-            showOnlyNumbersOnFocus: {
-                onlyNumbers: true,
-                showAll    : false,
             },
 
             /* Manage how autoNumeric react when the user tries to paste an invalid number.
@@ -487,6 +477,18 @@ Object.defineProperty(AutoNumeric, 'options', {
                 floor        : 'floor',
                 ignore       : 'ignore',
                 doNotOverride: null,
+            },
+
+            /* The `rawValueDivisor` divides the formatted value shown in the AutoNumeric element and store the result in `rawValue`.
+             * @example { rawValueDivisor: '100' } or <input data-raw-value-divisor="100">
+             * Given the `0.01234` raw value, the formatted value will be displayed as `'1.234'`.
+             * This is useful when displaying percentage for instance, and avoid the need to divide/multiply by 100 between the number shown and the raw value.
+             */
+            rawValueDivisor: {
+                none      : null,
+                percentage: 100,
+                permille  : 1000,
+                basisPoint: 10000,
             },
 
             /* Defines if the <input> element should be set as read only on initialization.
@@ -562,6 +564,16 @@ Object.defineProperty(AutoNumeric, 'options', {
             serializeSpaces: {
                 plus   : '+',
                 percent: '%20',
+            },
+
+            /* Defines if the element value should be converted to the raw value on focus (and back to the formatted on blur).
+             * If set to `true`, then autoNumeric remove the thousand separator, currency symbol and suffix on focus.
+             * Example:
+             * If the input value is '$ 1,999.88 suffix', on focus it becomes '1999.88' and back to '$ 1,999.88 suffix' on focus out.
+             */
+            showOnlyNumbersOnFocus: {
+                onlyNumbers: true,
+                showAll    : false,
             },
 
             /* Allow the positive sign symbol `+` to be displayed for positive numbers.

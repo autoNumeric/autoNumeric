@@ -104,7 +104,7 @@
     "wdio-spec-reporter": "^0.0.5",
     "wdio-static-server-service": "^1.0.1",
     "webdriverio": "^4.6.1",
-    "webpack": "latest"
+    "webpack": "1.14.0"
   },
   "scripts": {
     "authors": "sh tools/authors.sh",

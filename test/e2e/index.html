@@ -727,6 +727,16 @@
 			<p id="result_447">Testing value for `null`</p>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #452</p>
+			<input id="issue_452" type="text" placeholder="#452" value="">
+			<input id="issue_452_unfocus" type="text" placeholder="unfocus here" value="">
+			<input id="issue_452_formatted" type="text" placeholder="Formatted on load" value="0.12345">
+			<p id="result_452">Testing the raw value</p>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1572,6 +1582,24 @@
         result447.textContent = 'Input value is null';
     }
 
+    //-------------- Issue #452
+    const anElement452 = new AutoNumeric('#issue_452', { rawValueDivisor: AutoNumeric.options.rawValueDivisor.percentage });
+//    const anElement452 = new AutoNumeric('#issue_452', { rawValueDivisor: 100.345 });
+    const anElement452Formatted = new AutoNumeric('#issue_452_formatted', AutoNumeric.getPredefinedOptions().percentageEU2dec);
+    const input452 = document.getElementById('issue_452');
+    const result452 = document.getElementById('result_452');
+    input452.addEventListener('input', () => {
+        result452.textContent = anElement452.getNumber();
+    }, false);
+    input452.addEventListener('wheel', () => {
+        result452.textContent = anElement452.getNumber();
+    }, false);
+    input452.addEventListener('paste', () => {
+        result452.textContent = anElement452.getNumber();
+    }, false);
+    input452.addEventListener('drop', () => {
+        result452.textContent = anElement452.getNumber();
+    }, false);
 </script>
 </body>
 </html>

@@ -179,6 +179,10 @@ const selectors = {
     issue442Submit                    : '#issue_442_submit',
     issue447                          : '#issue_447',
     result447                         : '#result_447',
+    issue452                          : '#issue_452',
+    issue452Unfocus                   : '#issue_452_unfocus',
+    issue452Formatted                 : '#issue_452_formatted',
+    result452                         : '#result_452',
 };
 
 //-----------------------------------------------------------------------------
@@ -192,7 +196,7 @@ function helperGetCaretPosition(wdioElement) { //FIXME Find a way to allow using
     console.log('selector:', selector); //DEBUG
 
     const element = document.querySelector(selector);
-    console.log('element.selectionStart:', element.selectionStart); //DEBUG 
+    console.log('element.selectionStart:', element.selectionStart); //DEBUG
     return element.selectionStart;
 }
 */
@@ -3193,5 +3197,80 @@ describe('`emptyInputBehavior` option', () => {
         expect(result).toBeNull();
     });
 
-    //FIXME Test that no error are produced when hovering the input
+    //TODO Test that no error are produced when hovering the input
+});
+
+describe('`rawValueDivisor` option', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue452)).toEqual('');
+        expect(browser.getText(selectors.result452)).toEqual('Testing the raw value');
+    });
+
+    it('should update the raw value when divided by a `rawValueDivisor`, and the value is modified manually', () => {
+        // Test entering a number manually, and getting the divided raw value
+        $(selectors.issue452).click(); // Focus on the input element
+        expect(browser.getValue(selectors.issue452)).toEqual('');
+        browser.keys('1234');
+        expect(browser.getValue(selectors.issue452)).toEqual('1,234');
+        expect(browser.getText(selectors.result452)).toEqual('12.34');
+
+        // Test the rawValue directly
+        const result = browser.execute(() => {
+            const input = document.querySelector('#issue_452');
+            const an    = AutoNumeric.getAutoNumericElement(input);
+            return an.getNumericString();
+        }).value;
+        expect(result).toEqual('12.34');
+
+        browser.keys('567.8');
+        expect(browser.getValue(selectors.issue452)).toEqual('1,234,567.8');
+        expect(browser.getText(selectors.result452)).toEqual('12345.678');
+    });
+
+    it('should keep the correct raw value (divided by `rawValueDivisor`) when the element is unfocused', () => {
+        // Focus out of that input and check that the formatted and raw value are still ok
+        $(selectors.issue452Unfocus).click(); // First we change the focus to another element, then try to `set()` a value.
+        expect(browser.getValue(selectors.issue452)).toEqual('1,234,567.80');
+        expect(browser.getText(selectors.result452)).toEqual('12345.678');
+    });
+
+    it('should update the raw value when divided by a `rawValueDivisor`, and the value is modified via a script, while the element is unfocused', () => {
+        // Modify the element value while it does not have the focus
+        const result = browser.execute(() => {
+            const input = document.querySelector('#issue_452');
+            const an = AutoNumeric.getAutoNumericElement(input);
+            an.update(AutoNumeric.getPredefinedOptions().percentageEU3dec);
+            an.set(0.0221456); // This makes sure that if the element is currently unfocused, and an external script modify its value with `set`, the `rawValueDivisor` option is not used. This should only be used when the user is actually inputting numbers manually.
+            return an.getNumericString();
+        }).value;
+        expect(result).toEqual('0.02215');
+        expect(browser.getValue(selectors.issue452)).toEqual('2,215\u202f%');
+        // browser.keys('Esc', 'Esc');
+        // browser.keys('Backspace');
+    });
+
+    it('should update the raw value when divided by a `rawValueDivisor`, and the value is modified via a script, while the element is focused', () => {
+        // Modify the element value while it has the focus
+        $(selectors.issue452).click(); // Focus on the input element
+        const result = browser.execute(() => {
+            const input = document.querySelector('#issue_452');
+            const an = AutoNumeric.getAutoNumericElement(input);
+            an.set(0.07621327); // This makes sure that if the element is currently focused in, and an external script modify its value with `set`, the `rawValueDivisor` option is not used. This should only be used when the user is actually inputting numbers manually.
+            return an.getNumericString();
+        }).value;
+        expect(result).toEqual('0.07621');
+        expect(browser.getValue(selectors.issue452)).toEqual('7,621\u202f%');
+    });
+
+    it('should update on load the formatted and raw value when divided by a `rawValueDivisor`', () => {
+        expect(browser.getValue(selectors.issue452Formatted)).toEqual('12,35\u202f%');
+        const result = browser.execute(() => {
+            const input = document.querySelector('#issue_452_formatted');
+            const an = AutoNumeric.getAutoNumericElement(input);
+            return an.getNumericString();
+        }).value;
+        expect(result).toEqual('0.1235');
+    });
 });

@@ -289,6 +289,40 @@ export default class AutoNumericHelper {
     }
 
     /**
+     * Return the index of the first non-zero decimal place in the given value.
+     * The index starts after the decimal point, if any, and begins at '1'.
+     * If no decimal places are found in the value, this function returns `0`.
+     *
+     * @example
+     * indexFirstNonZeroDecimalPlace('0.00') -> 0
+     * indexFirstNonZeroDecimalPlace('1.00') -> 0
+     * indexFirstNonZeroDecimalPlace('0.12') -> 1
+     * indexFirstNonZeroDecimalPlace('0.1234') -> 1
+     * indexFirstNonZeroDecimalPlace('0.01234') -> 2
+     * indexFirstNonZeroDecimalPlace('0.001234') -> 3
+     * indexFirstNonZeroDecimalPlace('0.0001234') -> 4
+     *
+     * @param {number} value
+     * @returns {Number|number}
+     */
+    static indexFirstNonZeroDecimalPlace(value) {
+        const [, decimalPart] = String(Math.abs(value)).split('.');
+
+        if (this.isUndefined(decimalPart)) {
+            return 0;
+        }
+
+        let result = decimalPart.lastIndexOf('0');
+        if (result === -1) {
+            result = 0;
+        } else {
+            result += 2;
+        }
+
+        return result;
+    }
+
+    /**
      * Return the code for the key used to generate the given event.
      *
      * @param {Event} event
@@ -751,6 +785,30 @@ export default class AutoNumericHelper {
     }
 
     /**
+     * Return the given raw value truncated at the given number of decimal places `decimalPlaces`.
+     * This function does not round the value.
+     *
+     * @example
+     * forceDecimalPlaces(123.45678, 0) -> '123.45678'
+     * forceDecimalPlaces(123.45678, 1) -> '123.4'
+     * forceDecimalPlaces(123.45678, 2) -> '123.45'
+     * forceDecimalPlaces(123.45678, 3) -> '123.456'
+     *
+     * @param {number} value
+     * @param {int} decimalPlaces
+     * @returns {number|string}
+     */
+    static forceDecimalPlaces(value, decimalPlaces) {
+        // We could make sure `decimalPlaces` is an integer and positive, but we'll leave that to the dev calling this function.
+        const [integerPart, decimalPart] = String(value).split('.');
+        if (!decimalPart) {
+            return value;
+        }
+
+        return `${integerPart}.${decimalPart.substr(0, decimalPlaces)}`;
+    }
+
+    /**
      * Return the 'nearest rounded' value, according to the given step size.
      * @example roundToNearest(264789, 10000)) => 260000
      *
@@ -759,85 +817,154 @@ export default class AutoNumericHelper {
      * @returns {*}
      */
     static roundToNearest(value, stepPlace = 1000) {
-        if (value <= 10 && value >= -10) {
-            return value;
-        }
-
         if (0 === value) {
             return 0;
+        }
+
+        if (stepPlace === 0) {
+            this.throwError('The `stepPlace` used to round is equal to `0`. This value must not be equal to zero.');
         }
 
         return Math.round(value / stepPlace) * stepPlace;
     }
 
     /**
-     * Return the 'nearest rounded' value automatically by adding or subtracting the calculated offset to the initial value.
-     * This is done without having to pass a step to this function.
+     * Return the 'nearest rounded' value by automatically adding or subtracting the calculated offset to the initial value.
+     * This is done without having to pass a step to this function, and based on the size of the given `value`.
+     *
      * @example                    Calculated offset
-     *           1 ->           1 (10)
+     *           1 ->           1 (1)
      *          14 ->          10 (10)
      *         143 ->         140 (10)
      *       1.278 ->       1.300 (100)
      *      28.456 ->      28.500 (100)
-     *     276.345 ->     276.000 (1000)
-     *   4.534.061 ->   4.530.000 (10000)
-     *  66.723.844 ->  66.700.000 (100000)
-     * 257.833.411 -> 258.000.000 (1000000)
+     *     276.345 ->     276.000 (1.000)
+     *   4.534.061 ->   4.530.000 (10.000)
+     *  66.723.844 ->  66.700.000 (100.000)
+     * 257.833.411 -> 258.000.000 (1.000.000)
+     *
+     *                           Initial   Added   Offset
+     * 2 decimalPlacesRawValue : 1.12   -> 2.00   (1)
+     * 3 decimalPlacesRawValue : 1.123  -> 2.000  (1)
+     *
+     * Special case when the `value` to round is between -1 and 1, excluded :
+     * @example
+     *     Number of             Initial   Result  Calculated
+     *     decimal places        value     (add)   offset
+     * 2 decimalPlacesRawValue : 0.12   -> 0.13    (0.01) : Math.pow(10, -2)
+     * 2 decimalPlacesRawValue : 0.01   -> 0.02    (0.01)
+     * 2 decimalPlacesRawValue : 0.00   -> 0.01    (0.01)
+     *
+     * 3 decimalPlacesRawValue : 0.123  -> 0.133   (0.01)  : Math.pow(10, -2)
+     * 3 decimalPlacesRawValue : 0.012  -> 0.013   (0.001) : Math.pow(10, -3)
+     * 3 decimalPlacesRawValue : 0.001  -> 0.001   (0.001)
+     * 3 decimalPlacesRawValue : 0.000  -> 0.001   (0.001)
+     *
+     * 4 decimalPlacesRawValue : 0.4123 -> 0.4200  (0.01)   : Math.pow(10, -2)
+     * 4 decimalPlacesRawValue : 0.0412 -> 0.0420  (0.001)  : Math.pow(10, -3)
+     * 4 decimalPlacesRawValue : 0.0041 -> 0.0042  (0.0001) : Math.pow(10, -4)
+     * 4 decimalPlacesRawValue : 0.0004 -> 0.0005  (0.0001)
+     * 4 decimalPlacesRawValue : 0.0000 -> 0.0001  (0.0001)
      *
      * @param {number} value
      * @param {boolean} isAddition
+     * @param {int} decimalPlacesRawValue The precision needed by the `rawValue`
      * @returns {*}
      */
-    static modifyAndRoundToNearestAuto(value, isAddition) {
-        value = parseInt(value, 10);
-        const lengthValue = Math.abs(value).toString().length; // Math.abs is needed here to omit the negative sign '-' in case of a negative value
+    static modifyAndRoundToNearestAuto(value, isAddition, decimalPlacesRawValue) {
+        value = Number(this.forceDecimalPlaces(value, decimalPlacesRawValue)); // Make sure that '0.13000000001' is converted to the number of rawValue decimal places '0.13'
 
-        let pow;
-        switch (lengthValue) {
-            // Special cases for small numbers
-            case 1:
-            case 2:
-            case 3:
-                pow = 1;
-                break;
-            case 4:
-            case 5:
-                pow = 2;
-                break;
-            // Default behavior
-            default:
-                pow = lengthValue - 3;
-        }
-        const offset = Math.pow(10, pow);
+        const absValue = Math.abs(value);
+        if (absValue >= 0 && absValue < 1) {
+            const rawValueMinimumOffset = Math.pow(10, -decimalPlacesRawValue);
+            if (value === 0) {
+                // 4 decimalPlacesRawValue : 0.0000 -> 0.0001 (0.0001)
+                return (isAddition)?rawValueMinimumOffset:-rawValueMinimumOffset;
+            }
 
-        let result;
-        if (isAddition) {
-            result = value + offset;
+            let offset;
+            const minimumOffsetFirstDecimalPlaceIndex = decimalPlacesRawValue;
+            // Find where is the first non-zero decimal places
+            const indexFirstNonZeroDecimalPlace = this.indexFirstNonZeroDecimalPlace(value);
+            if (indexFirstNonZeroDecimalPlace >= minimumOffsetFirstDecimalPlaceIndex - 1) {
+                /* 4 decimalPlacesRawValue : 0.0041 -> 0.0042 (0.0001) : Math.pow(10, -4)
+                 * 4 decimalPlacesRawValue : 0.0004 -> 0.0005 (0.0001)
+                 */
+                offset = rawValueMinimumOffset;
+            } else {
+                offset = Math.pow(10, -(indexFirstNonZeroDecimalPlace + 1));
+            }
+
+            let result;
+            if (isAddition) {
+                result = value + offset;
+            } else {
+                result = value - offset;
+            }
+
+            return this.roundToNearest(result, offset);
         } else {
-            result = value - offset;
-        }
+            // For values >= 1
+            value = parseInt(value, 10);
+            const lengthValue = Math.abs(value).toString().length; // `Math.abs()` is needed here to omit the negative sign '-' in case of a negative value
 
-        return this.roundToNearest(result, Math.pow(10, pow));
+            let pow;
+            switch (lengthValue) {
+                // Special cases for small numbers
+                case 1:
+                    pow = 0;
+                    break;
+                case 2:
+                case 3:
+                    pow = 1;
+                    break;
+                case 4:
+                case 5:
+                    pow = 2;
+                    break;
+                // Default behavior
+                default:
+                    pow = lengthValue - 3;
+            }
+            const offset = Math.pow(10, pow);
+
+            let result;
+            if (isAddition) {
+                result = value + offset;
+            } else {
+                result = value - offset;
+            }
+
+            if (result <= 10 && result >= -10) {
+                return result;
+            }
+
+            return this.roundToNearest(result, offset);
+        }
     }
 
     /**
      * Return the 'nearest rounded' value automatically by adding the calculated offset to the initial value.
+     * This will limit the result to the given number of decimal places `decimalPlacesLimit`.
      *
      * @param {number} value
+     * @param {int} decimalPlacesLimit
      * @returns {*}
      */
-    static addAndRoundToNearestAuto(value) {
-        return this.modifyAndRoundToNearestAuto(value, true);
+    static addAndRoundToNearestAuto(value, decimalPlacesLimit) {
+        return this.modifyAndRoundToNearestAuto(value, true, decimalPlacesLimit);
     }
 
     /**
      * Return the 'nearest rounded' value automatically by subtracting the calculated offset to the initial value.
+     * This will limit the result to the given number of decimal places `decimalPlacesLimit`.
      *
      * @param {number} value
+     * @param {int} decimalPlacesLimit
      * @returns {*}
      */
-    static subtractAndRoundToNearestAuto(value) {
-        return this.modifyAndRoundToNearestAuto(value, false);
+    static subtractAndRoundToNearestAuto(value, decimalPlacesLimit) {
+        return this.modifyAndRoundToNearestAuto(value, false, decimalPlacesLimit);
     }
 
     /**

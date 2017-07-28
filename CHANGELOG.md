@@ -7,6 +7,30 @@
 + Fix issue #388 autoNumeric does not work with Browserify
 + Fix issue #461 Fixed problem on Android Chrome browsers when a currency symbol is used
 
++ Fix issue #452 Add a new `rawValueDivisor` option to display a formatted value different than the raw value.
+  This allows for instance to display percentages like `'1.23%'`, while keeping the `rawValue` `0.0123` 'unmultiplied', if `rawValueDivisor` is set to `100`.
++ Merge the `blur` event listeners into one.
++ Add the `this.isWheelEvent`, `this.isDropEvent` and `this.isEditing` attributes to track the `wheel` and `drop` events, as well as when the user is manually editing the element value.
++ Modify `_setRawValue()` to divide the `rawValue` if `rawValueDivisor` is set.
++ Fix the validation test for the `scaleDivisor` option where it did not check that it should not be equal to `0`.
++ Fix the validation test for the `allowDecimalPadding` when `decimalPlacesShownOnBlur` or `decimalPlacesShownOnFocus` is set.
++ Add a validation test for `divisorWhenUnfocused` so that it throws if it's set to `1`.
++ Modify the validation test so that setting `divisorWhenUnfocused` to `1` will throw.
++ Modify `_trimLeadingAndTrailingZeros()` so that it manages `null` values correctly (ie. it returns `null` instead of `'0'` if passed `null`).
++ Fix the error shown when blurring an input that accept a `null` value.
++ Modify the pre-defined options `percentage*` so that the `rawValueDivisor` is set to `100`.
++ Rename the `divisorWhenUnfocused` option value from `doNotActivateTheScalingOption` to `none`.
++ Fix `getNumericString()` so that it returns `null` when the `rawValue` is `null`.
++ Separate the `_calculateDecimalPlaces()` function into two `_calculateDecimalPlacesOnInit()` and `_calculateDecimalPlacesOnUpdate()`.
++ The callbacks found in the `settings` object are now run before modifying the `negativePositiveSignPlacement` option.
++ Modify how the settings are updated when the user pass the `decimalPlaces` option.
+  Before, this was overriding any other `decimalPlaces*` options passed in the same object.
+  Now, the `decimalPlaces` value is only used if the other `decimalPlaces*` options are not already set.
+  Moreover, the `decimalPlacesRawValue` option is now overwritten by the other `decimalPlaces*` options defined in the same option object, if their values are higher.
++ Modify the behavior of the `wheelStep` 'progressive' mode so that values between ]-1;-1[ are treated specially, by allowing the wheel event to modify the decimal places. The precision used for the `step` depends on the number of decimal places used for the `rawValue`.
+  Also, numbers between 1 and 9 (included) now use a step of `1`, instead of `10` like before.
++ Set the version of Webpack to `1.14.0`, instead of `latest`, in order to prevent potential incompatibility problems.
+
 ### 2.0.13
 + Merge the fix from issue #440 Pasting does not work in IE11 from `next` to `master`.
   This fix the issue #465 "Unable to get property 'getData' of undefined or null reference" on paste in IE11

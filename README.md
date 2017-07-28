@@ -57,7 +57,7 @@ anElement.french()
 - 26 built-in [methods](#methods) gives you the flexibility needed to use autoNumeric to its full potential
 - 22 [global methods](#perform-actions-globally-on-a-shared-list-of-autonumeric-elements) that allows to control sets of AutoNumeric-managed elements at once
 - 21 additional [methods](#methods) specialized for managing form submission
-- 15 [static functions](#static-methods) provided by the `AutoNumeric` class
+- 17 [static functions](#static-methods) provided by the `AutoNumeric` class
 - And more than 40 [options](#options) allowing you to customize your currency format
 
 With that said, autoNumeric supports most international numeric formats and currencies including those used in Europe, Asia, and North and South America.
@@ -315,6 +315,7 @@ Multiple options allow you to customize precisely how a form input will format y
 | `onInvalidPaste` | Manage how autoNumeric react when the user tries to paste an invalid number (possible options are `error`, `ignore`, `clamp`, `truncate` or `replace`) | `'error'` |
 | `outputFormat` | Defines the localized output format of the `get`, `getString` & `getArray` methods | `null` |
 | `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor` and `ignore`) | `null` |
+| `rawValueDivisor` | Define the number that will divide the formatted value into the raw value (ie. when displaying `'1.23%'`, the raw value kept is `0.0123` if `rawValueDivisor` is set to `100`) | `null` |
 | `readOnly` | Defines if the `<input>` element should be set as read only on initialization | `false` |
 | `roundingMethod` | Method used for rounding. The possible options are `S` (Round-Half-Up Symmetric (default)), `A` (Round-Half-Up Asymmetric), `s` (Round-Half-Down Symmetric (lower case s)), `a` (Round-Half-Down Asymmetric (lower case a)), `B` (Round-Half-Even 'Bankers Rounding'), `U` (Round Up 'Round-Away-From-Zero'), `D` (Round Down 'Round-Toward-Zero' - same as truncate), `C` (Round to Ceiling 'Toward Positive Infinity'), `F` (Round to Floor 'Toward Negative Infinity'), `N05` (Rounds to the nearest .05 (same as `'CHF'` used in v1.9.* and still valid)), `U05` (Rounds up to next .05), `D05` (Rounds down to next .05) | `'S'` |
 | `saveValueToSessionStorage` | Allow the `decimalPlacesShownOnFocus` value to be saved into session storage | `false` |

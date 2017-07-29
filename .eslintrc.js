@@ -1,38 +1,40 @@
+/* global module */
+
 module.exports = {
-    "env": {
+    env          : {
         "browser": true,
         "es6"    : true,
     },
-    "extends": "eslint:recommended",
-    "parserOptions": {
-        "sourceType": "module"
+    extends      : "eslint:recommended",
+    parserOptions: {
+        "sourceType": "module",
     },
-    "rules": {
+    rules        : {
         // Basic rules
-        "indent": [
+        "indent"                       : [
             "error",
             4,
             {
-                "SwitchCase": 1,
-                "VariableDeclarator": {
+                "SwitchCase"         : 1,
+                "VariableDeclarator" : {
                     "var"  : 1,
                     "let"  : 1,
-                    "const": 1
+                    "const": 1,
                 },
-                "outerIIFEBody": 0,
-                "MemberExpression": 1,
+                "outerIIFEBody"      : 0,
+                "MemberExpression"   : 1,
                 "FunctionDeclaration": {
-                    "parameters": "first"
+                    "parameters": "first",
                 },
-                "FunctionExpression": {
-                    "parameters": "first"
+                "FunctionExpression" : {
+                    "parameters": "first",
                 },
-                "CallExpression": {
-                    "arguments": "first"
+                "CallExpression"     : {
+                    "arguments": "first",
                 },
             },
         ],
-        "keyword-spacing": [
+        "keyword-spacing"              : [
             "error",
             {
                 "before": true,
@@ -40,26 +42,26 @@ module.exports = {
             },
         ],
         // Do not use "space-infix-ops": "error", for ternary operators
-        "arrow-spacing": [
+        "arrow-spacing"                : [
             "error",
             {
                 "before": true,
                 "after" : true,
             },
         ],
-        "arrow-parens" : [
+        "arrow-parens"                 : [
             "error",
             "as-needed",
         ],
-        "arrow-body-style": [
+        "arrow-body-style"             : [
             "error",
             "as-needed",
             {
                 requireReturnForObjectLiteral: false
             },
         ],
-        "no-confusing-arrow": "error",
-        "space-before-function-paren": [
+        "no-confusing-arrow"           : "error",
+        "space-before-function-paren"  : [
             "error",
             {
                 "anonymous" : "never",
@@ -67,150 +69,154 @@ module.exports = {
                 "asyncArrow": "always",
             },
         ],
-        "space-before-blocks": "error",
-        "linebreak-style": [
+        "space-before-blocks"          : "error",
+        "linebreak-style"              : [
             "error",
             "unix",
         ],
-        "newline-per-chained-call": [
+        "newline-per-chained-call"     : [
             "error",
             {
-                "ignoreChainWithDepth": 2
+                "ignoreChainWithDepth": 2,
             }
         ],
-        "object-curly-spacing": [
+        "object-curly-spacing"         : [
             "error",
-            "always"
+            "always",
         ],
-        "array-bracket-spacing": [
+        "array-bracket-spacing"        : [
             "error",
-            "never"
+            "never",
         ],
         "no-whitespace-before-property": "error",
-        "padded-blocks": [
+        "padded-blocks"                : [
             "error",
-            "never"
+            "never",
         ],
-        "space-in-parens": [
+        "space-in-parens"              : [
             "error",
-            "never"
+            "never",
         ],
-        "camelcase": [
+        "camelcase"                    : [
             "error",
             {
-                properties: "always"
-            }
+                properties: "always",
+            },
         ],
-        "new-cap" : "error",
-        "no-underscore-dangle": 0,
-        "quotes": [
+        "new-cap"                      : "error",
+        "no-underscore-dangle"         : 0,
+        "quotes"                       : [
             "error",
-            "single", //Backticks are allowed due to substitution
+            "single", // Backticks are allowed due to substitution
             {
                 "allowTemplateLiterals": true,
                 "avoidEscape"          : true,
             },
         ],
-        "semi": [
+        "semi"                         : [
             "error",
             "always",
         ],
-        "semi-spacing"    : "error",
-        "curly"           : "error",
-        "prefer-const"    : "error",
-        "no-const-assign" : "error",
-        "no-var"          : "error",
-        "no-new-object"   : "error",
-        "object-shorthand": "error",
-        "quote-props"     : [
+        "semi-spacing"                 : "error",
+        "curly"                        : [
+            "error",
+            "multi-line",
+            "consistent",
+        ],
+        "prefer-const"                 : "error",
+        "no-const-assign"              : "error",
+        "no-var"                       : "error",
+        "no-new-object"                : "error",
+        "object-shorthand"             : "error",
+        "quote-props"                  : [
             "error",
             "as-needed",
         ],
-        "no-array-constructor": "error",
-        "func-style": [
+        "no-array-constructor"         : "error",
+        "func-style"                   : [
             "error",
             "declaration",
             {
                 "allowArrowFunctions": true,
             },
         ],
-        "no-loop-func": "error",
-        "no-new-func": "error",
-        "prefer-spread": "error",
-        "prefer-arrow-callback": "error",
-        "no-useless-constructor": "error",
-        "no-dupe-class-members": "error",
-        "no-duplicate-imports": [
+        "no-loop-func"                 : "error",
+        "no-new-func"                  : "error",
+        "prefer-spread"                : "error",
+        "prefer-arrow-callback"        : "error",
+        "no-useless-constructor"       : "error",
+        "no-dupe-class-members"        : "error",
+        "no-duplicate-imports"         : [
             "error",
             {
                 "includeExports": true,
             },
         ],
-        "no-func-assign" : "error",
-        "no-class-assign": "error",
-        "no-iterator": "error",
-        "dot-notation": "error",
-        "no-undef": "error",
-        "one-var": [
+        "no-func-assign"               : "error",
+        "no-class-assign"              : "error",
+        "no-iterator"                  : "error",
+        "dot-notation"                 : "error",
+        "no-undef"                     : "error",
+        "one-var"                      : [
             "error",
             "never",
         ],
-        "radix": [
+        "radix"                        : [
             "error",
-            "always"
+            "always",
         ],
 
         // Other misc rules
-        "no-unneeded-ternary": "error",
-        "no-nested-ternary"  : "error",
-        "no-unreachable"     : "error",
-        "use-isnan"          : "error",
-        "no-unsafe-negation" : "error",
-        "no-extra-semi"      : "error",
-        "no-sparse-arrays"   : "error",
-        "no-eq-null"         : "error",
-        "eqeqeq"             : "error",
-        "no-eval"            : "error",
-        "strict": [
+        "no-unneeded-ternary"   : "error",
+        "no-nested-ternary"     : "error",
+        "no-unreachable"        : "error",
+        "use-isnan"             : "error",
+        "no-unsafe-negation"    : "error",
+        "no-extra-semi"         : "error",
+        "no-sparse-arrays"      : "error",
+        "no-eq-null"            : "error",
+        "eqeqeq"                : "error",
+        "no-eval"               : "error",
+        "strict"                : [
             "error",
             "safe",
         ],
-        "no-useless-escape": "error",
-        "prefer-rest-params": "error",
+        "no-useless-escape"     : "error",
+        "prefer-rest-params"    : "error",
         "generator-star-spacing": [
             "error",
             {
                 "before": false,
-                "after" : true
+                "after" : true,
             }
         ],
-        "no-case-declarations": "error",
-        "spaced-comment": [
+        "no-case-declarations"  : "error",
+        "spaced-comment"        : [
             "error",
             "always",
             {
                 "line" : {
                     "markers"   : ["/", "TODO", "FIXME", "DEBUG", "XXX"],
-                    "exceptions": ["-", "+"]
+                    "exceptions": ["-", "+", "TODO", "FIXME", "DEBUG", "XXX"],
                 },
                 "block": {
                     "markers"   : ["!"],
                     "exceptions": ["*"],
-                    "balanced"  : true
+                    "balanced"  : true,
                 }
             }
         ],
-        "eol-last": [
+        "eol-last"              : [
             "error",
-            "always"
+            "always",
         ],
-        "comma-style": [
+        "comma-style"           : [
             "error",
-            "last"
+            "last",
         ],
-        "comma-dangle": [
+        "comma-dangle"          : [
             "error",
-            "always-multiline"
+            "always-multiline",
         ],
 
         // allow debugger during development
@@ -233,19 +239,19 @@ module.exports = {
         //TODO This should really be enabled by default :
         // 'no-invalid-this': "error",
         /*"wrap-iife": [
-            "error",
-            "inside"
-        ],*/
+         "error",
+         "inside"
+         ],*/
         /*"yoda": [
-            "error",
-            "always",
-            {
-                "onlyEquality": true,
-            },
-        ],*/
+         "error",
+         "always",
+         {
+         "onlyEquality": true,
+         },
+         ],*/
         // "no-param-reassign"              : "error",
         // "import/prefer-default-export"   : "error",
         // "import/first"                   : "error",
         // "import/no-webpack-loader-syntax": "error",
-    }
+    },
 };

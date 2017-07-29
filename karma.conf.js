@@ -56,6 +56,7 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
+            './node_modules/babel-polyfill/dist/polyfill.js',
             'tests.webpack.js',
         ],
 
@@ -106,6 +107,11 @@ module.exports = function(config) {
         // level of logging
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
         logLevel: config.LOG_INFO,
+
+        // Enable or prevent any logs to be written to the console. This is allowed by default using `true`.
+        client: {
+            captureConsole: true,
+        },
 
         // enable / disable watching file and executing tests whenever any file changes
         // autoWatch: true,

@@ -32,15 +32,9 @@
 // eslint-disable-next-line
 /* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach, spyOn */
 
-import $ from '../../node_modules/jquery/dist/jquery';
-import an from '../../src/autoNumeric';
-
-// Default Jasmine test to make sure the test framework works
-// describe('A test suite', () => {
-//     it('contains a spec with an expectation', () => {
-//         expect(true).toBe(true);
-//     });
-// });
+import AutoNumeric from '../../src/AutoNumeric';
+import AutoNumericEnum from '../../src/AutoNumericEnum';
+import AutoNumericHelper from '../../src/AutoNumericHelper';
 
 // The autoNumeric tests :
 
@@ -72,191 +66,250 @@ const autoNumericOptionsDollar = {
 };
 
 describe('The autoNumeric object', () => {
-    let aNInput;
-    let newInput;
+    describe('manages default options', () => {
+        let aNInput;
+        let newInput;
 
-    beforeEach(() => { // Initialization
-        newInput = document.createElement('input');
-        document.body.appendChild(newInput);
-        aNInput = $(newInput).autoNumeric('init'); // Initiate the autoNumeric input
-    });
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+        });
 
-    afterEach(() => { // Un-initialization
-        aNInput.autoNumeric('destroy');
-        document.body.removeChild(newInput);
-    });
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
 
-    const defaultOption = {
-        digitGroupSeparator          : ',',
-        noSeparatorOnFocus           : false,
-        digitalGroupSpacing          : '3',
-        decimalCharacter             : '.',
-        decimalCharacterAlternative  : null,
-        currencySymbol               : '',
-        currencySymbolPlacement      : 'p',
-        negativePositiveSignPlacement: null,
-        showPositiveSign             : false,
-        suffixText                   : '',
-        overrideMinMaxLimits         : null,
-        maximumValue                 : '9999999999999.99',
-        minimumValue                 : '-9999999999999.99',
-        decimalPlacesOverride        : null,
-        decimalPlacesShownOnFocus    : null,
-        scaleDivisor                 : null,
-        scaleDecimalPlaces           : null,
-        scaleSymbol                  : null,
-        saveValueToSessionStorage    : false,
-        onInvalidPaste               : 'error',
-        roundingMethod               : 'S',
-        allowDecimalPadding          : true,
-        negativeBracketsTypeOnBlur   : null,
-        emptyInputBehavior           : 'focus',
-        leadingZero                  : 'deny',
-        formatOnPageLoad             : true,
-        selectNumberOnly             : false,
-        defaultValueOverride         : null,
-        unformatOnSubmit             : false,
-        outputFormat                 : null,
-        showWarnings                 : true,
-        failOnUnknownOption          : false,
-    };
-
-    it('should return some default values', () => {
-        // Test the options one by one, which makes it easier to spot the error
-        //XXX This loop is useful to spot the faulty options, since only those that are not equal to the default are shown
-        const defaultSettings = an.getDefaultConfig();
-        let i = 0;
-        for (const prop in defaultSettings) {
-            i++;
-            if (defaultSettings.hasOwnProperty(prop)) {
-                if (defaultSettings[prop] !== defaultOption[prop]) {
-                    console.log(`${i}: Setting ${prop} = [${defaultSettings[prop]}][${defaultOption[prop]}]`); //DEBUG
-                }
-                expect(defaultSettings[prop]).toEqual(defaultOption[prop]);
-            }
-        }
-
-        // Global test
-        expect(an.getDefaultConfig()).toEqual(defaultOption);
-    });
-
-    it('should return the predefined language options', () => {
-        const defaultLanguageOption = {
-            French       : { // Français
-                selectNumberOnly           : true,
-                digitGroupSeparator        : '.',
-                decimalCharacter           : ',',
-                decimalCharacterAlternative: '.',
-                currencySymbol             : '\u202f€',
-                currencySymbolPlacement    : 's',
-                roundingMethod             : 'U',
-                leadingZero                : 'deny',
-                minimumValue               : '-999999999999.99',
-                maximumValue               : '999999999999.99',
-            },
-            NorthAmerican: {
-                selectNumberOnly       : true,
-                digitGroupSeparator    : ',',
-                decimalCharacter       : '.',
-                currencySymbol         : '$',
-                currencySymbolPlacement: 'p',
-                roundingMethod         : 'U',
-                leadingZero            : 'deny',
-                minimumValue           : '-999999999999.99',
-                maximumValue           : '999999999999.99',
-            },
+        const defaultOption = {
+            allowDecimalPadding          : true,
+            caretPositionOnFocus         : null,
+            createLocalList              : true,
+            currencySymbol               : '',
+            currencySymbolPlacement      : 'p',
+            decimalCharacter             : '.',
+            decimalCharacterAlternative  : null,
+            decimalPlaces                : 2,
+            decimalPlacesRawValue        : null,
+            decimalPlacesShownOnBlur     : null,
+            decimalPlacesShownOnFocus    : null,
+            defaultValueOverride         : null,
+            digitalGroupSpacing          : '3',
+            digitGroupSeparator          : ',',
+            divisorWhenUnfocused         : null,
+            emptyInputBehavior           : 'focus',
+            failOnUnknownOption          : false,
+            formatOnPageLoad             : true,
+            historySize                  : 20,
+            isCancellable                : true,
+            leadingZero                  : 'deny',
+            maximumValue                 : '9999999999999.99',
+            minimumValue                 : '-9999999999999.99',
+            modifyValueOnWheel           : true,
+            negativeBracketsTypeOnBlur   : null,
+            negativePositiveSignPlacement: null,
+            noEventListeners             : false,
+            onInvalidPaste               : 'error',
+            outputFormat                 : null,
+            overrideMinMaxLimits         : null,
+            rawValueDivisor              : null,
+            readOnly                     : false,
+            roundingMethod               : 'S',
+            saveValueToSessionStorage    : false,
+            selectNumberOnly             : true,
+            selectOnFocus                : true,
+            serializeSpaces              : '+',
+            showOnlyNumbersOnFocus       : false,
+            showPositiveSign             : false,
+            showWarnings                 : true,
+            styleRules                   : null,
+            suffixText                   : '',
+            symbolWhenUnfocused          : null,
+            unformatOnHover              : true,
+            unformatOnSubmit             : false,
+            wheelStep                    : 'progressive',
         };
 
-        // Test the options one by one, which makes it easier to spot the error
-        //XXX This loop is useful to spot the faulty options, since only those that are not equal to the default are shown
-        const predefinedLanguages = an.getLanguages();
-        let i = 0;
-        for (const lang in defaultLanguageOption) { //XXX Here I test only this language subset
-            i++;
-            if (predefinedLanguages.hasOwnProperty(lang)) {
-                for (const prop in predefinedLanguages[lang]) {
-                    if (predefinedLanguages[lang].hasOwnProperty(prop)) {
-                        if (predefinedLanguages[lang][prop] !== defaultLanguageOption[lang][prop]) {
-                            console.log(`${i}: Setting ${prop} = [${predefinedLanguages[lang][prop]}][${defaultLanguageOption[lang][prop]}]`); //DEBUG
+        it('should return some default values', () => {
+            // Test the options one by one, which makes it easier to spot the error
+            //XXX This loop is useful to spot the faulty options, since only those that are not equal to the default are shown
+            const defaultSettings = AutoNumeric.getDefaultConfig();
+            let i = 0;
+            for (const prop in defaultSettings) {
+                i++;
+                if (defaultSettings.hasOwnProperty(prop)) {
+                    if (defaultSettings[prop] !== defaultOption[prop]) {
+                        console.log(`${i}: Setting ${prop} = [${defaultSettings[prop]}][${defaultOption[prop]}]`); //DEBUG
+                    }
+                    expect(defaultSettings[prop]).toEqual(defaultOption[prop]);
+                }
+            }
+
+            // Global test
+            expect(defaultSettings).toEqual(defaultOption);
+        });
+
+        it('should prevent modifying the default settings object', () => {
+            expect(() => { AutoNumeric.defaultSettings = {}; }).toThrow();
+        });
+
+        it('should prevent modifying the enumeration objects', () => {
+            expect(() => { AutoNumericEnum.allowedTagList = ['foobar']; }).toThrow();
+            expect(() => { AutoNumericEnum.keyCode = {}; }).toThrow();
+            expect(() => { AutoNumericEnum.fromCharCodeKeyCode = []; }).toThrow();
+            expect(() => { AutoNumericEnum.fromCharCodeKeyCode[91] = 'foobar'; }).not.toThrow();
+            AutoNumericEnum.fromCharCodeKeyCode[91] = 'OS'; // Set back the initial value
+            expect(() => { AutoNumericEnum.keyName = {}; }).toThrow();
+        });
+
+        it('should prevent modifying the events object', () => {
+            expect(() => { AutoNumeric.events = {}; }).toThrow();
+        });
+
+        it('should prevent modifying the options object', () => {
+            expect(() => { AutoNumeric.options = {}; }).toThrow();
+        });
+
+        it('should prevent modifying the predefinedOptions object', () => {
+            expect(() => { AutoNumeric.predefinedOptions = {}; }).toThrow();
+        });
+
+        it('should return the predefined language options', () => {
+            const defaultLanguageOption = {
+                French       : { // Français
+                    selectNumberOnly             : true,
+                    digitGroupSeparator          : '.',
+                    decimalCharacter             : ',',
+                    decimalCharacterAlternative  : '.',
+                    currencySymbol               : '\u202f€',
+                    currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+                    negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
+                    roundingMethod               : 'U',
+                    leadingZero                  : 'deny',
+                    minimumValue                 : '-9999999999999.99',
+                    maximumValue                 : '9999999999999.99',
+                },
+                NorthAmerican: {
+                    selectNumberOnly             : true,
+                    digitGroupSeparator          : ',',
+                    decimalCharacter             : '.',
+                    currencySymbol               : '$',
+                    currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+                    negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
+                    roundingMethod               : 'U',
+                    leadingZero                  : 'deny',
+                    minimumValue                 : '-9999999999999.99',
+                    maximumValue                 : '9999999999999.99',
+                },
+            };
+
+            // Test the options one by one, which makes it easier to spot the error
+            //XXX This loop is useful to spot the faulty options, since only those that are not equal to the default are shown
+            const predefinedLanguages = AutoNumeric.getPredefinedOptions();
+            let i = 0;
+            for (const lang in defaultLanguageOption) { //XXX Here I test only this language subset
+                i++;
+                if (predefinedLanguages.hasOwnProperty(lang)) {
+                    for (const prop in predefinedLanguages[lang]) {
+                        if (predefinedLanguages[lang].hasOwnProperty(prop)) {
+                            if (predefinedLanguages[lang][prop] !== defaultLanguageOption[lang][prop]) {
+                                console.log(`${i}: Setting ${prop} = [${predefinedLanguages[lang][prop]}][${defaultLanguageOption[lang][prop]}]`); //DEBUG
+                            }
+                            expect(predefinedLanguages[lang][prop]).toEqual(defaultLanguageOption[lang][prop]);
                         }
-                        expect(predefinedLanguages[lang][prop]).toEqual(defaultLanguageOption[lang][prop]);
                     }
                 }
             }
-        }
 
-        // Global test
-        // expect(an.getLanguages()).toEqual(defaultLanguageOption); //XXX Here I test only a language subset, not all language options
+            // Global test
+            // expect(an.getPredefinedOptions()).toEqual(defaultLanguageOption); //XXX Here I test only a language subset, not all language options
+        });
+
+        it('should be initiated with the default values', () => {
+            const defaultSettings = AutoNumeric.getDefaultConfig();
+            const aNInputSettings = aNInput.getSettings();
+            /* let i = 0;
+            for (const prop in defaultSettings) { //XXX This loop fails because of the `decimalPlaces*` and `negativePositiveSignPlacement` options that are calculated on creation, and because `historySize` default value is an integer instead of a string
+                i++;
+                if (defaultSettings.hasOwnProperty(prop)) {
+                    console.log(`${i}: Setting ${prop} = [${defaultSettings[prop]}][${aNInputSettings[prop]}]`); //DEBUG
+                    expect(defaultSettings[prop]).toEqual(aNInputSettings[prop]);
+                }
+            } */
+
+            expect(defaultSettings.allowDecimalPadding        ).toEqual(aNInputSettings.allowDecimalPadding        );
+            expect(defaultSettings.caretPositionOnFocus       ).toEqual(aNInputSettings.caretPositionOnFocus       );
+            expect(defaultSettings.createLocalList            ).toEqual(aNInputSettings.createLocalList            );
+            expect(defaultSettings.currencySymbol             ).toEqual(aNInputSettings.currencySymbol             );
+            expect(defaultSettings.currencySymbolPlacement    ).toEqual(aNInputSettings.currencySymbolPlacement    );
+            expect(defaultSettings.decimalCharacter           ).toEqual(aNInputSettings.decimalCharacter           );
+            expect(defaultSettings.decimalCharacterAlternative).toEqual(aNInputSettings.decimalCharacterAlternative);
+            // Special case for the decimalPlaces* options
+            expect(defaultSettings.defaultValueOverride      ).toEqual(aNInputSettings.defaultValueOverride       );
+            expect(defaultSettings.digitalGroupSpacing       ).toEqual(aNInputSettings.digitalGroupSpacing        );
+            expect(defaultSettings.digitGroupSeparator       ).toEqual(aNInputSettings.digitGroupSeparator        );
+            expect(defaultSettings.divisorWhenUnfocused      ).toEqual(aNInputSettings.divisorWhenUnfocused       );
+            expect(defaultSettings.emptyInputBehavior        ).toEqual(aNInputSettings.emptyInputBehavior         );
+            expect(defaultSettings.failOnUnknownOption       ).toEqual(aNInputSettings.failOnUnknownOption        );
+            expect(defaultSettings.formatOnPageLoad          ).toEqual(aNInputSettings.formatOnPageLoad           );
+            expect(String(defaultSettings.historySize)       ).toEqual(aNInputSettings.historySize                );
+            expect(defaultSettings.isCancellable             ).toEqual(aNInputSettings.isCancellable              );
+            expect(defaultSettings.leadingZero               ).toEqual(aNInputSettings.leadingZero                );
+            expect(defaultSettings.maximumValue              ).toEqual(aNInputSettings.maximumValue               );
+            expect(defaultSettings.minimumValue              ).toEqual(aNInputSettings.minimumValue               );
+            expect(defaultSettings.modifyValueOnWheel        ).toEqual(aNInputSettings.modifyValueOnWheel         );
+            expect(defaultSettings.negativeBracketsTypeOnBlur).toEqual(aNInputSettings.negativeBracketsTypeOnBlur );
+            // Special case for `negativePositiveSignPlacement`, see the related tests
+            // expect(defaultSettings.negativePositiveSignPlacement).toEqual(aNInputSettings.negativePositiveSignPlacement);
+            expect(defaultSettings.noEventListeners          ).toEqual(aNInputSettings.noEventListeners           );
+            expect(defaultSettings.onInvalidPaste            ).toEqual(aNInputSettings.onInvalidPaste             );
+            expect(defaultSettings.outputFormat              ).toEqual(aNInputSettings.outputFormat               );
+            expect(defaultSettings.overrideMinMaxLimits      ).toEqual(aNInputSettings.overrideMinMaxLimits       );
+            expect(defaultSettings.rawValueDivisor           ).toEqual(aNInputSettings.rawValueDivisor            );
+            expect(defaultSettings.readOnly                  ).toEqual(aNInputSettings.readOnly                   );
+            expect(defaultSettings.roundingMethod            ).toEqual(aNInputSettings.roundingMethod             );
+            expect(defaultSettings.saveValueToSessionStorage ).toEqual(aNInputSettings.saveValueToSessionStorage  );
+            expect(defaultSettings.selectNumberOnly          ).toEqual(aNInputSettings.selectNumberOnly           );
+            expect(defaultSettings.selectOnFocus             ).toEqual(aNInputSettings.selectOnFocus              );
+            expect(defaultSettings.serializeSpaces           ).toEqual(aNInputSettings.serializeSpaces            );
+            expect(defaultSettings.showOnlyNumbersOnFocus    ).toEqual(aNInputSettings.showOnlyNumbersOnFocus     );
+            expect(defaultSettings.showPositiveSign          ).toEqual(aNInputSettings.showPositiveSign           );
+            expect(defaultSettings.showWarnings              ).toEqual(aNInputSettings.showWarnings               );
+            expect(defaultSettings.styleRules                ).toEqual(aNInputSettings.styleRules                 );
+            expect(defaultSettings.suffixText                ).toEqual(aNInputSettings.suffixText                 );
+            expect(defaultSettings.symbolWhenUnfocused       ).toEqual(aNInputSettings.symbolWhenUnfocused        );
+            expect(defaultSettings.unformatOnHover           ).toEqual(aNInputSettings.unformatOnHover            );
+            expect(defaultSettings.unformatOnSubmit          ).toEqual(aNInputSettings.unformatOnSubmit           );
+            expect(defaultSettings.wheelStep                 ).toEqual(aNInputSettings.wheelStep                  );
+        });
+
+        it('should initialize the decimal places options with the default values', () => {
+            const defaultSettings = AutoNumeric.getDefaultConfig();
+            const aNInputSettings = aNInput.getSettings();
+
+            // Special cases here where `decimalPlacesRawValue`, `decimalPlacesShownOnBlur` and `decimalPlacesShownOnFocus` are calculated based on `decimalPlaces` if they are `null`, which is the default
+            expect(defaultSettings.decimalPlaces            ).toEqual(2);
+            expect(aNInputSettings.decimalPlacesRawValue    ).toEqual(2);
+            //TODO Modify `_transformOptionsValuesToDefaultTypes()` so that the decimalPlacesShown* options are not converted to strings?
+            expect(aNInputSettings.decimalPlacesShownOnBlur ).toEqual('2');
+            expect(aNInputSettings.decimalPlacesShownOnFocus).toEqual('2');
+        });
+
+        it('should update the options values accordingly', () => {
+            aNInput.update({ digitGroupSeparator: '.', decimalCharacter: ',', currencySymbol: '€' });
+            const defaultSettings = AutoNumeric.getDefaultConfig();
+            const aNInputSettings = aNInput.getSettings();
+
+            expect(defaultSettings.digitGroupSeparator).not.toEqual(aNInputSettings.digitGroupSeparator );
+            expect(defaultSettings.decimalCharacter   ).not.toEqual(aNInputSettings.decimalCharacter    );
+            expect(defaultSettings.currencySymbol     ).not.toEqual(aNInputSettings.currencySymbol      );
+            expect(aNInputSettings.digitGroupSeparator).toEqual('.');
+            expect(aNInputSettings.decimalCharacter   ).toEqual(',');
+            expect(aNInputSettings.currencySymbol     ).toEqual('€');
+        });
     });
 
-    it('should be initiated with the default values', () => {
-        const defaultSettings = an.getDefaultConfig();
-        const aNInputSettings = aNInput.autoNumeric('getSettings');
-        /* let i = 0;
-        for (let prop in defaultSettings) { //XXX This loop fails since the decimalPlacesOverride default is overridden by maximumValue/minimumValue (cf. following test cases)
-            i++;
-            if (defaultSettings.hasOwnProperty(prop)) {
-                console.log(`${i}: Setting ${prop} = [${defaultSettings[prop]}][${aNInputSettings[prop]}]`); //DEBUG
-                expect(defaultSettings[prop]).toEqual(aNInputSettings[prop]);
-            }
-        } */
-
-        expect(defaultSettings.digitGroupSeparator        ).toEqual(aNInputSettings.digitGroupSeparator        );
-        expect(defaultSettings.noSeparatorOnFocus         ).toEqual(aNInputSettings.noSeparatorOnFocus         );
-        expect(defaultSettings.digitalGroupSpacing        ).toEqual(aNInputSettings.digitalGroupSpacing        );
-        expect(defaultSettings.decimalCharacter           ).toEqual(aNInputSettings.decimalCharacter           );
-        expect(defaultSettings.decimalCharacterAlternative).toEqual(aNInputSettings.decimalCharacterAlternative);
-        expect(defaultSettings.currencySymbol             ).toEqual(aNInputSettings.currencySymbol             );
-        expect(defaultSettings.currencySymbolPlacement    ).toEqual(aNInputSettings.currencySymbolPlacement    );
-
-        // Special case for `negativePositiveSignPlacement`, see the related tests
-        // expect(defaultSettings.negativePositiveSignPlacement).toEqual(aNInputSettings.negativePositiveSignPlacement);
-        expect(defaultSettings.suffixText                   ).toEqual(aNInputSettings.suffixText                   );
-        expect(defaultSettings.overrideMinMaxLimits         ).toEqual(aNInputSettings.overrideMinMaxLimits         );
-        expect(defaultSettings.maximumValue                 ).toEqual(aNInputSettings.maximumValue                 );
-        expect(defaultSettings.minimumValue                 ).toEqual(aNInputSettings.minimumValue                 );
-
-        // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue number of decimals
-        const [, decimalPart] = aNInputSettings.minimumValue.split('.');
-        let decimalPartLength = 0;
-        if (decimalPart !== void(0)) {
-            decimalPartLength = decimalPart.length;
-        }
-        expect(decimalPartLength).toEqual(2);
-        expect(aNInputSettings.decimalPlacesOverride).toEqual(decimalPartLength);
-
-        expect(defaultSettings.decimalPlacesShownOnFocus ).toEqual(aNInputSettings.decimalPlacesShownOnFocus );
-        expect(defaultSettings.scaleDivisor              ).toEqual(aNInputSettings.scaleDivisor              );
-        expect(defaultSettings.scaleDecimalPlaces        ).toEqual(aNInputSettings.scaleDecimalPlaces        );
-        expect(defaultSettings.scaleSymbol               ).toEqual(aNInputSettings.scaleSymbol               );
-        expect(defaultSettings.saveValueToSessionStorage ).toEqual(aNInputSettings.saveValueToSessionStorage );
-        expect(defaultSettings.roundingMethod            ).toEqual(aNInputSettings.roundingMethod            );
-        expect(defaultSettings.allowDecimalPadding       ).toEqual(aNInputSettings.allowDecimalPadding       );
-        expect(defaultSettings.negativeBracketsTypeOnBlur).toEqual(aNInputSettings.negativeBracketsTypeOnBlur);
-        expect(defaultSettings.emptyInputBehavior        ).toEqual(aNInputSettings.emptyInputBehavior        );
-        expect(defaultSettings.leadingZero               ).toEqual(aNInputSettings.leadingZero               );
-        expect(defaultSettings.formatOnPageLoad          ).toEqual(aNInputSettings.formatOnPageLoad          );
-        expect(defaultSettings.selectNumberOnly          ).toEqual(aNInputSettings.selectNumberOnly          );
-        expect(defaultSettings.defaultValueOverride      ).toEqual(aNInputSettings.defaultValueOverride      );
-        expect(defaultSettings.unformatOnSubmit          ).toEqual(aNInputSettings.unformatOnSubmit          );
-        expect(defaultSettings.outputFormat              ).toEqual(aNInputSettings.outputFormat              );
-        expect(defaultSettings.showWarnings              ).toEqual(aNInputSettings.showWarnings              );
-    });
-
-    it('should update the options values accordingly', () => {
-        aNInput.autoNumeric('update', { digitGroupSeparator: '.', decimalCharacter: ',', currencySymbol: '€' });
-        const defaultSettings = an.getDefaultConfig();
-        const aNInputSettings = aNInput.autoNumeric('getSettings');
-
-        expect(defaultSettings.digitGroupSeparator).not.toEqual(aNInputSettings.digitGroupSeparator );
-        expect(defaultSettings.decimalCharacter   ).not.toEqual(aNInputSettings.decimalCharacter    );
-        expect(defaultSettings.currencySymbol     ).not.toEqual(aNInputSettings.currencySymbol      );
-        expect(aNInputSettings.digitGroupSeparator).toEqual('.');
-        expect(aNInputSettings.decimalCharacter   ).toEqual(',');
-        expect(aNInputSettings.currencySymbol     ).toEqual('€');
-    });
-
-    describe('manages the negativePositiveSignPlacement configuration option specially', () => {
+    describe('manages the `negativePositiveSignPlacement` configuration option specially', () => {
         let aNInput;
         let newInput;
 
@@ -266,7 +319,7 @@ describe('The autoNumeric object', () => {
         });
 
         afterEach(() => { // Un-initialization
-            aNInput.autoNumeric('destroy');
+            aNInput.remove();
             document.body.removeChild(newInput);
         });
 
@@ -279,16 +332,16 @@ describe('The autoNumeric object', () => {
          */
         it(`this should set the negativePositiveSignPlacement differently based on the currencySymbol and currencySymbolPlacement (s) values`, () => {
             // Case 1 : settings.currencySymbolPlacement equals 's'
-            aNInput = $(newInput).autoNumeric('init', { currencySymbol: '$', currencySymbolPlacement: 's' }); // Initiate the autoNumeric input
-            const aNInputSettings = aNInput.autoNumeric('getSettings');
+            aNInput = new AutoNumeric(newInput, { currencySymbol: '$', currencySymbolPlacement: 's' }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.getSettings();
 
             expect(aNInputSettings.negativePositiveSignPlacement).toEqual('p');
         });
 
         it(`this should set the negativePositiveSignPlacement differently based on the currencySymbol and currencySymbolPlacement (p) values`, () => {
             // Case 2 : settings.currencySymbolPlacement equals 'p'
-            aNInput = $(newInput).autoNumeric('init', { currencySymbol: '$', currencySymbolPlacement: 'p' }); // Initiate the autoNumeric input
-            const aNInputSettings = aNInput.autoNumeric('getSettings');
+            aNInput = new AutoNumeric(newInput, { currencySymbol: '$', currencySymbolPlacement: 'p' }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.getSettings();
 
             expect(aNInputSettings.negativePositiveSignPlacement).toEqual('l');
         });
@@ -297,8 +350,8 @@ describe('The autoNumeric object', () => {
          * Default cases
          */
         it(`this should set the default negativePositiveSignPlacement value if it's not set by the user, to -1,234.56`, () => {
-            aNInput = $(newInput).autoNumeric('init', { negativePositiveSignPlacement : null }); // Initiate the autoNumeric input
-            const aNInputSettings = aNInput.autoNumeric('getSettings');
+            aNInput = new AutoNumeric(newInput, { negativePositiveSignPlacement : null }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.getSettings();
 
             expect(aNInputSettings.currencySymbol).toEqual('');
             expect(aNInputSettings.currencySymbolPlacement).toEqual('p');
@@ -307,8 +360,8 @@ describe('The autoNumeric object', () => {
 
 
         it(`this should set the default negativePositiveSignPlacement value if it's not set by the user, to -$1,234.56`, () => {
-            aNInput = $(newInput).autoNumeric('init', { currencySymbol: '$', negativePositiveSignPlacement : null }); // Initiate the autoNumeric input
-            const aNInputSettings = aNInput.autoNumeric('getSettings');
+            aNInput = new AutoNumeric(newInput, { currencySymbol: '$', negativePositiveSignPlacement : null }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.getSettings();
 
             expect(aNInputSettings.currencySymbol).toEqual('$');
             expect(aNInputSettings.currencySymbolPlacement).toEqual('p');
@@ -316,219 +369,80 @@ describe('The autoNumeric object', () => {
         });
 
         it(`this should not override the negativePositiveSignPlacement value 'p' if it has been set by the user`, () => {
-            aNInput = $(newInput).autoNumeric('init', { negativePositiveSignPlacement : 'p' }); // Initiate the autoNumeric input
-            const aNInputSettings = aNInput.autoNumeric('getSettings');
+            aNInput = new AutoNumeric(newInput, { negativePositiveSignPlacement : 'p' }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.getSettings();
             expect(aNInputSettings.negativePositiveSignPlacement).toEqual('p');
         });
 
         it(`this should not override the negativePositiveSignPlacement value 's' if it has been set by the user`, () => {
-            aNInput = $(newInput).autoNumeric('init', { negativePositiveSignPlacement : 's' }); // Initiate the autoNumeric input
-            const aNInputSettings = aNInput.autoNumeric('getSettings');
+            aNInput = new AutoNumeric(newInput, { negativePositiveSignPlacement : 's' }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.getSettings();
             expect(aNInputSettings.negativePositiveSignPlacement).toEqual('s');
         });
 
         it(`this should not override the negativePositiveSignPlacement value 'l' if it has been set by the user`, () => {
-            aNInput = $(newInput).autoNumeric('init', { negativePositiveSignPlacement : 'l' }); // Initiate the autoNumeric input
-            const aNInputSettings = aNInput.autoNumeric('getSettings');
+            aNInput = new AutoNumeric(newInput, { negativePositiveSignPlacement : 'l' }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.getSettings();
             expect(aNInputSettings.negativePositiveSignPlacement).toEqual('l');
         });
 
         it(`this should not override the negativePositiveSignPlacement value 'r' if it has been set by the user`, () => {
-            aNInput = $(newInput).autoNumeric('init', { negativePositiveSignPlacement : 'r' }); // Initiate the autoNumeric input
-            const aNInputSettings = aNInput.autoNumeric('getSettings');
+            aNInput = new AutoNumeric(newInput, { negativePositiveSignPlacement : 'r' }); // Initiate the autoNumeric input
+            const aNInputSettings = aNInput.getSettings();
             expect(aNInputSettings.negativePositiveSignPlacement).toEqual('r');
         });
     });
 
-    describe('manages the decimalPlacesOverride configuration option specially', () => {
-        it('should set the default value for decimalPlacesOverride', () => {
-            // Setup
-            const newInput = document.createElement('input');
+    describe('manages the `decimalPlaces*` configuration option specially', () => {
+        let localANInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
             document.body.appendChild(newInput);
-            const localANInput = $(newInput).autoNumeric('init'); // Initiate the autoNumeric input
-            const localANInputSettings = localANInput.autoNumeric('getSettings');
+        });
 
-            //--------------- The tests
-            // Default value overridden
-            let [, decimalPart] = localANInputSettings.minimumValue.split('.');
-            let decimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                decimalPartLength = decimalPart.length;
-            }
-            expect(decimalPartLength).toEqual(2);
-
-            [, decimalPart] = localANInputSettings.maximumValue.split('.');
-            decimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                decimalPartLength = decimalPart.length;
-            }
-            expect(decimalPartLength).toEqual(2);
-
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(decimalPartLength); // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue decimal part
-
-            // Tear down
-            localANInput.autoNumeric('destroy');
+        afterEach(() => { // Un-initialization
+            localANInput.remove();
             document.body.removeChild(newInput);
         });
 
-        it('should set the default value for decimalPlacesOverride when minimumValue and maximumValue have different decimal sizes, maximumValue being bigger', () => {
-            // Setup
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            const localANInput = $(newInput).autoNumeric('init', { minimumValue: '-99.99', maximumValue: '99.999' }); // Initiate the autoNumeric input
-            const localANInputSettings = localANInput.autoNumeric('getSettings');
-
-            //--------------- The tests
-            // Default value overridden
-            let [, decimalPart] = localANInputSettings.minimumValue.split('.');
-            let minimumValueDecimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                minimumValueDecimalPartLength = decimalPart.length;
-            }
-            expect(minimumValueDecimalPartLength).toEqual(2);
-
-            [, decimalPart] = localANInputSettings.maximumValue.split('.');
-            let maximumValueDecimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                maximumValueDecimalPartLength = decimalPart.length;
-            }
-            expect(maximumValueDecimalPartLength).toEqual(3);
-
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(Math.max(minimumValueDecimalPartLength, maximumValueDecimalPartLength)); // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue decimal part
-
-            // Tear down
-            localANInput.autoNumeric('destroy');
-            document.body.removeChild(newInput);
-        });
-
-        it('should set the default value for decimalPlacesOverride when minimumValue and maximumValue have different decimal sizes, minimumValue being bigger', () => {
-            // Setup
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            const localANInput = $(newInput).autoNumeric('init', { minimumValue: '-99.999', maximumValue: '99.99' }); // Initiate the autoNumeric input
-            const localANInputSettings = localANInput.autoNumeric('getSettings');
-
-            //--------------- The tests
-            // Default value overridden
-            let [, decimalPart] = localANInputSettings.minimumValue.split('.');
-            let minimumValueDecimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                minimumValueDecimalPartLength = decimalPart.length;
-            }
-            expect(minimumValueDecimalPartLength).toEqual(3);
-
-            [, decimalPart] = localANInputSettings.maximumValue.split('.');
-            let maximumValueDecimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                maximumValueDecimalPartLength = decimalPart.length;
-            }
-            expect(maximumValueDecimalPartLength).toEqual(2);
-
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(Math.max(minimumValueDecimalPartLength, maximumValueDecimalPartLength)); // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue decimal part
-
-            // Tear down
-            localANInput.autoNumeric('destroy');
-            document.body.removeChild(newInput);
-        });
-
-        it(`should set the decimalPlacesOverride value if it's not set to 'null', overwriting minimumValue and maximumValue settings`, () => {
-            // Setup
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            spyOn(console, 'warn'); // The next statement will output a warning since we override the decimals places declared in minimumValue
-            const localANInput = $(newInput).autoNumeric('init', { minimumValue: '-99.999', maximumValue: '99.99', decimalPlacesOverride: '4' }); // Initiate the autoNumeric input
+        it(`should show a warning when decimalPlacesRawValue is lower than decimalPlaces, and overwrite \`decimalPlacesRawValue\``, () => {
+            spyOn(console, 'warn');
+            localANInput = new AutoNumeric(newInput, { decimalPlacesRawValue: 2, decimalPlaces: 3 }); // Initiate the autoNumeric input
             expect(console.warn).toHaveBeenCalled();
-            const localANInputSettings = localANInput.autoNumeric('getSettings');
+            const localANInputSettings = localANInput.getSettings();
 
-            //--------------- The tests
-            // Default value overridden
-            let [, decimalPart] = localANInputSettings.minimumValue.split('.');
-            let minimumValueDecimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                minimumValueDecimalPartLength = decimalPart.length;
-            }
-            expect(minimumValueDecimalPartLength).toEqual(3);
-
-            [, decimalPart] = localANInputSettings.maximumValue.split('.');
-            let maximumValueDecimalPartLength = 0;
-            if (decimalPart !== void(0)) {
-                maximumValueDecimalPartLength = decimalPart.length;
-            }
-            expect(maximumValueDecimalPartLength).toEqual(2);
-
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(4); // Special case for 'decimalPlacesOverride': when it's set to 'null' (which is the default), then its value is overwritten by the greater minimumValue or maximumValue decimal part, otherwise it takes precedence over minimumValue/maximumValue
-
-            // Tear down
-            localANInput.autoNumeric('destroy');
-            document.body.removeChild(newInput);
+            expect(localANInputSettings.decimalPlaces).toEqual('3');
+            expect(localANInputSettings.decimalPlacesRawValue).toEqual(3);
         });
 
-        it(`should set the decimalPlacesOverride value, and show a warning when setting a greater decimalPlacesShownOnFocus`, () => {
+        it(`should show a warning when decimalPlacesRawValue is lower than decimalPlacesShownOnFocus, and overwrite \`decimalPlacesRawValue\``, () => {
             // Setup
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            spyOn(console, 'warn'); // The next statement will output a warning since decimalPlacesShownOnFocus is lower than decimalPlacesOverride
-            const localANInput = $(newInput).autoNumeric('init', { minimumValue: '-99.99', maximumValue: '99.99', decimalPlacesOverride: '5', decimalPlacesShownOnFocus: '3' }); // Initiate the autoNumeric input
+            spyOn(console, 'warn');
+            localANInput = new AutoNumeric(newInput, { decimalPlacesRawValue: 2, decimalPlacesShownOnFocus: 3 }); // Initiate the autoNumeric input
             expect(console.warn).toHaveBeenCalled();
-            const localANInputSettings = localANInput.autoNumeric('getSettings');
+            const localANInputSettings = localANInput.getSettings();
 
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(5); // 'decimalPlacesOverride' is not overwritten by a greater decimalPlacesShownOnFocus
-
-            // Tear down
-            localANInput.autoNumeric('destroy');
-            document.body.removeChild(newInput);
+            expect(localANInputSettings.decimalPlaces).toEqual('2');
+            expect(localANInputSettings.decimalPlacesShownOnFocus).toEqual('3');
+            expect(localANInputSettings.decimalPlacesRawValue).toEqual(3);
         });
 
-        it(`should set the decimalPlacesOverride value when decimalPlacesOverride is not defined, and show a warning when setting a greater decimalPlacesShownOnFocus`, () => {
+        it(`should show a warning when decimalPlacesRawValue is lower than decimalPlacesShownOnBlur, and overwrite \`decimalPlacesRawValue\``, () => {
             // Setup
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            spyOn(console, 'warn'); // The next statement will output a warning since decimalPlacesShownOnFocus is lower than decimalPlacesOverride
-            const localANInput = $(newInput).autoNumeric('init', { minimumValue: '-99.9999', maximumValue: '99.9999', decimalPlacesShownOnFocus: '3' }); // Initiate the autoNumeric input
+            spyOn(console, 'warn');
+            localANInput = new AutoNumeric(newInput, { decimalPlacesRawValue: 2, decimalPlacesShownOnBlur: 3 }); // Initiate the autoNumeric input
             expect(console.warn).toHaveBeenCalled();
-            const localANInputSettings = localANInput.autoNumeric('getSettings');
+            const localANInputSettings = localANInput.getSettings();
 
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(4); // 'decimalPlacesOverride' is not overwritten by a greater decimalPlacesShownOnFocus
-
-            // Tear down
-            localANInput.autoNumeric('destroy');
-            document.body.removeChild(newInput);
-        });
-
-        it(`should set the decimalPlacesOverride value, and show a warning when setting a greater decimalPlacesShownOnFocus`, () => {
-            // Setup
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            spyOn(console, 'warn'); // The next statement will output a warning since decimalPlacesShownOnFocus is lower than decimalPlacesOverride
-            const localANInput = $(newInput).autoNumeric('init', { minimumValue: '-99.99', maximumValue: '99.99', decimalPlacesOverride: '5', decimalPlacesShownOnFocus: '3' }); // Initiate the autoNumeric input
-            expect(console.warn).toHaveBeenCalled();
-            const localANInputSettings = localANInput.autoNumeric('getSettings');
-
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(5); // 'decimalPlacesOverride' is not overwritten by a greater decimalPlacesShownOnFocus
-
-            // Tear down
-            localANInput.autoNumeric('destroy');
-            document.body.removeChild(newInput);
-        });
-
-        it(`should set the decimalPlacesOverride value when decimalPlacesOverride is not defined, and show a warning when setting a greater decimalPlacesShownOnFocus`, () => {
-            // Setup
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            spyOn(console, 'warn'); // The next statement will output a warning since decimalPlacesShownOnFocus is lower than decimalPlacesOverride
-            const localANInput = $(newInput).autoNumeric('init', { minimumValue: '-99.9999', maximumValue: '99.9999', decimalPlacesShownOnFocus: '3' }); // Initiate the autoNumeric input
-            expect(console.warn).toHaveBeenCalled();
-            const localANInputSettings = localANInput.autoNumeric('getSettings');
-
-            expect(localANInputSettings.decimalPlacesOverride).toEqual(4); // 'decimalPlacesOverride' is not overwritten by a greater decimalPlacesShownOnFocus
-
-            // Tear down
-            localANInput.autoNumeric('destroy');
-            document.body.removeChild(newInput);
+            expect(localANInputSettings.decimalPlaces).toEqual('2');
+            expect(localANInputSettings.decimalPlacesShownOnBlur).toEqual('3');
+            expect(localANInputSettings.decimalPlacesRawValue).toEqual(3);
         });
     });
 
-    xdescribe(`autoNumeric 'getSettings' options`, () => { //FIXME Correct the `rawValue` tests
+    describe('autoNumeric `getSettings` options and the `rawValue`', () => {
         let aNInput;
         let newInput;
         const anOptions = { decimalCharacter: ',', digitGroupSeparator: '.' };
@@ -536,902 +450,5438 @@ describe('The autoNumeric object', () => {
         beforeEach(() => { // Initialization
             newInput = document.createElement('input');
             document.body.appendChild(newInput);
-            aNInput = $(newInput).autoNumeric('init', anOptions); // Initiate the autoNumeric input
+            aNInput = new AutoNumeric(newInput, anOptions); // Initiate the autoNumeric input
         });
 
         afterEach(() => { // Un-initialization
-            aNInput.autoNumeric('destroy');
+            aNInput.remove();
             document.body.removeChild(newInput);
         });
 
         it('should return a correct raw value with a point as a decimal character', () => {
-            aNInput.autoNumeric('set', '1234.56');
-            expect(aNInput.autoNumeric('get')).toEqual('1234.56');
-            expect(aNInput.autoNumeric('getNumber')).toEqual(1234.56);
-            expect(aNInput.autoNumeric('getSettings').rawValue).toEqual('1234.56');
+            aNInput.set('1234.56');
+            expect(aNInput.get()).toEqual('1234.56');
+            expect(aNInput.getNumber()).toEqual(1234.56);
+            expect(aNInput.rawValue).toEqual('1234.56');
 
-            aNInput.autoNumeric('set', '-1234.56');
-            expect(aNInput.autoNumeric('get')).toEqual('-1234.56');
-            expect(aNInput.autoNumeric('getNumber')).toEqual(-1234.56);
-            expect(aNInput.autoNumeric('getSettings').rawValue).toEqual('-1234.56');
+            aNInput.set('-1234.56');
+            expect(aNInput.get()).toEqual('-1234.56');
+            expect(aNInput.getNumber()).toEqual(-1234.56);
+            expect(aNInput.rawValue).toEqual('-1234.56');
 
-            aNInput.autoNumeric('set', '1234');
-            expect(aNInput.autoNumeric('get')).toEqual('1234');
-            expect(aNInput.autoNumeric('getNumber')).toEqual(1234);
-            expect(aNInput.autoNumeric('getSettings').rawValue).toEqual('1234');
+            aNInput.set('1234');
+            expect(aNInput.get()).toEqual('1234');
+            expect(aNInput.getNumber()).toEqual(1234);
+            expect(aNInput.rawValue).toEqual('1234');
 
-            aNInput.autoNumeric('set', '-1234');
-            expect(aNInput.autoNumeric('get')).toEqual('-1234');
-            expect(aNInput.autoNumeric('getNumber')).toEqual(-1234);
-            expect(aNInput.autoNumeric('getSettings').rawValue).toEqual('-1234');
+            aNInput.set('-1234');
+            expect(aNInput.get()).toEqual('-1234');
+            expect(aNInput.getNumber()).toEqual(-1234);
+            expect(aNInput.rawValue).toEqual('-1234');
         });
     });
 
-//TODO Complete the tests in order to test every single option separately (and in the future ; with and without jQuery)
+    describe('provides public methods', () => {
+        let aNInput;
+        let newInput;
 
-//-----------------------------------------------------------------------------
-//---- Methods
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+        });
 
-    it('should recognize only a specific list of methods', () => {
-        // The 'init' method is implicit tested since we use that to setup those tests
-        expect(() => aNInput.autoNumeric('get')).not.toThrow();
-        expect(() => aNInput.autoNumeric('getArray')).not.toThrow();
-        expect(() => aNInput.autoNumeric('getFormatted')).not.toThrow();
-        expect(() => aNInput.autoNumeric('getLocalized')).not.toThrow();
-        expect(() => aNInput.autoNumeric('getNumber')).not.toThrow();
-        expect(() => aNInput.autoNumeric('getSettings')).not.toThrow();
-        expect(() => aNInput.autoNumeric('getString')).not.toThrow();
-        expect(() => aNInput.autoNumeric('reSet')).not.toThrow();
-        expect(() => aNInput.autoNumeric('set', 1234)).not.toThrow();
-        expect(() => aNInput.autoNumeric('set', 1234.56)).not.toThrow();
-        expect(() => aNInput.autoNumeric('update', {})).not.toThrow();
-        expect(() => aNInput.autoNumeric('unSet')).not.toThrow();
-        expect(() => aNInput.autoNumeric('wipe')).not.toThrow();
-        expect(() => aNInput.autoNumeric('_getStringOrArray')).toThrow(); //This is a private function only
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
 
-        expect(() => aNInput.autoNumeric('destroy')).not.toThrow(); //Special case that needs to be done at the end of this test suite
+        it('should recognize only a specific list of methods', () => {
+            const otherDomElement = document.createElement('input');
+            document.body.appendChild(otherDomElement);
+
+            // The 'init' method is implicit tested since we use that to setup those tests
+            expect(() => aNInput.update({})).not.toThrow();
+            expect(() => aNInput.getSettings()).not.toThrow();
+            expect(() => aNInput.set(1234)).not.toThrow();
+            expect(() => aNInput.set(1234.56)).not.toThrow();
+            expect(() => aNInput.setUnformatted(123456.789)).not.toThrow();
+            expect(() => aNInput.get()).not.toThrow();
+            expect(() => aNInput.getNumericString()).not.toThrow();
+            expect(() => aNInput.getFormatted()).not.toThrow();
+            expect(() => aNInput.getNumber()).not.toThrow();
+            expect(() => aNInput.getLocalized()).not.toThrow();
+            expect(() => aNInput.getLocalized('number')).not.toThrow();
+            expect(() => aNInput.reformat()).not.toThrow();
+            expect(() => aNInput.unformat()).not.toThrow();
+            expect(() => aNInput.unformatLocalized('number')).not.toThrow();
+            expect(() => aNInput.isPristine()).not.toThrow();
+            expect(() => aNInput.select()).not.toThrow();
+            expect(() => aNInput.selectNumber()).not.toThrow();
+            expect(() => aNInput.selectInteger()).not.toThrow();
+            expect(() => aNInput.selectDecimal()).not.toThrow();
+            expect(() => aNInput.node()).not.toThrow();
+            expect(() => aNInput.parent()).not.toThrow();
+            expect(() => aNInput.detach()).not.toThrow();
+
+            const yetAnotherDomElement = document.createElement('input');
+            document.body.appendChild(yetAnotherDomElement);
+            const anYetAnotherDomElement = new AutoNumeric(yetAnotherDomElement);
+            expect(() => aNInput.attach(anYetAnotherDomElement)).not.toThrow();
+
+            expect(() => aNInput.formatOther(27368)).not.toThrow();
+            expect(() => aNInput.unformatOther('1.234.789,89 €')).not.toThrow();
+            expect(() => aNInput.init(otherDomElement)).not.toThrow();
+            AutoNumeric.getAutoNumericElement(otherDomElement).remove(); // This prevent reinitializing an already initialized DOM element
+            expect(() => aNInput.init(otherDomElement, false)).not.toThrow();
+
+            // Calling the pre-defined options
+            expect(() => aNInput.french()).not.toThrow();
+            expect(() => aNInput.northAmerican()).not.toThrow();
+            expect(() => aNInput.british()).not.toThrow();
+            expect(() => aNInput.swiss()).not.toThrow();
+            expect(() => aNInput.japanese()).not.toThrow();
+            expect(() => aNInput.spanish()).not.toThrow();
+            expect(() => aNInput.chinese()).not.toThrow();
+            expect(() => aNInput.brazilian()).not.toThrow();
+
+            document.body.removeChild(yetAnotherDomElement);
+            document.body.removeChild(otherDomElement);
+        });
+
+        it(`should recognize the 'form*' methods`, () => {
+            // Create a form element, 3 inputs, and only 2 autoNumeric ones
+            const theForm = document.createElement('form');
+            document.body.appendChild(theForm);
+            const input1 = document.createElement('input');
+            const input2 = document.createElement('input');
+            const input3 = document.createElement('input');
+            theForm.appendChild(input1);
+            theForm.appendChild(input2);
+            theForm.appendChild(input3);
+            // Initialize the two autoNumeric inputs
+            const aNInput1 = new AutoNumeric(input1);
+            const aNInput3 = new AutoNumeric(input3);
+            // Set their value (and the option at the same time)
+            aNInput1.set(13567.897, AutoNumeric.getPredefinedOptions().French);
+            expect(aNInput1.getFormatted()).toEqual('13.567,90\u202f€');
+            aNInput3.set(2987367.0262, AutoNumeric.getPredefinedOptions().NorthAmerican);
+            expect(aNInput3.getFormatted()).toEqual('$2,987,367.03');
+            input2.value = 666;
+
+            // Create a dummy form submit callback in order to prevent the code to really submit
+            spyOn(theForm, 'submit').and.callFake(() => false);
+
+            // Use the from* functions
+            expect(() => aNInput1.form()).not.toThrow();
+            expect(() => aNInput1.formNumericString()).not.toThrow();
+            expect(() => aNInput1.formFormatted()).not.toThrow();
+            expect(() => aNInput1.formLocalized()).not.toThrow();
+            expect(() => aNInput1.formArrayNumericString()).not.toThrow();
+            expect(() => aNInput1.formArrayFormatted()).not.toThrow();
+            expect(() => aNInput1.formArrayLocalized()).not.toThrow();
+            expect(() => aNInput1.formJsonNumericString()).not.toThrow();
+            expect(() => aNInput1.formJsonFormatted()).not.toThrow();
+            expect(() => aNInput1.formJsonLocalized()).not.toThrow();
+            expect(() => aNInput1.formUnformat()).not.toThrow();
+            expect(() => aNInput1.formReformat()).not.toThrow();
+            expect(() => aNInput1.formSubmitNumericString()).not.toThrow();
+            expect(() => aNInput1.formSubmitFormatted()).not.toThrow();
+            expect(() => aNInput1.formSubmitLocalized()).not.toThrow();
+            expect(() => aNInput1.formSubmitArrayNumericString(() => {})).not.toThrow();
+            expect(() => aNInput1.formSubmitArrayFormatted(() => {})).not.toThrow();
+            expect(() => aNInput1.formSubmitArrayLocalized(() => {})).not.toThrow();
+            expect(() => aNInput1.formSubmitJsonNumericString(() => {})).not.toThrow();
+            expect(() => aNInput1.formSubmitJsonFormatted(() => {})).not.toThrow();
+            expect(() => aNInput1.formSubmitJsonLocalized(() => {})).not.toThrow();
+
+            expect(theForm.submit).toHaveBeenCalled();
+
+            // Test the behavior of some of those form* functions
+            expect(aNInput1.form()).toEqual(theForm);
+
+            // Remove the 3 inputs and the form elements
+            theForm.removeChild(input1);
+            theForm.removeChild(input2);
+            theForm.removeChild(input3);
+            document.body.removeChild(theForm);
+        });
+
+        /*
+        xit('should not allow to call private methods', () => {
+            //TODO In an ideal world, JS would allow us to declare attributes and methodes `private` (or `protected`), in order to provide a clear API (cf. http://stackoverflow.com/a/33533611/2834898). This is unfortunately not the case so until this is fixed, the following function will be visible...
+            expect(() => aNInput._createEventListeners()).toThrow();
+            expect(() => aNInput._getChildANInputElement()).toThrow();
+            expect(() => aNInput._createGlobalList()).toThrow();
+            expect(() => aNInput._doesGlobalListExists()).toThrow();
+            expect(() => aNInput._addToGlobalList()).toThrow();
+            expect(() => aNInput._removeFromGlobalList()).toThrow();
+            expect(() => aNInput._isInGlobalList()).toThrow();
+            expect(() => aNInput._createLocalList()).toThrow();
+            expect(() => aNInput._addToLocalList()).toThrow();
+            expect(() => aNInput._removeFromLocalList()).toThrow();
+            expect(() => aNInput._runCallbacksFoundInTheSettingsObject()).toThrow();
+            expect(() => aNInput._maximumVMinAndVMaxDecimalLength()).toThrow();
+            expect(() => aNInput._stripAllNonNumberCharacters()).toThrow();
+            expect(() => aNInput._toggleNegativeBracket()).toThrow();
+            expect(() => aNInput._convertToNumericString()).toThrow();
+            expect(() => aNInput._toLocale()).toThrow();
+            expect(() => aNInput._modifyNegativeSignAndDecimalCharacterForRawValue()).toThrow();
+            expect(() => aNInput._modifyNegativeSignAndDecimalCharacterForFormattedValue()).toThrow();
+            expect(() => aNInput._checkEmpty()).toThrow();
+            expect(() => aNInput._addGroupSeparators()).toThrow();
+            expect(() => aNInput._truncateZeros()).toThrow();
+            expect(() => aNInput._roundValue()).toThrow();
+            expect(() => aNInput._truncateDecimalPlaces()).toThrow();
+            expect(() => aNInput._checkIfInRangeWithOverrideOption()).toThrow();
+            expect(() => aNInput._getCurrentElement()).toThrow(); //FIXME à terminer
+            expect(() => aNInput._keepAnOriginalSettingsCopy()).toThrow();
+            expect(() => aNInput._readCookie()).toThrow();
+            expect(() => aNInput._storageTest()).toThrow();
+            expect(() => aNInput._isInputTypeSupported()).toThrow();
+            expect(() => aNInput._trimLeadingAndTrailingZeros()).toThrow();
+            expect(() => aNInput._trimPaddedZerosFromDecimalPlaces()).toThrow();
+            expect(() => aNInput._saveValueToPersistentStorage()).toThrow();
+            expect(() => aNInput._getStringOrArray()).toThrow();
+            expect(() => aNInput._onFocusInAndMouseEnter()).toThrow();
+            expect(() => aNInput._onFocus()).toThrow();
+            expect(() => aNInput._onKeydown()).toThrow();
+            expect(() => aNInput._onKeypress()).toThrow();
+            expect(() => aNInput._onKeyup()).toThrow();
+            expect(() => aNInput._onFocusOutAndMouseLeave()).toThrow();
+            expect(() => aNInput._onPaste()).toThrow();
+            expect(() => aNInput._onBlur()).toThrow();
+            expect(() => aNInput._onWheel()).toThrow();
+            expect(() => aNInput._onFormSubmit()).toThrow();
+            expect(() => aNInput._isElementSupported()).toThrow();
+            expect(() => aNInput._formatDefaultValueOnPageLoad()).toThrow();
+            expect(() => aNInput._correctNegativePositiveSignPlacementOption()).toThrow();
+            expect(() => aNInput._calculateVMinAndVMaxIntegerSizes()).toThrow();
+            expect(() => aNInput._correctDecimalPlacesOverrideOption()).toThrow();
+            expect(() => aNInput._setAlternativeDecimalSeparatorCharacter()).toThrow();
+            expect(() => aNInput._cachesUsualRegularExpressions()).toThrow();
+            expect(() => aNInput._transformOptionsValuesToDefaultTypes()).toThrow();
+            expect(() => aNInput._convertOldOptionsToNewOnes()).toThrow();
+            expect(() => aNInput._setSettings()).toThrow();
+            expect(() => aNInput._toNumericValue()).toThrow();
+            expect(() => aNInput._preparePastedText()).toThrow();
+            expect(() => aNInput._checkIfInRange()).toThrow();
+            expect(() => aNInput._updateInternalProperties()).toThrow();
+            expect(() => aNInput._updateEventKeycode()).toThrow();
+            expect(() => aNInput._saveCancellableValue()).toThrow();
+            expect(() => aNInput._setSelection()).toThrow();
+            expect(() => aNInput._setCaretPosition()).toThrow();
+            expect(() => aNInput._getLeftAndRightPartAroundTheSelection()).toThrow();
+            expect(() => aNInput._getUnformattedLeftAndRightPartAroundTheSelection()).toThrow();
+            expect(() => aNInput._normalizeParts()).toThrow();
+            expect(() => aNInput._setValueParts()).toThrow();
+            expect(() => aNInput._getSignPosition()).toThrow();
+            expect(() => aNInput._expandSelectionOnSign()).toThrow();
+            expect(() => aNInput._checkPaste()).toThrow();
+            expect(() => aNInput._processNonPrintableKeysAndShortcuts()).toThrow();
+            expect(() => aNInput._defaultSelectAll()).toThrow();
+            expect(() => aNInput._processCharacterDeletionIfTrailingNegativeSign()).toThrow();
+            expect(() => aNInput._processCharacterDeletion()).toThrow();
+            expect(() => aNInput._processCharacterInsertion()).toThrow();
+            expect(() => aNInput._formatValue()).toThrow();
+            expect(() => aNInput._getParentForm()).toThrow();
+        });
+        */
+
+        it(`should recognize the 'clear' method`, () => {
+            // Special case that needs to be done alone since it reset the AutoNumeric element content
+            expect(() => aNInput.clear()).not.toThrow();
+            expect(() => aNInput.clear(true)).not.toThrow();
+        });
+
+        it(`should recognize the 'remove' method`, () => {
+            // Special case that needs to be done alone since it remove the AutoNumeric object
+            expect(() => aNInput.remove()).not.toThrow();
+        });
+
+        it(`should recognize the 'wipe' method`, () => {
+            // Special case that needs to be done alone since it remove the AutoNumeric object
+            expect(() => aNInput.wipe()).not.toThrow();
+        });
+
+        it(`should recognize the 'nuke' method`, () => {
+            const anotherInput = document.createElement('input');
+            anotherInput.id = 'randomStringThatIsUnique_eech6Ohv';
+            document.body.appendChild(anotherInput);
+            const anotherAnInput = new AutoNumeric(anotherInput); // Initiate the autoNumeric input
+
+            // Special case that needs to be done alone since it remove the AutoNumeric object
+            expect(() => anotherAnInput.nuke()).not.toThrow();
+            // Test that the anInput.node() element is no more
+            const verifNoMoreElement = document.getElementById('randomStringThatIsUnique_eech6Ohv');
+            expect(verifNoMoreElement).toBeNull();
+        });
+
+        it('should not recognize non-existant methods', () => {
+            expect(() => aNInput(1)).toThrow();
+            expect(() => aNInput(-10)).toThrow();
+            expect(() => aNInput.foobar('foobar')).toThrow();
+        });
     });
 
-    it('should not recognize non-existant methods', () => {
-        // expect(() => aNInput.autoNumeric(0)).toThrow(); //FIXME Finish this : this does not fail, why?
-        // expect(() => aNInput.autoNumeric(null)).toThrow(); //FIXME Finish this : this does not fail, why?
-        // expect(() => aNInput.autoNumeric(undefined)).toThrow(); //FIXME Finish this : this does not fail, why?
-        // expect(() => aNInput.autoNumeric([])).toThrow(); //FIXME Finish this : this does not fail, why?
-        // expect(() => aNInput.autoNumeric({})).toThrow(); //FIXME Finish this : this does not fail, why?
-        expect(() => aNInput.autoNumeric(1)).toThrow();
-        expect(() => aNInput.autoNumeric(-10)).toThrow();
-        expect(() => aNInput.autoNumeric('foobar')).toThrow();
-        expect(() => aNInput.autoNumeric('foobar')).toThrowError('Method "foobar" is not supported by autoNumeric');
-    });
-});
-
-describe(`autoNumeric 'init' method should init with predefined options`, () => {
-    let aNInput;
-    let newInput;
-
-    it('with French', () => {
-        newInput = document.createElement('input');
-        document.body.appendChild(newInput);
-        aNInput = $(newInput).autoNumeric('init', $.fn.autoNumeric.lang.French); // Initiate the autoNumeric input
-
-        aNInput.autoNumeric('set', '1234567.89');
-        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(1234567.89);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('1.234.567,89\u202f€');
-
-        aNInput.autoNumeric('destroy');
-        document.body.removeChild(newInput);
-    });
-
-    it('with North American', () => {
-        newInput = document.createElement('input');
-        document.body.appendChild(newInput);
-        aNInput = $(newInput).autoNumeric('init', $.fn.autoNumeric.lang.NorthAmerican); // Initiate the autoNumeric input
-
-        aNInput.autoNumeric('set', '1234567.89');
-        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(1234567.89);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$1,234,567.89');
-
-        aNInput.autoNumeric('destroy');
-        document.body.removeChild(newInput);
-    });
-
-    it('with Japanese', () => {
-        newInput = document.createElement('input');
-        document.body.appendChild(newInput);
-        aNInput = $(newInput).autoNumeric('init', $.fn.autoNumeric.lang.Japanese); // Initiate the autoNumeric input
-
-        aNInput.autoNumeric('set', '1234567.89');
-        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(1234567.89);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('¥1,234,567.89');
-
-        aNInput.autoNumeric('destroy');
-        document.body.removeChild(newInput);
-    });
-});
-
-describe(`autoNumeric 'init' method`, () => {
-    let aNInput;
-    let newInput;
-
-    beforeEach(() => { // Initialization
-        newInput = document.createElement('input');
-        document.body.appendChild(newInput);
-    });
-
-    afterEach(() => { // Un-initialization
-        aNInput.autoNumeric('destroy');
-        document.body.removeChild(newInput);
-    });
-
-    it('should init the element with the correct settings (Euro)', () => {
-        newInput.value = '6789,02';
-        aNInput = $(newInput).autoNumeric('init', autoNumericOptionsEuro);
-        expect(aNInput.autoNumeric('get')).toEqual('6789.02');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('6.789,02 €');
-
-        aNInput.autoNumeric('update', autoNumericOptionsEuro);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('6.789,02 €');
-    });
-
-    it('should init the element with the correct settings (Dollar)', () => {
-        newInput.value = '6789.02';
-        aNInput = $(newInput).autoNumeric('init', autoNumericOptionsDollar);
-        expect(aNInput.autoNumeric('get')).toEqual('6789.02');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789.02');
-
-        aNInput.autoNumeric('update', autoNumericOptionsDollar);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789.02');
-    });
-
-    it('should init the element with the correct settings (no methods, Euro)', () => {
-        newInput.value = '256789,02';
-        aNInput = $(newInput).autoNumeric(autoNumericOptionsEuro);
-        expect(aNInput.autoNumeric('get')).toEqual('256789.02');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('256.789,02 €');
-
-        aNInput.autoNumeric('update', autoNumericOptionsEuro);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('256.789,02 €');
-    });
-
-    it('should init the element with the correct settings (no methods, Dollar)', () => {
-        newInput.value = '256789.02';
-        aNInput = $(newInput).autoNumeric(autoNumericOptionsDollar);
-        expect(aNInput.autoNumeric('get')).toEqual('256789.02');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$256,789.02');
-
-        aNInput.autoNumeric('update', autoNumericOptionsDollar);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$256,789.02');
-    });
-
-    // Test the showPositiveSign option
-    // +1.234,00
-    const noneLeft = {
-        digitGroupSeparator        : '.',
-        decimalCharacter           : ',',
-        decimalCharacterAlternative: '.',
-        showPositiveSign           : true,
-    };
-
-    // 1.234,00+
-    const noneSuffix = {
-        digitGroupSeparator          : '.',
-        decimalCharacter             : ',',
-        decimalCharacterAlternative  : '.',
-        negativePositiveSignPlacement: 's',
-        showPositiveSign             : true,
-    };
-
-    // € +1.234,00
-    const leftRight = {
-        digitGroupSeparator          : '.',
-        decimalCharacter             : ',',
-        decimalCharacterAlternative  : '.',
-        currencySymbol               : '€\u00a0',
-        roundingMethod               : 'U',
-        negativePositiveSignPlacement: 'r',
-        showPositiveSign             : true,
-    };
-
-    // +€ 1.234,00
-    const leftLeft = {
-        digitGroupSeparator          : '.',
-        decimalCharacter             : ',',
-        decimalCharacterAlternative  : '.',
-        currencySymbol               : '€\u00a0',
-        roundingMethod               : 'U',
-        negativePositiveSignPlacement: 'l',
-        showPositiveSign             : true,
-    };
-
-    // € 1.234,00+
-    const leftSuffix = {
-        digitGroupSeparator          : '.',
-        decimalCharacter             : ',',
-        decimalCharacterAlternative  : '.',
-        currencySymbol               : '€\u00a0',
-        roundingMethod               : 'U',
-        negativePositiveSignPlacement: 's',
-        showPositiveSign             : true,
-    };
-
-    // 1.234,00+ €
-    const rightLeft = {
-        digitGroupSeparator          : '.',
-        decimalCharacter             : ',',
-        decimalCharacterAlternative  : '.',
-        currencySymbol               : '\u00a0€',
-        currencySymbolPlacement      : 's',
-        roundingMethod               : 'U',
-        negativePositiveSignPlacement: 'l',
-        showPositiveSign             : true,
-    };
-
-    // 1.234,00 €+
-    const rightRight = {
-        digitGroupSeparator          : '.',
-        decimalCharacter             : ',',
-        decimalCharacterAlternative  : '.',
-        currencySymbol               : '\u00a0€',
-        currencySymbolPlacement      : 's',
-        roundingMethod               : 'U',
-        negativePositiveSignPlacement: 'r',
-        showPositiveSign             : true,
-    };
-
-    // +1.234,00 €
-    const rightPrefix = {
-        digitGroupSeparator          : '.',
-        decimalCharacter             : ',',
-        decimalCharacterAlternative  : '.',
-        currencySymbol               : '\u00a0€',
-        currencySymbolPlacement      : 's',
-        roundingMethod               : 'U',
-        negativePositiveSignPlacement: 'p',
-        showPositiveSign             : true,
-    };
-
-    it('should format with showPositiveSign, no currency sign, default placement', () => {
-        newInput.value = '1234567.89';
-        aNInput = $(newInput).autoNumeric('init', noneLeft);
-        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('+1.234.567,89');
-    });
-
-    it('should format with showPositiveSign, no currency sign, suffix placement', () => {
-        newInput.value = '1234567.89';
-        aNInput = $(newInput).autoNumeric('init', noneSuffix);
-        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('1.234.567,89+');
-    });
-
-    it('should format with showPositiveSign, left currency sign, right placement', () => {
-        newInput.value = '1234567.89';
-        aNInput = $(newInput).autoNumeric('init', leftRight);
-        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('€\u00a0+1.234.567,89');
-    });
-
-    it('should format with showPositiveSign, left currency sign, left placement', () => {
-        newInput.value = '1234567.89';
-        aNInput = $(newInput).autoNumeric('init', leftLeft);
-        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('+€\u00a01.234.567,89');
-    });
-
-    it('should format with showPositiveSign, left currency sign, suffix placement', () => {
-        newInput.value = '1234567.89';
-        aNInput = $(newInput).autoNumeric('init', leftSuffix);
-        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('€\u00a01.234.567,89+');
-    });
-
-    it('should format with showPositiveSign, right currency sign, left placement', () => {
-        newInput.value = '1234567.89';
-        aNInput = $(newInput).autoNumeric('init', rightLeft);
-        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('1.234.567,89+\u00a0€');
-    });
-
-    it('should format with showPositiveSign, right currency sign, right placement', () => {
-        newInput.value = '1234567.89';
-        aNInput = $(newInput).autoNumeric('init', rightRight);
-        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('1.234.567,89\u00a0€+');
-    });
-
-    it('should format with showPositiveSign, right currency sign, prefix placement', () => {
-        newInput.value = '1234567.89';
-        aNInput = $(newInput).autoNumeric('init', rightPrefix);
-        expect(aNInput.autoNumeric('get')).toEqual('1234567.89');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('+1.234.567,89\u00a0€');
-    });
-});
-
-describe(`autoNumeric 'get', 'getLocalized' and 'getNumber' methods`, () => {
-    let aNInput;
-    let newInput;
-
-    beforeEach(() => { // Initialization
-        newInput = document.createElement('input');
-        document.body.appendChild(newInput);
-        aNInput = $(newInput).autoNumeric('init'); // Initiate the autoNumeric input
-    });
-
-    afterEach(() => { // Un-initialization
-        aNInput.autoNumeric('destroy');
-        document.body.removeChild(newInput);
-    });
-
-
-    it('should return an unformatted value, (without having any option specified)', () => {
-        // With an integer
-        aNInput.autoNumeric('set', 0);
-        expect(aNInput.autoNumeric('get')).toEqual('0');
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('0');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(0);
-
-        aNInput.autoNumeric('set', -42);
-        expect(aNInput.autoNumeric('get')).toEqual('-42');
-        aNInput.autoNumeric('update', { outputFormat: ',-' });
-        expect(aNInput.autoNumeric('get')).toEqual('-42');
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('42-');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
-        aNInput.autoNumeric('update', { outputFormat: '-,' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
-        aNInput.autoNumeric('update', { outputFormat: '.-' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('42-');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
-        aNInput.autoNumeric('update', { outputFormat: null });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
-        aNInput.autoNumeric('update', { outputFormat: 'number' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual(-42);
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
-        aNInput.autoNumeric('update', { outputFormat: 'string' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
-
-        // With a float
-        aNInput.autoNumeric('set', -42.76);
-        expect(aNInput.autoNumeric('get')).toEqual('-42.76');
-        aNInput.autoNumeric('update', { outputFormat: ',-' });
-        expect(aNInput.autoNumeric('get')).toEqual('-42.76');
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('42,76-');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42.76);
-
-        aNInput.autoNumeric('update', { outputFormat: '-,' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42,76');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42.76);
-        aNInput.autoNumeric('update', { outputFormat: '.-' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('42.76-');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42.76);
-        aNInput.autoNumeric('update', { outputFormat: null });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42.76');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42.76);
-        aNInput.autoNumeric('update', { outputFormat: 'number' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual(-42.76);
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42.76);
-        aNInput.autoNumeric('update', { outputFormat: 'string' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42.76');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42.76);
-    });
-
-    it('should return an unformatted value (with some options set)', () => {
-        // Euros
-        aNInput.autoNumeric('update', autoNumericOptionsEuro);
-        aNInput.autoNumeric('update', { outputFormat: ',-' });
-        aNInput.autoNumeric('set', 0);
-        expect(aNInput.autoNumeric('get')).toEqual('0');
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('0');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(0);
-        aNInput.autoNumeric('update', { leadingZero: 'keep' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('0');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(0);
-
-        aNInput.autoNumeric('set', -42);
-        expect(aNInput.autoNumeric('get')).toEqual('-42');
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('42-');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
-        aNInput.autoNumeric('update', { outputFormat: '-,' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
-        aNInput.autoNumeric('update', { outputFormat: '.-' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('42-');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
-        aNInput.autoNumeric('update', { outputFormat: null });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
-        aNInput.autoNumeric('update', { outputFormat: 'number' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual(-42);
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
-        aNInput.autoNumeric('update', { outputFormat: 'string' });
-        expect(aNInput.autoNumeric('getLocalized')).toEqual('-42');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
-
-        aNInput.autoNumeric('set', 1234.56); // Here I also test that setting a positive value after a negative one works ok
-        expect(aNInput.autoNumeric('get')).toEqual('1234.56');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(1234.56);
-        aNInput.autoNumeric('set', 6789012.345);
-        expect(aNInput.autoNumeric('get')).toEqual('6789012.35'); // Rounding happens here
-        expect(aNInput.autoNumeric('getNumber')).toEqual(6789012.35);
-
-        // Dollars
-        aNInput.autoNumeric('update', autoNumericOptionsDollar);
-        expect(aNInput.autoNumeric('get')).toEqual('6789012.35'); // First check if updating the options changed the results accordingly
-        expect(aNInput.autoNumeric('getNumber')).toEqual(6789012.35);
-        aNInput.autoNumeric('set', 1234.56);
-        expect(aNInput.autoNumeric('get')).toEqual('1234.56');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(1234.56);
-        aNInput.autoNumeric('set', 6789012.345);
-        expect(aNInput.autoNumeric('get')).toEqual('6789012.35');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(6789012.35);
-        aNInput.autoNumeric('set', 0);
-        expect(aNInput.autoNumeric('get')).toEqual('0');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(0);
-        aNInput.autoNumeric('set', -42);
-        expect(aNInput.autoNumeric('get')).toEqual('-42');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(-42);
-    });
-
-    it('should return an unformatted value even if the number is bigger than Number.MAX_SAFE_INTEGER', () => {
-        if (Number.MAX_SAFE_INTEGER === void(0)) { // Special polyfill case for PhantomJS
-            // console.log(`Setting the Number.MAX_SAFE_INTEGER polyfill...`); //DEBUG
-            //noinspection JSPrimitiveTypeWrapperUsage
-            Number.MAX_SAFE_INTEGER = 9007199254740991;
-        }
-
-        aNInput.autoNumeric('update', { maximumValue: '9007199254740991000000' });
-        aNInput.autoNumeric('set', Number.MAX_SAFE_INTEGER); // The exact highest safe integer
-        expect(aNInput.autoNumeric('get')).toEqual(`${Number.MAX_SAFE_INTEGER}`);
-        aNInput.autoNumeric('set', '9007199254740996'); // A bit higher than the biggest safest integer
-        expect(aNInput.autoNumeric('get')).toEqual('9007199254740996');
-        // Add a test where the user set a very big number (bigger than Number.MAX_SAFE_INTEGER), and check if `get` return the correct number
-        aNInput.autoNumeric('set', '9007199254740991000000'); // A very big number
-        expect(aNInput.autoNumeric('get')).toEqual('9007199254740991000000');
-    });
-});
-
-describe(`autoNumeric 'get' methods`, () => {
-    it(`should return an empty string as the default value`, () => {
-        const newInput = document.createElement('input');
-        document.body.appendChild(newInput);
-        const aNInput = $(newInput).autoNumeric('init'); // Initiate the autoNumeric input
-
-        expect(aNInput.autoNumeric('get')).toEqual('');
-    });
-
-    it(`should return '0' as the default value`, () => {
-        const newInput = document.createElement('input');
-        document.body.appendChild(newInput);
-        const aNInput = $(newInput).autoNumeric('init', { emptyInputBehavior : 'zero' }); // Initiate the autoNumeric input
-
-        expect(aNInput.autoNumeric('get')).toEqual('0');
-    });
-
-    it(`should not return a negative value when inputting a positive one and minimumValue is equal to '0' (cf. issue #284)`, () => {
-        const newInput = document.createElement('input');
-        document.body.appendChild(newInput);
-        spyOn(console, 'warn');
-        const aNInput = $(newInput).autoNumeric('init', { minimumValue: '0', maximumValue: '9999', decimalPlacesOverride: '2' }); // Initiate the autoNumeric input
-        expect(console.warn).toHaveBeenCalled();
-
-        expect(aNInput.autoNumeric('get')).toEqual('');
-        aNInput.autoNumeric('set', 1234);
-        expect(aNInput.autoNumeric('get')).toEqual('1234');
-        aNInput.autoNumeric('set', 0);
-        expect(aNInput.autoNumeric('get')).toEqual('0');
-        aNInput.autoNumeric('set', -0);
-        expect(aNInput.autoNumeric('get')).toEqual('0');
-
-        aNInput.autoNumeric('destroy');
-        document.body.removeChild(newInput);
-    });
-
-    it(`should not return a negative value when inputting a positive one and minimumValue is superior to '0' (cf. issue #284)`, () => {
-        const newInput = document.createElement('input');
-        document.body.appendChild(newInput);
-        spyOn(console, 'warn');
-        const aNInput = $(newInput).autoNumeric('init', { minimumValue: '1', maximumValue: '9999', decimalPlacesOverride: '2' }); // Initiate the autoNumeric input
-        expect(console.warn).toHaveBeenCalled();
-
-        expect(aNInput.autoNumeric('get')).toEqual('');
-        aNInput.autoNumeric('set', 1234);
-        expect(aNInput.autoNumeric('get')).toEqual('1234');
-
-        aNInput.autoNumeric('destroy');
-        document.body.removeChild(newInput);
-    });
-});
-
-describe(`autoNumeric 'set' method`, () => {
-    let aNInput;
-    let newInput;
-
-    beforeEach(() => { // Initialization
-        newInput = document.createElement('input');
-        document.body.appendChild(newInput);
-        aNInput = $(newInput).autoNumeric('init'); // Initiate the autoNumeric input
-    });
-
-    afterEach(() => { // Un-initialization
-        aNInput.autoNumeric('destroy');
-        document.body.removeChild(newInput);
-    });
-
-    it('should set a raw value and result in a formatted value', () => {
-        // Euros
-        aNInput.autoNumeric('update', autoNumericOptionsEuro);
-        aNInput.autoNumeric('set', 1234.56);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('1.234,56 €');
-        aNInput.autoNumeric('set', 6789012.345);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('6.789.012,35 €'); // Rounding happens here
-
-        aNInput.autoNumeric('set', '1234.56');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('1.234,56 €');
-        aNInput.autoNumeric('set', '6789012.345');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('6.789.012,35 €'); // Rounding happens here
-
-        // Dollars
-        aNInput.autoNumeric('update', autoNumericOptionsDollar);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789,012.35'); // First check if updating the options changed the results accordingly
-        aNInput.autoNumeric('set', 1234.56);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$1,234.56');
-        aNInput.autoNumeric('set', 6789012.345);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789,012.35');
-
-        aNInput.autoNumeric('set', '1234.56');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$1,234.56');
-        aNInput.autoNumeric('set', '6789012.345');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789,012.35');
-    });
-
-    it('should set a formatted value and result in a formatted value', () => {
-        // Euros
-        aNInput.autoNumeric('update', autoNumericOptionsEuro);
-        aNInput.autoNumeric('set', '1.234,56');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('1.234,56 €');
-        aNInput.autoNumeric('set', '6.789.012,345');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('6.789.012,35 €'); // Rounding happens here
-
-        // Dollars
-        aNInput.autoNumeric('update', autoNumericOptionsDollar);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789,012.35'); // First check if updating the options changed the results accordingly
-        aNInput.autoNumeric('set', '1,234.56');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$1,234.56');
-        aNInput.autoNumeric('set', '6,789,012.345');
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('$6,789,012.35');
-    });
-
-    it('should respect the minimumValue and maximumValue settings', () => {
-        aNInput.autoNumeric('update', { minimumValue: '999999.99', maximumValue: '1111111111111.11' });
-        expect(() => aNInput.autoNumeric('set', 999999.99)).not.toThrow();
-        expect(() => aNInput.autoNumeric('set', 1111111111111.11)).not.toThrow();
-
-        expect(() => aNInput.autoNumeric('set', 999999.984)).toThrow(); // Min, with rounding up
-        expect(() => aNInput.autoNumeric('set', 999999.989)).toThrow(); // Min, even without rounding
-        expect(() => aNInput.autoNumeric('set', 999999.991)).not.toThrow();
-        expect(() => aNInput.autoNumeric('set', 1111111111111.109)).not.toThrow();
-        expect(() => aNInput.autoNumeric('set', 1111111111111.111)).toThrow(); // Max
-    });
-
-    it('should respect the minimumValue and maximumValue settings', () => {
-        aNInput.autoNumeric('update', { minimumValue: '999999.99', maximumValue: '1111111111111.11' });
-        expect(() => aNInput.autoNumeric('set', 999999.99)).not.toThrow();
-        expect(() => aNInput.autoNumeric('set', 1111111111111.11)).not.toThrow();
-
-        expect(() => aNInput.autoNumeric('set', 999999.984)).toThrow(); // Min, with rounding up
-        expect(() => aNInput.autoNumeric('set', 999999.989)).toThrow(); // Min, even without rounding
-        expect(() => aNInput.autoNumeric('set', 999999.991)).not.toThrow();
-        expect(() => aNInput.autoNumeric('set', 1111111111111.109)).not.toThrow();
-        expect(() => aNInput.autoNumeric('set', 1111111111111.111)).toThrow(); // Max
-    });
-
-    it('should respect the minimumValue and maximumValue settings', () => {
-        aNInput.autoNumeric('update', { minimumValue: '999999.99', maximumValue: '1111111111111.11' });
-        expect(() => aNInput.autoNumeric('set', 999999.99)).not.toThrow();
-        expect(() => aNInput.autoNumeric('set', 1111111111111.11)).not.toThrow();
-
-        expect(() => aNInput.autoNumeric('set', 999999.984)).toThrow(); // Min, with rounding up
-        expect(() => aNInput.autoNumeric('set', 999999.989)).toThrow(); // Min, even without rounding
-        expect(() => aNInput.autoNumeric('set', 999999.991)).not.toThrow();
-        expect(() => aNInput.autoNumeric('set', 1111111111111.109)).not.toThrow();
-        expect(() => aNInput.autoNumeric('set', 1111111111111.111)).toThrow(); // Max
-    });
-});
-
-describe('`set` and non-ascii numbers', () => {
-    let aNInput;
-    let newInput;
-
-    beforeEach(() => { // Initialization
-        newInput = document.createElement('input');
-        document.body.appendChild(newInput);
-        aNInput = $(newInput).autoNumeric('init', { digitGroupSeparator : ',', decimalCharacter : '.' }); // Initiate the autoNumeric input
-    });
-
-    afterEach(() => { // Un-initialization
-        aNInput.autoNumeric('destroy');
-        document.body.removeChild(newInput);
-    });
-
-    it('should accepts Arabic numbers', () => {
-        expect(aNInput.autoNumeric('get')).toEqual('');
-        aNInput.autoNumeric('set', '١٠٢٣٤٥٦٧.٨٩');
-        expect(aNInput.autoNumeric('get')).toEqual('10234567.89');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(10234567.89);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('10,234,567.89');
-    });
-
-    it('should accepts Persian numbers', () => {
-        expect(aNInput.autoNumeric('get')).toEqual('');
-        aNInput.autoNumeric('set', '۱٠۲۳۴۵۶۷.۸۹');
-        expect(aNInput.autoNumeric('get')).toEqual('10234567.89');
-        expect(aNInput.autoNumeric('getNumber')).toEqual(10234567.89);
-        expect(aNInput.autoNumeric('getFormatted')).toEqual('10,234,567.89');
-    });
-});
-
-describe(`autoNumeric 'getString' and 'getArray' methods`, () => {
-    let form;
-    let input1;
-    let input2;
-    let input3;
-    let input4;
-    let input5;
-    let anInput1;
-    let anInput2;
-    let anInput3;
-
-    beforeEach(() => { // Initialization
-        form = document.createElement('form');
-        input1 = document.createElement('input');
-        input2 = document.createElement('input');
-        input3 = document.createElement('input');
-        input4 = document.createElement('input');
-        input5 = document.createElement('input');
-
-        document.body.appendChild(form);
-        form.appendChild(input1);
-        form.appendChild(input2);
-        form.appendChild(input3);
-        form.appendChild(input4);
-        form.appendChild(input5);
-
-        input1.name = 'aa';
-        input2.name = 'bb';
-        input3.name = 'cc';
-        input4.name = 'ab';
-        input5.name = 'bc';
-
-        input1.value = '1111.11';
-        expect(input1.value).toEqual('1111.11');
-        input2.value = '2222.22';
-        input3.value = '3333.33';
-        input4.value = 'not autoNumeric test';
-        expect(input4.value).toEqual('not autoNumeric test');
-        input5.value = 'not autoNumeric $1,234.567';
-        expect(input5.value).toEqual('not autoNumeric $1,234.567');
-
-        // Initiate only 3 autoNumeric inputs
-        const anOptions = { digitGroupSeparator: '.', decimalCharacter: ',', currencySymbol: '€ ' };
-        anInput1 = $(input1).autoNumeric('init', anOptions);
-        anInput2 = $(input2).autoNumeric('init', anOptions);
-        anInput3 = $(input3).autoNumeric('init', anOptions);
-
-        expect(input1.value).toEqual('€ 1.111,11');
-        expect(anInput1.autoNumeric('getFormatted')).toEqual('€ 1.111,11');
-        anInput1.autoNumeric('update', anOptions);
-        expect(anInput1.autoNumeric('getFormatted')).toEqual('€ 1.111,11');
-    });
-
-    afterEach(() => { // Un-initialization
-        anInput1.autoNumeric('destroy');
-        anInput2.autoNumeric('destroy');
-        anInput3.autoNumeric('destroy');
-        form.removeChild(input1);
-        form.removeChild(input2);
-        form.removeChild(input3);
-        form.removeChild(input4);
-        form.removeChild(input5);
-        document.body.removeChild(form);
-    });
-
-    it('should return the correct string', () => {
-        expect($(form).autoNumeric('getString')).toEqual('aa=1111.11&bb=2222.22&cc=3333.33&ab=not%20autoNumeric%20test&bc=not%20autoNumeric%20%241%2C234.567');
-    });
-
-    it('should return the correct array', () => {
-        const arrayResult = [
-            {
-                name: 'aa',
-                value: '1111.11' ,
-            },
-            {
-                name : 'bb',
-                value: '2222.22',
-            },
-            {
-                name : 'cc',
-                value: '3333.33',
-            },
-            {
-                name: 'ab',
-                value: 'not autoNumeric test',
-            },
-            {
-                name: 'bc',
-                value: 'not autoNumeric $1,234.567',
-            },
-        ];
-        expect($(form).autoNumeric('getArray')).toEqual(arrayResult);
+    describe('initialization methods', () => {
+        let newInput;
+        const options = { decimalCharacter: ',', digitGroupSeparator: '.' };
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            document.body.removeChild(newInput);
+        });
+
+        it('should correctly initialize non-input elements', () => {
+            // Create elements
+            const p1 = document.createElement('p');
+            p1.textContent = '0.0214';
+            document.body.appendChild(p1);
+            const p2 = document.createElement('p');
+            document.body.appendChild(p2);
+            const code = document.createElement('code');
+            code.textContent = '12345.67';
+            document.body.appendChild(code);
+            const div = document.createElement('div');
+            div.textContent = '12345.67';
+            document.body.appendChild(div);
+            const h5 = document.createElement('h5');
+            h5.textContent = '12345.67';
+            document.body.appendChild(h5);
+            const label = document.createElement('label');
+            label.textContent = '12345.67';
+            document.body.appendChild(label);
+            const span = document.createElement('span');
+            span.textContent = '12345.67';
+            document.body.appendChild(span);
+
+            expect(() => new AutoNumeric(newInput)).not.toThrow();
+            expect(new AutoNumeric(p1, { decimalPlacesShownOnBlur: 3, decimalPlacesRawValue: 4, divisorWhenUnfocused: 0.01, symbolWhenUnfocused: '%' }).getFormatted()).toEqual('2.140%');
+            expect(new AutoNumeric(p2, 666.42).french().getFormatted()).toEqual('666,42 €');
+            expect(new AutoNumeric(code, AutoNumeric.getPredefinedOptions().Japanese).getFormatted()).toEqual('¥12,345.67');
+            expect(new AutoNumeric(div).northAmerican().getFormatted()).toEqual('$12,345.67');
+            expect(new AutoNumeric(h5, 666.42).swiss().getFormatted()).toEqual('666.42 CHF');
+            expect(new AutoNumeric(label).getFormatted()).toEqual('12,345.67');
+            expect(new AutoNumeric(span, '').getFormatted()).toEqual('');
+
+            // Remove the elements
+            document.body.removeChild(p1);
+            document.body.removeChild(p2);
+            document.body.removeChild(code);
+            document.body.removeChild(div);
+            document.body.removeChild(h5);
+            document.body.removeChild(label);
+            document.body.removeChild(span);
+        });
+
+        it('should fail initializing an input element of type `number`', () => {
+            // Create the element
+            const inputNumber = document.createElement('input');
+            inputNumber.type = 'number';
+            inputNumber.value = '663241800.0214';
+            document.body.appendChild(inputNumber);
+
+            expect(() => new AutoNumeric(inputNumber)).toThrow();
+
+            // Remove the element
+            document.body.removeChild(inputNumber);
+        });
+
+        it('should correctly initialize input element of type `tel`', () => {
+            // Create the element
+            const inputTel = document.createElement('input');
+            inputTel.type = 'tel';
+            inputTel.value = '663241800.0214';
+            document.body.appendChild(inputTel);
+
+            expect(new AutoNumeric(inputTel).french().getFormatted()).toEqual('663.241.800,02 €');
+
+            // Remove the element
+            document.body.removeChild(inputTel);
+        });
+
+        it('should correctly initialize input element of type `hidden`', () => {
+            // Create the element
+            const inputHidden = document.createElement('input');
+            inputHidden.type = 'hidden';
+            inputHidden.value = '663241800.0214';
+            document.body.appendChild(inputHidden);
+
+            expect(new AutoNumeric(inputHidden).french().getFormatted()).toEqual('663.241.800,02 €');
+
+            // Remove the element
+            document.body.removeChild(inputHidden);
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric(newInput)).not.toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric(newInput, options)).not.toThrow(); // With one option object
+        });
+
+        it('should correctly initialize the AutoNumeric element when passed a pre-defined option name', () => {
+            let anElement = null;
+
+            // new AutoNumeric(domElement, 'euroPos'); // With one pre-defined option name
+            expect(() => anElement = new AutoNumeric(newInput, 'euro')).not.toThrow();
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('1.234.567,89 €');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, 'dollar')).not.toThrow();
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('$1,234,567.89');
+
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, 'foobar')).toThrow();
+
+            // new AutoNumeric(domElement, 12345.789, 'euroPos');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, 1234567.89, 'euro')).not.toThrow();
+            expect(anElement.getFormatted()).toEqual('1.234.567,89 €');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, 1234567.89, 'dollar')).not.toThrow();
+            expect(anElement.getFormatted()).toEqual('$1,234,567.89');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, 1234567.89, 'foobar')).toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element when passed an array of options', () => {
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric(newInput, [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('#1 234 567·89');
+        });
+
+        it('should correctly initialize the AutoNumeric element when passed an array of options with pre-defined option names', () => {
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric(newInput, [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                'euro',
+                {
+                    currencySymbol     : '!',
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('1.234.567,89!');
+        });
+
+        it('should ignore unknown pre-defined option name when initializing the AutoNumeric element with an array of options with pre-defined option names', () => {
+            spyOn(console, 'warn');
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric(newInput, [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                'euro',
+                {
+                    currencySymbol     : '!',
+                },
+                'foobar',
+            ])).not.toThrow(); // With multiple option objects
+            expect(console.warn).toHaveBeenCalled();
+            expect(console.warn).toHaveBeenCalledTimes(1);
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('1.234.567,89!');
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric(newInput, null, options)).not.toThrow(); // With one option object and a null initial value
+        });
+
+        it('should correctly initialize the AutoNumeric element when passed an array of options', () => {
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric(newInput, null, [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('#1 234 567·89');
+        });
+
+        it('should correctly initialize the AutoNumeric element when passed an array of options, and an initial value', () => {
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric(newInput, 1234567.89, [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.getFormatted()).toEqual('#1 234 567·89');
+
+
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, '1234567.89', [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.getFormatted()).toEqual('#1 234 567·89');
+
+
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric(newInput, '', [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.getFormatted()).toEqual('');
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('#1 234 567·89');
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric(newInput, '', options)).not.toThrow(); // With one option object and an empty initial value
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric(newInput).french()).not.toThrow(); // With one pre-defined language object
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric(newInput).french(options)).not.toThrow(); // With one pre-defined language object and additional options that will override the defaults
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            // ...or init and set the value in one call :
+            expect(() => new AutoNumeric(newInput, 12345.789)).not.toThrow(); // With the default options, and an initial value
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric(newInput, 12345.789, options)).not.toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric(newInput, '12345.789', options)).not.toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric(newInput, 12345.789).french(options)).not.toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric(newInput, 12345.789, options).french(options)).not.toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            // The AutoNumeric constructor class can also accept a string as a css selector. Under the hood this use `QuerySelector` and limit itself to only the first element it finds.
+            expect(() => new AutoNumeric('input')).not.toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric('input', options)).not.toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element when passed an array of options', () => {
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric('input', [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('#1 234 567·89');
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric('input', 12345.789)).not.toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element when passed a pre-defined option name', () => {
+            let anElement = null;
+
+            // new AutoNumeric('.myCssClass > input', 'euroPos'); // With one pre-defined option name
+            expect(() => anElement = new AutoNumeric('input', 'euro')).not.toThrow();
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('1.234.567,89 €');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric('input', 'dollar')).not.toThrow();
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('$1,234,567.89');
+
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric('input', 'foobar')).toThrow();
+
+            // new AutoNumeric('.myCssClass > input', 12345.789, 'euroPos');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric('input', 1234567.89, 'euro')).not.toThrow();
+            expect(anElement.getFormatted()).toEqual('1.234.567,89 €');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric('input', 1234567.89, 'dollar')).not.toThrow();
+            expect(anElement.getFormatted()).toEqual('$1,234,567.89');
+            anElement.wipe();
+            expect(() => anElement = new AutoNumeric('input', 1234567.89, 'foobar')).toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric('input', 12345.789, options)).not.toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element when passed an array of options', () => {
+            let anElement = null;
+            expect(() => anElement = new AutoNumeric('input', null, [
+                options,
+                {
+                    currencySymbol     : '#',
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                },
+                {
+                    digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.thinSpace,
+                    decimalCharacter   : AutoNumeric.options.decimalCharacter.middleDot,
+                },
+            ])).not.toThrow(); // With multiple option objects
+            expect(anElement.set(1234567.89).getFormatted()).toEqual('#1 234 567·89');
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            const an = new AutoNumeric('input', 12300.789); //FIXME Move those tests in another test suite
+            expect(AutoNumeric.test(an.node())).toEqual(true);
+            expect(an.getFormatted()).toEqual('12,300.79');
+            an.french();
+            expect(an.getFormatted()).toEqual('12.300,79 €');
+            an.french({ currencySymbol : '#' });
+            expect(an.getFormatted()).toEqual('12.300,79#');
+            an.remove(); // This prevent reinitializing an already initialized DOM element
+            expect(() => new AutoNumeric('input', 12300.789).french(options)).not.toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element', () => {
+            expect(() => new AutoNumeric('input', 12345.789, options).french(options)).not.toThrow();
+        });
+
+        it('should not correctly initialize the AutoNumeric element and throw', () => {
+            expect(() => new AutoNumeric(0)).toThrow();
+            expect(() => new AutoNumeric(null)).toThrow();
+            expect(() => new AutoNumeric(undefined)).toThrow();
+            expect(() => new AutoNumeric([])).toThrow();
+            expect(() => new AutoNumeric({})).toThrow();
+            expect(() => new AutoNumeric('42')).toThrow();
+            expect(() => new AutoNumeric('foobar')).toThrow();
+
+            expect(() => new AutoNumeric('input', 'foobar')).toThrow();
+            expect(() => new AutoNumeric('input', 1235, 'foobar')).toThrow();
+            expect(() => new AutoNumeric('input', [])).toThrow();
+        });
     });
 });
 
-//TODO Complete the tests in order to test every single method separately (and in the future ; with and without jQuery)
+describe('autoNumeric options and `options.*` methods', () => {
+    describe('`options.*` methods', () => {
+        let aNInput;
+        let newInput;
 
-//-----------------------------------------------------------------------------
-//---- Static functions
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should correctly update the minimum and maximum range values', () => {
+            //XXX Note: The user cannot modify the `minimumValue` and `maximumValue` option if the current value is out of range with those updated options. This attempt will throw an error, and the `minimumValue` or `maximumValue` option will be reverted to the previous valid ones.
+
+            // Initialize the range
+            aNInput = new AutoNumeric(newInput, AutoNumeric.predefinedOptions.French);
+            aNInput.options.minimumValue(-1000);
+            aNInput.options.maximumValue(1000);
+
+            // Test setting the value, without changing the range
+            // Test ----------Min-----[Val]-----Max----------
+            expect(() => aNInput.set(-1000)).not.toThrow();
+            expect(() => aNInput.set(1000)).not.toThrow();
+            expect(() => aNInput.set(200)).not.toThrow();
+            expect(() => aNInput.set(-400)).not.toThrow();
+
+            // Test ----------Min----------Max-----[Val]-----
+            expect(() => aNInput.set(99999)).toThrow();
+            // Test -----[Val]-----Min----------Max----------
+            expect(() => aNInput.set(-99999)).toThrow();
+
+            // Now, instead of trying to change the value directly, let's change the range while the value stays the same
+            expect(aNInput.getFormatted()).toEqual('-400,00\u202f€');
+            // Test ----------Min-----[Val]-----Max----------
+            expect(() => aNInput.options.maximumValue(200)).not.toThrow();
+            expect(() => aNInput.options.maximumValue(-399)).not.toThrow();
+            expect(() => aNInput.options.minimumValue(-500)).not.toThrow();
+            expect(() => aNInput.options.minimumValue(-401)).not.toThrow();
+            expect(() => aNInput.options.minimumValue(-400)).not.toThrow();
+
+            // Reset the range and value to make the following tests more readable
+            aNInput.options.minimumValue(-1000);
+            aNInput.options.maximumValue(1000);
+            aNInput.set('');
+
+            // Then make the tests fails by trying to move the ranges at the 'wrong' places
+            // Test ----------Max----------Min----------
+            expect(() => aNInput.options.minimumValue(2000)).toThrow();
+            expect(aNInput.getSettings().minimumValue).toEqual('-1000');
+
+            aNInput.set(222);
+            expect(aNInput.getFormatted()).toEqual('222,00\u202f€');
+
+            // Test -----[Val]-----Min----------Max----------
+            expect(() => aNInput.options.minimumValue(400)).toThrow();
+            expect(aNInput.getSettings().minimumValue).toEqual('-1000');
+            aNInput.set(224);
+            expect(aNInput.getFormatted()).toEqual('224,00\u202f€');
+            expect(() => aNInput.set(-1001)).toThrow();
+
+            // Test ----------Min----------Max-----[Val]-----
+            expect(() => aNInput.options.maximumValue(200)).toThrow();
+            expect(aNInput.getSettings().maximumValue).toEqual('1000');
+            aNInput.set(225);
+            expect(aNInput.getFormatted()).toEqual('225,00\u202f€');
+            expect(() => aNInput.set(1001)).toThrow();
+        });
+
+        it('should correctly update single options and `reset()` all', () => {
+            aNInput = new AutoNumeric(newInput, 1146789.02, AutoNumeric.predefinedOptions.French);
+            expect(aNInput.getNumericString()).toEqual('1146789.02');
+            expect(aNInput.getFormatted()).toEqual('1.146.789,02\u202f€');
+            expect(aNInput.getSettings().decimalPlaces).toEqual('2');
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual(2);
+            expect(aNInput.getSettings().decimalPlacesShownOnFocus).toEqual('2');
+            expect(aNInput.getSettings().decimalPlacesShownOnBlur).toEqual('2');
+
+            aNInput.options.digitGroupSeparator(AutoNumeric.options.digitGroupSeparator.apostrophe);
+            expect(aNInput.getFormatted()).toEqual(`1'146'789,02\u202f€`);
+            aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.two);
+            expect(aNInput.getFormatted()).toEqual(`11'46'789,02\u202f€`);
+            aNInput.options.decimalCharacter(AutoNumeric.options.decimalCharacter.middleDot);
+            expect(aNInput.getFormatted()).toEqual(`11'46'789·02\u202f€`);
+            aNInput.options.currencySymbol(AutoNumeric.options.currencySymbol.franc);
+            expect(aNInput.getFormatted()).toEqual(`11'46'789·02₣`);
+            aNInput.options.currencySymbolPlacement(AutoNumeric.options.currencySymbolPlacement.prefix);
+            expect(aNInput.getFormatted()).toEqual(`₣11'46'789·02`);
+            aNInput.options.showPositiveSign(AutoNumeric.options.showPositiveSign.show);
+            expect(aNInput.getFormatted()).toEqual(`+₣11'46'789·02`);
+
+            aNInput.options.reset().french().set(-1234567.89);
+            expect(aNInput.getSettings().decimalPlaces).toEqual('2');
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('2');
+            expect(aNInput.getSettings().originalDecimalPlacesRawValue).toEqual(null);
+            expect(aNInput.getSettings().decimalPlacesShownOnFocus).toEqual('2');
+            expect(aNInput.getSettings().decimalPlacesShownOnBlur).toEqual('2');
+
+            expect(aNInput.getFormatted()).toEqual('-1.234.567,89\u202f€');
+            aNInput.options.negativePositiveSignPlacement(AutoNumeric.options.negativePositiveSignPlacement.suffix);
+            expect(aNInput.getFormatted()).toEqual('1.234.567,89\u202f€-');
+            aNInput.options.suffixText(AutoNumeric.options.suffixText.percentage);
+            expect(aNInput.getFormatted()).toEqual('1.234.567,89\u202f€-%');
+            aNInput.options.suffixText(AutoNumeric.options.suffixText.none);
+            expect(aNInput.getFormatted()).toEqual('1.234.567,89\u202f€-');
+
+            expect(aNInput.getSettings().historySize).toEqual('20');
+            aNInput.options.historySize(30);
+            expect(aNInput.getSettings().historySize).toEqual(30);
+
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('2');
+            expect(aNInput.getSettings().originalDecimalPlacesRawValue).toEqual(null);
+            expect(() => aNInput.options.rawValueDivisor(0)).toThrow();
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('2');
+            expect(aNInput.getSettings().originalDecimalPlacesRawValue).toEqual(null);
+            expect(() => aNInput.options.rawValueDivisor(1)).toThrow();
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('2');
+            expect(aNInput.getSettings().originalDecimalPlacesRawValue).toEqual(null);
+            expect(() => aNInput.options.rawValueDivisor(AutoNumeric.options.rawValueDivisor.none)).not.toThrow();
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('2');
+            expect(() => aNInput.options.rawValueDivisor(AutoNumeric.options.rawValueDivisor.percentage)).not.toThrow();
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('4');
+
+            aNInput.options.reset().french().set(-1234567.89);
+            spyOn(console, 'warn');
+            aNInput.options.decimalPlaces(4);
+            expect(console.warn).toHaveBeenCalledTimes(1);
+            expect(aNInput.getSettings().decimalPlaces).toEqual('4');
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('4');
+            expect(aNInput.getSettings().decimalPlacesShownOnFocus).toEqual('4');
+            expect(aNInput.getSettings().decimalPlacesShownOnBlur).toEqual('4');
+
+            expect(aNInput.getFormatted()).toEqual('-1.234.567,8900\u202f€');
+            aNInput.options.divisorWhenUnfocused(AutoNumeric.options.divisorWhenUnfocused.percentage);
+            aNInput.options.decimalPlacesShownOnBlur(3);
+            aNInput.options.symbolWhenUnfocused(AutoNumeric.options.symbolWhenUnfocused.percentage);
+            expect(aNInput.getFormatted()).toEqual('-12.345,679\u202f€%');
+
+            aNInput.options.reset().french();
+            expect(aNInput.node().classList.contains('neg')).toEqual(false);
+            expect(aNInput.node().classList.contains('pos')).toEqual(false);
+            aNInput.options.styleRules({ positive: 'pos', negative: 'neg' }).set(-10);
+            expect(aNInput.getFormatted()).toEqual('-10,00\u202f€');
+            expect(aNInput.node().classList.contains('neg')).toEqual(true);
+            expect(aNInput.node().classList.contains('pos')).toEqual(false);
+            aNInput.set(10);
+            expect(aNInput.node().classList.contains('neg')).toEqual(false);
+            expect(aNInput.node().classList.contains('pos')).toEqual(true);
+
+            aNInput.options.reset().french().set(-1234567.846);
+            expect(aNInput.getFormatted()).toEqual('-1.234.567,85\u202f€');
+            aNInput.options.roundingMethod(AutoNumeric.options.roundingMethod.downRoundTowardZero);
+            aNInput.set(-1234567.846);
+            expect(aNInput.getFormatted()).toEqual('-1.234.567,84\u202f€');
+
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            aNInput.set(-1234567);
+            expect(aNInput.getFormatted()).toEqual('-1.234.567,00\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(console.warn).toHaveBeenCalledTimes(2);
+            expect(aNInput.getFormatted()).toEqual('-1.234.567\u202f€');
+            aNInput.set(-1234567.8);
+            expect(aNInput.getFormatted()).toEqual('-1.234.567,8\u202f€');
+            aNInput.set(-1234567);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(console.warn).toHaveBeenCalledTimes(3);
+            expect(aNInput.getFormatted()).toEqual('-1.234.567\u202f€');
+            aNInput.set(-1234567.8);
+            expect(aNInput.getFormatted()).toEqual('-1.234.567,80\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+
+            aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.null);
+            aNInput.set(null);
+            expect(aNInput.getNumericString()).toEqual(null);
+            expect(aNInput.getFormatted()).toEqual('');
+            expect(aNInput.getNumber()).toEqual(null);
+            // Special case where changing the `emptyInputBehavior` option to something different from `AutoNumeric.options.emptyInputBehavior.null` while the rawValue is equal to `null`, modify that rawValue to '' automatically
+            aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.focus);
+            expect(console.warn).toHaveBeenCalledTimes(4);
+            expect(aNInput.getFormatted()).toEqual('');
+            expect(aNInput.getNumber()).toEqual(0);
+
+            aNInput.set('');
+            aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.press);
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.focus);
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.always);
+            expect(aNInput.getFormatted()).toEqual('\u202f€');
+            aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.zero);
+            expect(aNInput.getFormatted()).toEqual('0,00\u202f€');
+
+            aNInput.options.reset().french().set(-1234567.89);
+            aNInput.options.leadingZero(AutoNumeric.options.leadingZero.deny);
+            aNInput.set('000001.2345');
+            expect(aNInput.getFormatted()).toEqual('1,23\u202f€');
+            aNInput.options.leadingZero(AutoNumeric.options.leadingZero.keep);
+            expect(aNInput.getFormatted()).toEqual('1,23\u202f€');
+            aNInput.set('000001.2345');
+            expect(aNInput.getFormatted()).toEqual('000.001,23\u202f€');
+
+            aNInput.set(-12356.78);
+            expect(aNInput.getLocalized()).toEqual('-12356.78');
+            aNInput.options.outputFormat(AutoNumeric.options.outputFormat.dotNegative);
+            expect(aNInput.getLocalized()).toEqual('12356.78-');
+            aNInput.options.outputFormat(AutoNumeric.options.outputFormat.negativeComma);
+            expect(aNInput.getLocalized()).toEqual('-12356,78');
+
+            // Test function chaining on `options.*`
+            aNInput.options.reset().french().set(6666);
+            expect(aNInput.getFormatted()).toEqual('6.666,00\u202f€');
+            aNInput.options.digitGroupSeparator(AutoNumeric.options.digitGroupSeparator.narrowNoBreakSpace)
+                .options.decimalCharacter(AutoNumeric.options.decimalCharacter.decimalSeparatorKeySymbol);
+            expect(aNInput.getFormatted()).toEqual('6\u202f666⎖00\u202f€');
+        });
+
+        it('should correctly update the `decimalPlacesShownOnFocus` option', () => {
+            aNInput = new AutoNumeric(newInput, AutoNumeric.predefinedOptions.French);
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual(2);
+            aNInput.update({ decimalPlacesShownOnFocus : 4 }); // Note: You do not need to set `decimalPlacesRawValue`, it is taken care of automatically
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('4');
+            aNInput.set(2222.12345);
+            expect(aNInput.getFormatted()).toEqual('2.222,12\u202f€');
+            aNInput.node().focus();
+            expect(aNInput.getFormatted()).toEqual('2.222,1235\u202f€');
+        });
+    });
+
+    describe('`roundingMethod` option', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should round correctly with the method halfUpSymmetric', () => {
+            expect(aNInput.getSettings().roundingMethod).toEqual(AutoNumeric.options.roundingMethod.halfUpSymmetric);
+            // Positive values
+            aNInput.set(1119.444);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.445);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,120.00');
+            // Negative values
+            aNInput.set(-1119.444);
+            expect(aNInput.getFormatted()).toEqual('-1,119.44');
+            aNInput.set(-1119.445);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('-1,120.00');
+        });
+
+        it('should round correctly with the method halfUpAsymmetric', () => {
+            aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.halfUpAsymmetric });
+            // Positive values
+            aNInput.set(1119.444);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.445);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,120.00');
+            // Negative values
+            aNInput.set(-1119.444);
+            expect(aNInput.getFormatted()).toEqual('-1,119.44');
+            aNInput.set(-1119.445);
+            expect(aNInput.getFormatted()).toEqual('-1,119.44');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('-1,119.99');
+        });
+
+        it('should round correctly with the method halfDownSymmetric', () => {
+            aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.halfDownSymmetric });
+            // Positive values
+            aNInput.set(1119.444);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.445);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,119.99');
+            // Negative values
+            aNInput.set(-1119.444);
+            expect(aNInput.getFormatted()).toEqual('-1,119.44');
+            aNInput.set(-1119.445);
+            expect(aNInput.getFormatted()).toEqual('-1,119.44');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('-1,119.99');
+        });
+
+        it('should round correctly with the method halfDownAsymmetric', () => {
+            aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.halfDownAsymmetric });
+            // Positive values
+            aNInput.set(1119.444);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.445);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,119.99');
+            // Negative values
+            aNInput.set(-1119.444);
+            expect(aNInput.getFormatted()).toEqual('-1,119.44');
+            aNInput.set(-1119.445);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('-1,120.00');
+        });
+
+        it('should round correctly with the method halfEvenBankersRounding', () => {
+            aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.halfEvenBankersRounding });
+            // Positive values
+            aNInput.set(1119.444);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.445);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.446);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.454);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.455);
+            expect(aNInput.getFormatted()).toEqual('1,119.46');
+            aNInput.set(1119.456);
+            expect(aNInput.getFormatted()).toEqual('1,119.46');
+            aNInput.set(1119.994);
+            expect(aNInput.getFormatted()).toEqual('1,119.99');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,120.00');
+            // Negative values
+            aNInput.set(-1119.444);
+            expect(aNInput.getFormatted()).toEqual('-1,119.44');
+            aNInput.set(-1119.445);
+            expect(aNInput.getFormatted()).toEqual('-1,119.44');
+            aNInput.set(-1119.446);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.454);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.455);
+            expect(aNInput.getFormatted()).toEqual('-1,119.46');
+            aNInput.set(-1119.456);
+            expect(aNInput.getFormatted()).toEqual('-1,119.46');
+            aNInput.set(-1119.994);
+            expect(aNInput.getFormatted()).toEqual('-1,119.99');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('-1,120.00');
+        });
+
+        it('should round correctly with the method upRoundAwayFromZero', () => {
+            aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.upRoundAwayFromZero });
+            // Positive values
+            aNInput.set(1119.444);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.445);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,120.00');
+            // Negative values
+            aNInput.set(-1119.444);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.445);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('-1,120.00');
+        });
+
+        it('should round correctly with the method downRoundTowardZero', () => {
+            aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.downRoundTowardZero });
+            // Positive values
+            aNInput.set(1119.444);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.445);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,119.99');
+            // Negative values
+            aNInput.set(-1119.444);
+            expect(aNInput.getFormatted()).toEqual('-1,119.44');
+            aNInput.set(-1119.445);
+            expect(aNInput.getFormatted()).toEqual('-1,119.44');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('-1,119.99');
+        });
+
+        it('should round correctly with the method toCeilingTowardPositiveInfinity', () => {
+            aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.toCeilingTowardPositiveInfinity });
+            // Positive values
+            aNInput.set(1119.444);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.445);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,120.00');
+            // Negative values
+            aNInput.set(-1119.444);
+            expect(aNInput.getFormatted()).toEqual('-1,119.44');
+            aNInput.set(-1119.445);
+            expect(aNInput.getFormatted()).toEqual('-1,119.44');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('-1,119.99');
+        });
+
+        it('should round correctly with the method toFloorTowardNegativeInfinity', () => {
+            aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.toFloorTowardNegativeInfinity });
+            // Positive values
+            aNInput.set(1119.444);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.445);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,119.99');
+            // Negative values
+            aNInput.set(-1119.444);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.445);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('-1,120.00');
+        });
+
+        it('should round correctly with the method toNearest05Alt', () => {
+            aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.toNearest05Alt });
+            // Positive values
+            aNInput.set(1119.474);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.475);
+            expect(aNInput.getFormatted()).toEqual('1,119.50');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,120.00');
+            // Negative values
+            aNInput.set(-1119.474);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.475);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.476);
+            expect(aNInput.getFormatted()).toEqual('-1,119.50');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('-1,120.00');
+        });
+
+        it('should round correctly with the method toNearest05', () => {
+            aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.toNearest05 });
+            // Positive values
+            aNInput.set(1119.474);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.475);
+            expect(aNInput.getFormatted()).toEqual('1,119.50');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,120.00');
+            // Negative values
+            aNInput.set(-1119.474);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.475);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.476);
+            expect(aNInput.getFormatted()).toEqual('-1,119.50');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('-1,120.00');
+        });
+
+        it('should round correctly with the method upToNext05', () => {
+            aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.upToNext05 });
+            // Positive values
+            aNInput.set(1119.44);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.45);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.451);
+            expect(aNInput.getFormatted()).toEqual('1,119.50');
+            aNInput.set(1119.46);
+            expect(aNInput.getFormatted()).toEqual('1,119.50');
+            aNInput.set(1119.99);
+            expect(aNInput.getFormatted()).toEqual('1,120.00');
+            // Negative values
+            aNInput.set(-1119.44);
+            expect(aNInput.getFormatted()).toEqual('-1,119.40');
+            aNInput.set(-1119.449);
+            expect(aNInput.getFormatted()).toEqual('-1,119.40');
+            aNInput.set(-1119.45);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.46);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.47);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.48);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.499);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.999);
+            expect(aNInput.getFormatted()).toEqual('-1,119.95');
+        });
+
+        it('should round correctly with the method downToNext05', () => {
+            aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.downToNext05 });
+            // Positive values
+            aNInput.set(1119.44);
+            expect(aNInput.getFormatted()).toEqual('1,119.40');
+            aNInput.set(1119.45);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.451);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.46);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.499);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.99);
+            expect(aNInput.getFormatted()).toEqual('1,119.95');
+            aNInput.set(1119.999);
+            expect(aNInput.getFormatted()).toEqual('1,119.95');
+            // Negative values
+            aNInput.set(-1119.44);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.449);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.45);
+            expect(aNInput.getFormatted()).toEqual('-1,119.45');
+            aNInput.set(-1119.451);
+            expect(aNInput.getFormatted()).toEqual('-1,119.50');
+            aNInput.set(-1119.46);
+            expect(aNInput.getFormatted()).toEqual('-1,119.50');
+            aNInput.set(-1119.47);
+            expect(aNInput.getFormatted()).toEqual('-1,119.50');
+            aNInput.set(-1119.48);
+            expect(aNInput.getFormatted()).toEqual('-1,119.50');
+            aNInput.set(-1119.499);
+            expect(aNInput.getFormatted()).toEqual('-1,119.50');
+            aNInput.set(-1119.999);
+            expect(aNInput.getFormatted()).toEqual('-1,120.00');
+        });
+    });
+
+    describe('`allowDecimalPadding` option', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should show / hide decimal places correctly on positive numbers without a currency sign', () => {
+            spyOn(console, 'warn');
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().float);
+
+            aNInput.set(15.001);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('15.00');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('15');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('15');
+
+            aNInput.set(15.20);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('15.20');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('15.2');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('15.20');
+
+            aNInput.set(15);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('15.00');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('15');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('15');
+
+            aNInput.set(0);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('0.00');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('0');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('0');
+
+            aNInput.set('');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('');
+        });
+
+        it('should show / hide decimal places correctly on negative numbers without a currency sign', () => {
+            spyOn(console, 'warn');
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().float);
+
+            aNInput.set(-15.001);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('-15.00');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('-15');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('-15');
+
+            aNInput.set(-15.20);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('-15.20');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('-15.2');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('-15.20');
+
+            aNInput.set(-15);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('-15.00');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('-15');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('-15');
+        });
+
+        it('should show / hide decimal places correctly on positive numbers with a currency sign', () => {
+            spyOn(console, 'warn');
+            aNInput = new AutoNumeric(newInput).french();
+
+            aNInput.set(15.001);
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('2');
+            expect(aNInput.rawValue).toEqual('15');
+            expect(aNInput.getNumericString()).toEqual('15'); // Note: `getNumericString()` do not pad decimals
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('15,00\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('15\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('15\u202f€');
+
+            aNInput.set(15.20);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('15,20\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('15,2\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('15,20\u202f€');
+
+            aNInput.set(15);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('15,00\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('15\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('15\u202f€');
+
+            aNInput.set(0);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('0,00\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('0\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('0\u202f€');
+
+            aNInput.set('');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('');
+        });
+
+        it('should show / hide decimal places correctly on negative numbers with a currency sign', () => {
+            spyOn(console, 'warn');
+            aNInput = new AutoNumeric(newInput).french();
+
+            aNInput.set(-15.001);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('-15,00\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('-15\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('-15\u202f€');
+
+            aNInput.set(-15.20);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('-15,20\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('-15,2\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('-15,20\u202f€');
+
+            aNInput.set(-15);
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('-15,00\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.never);
+            expect(aNInput.getFormatted()).toEqual('-15\u202f€');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
+            expect(aNInput.getFormatted()).toEqual('-15\u202f€');
+        });
+    });
+
+    describe('`emptyInputBehavior` option', () => {
+        it('should fail the validation when `zero` is used in a range that does not contain this value (cf. issue #425)', () => {
+            spyOn(console, 'warn');
+
+            // Initialization
+            const newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+
+            // minimumValue side
+            expect(() => new AutoNumeric(newInput, {
+                emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+                minimumValue: -1,
+                maximumValue: 10,
+            })).not.toThrow();
+
+            expect(() => new AutoNumeric(newInput, {
+                emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+                minimumValue: 0,
+                maximumValue: 10,
+            })).not.toThrow();
+
+            expect(() => new AutoNumeric(newInput, {
+                emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+                minimumValue: 1,
+                maximumValue: 10,
+            })).toThrow();
+
+            // maximumValue side
+            expect(() => new AutoNumeric(newInput, {
+                emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+                minimumValue: -10,
+                maximumValue: 1,
+            })).not.toThrow();
+
+            expect(() => new AutoNumeric(newInput, {
+                emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+                minimumValue: -10,
+                maximumValue: 0,
+            })).not.toThrow();
+
+            expect(() => new AutoNumeric(newInput, {
+                emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+                minimumValue: -10,
+                maximumValue: -1,
+            })).toThrow();
+
+            // Special case
+            expect(() => new AutoNumeric(newInput, {
+                emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.zero,
+                minimumValue: 0,
+                maximumValue: 0,
+            })).not.toThrow();
+
+            // Un-initialization
+            document.body.removeChild(newInput);
+        });
+
+        describe('used with the `null` value (cf. issue #447 and #446)', () => {
+            let aNInput;
+            let newInput;
+
+            beforeEach(() => { // Initialization
+                newInput = document.createElement('input');
+                document.body.appendChild(newInput);
+            });
+
+            afterEach(() => { // Un-initialization
+                aNInput.nuke();
+            });
+
+            it('should allow for `null` value if set to `\'null\'`', () => {
+                aNInput = new AutoNumeric(newInput, { emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
+                aNInput.set(null);
+                expect(aNInput.getFormatted()).toEqual('');
+                expect(aNInput.getNumber()).toEqual(null);
+            });
+
+            it('should not allow for `null` value if set to something different than `\'null\'`', () => {
+                spyOn(console, 'warn');
+
+                aNInput = new AutoNumeric(newInput, { emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.focus });
+                aNInput.set(null);
+                expect(aNInput.getFormatted()).toEqual('');
+                expect(aNInput.getNumber()).toEqual(0);
+                expect(console.warn).toHaveBeenCalled();
+                expect(console.warn).toHaveBeenCalledTimes(1);
+            });
+
+            it(`should modify the rawValue to \`''\` when switching from \`null\` to a different option value`, () => {
+                spyOn(console, 'warn');
+
+                aNInput = new AutoNumeric(newInput, { emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
+                aNInput.set(null);
+                expect(aNInput.getFormatted()).toEqual('');
+                expect(aNInput.getNumber()).toEqual(null);
+
+                // Modify the options while `rawValue` is `null`
+                aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.always);
+                expect(aNInput.getFormatted()).toEqual('');
+                expect(aNInput.getNumber()).toEqual(0);
+                expect(console.warn).toHaveBeenCalled();
+                expect(console.warn).toHaveBeenCalledTimes(1);
+            });
+
+            it('should not allow initializing an AutoNumeric object with the `null` value, but will default to the `\'\'` value', () => {
+                // This is not allowed since using `null` for the initial value means that AutoNumeric needs to use the current html value instead of `null`
+                aNInput = new AutoNumeric(newInput, null, { emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
+                expect(aNInput.getFormatted()).toEqual('');
+                expect(aNInput.getNumber()).toEqual(0);
+
+                // Verification when setting the rawValue after the initialization
+                aNInput.set(null);
+                expect(aNInput.getFormatted()).toEqual('');
+                expect(aNInput.getNumber()).toEqual(null);
+            });
+        });
+    });
+
+    describe('`styleRules` option', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.nuke();
+        });
+
+        it('should add / remove the positive CSS class', () => {
+            aNInput = new AutoNumeric(newInput, {
+                styleRules: {
+                    positive: 'autoNumeric-positive',
+                    negative: null,
+                },
+            });
+
+            aNInput.set(10);
+            expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(true);
+            aNInput.set(-10);
+            expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(false);
+            aNInput.set(-0.01);
+            expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(false);
+            aNInput.set(0.01);
+            expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(true);
+            aNInput.set(0);
+            expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(true);
+        });
+
+        it('should add / remove the negative CSS class', () => {
+            aNInput = new AutoNumeric(newInput, {
+                styleRules: {
+                    positive: null,
+                    negative: 'autoNumeric-negative',
+                },
+            });
+
+            aNInput.set(10);
+            expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(false);
+            aNInput.set(-10);
+            expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(true);
+            aNInput.set(-0.01);
+            expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(true);
+            aNInput.set(0.01);
+            expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(false);
+            aNInput.set(0);
+            expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(false);
+        });
+
+        it('should add / remove CSS classes based on multiple ranges', () => {
+            aNInput = new AutoNumeric(newInput, {
+                styleRules: {
+                    positive: null,
+                    negative: null,
+                    ranges     : [
+                        { min: 0, max: 25, class: 'autoNumeric-red' },
+                        { min: 25, max: 50, class: 'autoNumeric-orange' },
+                        { min: 50, max: 75, class: 'autoNumeric-yellow' },
+                        { min: 75, max: Number.MAX_SAFE_INTEGER, class: 'autoNumeric-green' },
+                    ],
+                },
+            });
+
+            aNInput.set(-10);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(0);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(0.01);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(24.99);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(25);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(25.01);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(49.99);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(50);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(50.01);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(74.99);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(75);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(true);
+            aNInput.set(75.01);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(true);
+            aNInput.set(100);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(true);
+        });
+
+        it('should add / remove the CSS class based on user defined callbacks', () => {
+            aNInput = new AutoNumeric(newInput, {
+                styleRules: {
+                    ranges  : null,
+                    userDefined: [
+                        // If 'classes' is a string, set it if `true`, remove it if `false`
+                        { callback: rawValue => (8.25 < rawValue && rawValue <= 8.42), classes: 'between8AndDecimals' },
+
+                        // If 'classes' is an array with only 2 elements, set the first class if `true`, the second if `false`
+                        { callback: rawValue => rawValue % 2 === 0, classes: ['autoNumeric-even', 'autoNumeric-odd'] },
+
+                        // Return a single array index to use
+                        { callback: rawValue => {
+                            if (10 <= rawValue && rawValue < 12) {
+                                return 0;
+                            }
+                            if (24 <= rawValue && rawValue < 26) {
+                                return 1;
+                            }
+                            if (42 <= rawValue && rawValue < 69) {
+                                return 2;
+                            }
+
+                            return null;  // In case the rawValue is outside those ranges
+                        }, classes: ['one1', 'one2', 'one3'] },
+
+                        // Return an array of array indexes to use
+                        { callback: rawValue => {
+                            if (90 <= rawValue && rawValue < 100) {
+                                return [0, 1];
+                            }
+                            if (rawValue >= 120) {
+                                return [1, 2];
+                            }
+
+                            return null; // In case the rawValue is not valid
+                        }, classes: ['multiple1', 'multiple2', 'multiple3'] },
+
+                        // If 'classes' is `undefined` or `null`, then the callback is called with the AutoNumeric object as a parameter
+                        {
+                            callback: anElement => {
+                                if (anElement.getNumber() === 666) {
+                                    if (anElement.getFormatted() !== '666.00') {
+                                        AutoNumericHelper.throwError('Whoops, the formatted value has not been updated correctly!');
+                                    }
+
+                                    // Make sure that `set()` called within a callback is correctly taken into account.
+                                    // The `set()` method organisation make sure that all changes are already made when `_setRawValue` is called and the raw value or element value are not changed afterward
+                                    // This allows the user to modify the AutoNumeric object within this callback, without having to first wait for the `set()` method to finish
+                                    anElement.set(667);
+                                    if (anElement.getFormatted() !== '667.00') {
+                                        AutoNumericHelper.throwError('Whoops, the formatted value has not been updated correctly!');
+                                    }
+
+                                    if (anElement.getNumber() !== 667) {
+                                        AutoNumericHelper.throwError('Whoops, the raw value has not been updated correctly!');
+                                    }
+                                }
+                            },
+                        },
+                    ],
+                },
+            });
+
+            // If 'classes' is a string, set it if `true`, remove it if `false`
+            aNInput.set(8.249);
+            expect(aNInput.node().classList.contains('between8AndDecimals')).toEqual(false);
+            aNInput.set(8.25);
+            expect(aNInput.node().classList.contains('between8AndDecimals')).toEqual(false);
+            aNInput.set(8.26);
+            expect(aNInput.node().classList.contains('between8AndDecimals')).toEqual(true);
+            aNInput.set(8.42);
+            expect(aNInput.node().classList.contains('between8AndDecimals')).toEqual(true);
+            aNInput.set(8.424);
+            expect(aNInput.node().classList.contains('between8AndDecimals')).toEqual(true); // Rounding happens!
+            aNInput.set(8.43);
+            expect(aNInput.node().classList.contains('between8AndDecimals')).toEqual(false);
+
+            // If 'classes' is an array with only 2 elements, set the first class if `true`, the second if `false`
+            aNInput.set(1);
+            expect(aNInput.node().classList.contains('autoNumeric-even')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-odd')).toEqual(true);
+            aNInput.set(2);
+            expect(aNInput.node().classList.contains('autoNumeric-even')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-odd')).toEqual(false);
+            aNInput.set(3);
+            expect(aNInput.node().classList.contains('autoNumeric-even')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-odd')).toEqual(true);
+            aNInput.set(4);
+            expect(aNInput.node().classList.contains('autoNumeric-even')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-odd')).toEqual(false);
+
+            // return a single array index to use
+            aNInput.set(9);
+            expect(aNInput.node().classList.contains('one1')).toEqual(false);
+            expect(aNInput.node().classList.contains('one2')).toEqual(false);
+            expect(aNInput.node().classList.contains('one3')).toEqual(false);
+            aNInput.set(10);
+            expect(aNInput.node().classList.contains('one1')).toEqual(true);
+            expect(aNInput.node().classList.contains('one2')).toEqual(false);
+            expect(aNInput.node().classList.contains('one3')).toEqual(false);
+            aNInput.set(11);
+            expect(aNInput.node().classList.contains('one1')).toEqual(true);
+            expect(aNInput.node().classList.contains('one2')).toEqual(false);
+            expect(aNInput.node().classList.contains('one3')).toEqual(false);
+            aNInput.set(12);
+            expect(aNInput.node().classList.contains('one1')).toEqual(false);
+            expect(aNInput.node().classList.contains('one2')).toEqual(false);
+            expect(aNInput.node().classList.contains('one3')).toEqual(false);
+            aNInput.set(23.99);
+            expect(aNInput.node().classList.contains('one1')).toEqual(false);
+            expect(aNInput.node().classList.contains('one2')).toEqual(false);
+            expect(aNInput.node().classList.contains('one3')).toEqual(false);
+            aNInput.set(24);
+            expect(aNInput.node().classList.contains('one1')).toEqual(false);
+            expect(aNInput.node().classList.contains('one2')).toEqual(true);
+            expect(aNInput.node().classList.contains('one3')).toEqual(false);
+            aNInput.set(25);
+            expect(aNInput.node().classList.contains('one1')).toEqual(false);
+            expect(aNInput.node().classList.contains('one2')).toEqual(true);
+            expect(aNInput.node().classList.contains('one3')).toEqual(false);
+            aNInput.set(25.99);
+            expect(aNInput.node().classList.contains('one1')).toEqual(false);
+            expect(aNInput.node().classList.contains('one2')).toEqual(true);
+            expect(aNInput.node().classList.contains('one3')).toEqual(false);
+            aNInput.set(26);
+            expect(aNInput.node().classList.contains('one1')).toEqual(false);
+            expect(aNInput.node().classList.contains('one2')).toEqual(false);
+            expect(aNInput.node().classList.contains('one3')).toEqual(false);
+            aNInput.set(41.99);
+            expect(aNInput.node().classList.contains('one1')).toEqual(false);
+            expect(aNInput.node().classList.contains('one2')).toEqual(false);
+            expect(aNInput.node().classList.contains('one3')).toEqual(false);
+            aNInput.set(42);
+            expect(aNInput.node().classList.contains('one1')).toEqual(false);
+            expect(aNInput.node().classList.contains('one2')).toEqual(false);
+            expect(aNInput.node().classList.contains('one3')).toEqual(true);
+            aNInput.set(68);
+            expect(aNInput.node().classList.contains('one1')).toEqual(false);
+            expect(aNInput.node().classList.contains('one2')).toEqual(false);
+            expect(aNInput.node().classList.contains('one3')).toEqual(true);
+            aNInput.set(69);
+            expect(aNInput.node().classList.contains('one1')).toEqual(false);
+            expect(aNInput.node().classList.contains('one2')).toEqual(false);
+            expect(aNInput.node().classList.contains('one3')).toEqual(false);
+
+            // return an array of array indexes to use
+            aNInput.set(89);
+            expect(aNInput.node().classList.contains('multiple1')).toEqual(false);
+            expect(aNInput.node().classList.contains('multiple2')).toEqual(false);
+            expect(aNInput.node().classList.contains('multiple3')).toEqual(false);
+            aNInput.set(90);
+            expect(aNInput.node().classList.contains('multiple1')).toEqual(true);
+            expect(aNInput.node().classList.contains('multiple2')).toEqual(true);
+            expect(aNInput.node().classList.contains('multiple3')).toEqual(false);
+            aNInput.set(99.99);
+            expect(aNInput.node().classList.contains('multiple1')).toEqual(true);
+            expect(aNInput.node().classList.contains('multiple2')).toEqual(true);
+            expect(aNInput.node().classList.contains('multiple3')).toEqual(false);
+            aNInput.set(100);
+            expect(aNInput.node().classList.contains('multiple1')).toEqual(false);
+            expect(aNInput.node().classList.contains('multiple2')).toEqual(false);
+            expect(aNInput.node().classList.contains('multiple3')).toEqual(false);
+            aNInput.set(119.99);
+            expect(aNInput.node().classList.contains('multiple1')).toEqual(false);
+            expect(aNInput.node().classList.contains('multiple2')).toEqual(false);
+            expect(aNInput.node().classList.contains('multiple3')).toEqual(false);
+            aNInput.set(120);
+            expect(aNInput.node().classList.contains('multiple1')).toEqual(false);
+            expect(aNInput.node().classList.contains('multiple2')).toEqual(true);
+            expect(aNInput.node().classList.contains('multiple3')).toEqual(true);
+            aNInput.set(2000);
+            expect(aNInput.node().classList.contains('multiple1')).toEqual(false);
+            expect(aNInput.node().classList.contains('multiple2')).toEqual(true);
+            expect(aNInput.node().classList.contains('multiple3')).toEqual(true);
+
+            // If 'classes' is `undefined` or `null`, then the callback is called with the AutoNumeric object as a parameter
+            expect(() => aNInput.set(666)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('667.00'); // This is normal, the value has been changed within the callback
+        });
+
+        it('should add / remove the CSS class based on the userDefined `range0To100With4Steps` callback', () => {
+            aNInput = new AutoNumeric(newInput, { styleRules: AutoNumeric.options.styleRules.range0To100With4Steps });
+
+            aNInput.set(-1);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(0);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(24);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(25);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(49);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(50);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(74);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+            aNInput.set(75);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(true);
+            aNInput.set(99);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(true);
+            aNInput.set(100);
+            expect(aNInput.node().classList.contains('autoNumeric-red')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-orange')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-yellow')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-green')).toEqual(false);
+        });
+
+        it('should add / remove the CSS class based on the userDefined `positiveNegative` callback', () => {
+            aNInput = new AutoNumeric(newInput, { styleRules: AutoNumeric.options.styleRules.positiveNegative });
+
+            aNInput.set(-1);
+            expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(true);
+            aNInput.set(0);
+            expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(false);
+            aNInput.set(1);
+            expect(aNInput.node().classList.contains('autoNumeric-positive')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-negative')).toEqual(false);
+        });
+
+        it('should add / remove the CSS class based on the userDefined `evenOdd` callback', () => {
+            aNInput = new AutoNumeric(newInput, { styleRules: AutoNumeric.options.styleRules.evenOdd });
+
+            aNInput.set(1);
+            expect(aNInput.node().classList.contains('autoNumeric-even')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-odd')).toEqual(true);
+            aNInput.set(2);
+            expect(aNInput.node().classList.contains('autoNumeric-even')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-odd')).toEqual(false);
+        });
+
+        it('should add / remove the CSS class based on the userDefined `rangeSmallAndZero` callback', () => {
+            aNInput = new AutoNumeric(newInput, { styleRules: AutoNumeric.options.styleRules.rangeSmallAndZero });
+
+            aNInput.set(-2);
+            expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(false);
+            aNInput.set(-1);
+            expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(false);
+            aNInput.set(-0.01);
+            expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(false);
+            aNInput.set(0);
+            expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(true);
+            expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(false);
+            aNInput.set(0.01);
+            expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(true);
+            aNInput.set(1);
+            expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(true);
+            aNInput.set(2);
+            expect(aNInput.node().classList.contains('autoNumeric-small-negative')).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-zero'          )).toEqual(false);
+            expect(aNInput.node().classList.contains('autoNumeric-small-positive')).toEqual(false);
+        });
+    });
+
+    describe('`createLocalList` option', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should allow or disallow the creation of a local list', () => {
+            aNInput = new AutoNumeric(newInput, { createLocalList: false });
+            expect(aNInput._getLocalList()).toBeUndefined();
+
+            aNInput.remove();
+            aNInput = new AutoNumeric(newInput, { createLocalList: true });
+            expect(aNInput._getLocalList() instanceof Map).toEqual(true);
+        });
+
+        it('should update the creation or destruction of the local list', () => {
+            aNInput = new AutoNumeric(newInput, { createLocalList: false });
+            expect(aNInput._getLocalList()).toBeUndefined();
+            aNInput.options.createLocalList(true);
+            expect(aNInput._getLocalList() instanceof Map).toEqual(true);
+            aNInput.options.createLocalList(false);
+            expect(aNInput._getLocalList()).toBeUndefined();
+        });
+    });
+
+    describe('`negativeBracketsTypeOnBlur` option', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.nuke();
+        });
+
+        it('should show brackets on negative numbers', () => {
+            aNInput = new AutoNumeric(newInput, { negativeBracketsTypeOnBlur: AutoNumeric.options.negativeBracketsTypeOnBlur.angleBrackets });
+            aNInput.french();
+            aNInput.set(2500.01);
+            expect(aNInput.getFormatted()).toEqual('2.500,01\u202f€');
+            aNInput.set(-2500.01);
+            expect(aNInput.getFormatted()).toEqual('〈2.500,01\u202f€〉');
+
+            // Update the option
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
+            expect(aNInput.getFormatted()).toEqual('(2.500,01\u202f€)');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.brackets);
+            expect(aNInput.getFormatted()).toEqual('[2.500,01\u202f€]');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.chevrons);
+            expect(aNInput.getFormatted()).toEqual('<2.500,01\u202f€>');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.curlyBraces);
+            expect(aNInput.getFormatted()).toEqual('{2.500,01\u202f€}');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.japaneseQuotationMarks);
+            expect(aNInput.getFormatted()).toEqual('｢2.500,01\u202f€｣');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.halfBrackets);
+            expect(aNInput.getFormatted()).toEqual('⸤2.500,01\u202f€⸥');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.whiteSquareBrackets);
+            expect(aNInput.getFormatted()).toEqual('⟦2.500,01\u202f€⟧');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.quotationMarks);
+            expect(aNInput.getFormatted()).toEqual('‹2.500,01\u202f€›');
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.guillemets);
+            expect(aNInput.getFormatted()).toEqual('«2.500,01\u202f€»');
+
+            aNInput.set(1234.70);
+            expect(aNInput.getFormatted()).toEqual('1.234,70\u202f€');
+        });
+    });
+
+    /*
+    describe('`unformatOnSubmit` option', () => {
+        it('should unformat on submit', () => {
+            // Create the form elements
+            const newInput = document.createElement('input');
+            const formElement = document.createElement('form');
+            const submitButton = document.createElement('input');
+            submitButton.type = 'submit';
+            document.body.appendChild(formElement);
+            formElement.appendChild(newInput);
+            formElement.appendChild(submitButton);
+
+            // Init the AutoNumeric element
+            const aNInput = new AutoNumeric(newInput, { unformatOnSubmit: AutoNumeric.options.unformatOnSubmit.unformat }).french();
+            aNInput.set(12345.67);
+            expect(aNInput.getFormatted()).toEqual('12.345,67\u202f€');
+
+            // Testing the submit event
+            formElement.onsubmit = function(e) {
+                console.log('form submitted!');
+                e.preventDefault();
+            };
+
+            // Submit and test the unformatted value
+            formElement.submit(); //XXX In most browsers, the 'submit' event is only sent when the submit button is *clicked*, so this does not work, yet
+            expect(aNInput.getFormatted()).toEqual('12345.67');
+
+            // Remove the elements
+            aNInput.nuke();
+            formElement.removeChild(submitButton);
+            document.body.removeChild(formElement);
+        });
+    });
+    */
+
+    //TODO Complete the tests in order to test every single option separately:
+    /*
+     caretPositionOnFocus
+     decimalCharacterAlternative -> cf. end-to-end tests
+     decimalPlacesShownOnFocus
+     defaultValueOverride
+     failOnUnknownOption
+     formatOnPageLoad
+     historySize
+     isCancellable
+     modifyValueOnWheel
+     noEventListeners
+     showOnlyNumbersOnFocus
+     onInvalidPaste
+     overrideMinMaxLimits
+     readOnly
+     saveValueToSessionStorage
+     selectNumberOnly
+     selectOnFocus
+     serializeSpaces
+     showWarnings
+     unformatOnHover
+     wheelStep
+     */
+});
+
+describe('Initialization calls', () => {
+    describe(`Initialize a single AutoNumeric object`, () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should init the element with the correct settings (Euro)', () => {
+            newInput.value = '6789,02';
+            aNInput = new AutoNumeric(newInput, autoNumericOptionsEuro);
+            expect(aNInput.getNumericString()).toEqual('6789.02');
+            expect(aNInput.getFormatted()).toEqual('6.789,02 €');
+
+            aNInput.update(autoNumericOptionsEuro);
+            expect(aNInput.getFormatted()).toEqual('6.789,02 €');
+        });
+
+        it('should init the element with the correct settings (Dollar)', () => {
+            newInput.value = '6789.02';
+            aNInput = new AutoNumeric(newInput, autoNumericOptionsDollar);
+            expect(aNInput.getNumericString()).toEqual('6789.02');
+            expect(aNInput.getFormatted()).toEqual('$6,789.02');
+
+            aNInput.update(autoNumericOptionsDollar);
+            expect(aNInput.getFormatted()).toEqual('$6,789.02');
+        });
+
+        it('should init the element with the correct settings (no methods, Euro)', () => {
+            newInput.value = '256789,02';
+            aNInput = new AutoNumeric(newInput, autoNumericOptionsEuro);
+            expect(aNInput.getNumericString()).toEqual('256789.02');
+            expect(aNInput.getFormatted()).toEqual('256.789,02 €');
+
+            aNInput.update(autoNumericOptionsEuro);
+            expect(aNInput.getFormatted()).toEqual('256.789,02 €');
+        });
+
+        it('should init the element with the correct settings (no methods, Dollar)', () => {
+            newInput.value = '256789.02';
+            aNInput = new AutoNumeric(newInput, autoNumericOptionsDollar);
+            expect(aNInput.getNumericString()).toEqual('256789.02');
+            expect(aNInput.getFormatted()).toEqual('$256,789.02');
+
+            aNInput.update(autoNumericOptionsDollar);
+            expect(aNInput.getFormatted()).toEqual('$256,789.02');
+        });
+
+        it('should init and update the element with the correct predefined settings', () => {
+            newInput.value = '1256789.02';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().dotDecimalCharCommaSeparator);
+            expect(aNInput.getNumericString()).toEqual('1256789.02');
+            expect(aNInput.getFormatted()).toEqual('1,256,789.02');
+
+            aNInput.update(AutoNumeric.getPredefinedOptions().commaDecimalCharDotSeparator);
+            expect(aNInput.getFormatted()).toEqual('1.256.789,02');
+
+            aNInput.update(AutoNumeric.getPredefinedOptions().euro);
+            expect(aNInput.getFormatted()).toEqual('1.256.789,02\u202f€');
+
+            aNInput.update(AutoNumeric.getPredefinedOptions().euroSpace);
+            expect(aNInput.getFormatted()).toEqual('1 256 789,02\u202f€');
+
+            aNInput.update(AutoNumeric.getPredefinedOptions().dollar);
+            expect(aNInput.getFormatted()).toEqual('$1,256,789.02');
+        });
+
+        it('should modify differently the `rawValue` and the formatted value when the `rawValueDivisor` option is set', () => {
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().percentageEU2dec);
+
+            // Programmatically modifying the raw value result in a multiplied formatted value (when using `rawValueDivisor`)
+            aNInput.set(0.012345);
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual(4);
+            expect(aNInput.getNumericString()).toEqual('0.0123');
+            expect(aNInput.getFormatted()).toEqual('1,23\u202f%');
+
+            aNInput.set(0.012);
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual(4);
+            expect(aNInput.getNumericString()).toEqual('0.012');
+            expect(aNInput.getFormatted()).toEqual('1,20\u202f%');
+
+            aNInput.set(0.01);
+            expect(aNInput.getNumericString()).toEqual('0.01');
+            expect(aNInput.getFormatted()).toEqual('1,00\u202f%');
+
+            aNInput.set(0.0);
+            expect(aNInput.getNumericString()).toEqual('0');
+            expect(aNInput.getFormatted()).toEqual('0,00\u202f%');
+
+            // Updating the settings should keep the right amount of rawValue decimal places
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual(4);
+            aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.null);
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('4');
+            aNInput.set(null);
+            expect(aNInput.getNumericString()).toEqual(null);
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.set(0); // Prevent the warning message on the next line when trying to change `emptyInputBehavior` to 'focus' while the rawValue is `null`
+            aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.focus);
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('4');
+
+            aNInput.set('14,68\u202f%'); // Here every suffix text/currency sign are removed, whatever they are, and only the bare value is kept
+            expect(aNInput.getNumericString()).toEqual('14.68');
+            expect(aNInput.getFormatted()).toEqual('1.468,00\u202f%');
+
+            aNInput.set(2.341376);
+            expect(aNInput.getNumericString()).toEqual('2.3414');
+            expect(aNInput.getFormatted()).toEqual('234,14\u202f%');
+
+            aNInput.update(AutoNumeric.getPredefinedOptions().percentageUS2dec);
+            expect(aNInput.getNumericString()).toEqual('2.3414');
+            expect(aNInput.getFormatted()).toEqual('234.14%');
+
+            aNInput.update(AutoNumeric.getPredefinedOptions().percentageEU3dec);
+            expect(aNInput.getNumericString()).toEqual('2.3414');
+            expect(aNInput.getFormatted()).toEqual('234,140\u202f%');
+            aNInput.set(2.34137689);
+            expect(aNInput.getNumericString()).toEqual('2.34138');
+            expect(aNInput.getFormatted()).toEqual('234,138\u202f%');
+        });
+
+        it('should init and update the element with the correct predefined settings, limiting to a positive value', () => {
+            newInput.value = '1256789.02';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().euroPos);
+            expect(aNInput.getNumericString()).toEqual('1256789.02');
+            expect(aNInput.getFormatted()).toEqual('1.256.789,02\u202f€');
+            expect(() => aNInput.set(999999.99)).not.toThrow();
+            expect(() => aNInput.set(-1)).toThrow();
+            expect(aNInput.getFormatted()).toEqual('999.999,99\u202f€');
+        });
+
+        it('should fail to init when the default value is outside of the min and max limits', () => {
+            newInput.value = '-1256789.02';
+            expect(() => new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().euroPos)).toThrow();
+        });
+
+        it('should init and update the element with the correct predefined settings, limiting to a negative value', () => {
+            newInput.value = '-1256789.02';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().euroNeg);
+            expect(aNInput.getNumericString()).toEqual('-1256789.02');
+            expect(aNInput.getFormatted()).toEqual('-1.256.789,02\u202f€');
+            expect(() => aNInput.set(1)).toThrow();
+            expect(() => aNInput.set(-999999.99)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('-999.999,99\u202f€');
+        });
+
+        it('should init and update the element with the correct predefined settings (and `rawValueDivisor`), limiting to a positive value', () => {
+            newInput.value = '0.06246';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().percentageEU2decPos);
+            expect(aNInput.getNumericString()).toEqual('0.0625');
+            expect(aNInput.getFormatted()).toEqual('6,25\u202f%');
+            expect(() => aNInput.set(-0.001)).toThrow();
+            expect(() => aNInput.set(0.712)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('71,20\u202f%');
+        });
+
+        it('should init and update the element with the correct predefined settings (and `rawValueDivisor`), limiting to a negative value', () => {
+            newInput.value = '-0.06246';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().percentageEU2decNeg);
+            expect(aNInput.getNumericString()).toEqual('-0.0625');
+            expect(aNInput.getFormatted()).toEqual('-6,25\u202f%');
+            expect(() => aNInput.set(0.001)).toThrow();
+            expect(() => aNInput.set(-0.712)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('-71,20\u202f%');
+        });
+
+        it('should init and update the element with the correct predefined settings, using integers only', () => {
+            newInput.value = '-6.246';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().integer);
+            expect(aNInput.getNumericString()).toEqual('-6');
+            expect(aNInput.getFormatted()).toEqual('-6');
+            expect(() => aNInput.set(15.001)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('15');
+            expect(() => aNInput.set(-0.712)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('-1');
+            aNInput.set(13256.678);
+            expect(aNInput.getFormatted()).toEqual('13,257');
+        });
+
+        it('should init and update the element with the correct predefined settings, using positive integers only', () => {
+            newInput.value = '6.246';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().integerPos);
+            expect(aNInput.getNumericString()).toEqual('6');
+            expect(aNInput.getFormatted()).toEqual('6');
+            expect(() => aNInput.set(15.001)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('15');
+            expect(() => aNInput.set(-0.712)).toThrow();
+            expect(aNInput.getFormatted()).toEqual('15');
+            aNInput.set(13256.678);
+            expect(aNInput.getFormatted()).toEqual('13,257');
+        });
+
+        it('should init and update the element with the correct predefined settings, using negative integers only', () => {
+            newInput.value = '-6.246';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().integerNeg);
+            expect(aNInput.getNumericString()).toEqual('-6');
+            expect(aNInput.getFormatted()).toEqual('-6');
+            expect(() => aNInput.set(15.001)).toThrow();
+            expect(aNInput.getFormatted()).toEqual('-6');
+            expect(() => aNInput.set(-0.712)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('-1');
+            aNInput.set(-13256.678);
+            expect(aNInput.getFormatted()).toEqual('-13,257');
+        });
+
+        it('should init and update the element with the correct predefined settings, using floats only', () => {
+            spyOn(console, 'warn');
+            newInput.value = '-6.246';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().float);
+            expect(aNInput.getNumericString()).toEqual('-6.25');
+            expect(aNInput.getFormatted()).toEqual('-6.25');
+            expect(() => aNInput.set(15.021)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('15.02');
+            expect(() => aNInput.set(-0.712)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('-0.71');
+            aNInput.set(13256.678);
+            expect(aNInput.getFormatted()).toEqual('13,256.68');
+
+            aNInput.set(15.001);
+            expect(aNInput.getFormatted()).toEqual('15');
+            aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
+            expect(aNInput.getFormatted()).toEqual('15.00');
+        });
+
+        it('should init and update the element with the correct predefined settings, using positive floats only', () => {
+            spyOn(console, 'warn');
+            newInput.value = '6.246';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().floatPos);
+            expect(aNInput.getNumericString()).toEqual('6.25');
+            expect(aNInput.getFormatted()).toEqual('6.25');
+            expect(() => aNInput.set(15.021)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('15.02');
+            expect(() => aNInput.set(-0.712)).toThrow();
+            expect(aNInput.getFormatted()).toEqual('15.02');
+            aNInput.set(13256.678);
+            expect(aNInput.getFormatted()).toEqual('13,256.68');
+        });
+
+        it('should init and update the element with the correct predefined settings, using negative floats only', () => {
+            spyOn(console, 'warn');
+            newInput.value = '-6.246';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().floatNeg);
+            expect(aNInput.getNumericString()).toEqual('-6.25');
+            expect(aNInput.getFormatted()).toEqual('-6.25');
+            expect(() => aNInput.set(15.021)).toThrow();
+            expect(aNInput.getFormatted()).toEqual('-6.25');
+            expect(() => aNInput.set(-0.712)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('-0.71');
+            aNInput.set(-13256.678);
+            expect(aNInput.getFormatted()).toEqual('-13,256.68');
+        });
+
+        it('should init and update the element with the correct predefined settings, formatting numeric strings', () => {
+            newInput.value = '-72376.246';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().numeric);
+            expect(aNInput.getNumericString()).toEqual('-72376.25');
+            expect(aNInput.getFormatted()).toEqual('-72376.25');
+            expect(() => aNInput.set(15.001)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('15.00');
+            expect(() => aNInput.set(-0.712)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('-0.71');
+            aNInput.set(13256.678);
+            expect(aNInput.getFormatted()).toEqual('13256.68');
+        });
+
+        it('should init and update the element with the correct predefined settings, formatting positive numeric strings', () => {
+            newInput.value = '72376.246';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().numericPos);
+            expect(aNInput.getNumericString()).toEqual('72376.25');
+            expect(aNInput.getFormatted()).toEqual('72376.25');
+            expect(() => aNInput.set(15.001)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('15.00');
+            expect(() => aNInput.set(-0.712)).toThrow();
+            expect(aNInput.getFormatted()).toEqual('15.00');
+            aNInput.set(13256.678);
+            expect(aNInput.getFormatted()).toEqual('13256.68');
+        });
+
+        it('should init and update the element with the correct predefined settings, formatting negative numeric strings', () => {
+            newInput.value = '-72376.246';
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().numericNeg);
+            expect(aNInput.getNumericString()).toEqual('-72376.25');
+            expect(aNInput.getFormatted()).toEqual('-72376.25');
+            expect(() => aNInput.set(15.001)).toThrow();
+            expect(aNInput.getFormatted()).toEqual('-72376.25');
+            expect(() => aNInput.set(-0.712)).not.toThrow();
+            expect(aNInput.getFormatted()).toEqual('-0.71');
+            aNInput.set(-13256.678);
+            expect(aNInput.getFormatted()).toEqual('-13256.68');
+        });
+
+        // Test the showPositiveSign option
+        // +1.234,00
+        const noneLeft = {
+            digitGroupSeparator        : '.',
+            decimalCharacter           : ',',
+            decimalCharacterAlternative: '.',
+            showPositiveSign           : true,
+        };
+
+        // 1.234,00+
+        const noneSuffix = {
+            digitGroupSeparator          : '.',
+            decimalCharacter             : ',',
+            decimalCharacterAlternative  : '.',
+            negativePositiveSignPlacement: 's',
+            showPositiveSign             : true,
+        };
+
+        // € +1.234,00
+        const leftRight = {
+            digitGroupSeparator          : '.',
+            decimalCharacter             : ',',
+            decimalCharacterAlternative  : '.',
+            currencySymbol               : '€\u00a0',
+            roundingMethod               : 'U',
+            negativePositiveSignPlacement: 'r',
+            showPositiveSign             : true,
+        };
+
+        // +€ 1.234,00
+        const leftLeft = {
+            digitGroupSeparator          : '.',
+            decimalCharacter             : ',',
+            decimalCharacterAlternative  : '.',
+            currencySymbol               : '€\u00a0',
+            roundingMethod               : 'U',
+            negativePositiveSignPlacement: 'l',
+            showPositiveSign             : true,
+        };
+
+        // € 1.234,00+
+        const leftSuffix = {
+            digitGroupSeparator          : '.',
+            decimalCharacter             : ',',
+            decimalCharacterAlternative  : '.',
+            currencySymbol               : '€\u00a0',
+            roundingMethod               : 'U',
+            negativePositiveSignPlacement: 's',
+            showPositiveSign             : true,
+        };
+
+        // 1.234,00+ €
+        const rightLeft = {
+            digitGroupSeparator          : '.',
+            decimalCharacter             : ',',
+            decimalCharacterAlternative  : '.',
+            currencySymbol               : '\u00a0€',
+            currencySymbolPlacement      : 's',
+            roundingMethod               : 'U',
+            negativePositiveSignPlacement: 'l',
+            showPositiveSign             : true,
+        };
+
+        // 1.234,00 €+
+        const rightRight = {
+            digitGroupSeparator          : '.',
+            decimalCharacter             : ',',
+            decimalCharacterAlternative  : '.',
+            currencySymbol               : '\u00a0€',
+            currencySymbolPlacement      : 's',
+            roundingMethod               : 'U',
+            negativePositiveSignPlacement: 'r',
+            showPositiveSign             : true,
+        };
+
+        // +1.234,00 €
+        const rightPrefix = {
+            digitGroupSeparator          : '.',
+            decimalCharacter             : ',',
+            decimalCharacterAlternative  : '.',
+            currencySymbol               : '\u00a0€',
+            currencySymbolPlacement      : 's',
+            roundingMethod               : 'U',
+            negativePositiveSignPlacement: 'p',
+            showPositiveSign             : true,
+        };
+
+        it('should format with showPositiveSign, no currency sign, default placement', () => {
+            newInput.value = '1234567.89';
+            aNInput = new AutoNumeric(newInput, noneLeft);
+            expect(aNInput.getNumericString()).toEqual('1234567.89');
+            expect(aNInput.getFormatted()).toEqual('+1.234.567,89');
+        });
+
+        it('should format with showPositiveSign, no currency sign, suffix placement', () => {
+            newInput.value = '1234567.89';
+            aNInput = new AutoNumeric(newInput, noneSuffix);
+            expect(aNInput.getNumericString()).toEqual('1234567.89');
+            expect(aNInput.getFormatted()).toEqual('1.234.567,89+');
+        });
+
+        it('should format with showPositiveSign, left currency sign, right placement', () => {
+            newInput.value = '1234567.89';
+            aNInput = new AutoNumeric(newInput, leftRight);
+            expect(aNInput.getNumericString()).toEqual('1234567.89');
+            expect(aNInput.getFormatted()).toEqual('€\u00a0+1.234.567,89');
+        });
+
+        it('should format with showPositiveSign, left currency sign, left placement', () => {
+            newInput.value = '1234567.89';
+            aNInput = new AutoNumeric(newInput, leftLeft);
+            expect(aNInput.getNumericString()).toEqual('1234567.89');
+            expect(aNInput.getFormatted()).toEqual('+€\u00a01.234.567,89');
+        });
+
+        it('should format with showPositiveSign, left currency sign, suffix placement', () => {
+            newInput.value = '1234567.89';
+            aNInput = new AutoNumeric(newInput, leftSuffix);
+            expect(aNInput.getNumericString()).toEqual('1234567.89');
+            expect(aNInput.getFormatted()).toEqual('€\u00a01.234.567,89+');
+        });
+
+        it('should format with showPositiveSign, right currency sign, left placement', () => {
+            newInput.value = '1234567.89';
+            aNInput = new AutoNumeric(newInput, rightLeft);
+            expect(aNInput.getNumericString()).toEqual('1234567.89');
+            expect(aNInput.getFormatted()).toEqual('1.234.567,89+\u00a0€');
+        });
+
+        it('should format with showPositiveSign, right currency sign, right placement', () => {
+            newInput.value = '1234567.89';
+            aNInput = new AutoNumeric(newInput, rightRight);
+            expect(aNInput.getNumericString()).toEqual('1234567.89');
+            expect(aNInput.getFormatted()).toEqual('1.234.567,89\u00a0€+');
+        });
+
+        it('should format with showPositiveSign, right currency sign, prefix placement', () => {
+            newInput.value = '1234567.89';
+            aNInput = new AutoNumeric(newInput, rightPrefix);
+            expect(aNInput.getNumericString()).toEqual('1234567.89');
+            expect(aNInput.getFormatted()).toEqual('+1.234.567,89\u00a0€');
+        });
+    });
+
+    describe('`init` method should init with predefined options', () => {
+        let aNInput;
+        let newInput;
+
+        it('with French', () => {
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().French); // Initiate the autoNumeric input
+
+            aNInput.set('1234567.89');
+            expect(aNInput.get()).toEqual('1234567.89');
+            expect(aNInput.getNumericString()).toEqual('1234567.89');
+            expect(aNInput.getNumber()).toEqual(1234567.89);
+            expect(aNInput.getFormatted()).toEqual('1.234.567,89\u202f€');
+
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('with North American', () => {
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().NorthAmerican); // Initiate the autoNumeric input
+
+            aNInput.set('1234567.89');
+            expect(aNInput.get()).toEqual('1234567.89');
+            expect(aNInput.getNumericString()).toEqual('1234567.89');
+            expect(aNInput.getNumber()).toEqual(1234567.89);
+            expect(aNInput.getFormatted()).toEqual('$1,234,567.89');
+
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('with Japanese', () => {
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().Japanese); // Initiate the autoNumeric input
+
+            aNInput.set('1234567.89');
+            expect(aNInput.get()).toEqual('1234567.89');
+            expect(aNInput.getNumericString()).toEqual('1234567.89');
+            expect(aNInput.getNumber()).toEqual(1234567.89);
+            expect(aNInput.getFormatted()).toEqual('¥1,234,567.89');
+
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+    });
+
+    describe('Initialize multiple AutoNumeric objects with one call to `AutoNumeric.multiple`', () => {
+        describe('initialization methods with the `multiple()` function', () => {
+            let newInput1;
+            let newInput2;
+            let newInput3;
+            let newInput4;
+            let newInput5;
+            const options = { currencySymbol: ' €', currencySymbolPlacement: 's', decimalCharacter: ',', digitGroupSeparator: ' ' };
+
+            beforeEach(() => { // Initialization
+                newInput1 = document.createElement('input');
+                newInput2 = document.createElement('input');
+                newInput3 = document.createElement('input');
+                newInput4 = document.createElement('input');
+                newInput5 = document.createElement('input');
+                document.body.appendChild(newInput1);
+                document.body.appendChild(newInput2);
+                document.body.appendChild(newInput3);
+                document.body.appendChild(newInput4);
+                document.body.appendChild(newInput5);
+            });
+
+            afterEach(() => { // Un-initialization
+                document.body.removeChild(newInput1);
+                document.body.removeChild(newInput2);
+                document.body.removeChild(newInput3);
+                document.body.removeChild(newInput4);
+                document.body.removeChild(newInput5);
+            });
+
+            it('should throw when calling `multiple()` the wrong way', () => {
+                expect(() => AutoNumeric.multiple([newInput1])).not.toThrow();
+                expect(() => AutoNumeric.multiple(newInput1)).toThrow();
+                expect(() => AutoNumeric.multiple(42)).toThrow();
+                expect(() => AutoNumeric.multiple(true)).toThrow();
+            });
+
+            it('should show a warning when calling `multiple()` with an empty array', () => {
+                spyOn(console, 'warn');
+                AutoNumeric.multiple([]);
+                expect(console.warn).toHaveBeenCalled();
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with an array of elements', () => {
+                const [anElement2, anElement3, anElement4, anElement5] = AutoNumeric.multiple([newInput2, newInput3, newInput4, newInput5]);
+                expect(anElement2.getFormatted()).toEqual('');
+                expect(anElement3.getFormatted()).toEqual('');
+                expect(anElement4.getFormatted()).toEqual('');
+                expect(anElement5.getFormatted()).toEqual('');
+
+                expect(anElement2.set(13568.243).getFormatted()).toEqual('13,568.24');
+                expect(anElement3.set(187568.243).getFormatted()).toEqual('187,568.24');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21,613,568.24');
+                expect(anElement5.set(1028.005).getFormatted()).toEqual('1,028.01');
+
+                //TODO Use .global.update() here instead of manually changing each option object one by one -->
+                expect(anElement2.update(options).getFormatted()).toEqual('13 568,24 €');
+                expect(anElement3.update(options).getFormatted()).toEqual('187 568,24 €');
+                expect(anElement4.update(options).getFormatted()).toEqual('21 613 568,24 €');
+                expect(anElement5.update(options).getFormatted()).toEqual('1 028,01 €');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with an array of one element', () => {
+                const [anElement4] = AutoNumeric.multiple([newInput4]);
+                expect(anElement4.getFormatted()).toEqual('');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21,613,568.24');
+
+                //TODO Use .global.update() here instead of manually changing each option object one by one -->
+                expect(anElement4.update(options).getFormatted()).toEqual('21 613 568,24 €');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with an empty array', () => {
+                spyOn(console, 'warn'); // Suppress the warning message
+                const result = AutoNumeric.multiple([]);
+                expect(Array.isArray(result)).toEqual(true);
+                expect(result.length).toEqual(0);
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with an array of elements with options', () => {
+                const [anElement2, anElement3, anElement4, anElement5] = AutoNumeric.multiple([newInput2, newInput3, newInput4, newInput5], null, options);
+                expect(anElement2.getFormatted()).toEqual('');
+                expect(anElement3.getFormatted()).toEqual('');
+                expect(anElement4.getFormatted()).toEqual('');
+                expect(anElement5.getFormatted()).toEqual('');
+
+                expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+                expect(anElement3.set(187568.243).getFormatted()).toEqual('187 568,24 €');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+                expect(anElement5.set(1028.005).getFormatted()).toEqual('1 028,01 €');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with a selector string that select nothing', () => {
+                spyOn(console, 'warn'); // Suppress the warning message
+                const result = AutoNumeric.multiple('.randomSelectThatDoesNotExists_Ge6coo5a > input');
+                expect(Array.isArray(result)).toEqual(true);
+                expect(result.length).toEqual(0);
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with a selector string that select only one element', () => {
+                newInput4.classList.add('id_multiple_pieb5Aex');
+                const result = AutoNumeric.multiple('.id_multiple_pieb5Aex');
+                expect(result.length).toEqual(1);
+                const [anElement4] = result;
+
+                expect(anElement4.getFormatted()).toEqual('');
+                expect(anElement4.set(-21613968.243).getFormatted()).toEqual('-21,613,968.24');
+                expect(anElement4.update(options).getFormatted()).toEqual('21 613 968,24- €');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with a selector string that select multiple elements', () => {
+                newInput1.classList.add('id_multiple_toh1og1I');
+                newInput2.classList.add('id_multiple_toh1og1I');
+                newInput4.classList.add('id_multiple_toh1og1I');
+                const result = AutoNumeric.multiple('.id_multiple_toh1og1I');
+                expect(result.length).toEqual(3);
+                const [anElement1, anElement2, anElement4] = result;
+
+                expect(anElement1.getFormatted()).toEqual('');
+                expect(anElement2.getFormatted()).toEqual('');
+                expect(anElement4.getFormatted()).toEqual('');
+
+                expect(anElement1.set(187568.243).getFormatted()).toEqual('187,568.24');
+                expect(anElement2.set(13568.243).getFormatted()).toEqual('13,568.24');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21,613,568.24');
+
+                //TODO Use .global.update() here instead of manually changing each option object one by one -->
+                expect(anElement1.update(options).getFormatted()).toEqual('187 568,24 €');
+                expect(anElement2.update(options).getFormatted()).toEqual('13 568,24 €');
+                expect(anElement4.update(options).getFormatted()).toEqual('21 613 568,24 €');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with a selector string that select multiple elements, and options', () => {
+                newInput1.classList.add('id_multiple_ahXee8je');
+                newInput2.classList.add('id_multiple_ahXee8je');
+                newInput4.classList.add('id_multiple_ahXee8je');
+                const result = AutoNumeric.multiple('.id_multiple_ahXee8je', options);
+                expect(result.length).toEqual(3);
+                const [anElement1, anElement2, anElement4] = result;
+
+                expect(anElement1.set(187568.243).getFormatted()).toEqual('187 568,24 €');
+                expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with an array of elements and one initial value', () => {
+                const [anElement2, anElement3, anElement4, anElement5] = AutoNumeric.multiple([newInput2, newInput3, newInput4, newInput5]);
+                expect(anElement2.getFormatted()).toEqual('');
+                expect(anElement3.getFormatted()).toEqual('');
+                expect(anElement4.getFormatted()).toEqual('');
+                expect(anElement5.getFormatted()).toEqual('');
+
+                expect(anElement2.set(13568.243).getFormatted()).toEqual('13,568.24');
+                expect(anElement3.set(187568.243).getFormatted()).toEqual('187,568.24');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21,613,568.24');
+                expect(anElement5.set(1028.005).getFormatted()).toEqual('1,028.01');
+
+                //TODO Use .global.update() here instead of manually changing each option object one by one -->
+                expect(anElement2.update(options).getFormatted()).toEqual('13 568,24 €');
+                expect(anElement3.update(options).getFormatted()).toEqual('187 568,24 €');
+                expect(anElement4.update(options).getFormatted()).toEqual('21 613 568,24 €');
+                expect(anElement5.update(options).getFormatted()).toEqual('1 028,01 €');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with multiple elements, one initial value, and options', () => {
+                newInput1.classList.add('id_multiple_Gur0hei6');
+                newInput2.classList.add('id_multiple_Gur0hei6');
+                newInput4.classList.add('id_multiple_Gur0hei6');
+                const result = AutoNumeric.multiple('.id_multiple_Gur0hei6', 187568.243, options);
+                expect(result.length).toEqual(3);
+                const [anElement1, anElement2, anElement4] = result;
+
+                expect(anElement1.getFormatted()).toEqual('187 568,24 €');
+                expect(anElement2.getFormatted()).toEqual('187 568,24 €');
+                expect(anElement4.getFormatted()).toEqual('187 568,24 €');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with multiple elements, multiple initial values (complete), and options', () => {
+                newInput1.classList.add('id_multiple_Gaet4zaa');
+                newInput2.classList.add('id_multiple_Gaet4zaa');
+                newInput4.classList.add('id_multiple_Gaet4zaa');
+                const result = AutoNumeric.multiple('.id_multiple_Gaet4zaa', [187568.243, 13568.243, 21613568.243], options);
+                expect(result.length).toEqual(3);
+                const [anElement1, anElement2, anElement4] = result;
+
+                expect(anElement1.getFormatted()).toEqual('187 568,24 €');
+                expect(anElement2.getFormatted()).toEqual('13 568,24 €');
+                expect(anElement4.getFormatted()).toEqual('21 613 568,24 €');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with multiple elements, multiple initial values (incomplete), and options', () => {
+                newInput1.classList.add('id_multiple_RaePhut1');
+                newInput2.classList.add('id_multiple_RaePhut1');
+                newInput4.classList.add('id_multiple_RaePhut1');
+                const result = AutoNumeric.multiple('.id_multiple_RaePhut1', [187568.243, 13568.243], options);
+                expect(result.length).toEqual(3);
+                const [anElement1, anElement2, anElement4] = result;
+
+                expect(anElement1.getFormatted()).toEqual('187 568,24 €');
+                expect(anElement2.getFormatted()).toEqual('13 568,24 €');
+                expect(anElement4.getFormatted()).toEqual('');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with an array of elements and an array of options as the second argument', () => {
+                const [anElement2, anElement3, anElement4, anElement5] = AutoNumeric.multiple(
+                    [newInput2, newInput3, newInput4, newInput5],
+                    [
+                        'dollar',
+                        {
+                            currencySymbol: AutoNumeric.options.currencySymbol.franc,
+                            currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.suffix,
+                        },
+                    ]
+                );
+                expect(anElement2.getFormatted()).toEqual('');
+                expect(anElement3.getFormatted()).toEqual('');
+                expect(anElement4.getFormatted()).toEqual('');
+                expect(anElement5.getFormatted()).toEqual('');
+
+                expect(anElement2.set(13568.243).getFormatted()).toEqual('13,568.24₣');
+                expect(anElement3.set(187568.243).getFormatted()).toEqual('187,568.24₣');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21,613,568.24₣');
+                expect(anElement5.set(1028.005).getFormatted()).toEqual('1,028.01₣');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with an array of elements and an array of options as the third argument', () => {
+                const [anElement2, anElement3, anElement4, anElement5] = AutoNumeric.multiple(
+                    [newInput2, newInput3, newInput4, newInput5],
+                    null, // Initial values
+                    [
+                        'dollar',
+                        {
+                            currencySymbol: AutoNumeric.options.currencySymbol.franc,
+                            currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.suffix,
+                        },
+                    ]
+                );
+                expect(anElement2.getFormatted()).toEqual('');
+                expect(anElement3.getFormatted()).toEqual('');
+                expect(anElement4.getFormatted()).toEqual('');
+                expect(anElement5.getFormatted()).toEqual('');
+
+                expect(anElement2.set(13568.243).getFormatted()).toEqual('13,568.24₣');
+                expect(anElement3.set(187568.243).getFormatted()).toEqual('187,568.24₣');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21,613,568.24₣');
+                expect(anElement5.set(1028.005).getFormatted()).toEqual('1,028.01₣');
+            });
+        });
+
+        describe('initialization methods with the `multiple()` function and the `parentElement`/`exclude` object', () => {
+            let formElement;
+            let newInput1;
+            let newInput2;
+            let newInput3;
+            let newInput4;
+            let newInput5;
+            const options = { currencySymbol: ' €', currencySymbolPlacement: 's', decimalCharacter: ',', digitGroupSeparator: ' ' };
+
+            beforeEach(() => { // Initialization
+                formElement = document.createElement('form');
+                newInput1 = document.createElement('input');
+                newInput2 = document.createElement('input');
+                newInput3 = document.createElement('input');
+                newInput4 = document.createElement('input');
+                newInput5 = document.createElement('input');
+                document.body.appendChild(newInput5);
+                document.body.appendChild(formElement);
+                formElement.appendChild(newInput1);
+                formElement.appendChild(newInput2);
+                formElement.appendChild(newInput3);
+                formElement.appendChild(newInput4);
+            });
+
+            afterEach(() => { // Un-initialization
+                formElement.removeChild(newInput1);
+                formElement.removeChild(newInput2);
+                formElement.removeChild(newInput3);
+                formElement.removeChild(newInput4);
+                document.body.removeChild(newInput5);
+                document.body.removeChild(formElement);
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with only the `parentElement` attribute initialized, and without options', () => {
+                const result = AutoNumeric.multiple({ rootElement: formElement });
+                expect(result.length).toEqual(4);
+                const [anElement1, anElement2, anElement3, anElement4] = result;
+
+                expect(anElement1.getFormatted()).toEqual('');
+                expect(anElement2.getFormatted()).toEqual('');
+                expect(anElement3.getFormatted()).toEqual('');
+                expect(anElement4.getFormatted()).toEqual('');
+
+                expect(anElement1.set(1028.005).getFormatted()).toEqual('1,028.01');
+                expect(anElement2.set(13568.243).getFormatted()).toEqual('13,568.24');
+                expect(anElement3.set(187568.243).getFormatted()).toEqual('187,568.24');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21,613,568.24');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with only the `parentElement` attribute initialized, with options', () => {
+                const result = AutoNumeric.multiple({ rootElement: formElement }, options);
+                expect(result.length).toEqual(4);
+                const [anElement1, anElement2, anElement3, anElement4] = result;
+
+                expect(anElement1.getFormatted()).toEqual('');
+                expect(anElement2.getFormatted()).toEqual('');
+                expect(anElement3.getFormatted()).toEqual('');
+                expect(anElement4.getFormatted()).toEqual('');
+
+                expect(anElement1.set(1028.005).getFormatted()).toEqual('1 028,01 €');
+                expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+                expect(anElement3.set(187568.243).getFormatted()).toEqual('187 568,24 €');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with the `parentElement` and `exclude` attributes initialized, and without options', () => {
+                const result = AutoNumeric.multiple({ rootElement: formElement, exclude: [newInput2, newInput3] });
+                expect(result.length).toEqual(2);
+                const [anElement1, anElement4] = result;
+
+                expect(anElement1.getFormatted()).toEqual('');
+                expect(anElement4.getFormatted()).toEqual('');
+
+                expect(anElement1.set(1028.005).getFormatted()).toEqual('1,028.01');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21,613,568.24');
+            });
+
+            it('should correctly initialize multiple AutoNumeric elements, with the `parentElement` and `exclude` attributes initialized, with options', () => {
+                const result = AutoNumeric.multiple({ rootElement: formElement, exclude: [newInput2, newInput3] }, options);
+                expect(result.length).toEqual(2);
+                const [anElement1, anElement4] = result;
+
+                expect(anElement1.getFormatted()).toEqual('');
+                expect(anElement4.getFormatted()).toEqual('');
+
+                expect(anElement1.set(1028.005).getFormatted()).toEqual('1 028,01 €');
+                expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            });
+
+            it('should throw when trying to initialize multiple AutoNumeric elements, with an invalide `exclude` attributes', () => {
+                expect(() => AutoNumeric.multiple({ rootElement: formElement, exclude: 'foobar' })).toThrow();
+            });
+        });
+    });
+});
+
+describe('Instantiated autoNumeric functions', () => {
+    describe('`getNumericString`, `getLocalized` and `getNumber` methods', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should return an unformatted value, (without having any option specified)', () => {
+            // With an integer
+            aNInput.set(0);
+            expect(aNInput.get()).toEqual('0');
+            expect(aNInput.getNumericString()).toEqual('0');
+            expect(aNInput.getLocalized()).toEqual('0');
+            expect(aNInput.getNumber()).toEqual(0);
+
+            aNInput.set(-42);
+            expect(aNInput.get()).toEqual('-42');
+            expect(aNInput.getNumericString()).toEqual('-42');
+            aNInput.update({ outputFormat: ',-' });
+            expect(aNInput.getNumericString()).toEqual('-42');
+            expect(aNInput.getLocalized()).toEqual('42-');
+            expect(aNInput.getNumber()).toEqual(-42);
+            aNInput.update({ outputFormat: '-,' });
+            expect(aNInput.getLocalized()).toEqual('-42');
+            expect(aNInput.getNumber()).toEqual(-42);
+            aNInput.update({ outputFormat: '.-' });
+            expect(aNInput.getLocalized()).toEqual('42-');
+            expect(aNInput.getNumber()).toEqual(-42);
+            aNInput.update({ outputFormat: null });
+            expect(aNInput.getLocalized()).toEqual('-42');
+            expect(aNInput.getNumber()).toEqual(-42);
+            aNInput.update({ outputFormat: 'number' });
+            expect(aNInput.getLocalized()).toEqual(-42);
+            expect(aNInput.getNumber()).toEqual(-42);
+            aNInput.update({ outputFormat: 'string' });
+            expect(aNInput.getLocalized()).toEqual('-42');
+            expect(aNInput.getNumber()).toEqual(-42);
+
+            // With a float
+            aNInput.set(-42.76);
+            expect(aNInput.getNumericString()).toEqual('-42.76');
+            aNInput.update({ outputFormat: ',-' });
+            expect(aNInput.getNumericString()).toEqual('-42.76');
+            expect(aNInput.getLocalized()).toEqual('42,76-');
+            expect(aNInput.getNumber()).toEqual(-42.76);
+
+            aNInput.update({ outputFormat: '-,' });
+            expect(aNInput.getLocalized()).toEqual('-42,76');
+            expect(aNInput.getNumber()).toEqual(-42.76);
+            aNInput.update({ outputFormat: '.-' });
+            expect(aNInput.getLocalized()).toEqual('42.76-');
+            expect(aNInput.getNumber()).toEqual(-42.76);
+            aNInput.update({ outputFormat: null });
+            expect(aNInput.getLocalized()).toEqual('-42.76');
+            expect(aNInput.getNumber()).toEqual(-42.76);
+            aNInput.update({ outputFormat: 'number' });
+            expect(aNInput.getLocalized()).toEqual(-42.76);
+            expect(aNInput.getNumber()).toEqual(-42.76);
+            aNInput.update({ outputFormat: 'string' });
+            expect(aNInput.getLocalized()).toEqual('-42.76');
+            expect(aNInput.getNumber()).toEqual(-42.76);
+        });
+
+        it('should return an unformatted value (with some options set)', () => {
+            // Euros
+            aNInput.update(autoNumericOptionsEuro);
+            aNInput.update({ outputFormat: ',-' });
+            aNInput.set(0);
+            expect(aNInput.getFormatted()).toEqual('0,00 €');
+            expect(aNInput.getNumericString()).toEqual('0');
+            expect(aNInput.getLocalized()).toEqual('0');
+            expect(aNInput.getNumber()).toEqual(0);
+            aNInput.update({ leadingZero: 'keep' });
+            expect(aNInput.getLocalized()).toEqual('0');
+            expect(aNInput.getNumber()).toEqual(0);
+
+            aNInput.set(-42);
+            expect(aNInput.getFormatted()).toEqual('42,00- €');
+            expect(aNInput.getNumericString()).toEqual('-42');
+            expect(aNInput.getLocalized()).toEqual('42-');
+            expect(aNInput.getNumber()).toEqual(-42);
+            aNInput.update({ outputFormat: '-,' });
+            expect(aNInput.getLocalized()).toEqual('-42');
+            expect(aNInput.getNumber()).toEqual(-42);
+            aNInput.update({ outputFormat: '.-' });
+            expect(aNInput.getLocalized()).toEqual('42-');
+            expect(aNInput.getNumber()).toEqual(-42);
+            aNInput.update({ outputFormat: null });
+            expect(aNInput.getLocalized()).toEqual('-42');
+            expect(aNInput.getNumber()).toEqual(-42);
+            aNInput.update({ outputFormat: 'number' });
+            expect(aNInput.getLocalized()).toEqual(-42);
+            expect(aNInput.getNumber()).toEqual(-42);
+            aNInput.update({ outputFormat: 'string' });
+            expect(aNInput.getLocalized()).toEqual('-42');
+            expect(aNInput.getNumber()).toEqual(-42);
+
+            aNInput.set(1234.56); // Here I also test that setting a positive value after a negative one works ok
+            expect(aNInput.getNumericString()).toEqual('1234.56');
+            expect(aNInput.getNumber()).toEqual(1234.56);
+            aNInput.set(6789012.345);
+            expect(aNInput.getNumericString()).toEqual('6789012.35'); // Rounding happens here
+            expect(aNInput.getNumber()).toEqual(6789012.35);
+
+            // Dollars
+            aNInput.update(autoNumericOptionsDollar);
+            expect(aNInput.getNumericString()).toEqual('6789012.35'); // First check if updating the options changed the results accordingly
+            expect(aNInput.getNumber()).toEqual(6789012.35);
+            aNInput.set(1234.56);
+            expect(aNInput.getNumericString()).toEqual('1234.56');
+            expect(aNInput.getNumber()).toEqual(1234.56);
+            aNInput.set(6789012.345);
+            expect(aNInput.getNumericString()).toEqual('6789012.35');
+            expect(aNInput.getNumber()).toEqual(6789012.35);
+            aNInput.set(0);
+            expect(aNInput.getNumericString()).toEqual('0');
+            expect(aNInput.getNumber()).toEqual(0);
+            aNInput.set(-42);
+            expect(aNInput.getNumericString()).toEqual('-42');
+            expect(aNInput.getNumber()).toEqual(-42);
+        });
+
+        it('should return an unformatted value even if the number is bigger than Number.MAX_SAFE_INTEGER', () => {
+            if (Number.MAX_SAFE_INTEGER === void(0)) { // Special polyfill case for PhantomJS
+                // console.log(`Setting the Number.MAX_SAFE_INTEGER polyfill...`); //DEBUG
+                //noinspection JSPrimitiveTypeWrapperUsage
+                Number.MAX_SAFE_INTEGER = 9007199254740991;
+            }
+
+            aNInput.update({ maximumValue: '9007199254740991000000' });
+            aNInput.set(Number.MAX_SAFE_INTEGER); // The exact highest safe integer
+            expect(aNInput.getNumericString()).toEqual(`${Number.MAX_SAFE_INTEGER}`);
+            aNInput.set('9007199254740996'); // A bit higher than the biggest safest integer
+            expect(aNInput.getNumericString()).toEqual('9007199254740996');
+            // Add a test where the user set a very big number (bigger than Number.MAX_SAFE_INTEGER), and check if `get` return the correct number
+            aNInput.set('9007199254740991000000'); // A very big number
+            expect(aNInput.getNumericString()).toEqual('9007199254740991000000');
+        });
+
+        it('should execute the given callback with the `get*` methods result', () => {
+            let counter = 0;
+            function incrementCounter() {
+                counter++;
+            }
+
+            aNInput.set(42);
+            expect(aNInput.getNumericString()).toEqual('42');
+            expect(aNInput.getNumber()).toEqual(42);
+
+            expect(counter).toEqual(0);
+            expect(aNInput.get(incrementCounter)).toEqual('42');
+            expect(counter).toEqual(1);
+            expect(aNInput.getNumericString(incrementCounter)).toEqual('42');
+            expect(counter).toEqual(2);
+            expect(aNInput.getFormatted(incrementCounter)).toEqual('42.00');
+            expect(counter).toEqual(3);
+            expect(aNInput.getNumber(incrementCounter)).toEqual(42);
+            expect(counter).toEqual(4);
+            expect(aNInput.getLocalized(null, incrementCounter)).toEqual('42');
+            expect(counter).toEqual(5);
+            expect(aNInput.getLocalized(incrementCounter)).toEqual('42');
+            expect(counter).toEqual(6);
+            aNInput.set(42.61);
+            expect(aNInput.getLocalized(AutoNumeric.options.outputFormat.comma, incrementCounter)).toEqual('42,61');
+            expect(counter).toEqual(7);
+        });
+
+        it('should execute the given callback with the `global.get*` methods result', () => {
+            // Initialization
+            const newInput1 = document.createElement('input');
+            const newInput2 = document.createElement('input');
+            const newInput3 = document.createElement('input');
+            document.body.appendChild(newInput1);
+            document.body.appendChild(newInput2);
+            document.body.appendChild(newInput3);
+
+            let concatenate = 0;
+            let callCount = 0;
+            function concatenateAndCallCount(arrValues) {
+                concatenate = arrValues.reduce((count, val) => count + val);
+                callCount++;
+            }
+
+            // Setting the default value
+            const anElement1 = new AutoNumeric(newInput1).french();
+            const [anElement2, anElement3] = anElement1.init([newInput2, newInput3]);
+            anElement1.set(111);
+            anElement2.set(222);
+            anElement3.set(333);
+
+            // Testing the callback
+            expect(callCount).toEqual(0);
+            expect(concatenate).toEqual(0);
+            const resultNumber = anElement1.global.getNumber();
+            expect(resultNumber).toEqual([111, 222, 333]);
+            expect(callCount).toEqual(0);
+            expect(concatenate).toEqual(0);
+            expect(anElement1.global.getNumber(concatenateAndCallCount)).toEqual([111, 222, 333]);
+            expect(callCount).toEqual(1);
+            expect(concatenate).toEqual(666); // 111+222+333
+
+            anElement1.set(1);
+            anElement2.set(2);
+            anElement3.set(3);
+            expect(anElement1.global.get(concatenateAndCallCount)).toEqual(['1', '2', '3']);
+            expect(callCount).toEqual(2);
+            expect(concatenate).toEqual('123');
+
+            anElement1.set(-1);
+            anElement2.set(0);
+            anElement3.set(6);
+            expect(anElement1.global.getNumericString(concatenateAndCallCount)).toEqual(['-1', '0', '6']);
+            expect(callCount).toEqual(3);
+            expect(concatenate).toEqual('-106');
+
+            expect(anElement1.global.getFormatted(concatenateAndCallCount)).toEqual(['-1,00\u202f€', '0,00\u202f€', '6,00\u202f€']);
+            expect(callCount).toEqual(4);
+            expect(concatenate).toEqual('-1,00\u202f€0,00\u202f€6,00\u202f€');
+
+            anElement1.set(22.67);
+            anElement2.set(-20.07).options.outputFormat(AutoNumeric.options.outputFormat.commaNegative);
+            anElement3.set(14.06);
+            expect(anElement1.global.getLocalized(concatenateAndCallCount)).toEqual(['22.67', '20,07-', '14.06']);
+            expect(callCount).toEqual(5);
+            expect(concatenate).toEqual('22.6720,07-14.06');
+
+            // Un-initialization
+            document.body.removeChild(newInput1);
+            document.body.removeChild(newInput2);
+            document.body.removeChild(newInput3);
+        });
+    });
+
+    describe(`getNumericString`, () => {
+        it(`should return an empty string as the default value`, () => {
+            const newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            const aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+
+            expect(aNInput.getNumericString()).toEqual('');
+        });
+
+        it(`should return '0' as the default value`, () => {
+            const newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            const aNInput = new AutoNumeric(newInput, { emptyInputBehavior : 'zero' }); // Initiate the autoNumeric input
+
+            expect(aNInput.getNumericString()).toEqual('0');
+        });
+
+        it(`should not return a negative value when inputting a positive one and minimumValue is equal to '0' (cf. issue #284)`, () => {
+            const newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            const aNInput = new AutoNumeric(newInput, { minimumValue: '0', maximumValue: '9999', decimalPlaces: 2 }); // Initiate the autoNumeric input
+
+            expect(aNInput.getNumericString()).toEqual('');
+            aNInput.set(1234);
+            expect(aNInput.getNumericString()).toEqual('1234');
+            aNInput.set(0);
+            expect(aNInput.getNumericString()).toEqual('0');
+            aNInput.set(-0);
+            expect(aNInput.getNumericString()).toEqual('0');
+
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it(`should not return a negative value when inputting a positive one and minimumValue is superior to '0' (cf. issue #284)`, () => {
+            const newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            const aNInput = new AutoNumeric(newInput, { minimumValue: '1', maximumValue: '9999', decimalPlaces: 2 }); // Initiate the autoNumeric input
+
+            expect(aNInput.getNumericString()).toEqual('');
+            aNInput.set(1234);
+            expect(aNInput.getNumericString()).toEqual('1234');
+
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+    });
+
+    describe(`set`, () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should set a raw value and result in a formatted value', () => {
+            // Euros
+            aNInput.update(autoNumericOptionsEuro);
+            aNInput.set(1234.56);
+            expect(aNInput.getFormatted()).toEqual('1.234,56 €');
+            aNInput.set(6789012.345);
+            expect(aNInput.getFormatted()).toEqual('6.789.012,35 €'); // Rounding happens here
+
+            aNInput.set('1234.56');
+            expect(aNInput.getFormatted()).toEqual('1.234,56 €');
+            aNInput.set('6789012.345');
+            expect(aNInput.getFormatted()).toEqual('6.789.012,35 €'); // Rounding happens here
+
+            // Dollars
+            aNInput.update(autoNumericOptionsDollar);
+            expect(aNInput.getFormatted()).toEqual('$6,789,012.35'); // First check if updating the options changed the results accordingly
+            aNInput.set(1234.56);
+            expect(aNInput.getFormatted()).toEqual('$1,234.56');
+            aNInput.set(6789012.345);
+            expect(aNInput.getFormatted()).toEqual('$6,789,012.35');
+
+            aNInput.set('1234.56');
+            expect(aNInput.getFormatted()).toEqual('$1,234.56');
+            aNInput.set('6789012.345');
+            expect(aNInput.getFormatted()).toEqual('$6,789,012.35');
+        });
+
+        it('should set a formatted value and result in a formatted value', () => {
+            // Euros
+            aNInput.update(autoNumericOptionsEuro);
+            aNInput.set('1.234,56');
+            expect(aNInput.getFormatted()).toEqual('1.234,56 €');
+            aNInput.set('6.789.012,345');
+            expect(aNInput.getFormatted()).toEqual('6.789.012,35 €'); // Rounding happens here
+
+            // Dollars
+            aNInput.update(autoNumericOptionsDollar);
+            expect(aNInput.getFormatted()).toEqual('$6,789,012.35'); // First check if updating the options changed the results accordingly
+            aNInput.set('1,234.56');
+            expect(aNInput.getFormatted()).toEqual('$1,234.56');
+            aNInput.set('6,789,012.345');
+            expect(aNInput.getFormatted()).toEqual('$6,789,012.35');
+        });
+
+        it('should respect the minimumValue and maximumValue settings', () => {
+            aNInput.update({ minimumValue: '999999.99', maximumValue: '1111111111111.11' });
+            expect(() => aNInput.set(999999.99)).not.toThrow();
+            expect(() => aNInput.set(1111111111111.11)).not.toThrow();
+
+            expect(() => aNInput.set(999999.984)).toThrow(); // Min, with rounding up
+            expect(() => aNInput.set(999999.989)).toThrow(); // Min, even without rounding
+            expect(() => aNInput.set(999999.991)).not.toThrow();
+            expect(() => aNInput.set(1111111111111.109)).not.toThrow();
+            expect(() => aNInput.set(1111111111111.111)).toThrow(); // Max
+        });
+
+        it('should respect the minimumValue and maximumValue settings', () => {
+            aNInput.update({ minimumValue: '999999.99', maximumValue: '1111111111111.11' });
+            expect(() => aNInput.set(999999.99)).not.toThrow();
+            expect(() => aNInput.set(1111111111111.11)).not.toThrow();
+
+            expect(() => aNInput.set(999999.984)).toThrow(); // Min, with rounding up
+            expect(() => aNInput.set(999999.989)).toThrow(); // Min, even without rounding
+            expect(() => aNInput.set(999999.991)).not.toThrow();
+            expect(() => aNInput.set(1111111111111.109)).not.toThrow();
+            expect(() => aNInput.set(1111111111111.111)).toThrow(); // Max
+        });
+
+        it('should respect the minimumValue and maximumValue settings', () => {
+            aNInput.update({ minimumValue: '999999.99', maximumValue: '1111111111111.11' });
+            expect(() => aNInput.set(999999.99)).not.toThrow();
+            expect(() => aNInput.set(1111111111111.11)).not.toThrow();
+
+            expect(() => aNInput.set(999999.984)).toThrow(); // Min, with rounding up
+            expect(() => aNInput.set(999999.989)).toThrow(); // Min, even without rounding
+            expect(() => aNInput.set(999999.991)).not.toThrow();
+            expect(() => aNInput.set(1111111111111.109)).not.toThrow();
+            expect(() => aNInput.set(1111111111111.111)).toThrow(); // Max
+        });
+    });
+
+    describe('`set` and non-ascii numbers', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput, { digitGroupSeparator : ',', decimalCharacter : '.' }); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should accepts Arabic numbers', () => {
+            expect(aNInput.getNumericString()).toEqual('');
+            aNInput.set('١٠٢٣٤٥٦٧.٨٩');
+            expect(aNInput.getNumericString()).toEqual('10234567.89');
+            expect(aNInput.getNumber()).toEqual(10234567.89);
+            expect(aNInput.getFormatted()).toEqual('10,234,567.89');
+        });
+
+        it('should accepts Persian numbers', () => {
+            expect(aNInput.getNumericString()).toEqual('');
+            aNInput.set('۱٠۲۳۴۵۶۷.۸۹');
+            expect(aNInput.getNumericString()).toEqual('10234567.89');
+            expect(aNInput.getNumber()).toEqual(10234567.89);
+            expect(aNInput.getFormatted()).toEqual('10,234,567.89');
+        });
+    });
+
+    describe(`setUnformatted`, () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should set the given value as is, without formatting it', () => {
+            aNInput.french();
+            aNInput.setUnformatted(1234.56);
+            expect(aNInput.getFormatted()).toEqual('1234.56');
+            aNInput.setUnformatted(6789012.345);
+            expect(aNInput.getFormatted()).toEqual('6789012.345');
+            aNInput.setUnformatted('2.172.834,23\u202f€');
+            expect(aNInput.getFormatted()).toEqual('2.172.834,23\u202f€');
+
+            aNInput.set(500);
+            aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.curlyBraces);
+            aNInput.setUnformatted('{1234.56}');
+            expect(aNInput.getFormatted()).toEqual('{1234.56}');
+
+            aNInput.set(500);
+            aNInput.options.suffixText(AutoNumeric.options.suffixText.percentage);
+            aNInput.setUnformatted('1234.56%');
+            expect(aNInput.getFormatted()).toEqual('1234.56%');
+        });
+
+        it('should fail when trying to set a value outside the range limits', () => {
+            aNInput.french({ minimumValue: -50, maximumValue: 200, decimalPlaces: 0 });
+
+            expect(() => aNInput.setUnformatted(-51)).toThrow();
+            expect(() => aNInput.setUnformatted(-50)).not.toThrow();
+            expect(() => aNInput.setUnformatted(0)).not.toThrow();
+            expect(() => aNInput.setUnformatted(10)).not.toThrow();
+            expect(() => aNInput.setUnformatted(200)).not.toThrow();
+            expect(() => aNInput.setUnformatted(201)).toThrow();
+        });
+
+        it('should fail when trying to set an invalid value', () => {
+            expect(() => aNInput.setUnformatted('foobar')).toThrow();
+        });
+
+        it('should not set anything when the given value is null or undefined', () => {
+            aNInput.french();
+            aNInput.set(2222.22);
+            expect(aNInput.getFormatted()).toEqual('2.222,22\u202f€');
+            aNInput.setUnformatted(null);
+            expect(aNInput.getFormatted()).toEqual('2.222,22\u202f€');
+            aNInput.setUnformatted();
+            expect(aNInput.getFormatted()).toEqual('2.222,22\u202f€');
+        });
+    });
+
+    describe(`setValue`, () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should set the given value without formatting it, and without checking it', () => {
+            aNInput.french();
+            aNInput.setValue(1234.56);
+            expect(aNInput.getFormatted()).toEqual('1234.56');
+            aNInput.setValue(6789012.345);
+            expect(aNInput.getFormatted()).toEqual('6789012.345');
+
+            aNInput.setValue('foobar');
+            expect(aNInput.getFormatted()).toEqual('foobar');
+        });
+    });
+
+    describe(`_setElementAndRawValue`, () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should set the given values (element and raw value) without formatting it, and without checking it', () => {
+            aNInput.french();
+            aNInput._setElementAndRawValue('newElementValue', 'rawValue');
+            expect(aNInput.getFormatted()).toEqual('newElementValue');
+            expect(aNInput.rawValue).toEqual('rawValue');
+
+            aNInput._setElementAndRawValue('sameValue');
+            expect(aNInput.getFormatted()).toEqual('sameValue');
+            expect(aNInput.rawValue).toEqual('sameValue');
+
+            aNInput._setElementAndRawValue('sameValueAgain', false);
+            expect(aNInput.getFormatted()).toEqual('sameValueAgain');
+            expect(aNInput.rawValue).toEqual('sameValueAgain');
+        });
+    });
+
+    describe('`update`', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput).french(); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.nuke();
+        });
+
+        it('should update the options with one option object', () => {
+            aNInput.set(2172834.234);
+            expect(aNInput.getFormatted()).toEqual('2.172.834,23\u202f€');
+
+            aNInput.update({ currencySymbol: AutoNumeric.options.currencySymbol.pound });
+            expect(aNInput.getFormatted()).toEqual('2.172.834,23£');
+        });
+
+        it('should update the options with multiple option objects', () => {
+            aNInput.set(2172834.234);
+            expect(aNInput.getFormatted()).toEqual('2.172.834,23\u202f€');
+
+            // Objects overwriting themselves
+            aNInput.update({ currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                           { currencySymbol:  AutoNumeric.options.currencySymbol.franc });
+            expect(aNInput.getFormatted()).toEqual('2.172.834,23₣');
+
+            // Objects completing themselves
+            aNInput.update(AutoNumeric.getPredefinedOptions().NorthAmerican,
+                           {
+                               currencySymbol     : AutoNumeric.options.currencySymbol.currencySign,
+                               digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                           },
+                           {
+                               decimalCharacter       : AutoNumeric.options.decimalCharacter.decimalSeparatorKeySymbol,
+                               currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.suffix,
+                           });
+            expect(aNInput.getFormatted()).toEqual("2'172'834⎖23¤");
+        });
+    });
+
+    describe('`selectDecimal`', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput).french(); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should select only the decimal part', () => {
+            expect(aNInput.getNumericString()).toEqual('');
+            aNInput.set(2172834.234);
+            expect(aNInput.getNumericString()).toEqual('2172834.23');
+            expect(aNInput.getNumber()).toEqual(2172834.23);
+            expect(aNInput.getFormatted()).toEqual('2.172.834,23\u202f€');
+
+            aNInput.select();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(12);
+
+            aNInput.options.selectNumberOnly(AutoNumeric.options.selectNumberOnly.selectAll);
+            aNInput.select();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(14);
+
+            aNInput.selectDecimal();
+            expect(aNInput.node().selectionStart).toEqual(10);
+            expect(aNInput.node().selectionEnd).toEqual(12);
+
+            // Bigger number of decimals
+            aNInput.set(12266.1234567, { minimumValue: '0', maximumValue: '9999999', decimalPlaces: 7 });
+            expect(aNInput.getFormatted()).toEqual('12.266,1234567\u202f€');
+            aNInput.selectDecimal();
+            expect(aNInput.node().selectionStart).toEqual(7);
+            expect(aNInput.node().selectionEnd).toEqual(14);
+
+            // No decimal part
+            aNInput.set(12266, { minimumValue: '0', maximumValue: '9999999', decimalPlaces: 0 });
+            expect(aNInput.getFormatted()).toEqual('12.266\u202f€');
+            aNInput.selectDecimal();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(0);
+
+            // Decimal places shown on focus //FIXME Move this test to the end-to-end tests
+            /*aNInput.set(12266.1234567, { minimumValue: '0', maximumValue: '9999999.9999999', decimalPlaces: 3, decimalPlacesShownOnFocus: 6 });
+            expect(aNInput.getFormatted()).toEqual('12.266,123\u202f€');
+            aNInput.selectDecimal();
+            expect(aNInput.node().selectionStart).toEqual(7);
+            expect(aNInput.node().selectionEnd).toEqual(10);
+            aNInput.node().focus();
+            expect(aNInput.getFormatted()).toEqual('12.266,123456\u202f€'); //FIXME à terminer
+            // aNInput.node().select();
+            aNInput.selectDecimal();
+            expect(aNInput.node().selectionStart).toEqual(7);
+            expect(aNInput.node().selectionEnd).toEqual(13); //FIXME à terminer*/
+        });
+    });
+
+    describe('`selectInteger`', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput).french(); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should select only the decimal part', () => {
+            expect(aNInput.getNumericString()).toEqual('');
+            aNInput.set(2172834.234);
+            expect(aNInput.getNumericString()).toEqual('2172834.23');
+            expect(aNInput.getNumber()).toEqual(2172834.23);
+            expect(aNInput.getFormatted()).toEqual('2.172.834,23\u202f€');
+
+            aNInput.select();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(12);
+
+            aNInput.options.selectNumberOnly(AutoNumeric.options.selectNumberOnly.selectAll);
+            aNInput.select();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(14);
+
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(9);
+
+            // Changing the number of integer places
+            aNInput.set(12266.1);
+            expect(aNInput.getFormatted()).toEqual('12.266,10\u202f€');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(6);
+            aNInput.set(352.1);
+            expect(aNInput.getFormatted()).toEqual('352,10\u202f€');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(3);
+
+            // A small integer part
+            aNInput.set(0.234, { minimumValue: '0', maximumValue: '9999999', decimalPlaces: 3 });
+            expect(aNInput.getFormatted()).toEqual('0,234\u202f€');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(1);
+
+            // Decimal places shown on focus
+            aNInput.set(12266.1234567, { minimumValue: '0', maximumValue: '9999999', decimalPlaces: 3, decimalPlacesShownOnFocus: 6 });
+            expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('6');
+            expect(aNInput.getSettings().decimalPlacesShownOnFocus).toEqual('6');
+            expect(aNInput.getSettings().decimalPlacesShownOnBlur).toEqual('3');
+            expect(aNInput.getFormatted()).toEqual('12.266,123\u202f€');
+            aNInput.selectDecimal();
+            expect(aNInput.node().selectionStart).toEqual(7);
+            expect(aNInput.node().selectionEnd).toEqual(10);
+
+            aNInput.node().focus();
+            expect(aNInput.getFormatted()).toEqual('12.266,123457\u202f€');
+            aNInput.selectDecimal();
+            expect(aNInput.node().selectionStart).toEqual(7);
+            expect(aNInput.node().selectionEnd).toEqual(13);
+
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(6);
+
+            //TODO Test the decimalPlacesShownOnBlur with the selections
+
+            // Common configuration
+            aNInput.update({ suffixText: 'suffixText', minimumValue: '-9999999', maximumValue: '9999999', decimalPlaces: 2 });
+
+            // Test each possible combination
+
+            // -1.234,57suffixText
+            aNInput.set(1234.57, { negativePositiveSignPlacement: null, currencySymbol: '', showPositiveSign: false });
+            expect(aNInput.getFormatted()).toEqual('1.234,57suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(5);
+
+            aNInput.update({ showPositiveSign: true, negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix });
+            expect(aNInput.getFormatted()).toEqual('+1.234,57suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(1);
+            expect(aNInput.node().selectionEnd).toEqual(6);
+
+            expect(aNInput.set(-1234.57).getFormatted()).toEqual('-1.234,57suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(6);
+
+            // € +1.234,57suffixText
+            aNInput.set(1234.57).update({ currencySymbol: '€ ', currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.prefix, showPositiveSign: true, negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right });
+            expect(aNInput.getFormatted()).toEqual('€ +1.234,57suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(3);
+            expect(aNInput.node().selectionEnd).toEqual(8);
+
+            aNInput.update({ showPositiveSign: false });
+            expect(aNInput.getFormatted()).toEqual('€ 1.234,57suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(2);
+            expect(aNInput.node().selectionEnd).toEqual(7);
+
+            expect(aNInput.set(-1234.57).getFormatted()).toEqual('€ -1.234,57suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(2);
+            expect(aNInput.node().selectionEnd).toEqual(8);
+
+            // +€ 1.234,57suffixText
+            aNInput.set(1234.57).update({ showPositiveSign: true, negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.left });
+            expect(aNInput.getFormatted()).toEqual('+€ 1.234,57suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(3);
+            expect(aNInput.node().selectionEnd).toEqual(8);
+
+            aNInput.update({ showPositiveSign: false });
+            expect(aNInput.getFormatted()).toEqual('€ 1.234,57suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(2);
+            expect(aNInput.node().selectionEnd).toEqual(7);
+
+            expect(aNInput.set(-1234.57).getFormatted()).toEqual('-€ 1.234,57suffixText'); // Selecting the integer part here is problematic, due to the currency sign
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(3);
+            expect(aNInput.node().selectionEnd).toEqual(8);
+
+            // 1.234,57+ €suffixText
+            aNInput.set(1234.57).update({ showPositiveSign: true, negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.left, currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.suffix, currencySymbol: ' €' });
+            expect(aNInput.getFormatted()).toEqual('1.234,57+ €suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(5);
+
+            aNInput.update({ showPositiveSign: false });
+            expect(aNInput.getFormatted()).toEqual('1.234,57 €suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(5);
+
+            expect(aNInput.set(-1234.57).getFormatted()).toEqual('1.234,57- €suffixText'); // Selecting the integer part here is problematic, due to the currency sign
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(5);
+
+            // 1.234,57 €+suffixText
+            aNInput.set(1234.57).update({ showPositiveSign: true, negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right });
+            expect(aNInput.getFormatted()).toEqual('1.234,57 €+suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(5);
+
+            aNInput.update({ showPositiveSign: false });
+            expect(aNInput.getFormatted()).toEqual('1.234,57 €suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(5);
+
+            expect(aNInput.set(-1234.57).getFormatted()).toEqual('1.234,57 €-suffixText'); // Selecting the integer part here is problematic, due to the currency sign
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(5);
+
+            // +1.234,57 €suffixText
+            aNInput.set(1234.57).update({ showPositiveSign: true, negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix });
+            expect(aNInput.getFormatted()).toEqual('+1.234,57 €suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(1);
+            expect(aNInput.node().selectionEnd).toEqual(6);
+
+            aNInput.update({ showPositiveSign: false });
+            expect(aNInput.getFormatted()).toEqual('1.234,57 €suffixText');
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(5);
+
+            expect(aNInput.set(-1234.57).getFormatted()).toEqual('-1.234,57 €suffixText'); // Selecting the integer part here is problematic, due to the currency sign
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(6);
+        });
+    });
+
+    describe('`reformat`, `unformat` and `unformatLocalized` methods', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput).french(); // Initiate the autoNumeric input
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+        });
+
+        it('should `unformat` the element value, then `reformat` it correctly', () => {
+            aNInput.set(1234567.89);
+            expect(aNInput.getFormatted()).toEqual('1.234.567,89\u202f€');
+            expect(aNInput.unformat().getFormatted()).toEqual('1234567.89');
+            expect(aNInput.reformat().getFormatted()).toEqual('1.234.567,89\u202f€');
+            /* eslint newline-per-chained-call: 0 */
+            expect(aNInput.northAmerican().getFormatted()).toEqual('$1,234,567.89');
+            expect(aNInput.unformat().getFormatted()).toEqual('1234567.89');
+        });
+
+        it('should `unformatLocalized` the element value, then `reformat` it correctly', () => {
+            aNInput.set(-1234567.89, { outputFormat: AutoNumeric.options.outputFormat.commaNegative });
+            expect(aNInput.getFormatted()).toEqual('-1.234.567,89\u202f€');
+            expect(aNInput.unformatLocalized().getFormatted()).toEqual('1234567,89-');
+            expect(aNInput.reformat().getFormatted()).toEqual('-1.234.567,89\u202f€');
+            /* eslint newline-per-chained-call: 0 */
+            expect(aNInput.northAmerican().getFormatted()).toEqual('$-1,234,567.89');
+            expect(aNInput.unformatLocalized().getFormatted()).toEqual('1234567,89-');
+            expect(aNInput.unformatLocalized(AutoNumeric.options.outputFormat.number).getFormatted()).toEqual('-1234567.89');
+            expect(aNInput.unformatLocalized().getFormatted()).toEqual('1234567,89-');
+            expect(aNInput.reformat().getFormatted()).toEqual('$-1,234,567.89');
+        });
+    });
+
+    describe(`'form*' methods`, () => {
+        let form;
+        let input1;
+        let input2;
+        let input3;
+        let input4;
+        let input5;
+        let anInput1;
+        let anInput2;
+        let anInput3;
+
+        beforeEach(() => { // Initialization
+            form = document.createElement('form');
+            input1 = document.createElement('input');
+            input2 = document.createElement('input');
+            input3 = document.createElement('input');
+            input4 = document.createElement('input');
+            input5 = document.createElement('input');
+
+            document.body.appendChild(form);
+            form.appendChild(input1);
+            form.appendChild(input2);
+            form.appendChild(input3);
+            form.appendChild(input4);
+            form.appendChild(input5);
+
+            input1.name = 'aa';
+            input2.name = 'bb';
+            input3.name = 'cc';
+            input4.name = 'ab';
+            input5.name = 'bc';
+
+            input1.value = '1111.11';
+            expect(input1.value).toEqual('1111.11');
+            input2.value = '-2222.22';
+            input3.value = '3333.33';
+            input4.value = 'not autoNumeric test';
+            expect(input4.value).toEqual('not autoNumeric test');
+            input5.value = 'not autoNumeric $1,234.567';
+            expect(input5.value).toEqual('not autoNumeric $1,234.567');
+
+            // Initiate only 3 autoNumeric inputs
+            const anOptions = { digitGroupSeparator: '.', decimalCharacter: ',', currencySymbol: '€ ' };
+            anInput1 = new AutoNumeric(input1, anOptions);
+            anInput2 = new AutoNumeric(input2, anOptions);
+            anInput3 = new AutoNumeric(input3, anOptions);
+
+            expect(input1.value).toEqual('€ 1.111,11');
+            expect(anInput1.getFormatted()).toEqual('€ 1.111,11');
+            anInput1.update(anOptions);
+            expect(anInput1.getFormatted()).toEqual('€ 1.111,11');
+        });
+
+        afterEach(() => { // Un-initialization
+            anInput1.remove();
+            anInput2.remove();
+            anInput3.remove();
+            form.removeChild(input1);
+            form.removeChild(input2);
+            form.removeChild(input3);
+            form.removeChild(input4);
+            form.removeChild(input5);
+            document.body.removeChild(form);
+        });
+
+        it(`'formNumericString()' should return the correct string, with unformatted values`, () => {
+            expect(anInput1.formNumericString()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
+            anInput1.update({ serializeSpaces : '%20' });
+            expect(anInput1.formNumericString()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not%20autoNumeric%20test&bc=not%20autoNumeric%20%241%2C234.567');
+        });
+
+        it(`'formFormatted()' should return the correct string, with formatted values`, () => {
+            expect(anInput1.formFormatted()).toEqual('aa=%E2%82%AC+1.111%2C11&bb=-%E2%82%AC+2.222%2C22&cc=%E2%82%AC+3.333%2C33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
+            anInput1.update({ serializeSpaces : '%20' });
+            expect(anInput1.formFormatted()).toEqual('aa=%E2%82%AC%201.111%2C11&bb=-%E2%82%AC%202.222%2C22&cc=%E2%82%AC%203.333%2C33&ab=not%20autoNumeric%20test&bc=not%20autoNumeric%20%241%2C234.567');
+        });
+
+        it(`'formLocalized()' should return the correct string, with formatted values`, () => {
+            anInput1.update({ outputFormat : null });
+            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
+            anInput1.update({ outputFormat : 'string' });
+            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
+            anInput1.update({ outputFormat : 'number' });
+            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
+            expect(anInput1.formLocalized(',-')).toEqual('aa=1111%2C11&bb=2222%2C22-&cc=3333%2C33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
+            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
+            anInput1.update({ outputFormat : ',-' });
+            expect(anInput1.formLocalized()).toEqual('aa=1111%2C11&bb=2222%2C22-&cc=3333%2C33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
+            anInput1.update({ outputFormat : '.-' });
+            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=2222.22-&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
+            anInput1.update({ outputFormat : '-,' });
+            expect(anInput1.formLocalized()).toEqual('aa=1111%2C11&bb=-2222%2C22&cc=3333%2C33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
+            anInput1.update({ outputFormat : '-.' });
+            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
+        });
+
+        it(`'formArrayNumericString()' should return the correct array`, () => {
+            const arrayResult = [
+                {
+                    name: 'aa',
+                    value: '1111.11' ,
+                },
+                {
+                    name : 'bb',
+                    value: '-2222.22',
+                },
+                {
+                    name : 'cc',
+                    value: '3333.33',
+                },
+                {
+                    name: 'ab',
+                    value: 'not autoNumeric test',
+                },
+                {
+                    name: 'bc',
+                    value: 'not autoNumeric $1,234.567',
+                },
+            ];
+            expect(anInput1.formArrayNumericString()).toEqual(arrayResult);
+        });
+
+        it(`'formArrayFormatted()' should return the correct array`, () => {
+            const arrayResult = [
+                {
+                    name: 'aa',
+                    value: '€ 1.111,11',
+                },
+                {
+                    name : 'bb',
+                    value: '-€ 2.222,22',
+                },
+                {
+                    name : 'cc',
+                    value: '€ 3.333,33',
+                },
+                {
+                    name: 'ab',
+                    value: 'not autoNumeric test',
+                },
+                {
+                    name: 'bc',
+                    value: 'not autoNumeric $1,234.567',
+                },
+            ];
+            expect(anInput1.formArrayFormatted()).toEqual(arrayResult);
+        });
+
+        it(`'formArrayLocalized()' should return the correct array`, () => {
+            const arrayResult1 = [
+                {
+                    name: 'aa',
+                    value: '1111.11' ,
+                },
+                {
+                    name : 'bb',
+                    value: '-2222.22',
+                },
+                {
+                    name : 'cc',
+                    value: '3333.33',
+                },
+                {
+                    name: 'ab',
+                    value: 'not autoNumeric test',
+                },
+                {
+                    name: 'bc',
+                    value: 'not autoNumeric $1,234.567',
+                },
+            ];
+            expect(anInput1.formArrayLocalized()).toEqual(arrayResult1);
+            const arrayResult2 = [
+                {
+                    name: 'aa',
+                    value: '1111,11' ,
+                },
+                {
+                    name : 'bb',
+                    value: '2222,22-',
+                },
+                {
+                    name : 'cc',
+                    value: '3333,33',
+                },
+                {
+                    name: 'ab',
+                    value: 'not autoNumeric test',
+                },
+                {
+                    name: 'bc',
+                    value: 'not autoNumeric $1,234.567',
+                },
+            ];
+            expect(anInput1.formArrayLocalized(',-')).toEqual(arrayResult2);
+            anInput1.update({ outputFormat : ',-' });
+            expect(anInput1.formArrayLocalized()).toEqual(arrayResult2);
+        });
+
+        it(`'formJsonNumericString()' should return the correct JSON object`, () => {
+            const jsonResult = JSON.stringify([
+                {
+                    name: 'aa',
+                    value: '1111.11' ,
+                },
+                {
+                    name : 'bb',
+                    value: '-2222.22',
+                },
+                {
+                    name : 'cc',
+                    value: '3333.33',
+                },
+                {
+                    name: 'ab',
+                    value: 'not autoNumeric test',
+                },
+                {
+                    name: 'bc',
+                    value: 'not autoNumeric $1,234.567',
+                },
+            ]);
+            expect(anInput1.formJsonNumericString()).toEqual(jsonResult);
+        });
+
+        it(`'formJsonFormatted()' should return the correct JSON object`, () => {
+            const jsonResult = JSON.stringify([
+                {
+                    name: 'aa',
+                    value: '€ 1.111,11',
+                },
+                {
+                    name : 'bb',
+                    value: '-€ 2.222,22',
+                },
+                {
+                    name : 'cc',
+                    value: '€ 3.333,33',
+                },
+                {
+                    name: 'ab',
+                    value: 'not autoNumeric test',
+                },
+                {
+                    name: 'bc',
+                    value: 'not autoNumeric $1,234.567',
+                },
+            ]);
+            expect(anInput1.formJsonFormatted()).toEqual(jsonResult);
+        });
+
+        it(`'formJsonLocalized()' should return the correct JSON object`, () => {
+            const jsonResult1 = JSON.stringify([
+                {
+                    name: 'aa',
+                    value: '1111.11' ,
+                },
+                {
+                    name : 'bb',
+                    value: '-2222.22',
+                },
+                {
+                    name : 'cc',
+                    value: '3333.33',
+                },
+                {
+                    name: 'ab',
+                    value: 'not autoNumeric test',
+                },
+                {
+                    name: 'bc',
+                    value: 'not autoNumeric $1,234.567',
+                },
+            ]);
+            expect(anInput1.formJsonLocalized()).toEqual(jsonResult1);
+            const jsonResult2 = JSON.stringify([
+                {
+                    name: 'aa',
+                    value: '1111,11' ,
+                },
+                {
+                    name : 'bb',
+                    value: '2222,22-',
+                },
+                {
+                    name : 'cc',
+                    value: '3333,33',
+                },
+                {
+                    name: 'ab',
+                    value: 'not autoNumeric test',
+                },
+                {
+                    name: 'bc',
+                    value: 'not autoNumeric $1,234.567',
+                },
+            ]);
+            expect(anInput1.formJsonLocalized(',-')).toEqual(jsonResult2);
+            anInput1.update({ outputFormat : ',-' });
+            expect(anInput1.formJsonLocalized()).toEqual(jsonResult2);
+        });
+
+        it(`should modify the parent form reference if it's changed and \`form()\` is 'forced'`, () => {
+            // Get the initial parent form element reference
+            const initialForm = anInput1.form();
+            initialForm.id = 'initialForm';
+
+            // Modify the parent form
+            const secondForm = document.createElement('form');
+            secondForm.id = 'secondForm';
+            document.body.appendChild(secondForm);
+            secondForm.appendChild(input1);
+
+            // Get the parent form reference
+            const sameInitialParentForm = anInput1.form();
+            expect(initialForm.id).toEqual(sameInitialParentForm.id);
+            const newParentForm = anInput1.form(true);
+            expect(initialForm.id).not.toEqual(newParentForm.id);
+            expect(newParentForm.id).toEqual(secondForm.id);
+
+            // Un-initialize the form element
+            form.appendChild(input1);
+            document.body.removeChild(secondForm);
+        });
+
+        //FIXME Add the tests for : formUnformat, formReformat, formSubmit*
+    });
+
+    //TODO Complete the tests in order to test every single method separately:
+    /*
+     isPristine
+     select
+     selectNumber
+     selectInteger
+     selectDecimal
+     clear
+
+     remove
+     wipe
+     nuke
+
+     node
+     parent
+     detach
+     attach
+
+     formatOther
+     unformatOther
+
+     init
+     */
+});
+
+describe('`global.*` functions', () => {
+    describe('provides public methods (size, set, setUnformatted, update, reformat, unformat, unformatLocalized, isPristine, get, getNumericString, getFormatted, getNumber, getLocalized, clear, remove, wipe, has, addObject, removeObject, empty, elements and getList) for modifying multiple AutoNumeric objects sharing the same local list at once', () => {
+        let newInput1;
+        let newInput2;
+        let newInput3;
+        let newInput4;
+        let newInput5;
+        const options = { currencySymbol: ' €', currencySymbolPlacement: 's', decimalCharacter: ',', digitGroupSeparator: ' ', outputFormat: ',-' };
+
+        beforeEach(() => { // Initialization
+            newInput1 = document.createElement('input');
+            newInput2 = document.createElement('input');
+            newInput3 = document.createElement('input');
+            newInput4 = document.createElement('input');
+            newInput5 = document.createElement('input');
+            document.body.appendChild(newInput1);
+            document.body.appendChild(newInput2);
+            document.body.appendChild(newInput3);
+            document.body.appendChild(newInput4);
+            document.body.appendChild(newInput5);
+            newInput1.name = 'nameInput1';
+            newInput2.name = 'nameInput2';
+            newInput3.name = 'nameInput3';
+            newInput4.name = 'nameInput4';
+            newInput5.name = 'nameInput5';
+        });
+
+        afterEach(() => { // Un-initialization
+            document.body.removeChild(newInput1);
+            document.body.removeChild(newInput2);
+            document.body.removeChild(newInput3);
+            document.body.removeChild(newInput4);
+            document.body.removeChild(newInput5);
+        });
+
+        it('should initialize multiple DOM elements stored in an Array, from an existing AutoNumeric object', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const newAnElements = anElement1.init([newInput2, newInput3, newInput4, newInput5]);
+            const [anElement2, anElement3, anElement4, anElement5] = newAnElements;
+
+            expect(anElement1.set(22).getFormatted()).toEqual('22,00 €');
+            expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+            expect(anElement3.set(187568.243).getFormatted()).toEqual('187 568,24 €');
+            expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            expect(anElement5.set(1028.005).getFormatted()).toEqual('1 028,01 €');
+            expect(anElement4.global.size()).toEqual(5);
+
+            // Then test that those elements share the same local list
+            anElement2.global.set(1223355.66);
+            expect(anElement1.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement2.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement4.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement5.getFormatted()).toEqual('1 223 355,66 €');
+
+            // ...and that removing one from the list is taken into account
+            anElement3.global.removeObject(newInput3);
+            expect(anElement4.global.size()).toEqual(4);
+            anElement2.global.set(42);
+            expect(anElement1.getFormatted()).toEqual('42,00 €');
+            expect(anElement2.getFormatted()).toEqual('42,00 €');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement4.getFormatted()).toEqual('42,00 €');
+            expect(anElement5.getFormatted()).toEqual('42,00 €');
+        });
+
+        it('should initialize multiple DOM elements selected with a CSS selector, from an existing AutoNumeric object', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            newInput2.classList.add('testingCSSSelector');
+            newInput3.classList.add('testingCSSSelector');
+            newInput4.classList.add('testingCSSSelector');
+            newInput5.classList.add('testingCSSSelector');
+            const newAnElements = anElement1.init('.testingCSSSelector');
+            const [anElement2, anElement3, anElement4, anElement5] = newAnElements;
+
+            expect(anElement1.set(22).getFormatted()).toEqual('22,00 €');
+            expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+            expect(anElement3.set(187568.243).getFormatted()).toEqual('187 568,24 €');
+            expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            expect(anElement5.set(1028.005).getFormatted()).toEqual('1 028,01 €');
+            expect(anElement4.global.size()).toEqual(5);
+
+            // Then test that those elements share the same local list
+            anElement2.global.set(1223355.66);
+            expect(anElement1.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement2.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement4.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement5.getFormatted()).toEqual('1 223 355,66 €');
+
+            // ...and that removing one from the list is taken into account
+            anElement3.global.removeObject(newInput3);
+            expect(anElement4.global.size()).toEqual(4);
+            anElement2.global.set(42);
+            expect(anElement1.getFormatted()).toEqual('42,00 €');
+            expect(anElement2.getFormatted()).toEqual('42,00 €');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement4.getFormatted()).toEqual('42,00 €');
+            expect(anElement5.getFormatted()).toEqual('42,00 €');
+        });
+
+        it('should initialize other DOM element from an existing AutoNumeric object, and `set` the values globally across those elements', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            expect(anElement1.set(22).getFormatted()).toEqual('22,00 €');
+            expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+            expect(anElement3.set(187568.243).getFormatted()).toEqual('187 568,24 €');
+            expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            expect(anElement5.set(1028.005).getFormatted()).toEqual('1 028,01 €');
+            expect(anElement4.global.size()).toEqual(5);
+
+            // Then test that those elements share the same local list
+            anElement2.global.set(1223355.66);
+            expect(anElement1.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement2.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement4.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement5.getFormatted()).toEqual('1 223 355,66 €');
+
+            // ...and that removing one from the list is taken into account
+            anElement3.global.removeObject(newInput3);
+            expect(anElement4.global.size()).toEqual(4);
+            anElement2.global.set(42);
+            expect(anElement1.getFormatted()).toEqual('42,00 €');
+            expect(anElement2.getFormatted()).toEqual('42,00 €');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement4.getFormatted()).toEqual('42,00 €');
+            expect(anElement5.getFormatted()).toEqual('42,00 €');
+        });
+
+        it('should update the settings globally', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            expect(anElement1.set(22).getFormatted()).toEqual('22,00 €');
+            expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+            expect(anElement3.set(187568.243).getFormatted()).toEqual('187 568,24 €');
+            expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            expect(anElement5.set(1028.005).getFormatted()).toEqual('1 028,01 €');
+            expect(anElement4.global.size()).toEqual(5);
+
+            // Then test that those elements share the same local list
+            anElement2.global.set(1223355.66);
+            expect(anElement1.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement2.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement4.getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement5.getFormatted()).toEqual('1 223 355,66 €');
+
+            // Update the elements with one option object
+            anElement3.global.update({ currencySymbol: AutoNumeric.options.currencySymbol.franc });
+            expect(anElement1.getFormatted()).toEqual('1 223 355,66₣');
+            expect(anElement2.getFormatted()).toEqual('1 223 355,66₣');
+            expect(anElement3.getFormatted()).toEqual('1 223 355,66₣');
+            expect(anElement4.getFormatted()).toEqual('1 223 355,66₣');
+            expect(anElement5.getFormatted()).toEqual('1 223 355,66₣');
+
+            // Update the elements with multiple option objects
+            anElement3.global.update({ currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                                     {
+                                         currencySymbol: AutoNumeric.options.currencySymbol.dollar,
+                                         digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.apostrophe,
+                                     }
+            );
+            expect(anElement1.getFormatted()).toEqual("1'223'355,66$");
+            expect(anElement2.getFormatted()).toEqual("1'223'355,66$");
+            expect(anElement3.getFormatted()).toEqual("1'223'355,66$");
+            expect(anElement4.getFormatted()).toEqual("1'223'355,66$");
+            expect(anElement5.getFormatted()).toEqual("1'223'355,66$");
+        });
+
+        it('should `setUnformatted` the values globally across those elements', () => {
+            newInput5.value = '88764.24';
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            expect(anElement1.set(22).getFormatted()).toEqual('22,00 €');
+            expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+            expect(anElement3.set(187568.243).getFormatted()).toEqual('187 568,24 €');
+            expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            expect(anElement5.getFormatted()).toEqual('88 764,24 €');
+
+            // Test that those elements share the same local list
+            anElement2.global.setUnformatted(1223355.66);
+            expect(anElement1.getFormatted()).toEqual('1223355.66');
+            expect(anElement2.getFormatted()).toEqual('1223355.66');
+            expect(anElement3.getFormatted()).toEqual('1223355.66');
+            expect(anElement4.getFormatted()).toEqual('1223355.66');
+            expect(anElement5.getFormatted()).toEqual('1223355.66');
+
+            // The unformatted value can be formatted using `reformat`. This does not affect the other elements.
+            expect(anElement3.reformat().getFormatted()).toEqual('1 223 355,66 €');
+            expect(anElement4.getFormatted()).toEqual('1223355.66');
+        });
+
+        it('should `reformat` the values globally across those elements', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            expect(anElement1.set(22).getFormatted()).toEqual('22,00 €');
+            expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+            expect(anElement3.set(187568.243).getFormatted()).toEqual('187 568,24 €');
+            expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            expect(anElement5.getFormatted()).toEqual('');
+
+            // Test that those elements share the same local list
+            anElement2.global.setUnformatted(20241.08);
+            expect(anElement1.getFormatted()).toEqual('20241.08');
+            expect(anElement2.getFormatted()).toEqual('20241.08');
+            expect(anElement3.getFormatted()).toEqual('20241.08');
+            expect(anElement4.getFormatted()).toEqual('20241.08');
+            expect(anElement5.getFormatted()).toEqual('20241.08');
+
+            // Reformat the elements globally
+            anElement3.global.reformat();
+            expect(anElement1.getFormatted()).toEqual('20 241,08 €');
+            expect(anElement2.getFormatted()).toEqual('20 241,08 €');
+            expect(anElement3.getFormatted()).toEqual('20 241,08 €');
+            expect(anElement4.getFormatted()).toEqual('20 241,08 €');
+            expect(anElement5.getFormatted()).toEqual('20 241,08 €');
+        });
+
+        it('should `unformat` the values globally across those elements', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            expect(anElement1.set(22).getFormatted()).toEqual('22,00 €');
+            expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+            expect(anElement3.set(187568.243).getFormatted()).toEqual('187 568,24 €');
+            expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            expect(anElement5.getFormatted()).toEqual('');
+
+            // Unformat the elements globally
+            anElement3.global.unformat();
+            expect(anElement1.getFormatted()).toEqual('22');
+            expect(anElement2.getFormatted()).toEqual('13568.24');
+            expect(anElement3.getFormatted()).toEqual('187568.24');
+            expect(anElement4.getFormatted()).toEqual('21613568.24');
+            expect(anElement5.getFormatted()).toEqual('');
+        });
+
+        it('should `unformatLocalized` the values globally across those elements', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            expect(anElement1.set(22).getFormatted()).toEqual('22,00 €');
+            expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+            expect(anElement3.set(-187568.243).getFormatted()).toEqual('-187 568,24 €');
+            expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            expect(anElement5.getFormatted()).toEqual('');
+
+            // Unformat the elements globally
+            anElement3.global.unformatLocalized();
+            expect(anElement1.getFormatted()).toEqual('22');
+            expect(anElement2.getFormatted()).toEqual('13568,24');
+            expect(anElement3.getFormatted()).toEqual('187568,24-');
+            expect(anElement4.getFormatted()).toEqual('21613568,24');
+            expect(anElement5.getFormatted()).toEqual('');
+        });
+
+        it('should `unformatLocalized` the values globally across those elements, while forcing the output format', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            expect(anElement1.set(22).getFormatted()).toEqual('22,00 €');
+            expect(anElement2.set(13568.243).getFormatted()).toEqual('13 568,24 €');
+            expect(anElement3.set(-187568.243).getFormatted()).toEqual('-187 568,24 €');
+            expect(anElement4.set(21613568.243).getFormatted()).toEqual('21 613 568,24 €');
+            expect(anElement5.getFormatted()).toEqual('');
+
+            // Unformat the elements globally
+            anElement3.global.unformatLocalized('-.');
+            expect(anElement1.getFormatted()).toEqual('22');
+            expect(anElement2.getFormatted()).toEqual('13568.24');
+            expect(anElement3.getFormatted()).toEqual('-187568.24');
+            expect(anElement4.getFormatted()).toEqual('21613568.24');
+            expect(anElement5.getFormatted()).toEqual('');
+        });
+
+        it('should check if the values have not changed with `isPristine`', () => {
+            newInput5.value = '88764.24';
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            // Check each element individually
+            expect(anElement1.isPristine()).toBe(true);
+            expect(anElement2.isPristine()).toBe(true);
+            expect(anElement3.isPristine()).toBe(true);
+            expect(anElement4.isPristine()).toBe(true);
+
+            expect(anElement1.isPristine(false)).toBe(true);
+            expect(anElement2.isPristine(false)).toBe(true);
+            expect(anElement3.isPristine(false)).toBe(true);
+            expect(anElement4.isPristine(false)).toBe(true);
+
+            expect(anElement5.isPristine(false)).toBe(false); // During initialization, the format changed
+            expect(anElement5.isPristine()).toBe(true);
+
+            // Then check all the elements globally
+            expect(anElement5.global.isPristine()).toBe(true);
+            expect(anElement1.set(22).getFormatted()).toEqual('22,00 €');
+            expect(anElement1.isPristine()).toBe(false);
+            expect(anElement1.isPristine(false)).toBe(false);
+            expect(anElement5.global.isPristine()).toBe(false);
+            //FIXME Test the case where the raw value have not changed, but the formatting has
+        });
+
+        it('should return the correct values with `getNumericString`, `getFormatted`, `getNumber` and `getLocalized`', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            anElement1.options.outputFormat(AutoNumeric.options.outputFormat.commaNegative);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.get()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '187 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+            expect(anElement1.global.getNumber()).toEqual([22, 13568.24, 187568.24, 21613568.24, 1028.01]);
+            expect(anElement1.global.getLocalized()).toEqual(['22', '13568,24', '187568,24', '21613568,24', '1028,01']);
+
+            // Then test that those elements share the same local list
+            anElement4.global.set(1223355.66);
+
+            expect(anElement1.global.get()).toEqual(['1223355.66', '1223355.66', '1223355.66', '1223355.66', '1223355.66']);
+            expect(anElement1.global.getNumericString()).toEqual(['1223355.66', '1223355.66', '1223355.66', '1223355.66', '1223355.66']);
+            expect(anElement1.global.getFormatted()).toEqual(['1 223 355,66 €', '1 223 355,66 €', '1 223 355,66 €', '1 223 355,66 €', '1 223 355,66 €']);
+            expect(anElement1.global.getNumber()).toEqual([1223355.66, 1223355.66, 1223355.66, 1223355.66, 1223355.66]);
+            expect(anElement1.global.getLocalized()).toEqual(['1223355,66', '1223355,66', '1223355,66', '1223355,66', '1223355,66']);
+
+            anElement1.set(-22);
+            anElement2.set(-13568.243);
+            anElement3.set(-187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(-1028.005);
+            expect(anElement1.global.getLocalized()).toEqual(['22-', '13568,24-', '187568,24-', '21613568,24', '1028,01-']);
+            anElement1.options.outputFormat(AutoNumeric.options.outputFormat.dotNegative);
+            expect(anElement1.global.getLocalized()).toEqual(['22-', '13568,24-', '187568,24-', '21613568,24', '1028,01-']);
+            anElement3.options.outputFormat(AutoNumeric.options.outputFormat.dotNegative);
+            expect(anElement1.global.getLocalized()).toEqual(['22-', '13568,24-', '187568.24-', '21613568,24', '1028,01-']);
+            anElement5.global.update({ outputFormat: AutoNumeric.options.outputFormat.negativeDot });
+            expect(anElement1.global.getLocalized()).toEqual(['-22', '-13568.24', '-187568.24', '21613568.24', '-1028.01']);
+            anElement5.global.update({ outputFormat: AutoNumeric.options.outputFormat.number });
+            expect(anElement1.global.getLocalized()).toEqual([-22, -13568.24, -187568.24, 21613568.24, -1028.01]);
+        });
+
+        it('should `clear` the input values', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            anElement1.options.outputFormat(AutoNumeric.options.outputFormat.commaNegative);
+            anElement1.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.always);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '187 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Clear only one element
+            expect(anElement3.clear().global.getNumericString()).toEqual(['22', '13568.24', '', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', ' €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Then clear all elements
+            anElement3.global.clear();
+            expect(anElement1.global.getNumericString()).toEqual(['', '', '', '', '']);
+            expect(anElement1.global.getFormatted()).toEqual([' €', ' €', ' €', ' €', ' €']);
+            anElement3.global.clear(true);
+            expect(anElement1.global.getFormatted()).toEqual(['', '', '', '', '']);
+        });
+
+        it('should `remove` the elements correctly, either one by one or globally', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '187 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Remove only one element
+            expect(newInput3.value).toEqual('187 568,24 €');
+            anElement3.remove();
+            expect(newInput3.value).toEqual('187 568,24 €');
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+            // Test that anElement3 is no more in the global AutoNumeric element list
+            expect(AutoNumeric.test(newInput3)).toBe(false);
+
+            // Then remove all elements
+            anElement1.global.remove();
+            expect(AutoNumeric.test(newInput1)).toBe(false);
+            expect(AutoNumeric.test(newInput2)).toBe(false);
+            expect(AutoNumeric.test(newInput4)).toBe(false);
+            expect(AutoNumeric.test(newInput5)).toBe(false);
+
+            // Here we can still access the .global.* functions since the garbage collector has not passed yet
+            expect(anElement1.global.getNumericString()).toEqual([]);
+            expect(anElement1.global.getFormatted()).toEqual([]);
+        });
+
+        it('should `wipe` the elements correctly, either one by one or globally', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '187 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Wipe only one element
+            expect(newInput3.value).toEqual('187 568,24 €');
+            anElement3.wipe();
+            expect(newInput3.value).toEqual('');
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Test that anElement3 is no more in the global AutoNumeric element list
+            expect(AutoNumeric.test(newInput3)).toBe(false);
+
+            // Then wipe all elements
+            anElement1.global.wipe();
+            expect(AutoNumeric.test(newInput1)).toBe(false);
+            expect(AutoNumeric.test(newInput2)).toBe(false);
+            expect(AutoNumeric.test(newInput4)).toBe(false);
+            expect(AutoNumeric.test(newInput5)).toBe(false);
+            expect(newInput1.value).toEqual('');
+            expect(newInput2.value).toEqual('');
+            expect(newInput4.value).toEqual('');
+            expect(newInput5.value).toEqual('');
+        });
+
+        it('should detect the DOM elements correctly using the `has` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Wipe only one element
+            expect(anElement1.global.has(newInput1)).toBe(true);
+            expect(anElement1.global.has(newInput2)).toBe(true);
+            expect(anElement1.global.has(newInput3)).toBe(true);
+            expect(anElement1.global.has(newInput4)).toBe(false);
+            expect(anElement1.global.has(newInput5)).toBe(false);
+
+            expect(anElement4.global.has(newInput1)).toBe(false);
+            expect(anElement4.global.has(newInput2)).toBe(false);
+            expect(anElement4.global.has(newInput3)).toBe(false);
+            expect(anElement4.global.has(newInput4)).toBe(true);
+            expect(anElement4.global.has(newInput5)).toBe(true);
+        });
+
+        it('should detect the AutoNumeric object correctly using the `has` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Wipe only one element
+            expect(anElement1.global.has(anElement1)).toBe(true);
+            expect(anElement1.global.has(anElement2)).toBe(true);
+            expect(anElement1.global.has(anElement3)).toBe(true);
+            expect(anElement1.global.has(anElement4)).toBe(false);
+            expect(anElement1.global.has(anElement5)).toBe(false);
+
+            expect(anElement4.global.has(anElement1)).toBe(false);
+            expect(anElement4.global.has(anElement2)).toBe(false);
+            expect(anElement4.global.has(anElement3)).toBe(false);
+            expect(anElement4.global.has(anElement4)).toBe(true);
+            expect(anElement4.global.has(anElement5)).toBe(true);
+        });
+
+        it('should add the given AutoNumeric object with the `addObject` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = new AutoNumeric(newInput5, options);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['1028.01']);
+
+            // Add an AutoNumeric object to the local list
+            anElement2.global.addObject(anElement5);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            anElement5.global.addObject(anElement4);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+        });
+
+        it('should add the given DOM element with the `addObject` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = new AutoNumeric(newInput5, options);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['1028.01']);
+
+            // Add a DOM element to the local list
+            anElement2.global.addObject(newInput5);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01']);
+            anElement5.global.addObject(newInput4);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '1028.01', '21613568.24']);
+        });
+
+        it('should add the given AutoNumeric object, and its other linked AutoNumeric objects, with the `addObject` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Add an AutoNumeric object to the local list
+            // This manages the case where we use `addObject` on an AutoNumeric object that already has multiple elements in its local list
+            anElement2.global.addObject(anElement4);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement4.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+        });
+
+        it('should add the given DOM element, and its other linked AutoNumeric objects, with the `addObject` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Add a DOM element to the local list
+            // This manages the case where `addObject` is used on an AutoNumeric object that already has multiple elements in its local list.
+            anElement2.global.addObject(newInput4);
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement4.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+        });
+
+        it('should remove the given AutoNumeric object with the `removeObject` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+
+            // Remove an AutoNumeric object from the local list
+            anElement2.global.removeObject(anElement1);
+            expect(anElement1.global.getNumericString()).toEqual(['22']); // The element got removed by another one, it keeps itself in its own local list
+            expect(anElement2.global.getNumericString()).toEqual(['13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['13568.24', '187568.24']);
+            anElement3.global.removeObject(anElement3);
+            expect(anElement1.global.getNumericString()).toEqual(['22']);
+            expect(anElement2.global.getNumericString()).toEqual(['13568.24']);
+            expect(anElement3.global.getNumericString()).toEqual([]); // The element removed itself
+
+            anElement4.global.removeObject(anElement4, true);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            anElement4.global.removeObject(anElement4);
+            expect(anElement4.global.getNumericString()).toEqual([]);
+
+            // Then make sure an object with an empty local list can add other AutoNumeric objects back (without having to add itself into it)
+            anElement4.global.addObject(anElement3);
+            expect(anElement3.global.getNumericString()).toEqual(['21613568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '187568.24']);
+        });
+
+        it('should remove the given DOM element with the `removeObject` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+
+            // Remove a DOM element from the local list
+            anElement2.global.removeObject(newInput1);
+            expect(anElement1.global.getNumericString()).toEqual(['22']); // The element got removed by another one, it keeps itself in its own local list
+            expect(anElement2.global.getNumericString()).toEqual(['13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['13568.24', '187568.24']);
+            anElement3.global.removeObject(newInput3);
+            expect(anElement1.global.getNumericString()).toEqual(['22']);
+            expect(anElement2.global.getNumericString()).toEqual(['13568.24']);
+            expect(anElement3.global.getNumericString()).toEqual([]); // The element removed itself
+
+            anElement4.global.removeObject(newInput4, true);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            anElement4.global.removeObject(newInput4);
+            expect(anElement4.global.getNumericString()).toEqual([]);
+
+            // Then make sure an object with an empty local list can add other DOM elements back (without having to add itself into it)
+            anElement4.global.addObject(newInput3);
+            expect(anElement3.global.getNumericString()).toEqual(['21613568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '187568.24']);
+        });
+
+        it('should empty the local AutoNumeric objects list, with the `empty` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Empty the local list
+            anElement2.global.empty();
+            expect(anElement1.global.getNumericString()).toEqual([]);
+            expect(anElement2.global.getNumericString()).toEqual([]);
+            expect(anElement3.global.getNumericString()).toEqual([]);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            anElement4.global.empty(true);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24']);
+            expect(anElement5.global.getNumericString()).toEqual(['1028.01']);
+            anElement4.global.empty();
+            expect(anElement4.global.getNumericString()).toEqual([]);
+            expect(anElement5.global.getNumericString()).toEqual(['1028.01']);
+            anElement5.global.empty();
+            expect(anElement5.global.getNumericString()).toEqual([]);
+            anElement5.global.empty();
+            expect(anElement5.global.getNumericString()).toEqual([]);
+        });
+
+        it('should return the DOM elements from the local AutoNumeric objects list, with the `elements` function', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Get the DOM elements form the local lists
+            expect(anElement2.global.elements()).toEqual([
+                newInput1,
+                newInput2,
+                newInput3,
+            ]);
+            expect(anElement4.global.elements()).toEqual([
+                newInput4,
+                newInput5,
+            ]);
+        });
+
+        it('should return the local AutoNumeric objects list with the `getList` function, and get its size with `size`', () => {
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = new AutoNumeric(newInput4, options);
+            const anElement5 = anElement4.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement2.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement3.global.getNumericString()).toEqual(['22', '13568.24', '187568.24']);
+            expect(anElement4.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+            expect(anElement5.global.getNumericString()).toEqual(['21613568.24', '1028.01']);
+
+            // Get the local list
+            expect(anElement1.global.getList()).toEqual(anElement1.autoNumericLocalList);
+            expect(anElement2.global.getList()).toEqual(anElement1.autoNumericLocalList);
+            expect(anElement3.global.getList()).toEqual(anElement1.autoNumericLocalList);
+            expect(anElement4.global.getList()).toEqual(anElement4.autoNumericLocalList);
+            expect(anElement5.global.getList()).toEqual(anElement4.autoNumericLocalList);
+
+            // Get the local list sizes
+            expect(anElement1.global.size()).toEqual(3);
+            expect(anElement5.global.size()).toEqual(2);
+
+            anElement2.global.removeObject(anElement3);
+            expect(anElement1.global.size()).toEqual(2);
+        });
+    });
+
+    describe('initialization methods with the multiple `nuke` function', () => {
+        it('should `nuke` the elements correctly, either one by one or globally', () => {
+            // Initialize the DOM elements
+            const options = { currencySymbol: ' €', currencySymbolPlacement: 's', decimalCharacter: ',', digitGroupSeparator: ' ', outputFormat: ',-' };
+            const newInput1 = document.createElement('input');
+            const newInput2 = document.createElement('input');
+            const newInput3 = document.createElement('input');
+            const newInput4 = document.createElement('input');
+            const newInput5 = document.createElement('input');
+            document.body.appendChild(newInput1);
+            document.body.appendChild(newInput2);
+            document.body.appendChild(newInput3);
+            document.body.appendChild(newInput4);
+            document.body.appendChild(newInput5);
+            newInput1.name = 'nameInput1';
+            newInput2.name = 'nameInput2';
+            newInput3.name = 'nameInput3';
+            newInput4.name = 'nameInput4';
+            newInput5.name = 'nameInput5';
+            newInput1.id = 'uniqueId1';
+            newInput2.id = 'uniqueId2';
+            newInput3.id = 'uniqueId3';
+            newInput4.id = 'uniqueId4';
+            newInput5.id = 'uniqueId5';
+
+            expect(document.querySelector('#uniqueId1')).not.toBeNull();
+            expect(document.querySelector('#uniqueId2')).not.toBeNull();
+            expect(document.querySelector('#uniqueId3')).not.toBeNull();
+            expect(document.querySelector('#uniqueId4')).not.toBeNull();
+            expect(document.querySelector('#uniqueId5')).not.toBeNull();
+
+            // Initialize the AutoNumeric elements
+            const anElement1 = new AutoNumeric(newInput1, options);
+            const anElement2 = anElement1.init(newInput2);
+            const anElement3 = anElement1.init(newInput3);
+            const anElement4 = anElement2.init(newInput4);
+            const anElement5 = anElement2.init(newInput5);
+
+            anElement1.set(22);
+            anElement2.set(13568.243);
+            anElement3.set(187568.243);
+            anElement4.set(21613568.243);
+            anElement5.set(1028.005);
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '187568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '187 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Nuke only one element
+            expect(newInput3.value).toEqual('187 568,24 €');
+            anElement3.nuke();
+            expect(document.querySelector('#uniqueId3')).toBeNull();
+
+            expect(anElement1.global.getNumericString()).toEqual(['22', '13568.24', '21613568.24', '1028.01']);
+            expect(anElement1.global.getFormatted()).toEqual(['22,00 €', '13 568,24 €', '21 613 568,24 €', '1 028,01 €']);
+
+            // Test that anElement3 is no more in the global AutoNumeric element list
+            expect(AutoNumeric.test(newInput3)).toBe(false);
+
+            // Then nuke all elements
+            anElement1.global.nuke();
+            expect(AutoNumeric.test(newInput1)).toBe(false);
+            expect(AutoNumeric.test(newInput2)).toBe(false);
+            expect(AutoNumeric.test(newInput4)).toBe(false);
+            expect(AutoNumeric.test(newInput5)).toBe(false);
+            expect(document.querySelector('#uniqueId1')).toBeNull();
+            expect(document.querySelector('#uniqueId2')).toBeNull();
+            expect(document.querySelector('#uniqueId4')).toBeNull();
+            expect(document.querySelector('#uniqueId5')).toBeNull();
+
+            expect(anElement1.global.getFormatted()).toEqual([]);
+        });
+    });
+});
 
 describe('Static autoNumeric functions', () => {
-    describe('`autoUnformat` should unformat using jQuery `$.fn`', () => {
-        it('with default options', () => {
-            expect($.fn.autoUnformat('$1,234,567.89')).toEqual('1234567.89');
-            expect($.fn.autoUnformat('$1,234.56')).toEqual('1234.56');
-            expect($.fn.autoUnformat('$123.45')).toEqual('123.45');
-            expect($.fn.autoUnformat('$0.00')).toEqual('0.00');
+    describe('`test`', () => {
+        it('should test for AutoNumeric objects', () => {
+            const input1 = document.createElement('input');
+            const input2 = document.createElement('input');
+            const input3 = document.createElement('input');
+            const input4 = document.createElement('input');
+            document.body.appendChild(input1);
+            document.body.appendChild(input2);
+            document.body.appendChild(input3);
+            document.body.appendChild(input4);
 
-            expect($.fn.autoUnformat('$1,234.56', { outputFormat : 'number' })).toEqual(1234.56);
-            expect($.fn.autoUnformat('$123.45', { outputFormat : 'number' })).toEqual(123.45);
-            expect($.fn.autoUnformat('$0.00', { outputFormat : 'number' })).toEqual(0);
-            expect($.fn.autoUnformat(null)).toEqual(null);
-        });
+            // AutoNumeric initialization
+            const anInput1 = new AutoNumeric(input1);
+            const anInput3 = new AutoNumeric(input3);
 
-        it('with user options', () => {
-            expect($.fn.autoUnformat('1.234.567,89 €', autoNumericOptionsEuroNumber)).toEqual(1234567.89);
-            expect($.fn.autoUnformat('1.234,56 €', autoNumericOptionsEuroNumber)).toEqual(1234.56);
-            expect($.fn.autoUnformat('123,45 €', autoNumericOptionsEuroNumber)).toEqual(123.45);
-            expect($.fn.autoUnformat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);
+            expect(AutoNumeric.test(input1)).toEqual(true);
+            expect(AutoNumeric.test(input2)).toEqual(false);
+            expect(AutoNumeric.test(input3)).toEqual(true);
+            expect(AutoNumeric.test(input4)).toEqual(false);
 
-            expect($.fn.autoUnformat('1.234,56 €', autoNumericOptionsEuro)).toEqual('1234.56');
-            expect($.fn.autoUnformat('123,45 €', autoNumericOptionsEuro)).toEqual('123.45');
-            expect($.fn.autoUnformat('0,00 €', autoNumericOptionsEuro)).toEqual('0.00');
-            expect($.fn.autoUnformat(null, autoNumericOptionsEuro)).toEqual(null);
+            // Un-initialization
+            anInput1.remove();
+            anInput3.remove();
+            document.body.removeChild(input1);
+            document.body.removeChild(input2);
+            document.body.removeChild(input3);
+            document.body.removeChild(input4);
         });
     });
 
-    describe('`unFormat` should unformat without jQuery `$.fn`', () => {
-        it('with default options', () => {
-            expect(an.unFormat('$1,234,567.89')).toEqual('1234567.89');
-            expect(an.unFormat('$1,234.56')).toEqual('1234.56');
-            expect(an.unFormat('$123.45')).toEqual('123.45');
-            expect(an.unFormat('$0.00')).toEqual('0.00');
+    describe('`unformat`', () => {
+        it('should unformat with default options', () => {
+            expect(AutoNumeric.unformat('$1,234,567.89')).toEqual(NaN);
+            expect(AutoNumeric.unformat('$1,234.56')).toEqual(NaN);
+            expect(AutoNumeric.unformat('$123.45')).toEqual(NaN);
+            expect(AutoNumeric.unformat('$0.00')).toEqual(NaN);
+            expect(AutoNumeric.unformat(0)).not.toEqual('0.00'); //XXX This is false because 'real' non-numeric numbers are directly returned
+            expect(AutoNumeric.unformat(0)).toEqual(0);
 
-            expect(an.unFormat('$1,234.56', { outputFormat : 'number' })).toEqual(1234.56);
-            expect(an.unFormat('$123.45', { outputFormat : 'number' })).toEqual(123.45);
-            expect(an.unFormat('$0.00', { outputFormat : 'number' })).toEqual(0);
-            expect(an.unFormat(null)).toEqual(null);
-            expect(an.unFormat(1234.56, { outputFormat : 'number' })).toEqual(1234.56);
-            expect(an.unFormat(0, { outputFormat : 'number' })).toEqual(0);
+            expect(AutoNumeric.unformat('$1,234.56', { outputFormat : 'number' })).toEqual(NaN);
+            expect(AutoNumeric.unformat('$123.45', { outputFormat : 'number' })).toEqual(NaN);
+            expect(AutoNumeric.unformat('$0.00', { outputFormat : 'number' })).toEqual(NaN);
+            expect(AutoNumeric.unformat(null)).toEqual(null);
+            expect(AutoNumeric.unformat(1234.56, { outputFormat : 'number' })).toEqual(1234.56);
+            expect(AutoNumeric.unformat(0, { outputFormat : 'number' })).toEqual(0);
         });
 
-        it('with user options', () => {
-            expect(an.unFormat('1.234.567,89 €', autoNumericOptionsEuroNumber)).toEqual(1234567.89);
-            expect(an.unFormat('1.234,56 €', autoNumericOptionsEuroNumber)).toEqual(1234.56);
-            expect(an.unFormat('123,45 €', autoNumericOptionsEuroNumber)).toEqual(123.45);
-            expect(an.unFormat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);
+        it('should unformat with a currency symbol options', () => {
+            expect(AutoNumeric.unformat('$1,234,567.89', { currencySymbol: '$' })).toEqual('1234567.89');
+            expect(AutoNumeric.unformat('$1,234.56', { currencySymbol: '$' })).toEqual('1234.56');
+            expect(AutoNumeric.unformat('$123.45', { currencySymbol: '$' })).toEqual('123.45');
+            expect(AutoNumeric.unformat('$0.00', { currencySymbol: '$' })).toEqual('0.00');
+            expect(AutoNumeric.unformat(0, { currencySymbol: '$' })).not.toEqual('0.00'); //XXX This is false because 'real' non-numeric numbers are directly returned
+            expect(AutoNumeric.unformat(0, { currencySymbol: '$' })).toEqual(0);
 
-            expect(an.unFormat('1.234,56 €', autoNumericOptionsEuro)).toEqual('1234.56');
-            expect(an.unFormat('123,45 €', autoNumericOptionsEuro)).toEqual('123.45');
-            expect(an.unFormat('0,00 €', autoNumericOptionsEuro)).toEqual('0.00');
-            expect(an.unFormat(null, autoNumericOptionsEuro)).toEqual(null);
+            expect(AutoNumeric.unformat('$1,234.56', { outputFormat : 'number', currencySymbol: '$' })).toEqual(1234.56);
+            expect(AutoNumeric.unformat('$123.45', { outputFormat : 'number', currencySymbol: '$' })).toEqual(123.45);
+            expect(AutoNumeric.unformat('$0.00', { outputFormat : 'number', currencySymbol: '$' })).toEqual(0);
+            expect(AutoNumeric.unformat(null)).toEqual(null);
+            expect(AutoNumeric.unformat(1234.56, { outputFormat : 'number', currencySymbol: '$' })).toEqual(1234.56);
+            expect(AutoNumeric.unformat(0, { outputFormat : 'number', currencySymbol: '$' })).toEqual(0);
         });
 
-        it(`and return a 'real' number, whatever options are passed as an argument`, () => {
-            expect(an.unFormat(1234.56)).toEqual(1234.56);
-            expect(an.unFormat(0)).toEqual(0);
+        it('should unformat with user options', () => {
+            expect(AutoNumeric.unformat('1.234.567,89 €', autoNumericOptionsEuroNumber)).toEqual(1234567.89);
+            expect(AutoNumeric.unformat('1.234,56 €', autoNumericOptionsEuroNumber)).toEqual(1234.56);
+            expect(AutoNumeric.unformat('123,45 €', autoNumericOptionsEuroNumber)).toEqual(123.45);
+            expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);
+
+            expect(AutoNumeric.unformat('1.234,56 €', autoNumericOptionsEuro)).toEqual('1234.56');
+            expect(AutoNumeric.unformat('123,45 €', autoNumericOptionsEuro)).toEqual('123.45');
+            expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuro)).toEqual('0.00');
+            expect(AutoNumeric.unformat(null, autoNumericOptionsEuro)).toEqual(null);
+        });
+
+        it('should unformat with multiple user options overwriting each other in the right order', () => {
+            expect(AutoNumeric.unformat('241800,02 €', AutoNumeric.getPredefinedOptions().French, { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator })).toEqual('241800.02');
+            expect(AutoNumeric.unformat('241800,02 $',
+                                        AutoNumeric.getPredefinedOptions().French,
+                                        { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                                        { currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                                        { currencySymbol: AutoNumeric.options.currencySymbol.dollar }
+            )).toEqual('241800.02');
+        });
+
+        it('should unformat with multiple user options in one array, overwriting each other in the right order', () => {
+            expect(AutoNumeric.unformat('241800,02 €',
+                                        [
+                                            AutoNumeric.getPredefinedOptions().French,
+                                            { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                                        ])).toEqual('241800.02');
+            expect(AutoNumeric.unformat('241800,02 $',
+                                        [
+                                            AutoNumeric.getPredefinedOptions().French,
+                                            { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                                            { currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                                            { currencySymbol: AutoNumeric.options.currencySymbol.dollar },
+                                        ]
+            )).toEqual('241800.02');
+        });
+
+        it('should unformat with multiple user options in one array, with named pre-defined options', () => {
+            expect(AutoNumeric.unformat('241800,02 €',
+                                        [
+                                            'euro',
+                                            { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                                        ])).toEqual('241800.02');
+            expect(AutoNumeric.unformat('241800,02 $',
+                                        [
+                                            'euro',
+                                            { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                                            { currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                                            { currencySymbol: AutoNumeric.options.currencySymbol.dollar },
+                                        ]
+            )).toEqual('241800.02');
+        });
+
+        it(`should return a 'real' number, whatever options are passed as an argument`, () => {
+            expect(AutoNumeric.unformat(1234.56)).toEqual(1234.56);
+            expect(AutoNumeric.unformat(0)).toEqual(0);
 
             // Giving an unformatted value should return the same unformatted value, whatever the options passed as a parameter
-            expect(an.unFormat(1234.56, autoNumericOptionsEuro)).toEqual(1234.56);
+            expect(AutoNumeric.unformat(1234.56, autoNumericOptionsEuro)).toEqual(1234.56);
         });
 
         it('should only send a warning, and not throw', () => {
             spyOn(console, 'warn');
-            expect(() => an.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
             expect(console.warn).toHaveBeenCalled();
         });
+
+        it('should fail unformatting wrong parameters', () => {
+            expect(AutoNumeric.unformat('foobar')).toEqual(NaN);
+            expect(() => AutoNumeric.unformat([1234])).toThrow();
+            expect(() => AutoNumeric.unformat({})).toThrow();
+            expect(() => AutoNumeric.unformat({ val: 1234 })).toThrow();
+            expect(() => AutoNumeric.unformat([])).toThrow();
+        });
+
+        it('should unformat brackets and negative (localized) values', () => {
+            // Negative values
+            expect(AutoNumeric.unformat('-1.234,56 €', autoNumericOptionsEuroNumber)).toEqual(-1234.56);
+            expect(AutoNumeric.unformat('-123,45 €', autoNumericOptionsEuroNumber)).toEqual(-123.45);
+            expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);
+
+            expect(AutoNumeric.unformat('-1.234,56 €', autoNumericOptionsEuro)).toEqual('-1234.56');
+            expect(AutoNumeric.unformat('-123,45 €', autoNumericOptionsEuro)).toEqual('-123.45');
+            expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuro)).toEqual('0.00');
+
+            expect(AutoNumeric.unformat('-1234.56')).toEqual('-1234.56');
+            expect(AutoNumeric.unformat('-123.45')).toEqual('-123.45');
+            expect(AutoNumeric.unformat('0.00')).toEqual('0.00');
+
+            // Negative values with brackets
+            const options = {
+                digitGroupSeparator        : '.',
+                decimalCharacter           : ',',
+                decimalCharacterAlternative: '.',
+                currencySymbol             : ' €',
+                currencySymbolPlacement    : 's',
+                roundingMethod             : 'U',
+                outputFormat               : 'number',
+                negativeBracketsTypeOnBlur : AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses,
+            };
+            expect(AutoNumeric.unformat('(1.234,56 €)', options)).toEqual(-1234.56);
+            expect(AutoNumeric.unformat('(123,45 €)', options)).toEqual(-123.45);
+            expect(AutoNumeric.unformat('(0,00 €)', options)).toEqual(0);
+        });
+
+        it('should unformat correctly when there are no decimal places', () => {
+            const options1 = {
+                maximumValue : '9999',
+                minimumValue : '0',
+                decimalPlaces: 2,
+            };
+            expect(AutoNumeric.unformat('4000', options1)).toEqual('4000.00');
+            expect(AutoNumeric.unformat(4000, options1)).toEqual(4000);
+            expect(AutoNumeric.unformat('4000.123', options1)).toEqual('4000.12');
+            expect(AutoNumeric.unformat(4000.123, options1)).toEqual(4000.123);
+
+            const options2 = {
+                maximumValue : '9999',
+                minimumValue : '0',
+                decimalPlaces: 0,
+            };
+            expect(AutoNumeric.unformat('4000', options2)).toEqual('4000');
+            expect(AutoNumeric.unformat(4000, options2)).toEqual(4000);
+            expect(AutoNumeric.unformat('4000.123', options2)).toEqual('4000');
+            expect(AutoNumeric.unformat(4000.123, options2)).toEqual(4000.123);
+        });
+
+        it('should handle multiple digit group separators', () => { // cf. issue #449
+            expect(AutoNumeric.unformat('$12,345,678.90', AutoNumeric.getPredefinedOptions().dollar)).toEqual('12345678.90');
+        });
+
+        //TODO Add the tests for the localized values (positive and negative)
     });
 
-    describe('`autoFormat` should format using jQuery `$.fn`', () => {
-        it('with default options', () => {
-            expect($.fn.autoFormat(1234.56)).toEqual('1,234.56');
-            expect($.fn.autoFormat(123.45)).toEqual('123.45');
-            expect($.fn.autoFormat(0)).toEqual('0.00');
-            expect($.fn.autoFormat(null)).toEqual(null);
-            expect($.fn.autoFormat(undefined)).toEqual(null);
+    describe('`unformat` should unformat correctly when a decimal character or group separator is defined in the `options` (cf. issue #427)', () => {
+        it('with a `digitGroupSeparator` found in the source', () => {
+            const options1 = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '9999',
+                minimumValue: '0',
+            };
+            expect(AutoNumeric.unformat('4.000', options1)).toEqual('4000.00');
+            expect(AutoNumeric.unformat(4000, options1)).toEqual(4000);
+
+            const options2a = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '9999',
+                minimumValue: '0',
+                allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never,
+            };
+            expect(AutoNumeric.unformat('4.000', options2a)).toEqual('4000');
+            expect(AutoNumeric.unformat('4.000,6', options2a)).toEqual('4000.6');
+
+            const options2b = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '9999',
+                minimumValue: '0',
+                allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats,
+            };
+            expect(AutoNumeric.unformat('4.000', options2b)).toEqual('4000');
+            expect(AutoNumeric.unformat('4.000,6', options2b)).toEqual('4000.60');
+
+            const options2c = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '9999',
+                minimumValue: '0',
+                allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.always,
+            };
+            expect(AutoNumeric.unformat('4.000', options2c)).toEqual('4000.00');
+            expect(AutoNumeric.unformat('4.000,6', options2c)).toEqual('4000.60');
+
+            const options3 = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '9999',
+                minimumValue: '0',
+                outputFormat: AutoNumeric.options.outputFormat.number,
+            };
+            expect(AutoNumeric.unformat('4.000', options3)).toEqual(4000);
+            expect(AutoNumeric.unformat(4000, options3)).toEqual(4000);
         });
 
-        it('with user options', () => {
-            expect($.fn.autoFormat(1234.56, autoNumericOptionsEuro)).toEqual('1.234,56 €');
-            expect($.fn.autoFormat(123.45, autoNumericOptionsEuro)).toEqual('123,45 €');
-            expect($.fn.autoFormat(0, autoNumericOptionsEuro)).toEqual('0,00 €');
-            expect($.fn.autoFormat(null, autoNumericOptionsEuro)).toEqual(null);
-            expect($.fn.autoFormat(undefined, autoNumericOptionsEuro)).toEqual(null);
+        it('with a `decimalCharacter` found in the source', () => {
+            const options1 = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '99999',
+                minimumValue: '0',
+            };
+            expect(AutoNumeric.unformat('4,123', options1)).toEqual('4.12');
+            expect(AutoNumeric.unformat(4.12, options1)).toEqual(4.12);
+
+            const options2 = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '99999',
+                minimumValue: '0',
+                outputFormat: AutoNumeric.options.outputFormat.number,
+            };
+            expect(AutoNumeric.unformat('4,123', options2)).toEqual(4.12);
+            expect(AutoNumeric.unformat(4.12, options2)).toEqual(4.12);
+        });
+
+        it('with a `leadingZero` set to `keep` in the options', () => {
+            const options1 = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '99999',
+                minimumValue: '0',
+                leadingZero: AutoNumeric.options.leadingZero.keep,
+            };
+            expect(AutoNumeric.unformat('00004', options1)).toEqual('00004.00');
+
+            const options2 = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                decimalPlaces: 0,
+                maximumValue: '99999',
+                minimumValue: '0',
+                leadingZero: AutoNumeric.options.leadingZero.keep,
+            };
+            expect(AutoNumeric.unformat('00004', options2)).toEqual('00004');
+
+            const options1Deny = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                maximumValue: '99999',
+                minimumValue: '0',
+                leadingZero: AutoNumeric.options.leadingZero.deny,
+            };
+            expect(AutoNumeric.unformat('00004', options1Deny)).toEqual('4.00');
+
+            const options2Deny = {
+                digitGroupSeparator: '.',
+                decimalCharacter: ',',
+                decimalPlaces: 0,
+                maximumValue: '99999',
+                minimumValue: '0',
+                leadingZero: AutoNumeric.options.leadingZero.deny,
+            };
+            expect(AutoNumeric.unformat('00004', options2Deny)).toEqual('4');
         });
     });
 
-    describe('`format` should format without jQuery `$.fn`', () => {
-        it('with default options', () => {
-            expect(an.format(1234.56)).toEqual('1,234.56');
-            expect(an.format('1234.56')).toEqual('1,234.56');
-            expect(an.format(123.45)).toEqual('123.45');
-            expect(an.format('1234,56')).toEqual('123,456.00'); // By default, ',' is a group separator, which gets removed
-            expect(an.format('1.234,56')).toEqual('1.23'); // By default, '.' is the decimal separator
-            expect(an.format(0)).toEqual('0.00');
-            expect(an.format(null)).toEqual(null);
-            expect(an.format(undefined)).toEqual(null);
+    describe('`format`', () => {
+        it('should format with default options', () => {
+            expect(AutoNumeric.format(1234.56)).toEqual('1,234.56');
+            expect(AutoNumeric.format('1234.56')).toEqual('1,234.56');
+            expect(AutoNumeric.format(123.45)).toEqual('123.45');
+            expect(AutoNumeric.format('1234,56')).toEqual('123,456.00'); // By default, ',' is a group separator, which gets removed
+            expect(AutoNumeric.format('1.234,56')).toEqual('1.23'); // By default, '.' is the decimal separator
+            expect(AutoNumeric.format(0)).toEqual('0.00');
+            expect(AutoNumeric.format(null)).toEqual(null);
+            expect(AutoNumeric.format(undefined)).toEqual(null);
         });
 
-        it('with user options', () => {
-            expect(an.format(1234.56, autoNumericOptionsEuro)).toEqual('1.234,56 €');
-            expect(an.format('1.234,56 €', autoNumericOptionsEuro)).toEqual('1.234,56 €');
-            expect(an.format('1234.56', autoNumericOptionsEuro)).toEqual('1.234,56 €');
-            expect(an.format(123.45, autoNumericOptionsEuro)).toEqual('123,45 €');
-            expect(an.format('123,45 €', autoNumericOptionsEuro)).toEqual('123,45 €');
-            expect(an.format(0, autoNumericOptionsEuro)).toEqual('0,00 €');
+        it('should format with user options', () => {
+            expect(AutoNumeric.format(1234.56, autoNumericOptionsEuro)).toEqual('1.234,56 €');
+            expect(AutoNumeric.format('1.234,56 €', autoNumericOptionsEuro)).toEqual('1.234,56 €');
+            expect(AutoNumeric.format('1234.56', autoNumericOptionsEuro)).toEqual('1.234,56 €');
+            expect(AutoNumeric.format(123.45, autoNumericOptionsEuro)).toEqual('123,45 €');
+            expect(AutoNumeric.format('123,45 €', autoNumericOptionsEuro)).toEqual('123,45 €');
+            expect(AutoNumeric.format(0, autoNumericOptionsEuro)).toEqual('0,00 €');
 
-            expect(an.format(1234.56, autoNumericOptionsDollar)).toEqual('$1,234.56');
-            expect(an.format(123.45, autoNumericOptionsDollar)).toEqual('$123.45');
-            expect(an.format('$1,234.56', autoNumericOptionsDollar)).toEqual('$1,234.56');
-            expect(an.format('$123.45', autoNumericOptionsDollar)).toEqual('$123.45');
+            expect(AutoNumeric.format(1234.56, autoNumericOptionsDollar)).toEqual('$1,234.56');
+            expect(AutoNumeric.format(123.45, autoNumericOptionsDollar)).toEqual('$123.45');
+            expect(AutoNumeric.format('$1,234.56', autoNumericOptionsDollar)).toEqual('$1,234.56');
+            expect(AutoNumeric.format('$123.45', autoNumericOptionsDollar)).toEqual('$123.45');
 
-            expect(an.format(null, autoNumericOptionsEuro)).toEqual(null);
-            expect(an.format(undefined, autoNumericOptionsEuro)).toEqual(null);
+            expect(AutoNumeric.format(null, autoNumericOptionsEuro)).toEqual(null);
+            expect(AutoNumeric.format(undefined, autoNumericOptionsEuro)).toEqual(null);
+        });
+
+        it('should format with multiple options', () => {
+            expect(AutoNumeric.format(241800.02, [
+                AutoNumeric.getPredefinedOptions().French,
+                { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+            ])).toEqual('241800,02 €');
+            expect(AutoNumeric.format(241800.02, [
+                AutoNumeric.getPredefinedOptions().French,
+                { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                { currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                { currencySymbol: AutoNumeric.options.currencySymbol.dollar },
+            ])).toEqual('241800,02$');
+        });
+
+        it('should format with multiple options, with named pre-defined options', () => {
+            expect(AutoNumeric.format(241800.02, [
+                'euro',
+                { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+            ])).toEqual('241800,02 €');
+            expect(AutoNumeric.format(241800.02, [
+                'euro',
+                { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                { currencySymbol: AutoNumeric.options.currencySymbol.pound },
+                { currencySymbol: AutoNumeric.options.currencySymbol.dollar },
+            ])).toEqual('241800,02$');
         });
 
         it('should only send a warning, and not throw', () => {
             spyOn(console, 'warn');
-            expect(() => an.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: 3, decimalPlacesShownOnFocus: 2 })).not.toThrow();
             expect(console.warn).toHaveBeenCalled();
+        });
+
+        it('should fail formatting wrong parameters', () => {
+            spyOn(console, 'warn');
+            expect(() => AutoNumeric.format('foobar')).toThrow();
+            expect(() => AutoNumeric.format([1234])).toThrow();
+            expect(() => AutoNumeric.format({})).toThrow();
+            expect(() => AutoNumeric.format({ val: 1234 })).toThrow();
+            expect(() => AutoNumeric.format([])).toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(1);
+        });
+
+        it('should fail when trying to format a localized string with the wrong options', () => {
+            spyOn(console, 'warn');
+            expect(() => AutoNumeric.format('$1,234.56', autoNumericOptionsEuro)).toThrow();
+            expect(() => AutoNumeric.format('$123.45', autoNumericOptionsEuro)).toThrow();
+            expect(() => AutoNumeric.format('1.234,56 €', autoNumericOptionsDollar)).toThrow();
+            expect(() => AutoNumeric.format('123,45 €', autoNumericOptionsDollar)).toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(4);
         });
     });
 
-    it('`format` should fail formatting wrong parameters', () => {
-        spyOn(console, 'warn');
-        expect(() => an.format('foobar')).toThrow();
-        expect(() => an.format([1234])).toThrow();
-        expect(() => an.format({})).toThrow();
-        expect(() => an.format({ val: 1234 })).toThrow();
-        expect(() => an.format([])).toThrow();
-        expect(console.warn).toHaveBeenCalledTimes(1);
-    });
-
-    it('`format` should fail when trying to format a localized string with the wrong options', () => {
-        spyOn(console, 'warn');
-        expect(() => an.format('$1,234.56', autoNumericOptionsEuro)).toThrow();
-        expect(() => an.format('$123.45', autoNumericOptionsEuro)).toThrow();
-        expect(() => an.format('1.234,56 €', autoNumericOptionsDollar)).toThrow();
-        expect(() => an.format('123,45 €', autoNumericOptionsDollar)).toThrow();
-        expect(console.warn).toHaveBeenCalledTimes(4);
-    });
-
-    it('`unFormat` should fail unformatting wrong parameters', () => {
-        // expect(() => an.unFormat('foobar')).toThrow(); //FIXME This should throw
-        expect(() => an.unFormat([1234])).toThrow();
-        expect(() => an.unFormat({})).toThrow();
-        expect(() => an.unFormat({ val: 1234 })).toThrow();
-        expect(() => an.unFormat([])).toThrow();
-    });
-
-    describe('`validate` (without jQuery `$.fn`)', () => {
+    describe('`validate`', () => {
         it('should validate any old setting name, while outputting a warning', () => {
             const oldOptionObject = { aSep: ' ' };
             // Test if a warning is written in the console
             spyOn(console, 'warn');
-            expect(() => an.validate(oldOptionObject)).not.toThrow();
+            expect(() => AutoNumeric.validate(oldOptionObject)).not.toThrow();
+            expect(AutoNumeric.areSettingsValid(oldOptionObject)).toEqual(true);
             /* eslint no-console: 0 */
             expect(console.warn).toHaveBeenCalled();
 
@@ -1443,7 +5893,8 @@ describe('Static autoNumeric functions', () => {
             const oldOptionObject = { aSep: ' ', aDec: ',', altDec: '.', aSign: ' €' };
             // Test if a warning is written in the console
             spyOn(console, 'warn');
-            expect(() => an.validate(oldOptionObject)).not.toThrow();
+            expect(() => AutoNumeric.validate(oldOptionObject)).not.toThrow();
+            expect(AutoNumeric.areSettingsValid(oldOptionObject)).toEqual(true);
             /* eslint no-console: 0 */
             expect(console.warn).toHaveBeenCalled();
             expect(console.warn).toHaveBeenCalledTimes(4);
@@ -1453,490 +5904,746 @@ describe('Static autoNumeric functions', () => {
         });
 
         it('should throw when using a unknown option name, if `failOnUnknownOption` is set to `TRUE`', () => {
-            expect(() => an.validate({ failOnUnknownOption: true, foobar: '.' })).toThrow();
+            expect(() => AutoNumeric.validate({ failOnUnknownOption: true, foobar: '.' })).toThrow();
+            expect(AutoNumeric.areSettingsValid({ failOnUnknownOption: true, foobar: '.' })).toEqual(false);
         });
 
         it('should not throw when using a unknown option name, if `failOnUnknownOption` is set to `FALSE`', () => {
-            expect(() => an.validate({ foobar: '.' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ foobar: '.' })).not.toThrow();
+            expect(AutoNumeric.areSettingsValid({ foobar: '.' })).toEqual(true);
         });
 
         it('should validate', () => {
-            expect(() => an.validate(autoNumericOptionsEuro)).not.toThrow();
-            expect(() => an.validate(autoNumericOptionsDollar)).not.toThrow();
+            expect(() => AutoNumeric.validate({})).not.toThrow();
+            expect(() => AutoNumeric.validate(autoNumericOptionsEuro)).not.toThrow();
+            expect(() => AutoNumeric.validate(autoNumericOptionsDollar)).not.toThrow();
 
-            expect(() => an.validate({ digitGroupSeparator: ',' })).not.toThrow();
-            expect(() => an.validate({ digitGroupSeparator: '.',  decimalCharacter: ',' })).not.toThrow();
-            expect(() => an.validate({ digitGroupSeparator: ' ' })).not.toThrow();
-            expect(() => an.validate({ digitGroupSeparator: '\u2009' })).not.toThrow(); // Thin-space
-            expect(() => an.validate({ digitGroupSeparator: '\u202f' })).not.toThrow(); // Narrow no-break space
-            expect(() => an.validate({ digitGroupSeparator: '\u00a0' })).not.toThrow(); // No-break space
-            expect(() => an.validate({ digitGroupSeparator: '' })).not.toThrow();
-            expect(() => an.validate({ digitGroupSeparator: "'" })).not.toThrow();
-            expect(() => an.validate({ digitGroupSeparator: '٬' })).not.toThrow();
-            expect(() => an.validate({ digitGroupSeparator: '˙' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'start' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'end' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'decimalLeft' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'decimalRight' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: null })).not.toThrow();
 
-            expect(() => an.validate({ noSeparatorOnFocus: false })).not.toThrow();
-            expect(() => an.validate({ noSeparatorOnFocus: true })).not.toThrow();
-            expect(() => an.validate({ noSeparatorOnFocus: 'false' })).not.toThrow();
-            expect(() => an.validate({ noSeparatorOnFocus: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: ',' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: '.',  decimalCharacter: ',' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: ' ' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: '\u2009' })).not.toThrow(); // Thin-space
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: '\u202f' })).not.toThrow(); // Narrow no-break space
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: '\u00a0' })).not.toThrow(); // No-break space
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: '' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: "'" })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: '٬' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: '˙' })).not.toThrow();
 
-            expect(() => an.validate({ digitalGroupSpacing: '2' })).not.toThrow();
-            expect(() => an.validate({ digitalGroupSpacing: '3' })).not.toThrow();
-            expect(() => an.validate({ digitalGroupSpacing: 4 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: 'false' })).not.toThrow();
 
-            expect(() => an.validate({ decimalCharacter: ',', digitGroupSeparator: ' ' })).not.toThrow();
-            expect(() => an.validate({ decimalCharacter: '.' })).not.toThrow();
-            expect(() => an.validate({ decimalCharacter: '·' })).not.toThrow();
-            expect(() => an.validate({ decimalCharacter: '٫' })).not.toThrow();
-            expect(() => an.validate({ decimalCharacter: '⎖' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: 'false' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: 'true' })).not.toThrow();
 
-            expect(() => an.validate({ decimalCharacterAlternative: null })).not.toThrow();
-            expect(() => an.validate({ decimalCharacterAlternative: 'longSeparator' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: '3' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: 4 })).not.toThrow();
 
-            expect(() => an.validate({ currencySymbol: ' €' })).not.toThrow();
-            expect(() => an.validate({ currencySymbol: '' })).not.toThrow();
-            expect(() => an.validate({ currencySymbol: 'foobar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacter: ',', digitGroupSeparator: ' ' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacter: '.' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacter: '·' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacter: '٫' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacter: '⎖' })).not.toThrow();
 
-            expect(() => an.validate({ currencySymbolPlacement: 'p' })).not.toThrow();
-            expect(() => an.validate({ currencySymbolPlacement: 's' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacterAlternative: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacterAlternative: 'longSeparator' })).not.toThrow();
 
-            expect(() => an.validate({ negativePositiveSignPlacement: 'p' })).not.toThrow();
-            expect(() => an.validate({ negativePositiveSignPlacement: 's' })).not.toThrow();
-            expect(() => an.validate({ negativePositiveSignPlacement: 'l' })).not.toThrow();
-            expect(() => an.validate({ negativePositiveSignPlacement: 'r' })).not.toThrow();
-            expect(() => an.validate({ negativePositiveSignPlacement: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbol: ' €' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbol: '' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbol: 'foobar' })).not.toThrow();
 
-            expect(() => an.validate({ showPositiveSign: true })).not.toThrow();
-            expect(() => an.validate({ showPositiveSign: false })).not.toThrow();
-            expect(() => an.validate({ showPositiveSign: 'true' })).not.toThrow();
-            expect(() => an.validate({ showPositiveSign: 'false' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbolPlacement: 'p' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbolPlacement: 's' })).not.toThrow();
 
-            expect(() => an.validate({ suffixText: '' })).not.toThrow();
-            expect(() => an.validate({ suffixText: 'foobar' })).not.toThrow();
-            expect(() => an.validate({ suffixText: ' foobar' })).not.toThrow();
-            expect(() => an.validate({ suffixText: 'foo bar' })).not.toThrow();
-            expect(() => an.validate({ suffixText: 'foobar ' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignPlacement: 'p' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignPlacement: 's' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignPlacement: 'l' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignPlacement: 'r' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignPlacement: null })).not.toThrow();
 
-            expect(() => an.validate({ overrideMinMaxLimits: null })).not.toThrow();
-            expect(() => an.validate({ overrideMinMaxLimits: 'ceiling' })).not.toThrow();
-            expect(() => an.validate({ overrideMinMaxLimits: 'floor' })).not.toThrow();
-            expect(() => an.validate({ overrideMinMaxLimits: 'ignore' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showPositiveSign: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showPositiveSign: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showPositiveSign: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showPositiveSign: 'false' })).not.toThrow();
 
-            expect(() => an.validate({ maximumValue: '42' })).not.toThrow();
-            expect(() => an.validate({ maximumValue: '42.4' })).not.toThrow();
-            expect(() => an.validate({ maximumValue: '42.42' })).not.toThrow();
-            expect(() => an.validate({ maximumValue: '-42' })).not.toThrow();
-            expect(() => an.validate({ maximumValue: '-42.4' })).not.toThrow();
-            expect(() => an.validate({ maximumValue: '-42.42' })).not.toThrow();
-            expect(() => an.validate({ maximumValue: '9999999999999.99' })).not.toThrow();
-            expect(() => an.validate({ maximumValue: '-9999999999999.99' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: { positive: null } })).not.toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: { negative: null } })).not.toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: { ranges: null } })).not.toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: { userDefined: null } })).not.toThrow();
+            expect(() => AutoNumeric.validate({
+                styleRules: {
+                    userDefined: [
+                        { callback: () => {} },
+                    ],
+                },
+            })).not.toThrow();
 
-            expect(() => an.validate({ minimumValue: '42' })).not.toThrow();
-            expect(() => an.validate({ minimumValue: '42.4' })).not.toThrow();
-            expect(() => an.validate({ minimumValue: '42.42' })).not.toThrow();
-            expect(() => an.validate({ minimumValue: '-42' })).not.toThrow();
-            expect(() => an.validate({ minimumValue: '-42.4' })).not.toThrow();
-            expect(() => an.validate({ minimumValue: '-42.42' })).not.toThrow();
-            expect(() => an.validate({ minimumValue: '9999999999999.99' })).not.toThrow();
-            expect(() => an.validate({ minimumValue: '-9999999999999.99' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: '' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: 'foobar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: ' foobar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: 'foo bar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: 'foobar ' })).not.toThrow();
 
-            expect(() => an.validate({ minimumValue: '-10', maximumValue: '-5' })).not.toThrow();
-            expect(() => an.validate({ minimumValue: '-10', maximumValue:  '0' })).not.toThrow();
-            expect(() => an.validate({ minimumValue: '-10', maximumValue: '20' })).not.toThrow();
-            expect(() => an.validate({ minimumValue:   '0', maximumValue: '20' })).not.toThrow();
-            expect(() => an.validate({ minimumValue:  '10', maximumValue: '20' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ overrideMinMaxLimits: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ overrideMinMaxLimits: 'ceiling' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ overrideMinMaxLimits: 'floor' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ overrideMinMaxLimits: 'ignore' })).not.toThrow();
 
-            expect(() => an.validate({ decimalPlacesOverride: null })).not.toThrow();
-            expect(() => an.validate({ decimalPlacesOverride: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '42' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '42.4' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '42.42' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '-42' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '-42.4' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '-42.42' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '9999999999999.99' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '-9999999999999.99' })).not.toThrow();
 
-            expect(() => an.validate({ decimalPlacesShownOnFocus: null })).not.toThrow();
-            expect(() => an.validate({ decimalPlacesShownOnFocus: '0' })).not.toThrow();
-            expect(() => an.validate({ decimalPlacesShownOnFocus: '2' })).not.toThrow();
-            expect(() => an.validate({ decimalPlacesShownOnFocus: '15' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '42' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '42.4' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '42.42' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '-42' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '-42.4' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '-42.42' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '9999999999999.99' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '-9999999999999.99' })).not.toThrow();
 
-            expect(() => an.validate({ decimalPlacesOverride: '2', decimalPlacesShownOnFocus: '2' })).not.toThrow();
-            expect(() => an.validate({ decimalPlacesOverride: '2', decimalPlacesShownOnFocus: '3' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '-10', maximumValue: '-5' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '-10', maximumValue:  '0' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '-10', maximumValue: '20' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue:   '0', maximumValue: '20' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue:  '10', maximumValue: '20' })).not.toThrow();
 
-            expect(() => an.validate({ scaleDivisor: null })).not.toThrow();
-            expect(() => an.validate({ scaleDivisor: '100' })).not.toThrow();
-            expect(() => an.validate({ scaleDivisor: 100 })).not.toThrow();
-            expect(() => an.validate({ scaleDivisor: 45.89 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '0' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: 5 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '10' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '2', minimumValue: '0', maximumValue: '20' })).not.toThrow();
 
-            expect(() => an.validate({ scaleDecimalPlaces: null })).not.toThrow();
-            expect(() => an.validate({ scaleDecimalPlaces: 0 })).not.toThrow();
-            expect(() => an.validate({ scaleDecimalPlaces: 2 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: 5 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: '10' })).not.toThrow();
 
-            expect(() => an.validate({ scaleSymbol: null })).not.toThrow();
-            expect(() => an.validate({ scaleSymbol: '' })).not.toThrow();
-            expect(() => an.validate({ scaleSymbol: 'foobar' })).not.toThrow();
-            expect(() => an.validate({ scaleSymbol: 'foo bar' })).not.toThrow();
-            expect(() => an.validate({ scaleSymbol: ' foobar' })).not.toThrow();
-            expect(() => an.validate({ scaleSymbol: 'foobar ' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: 5 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: '15' })).not.toThrow();
 
-            expect(() => an.validate({ saveValueToSessionStorage: true })).not.toThrow();
-            expect(() => an.validate({ saveValueToSessionStorage: false })).not.toThrow();
-            expect(() => an.validate({ saveValueToSessionStorage: 'true' })).not.toThrow();
-            expect(() => an.validate({ saveValueToSessionStorage: 'false' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '2', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '2', decimalPlacesShownOnFocus: '3' })).not.toThrow();
 
-            expect(() => an.validate({ onInvalidPaste: 'error' })).not.toThrow();
-            expect(() => an.validate({ onInvalidPaste: 'ignore' })).not.toThrow();
-            expect(() => an.validate({ onInvalidPaste: 'clamp' })).not.toThrow();
-            expect(() => an.validate({ onInvalidPaste: 'truncate' })).not.toThrow();
-            expect(() => an.validate({ onInvalidPaste: 'replace' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ rawValueDivisor: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ rawValueDivisor: '100' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ rawValueDivisor: 100 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ rawValueDivisor: 45.89 })).not.toThrow();
 
-            expect(() => an.validate({ roundingMethod: 'S' })).not.toThrow();
-            expect(() => an.validate({ roundingMethod: 'A' })).not.toThrow();
-            expect(() => an.validate({ roundingMethod: 's' })).not.toThrow();
-            expect(() => an.validate({ roundingMethod: 'a' })).not.toThrow();
-            expect(() => an.validate({ roundingMethod: 'B' })).not.toThrow();
-            expect(() => an.validate({ roundingMethod: 'U' })).not.toThrow();
-            expect(() => an.validate({ roundingMethod: 'D' })).not.toThrow();
-            expect(() => an.validate({ roundingMethod: 'C' })).not.toThrow();
-            expect(() => an.validate({ roundingMethod: 'F' })).not.toThrow();
-            expect(() => an.validate({ roundingMethod: 'N05' })).not.toThrow();
-            expect(() => an.validate({ roundingMethod: 'CHF' })).not.toThrow();
-            expect(() => an.validate({ roundingMethod: 'U05' })).not.toThrow();
-            expect(() => an.validate({ roundingMethod: 'D05' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: '100' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: 100 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: 45.89 })).not.toThrow();
 
-            expect(() => an.validate({ allowDecimalPadding: true })).not.toThrow();
-            expect(() => an.validate({ allowDecimalPadding: false })).not.toThrow();
-            expect(() => an.validate({ allowDecimalPadding: 'true' })).not.toThrow();
-            expect(() => an.validate({ allowDecimalPadding: 'false' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: 0 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: 2 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: '5' })).not.toThrow();
 
-            expect(() => an.validate({ negativeBracketsTypeOnBlur: null })).not.toThrow();
-            expect(() => an.validate({ negativeBracketsTypeOnBlur: '(,)' })).not.toThrow();
-            expect(() => an.validate({ negativeBracketsTypeOnBlur: '[,]' })).not.toThrow();
-            expect(() => an.validate({ negativeBracketsTypeOnBlur: '<,>' })).not.toThrow();
-            expect(() => an.validate({ negativeBracketsTypeOnBlur: '{,}' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: '' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: 'foobar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: 'foo bar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: ' foobar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: 'foobar ' })).not.toThrow();
 
-            expect(() => an.validate({ emptyInputBehavior: 'focus' })).not.toThrow();
-            expect(() => an.validate({ emptyInputBehavior: 'press' })).not.toThrow();
-            expect(() => an.validate({ emptyInputBehavior: 'always' })).not.toThrow();
-            expect(() => an.validate({ emptyInputBehavior: 'zero' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ saveValueToSessionStorage: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ saveValueToSessionStorage: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ saveValueToSessionStorage: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ saveValueToSessionStorage: 'false' })).not.toThrow();
 
-            expect(() => an.validate({ leadingZero: 'allow' })).not.toThrow();
-            expect(() => an.validate({ leadingZero: 'deny' })).not.toThrow();
-            expect(() => an.validate({ leadingZero: 'keep' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: 'error' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: 'ignore' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: 'clamp' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: 'truncate' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: 'replace' })).not.toThrow();
 
-            expect(() => an.validate({ formatOnPageLoad: true })).not.toThrow();
-            expect(() => an.validate({ formatOnPageLoad: false })).not.toThrow();
-            expect(() => an.validate({ formatOnPageLoad: 'true' })).not.toThrow();
-            expect(() => an.validate({ formatOnPageLoad: 'false' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 'S' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 'A' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 's' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 'a' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 'B' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 'U' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 'D' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 'C' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 'F' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 'N05' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 'CHF' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 'U05' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 'D05' })).not.toThrow();
 
-            expect(() => an.validate({ selectNumberOnly: true })).not.toThrow();
-            expect(() => an.validate({ selectNumberOnly: false })).not.toThrow();
-            expect(() => an.validate({ selectNumberOnly: 'true' })).not.toThrow();
-            expect(() => an.validate({ selectNumberOnly: 'false' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: 'true' })).not.toThrow();
 
-            expect(() => an.validate({ defaultValueOverride: null })).not.toThrow();
-            expect(() => an.validate({ defaultValueOverride: '' })).not.toThrow();
-            expect(() => an.validate({ defaultValueOverride: '42' })).not.toThrow();
-            expect(() => an.validate({ defaultValueOverride: '-42' })).not.toThrow();
-            expect(() => an.validate({ defaultValueOverride: '42.99' })).not.toThrow();
-            expect(() => an.validate({ defaultValueOverride: '-42.99' })).not.toThrow();
-            expect(() => an.validate({ defaultValueOverride: 5 })).not.toThrow();
-            expect(() => an.validate({ defaultValueOverride: -5 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '(,)' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '[,]' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '<,>' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '{,}' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '〈,〉' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '｢,｣' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '⸤,⸥' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '⟦,⟧' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '‹,›' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '«,»' })).not.toThrow();
 
-            expect(() => an.validate({ unformatOnSubmit: true })).not.toThrow();
-            expect(() => an.validate({ unformatOnSubmit: false })).not.toThrow();
-            expect(() => an.validate({ unformatOnSubmit: 'true' })).not.toThrow();
-            expect(() => an.validate({ unformatOnSubmit: 'false' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: 'focus' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: 'press' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: 'always' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: 'zero' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: 'null' })).not.toThrow();
 
-            expect(() => an.validate({ outputFormat: null })).not.toThrow();
-            expect(() => an.validate({ outputFormat: 'string' })).not.toThrow();
-            expect(() => an.validate({ outputFormat: 'number' })).not.toThrow();
-            expect(() => an.validate({ outputFormat: '.' })).not.toThrow();
-            expect(() => an.validate({ outputFormat: '-.' })).not.toThrow();
-            expect(() => an.validate({ outputFormat: ',' })).not.toThrow();
-            expect(() => an.validate({ outputFormat: '-,' })).not.toThrow();
-            expect(() => an.validate({ outputFormat: '.-' })).not.toThrow();
-            expect(() => an.validate({ outputFormat: ',-' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ leadingZero: 'allow' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ leadingZero: 'deny' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ leadingZero: 'keep' })).not.toThrow();
 
-            expect(() => an.validate({ showWarnings: true })).not.toThrow();
-            expect(() => an.validate({ showWarnings: false })).not.toThrow();
-            expect(() => an.validate({ showWarnings: 'true' })).not.toThrow();
-            expect(() => an.validate({ showWarnings: 'false' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ formatOnPageLoad: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ formatOnPageLoad: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ formatOnPageLoad: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ formatOnPageLoad: 'false' })).not.toThrow();
 
-            expect(() => an.validate({ failOnUnknownOption: true })).not.toThrow();
-            expect(() => an.validate({ failOnUnknownOption: false })).not.toThrow();
-            expect(() => an.validate({ failOnUnknownOption: 'true' })).not.toThrow();
-            expect(() => an.validate({ failOnUnknownOption: 'false' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ historySize: 1 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ historySize: 10 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ historySize: 1000 })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ historySize: '1' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ historySize: '10' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ historySize: '1000' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ selectNumberOnly: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ selectNumberOnly: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ selectNumberOnly: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ selectNumberOnly: 'false' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ selectOnFocus: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: 'false' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ defaultValueOverride: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ defaultValueOverride: '' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ defaultValueOverride: '42' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ defaultValueOverride: '-42' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ defaultValueOverride: '42.99' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ defaultValueOverride: '-42.99' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ defaultValueOverride: 5 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ defaultValueOverride: -5 })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ unformatOnSubmit: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnSubmit: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnSubmit: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnSubmit: 'false' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ outputFormat: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: 'string' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: 'number' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: '.' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: '-.' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: ',' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: '-,' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: '.-' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: ',-' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ isCancellable: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ isCancellable: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ isCancellable: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ isCancellable: 'false' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ modifyValueOnWheel: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnWheel: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnWheel: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnWheel: 'false' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ wheelStep: 'progressive' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ wheelStep: '1000' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ wheelStep: '422.345' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ wheelStep: 1000 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ wheelStep: 422.345 })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ serializeSpaces: '+' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ serializeSpaces: '%20' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ showWarnings: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showWarnings: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showWarnings: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ showWarnings: 'false' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ noEventListeners: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ noEventListeners: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ noEventListeners: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ noEventListeners: 'false' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ readOnly: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ readOnly: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ readOnly: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ readOnly: 'false' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ unformatOnHover: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: 'false' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ failOnUnknownOption: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ failOnUnknownOption: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ failOnUnknownOption: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ failOnUnknownOption: 'false' })).not.toThrow();
         });
 
         it('should validate, with warnings', () => {
             spyOn(console, 'warn');
-            expect(() => an.validate({ decimalPlacesOverride: '0' })).not.toThrow();
-            expect(() => an.validate({ decimalPlacesOverride: '15' })).not.toThrow();
-            expect(() => an.validate({ decimalPlacesOverride: 5 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, decimalPlaces: '2' })).not.toThrow();
 
-            expect(() => an.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow(); // This will output 2 warnings
-            expect(() => an.validate({ decimalPlacesOverride: '2', minimumValue: '0', maximumValue: '20' })).not.toThrow(); // This will output a warning
+            expect(() => AutoNumeric.validate({ selectOnFocus: AutoNumeric.options.selectOnFocus.select, caretPositionOnFocus: AutoNumeric.options.caretPositionOnFocus.decimalLeft })).not.toThrow();
+            expect(() => AutoNumeric.validate({}, true, { selectOnFocus: AutoNumeric.options.selectOnFocus.select, caretPositionOnFocus: AutoNumeric.options.caretPositionOnFocus.decimalLeft })).not.toThrow();
 
-            expect(() => an.validate({ allowDecimalPadding: false, decimalPlacesOverride: '2' })).not.toThrow(); // This will output a warning
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: '0' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: '0' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats })).not.toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: 'false' })).not.toThrow();
+
             expect(console.warn).toHaveBeenCalled();
-            expect(console.warn).toHaveBeenCalledTimes(7);
+            expect(console.warn).toHaveBeenCalledTimes(9);
         });
 
         it('should not validate', () => {
-            expect(() => an.validate(0)).toThrow();
-            expect(() => an.validate(undefined)).toThrow();
-            expect(() => an.validate(null)).toThrow();
-            expect(() => an.validate('')).toThrow();
-            expect(() => an.validate([])).toThrow();
-            expect(() => an.validate({})).toThrow();
-            expect(() => an.validate([{ digitGroupSeparator: '.' }])).toThrow();
-            expect(() => an.validate('foobar')).toThrow();
-            expect(() => an.validate(42)).toThrow();
+            expect(() => AutoNumeric.validate(0)).toThrow();
+            expect(() => AutoNumeric.validate(undefined)).toThrow();
+            expect(() => AutoNumeric.validate(null)).toThrow();
+            expect(() => AutoNumeric.validate('')).toThrow();
+            expect(() => AutoNumeric.validate([])).toThrow();
+            expect(() => AutoNumeric.validate([{ digitGroupSeparator: '.' }])).toThrow();
+            expect(() => AutoNumeric.validate('foobar')).toThrow();
+            expect(() => AutoNumeric.validate(42)).toThrow();
 
-            expect(() => an.validate({ digitGroupSeparator: '-' })).toThrow();
-            expect(() => an.validate({ digitGroupSeparator: '"' })).toThrow();
-            expect(() => an.validate({ digitGroupSeparator: 'a' })).toThrow();
-            expect(() => an.validate({ digitGroupSeparator: 42 })).toThrow();
-            expect(() => an.validate({ digitGroupSeparator: '.' })).toThrow(); // Since the default 'decimalCharacter' is '.' too
-            expect(() => an.validate({ digitGroupSeparator: true })).toThrow();
-            expect(() => an.validate({ digitGroupSeparator: null })).toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: -42 })).toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: '-' })).toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'a' })).toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ caretPositionOnFocus: true })).toThrow();
 
-            expect(() => an.validate({ noSeparatorOnFocus: 'foobar' })).toThrow();
-            expect(() => an.validate({ noSeparatorOnFocus: 42 })).toThrow();
-            expect(() => an.validate({ noSeparatorOnFocus: null })).toThrow();
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: '-' })).toThrow();
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: '"' })).toThrow();
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: 'a' })).toThrow();
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: '.' })).toThrow(); // Since the default 'decimalCharacter' is '.' too
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: true })).toThrow();
+            expect(() => AutoNumeric.validate({ digitGroupSeparator: null })).toThrow();
 
-            expect(() => an.validate({ digitalGroupSpacing: '37foo' })).toThrow();
-            expect(() => an.validate({ digitalGroupSpacing: null })).toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ createLocalList: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ decimalCharacter: 'foobar' })).toThrow();
-            expect(() => an.validate({ decimalCharacter: true })).toThrow();
-            expect(() => an.validate({ decimalCharacter: 42 })).toThrow();
-            expect(() => an.validate({ decimalCharacter: '.', digitGroupSeparator: '.' })).toThrow();
-            expect(() => an.validate({ decimalCharacter: ',', digitGroupSeparator: ',' })).toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: null })).toThrow();
 
-            expect(() => an.validate({ decimalCharacterAlternative: 42 })).toThrow();
-            expect(() => an.validate({ decimalCharacterAlternative: true })).toThrow();
-            expect(() => an.validate({ decimalCharacterAlternative: ['foobar'] })).toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: '37foo' })).toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: null })).toThrow();
 
-            expect(() => an.validate({ currencySymbol: [] })).toThrow();
-            expect(() => an.validate({ currencySymbol: 42 })).toThrow();
-            expect(() => an.validate({ currencySymbol: true })).toThrow();
-            expect(() => an.validate({ currencySymbol: null })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacter: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacter: true })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacter: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacter: '.', digitGroupSeparator: '.' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacter: ',', digitGroupSeparator: ',' })).toThrow();
 
-            expect(() => an.validate({ currencySymbolPlacement: ['s'] })).toThrow();
-            expect(() => an.validate({ currencySymbolPlacement: 42 })).toThrow();
-            expect(() => an.validate({ currencySymbolPlacement: true })).toThrow();
-            expect(() => an.validate({ currencySymbolPlacement: null })).toThrow();
-            expect(() => an.validate({ currencySymbolPlacement: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacterAlternative: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacterAlternative: true })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalCharacterAlternative: ['foobar'] })).toThrow();
 
-            expect(() => an.validate({ negativePositiveSignPlacement: ['r'] })).toThrow();
-            expect(() => an.validate({ negativePositiveSignPlacement: 42 })).toThrow();
-            expect(() => an.validate({ negativePositiveSignPlacement: true })).toThrow();
-            expect(() => an.validate({ negativePositiveSignPlacement: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbol: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbol: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbol: true })).toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbol: null })).toThrow();
 
-            expect(() => an.validate({ showPositiveSign: 0 })).toThrow();
-            expect(() => an.validate({ showPositiveSign: 1 })).toThrow();
-            expect(() => an.validate({ showPositiveSign: '0' })).toThrow();
-            expect(() => an.validate({ showPositiveSign: '1' })).toThrow();
-            expect(() => an.validate({ showPositiveSign: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbolPlacement: ['s'] })).toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbolPlacement: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbolPlacement: true })).toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbolPlacement: null })).toThrow();
+            expect(() => AutoNumeric.validate({ currencySymbolPlacement: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ suffixText: '-foobar' })).toThrow();
-            expect(() => an.validate({ suffixText: 'foo-bar' })).toThrow();
-            expect(() => an.validate({ suffixText: 'foo42bar' })).toThrow();
-            expect(() => an.validate({ suffixText: '42foobar' })).toThrow();
-            expect(() => an.validate({ suffixText: 'foobar42' })).toThrow();
-            expect(() => an.validate({ suffixText: 42 })).toThrow();
-            expect(() => an.validate({ suffixText: -42 })).toThrow();
-            expect(() => an.validate({ suffixText: true })).toThrow();
-            expect(() => an.validate({ suffixText: null })).toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignPlacement: ['r'] })).toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignPlacement: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignPlacement: true })).toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignPlacement: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ overrideMinMaxLimits: 'foobar' })).toThrow();
-            expect(() => an.validate({ overrideMinMaxLimits: 42 })).toThrow();
-            expect(() => an.validate({ overrideMinMaxLimits: true })).toThrow();
+            expect(() => AutoNumeric.validate({ showPositiveSign: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ showPositiveSign: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ showPositiveSign: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ showPositiveSign: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ showPositiveSign: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ maximumValue: true })).toThrow();
-            expect(() => an.validate({ maximumValue: null })).toThrow();
-            expect(() => an.validate({ maximumValue: 42 })).toThrow();
-            expect(() => an.validate({ maximumValue: 42.42 })).toThrow();
-            expect(() => an.validate({ maximumValue: -42 })).toThrow();
-            expect(() => an.validate({ maximumValue: -42.42 })).toThrow();
-            expect(() => an.validate({ maximumValue: '42.' })).toThrow();
-            expect(() => an.validate({ maximumValue: '-42.' })).toThrow();
-            expect(() => an.validate({ maximumValue: '.42' })).toThrow();
-            expect(() => an.validate({ maximumValue: '-42foobar' })).toThrow();
-            expect(() => an.validate({ maximumValue: '9999999999999,99' })).toThrow();
-            expect(() => an.validate({ maximumValue: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: { } })).toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: true })).toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ styleRules: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({
+                styleRules: {
+                    userDefined: [
+                        { callback: 'foobar' },
+                    ],
+                },
+            })).toThrow();
 
-            expect(() => an.validate({ minimumValue: true })).toThrow();
-            expect(() => an.validate({ minimumValue: null })).toThrow();
-            expect(() => an.validate({ minimumValue: 42 })).toThrow();
-            expect(() => an.validate({ minimumValue: 42.42 })).toThrow();
-            expect(() => an.validate({ minimumValue: -42 })).toThrow();
-            expect(() => an.validate({ minimumValue: -42.42 })).toThrow();
-            expect(() => an.validate({ minimumValue: '42.' })).toThrow();
-            expect(() => an.validate({ minimumValue: '-42.' })).toThrow();
-            expect(() => an.validate({ minimumValue: '.42' })).toThrow();
-            expect(() => an.validate({ minimumValue: '-42foobar' })).toThrow();
-            expect(() => an.validate({ minimumValue: '9999999999999,99' })).toThrow();
-            expect(() => an.validate({ minimumValue: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: '-foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: 'foo-bar' })).toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: 'foo42bar' })).toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: '42foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: 'foobar42' })).toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: -42 })).toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: true })).toThrow();
+            expect(() => AutoNumeric.validate({ suffixText: null })).toThrow();
 
-            expect(() => an.validate({ minimumValue: '20', maximumValue: '-10' })).toThrow();
-            expect(() => an.validate({ minimumValue: '-5', maximumValue: '-10' })).toThrow();
-            expect(() => an.validate({ minimumValue:  '0', maximumValue: '-10' })).toThrow();
-            expect(() => an.validate({ minimumValue: '20', maximumValue: '-10' })).toThrow();
-            expect(() => an.validate({ minimumValue: '20', maximumValue:   '0' })).toThrow();
-            expect(() => an.validate({ minimumValue: '20', maximumValue:  '10' })).toThrow();
+            expect(() => AutoNumeric.validate({ overrideMinMaxLimits: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ overrideMinMaxLimits: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ overrideMinMaxLimits: true })).toThrow();
 
-            expect(() => an.validate({ decimalPlacesOverride: [] })).toThrow();
-            expect(() => an.validate({ decimalPlacesOverride: true })).toThrow();
-            expect(() => an.validate({ decimalPlacesOverride: 'foobar' })).toThrow();
-            expect(() => an.validate({ decimalPlacesOverride: '22foobar' })).toThrow();
-            expect(() => an.validate({ decimalPlacesOverride: '-5' })).toThrow();
-            expect(() => an.validate({ decimalPlacesOverride: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: true })).toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: null })).toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: 42.42 })).toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: -42 })).toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: -42.42 })).toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '42.' })).toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '-42.' })).toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '.42' })).toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '-42foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '9999999999999,99' })).toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ decimalPlacesShownOnFocus: [] })).toThrow();
-            expect(() => an.validate({ decimalPlacesShownOnFocus: true })).toThrow();
-            expect(() => an.validate({ decimalPlacesShownOnFocus: 'foobar' })).toThrow();
-            expect(() => an.validate({ decimalPlacesShownOnFocus: '22foobar' })).toThrow();
-            expect(() => an.validate({ decimalPlacesShownOnFocus: '-5' })).toThrow();
-            expect(() => an.validate({ decimalPlacesShownOnFocus: 5 })).toThrow();
-            expect(() => an.validate({ decimalPlacesShownOnFocus: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: true })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: null })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: 42.42 })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: -42 })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: -42.42 })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '42.' })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '-42.' })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '.42' })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '-42foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '9999999999999,99' })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ scaleDivisor: 'foobar' })).toThrow();
-            expect(() => an.validate({ scaleDivisor: true })).toThrow();
-            expect(() => an.validate({ scaleDivisor: -1000 })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '20', maximumValue: '-10' })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '-5', maximumValue: '-10' })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue:  '0', maximumValue: '-10' })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '20', maximumValue: '-10' })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '20', maximumValue:   '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '20', maximumValue:  '10' })).toThrow();
 
-            expect(() => an.validate({ scaleDecimalPlaces: -5 })).toThrow();
-            expect(() => an.validate({ scaleDecimalPlaces: 4.2 })).toThrow();
-            expect(() => an.validate({ scaleDecimalPlaces: 'foobar' })).toThrow();
-            expect(() => an.validate({ scaleDecimalPlaces: false })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: true })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '22foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '-5' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: null })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: 2.3 })).toThrow();
 
-            expect(() => an.validate({ scaleSymbol: true })).toThrow();
-            expect(() => an.validate({ scaleSymbol: 42 })).toThrow();
-            expect(() => an.validate({ scaleSymbol: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: true })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: '22foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: '-5' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesRawValue: 2.3 })).toThrow();
 
-            expect(() => an.validate({ saveValueToSessionStorage: 0 })).toThrow();
-            expect(() => an.validate({ saveValueToSessionStorage: 1 })).toThrow();
-            expect(() => an.validate({ saveValueToSessionStorage: '0' })).toThrow();
-            expect(() => an.validate({ saveValueToSessionStorage: '1' })).toThrow();
-            expect(() => an.validate({ saveValueToSessionStorage: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: true })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: '22foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: '-5' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: 2.3 })).toThrow();
 
-            expect(() => an.validate({ onInvalidPaste: 0 })).toThrow();
-            expect(() => an.validate({ onInvalidPaste: 1 })).toThrow();
-            expect(() => an.validate({ onInvalidPaste: -42 })).toThrow();
-            expect(() => an.validate({ onInvalidPaste: '0' })).toThrow();
-            expect(() => an.validate({ onInvalidPaste: '1' })).toThrow();
-            expect(() => an.validate({ onInvalidPaste: 'foobar' })).toThrow();
-            expect(() => an.validate({ onInvalidPaste: 0.5 })).toThrow();
-            expect(() => an.validate({ onInvalidPaste: true })).toThrow();
-            expect(() => an.validate({ onInvalidPaste: null })).toThrow();
-            expect(() => an.validate({ onInvalidPaste: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ rawValueDivisor: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ rawValueDivisor: true })).toThrow();
+            expect(() => AutoNumeric.validate({ rawValueDivisor: -1000 })).toThrow();
+            expect(() => AutoNumeric.validate({ rawValueDivisor: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ rawValueDivisor: 1 })).toThrow();
 
-            expect(() => an.validate({ roundingMethod: 0.5 })).toThrow();
-            expect(() => an.validate({ roundingMethod: true })).toThrow();
-            expect(() => an.validate({ roundingMethod: null })).toThrow();
-            expect(() => an.validate({ roundingMethod: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: true })).toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: -1000 })).toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ divisorWhenUnfocused: 1 })).toThrow();
 
-            expect(() => an.validate({ allowDecimalPadding: 0 })).toThrow();
-            expect(() => an.validate({ allowDecimalPadding: 1 })).toThrow();
-            expect(() => an.validate({ allowDecimalPadding: '0' })).toThrow();
-            expect(() => an.validate({ allowDecimalPadding: '1' })).toThrow();
-            expect(() => an.validate({ allowDecimalPadding: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: true })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: '22foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: '-5' })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: 2.3 })).toThrow();
 
-            expect(() => an.validate({ negativeBracketsTypeOnBlur: [] })).toThrow();
-            expect(() => an.validate({ negativeBracketsTypeOnBlur: true })).toThrow();
-            expect(() => an.validate({ negativeBracketsTypeOnBlur: 'foobar' })).toThrow();
-            expect(() => an.validate({ negativeBracketsTypeOnBlur: '22foobar' })).toThrow();
-            expect(() => an.validate({ negativeBracketsTypeOnBlur: '-5' })).toThrow();
-            expect(() => an.validate({ negativeBracketsTypeOnBlur: 5 })).toThrow();
-            expect(() => an.validate({ negativeBracketsTypeOnBlur: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: true })).toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ symbolWhenUnfocused: [] })).toThrow();
 
-            expect(() => an.validate({ emptyInputBehavior: [] })).toThrow();
-            expect(() => an.validate({ emptyInputBehavior: true })).toThrow();
-            expect(() => an.validate({ emptyInputBehavior: 'foobar' })).toThrow();
-            expect(() => an.validate({ emptyInputBehavior: '22foobar' })).toThrow();
-            expect(() => an.validate({ emptyInputBehavior: '-5' })).toThrow();
-            expect(() => an.validate({ emptyInputBehavior: 5 })).toThrow();
-            expect(() => an.validate({ emptyInputBehavior: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ saveValueToSessionStorage: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ saveValueToSessionStorage: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ saveValueToSessionStorage: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ saveValueToSessionStorage: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ saveValueToSessionStorage: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ leadingZero: [] })).toThrow();
-            expect(() => an.validate({ leadingZero: true })).toThrow();
-            expect(() => an.validate({ leadingZero: 'foobar' })).toThrow();
-            expect(() => an.validate({ leadingZero: '22foobar' })).toThrow();
-            expect(() => an.validate({ leadingZero: '-5' })).toThrow();
-            expect(() => an.validate({ leadingZero: 5 })).toThrow();
-            expect(() => an.validate({ leadingZero: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: -42 })).toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: 0.5 })).toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: true })).toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: null })).toThrow();
+            expect(() => AutoNumeric.validate({ onInvalidPaste: [] })).toThrow();
 
-            expect(() => an.validate({ formatOnPageLoad: 0 })).toThrow();
-            expect(() => an.validate({ formatOnPageLoad: 1 })).toThrow();
-            expect(() => an.validate({ formatOnPageLoad: '0' })).toThrow();
-            expect(() => an.validate({ formatOnPageLoad: '1' })).toThrow();
-            expect(() => an.validate({ formatOnPageLoad: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 0.5 })).toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: true })).toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: null })).toThrow();
+            expect(() => AutoNumeric.validate({ roundingMethod: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ selectNumberOnly: 0 })).toThrow();
-            expect(() => an.validate({ selectNumberOnly: 1 })).toThrow();
-            expect(() => an.validate({ selectNumberOnly: '0' })).toThrow();
-            expect(() => an.validate({ selectNumberOnly: '1' })).toThrow();
-            expect(() => an.validate({ selectNumberOnly: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ defaultValueOverride: [] })).toThrow();
-            expect(() => an.validate({ defaultValueOverride: true })).toThrow();
-            expect(() => an.validate({ defaultValueOverride: 'foobar' })).toThrow();
-            expect(() => an.validate({ defaultValueOverride: '22foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: true })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '22foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '-5' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: 5 })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: -5 })).toThrow();
 
-            expect(() => an.validate({ unformatOnSubmit: 0 })).toThrow();
-            expect(() => an.validate({ unformatOnSubmit: 1 })).toThrow();
-            expect(() => an.validate({ unformatOnSubmit: '0' })).toThrow();
-            expect(() => an.validate({ unformatOnSubmit: '1' })).toThrow();
-            expect(() => an.validate({ unformatOnSubmit: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: true })).toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: '22foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: '-5' })).toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: 5 })).toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ emptyInputBehavior: null })).toThrow();
 
-            expect(() => an.validate({ outputFormat: [] })).toThrow();
-            expect(() => an.validate({ outputFormat: true })).toThrow();
-            expect(() => an.validate({ outputFormat: 'foobar' })).toThrow();
-            expect(() => an.validate({ outputFormat: '22foobar' })).toThrow();
-            expect(() => an.validate({ outputFormat: '-5' })).toThrow();
-            expect(() => an.validate({ outputFormat: 5 })).toThrow();
-            expect(() => an.validate({ outputFormat: -5 })).toThrow();
+            expect(() => AutoNumeric.validate({ leadingZero: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ leadingZero: true })).toThrow();
+            expect(() => AutoNumeric.validate({ leadingZero: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ leadingZero: '22foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ leadingZero: '-5' })).toThrow();
+            expect(() => AutoNumeric.validate({ leadingZero: 5 })).toThrow();
+            expect(() => AutoNumeric.validate({ leadingZero: -5 })).toThrow();
 
-            expect(() => an.validate({ showWarnings: 0 })).toThrow();
-            expect(() => an.validate({ showWarnings: 1 })).toThrow();
-            expect(() => an.validate({ showWarnings: '0' })).toThrow();
-            expect(() => an.validate({ showWarnings: '1' })).toThrow();
-            expect(() => an.validate({ showWarnings: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ formatOnPageLoad: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ formatOnPageLoad: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ formatOnPageLoad: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ formatOnPageLoad: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ formatOnPageLoad: 'foobar' })).toThrow();
 
-            expect(() => an.validate({ failOnUnknownOption: 0 })).toThrow();
-            expect(() => an.validate({ failOnUnknownOption: 1 })).toThrow();
-            expect(() => an.validate({ failOnUnknownOption: '0' })).toThrow();
-            expect(() => an.validate({ failOnUnknownOption: '1' })).toThrow();
-            expect(() => an.validate({ failOnUnknownOption: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: -1 })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: 5.34 })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: -5.34 })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: true })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: false })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ historySize: null })).toThrow();
+
+            expect(() => AutoNumeric.validate({ selectNumberOnly: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ selectNumberOnly: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ selectNumberOnly: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ selectNumberOnly: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ selectNumberOnly: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ selectOnFocus: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ selectOnFocus: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ defaultValueOverride: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ defaultValueOverride: true })).toThrow();
+            expect(() => AutoNumeric.validate({ defaultValueOverride: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ defaultValueOverride: '22foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ unformatOnSubmit: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnSubmit: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnSubmit: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnSubmit: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnSubmit: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ outputFormat: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: true })).toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: '22foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: '-5' })).toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: 5 })).toThrow();
+            expect(() => AutoNumeric.validate({ outputFormat: -5 })).toThrow();
+
+            expect(() => AutoNumeric.validate({ isCancellable: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ isCancellable: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ isCancellable: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ isCancellable: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ isCancellable: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ modifyValueOnWheel: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnWheel: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnWheel: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnWheel: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnWheel: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ wheelStep: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ wheelStep: true })).toThrow();
+            expect(() => AutoNumeric.validate({ wheelStep: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ wheelStep: -42 })).toThrow();
+            expect(() => AutoNumeric.validate({ wheelStep: '-42' })).toThrow();
+            expect(() => AutoNumeric.validate({ wheelStep: -1000.02 })).toThrow();
+            expect(() => AutoNumeric.validate({ wheelStep: '-1000.02' })).toThrow();
+            expect(() => AutoNumeric.validate({ wheelStep: '1000foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ serializeSpaces: true })).toThrow();
+            expect(() => AutoNumeric.validate({ serializeSpaces: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ serializeSpaces: -42 })).toThrow();
+            expect(() => AutoNumeric.validate({ serializeSpaces: '-42' })).toThrow();
+            expect(() => AutoNumeric.validate({ serializeSpaces: '++' })).toThrow();
+            expect(() => AutoNumeric.validate({ serializeSpaces: ' ' })).toThrow();
+            expect(() => AutoNumeric.validate({ serializeSpaces: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ serializeSpaces: ' foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ showWarnings: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ showWarnings: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ showWarnings: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ showWarnings: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ showWarnings: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ noEventListeners: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ noEventListeners: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ noEventListeners: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ noEventListeners: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ noEventListeners: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ readOnly: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ readOnly: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ readOnly: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ readOnly: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ readOnly: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ unformatOnHover: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ unformatOnHover: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ failOnUnknownOption: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ failOnUnknownOption: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ failOnUnknownOption: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ failOnUnknownOption: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ failOnUnknownOption: 'foobar' })).toThrow();
         });
 
         it('should only send a warning, and not throw', () => {
             spyOn(console, 'warn');
-            expect(() => an.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
             expect(console.warn).toHaveBeenCalled();
         });
 
         it('should only send a warning, and not throw', () => {
             spyOn(console, 'warn');
-            expect(() => an.validate({ decimalPlacesOverride: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ decimalPlaces: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
             expect(console.warn).toHaveBeenCalled();
         });
     });
 
-    // Basic test (that are copied from the non-jQuery ones) just to test that the jQuery version is called correctly
-    describe('`validate` (with jQuery `$.fn`)', () => {
-        it('should validate', () => {
-            expect(() => $.fn.autoValidate(autoNumericOptionsEuro)).not.toThrow();
-            expect(() => $.fn.autoValidate(autoNumericOptionsDollar)).not.toThrow();
+    //TODO Complete the tests in order to test every single static method separately:
+    /*
+     areSettingsValid
+     getDefaultConfig
+     getPredefinedOptions
+     formatAndSet
+     unformatAndSet
+     reformatAndSet
+     localize
+     localizeAndSet
+     version
+     */
+});
 
-            expect(() => $.fn.autoValidate({ digitGroupSeparator: ',' })).not.toThrow();
-            expect(() => $.fn.autoValidate({ digitGroupSeparator: '.',  decimalCharacter: ',' })).not.toThrow();
-        });
-
-        it('should not validate', () => {
-            expect(() => $.fn.autoValidate(0)).toThrow();
-            expect(() => $.fn.autoValidate(undefined)).toThrow();
-
-            expect(() => $.fn.autoValidate({ digitGroupSeparator: '-' })).toThrow();
-            expect(() => $.fn.autoValidate({ digitGroupSeparator: '"' })).toThrow();
-        });
+describe(`The static options object`, () => {
+    it('should give access to the options enumeration', () => {
+        expect(AutoNumeric.options.onInvalidPaste.error).toEqual('error');
+        expect(AutoNumeric.options.currencySymbolPlacement.suffix).toEqual('s');
+        expect(AutoNumeric.options.digitGroupSeparator.apostrophe).toEqual("'");
+        expect(AutoNumeric.options.decimalCharacter.middleDot).toEqual('·');
+        expect(AutoNumeric.options.decimalCharacterAlternative.none).toBeNull();
+        expect(AutoNumeric.options.currencySymbol.none).toEqual('');
     });
 });
 
-//TODO Complete the tests with user interactions tests
+describe(`The AutoNumeric event lifecycle`, () => {
+    let aNInput;
+    let newInput;
+    let customFunction;
+
+    beforeEach(() => { // Initialization
+        newInput = document.createElement('input');
+        document.body.appendChild(newInput);
+        aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+
+        customFunction = { // Dummy function used for spying
+            formattedEvent(value) {
+                // console.log(`formattedEvent called!`); //DEBUG
+                return value;
+            },
+        };
+    });
+
+    afterEach(() => { // Un-initialization
+        aNInput.nuke();
+    });
+
+    it(`should send the 'autoNumeric:formatted' event when formatting is done`, () => {
+        newInput.addEventListener('autoNumeric:formatted', e => customFunction.formattedEvent(e));
+        spyOn(customFunction, 'formattedEvent');
+
+        aNInput.set(2000);
+        expect(customFunction.formattedEvent).toHaveBeenCalled();
+        aNInput.french();
+        expect(customFunction.formattedEvent).toHaveBeenCalledTimes(2);
+        aNInput.set('');
+        expect(customFunction.formattedEvent).toHaveBeenCalledTimes(3);
+        aNInput.set(-5600.78);
+        expect(customFunction.formattedEvent).toHaveBeenCalledTimes(4);
+        expect(aNInput.getFormatted()).toEqual('-5.600,78 €');
+        aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.curlyBraces);
+        expect(aNInput.getFormatted()).toEqual('{5.600,78 €}');
+        expect(customFunction.formattedEvent).toHaveBeenCalledTimes(5);
+        aNInput.node().focus(); //TODO This fails under Chrome _only_ when the tests are run with PhantomJS and Firefox. That test does not fail when running only the `test:unitc` task!?
+        expect(customFunction.formattedEvent).toHaveBeenCalledTimes(6);
+        expect(aNInput.getFormatted()).toEqual('-5.600,78 €');
+    });
+});

@@ -48,10 +48,12 @@ exports.config = {
         {
             browserName : 'chrome',
         },
-        /*{
+        /*
+        {
             browserName   : 'firefox', // developer version
             firefox_binary: '/home/user/.local/share/umake/web/firefox-dev/firefox', // Path to the executable
-        },*/
+        },
+        */
     ],
 
 
@@ -129,10 +131,6 @@ exports.config = {
             path: './test/e2e/index.html',
         },
         // Libraries
-        {
-            mount: '/jquery',
-            path: './node_modules/jquery/dist/jquery.js',
-        },
         {
             mount: '/autonumeric',
             path: './dist/autoNumeric.min.js',

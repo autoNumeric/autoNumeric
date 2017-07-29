@@ -32,6 +32,9 @@
 
 // Note : A list of named keys can be found here : https://github.com/webdriverio/webdriverio/blob/master/lib/helpers/constants.js#L67
 
+// High default timeout need when debugging the tests
+/* eslint no-undef: 0 */
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
 //-----------------------------------------------------------------------------
 // ---- Configuration
@@ -41,58 +44,176 @@ const testUrl = '/e2e';
 
 // Object that holds the references to the input we test
 const selectors = {
-    inputClassic          : '#classic',
-    issue283Input0        : '#issue283Input0',
-    issue283Input1        : '#issue283Input1',
-    issue283Input2        : '#issue283Input2',
-    issue283Input3        : '#issue283Input3',
-    issue283Input4        : '#issue283Input4',
-    issue183error         : '#issue_183_error',
-    issue183ignore        : '#issue_183_ignore',
-    issue183clamp         : '#issue_183_clamp',
-    issue183truncate      : '#issue_183_truncate',
-    issue183replace       : '#issue_183_replace',
-    issue326input         : '#issue_326',
-    issue322input         : '#issue_322',
-    issue317input         : '#issue_317',
-    issue306input         : '#issue_306',
-    issue306inputDecimals : '#issue_306decimals',
-    issue306inputDecimals2: '#issue_306decimals2',
-    issue303inputNonAn    : '#issue_303non_an',
-    issue303inputP        : '#issue_303p',
-    issue303inputS        : '#issue_303s',
-    issue403a             : '#issue_403a',
-    issue403b             : '#issue_403b',
-    issue403c             : '#issue_403c',
+    inputClassic                      : '#classic',
+    elementP1                         : '#tag_p1',
+    elementP2                         : '#tag_p2',
+    elementCode                       : '#tag_code',
+    elementDiv                        : '#tag_div',
+    elementH5                         : '#tag_h5',
+    elementLabel                      : '#tag_label',
+    elementSpan                       : '#tag_span',
+    readOnlyElement                   : '#readOnly_option',
+    noEventListenersElement           : '#noEventListeners_option',
+    issue283Input0                    : '#issue283Input0',
+    issue283Input1                    : '#issue283Input1',
+    issue283Input2                    : '#issue283Input2',
+    issue283Input3                    : '#issue283Input3',
+    issue283Input4                    : '#issue283Input4',
+    issue183error                     : '#issue_183_error',
+    issue183ignore                    : '#issue_183_ignore',
+    issue183clamp                     : '#issue_183_clamp',
+    issue183truncate                  : '#issue_183_truncate',
+    issue183replace                   : '#issue_183_replace',
+    issue326input                     : '#issue_326',
+    issue322input                     : '#issue_322',
+    issue317input                     : '#issue_317',
+    issue306input                     : '#issue_306',
+    issue306inputDecimals             : '#issue_306decimals',
+    issue306inputDecimals2            : '#issue_306decimals2',
+    issue303inputNonAn                : '#issue_303non_an',
+    issue303inputP                    : '#issue_303p',
+    issue303inputS                    : '#issue_303s',
+    issue387inputCancellable          : '#issue_387_cancellable',
+    issue387inputCancellableNumOnly   : '#issue_387_cancellable_numOnly',
+    issue387inputNotCancellable       : '#issue_387_not_cancellable',
+    issue387inputNotCancellableNumOnly: '#issue_387_not_cancellable_numOnly',
+    issue393inputNoWheel              : '#issue_393_nowheel',
+    issue393inputFixed                : '#issue_393_fixed',
+    issue393inputProgressive          : '#issue_393_progressive',
+    issue393inputUpperLimit           : '#issue_393_upperLimit',
+    issue393inputLowerLimit           : '#issue_393_lowerLimit',
+    issue393inputLimitOneSideUp       : '#issue_393_limitOneSideUp',
+    issue393inputLimitOneSideDown     : '#issue_393_limitOneSideDown',
+    contentEditable1                  : '#contentEditable1',
+    contentEditable2                  : '#contentEditable2',
+    contentEditableNotActivated       : '#contentEditableNotActivated',
+    issue403a                         : '#issue_403a',
+    issue403b                         : '#issue_403b',
+    issue403c                         : '#issue_403c',
+    negativeBrackets1                 : '#negativeBrackets1',
+    negativeBrackets2                 : '#negativeBrackets2',
+    negativeBrackets3                 : '#negativeBrackets3',
+    negativeBrackets4                 : '#negativeBrackets4',
+    negativeBrackets5                 : '#negativeBrackets5',
+    negativeBracketsInput1            : '#negativeBrackets_1',
+    negativeBracketsInput2            : '#negativeBrackets_2',
+    negativeBracketsInput3            : '#negativeBrackets_3',
+    negativeBracketsInput4            : '#negativeBrackets_4',
+    negativeBracketsInput5            : '#negativeBrackets_5',
+    negativeBracketsInput6            : '#negativeBrackets_6',
+    negativeBracketsInput7            : '#negativeBrackets_7',
+    negativeBracketsInput8            : '#negativeBrackets_8',
+    remove1                           : '#remove1',
+    undoRedo1                         : '#undoRedo1',
+    undoRedo2                         : '#undoRedo2',
+    undoRedo3                         : '#undoRedo3',
+    undoRedo4                         : '#undoRedo4',
+    issue423a                         : '#issue_423a',
+    issue423b                         : '#issue_423b',
+    issue409a                         : '#issue_409a',
+    issue409n                         : '#issue_409n',
+    issue409f                         : '#issue_409f',
+    issue416Input1                    : '#issue_416_1',
+    issue416Input2                    : '#issue_416_2',
+    issue416Input3                    : '#issue_416_3',
+    issue416Input4                    : '#issue_416_4',
+    issue416Input5                    : '#issue_416_5',
+    issue416Input6                    : '#issue_416_6',
+    issue416Input7                    : '#issue_416_7',
+    issue416Input8                    : '#issue_416_8',
+    issue416Input9                    : '#issue_416_9',
+    issue416Input10                   : '#issue_416_10',
+    issue416Input11                   : '#issue_416_11',
+    issue416Input12                   : '#issue_416_12',
+    optionUpdate1                     : '#optionUpdate1',
+    optionUpdate2                     : '#optionUpdate2',
+    optionUpdate3                     : '#optionUpdate3',
+    selection1                        : '#selection1',
+    showOnlyNumbersOnFocusInput1      : '#showOnlyNumbersOnFocus1',
+    showOnlyNumbersOnFocusInput2      : '#showOnlyNumbersOnFocus2',
+    selectOnFocusA                    : '#selectOnFocusA',
+    selectOnFocusB                    : '#selectOnFocusB',
+    selectOnFocusC                    : '#selectOnFocusC',
+    selectOnFocusD                    : '#selectOnFocusD',
+    selectOnFocus1                    : '#selectOnFocus1',
+    selectOnFocus2                    : '#selectOnFocus2',
+    selectOnFocus3                    : '#selectOnFocus3',
+    selectOnFocus4                    : '#selectOnFocus4',
+    selectOnFocus5                    : '#selectOnFocus5',
+    selectOnFocus6                    : '#selectOnFocus6',
+    selectOnFocus7                    : '#selectOnFocus7',
+    selectOnFocus8                    : '#selectOnFocus8',
+    selectOnFocus9                    : '#selectOnFocus9',
+    selectOnFocus10                   : '#selectOnFocus10',
+    selectOnFocus11                   : '#selectOnFocus11',
+    selectOnFocus12                   : '#selectOnFocus12',
+    selectOnFocus13                   : '#selectOnFocus13',
+    selectOnFocus14                   : '#selectOnFocus14',
+    selectOnFocus15                   : '#selectOnFocus15',
+    selectOnFocus16                   : '#selectOnFocus16',
+    selectOnFocus17                   : '#selectOnFocus17',
+    selectOnFocus18                   : '#selectOnFocus18',
+    selectOnFocus19                   : '#selectOnFocus19',
+    selectOnFocus20                   : '#selectOnFocus20',
+    selectOnFocus21                   : '#selectOnFocus21',
+    selectOnFocus22                   : '#selectOnFocus22',
+    selectOnFocus23                   : '#selectOnFocus23',
+    selectOnFocus24                   : '#selectOnFocus24',
+    selectOnFocus25                   : '#selectOnFocus25',
+    selectOnFocus26                   : '#selectOnFocus26',
+    selectOnFocus27                   : '#selectOnFocus27',
+    selectOnFocus28                   : '#selectOnFocus28',
+    selectOnFocus29                   : '#selectOnFocus29',
+    selectOnFocus30                   : '#selectOnFocus30',
+    selectOnFocus31                   : '#selectOnFocus31',
+    selectOnFocus32                   : '#selectOnFocus32',
+    selectOnFocus33                   : '#selectOnFocus33',
+    selectOnFocus34                   : '#selectOnFocus34',
+    selectOnFocus35                   : '#selectOnFocus35',
+    selectOnFocus36                   : '#selectOnFocus36',
+    selectOnFocus37                   : '#selectOnFocus37',
+    selectOnFocus38                   : '#selectOnFocus38',
+    selectOnFocus39                   : '#selectOnFocus39',
+    selectOnFocus40                   : '#selectOnFocus40',
+    issue442                          : '#issue_442',
+    issue442Submit                    : '#issue_442_submit',
+    issue447                          : '#issue_447',
+    result447                         : '#result_447',
+    issue452                          : '#issue_452',
+    issue452Unfocus                   : '#issue_452_unfocus',
+    issue452Formatted                 : '#issue_452_formatted',
+    result452                         : '#result_452',
 };
 
 //-----------------------------------------------------------------------------
 // ---- Helper functions
 
 /*
- function helperGetCaretPosition(wdioElement) { //FIXME Find a way to allow using helper functions inside webdriver.io `execute()` blocks
- console.log('wdioElement:', wdioElement); //DEBUG
- // console.log('this:', this); //DEBUG
- const selector = wdioElement.selector;
- console.log('selector:', selector); //DEBUG
+function helperGetCaretPosition(wdioElement) { //FIXME Find a way to allow using helper functions inside webdriver.io `execute()` blocks
+    console.log('wdioElement:', wdioElement); //DEBUG
+    // console.log('this:', this); //DEBUG
+    const selector = wdioElement.selector;
+    console.log('selector:', selector); //DEBUG
 
- const element = document.querySelector(selector);
- console.log('element.selectionStart:', element.selectionStart); //DEBUG
- return element.selectionStart;
- }
- */
+    const element = document.querySelector(selector);
+    console.log('element.selectionStart:', element.selectionStart); //DEBUG
+    return element.selectionStart;
+}
+*/
 
 
 //-----------------------------------------------------------------------------
 // ---- Tests
 
-xdescribe('webdriver.io page', () => {
+/*
+describe('webdriver.io page', () => {
     it('should have the right title - the fancy generator way', () => {
         browser.url('http://webdriver.io');
         const title = browser.getTitle();
         expect(title).toEqual('WebdriverIO - Selenium 2.0 javascript bindings for nodejs');
     });
 });
+*/
 
 describe('webdriver.io runner', () => {
     it(`should be able to send basic keys to basic inputs (which we'll use later for copy-pasting text strings)`, () => {
@@ -121,10 +242,10 @@ describe('webdriver.io runner', () => {
         expect(browser.getValue(selectors.inputClassic)).toEqual('987654321te01ststYES!ring');
 
         /*
-         expect(helperGetCaretPosition(inputClassic)).toEqual(42); //FIXME This cannot be called correctly
-         const result = browser.getCaretPosition(inputClassic); //FIXME This cannot be called correctly
-         expect(result).toEqual(19);
-         */
+        expect(helperGetCaretPosition(inputClassic)).toEqual(42); //FIXME This cannot be called correctly
+        const result = browser.getCaretPosition(inputClassic); //FIXME This cannot be called correctly
+        expect(result).toEqual(19);
+        */
 
         // Hold some modifier keys
         browser.keys('End');
@@ -156,8 +277,47 @@ describe('webdriver.io runner', () => {
     });
 });
 
+describe('Initialized non-input elements', () => {
+    it('should show the same formatting as their <input> counterparts', () => {
+        browser.url(testUrl);
+
+        /* eslint space-in-parens: 0 */
+        expect(browser.getText(selectors.elementP1   )).toEqual('2.140%');
+        expect(browser.getText(selectors.elementP2   )).toEqual('666,42 €');
+        expect(browser.getText(selectors.elementCode )).toEqual('¥12,345.67');
+        expect(browser.getText(selectors.elementDiv  )).toEqual('$12,345.67');
+        expect(browser.getText(selectors.elementH5   )).toEqual('666.42 CHF');
+        expect(browser.getText(selectors.elementLabel)).toEqual('12,345.67');
+        expect(browser.getText(selectors.elementSpan )).toEqual('');
+    });
+});
+
+describe('Initialized elements with the noEventListeners option', () => {
+    it('should not be react with the autoNumeric listeners', () => {
+        browser.url(testUrl);
+
+        // Focus in that input
+        const input = $(selectors.noEventListenersElement);
+        input.click();
+
+        expect(browser.getValue(selectors.noEventListenersElement)).toEqual('69,67 €');
+        browser.keys(['End', '123', 'Home', '789']);
+        expect(browser.getValue(selectors.noEventListenersElement)).toEqual('78969,67 €123');
+    });
+});
+
+describe('Initialized elements with the readOnly option', () => {
+    it('should not be modifiable', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.readOnlyElement)).toEqual('42.42');
+        browser.keys(['Home', '12345']);
+        expect(browser.getValue(selectors.readOnlyElement)).toEqual('42.42');
+    });
+});
+
 describe('Issue #327 (using inputs from issue #183)', () => {
-    it('should tests for default values', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         /* eslint space-in-parens: 0 */
@@ -192,7 +352,7 @@ describe('Issue #327 (using inputs from issue #183)', () => {
             return { start: input.selectionStart, end: input.selectionEnd };
         }).value;
         expect(inputCaretPosition.start).toEqual(0);
-        expect(inputCaretPosition.end).toEqual(15);
+        expect(inputCaretPosition.end).toEqual(13); //XXX This does not work under Firefox 45.7, but does under firefox 53. Since we only support the browsers last version - 2, let's ignore it.
 
         browser.keys('Tab');
         // Check the text selection
@@ -200,7 +360,7 @@ describe('Issue #327 (using inputs from issue #183)', () => {
             const input = document.querySelector('#issue_183_clamp');
             return { start: input.selectionStart, end: input.selectionEnd };
         }).value;
-        expect(inputCaretPosition.start).toEqual(0);
+        expect(inputCaretPosition.start).toEqual(2);
         expect(inputCaretPosition.end).toEqual(15);
 
         browser.keys('Tab');
@@ -210,7 +370,7 @@ describe('Issue #327 (using inputs from issue #183)', () => {
             return { start: input.selectionStart, end: input.selectionEnd };
         }).value;
         expect(inputCaretPosition.start).toEqual(0);
-        expect(inputCaretPosition.end).toEqual(15);
+        expect(inputCaretPosition.end).toEqual(13);
 
         browser.keys('Tab');
         // Check the text selection
@@ -219,15 +379,28 @@ describe('Issue #327 (using inputs from issue #183)', () => {
             return { start: input.selectionStart, end: input.selectionEnd };
         }).value;
         expect(inputCaretPosition.start).toEqual(0);
-        expect(inputCaretPosition.end).toEqual(15);
+        expect(inputCaretPosition.end).toEqual(13);
     });
 });
 
 describe('Issue #306', () => {
-    it('should tests for default values', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue306input)).toEqual('');
+
+        /*
+        // The following code snippet shows if the browser detects that this is using the selenium geckodriver
+        browser.execute(() => {
+            const input306 = document.querySelector('#issue_306');
+            if (window.navigator.webdriver) {
+                input306.value = 'This is using the gecko webdriver.';
+            } else {
+                input306.value = 'This in NOT using the gecko webdriver.';
+            }
+        });
+        browser.pause(5000);
+        */
     });
 
     it(`should allow entering '0.0'`, () => {
@@ -384,7 +557,7 @@ describe('Issue #306', () => {
 });
 
 describe('Issue #283', () => {
-    it('should tests for default values', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue283Input0)).toEqual('1.12');
@@ -488,7 +661,7 @@ describe('Issue #283', () => {
 });
 
 describe('Issue #326', () => {
-    it('should tests for default values, and focus on it', () => {
+    it('should test for default values, and focus on it', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue326input)).toEqual('12.345.678,00 €');
@@ -538,9 +711,8 @@ describe('Issue #326', () => {
     });
 });
 
-
 describe('Issue #322', () => {
-    it('should tests for default values, and focus on it', () => {
+    it('should test for default values, and focus on it', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue322input)).toEqual('12,345,678.00');
@@ -624,7 +796,7 @@ describe('Issue #322', () => {
 });
 
 describe('Issue #317', () => {
-    it('should tests for default values, and focus on it', () => {
+    it('should test for default values, and focus on it', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue317input)).toEqual('0.00');
@@ -641,7 +813,7 @@ describe('Issue #317', () => {
         // Try to enter a '0' that will be dropped
         browser.keys('0');
 
-        // Check that the value did not change, and the the caret is correctly positionned
+        // Check that the value did not change, and that the caret is correctly positioned
         expect(browser.getValue(selectors.issue317input)).toEqual('0.00');
         const inputCaretPosition = browser.execute(() => {
             const input = document.querySelector('#issue_317');
@@ -661,7 +833,7 @@ describe('Issue #317', () => {
         // Try to enter a '9' that will be dropped
         browser.keys('9');
 
-        // Check that the value did not change, and the the caret is correctly positionned
+        // Check that the value did not change, and that the caret is correctly positioned
         expect(browser.getValue(selectors.issue317input)).toEqual('2,342,423,423,423.00');
         let inputCaretPosition = browser.execute(() => {
             const input = document.querySelector('#issue_317');
@@ -701,8 +873,8 @@ describe('Issue #317', () => {
     });
 });
 
-xdescribe('Issue #303', () => { //FIXME Finish this
-    it('should tests for default values', () => {
+describe('Issue #303', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue303inputP)).toEqual('');
@@ -710,7 +882,7 @@ xdescribe('Issue #303', () => { //FIXME Finish this
     });
 
 
-    it('should position the caret at the right position, depending on the currencySymbolPlacement', () => {
+    xit('should position the caret at the right position, depending on the currencySymbolPlacement', () => {
         // Focus in the non-an input
         const input = $(selectors.issue303inputNonAn);
         input.click();
@@ -736,11 +908,267 @@ xdescribe('Issue #303', () => { //FIXME Finish this
     });
 });
 
+describe('Issue #387', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$220,242.76');
+    });
+
+    it('should cancel the last modifications', () => {
+        // Focus in the input
+        const input = $(selectors.issue387inputCancellable);
+        input.click();
+        // Test the initial value
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+
+        // Test that after deleting characters, we get back the original value
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'Backspace', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$2,202.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+        // Check the text selection
+        const inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#issue_387_cancellable');
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }).value;
+        expect(inputCaretPosition.start).toEqual(0);
+        expect(inputCaretPosition.end).toEqual('$220,242.76'.length);
+
+        // Test that after adding characters, we get back the original value
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', '583']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$225,830,242.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+
+        // Test that after adding and deleting characters, we get back the original value
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Delete', '583', 'Delete', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$225,842.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+
+        // Test that after not modifying the value, we get the same value
+        // Focus in the next input
+        browser.keys(['Tab']);
+        // Test the initial value
+        expect(browser.getValue(selectors.issue387inputCancellableNumOnly)).toEqual('$220,242.76');
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', '146']);
+        expect(browser.getValue(selectors.issue387inputCancellableNumOnly)).toEqual('$220,146,242.76');
+        browser.keys(['Backspace', 'Backspace', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputCancellableNumOnly)).toEqual('$220,242.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellableNumOnly)).toEqual('$220,242.76');
+    });
+
+    it('should select only the numbers on focus, without the currency symbol', () => {
+        // Focus in the first input
+        const input = $(selectors.issue387inputCancellable);
+        input.click();
+
+        // Then focus in the next input
+        browser.keys(['Tab']);
+        // Test the initial value
+        expect(browser.getValue(selectors.issue387inputCancellableNumOnly)).toEqual('$220,242.76');
+        // Check the text selection
+        const inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#issue_387_cancellable_numOnly');
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }).value;
+        // Since `selectNumberOnly` is set to `true`, the currency symbol is not selected by default
+        expect(inputCaretPosition.start).toEqual(1); //XXX This does not work under Firefox 45.7, but does under firefox 53. Since we only support the browsers last version - 2, let's ignore it.
+        expect(inputCaretPosition.end).toEqual('$220,242.76'.length);
+    });
+
+    it('should not cancel the last modifications, since `Enter` is used or the element is blurred', () => {
+        // Focus in the input
+        const input = $(selectors.issue387inputCancellable);
+        input.click();
+        // Test the initial value
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+
+        // Test that after hitting 'Enter' the saved cancellable value is updated
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$22,024.76');
+        browser.keys(['Enter', 'Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$22,024.76');
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', '678']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$22,024,678.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$22,024.76');
+        // Check the text selection
+        const inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#issue_387_cancellable');
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }).value;
+        expect(inputCaretPosition.start).toEqual(0);
+        expect(inputCaretPosition.end).toEqual('$22,024.76'.length);
+
+        // Test that after blurring the input the saved cancellable value is updated
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', '446']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$24,462,024.76');
+        browser.keys(['Tab', 'Shift', 'Tab', 'Shift']); // I focus on the next input, then come back to this one
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$24,462,024.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$24,462,024.76');
+    });
+
+    it('should not cancel the last modifications, since `isCancellable` is set to false', () => {
+        // Focus in the input
+        const input = $(selectors.issue387inputNotCancellable);
+        input.click();
+        // Test the initial value
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$220,242.76');
+
+        // Test that after deleting characters, we get back the original value
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'Backspace', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$2,202.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$2,202.76');
+        // Check the text selection
+        const inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#issue_387_not_cancellable');
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }).value;
+        expect(inputCaretPosition.start).toEqual(0);
+        expect(inputCaretPosition.end).toEqual('$2,202.76'.length);
+
+        // Test that after adding characters, we get back the original value
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', '583']);
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$2,258,302.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$2,258,302.76');
+
+        browser.setValue(selectors.issue387inputNotCancellable, '220242.76');
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$220,242.76');
+        // Test that after adding and deleting characters, we get back the original value
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Delete', '583', 'Delete', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$225,842.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$225,842.76');
+
+        // Test that after not modifying the value, we get the same value
+        // Focus in the next input
+        browser.keys(['Tab']);
+        // Test the initial value
+        expect(browser.getValue(selectors.issue387inputNotCancellableNumOnly)).toEqual('$220,242.76');
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', '146']);
+        expect(browser.getValue(selectors.issue387inputNotCancellableNumOnly)).toEqual('$220,146,242.76');
+        browser.keys(['Backspace', 'Backspace', 'Backspace']);
+        expect(browser.getValue(selectors.issue387inputNotCancellableNumOnly)).toEqual('$220,242.76');
+        browser.keys(['Escape']);
+        expect(browser.getValue(selectors.issue387inputNotCancellableNumOnly)).toEqual('$220,242.76');
+    });
+});
+
+describe('Issue #393', () => { //FIXME Finish this
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue393inputFixed)).toEqual('');
+        expect(browser.getValue(selectors.issue393inputProgressive)).toEqual('2,202.00');
+        expect(browser.getValue(selectors.issue393inputUpperLimit)).toEqual('');
+        expect(browser.getValue(selectors.issue393inputLowerLimit)).toEqual('');
+        expect(browser.getValue(selectors.issue393inputLimitOneSideUp)).toEqual('');
+        expect(browser.getValue(selectors.issue393inputLimitOneSideDown)).toEqual('');
+    });
+    //TODO Create the tests once the mousewheel events will be managed by the Selenium server (cf. http://stackoverflow.com/questions/6735830/how-to-fire-mouse-wheel-event-in-firefox-with-javascript | https://groups.google.com/forum/#!topic/selenium-users/VyE-BB5Z2lU)
+
+    xit('should increment and decrement the value with a fixed step', () => { //FIXME Finish this
+        // Focus in the input
+        const input = $(selectors.issue393inputFixed);
+        input.click();
+        // Test the initial value
+        expect(browser.getValue(selectors.issue393inputFixed)).toEqual('');
+
+        // Simulate a mouseevent on that input element
+        // input.scroll(); //FIXME Does not work : This only used to scroll the view to that element, but does not simulate wheel events (cf. http://webdriver.io/api/utility/scroll.html#Example)
+        /*
+        browser.execute(() => {
+            /!*const evt = document.createEvent('MouseEvents'); //FIXME Does not work (cf. http://stackoverflow.com/a/6740625/2834898)
+            evt.initMouseEvent(
+                'DOMMouseScroll', // in DOMString typeArg,
+                true,  // in boolean canBubbleArg,
+                true,  // in boolean cancelableArg,
+                window,// in views::AbstractView viewArg,
+                120,   // in long detailArg,
+                0,     // in long screenXArg,
+                0,     // in long screenYArg,
+                0,     // in long clientXArg,
+                0,     // in long clientYArg,
+                0,     // in boolean ctrlKeyArg,
+                0,     // in boolean altKeyArg,
+                0,     // in boolean shiftKeyArg,
+                0,     // in boolean metaKeyArg,
+                0,     // in unsigned short buttonArg,
+                null   // in EventTarget relatedTargetArg
+            );
+            document.querySelector('#issue_393_fixed').dispatchEvent(evt);*!/
+
+            const input = document.querySelector('#issue_393_fixed');
+            // input.scrollTop += 20; //FIXME à tester (cf. http://stackoverflow.com/questions/25994971/mousewheel-scrolling-over-div)
+        });
+        */
+        // input.mouseWheel(-100); //FIXME Does not work (cf. http://stackoverflow.com/questions/29837922/how-to-implement-zoom-in-out-by-using-ctrlmousewheel-in-selenium-webdriver)
+        expect(browser.getValue(selectors.issue393inputFixed)).toEqual('1,000.00');
+    });
+});
+
+describe('Elements with the `contenteditable` attribute set to `true`', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getText(selectors.contentEditable1)).toEqual('');
+        expect(browser.getText(selectors.contentEditable2)).toEqual('$12,345,678.90');
+    });
+
+    it('should change the input value accordingly when focusing on the element', () => {
+        const contentEditable1 = $(selectors.contentEditable1);
+        const contentEditable2 = $(selectors.contentEditable2);
+
+        // Focus in the input
+        contentEditable1.click();
+
+        // Test the values
+        // expect(browser.getText(selectors.contentEditable1)).toEqual('\u202f€'); //TODO There is a bug upstream in webdriver.io where `getText` trims whitespaces (https://github.com/webdriverio/webdriverio/issues/1896)
+        expect(browser.getText(selectors.contentEditable1)).toEqual('€'); //TODO Delete this line when the upstream bug (https://github.com/webdriverio/webdriverio/issues/1896) is corrected
+        browser.keys(['Home', '1234567.89']);
+        expect(browser.getText(selectors.contentEditable1)).toEqual('1.234.567,89\u202f€');
+
+        // Focus in the input
+        contentEditable2.click();
+
+        // Test the values
+        expect(browser.getText(selectors.contentEditable2)).toEqual('$12,345,678.90');
+        browser.keys(['ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft']); // Under Firefox, 'Home' does not work and I must rely on that //TODO Change it back when the bug is fixed upstream
+        browser.keys(['Home']); // Under Firefox, 'Home' does not work and I must rely on that //TODO Change it back when the bug is fixed upstream
+        // browser.keys(['Home', 'Delete', 'Delete', 'Delete', 'Delete', 'Delete', 'Delete', '2267']); //TODO Uncomment this line when the bug is fixed upstream
+        browser.keys(['Delete', 'Delete', 'Delete', 'Delete', 'Delete', 'Delete', '2267']); //TODO Delete this line when the bug is fixed upstream
+        expect(browser.getText(selectors.contentEditable2)).toEqual('$226,778.90');
+    });
+
+    it('should not change the element value since `contenteditable` is set to `false`', () => {
+        const contentEditableNotActivated = $(selectors.contentEditableNotActivated);
+
+        // Focus in the input
+        contentEditableNotActivated.click();
+
+        // Test the values
+        expect(browser.getText(selectors.contentEditableNotActivated)).toEqual('69.02 CHF');
+        browser.keys(['Home', '1234']);
+        expect(browser.getText(selectors.contentEditableNotActivated)).toEqual('69.02 CHF');
+    });
+
+    //FIXME Add the paste tests (and check the resulting caret position)
+});
+
 describe('Issue #403', () => {
-    it('should tests for default values', () => {
+    it('should test for default values', () => {
         browser.url(testUrl);
 
         expect(browser.getValue(selectors.issue403a)).toEqual('25.00%');
+        expect(browser.getValue(selectors.issue403b)).toEqual('1.200%');
+        expect(browser.getValue(selectors.issue403c)).toEqual('');
     });
 
     it('should change the input value accordingly when focusing on the element', () => {
@@ -777,25 +1205,28 @@ describe('Issue #403', () => {
         // Focus in the input
         inputB.click();
 
+        // Set the value
+        browser.keys(['Control', 'a', 'Control', '0.01234']);
+
         // Test the input value while the element is focused
-        expect(browser.getValue(selectors.issue403b)).toEqual('0.01200');
+        expect(browser.getValue(selectors.issue403b)).toEqual('0.01234');
 
         // Focus out of the input
         inputA.click();
 
         // Test the input value while the element is not focused
-        expect(browser.getValue(selectors.issue403b)).toEqual('1.200%');
+        expect(browser.getValue(selectors.issue403b)).toEqual('1.234%');
 
         // Then we cycle back twice just to make sure the value stays the same while tabbing in/out
         inputB.click();
-        expect(browser.getValue(selectors.issue403b)).toEqual('0.01200');
+        expect(browser.getValue(selectors.issue403b)).toEqual('0.01234');
         inputA.click();
-        expect(browser.getValue(selectors.issue403b)).toEqual('1.200%');
+        expect(browser.getValue(selectors.issue403b)).toEqual('1.234%');
 
         inputB.click();
-        expect(browser.getValue(selectors.issue403b)).toEqual('0.01200');
+        expect(browser.getValue(selectors.issue403b)).toEqual('0.01234');
         inputA.click();
-        expect(browser.getValue(selectors.issue403b)).toEqual('1.200%');
+        expect(browser.getValue(selectors.issue403b)).toEqual('1.234%');
     });
 
     it('should change the input value accordingly when focusing on the element, with a bigger number of decimal places', () => {
@@ -804,7 +1235,7 @@ describe('Issue #403', () => {
 
         // Focus in the input
         inputC.click();
-        browser.keys(['Control', 'a', 'Control', '1234567.89']);
+        browser.keys(['1234567.89']);
 
         // Test the input value while the element is focused
         expect(browser.getValue(selectors.issue403c)).toEqual('1,234,567.89');
@@ -825,5 +1256,2021 @@ describe('Issue #403', () => {
         expect(browser.getValue(selectors.issue403c)).toEqual('1,234,567.89');
         inputB.click();
         expect(browser.getValue(selectors.issue403c)).toEqual('1.23457MM');
+    });
+});
+
+describe('Negative numbers & brackets notations', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.negativeBrackets1)).toEqual('[1.352.468,24 €]');
+        expect(browser.getValue(selectors.negativeBrackets2)).toEqual('<$1,352,468.24>');
+        expect(browser.getValue(selectors.negativeBrackets3)).toEqual("{1'352'468.24 CHF}");
+        expect(browser.getValue(selectors.negativeBrackets4)).toEqual('(1.352.468,24 €)');
+        expect(browser.getValue(selectors.negativeBrackets5)).toEqual('$-1,352,468.24');
+
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('(1.234,57 €)');
+    });
+
+    it('should hide the parenthesis on focus', () => {
+        const negativeBrackets1 = $(selectors.negativeBrackets1);
+
+        // Focus in the input
+        negativeBrackets1.click();
+        expect(browser.getValue(selectors.negativeBrackets1)).toEqual('-1.352.468,24 €');
+    });
+
+    it('should show the parenthesis back on blur', () => {
+        const negativeBrackets2 = $(selectors.negativeBrackets2);
+
+        // Focus on another the input
+        negativeBrackets2.click();
+        expect(browser.getValue(selectors.negativeBrackets1)).toEqual('[1.352.468,24 €]');
+        expect(browser.getValue(selectors.negativeBrackets2)).toEqual('$-1,352,468.24');
+    });
+
+    it('should not show the parenthesis back on blur if the value has changed for a positive one', () => {
+        const negativeBrackets1 = $(selectors.negativeBrackets1);
+        const negativeBrackets2 = $(selectors.negativeBrackets2);
+
+        // Focus in the input
+        negativeBrackets1.click();
+        browser.keys(['Home', 'Delete']);
+        expect(browser.getValue(selectors.negativeBrackets1)).toEqual('1.352.468,24 €');
+        // Focus on another the input
+        negativeBrackets2.click();
+        expect(browser.getValue(selectors.negativeBrackets1)).toEqual('1.352.468,24 €');
+    });
+
+    xit('should toggle to positive and negative values when inputting `-` or `+`', () => {
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+        const negativeBracketsInput5 = $(selectors.negativeBracketsInput5);
+
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+        browser.keys(['Home', '-']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57'); //FIXME This is working manually, but not when using selenium under Firefox 52
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+
+        negativeBracketsInput5.click();
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+        browser.keys(['Home', '-']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+    });
+
+    it('should hide the parenthesis on focus, via tabbing, for each variations of the currency and negative sign placements', () => {
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+
+        // Focus in the input
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57-');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ -1.234,57');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('-€ 1.234,57');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57- €');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €-');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('-1.234,57 €');
+
+        // Focus elsewhere
+        $(selectors.negativeBrackets1).click();
+
+        // Check that the values are back with the parenthesis
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('(1.234,57 €)');
+    });
+
+    it('should hide the parenthesis on focus, via mouse clicks, for each variations of the currency and negative sign placements', () => {
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+        const negativeBracketsInput2 = $(selectors.negativeBracketsInput2);
+        const negativeBracketsInput3 = $(selectors.negativeBracketsInput3);
+        const negativeBracketsInput4 = $(selectors.negativeBracketsInput4);
+        const negativeBracketsInput5 = $(selectors.negativeBracketsInput5);
+        const negativeBracketsInput6 = $(selectors.negativeBracketsInput6);
+        const negativeBracketsInput7 = $(selectors.negativeBracketsInput7);
+        const negativeBracketsInput8 = $(selectors.negativeBracketsInput8);
+
+        // Focus in the input
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+        negativeBracketsInput2.click();
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57-');
+        negativeBracketsInput3.click();
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ -1.234,57');
+        negativeBracketsInput4.click();
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('-€ 1.234,57');
+        negativeBracketsInput5.click();
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+        negativeBracketsInput6.click();
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57- €');
+        negativeBracketsInput7.click();
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €-');
+        negativeBracketsInput8.click();
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('-1.234,57 €');
+
+        // Focus elsewhere
+        $(selectors.negativeBrackets1).click();
+
+        // Check that the values are back with the parenthesis
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('(1.234,57 €)');
+    });
+
+    it('should correctly remove the brackets when the value is set to a positive one, when the caret in on the far left (Issue #414)', () => {
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+        const negativeBracketsInput2 = $(selectors.negativeBracketsInput2);
+        const negativeBracketsInput3 = $(selectors.negativeBracketsInput3);
+        const negativeBracketsInput4 = $(selectors.negativeBracketsInput4);
+        const negativeBracketsInput5 = $(selectors.negativeBracketsInput5);
+        const negativeBracketsInput6 = $(selectors.negativeBracketsInput6);
+        const negativeBracketsInput7 = $(selectors.negativeBracketsInput7);
+        const negativeBracketsInput8 = $(selectors.negativeBracketsInput8);
+
+        // Focus in the input
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+        browser.keys(['Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+
+        negativeBracketsInput2.click();
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57-');
+        browser.keys(['Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+
+        negativeBracketsInput3.click();
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ -1.234,57');
+        browser.keys(['Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+
+        negativeBracketsInput4.click();
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('-€ 1.234,57');
+        browser.keys(['Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+
+        negativeBracketsInput5.click();
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+        browser.keys(['Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+
+        negativeBracketsInput6.click();
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57- €');
+        browser.keys(['Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+
+        negativeBracketsInput7.click();
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €-');
+        browser.keys(['Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+
+        negativeBracketsInput8.click();
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('-1.234,57 €');
+        browser.keys(['Home', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
+
+        // Focus elsewhere
+        $(selectors.negativeBrackets1).click();
+
+        // Check that the values are correctly formatted when unfocused
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
+    });
+
+    it('should correctly keep the positive value when tabbing between the inputs (Issue #414)', () => {
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+
+        // Focus in the input
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+        browser.keys(['Tab']);
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
+        browser.keys(['Shift', 'Tab', 'Shift']);
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
+    });
+
+    xit('should correctly change back the element value to negative ones, with tabbing (Issue #414)', () => {
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+
+        // Focus in the input
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+        browser.keys(['Home', '-', 'Tab']);
+
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
+        browser.keys(['Home', '-']);
+
+        // Focus elsewhere
+        $(selectors.negativeBrackets1).click();
+
+        // Check that the values are correctly formatted when unfocused
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('(1.234,57)'); //FIXME This is working manually, but not when using selenium under Firefox 52
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('(1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('(€ 1.234,57)');
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('(1.234,57 €)');
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('(1.234,57 €)');
+    });
+
+    xit('should correctly remove the brackets when the value is set to a positive one, when the caret in on the far right (Issue #414)', () => { //FIXME Currently, the user need to type the negative sign two times for it to be taken into account. This needs to be fixed!
+        const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
+        const negativeBracketsInput2 = $(selectors.negativeBracketsInput2);
+        const negativeBracketsInput3 = $(selectors.negativeBracketsInput3);
+        const negativeBracketsInput4 = $(selectors.negativeBracketsInput4);
+        const negativeBracketsInput5 = $(selectors.negativeBracketsInput5);
+        const negativeBracketsInput6 = $(selectors.negativeBracketsInput6);
+        const negativeBracketsInput7 = $(selectors.negativeBracketsInput7);
+        const negativeBracketsInput8 = $(selectors.negativeBracketsInput8);
+
+        // Focus in the input
+        negativeBracketsInput1.click();
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+
+        negativeBracketsInput2.click();
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57-');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+
+        negativeBracketsInput3.click();
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ -1.234,57');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+
+        negativeBracketsInput4.click();
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('-€ 1.234,57');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+
+        negativeBracketsInput5.click();
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57-');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+
+        negativeBracketsInput6.click();
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57- €');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+
+        negativeBracketsInput7.click();
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €-');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+
+        negativeBracketsInput8.click();
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('-1.234,57 €');
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
+
+        // Focus elsewhere
+        $(selectors.negativeBrackets1).click();
+
+        // Check that the values are correctly formatted when unfocused
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
+        expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('€ +1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('+€ 1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput5)).toEqual('€ 1.234,57+');
+        expect(browser.getValue(selectors.negativeBracketsInput6)).toEqual('1.234,57+ €');
+        expect(browser.getValue(selectors.negativeBracketsInput7)).toEqual('1.234,57 €+');
+        expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
+    });
+});
+
+describe('remove() function', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.remove1)).toEqual('2.468,42 €');
+    });
+
+    it('should stop reacting with the AutoNumeric event handlers to user interactions once its removed', () => {
+        const remove1 = $(selectors.remove1);
+
+        // Focus in the input
+        remove1.click();
+        browser.keys(['Home', '115']);
+        expect(browser.getValue(selectors.remove1)).toEqual('1.152.468,42 €');
+
+        // Call the `remove()` function
+        browser.execute(() => {
+            const inputRemove1 = document.querySelector('#remove1');
+            // eslint-disable-next-line
+            const anElement = AutoNumeric.getAutoNumericElement(inputRemove1);
+            anElement.remove();
+        });
+
+        // Check that the value has not changed
+        expect(browser.getValue(selectors.remove1)).toEqual('1.152.468,42 €');
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Delete', 'Delete']);
+        expect(browser.getValue(selectors.remove1)).toEqual('1.15468,42 €');
+    });
+});
+
+describe('undo and redo functions', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €');
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.357,92 €');
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('12.340');
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('');
+    });
+
+    it('should undo the user inputs correctly on <input> elements', () => {
+        let inputCaretPosition;
+        const undoRedoInput = $(selectors.undoRedo1);
+
+        // Focus in the input
+        undoRedoInput.click();
+
+        // Enter some characters to build the history table
+        browser.keys(['Home', '0']); // Input a character that will be dropped and won't be set in the history list
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['1']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.357,92 €'); // 1|1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        browser.keys(['ArrowRight', '2']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.357,92 €'); // 11.|357,92 € -> 112|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['4']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(5);
+
+        browser.keys(['ArrowRight', 'ArrowRight', '6']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 1.124.|357,92 € -> 1.124.3|57,92 € -> 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+
+        // Undos
+        browser.keys(['Control', 'z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.357,92 €'); // 112|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.357,92 €'); // 11.|357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['z']); // This makes sure we cannot go back too far
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+    });
+
+    it('should redo the user inputs correctly on <input> elements, when releasing the Shift then Control key', () => {
+        let inputCaretPosition;
+        // Redos (releasing the keys shift, then ctrl)
+        browser.keys(['Control', 'Shift', 'z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.357,92 €'); // 11.|357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.357,92 €'); // 112|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['z']); // This makes sure we cannot go back too far
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Shift']); // Release the Shift key
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+    });
+
+    it('should redo the user inputs correctly on <input> elements, when releasing the Control then Shift key', () => {
+        let inputCaretPosition;
+        // Undos some more to test the last redos with the specific key release order
+        browser.keys(['Control', 'z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.357,92 €'); // 112|.357,92 €
+        browser.keys(['Control']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.357,92 €'); // 112|.357,92 €
+
+        // Redos (releasing the keys ctrl, then shift)
+        browser.keys(['Control', 'Shift', 'z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Shift']); // Release the Shift key
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+    });
+
+    it('should save the very last known caret/selection position correctly, even if a group separator is added', () => {
+        let inputCaretPosition;
+
+        browser.keys(['1']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.436.157,92 €'); // 112.436.1|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(9);
+
+        browser.keys(['2']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.361.257,92 €'); // 1.124.361.2|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Undo
+        browser.keys(['Control', 'z']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.436.157,92 €'); // 112.436.1|57,92 €
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('112.436.157,92 €'); // 112.436.1|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(9);
+
+        // Redo
+        browser.keys(['Control', 'Shift', 'z', 'Shift', 'Control']);
+        expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.361.257,92 €'); // 1.124.361.2|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+    });
+
+    it('should respect the `historySize` option', () => {
+        let inputCaretPosition;
+        const undoRedoInput = $(selectors.undoRedo3);
+
+        // Focus in the input
+        undoRedoInput.click();
+
+        // Enter some characters to build the history table
+        browser.keys(['Home', 'ArrowRight', 'Shift', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Shift', '5']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('1.540'); // 1|2.3|40 -> 1.5|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['Home', 'Shift', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Shift', '6']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('640'); // 1.5|40 -> 6|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        browser.keys(['Backspace']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('40'); // 6|40 -> |40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['2']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('240'); // |40 -> 2|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        browser.keys(['8']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('2.840'); // 2|40 -> 2.8|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+
+        // Undos
+        browser.keys(['Control', 'zzzzz', 'Control']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('1.540'); // 1.5|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }).value;
+        expect(inputCaretPosition.start).toEqual(0);
+        expect(inputCaretPosition.end).toEqual(3);
+
+
+        // Redos
+        browser.keys(['Control', 'Shift', 'zzzzz', 'Shift', 'Control']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('2.840'); // 2.8|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+
+        // Input more numbers so that the history size overflow
+        browser.keys(['Home', '6']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('62.840'); // |2.840 -> 6|2.840
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        // Undo to the max history size
+        browser.keys(['Control', 'zzzzz', 'Control']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('640'); // 6|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        // Try to undo once more ; this stays on the same state, since the first one got deleted
+        browser.keys(['Control', 'z', 'Control']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('640'); // 6|40
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#undoRedo3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        // Try to redo more states that there is in the history table should only return the last state
+        browser.keys(['Control', 'Shift', 'zzzzzzzzz', 'Shift', 'Control']);
+        expect(browser.getValue(selectors.undoRedo3)).toEqual('62.840');
+    });
+
+    it('should keep the redo history if the use re-enter the same redo information that do not change the intermediary states', () => {
+        const undoRedoInput = $(selectors.undoRedo4);
+
+        // Focus in the input
+        undoRedoInput.click();
+
+        // Enter some characters to build the history table
+        browser.keys(['End', '1234567890']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('1,234,567,890');
+
+        // Undos some states in order to stop at an intermediary state where there are multiple potential redo states after the current history pointer
+        browser.keys(['Control', 'zzzz', 'Control']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('123,456.00');
+
+        // Enter the exact same data that would result in the same next saved state
+        browser.keys(['7']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('1,234,567.00');
+
+        // ...and test if the rest of the history stable is still there by doing some redos
+        browser.keys(['Control', 'Shift', 'z']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('12,345,678.00');
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('123,456,789.00');
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('1,234,567,890.00');
+        browser.keys(['z']);
+        expect(browser.getValue(selectors.undoRedo4)).toEqual('1,234,567,890.00');
+        browser.keys(['Shift', 'Control']); // Release the 'Control' and 'Shift' keys
+    });
+
+    xit('should undo the user inputs correctly on non-input elements', () => { //FIXME This does not work under FF 52...
+        let inputCaretPosition;
+        const undoRedoElement = $(selectors.undoRedo2);
+
+        // Focus in the input
+        undoRedoElement.click();
+
+        // Enter some characters to build the history table
+        browser.keys(['Home', '0']); // Input a character that will be dropped and won't be set in the history list
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['1']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.357,92 €'); // 1|1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        browser.keys(['ArrowRight', '2']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('112.357,92 €'); // 11.|357,92 € -> 112|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['4']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.124.357,92 €'); // 1.124|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(5);
+
+        browser.keys(['ArrowRight', 'ArrowRight', '6']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 1.124.|357,92 € -> 1.124.3|57,92 € -> 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+
+        // Undos
+        browser.keys(['Control', 'z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('112.357,92 €'); // 112|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.357,92 €'); // 11.|357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['z']); // This makes sure we cannot go back too far
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.357,92 €'); // |1.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+    });
+
+    xit('should redo the user inputs correctly on non-input elements, when releasing the Shift then Control key', () => { //FIXME This does not work under FF 52...
+        let inputCaretPosition;
+        // Redos (releasing the keys shift, then ctrl)
+        browser.keys(['Control', 'Shift', 'z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.357,92 €'); // 11.|357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('112.357,92 €'); // 112|.357,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['z']); // This makes sure we cannot go back too far
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Shift']); // Release the Shift key
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+    });
+
+    xit('should redo the user inputs correctly on non-input elements, when releasing the Control then Shift key', () => { //FIXME This does not work under FF 52...
+        let inputCaretPosition;
+        // Undos some more to test the last redos with the specific key release order
+        browser.keys(['Control', 'z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('112.357,92 €'); // 112|.357,92 €
+        browser.keys(['Control']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('112.357,92 €'); // 112|.357,92 €
+
+        // Redos (releasing the keys ctrl, then shift)
+        browser.keys(['Control', 'Shift', 'z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        browser.keys(['z']);
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Control']); // Release the control key
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        browser.keys(['Shift']); // Release the Shift key
+        expect(browser.getText(selectors.undoRedo2)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
+        // Check the caret position
+        inputCaretPosition = browser.execute(() => {
+            const selectionInfo = window.getSelection().getRangeAt(0);
+            const position = {};
+            position.start = selectionInfo.startOffset;
+            position.end = selectionInfo.endOffset;
+            return position.start;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+    });
+});
+
+describe('Issue #423', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue423a)).toEqual('');
+    });
+
+    it('should keep zeros when losing focus and coming back to the element', () => {
+        const inputA = $(selectors.issue423a);
+        const inputB = $(selectors.issue423b);
+
+        // Focus in the input
+        inputA.click();
+
+        // Input the numbers
+        browser.keys(['00123']);
+        expect(browser.getValue(selectors.issue423a)).toEqual('00123');
+
+        // Lose the focus
+        inputB.click();
+        expect(browser.getValue(selectors.issue423a)).toEqual('00123');
+
+        // Focus back in the input
+        inputA.click();
+        expect(browser.getValue(selectors.issue423a)).toEqual('00123');
+    });
+
+    it('should automatically overwrite zeros on the left-hand side when adding numbers', () => {
+        // Input the numbers
+        browser.keys(['End', '4']);
+        expect(browser.getValue(selectors.issue423a)).toEqual('01234');
+        browser.keys(['5']);
+        expect(browser.getValue(selectors.issue423a)).toEqual('12345');
+
+        // Try to add more numbers, that will be dropped due to the length constraint on the input
+        browser.keys(['6']);
+        expect(browser.getValue(selectors.issue423a)).toEqual('12345');
+    });
+});
+
+describe('Issue #409', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue409a)).toEqual('500.40');
+        expect(browser.getValue(selectors.issue409n)).toEqual('500.4');
+        expect(browser.getValue(selectors.issue409f)).toEqual('500.40');
+    });
+
+    it('should keep or remove zeros when losing focus and coming back to the element', () => {
+        const inputA = $(selectors.issue409a);
+        const inputN = $(selectors.issue409n);
+        const inputF = $(selectors.issue409f);
+
+        // Focus on the first input that we want to test
+        inputA.click();
+
+        // Modify the value to an integer
+        browser.keys(['End', 'Backspace', 'Backspace']);
+        inputN.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409a)).toEqual('500.00');
+
+        // Modify the value to an integer
+        browser.keys(['End', 'Backspace']);
+        inputF.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409n)).toEqual('500');
+
+        // Modify the value to float
+        browser.keys(['End', 'Backspace']);
+        inputA.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409f)).toEqual('500.40');
+
+        // Modify the value to an integer
+        inputF.click();
+        browser.keys(['End', 'Backspace', 'Backspace']);
+        inputA.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409f)).toEqual('500');
+    });
+
+    it('should keep or remove zeros when adding back the decimal part, and losing focus and coming back to the element', () => {
+        const inputA = $(selectors.issue409a);
+        const inputN = $(selectors.issue409n);
+        const inputF = $(selectors.issue409f);
+
+        // Focus on the first input that we want to test
+        inputA.click();
+
+        // Modify the value to a float
+        browser.keys(['End', 'ArrowLeft', 'Backspace', '2']);
+        inputN.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409a)).toEqual('500.20');
+        inputA.click();
+        browser.keys(['End', 'Backspace', 'Backspace', '2']);
+        inputN.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409a)).toEqual('500.20');
+
+        // Check that the value is converted to an integer by dropping the last dot character
+        browser.keys(['End', '.']);
+        inputF.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409n)).toEqual('500');
+        inputN.click();
+        // Modify the value to a float
+        browser.keys(['End', '.', '2']);
+        inputF.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409n)).toEqual('500.2');
+
+        // Modify the value to float
+        browser.keys(['End', '.']);
+        inputA.click(); // Focus out of the input so that it reformat itself
+        // Check that the value is converted to an integer by dropping the last dot character
+        expect(browser.getValue(selectors.issue409f)).toEqual('500');
+        inputF.click();
+        browser.keys(['End', '.', '2']);
+        inputA.click(); // Focus out of the input so that it reformat itself
+        expect(browser.getValue(selectors.issue409f)).toEqual('500.20');
+    });
+});
+
+describe('Issue #416', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        // none
+        expect(browser.getValue(selectors.issue416Input1)).toEqual('1.00');
+        // positiveNegative
+        expect(browser.getValue(selectors.issue416Input2)).toEqual('-2.00');
+        expect(browser.getValue(selectors.issue416Input3)).toEqual('3.00');
+        // evenOdd
+        expect(browser.getValue(selectors.issue416Input4)).toEqual('4.00');
+        expect(browser.getValue(selectors.issue416Input5)).toEqual('5.00');
+        // range0To100With4Steps
+        expect(browser.getValue(selectors.issue416Input6)).toEqual('0.00');
+        expect(browser.getValue(selectors.issue416Input7)).toEqual('25.00');
+        expect(browser.getValue(selectors.issue416Input8)).toEqual('50.00');
+        expect(browser.getValue(selectors.issue416Input9)).toEqual('99.00');
+        // rangeSmallAndZero
+        expect(browser.getValue(selectors.issue416Input10)).toEqual('-1.00');
+        expect(browser.getValue(selectors.issue416Input11)).toEqual('0.00');
+        expect(browser.getValue(selectors.issue416Input12)).toEqual('0.08');
+    });
+
+    it('should correctly change the CSS positive/negative classes', () => {
+        const input2 = $(selectors.issue416Input2);
+        const input3 = $(selectors.issue416Input3);
+
+        input2.click();
+        browser.keys(['Home', '-----']);
+        input3.click();
+        browser.keys(['Home', '-----']);
+    });
+
+    it('should correctly change the CSS odd/even classes', () => {
+        const input4 = $(selectors.issue416Input4);
+        const input5 = $(selectors.issue416Input5);
+
+        input4.click();
+        browser.keys(['Home', 'ArrowRight', 'ArrowLeft', '1']);
+        expect(browser.getValue(selectors.issue416Input4)).toEqual('41.00');
+        input5.click();
+        browser.keys(['Home', 'ArrowRight', 'ArrowLeft', '2']);
+        expect(browser.getValue(selectors.issue416Input5)).toEqual('52.00');
+    });
+
+    it('should correctly change the CSS ranges classes', () => {
+        // Not really a test, but it's pretty ;)
+        const input6 = $(selectors.issue416Input6);
+        const input7 = $(selectors.issue416Input7);
+        const input8 = $(selectors.issue416Input8);
+        const input9 = $(selectors.issue416Input9);
+
+        // One cycle
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+
+        // Second cycle
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+
+        input6.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input7.click();
+        browser.keys(['Control', 'a', 'Control', '25']);
+        input8.click();
+        browser.keys(['Control', 'a', 'Control', '50']);
+        input9.click();
+        browser.keys(['Control', 'a', 'Control', '75']);
+    });
+
+    it('should correctly change the CSS `rangeSmallAndZero` classes', () => {
+        // Ditto
+        const input10 = $(selectors.issue416Input10);
+        const input11 = $(selectors.issue416Input11);
+        const input12 = $(selectors.issue416Input12);
+
+        // One cycle
+        input10.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input11.click();
+        browser.keys(['Control', 'a', 'Control', '1']);
+        input12.click();
+        browser.keys(['Control', 'a', 'Control', '-1']);
+
+        input10.click();
+        browser.keys(['Control', 'a', 'Control', '1']);
+        input11.click();
+        browser.keys(['Control', 'a', 'Control', '-1']);
+        input12.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+
+        input10.click();
+        browser.keys(['Control', 'a', 'Control', '-1']);
+        input11.click();
+        browser.keys(['Control', 'a', 'Control', '0']);
+        input12.click();
+        browser.keys(['Control', 'a', 'Control', '1']);
+    });
+});
+
+describe('Options updates', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.optionUpdate1)).toEqual('2.222,22 €');
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('4.444,66 €');
+        expect(browser.getValue(selectors.optionUpdate3)).toEqual('$8,888.00');
+    });
+
+    xit('should update the `decimalCharacterAlternative` option (cf. issue #432)', () => {
+        const input1 = $(selectors.optionUpdate1);
+        input1.click();
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'Delete']);
+        expect(browser.getValue(selectors.optionUpdate1)).toEqual('222.222 €');
+        browser.keys([',']);
+        expect(browser.getValue(selectors.optionUpdate1)).toEqual('2.222,22 €');
+        browser.keys(['Backspace']);
+        expect(browser.getValue(selectors.optionUpdate1)).toEqual('222.222 €');
+        browser.keys(['.']);
+        expect(browser.getValue(selectors.optionUpdate1)).toEqual('2.222,22 €');
+
+
+        const input2 = $(selectors.optionUpdate2);
+        input2.click();
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'Delete']);
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('444.466 €');
+        browser.keys([',']);
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('4.444,66 €');
+        browser.keys(['Backspace']);
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('444.466 €');
+        browser.keys(['*']);
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('4.444,66 €');
+        browser.keys(['Backspace']);
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('444.466 €');
+
+        // Update the option
+        const anElementVersion = browser.execute(() => {
+            const input = document.querySelector('#optionUpdate2');
+            const anElement = AutoNumeric.getAutoNumericElement(input);
+            anElement.options.decimalCharacterAlternative('#');
+            return anElement.rawValue;
+        }).value;
+        expect(anElementVersion).toEqual('444466');
+        browser.keys(['*']); // Ignored
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('444.466 €');
+        browser.keys(['#']);
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('4.444,66 €'); //FIXME This fails under Firefox 52
+
+
+        const input3 = $(selectors.optionUpdate3);
+        input3.click();
+        browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'Delete']);
+        expect(browser.getValue(selectors.optionUpdate3)).toEqual('$888,800');
+        browser.keys(['.']);
+        expect(browser.getValue(selectors.optionUpdate3)).toEqual('$8,888.00');
+        browser.keys(['Backspace']);
+        expect(browser.getValue(selectors.optionUpdate3)).toEqual('$888,800');
+        browser.keys([',']); // Ignored
+        expect(browser.getValue(selectors.optionUpdate3)).toEqual('$888,800'); //FIXME This should work (issue #432)
+    });
+});
+
+describe('`decimalPlacesShownOnFocus` and selections', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.selection1)).toEqual('12.266,123\u202f€');
+    });
+
+    it('should select the decimals correctly regarding the `decimalPlacesShownOnFocus` option', () => {
+        const input1 = $(selectors.selection1);
+
+        // Focus on the input
+        input1.click();
+
+        // Check the text selection in the first input
+        const inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selection1');
+            const anElement = AutoNumeric.getAutoNumericElement(input);
+            anElement.selectDecimal();
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }).value;
+        expect(inputCaretPosition.start).toEqual(7);
+        expect(inputCaretPosition.end).toEqual(13);
+    });
+});
+
+describe('`showOnlyNumbersOnFocus` option', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.showOnlyNumbersOnFocusInput1)).toEqual('-246.813,58\u202f€ loan');
+        expect(browser.getValue(selectors.showOnlyNumbersOnFocusInput2)).toEqual('$-246,813.58 interest');
+    });
+
+    it('should show the unformatted value on focus', () => {
+        const input1 = $(selectors.showOnlyNumbersOnFocusInput1);
+        const input2 = $(selectors.showOnlyNumbersOnFocusInput2);
+
+        // Focus on the first input
+        input1.click();
+        expect(browser.getValue(selectors.showOnlyNumbersOnFocusInput1)).toEqual('-246813,58');
+        expect(browser.getValue(selectors.showOnlyNumbersOnFocusInput2)).toEqual('$-246,813.58 interest');
+
+        // Blur the first input, and focus on the second
+        input2.click();
+        expect(browser.getValue(selectors.showOnlyNumbersOnFocusInput1)).toEqual('-246.813,58\u202f€ loan');
+        expect(browser.getValue(selectors.showOnlyNumbersOnFocusInput2)).toEqual('-246813.58');
+    });
+});
+
+describe('`caretPositionOnFocus` option', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.selectOnFocus1)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus2)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus3)).toEqual('jk-246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus4)).toEqual('jk246.813,58-');
+        expect(browser.getValue(selectors.selectOnFocus5)).toEqual('-jk246.813,58');
+
+        expect(browser.getValue(selectors.selectOnFocus6)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus7)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus8)).toEqual('jk-246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus9)).toEqual('jk246.813,58-');
+        expect(browser.getValue(selectors.selectOnFocus10)).toEqual('-jk246.813,58');
+
+        expect(browser.getValue(selectors.selectOnFocus11)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus12)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus13)).toEqual('jk-246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus14)).toEqual('jk246.813,58-');
+        expect(browser.getValue(selectors.selectOnFocus15)).toEqual('-jk246.813,58');
+
+        expect(browser.getValue(selectors.selectOnFocus16)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus17)).toEqual('-jk246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus18)).toEqual('jk-246.813,58');
+        expect(browser.getValue(selectors.selectOnFocus19)).toEqual('jk246.813,58-');
+        expect(browser.getValue(selectors.selectOnFocus20)).toEqual('-jk246.813,58');
+
+
+        expect(browser.getValue(selectors.selectOnFocus21)).toEqual('-246.813,58jk');
+        expect(browser.getValue(selectors.selectOnFocus22)).toEqual('246.813,58-jk');
+        expect(browser.getValue(selectors.selectOnFocus23)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus24)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus25)).toEqual('-246.813,58jk');
+
+        expect(browser.getValue(selectors.selectOnFocus26)).toEqual('-246.813,58jk');
+        expect(browser.getValue(selectors.selectOnFocus27)).toEqual('246.813,58-jk');
+        expect(browser.getValue(selectors.selectOnFocus28)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus29)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus30)).toEqual('-246.813,58jk');
+
+        expect(browser.getValue(selectors.selectOnFocus31)).toEqual('-246.813,58jk');
+        expect(browser.getValue(selectors.selectOnFocus32)).toEqual('246.813,58-jk');
+        expect(browser.getValue(selectors.selectOnFocus33)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus34)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus35)).toEqual('-246.813,58jk');
+
+        expect(browser.getValue(selectors.selectOnFocus36)).toEqual('-246.813,58jk');
+        expect(browser.getValue(selectors.selectOnFocus37)).toEqual('246.813,58-jk');
+        expect(browser.getValue(selectors.selectOnFocus38)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus39)).toEqual('246.813,58jk-');
+        expect(browser.getValue(selectors.selectOnFocus40)).toEqual('-246.813,58jk');
+    });
+
+    it('should position the caret correctly on focus', () => {
+        let inputCaretPosition;
+        const inputD = $(selectors.selectOnFocusD);
+
+        // Focus on the input before the input series
+        inputD.click();
+
+        // Serie 1
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus1');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus2');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus3');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus4');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(2);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus5');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(3);
+
+        // Serie 2
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus6');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(13);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus7');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(13);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus8');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(13);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus9');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(12);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus10');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(13);
+
+        // Serie 3
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus11');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus12');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus13');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus14');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(9);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus15');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Serie 4
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus16');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus17');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus18');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus19');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus20');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Serie 5
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus21');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus22');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus23');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus24');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(0);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus25');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(1);
+
+        // Serie 6
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus26');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus27');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus28');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus29');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(10);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus30');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(11);
+
+        // Serie 7
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus31');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus32');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus33');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus34');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(7);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus35');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        // Serie 8
+        // Focus on the input and check the caret position -246.813,58jk
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus36');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(9);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus37');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus38');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus39');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(8);
+
+        // Focus on the input and check the caret position
+        browser.keys('Tab');
+        inputCaretPosition = browser.execute(() => {
+            const input = document.querySelector('#selectOnFocus40');
+            return input.selectionStart;
+        }).value;
+        expect(inputCaretPosition).toEqual(9);
+    });
+});
+
+describe('`unformatOnSubmit` option', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue442)).toEqual('12.345,67\u202f€');
+    });
+
+    it('should unformat on submit', () => {
+        const submitButton = $(selectors.issue442Submit);
+
+        submitButton.click(); // Submit the form by clicking on the submit button
+        expect(browser.getValue(selectors.issue442)).toEqual('12345.67');
+    });
+});
+
+describe('`emptyInputBehavior` option', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue447)).toEqual('');
+    });
+
+    it('should detect a `null` value after using `set()`', () => {
+        expect(browser.getText(selectors.result447)).toEqual('Input value is null');
+    });
+
+    it('should change the `rawValue` to `null` when emptied', () => {
+        const issue447 = $(selectors.issue447);
+
+        issue447.click(); // Focus on the input element
+        expect(browser.getValue(selectors.issue447)).toEqual('');
+        browser.keys('1234');
+        expect(browser.getValue(selectors.issue447)).toEqual('1,234');
+        browser.keys('End');
+        browser.keys('Backspace');
+        expect(browser.getValue(selectors.issue447)).toEqual('123');
+        browser.keys('Backspace');
+        expect(browser.getValue(selectors.issue447)).toEqual('12');
+        browser.keys('Backspace');
+        expect(browser.getValue(selectors.issue447)).toEqual('1');
+        browser.keys('Backspace');
+        expect(browser.getValue(selectors.issue447)).toEqual('');
+
+        // Then we test if the rawValue is correctly set to `null`
+        const result = browser.execute(() => {
+            const input = document.querySelector('#issue_447');
+            const an = AutoNumeric.getAutoNumericElement(input);
+            return an.getNumber();
+        }).value;
+        expect(result).toBeNull();
+    });
+
+    //TODO Test that no error are produced when hovering the input
+});
+
+describe('`rawValueDivisor` option', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue452)).toEqual('');
+        expect(browser.getText(selectors.result452)).toEqual('Testing the raw value');
+    });
+
+    it('should update the raw value when divided by a `rawValueDivisor`, and the value is modified manually', () => {
+        // Test entering a number manually, and getting the divided raw value
+        $(selectors.issue452).click(); // Focus on the input element
+        expect(browser.getValue(selectors.issue452)).toEqual('');
+        browser.keys('1234');
+        expect(browser.getValue(selectors.issue452)).toEqual('1,234');
+        expect(browser.getText(selectors.result452)).toEqual('12.34');
+
+        // Test the rawValue directly
+        const result = browser.execute(() => {
+            const input = document.querySelector('#issue_452');
+            const an    = AutoNumeric.getAutoNumericElement(input);
+            return an.getNumericString();
+        }).value;
+        expect(result).toEqual('12.34');
+
+        browser.keys('567.8');
+        expect(browser.getValue(selectors.issue452)).toEqual('1,234,567.8');
+        expect(browser.getText(selectors.result452)).toEqual('12345.678');
+    });
+
+    it('should keep the correct raw value (divided by `rawValueDivisor`) when the element is unfocused', () => {
+        // Focus out of that input and check that the formatted and raw value are still ok
+        $(selectors.issue452Unfocus).click(); // First we change the focus to another element, then try to `set()` a value.
+        expect(browser.getValue(selectors.issue452)).toEqual('1,234,567.80');
+        expect(browser.getText(selectors.result452)).toEqual('12345.678');
+    });
+
+    it('should update the raw value when divided by a `rawValueDivisor`, and the value is modified via a script, while the element is unfocused', () => {
+        // Modify the element value while it does not have the focus
+        const result = browser.execute(() => {
+            const input = document.querySelector('#issue_452');
+            const an = AutoNumeric.getAutoNumericElement(input);
+            an.update(AutoNumeric.getPredefinedOptions().percentageEU3dec);
+            an.set(0.0221456); // This makes sure that if the element is currently unfocused, and an external script modify its value with `set`, the `rawValueDivisor` option is not used. This should only be used when the user is actually inputting numbers manually.
+            return an.getNumericString();
+        }).value;
+        expect(result).toEqual('0.02215');
+        expect(browser.getValue(selectors.issue452)).toEqual('2,215\u202f%');
+        // browser.keys('Esc', 'Esc');
+        // browser.keys('Backspace');
+    });
+
+    it('should update the raw value when divided by a `rawValueDivisor`, and the value is modified via a script, while the element is focused', () => {
+        // Modify the element value while it has the focus
+        $(selectors.issue452).click(); // Focus on the input element
+        const result = browser.execute(() => {
+            const input = document.querySelector('#issue_452');
+            const an = AutoNumeric.getAutoNumericElement(input);
+            an.set(0.07621327); // This makes sure that if the element is currently focused in, and an external script modify its value with `set`, the `rawValueDivisor` option is not used. This should only be used when the user is actually inputting numbers manually.
+            return an.getNumericString();
+        }).value;
+        expect(result).toEqual('0.07621');
+        expect(browser.getValue(selectors.issue452)).toEqual('7,621\u202f%');
+    });
+
+    it('should update on load the formatted and raw value when divided by a `rawValueDivisor`', () => {
+        expect(browser.getValue(selectors.issue452Formatted)).toEqual('12,35\u202f%');
+        const result = browser.execute(() => {
+            const input = document.querySelector('#issue_452_formatted');
+            const an = AutoNumeric.getAutoNumericElement(input);
+            return an.getNumericString();
+        }).value;
+        expect(result).toEqual('0.1235');
     });
 });

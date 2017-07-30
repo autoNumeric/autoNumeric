@@ -4,8 +4,8 @@ Version `4` has seen a [lots of improvements and new features](https://github.co
 
 ### Initialization
 
-Initialization of an AutoNumeric object [has changed](https://github.com/autoNumeric/autoNumeric/#initialization) a bit.
-Since AutoNumeric is now an ES6 module, `AutoNumeric` being the name of the `class`, and since the jQuery dependency has been dropped, you now longer need to first select the DOM element with jQuery, then call the `$(yourElement).autoNumeric('init', {options})` method, but only need to instantiate an `AutoNumeric` object using `new AutoNumeric(yourElement, {options})`.
+Initialization of an AutoNumeric object [has changed](https://github.com/autoNumeric/autoNumeric/#initialization) a bit.<br>
+Since AutoNumeric is now an ES6 module, *`AutoNumeric` being the name of the `class`*, and since the jQuery dependency has been dropped, you now longer need to first select the DOM element with jQuery, then call the `$(yourElement).autoNumeric('init', {options})` method, but only need to instantiate an `AutoNumeric` object using `new AutoNumeric(yourElement, {options})`.
 
 | <= `v2` (Before)          | `v4` (After) |
 | :---------------- | :-----------  |
@@ -15,7 +15,7 @@ Since AutoNumeric is now an ES6 module, `AutoNumeric` being the name of the `cla
 ### Configuration
 
 The old option names have changed and are deprecated, in favor of the [new ones](https://github.com/autoNumeric/autoNumeric/#options).<br>
-To help you switch to the new names, warning messages are displayed in the console if any old name is detected.
+To help you switch to the new names, detailed warning messages are displayed in the console if an old option name is detected.
 
 | <= `v2` (Before)          | `v4` (After) |
 | :---------------- | :-----------  |
@@ -49,10 +49,10 @@ To help you switch to the new names, warning messages are displayed in the conso
 
 ### Method calls
 
-Moreover, since we are now using an `AutoNumeric` object, we can now directly call its [methods](https://github.com/autoNumeric/autoNumeric/#methods) (and [chain](https://github.com/autoNumeric/autoNumeric/#function-chaining) them if needed) like `anElement.set(42)`.<br> 
+Moreover, since we are now using an `AutoNumeric` object, we can now directly call its [methods](https://github.com/autoNumeric/autoNumeric/#methods) (and [chain](https://github.com/autoNumeric/autoNumeric/#function-chaining) them if needed).<br> 
 In the following table, the `anElement` variable is created using `const anElement = new AutoNumeric(domElement, {options})`.
 
-The old methods are now called like so:
+The methods are now called like so:
 
 | <= `v2` (Before)          | `v4` (After) |
 | :---------------- | :-----------  |
@@ -77,4 +77,4 @@ The old methods are now called like so:
 Check the [documentation](https://github.com/autoNumeric/autoNumeric/#instantiated-methods) to see how some of those functions signatures changed.
 
 
-If you encounter any problem upgrading to `v4`, feel free to contacts us on our [Gitter channel](https://gitter.im/autoNumeric/autoNumeric) or on IRC on Freenode #autoNumeric!
+If you encounter any problem upgrading to `v4`, feel free to contacts us on our [Gitter channel](https://gitter.im/autoNumeric/autoNumeric) or on IRC on Freenode `#autoNumeric`!

@@ -12,7 +12,11 @@ autoNumeric is a standalone Javascript library that provides live *as-you-type* 
 <br>
 [![Gitter chat][gitter-image]][gitter-url]
 
-The latest stable branch is version [4.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>For older stable versions, please take a look [here](#older-versions), while for the latest development version, check the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br><br>
+The latest stable branch is always on `master`. Currently this is version [4.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>
+if you want to live dangerously, you can check out the latest development version in the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br>
+<br>
+For older stable versions, please take a look [here](#older-versions).<br>
+Alternatively, you can **use our [guide](HowToUpgradeToV4.md) for upgrading from version `1.9`/`2` to version `4`.**<br><br>
 Moreover, you can take a look at what could be the next features coming to autoNumeric on our [project](https://github.com/autoNumeric/autoNumeric/projects) page *(feel free to participate!)*.
 
 #### Highlights
@@ -889,6 +893,8 @@ None!
 
 ## Older versions
 The previous stable autoNumeric version `v2.0.13` can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/v2.0.13), while the older `v1.9.46` can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/1.9.46).
+
+Check out the [upgrade guide](HowToUpgradeToV4.md) if you need help upgrading from version `1.9`/`2` to version `4`.
 
 ## Related projects
 For integration into [Rails](http://rubyonrails.org/) projects, you can use the [autonumeric-rails](https://github.com/randoum/autonumeric-rails) project.

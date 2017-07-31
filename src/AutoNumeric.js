@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0
- * @date         2017-07-28 UTC 22:22
+ * @version      4.0.1
+ * @date         2017-07-31 UTC 19:40
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -815,7 +815,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0';
+        return '4.0.1';
     }
 
     /**
@@ -3607,20 +3607,29 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Format the given number (or numeric string) with the given options. This returns the formatted value as a string.
-     * This can also format the give DOM element value with the given options and returns the formatted value as a string.
-     * Note : This function does update that element value with the newly formatted value in the process.
+     * This can also format the given DOM element value with the given options and returns the formatted value as a string.
+     * Note : This function does *not* update that element value with the newly formatted value.
+     * This basically allows to get the formatted value without first having to initialize an AutoNumeric object.
      *
-     * @param {number|string|HTMLElement|HTMLInputElement} valueOrDomElement A number, or a string that represent a javascript number, or a DOM element
-     * @param {object|null} options
+     * @param {number|string|HTMLElement|HTMLInputElement} numericStringOrDomElement A number, or a string that represent a javascript number, or a DOM element
+     * @param {object|null} options Multiple objects can be passed, the latter overwriting the settings from the former ones
      * @returns {string|null}
      */
-    static format(valueOrDomElement, ...options) {
-        if (AutoNumericHelper.isUndefined(valueOrDomElement) || valueOrDomElement === null) {
+    static format(numericStringOrDomElement, ...options) {
+        if (AutoNumericHelper.isUndefined(numericStringOrDomElement) || numericStringOrDomElement === null) {
             return null;
         }
 
-        if (!AutoNumericHelper.isString(valueOrDomElement) && !AutoNumericHelper.isNumber(valueOrDomElement)) {
-            AutoNumericHelper.throwError(`The value "${valueOrDomElement}" being "set" is not numeric and therefore cannot be used appropriately.`);
+        // Retrieve the value to format
+        let value;
+        if (AutoNumericHelper.isElement(numericStringOrDomElement)) {
+            value = AutoNumericHelper.getElementValue(numericStringOrDomElement);
+        } else {
+            value = numericStringOrDomElement;
+        }
+
+        if (!AutoNumericHelper.isString(value) && !AutoNumericHelper.isNumber(value)) {
+            AutoNumericHelper.throwError(`The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`);
         }
 
         // Manage options
@@ -3628,16 +3637,18 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // Initiate a very basic settings object
         const settings = Object.assign({}, this.getDefaultConfig(), optionsToUse);
-        if (valueOrDomElement < 0) {
+        if (value < 0) {
             settings.negativeSignCharacter = '-';
+        } else {
+            settings.negativeSignCharacter = '';
         }
 
         const regex = {};
         this._cachesUsualRegularExpressions(settings, regex); // This is needed by `_stripAllNonNumberCharacters` that uses those regex
 
-        // Check the validity of the `valueOrDomElement` parameter
-        // Convert the valueOrDomElement to a numeric string, stripping unnecessary characters in the process
-        let valueString = this._toNumericValue(valueOrDomElement, settings);
+        // Check the validity of the `value` parameter
+        // Convert the value to a numeric string, stripping unnecessary characters in the process
+        let valueString = this._toNumericValue(value, settings);
         if (isNaN(Number(valueString))) {
             AutoNumericHelper.throwError(`The value [${valueString}] that you are trying to format is not a recognized number.`);
         }
@@ -3650,6 +3661,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             AutoNumericHelper.throwError(`The value [${valueString}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`);
         }
 
+        // Generate the `negativePositiveSignPlacement` option as needed
+        this._correctNegativePositiveSignPlacementOption(settings);
         // Calculate the needed decimal places
         this._calculateDecimalPlacesOnInit(settings);
 
@@ -3681,9 +3694,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Note: This does *not* update that element value.
      * This basically allows to get the unformatted value without first having to initialize an AutoNumeric object.
      *
-     * @param {string|number|HTMLElement|HTMLInputElement} numericStringOrDomElement
+     * @param {string|number|HTMLElement|HTMLInputElement} numericStringOrDomElement A number, or a string that represent a javascript number, or a DOM element
      * @param {object|null} options Multiple objects can be passed, the latter overwriting the settings from the former ones
-     * @returns {*}
+     * @returns {string|number|NaN}
      */
     static unformat(numericStringOrDomElement, ...options) {
         if (AutoNumericHelper.isNumberStrict(numericStringOrDomElement)) {
@@ -3691,6 +3704,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             return numericStringOrDomElement;
         }
 
+        // Retrieve the value to unformat
         let value;
         if (AutoNumericHelper.isElement(numericStringOrDomElement)) {
             value = AutoNumericHelper.getElementValue(numericStringOrDomElement);
@@ -3732,6 +3746,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             return NaN;
         }
 
+        // Generate the `negativePositiveSignPlacement` option as needed
+        this._correctNegativePositiveSignPlacementOption(settings);
         // Calculate the needed decimal places
         this._calculateDecimalPlacesOnInit(settings);
         
@@ -6497,29 +6513,32 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * then we modify the default value of `negativePositiveSignPlacement` in order to keep the resulting output logical by default :
      * - "$-1,234.56" instead of "-$1,234.56" ({currencySymbol: "$", negativePositiveSignPlacement: "r"})
      * - "-1,234.56$" instead of "1,234.56-$" ({currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "p"})
+     *
+     * @param {object} settings
      */
-    _correctNegativePositiveSignPlacementOption() {
+    static _correctNegativePositiveSignPlacementOption(settings) {
+        //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
         // If negativePositiveSignPlacement is already set, we do not overwrite it
-        if (!AutoNumericHelper.isNull(this.settings.negativePositiveSignPlacement)) {
+        if (!AutoNumericHelper.isNull(settings.negativePositiveSignPlacement)) {
             return;
         }
 
-        if (!AutoNumericHelper.isUndefined(this.settings) &&
-            AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.negativePositiveSignPlacement) &&
-            !AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.currencySymbol)) {
-            switch (this.settings.currencySymbolPlacement) {
+        if (!AutoNumericHelper.isUndefined(settings) &&
+            AutoNumericHelper.isUndefinedOrNullOrEmpty(settings.negativePositiveSignPlacement) &&
+            !AutoNumericHelper.isUndefinedOrNullOrEmpty(settings.currencySymbol)) {
+            switch (settings.currencySymbolPlacement) {
                 case AutoNumeric.options.currencySymbolPlacement.suffix:
-                    this.settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix; // Default -1,234.56 €
+                    settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix; // Default -1,234.56 €
                     break;
                 case AutoNumeric.options.currencySymbolPlacement.prefix:
-                    this.settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.left; // Default -$1,234.56
+                    settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.left; // Default -$1,234.56
                     break;
                 default :
                 //
             }
         } else {
             // Sets the default value if `negativePositiveSignPlacement` is `null`
-            this.settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.left;
+            settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.left;
         }
     }
 
@@ -6950,7 +6969,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this._runCallbacksFoundInTheSettingsObject();
 
         // Improve the `negativePositiveSignPlacement` option if needed
-        this._correctNegativePositiveSignPlacementOption();
+        this.constructor._correctNegativePositiveSignPlacementOption(this.settings);
 
         // Set the `caretPositionOnFocus` and `selectOnFocus` options so that they do not conflict, if one of those have been set manually by the user.
         // If order to check that, we take a look at the original options the user passed as an argument, not `this.settings` that have been merged with the default settings. //TODO Check the validity of that comment

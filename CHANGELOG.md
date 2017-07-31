@@ -1,5 +1,9 @@
 ## Changelog for autoNumeric
 
+### 4.0.1
++ Fix issue #471 The static `format()` function does not keep the negative sign
++ Fix issue #472 The static `AutoNumeric.format()` function does not accept DOM element as its first parameter
+
 ### 4.0.0
 + Release `v4.0.0`
 + The highlights of this new version are:

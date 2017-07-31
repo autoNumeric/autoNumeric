@@ -16,7 +16,7 @@ The latest stable branch is always on `master`. Currently this is version [4.*](
 if you want to live dangerously, you can check out the latest development version in the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br>
 <br>
 For older stable versions, please take a look [here](#older-versions).<br>
-Alternatively, you can **use our [guide](HowToUpgradeToV4.md) for upgrading from version `1.9`/`2` to version `4`.**<br><br>
+Alternatively, you can **use our [guide](doc/HowToUpgradeToV4.md) for upgrading from version `1.9`/`2` to version `4`.**<br><br>
 Moreover, you can take a look at what could be the next features coming to autoNumeric on our [project](https://github.com/autoNumeric/autoNumeric/projects) page *(feel free to participate!)*.
 
 #### Highlights
@@ -876,7 +876,7 @@ For questions and support please use the [Gitter chat room](https://gitter.im/au
 
 ## How to contribute?
 Contributors and pull requests are welcome.<br>Feel free to [contact](#questions) us for any questions.<br>
-For more information about how to contribute, please check the [CONTRIBUTING](CONTRIBUTING.md) file which has more details about it.
+For more information about how to contribute, please check the [CONTRIBUTING](doc/CONTRIBUTING.md) file which has more details about it.
 
 In a nutshell :
 - Get the latest source `git clone -b next https://github.com/autoNumeric/autoNumeric.git && cd autoNumeric && yarn install`
@@ -885,7 +885,7 @@ In a nutshell :
   - If you encounter any linting problems, you can try to automatically fix those with `yarn lintfix` 
 - Create a pull request, and we'll check it out as soon as possible!
 
-Again, be sure to check the [CONTRIBUTING](CONTRIBUTING.md) guidelines for more details.<br>
+Again, be sure to check the [CONTRIBUTING](doc/CONTRIBUTING.md) guidelines for more details.<br>
 Also, feel free to follow our RSS feeds on [master](https://github.com/autoNumeric/autoNumeric/commits/master.atom) and [next](https://github.com/autoNumeric/autoNumeric/commits/next.atom) to keep up with the latest commits.
 
 ## Dependencies
@@ -894,7 +894,7 @@ None!
 ## Older versions
 The previous stable autoNumeric version `v2.0.13` can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/v2.0.13), while the older `v1.9.46` can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/1.9.46).
 
-Check out the [upgrade guide](HowToUpgradeToV4.md) if you need help upgrading from version `1.9`/`2` to version `4`.
+Check out the [upgrade guide](doc/HowToUpgradeToV4.md) if you need help upgrading from version `1.9`/`2` to version `4`.
 
 ## Related projects
 For integration into [Rails](http://rubyonrails.org/) projects, you can use the [autonumeric-rails](https://github.com/randoum/autonumeric-rails) project.
@@ -910,7 +910,7 @@ For integration into Javascript frameworks, you can use:
 *Note: Some of those projects may lag with the latest AutoNumeric stable version, or even be incomplete*
 
 ## Other documentation
-The old and outdated documentation can be found in the [Documentation](Documentation.md) file.<br>
+The old and outdated documentation can be found in the [Documentation](doc/Documentation.md) file.<br>
 For some examples and an option code generator for the old v1.9.* version, take a look [here](http://www.decorplanit.com/plugin/).
 
 ## Licence

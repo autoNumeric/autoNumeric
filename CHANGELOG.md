@@ -1,5 +1,9 @@
 ## Changelog for autoNumeric
 
+### 4.0.2
++ Fix issue #473 Static `format()` and `unformat()` functions ignores the `rawValueDivisor` option
++ Fix `AutoNumeric.unformat()` that used the number of decimal places shown on focus instead of the one for the raw value.
+
 ### 4.0.1
 + Fix issue #471 The static `format()` function does not keep the negative sign
 + Fix issue #472 The static `AutoNumeric.format()` function does not accept DOM element as its first parameter

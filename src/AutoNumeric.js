@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.1
- * @date         2017-07-31 UTC 19:40
+ * @version      4.0.2
+ * @date         2017-08-02 UTC 02:50
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -815,7 +815,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.1';
+        return '4.0.2';
     }
 
     /**
@@ -3666,6 +3666,12 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Calculate the needed decimal places
         this._calculateDecimalPlacesOnInit(settings);
 
+        // Multiply the raw value with `rawValueDivisor` if defined
+        if ((!AutoNumericHelper.isUndefinedOrNullOrEmpty(settings.rawValueDivisor) && settings.rawValueDivisor !== 0) && // Only divide if the `rawValueDivisor` option is set
+            valueString !== '' && valueString !== null) { // Do not modify the `valueString` if it's an empty string or null
+            valueString *= settings.rawValueDivisor;
+        }
+
         // Everything is ok, proceed to rounding, formatting and grouping
         valueString = this._roundFormattedValueShownOnFocus(valueString, settings);
         valueString = this._modifyNegativeSignAndDecimalCharacterForFormattedValue(valueString, settings);
@@ -3749,9 +3755,21 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Generate the `negativePositiveSignPlacement` option as needed
         this._correctNegativePositiveSignPlacementOption(settings);
         // Calculate the needed decimal places
+        if (settings.decimalPlacesRawValue) { // `originalDecimalPlacesRawValue` needs to be defined
+            settings.originalDecimalPlacesRawValue = settings.decimalPlacesRawValue;
+        } else {
+            settings.originalDecimalPlacesRawValue = settings.decimalPlaces;
+        }
+
         this._calculateDecimalPlacesOnInit(settings);
+
+        // Divide the raw value with `rawValueDivisor` if defined
+        if ((!AutoNumericHelper.isUndefinedOrNullOrEmpty(settings.rawValueDivisor) && settings.rawValueDivisor !== 0) && // Only divide if the `rawValueDivisor` option is set
+            value !== '' && value !== null) { // Do not modify the `value` if it's an empty string or null
+            value /= settings.rawValueDivisor;
+        }
         
-        value = this._roundFormattedValueShownOnFocus(value, settings);
+        value = this._roundRawValue(value, settings);
         value = value.replace(settings.decimalCharacter, '.'); // Here we need to convert back the decimal character to a period since `_roundValue` adds it in some cases
         value = this._toLocale(value, settings.outputFormat);
 

@@ -46,7 +46,6 @@ const autoNumericOptionsEuro = {
     decimalCharacterAlternative: '.',
     currencySymbol             : ' €',
     currencySymbolPlacement    : 's',
-    roundingMethod             : 'U',
 };
 const autoNumericOptionsEuroNumber = {
     digitGroupSeparator        : '.',
@@ -54,7 +53,6 @@ const autoNumericOptionsEuroNumber = {
     decimalCharacterAlternative: '.',
     currencySymbol             : ' €',
     currencySymbolPlacement    : 's',
-    roundingMethod             : 'U',
     outputFormat               : 'number',
 };
 const autoNumericOptionsDollar = {
@@ -62,7 +60,6 @@ const autoNumericOptionsDollar = {
     decimalCharacter       : '.',
     currencySymbol         : '$',
     currencySymbolPlacement: 'p',
-    roundingMethod         : 'U',
 };
 
 describe('The autoNumeric object', () => {
@@ -5625,6 +5622,7 @@ describe('Static autoNumeric functions', () => {
 
         it('should unformat with user options', () => {
             expect(AutoNumeric.unformat('1.234.567,89 €', autoNumericOptionsEuroNumber)).toEqual(1234567.89);
+            expect(AutoNumeric.unformat('1.234.567,86123 €', autoNumericOptionsEuroNumber)).toEqual(1234567.86);
             expect(AutoNumeric.unformat('1.234,56 €', autoNumericOptionsEuroNumber)).toEqual(1234.56);
             expect(AutoNumeric.unformat('123,45 €', autoNumericOptionsEuroNumber)).toEqual(123.45);
             expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);
@@ -5633,6 +5631,12 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.unformat('123,45 €', autoNumericOptionsEuro)).toEqual('123.45');
             expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuro)).toEqual('0.00');
             expect(AutoNumeric.unformat(null, autoNumericOptionsEuro)).toEqual(null);
+
+            expect(AutoNumeric.unformat('4,797\u202f%', AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0.04797');
+            expect(AutoNumeric.unformat('-2,541\u202f%', AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('-0.02541');
+            expect(AutoNumeric.unformat('0,480\u202f%', AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0.00480');
+            expect(AutoNumeric.unformat('0,474\u202f%', AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0.00474');
+            expect(AutoNumeric.unformat('-0,254\u202f%', AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('-0.00254');
         });
 
         it('should unformat with multiple user options overwriting each other in the right order', () => {
@@ -5931,6 +5935,7 @@ describe('Static autoNumeric functions', () => {
 
         it('should format with user options', () => {
             expect(AutoNumeric.format(1234.56, autoNumericOptionsEuro)).toEqual('1.234,56 €');
+            expect(AutoNumeric.format(1234.56123, autoNumericOptionsEuro)).toEqual('1.234,56 €');
             expect(AutoNumeric.format('1.234,56 €', autoNumericOptionsEuro)).toEqual('1.234,56 €');
             expect(AutoNumeric.format('1234.56', autoNumericOptionsEuro)).toEqual('1.234,56 €');
             expect(AutoNumeric.format(123.45, autoNumericOptionsEuro)).toEqual('123,45 €');
@@ -5944,6 +5949,12 @@ describe('Static autoNumeric functions', () => {
 
             expect(AutoNumeric.format(null, autoNumericOptionsEuro)).toEqual(null);
             expect(AutoNumeric.format(undefined, autoNumericOptionsEuro)).toEqual(null);
+
+            expect(AutoNumeric.format(0.04796656, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('4,797\u202f%');
+            expect(AutoNumeric.format(-0.02541148, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('-2,541\u202f%');
+            expect(AutoNumeric.format(0.004796656, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0,480\u202f%');
+            expect(AutoNumeric.format(0.004742656, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0,474\u202f%');
+            expect(AutoNumeric.format(-0.002541148, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('-0,254\u202f%');
         });
 
         it('should format with multiple user options overwriting each other in the right order', () => {

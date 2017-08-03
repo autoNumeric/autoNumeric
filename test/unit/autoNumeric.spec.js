@@ -5627,6 +5627,15 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.unformat('123,45 €', autoNumericOptionsEuroNumber)).toEqual(123.45);
             expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);
 
+            expect(AutoNumeric.unformat('1.234,56\u202f€', AutoNumeric.getPredefinedOptions().euro)).toEqual('1234.56');
+            expect(AutoNumeric.unformat('1.234,56\u202f€', 'euro')).toEqual('1234.56');
+            expect(AutoNumeric.unformat('1.234,56\u202f€', ['euro'])).toEqual('1234.56');
+            expect(AutoNumeric.unformat('1.234,56 CFP', ['euro', { currencySymbol: ' CFP' }])).toEqual('1234.56');
+            expect(AutoNumeric.unformat('1.234,56 CFP', 'euro', { currencySymbol: ' CFP' })).toEqual('1234.56');
+            expect(AutoNumeric.unformat('72.687,41\u202f€', AutoNumeric.getPredefinedOptions().euro)).toEqual('72687.41');
+            expect(AutoNumeric.unformat('72.687,41\u202f€', 'euro')).toEqual('72687.41');
+            expect(AutoNumeric.unformat('72.687,41\u202f€', ['euro'])).toEqual('72687.41');
+
             expect(AutoNumeric.unformat('1.234,56 €', autoNumericOptionsEuro)).toEqual('1234.56');
             expect(AutoNumeric.unformat('123,45 €', autoNumericOptionsEuro)).toEqual('123.45');
             expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuro)).toEqual('0.00');
@@ -5941,6 +5950,15 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.format(123.45, autoNumericOptionsEuro)).toEqual('123,45 €');
             expect(AutoNumeric.format('123,45 €', autoNumericOptionsEuro)).toEqual('123,45 €');
             expect(AutoNumeric.format(0, autoNumericOptionsEuro)).toEqual('0,00 €');
+
+            expect(AutoNumeric.format(1234.56, AutoNumeric.getPredefinedOptions().euro)).toEqual('1.234,56\u202f€');
+            expect(AutoNumeric.format(1234.56, 'euro')).toEqual('1.234,56\u202f€');
+            expect(AutoNumeric.format(1234.56, ['euro'])).toEqual('1.234,56\u202f€');
+            expect(AutoNumeric.format(1234.56, ['euro', { currencySymbol: ' CFP' }])).toEqual('1.234,56 CFP');
+            expect(AutoNumeric.format(1234.56, 'euro', { currencySymbol: ' CFP' })).toEqual('1.234,56 CFP');
+            expect(AutoNumeric.format(72687.408552029, AutoNumeric.getPredefinedOptions().euro)).toEqual('72.687,41\u202f€');
+            expect(AutoNumeric.format(72687.408552029, 'euro')).toEqual('72.687,41\u202f€');
+            expect(AutoNumeric.format(72687.408552029, ['euro'])).toEqual('72.687,41\u202f€');
 
             expect(AutoNumeric.format(1234.56, autoNumericOptionsDollar)).toEqual('$1,234.56');
             expect(AutoNumeric.format(123.45, autoNumericOptionsDollar)).toEqual('$123.45');

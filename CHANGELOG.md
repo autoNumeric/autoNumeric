@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.0.3
++ Fix issue #474 `AutoNumeric.format()` and `AutoNumeric.unformat()` do not accept named options
+
 ### 4.0.2
 + Fix issue #473 Static `format()` and `unformat()` functions ignores the `rawValueDivisor` option
 + Fix `AutoNumeric.unformat()` that used the number of decimal places shown on focus instead of the one for the raw value.

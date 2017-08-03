@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.2
+ * @version      4.0.3
  * @date         2017-08-02 UTC 02:50
  *
  * @authors      Bob Knothe, Alexandre Bonneau
@@ -815,7 +815,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.2';
+        return '4.0.3';
     }
 
     /**
@@ -3580,7 +3580,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Analyse the given array `options` and return a single 'merged' option objet.
      * `options` can be `null`, or an array of an option objects, or an array containing another array of option objects / strings (pre-defined option names)
      *
-     * @param {null|Array<object|Array<string|object>>} options
+     * @param {null|Array<object|string|Array<string|object>>} options
      * @returns {null|object}
      * @private
      */
@@ -3597,7 +3597,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 });
             } else if (options.length >= 1) {
                 options.forEach(optionObject => {
-                    Object.assign(optionsResult, optionObject);
+                    Object.assign(optionsResult, this._getOptionObject(optionObject));
                 });
             }
         }

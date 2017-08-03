@@ -124,7 +124,7 @@ With that said, autoNumeric supports most international numeric formats and curr
 You can install autoNumeric with your preferred dependency manager:
 ```bash
 # with `yarn` :
-yarn add autonumeric --save
+yarn add autonumeric
 # or with `npm` :
 npm install autonumeric --save
 ```
@@ -370,40 +370,40 @@ If you feel a common currency option is missing, please [create a pull request](
 
 Moreover, autoNumeric provides the following common options:
 
-| Option name | Description |
-| :---------------- | :---------------- |
-| `dotDecimalCharCommaSeparator` | Set the decimal character as a dot `.` and the group separator as a comma `,` |
-| `commaDecimalCharDotSeparator` | Set the decimal character as a comma `,` and the group separator as a dot `.` |
-| `integer` | Set the minimum and maximum value so that only an integer can be entered, without any decimal places available |
-| `integerPos` | Set the minimum and maximum value so that only a positive integer can be entered |
-| `integerNeg` | Set the minimum and maximum value so that only a negative integer can be entered |
-| `float` | Set the minimum and maximum value so that a float can be entered, without the default `2` decimal places |
-| `floatPos` | Set the minimum and maximum value so that only a positive float can be entered |
-| `floatNeg` | Set the minimum and maximum value so that only a negative float can be entered |
-| `numeric` | Format the value as a numeric string (with no digit group separator, and a dot for the decimal point) |
-| `numericPos` | Idem above, but only allow positive values |
-| `numericNeg` | Idem above, but only allow negative values |
-| `euro` | Same configuration than `French` |
-| `euroPos` | Idem above, but only allow positive values |
-| `euroNeg` | Idem above, but only allow negative values |
-| `euroSpace` | Same configuration than `French` except a space is used for the group separator instead of the dot |
-| `euroSpacePos` | Idem above, but only allow positive values |
-| `euroSpaceNeg` | Idem above, but only allow negative values |
-| `dollar` | Same configuration than `NorthAmerican`  |
-| `dollarPos` | Idem above, but only allow positive values |
-| `dollarNeg` | Idem above, but only allow negative values |
-| `percentageEU2dec` | Same configuration than `French`, but display a percent `%` sign instead of the currency sign, with `2` decimal places |
-| `percentageEU2decPos` | Idem above, but only allow positive values |
-| `percentageEU2decNeg` | Idem above, but only allow negative values |
-| `percentageEU3dec` | Same configuration than `French`, but display a percent `%` sign instead of the currency sign, with `3` decimal places |
-| `percentageEU3decPos` | Idem above, but only allow positive values |
-| `percentageEU3decNeg` | Idem above, but only allow negative values |
-| `percentageUS2dec` | Same configuration than `NorthAmerican`, but display a percent `%` sign instead of the currency sign, with `2` decimal places |
-| `percentageUS2decPos` | Idem above, but only allow positive values |
-| `percentageUS2decNeg` | Idem above, but only allow negative values |
-| `percentageUS3dec` | Same configuration than `NorthAmerican`, but display a percent `%` sign instead of the currency sign, with `3` decimal places |
-| `percentageUS3decPos` | Idem above, but only allow positive values |
-| `percentageUS3decNeg` | Idem above, but only allow negative values |
+| Option name | Description | Examples |
+| :---------------- | :---------------- | :---------------- |
+| `dotDecimalCharCommaSeparator` | Set the decimal character as a dot `.` and the group separator as a comma `,` | `1,234.56` |
+| `commaDecimalCharDotSeparator` | Set the decimal character as a comma `,` and the group separator as a dot `.` | `1.234,56` |
+| `integer` | Set the minimum and maximum value so that only an integer can be entered, without any decimal places available | `42`, `-42` |
+| `integerPos` | Set the minimum and maximum value so that only a positive integer can be entered | `42` |
+| `integerNeg` | Set the minimum and maximum value so that only a negative integer can be entered | `-42` |
+| `float` | Set the minimum and maximum value so that a float can be entered, without the default `2` decimal places | `1.234`, `-1.234` |
+| `floatPos` | Set the minimum and maximum value so that only a positive float can be entered | `1.234` |
+| `floatNeg` | Set the minimum and maximum value so that only a negative float can be entered | `-1.234` |
+| `numeric` | Format the value as a numeric string (with no digit group separator, and a dot for the decimal point) | `1234.56` |
+| `numericPos` | Idem above, but only allow positive values | `1234.56` |
+| `numericNeg` | Idem above, but only allow negative values | `-1234.56` |
+| `euro` | Same configuration than `French` | `1.234,56 €` |
+| `euroPos` | Idem above, but only allow positive values | `1.234,56 €` |
+| `euroNeg` | Idem above, but only allow negative values | `-1.234,56 €` |
+| `euroSpace` | Same configuration than `French` except a space is used for the group separator instead of the dot | `1 234,56 €` |
+| `euroSpacePos` | Idem above, but only allow positive values | `1 234,56 €` |
+| `euroSpaceNeg` | Idem above, but only allow negative values | `-1 234,56 €` |
+| `dollar` | Same configuration than `NorthAmerican`  | `$1,234.56` |
+| `dollarPos` | Idem above, but only allow positive values | `$1,234.56` |
+| `dollarNeg` | Idem above, but only allow negative values | `-$1,234.56` |
+| `percentageEU2dec` | Same configuration than `French`, but display a percent `%` sign instead of the currency sign, with `2` decimal places | `12,34 %` |
+| `percentageEU2decPos` | Idem above, but only allow positive values | `12,34 %` |
+| `percentageEU2decNeg` | Idem above, but only allow negative values | `-12,34 %` |
+| `percentageEU3dec` | Same configuration than `French`, but display a percent `%` sign instead of the currency sign, with `3` decimal places | `12,345 %` |
+| `percentageEU3decPos` | Idem above, but only allow positive values | `12,345 %` |
+| `percentageEU3decNeg` | Idem above, but only allow negative values | `-12,345 %` |
+| `percentageUS2dec` | Same configuration than `NorthAmerican`, but display a percent `%` sign instead of the currency sign, with `2` decimal places | `12.34%` |
+| `percentageUS2decPos` | Idem above, but only allow positive values | `12.34%` |
+| `percentageUS2decNeg` | Idem above, but only allow negative values | `-12.34%` |
+| `percentageUS3dec` | Same configuration than `NorthAmerican`, but display a percent `%` sign instead of the currency sign, with `3` decimal places | `12.345%` |
+| `percentageUS3decPos` | Idem above, but only allow positive values | `12.345%` |
+| `percentageUS3decNeg` | Idem above, but only allow negative values | `-12.345%` |
 
 You can set those pre-defined options like so:
 ```js

@@ -371,7 +371,7 @@ If you feel a common currency option is missing, please [create a pull request](
 Moreover, autoNumeric provides the following common options:
 
 | Option name | Description | Examples |
-| :---------------- | :---------------- | :---------------- |
+| :---------------- | :---------------- | ----------------: |
 | `dotDecimalCharCommaSeparator` | Set the decimal character as a dot `.` and the group separator as a comma `,` | `1,234.56` |
 | `commaDecimalCharDotSeparator` | Set the decimal character as a comma `,` and the group separator as a dot `.` | `1.234,56` |
 | `integer` | Set the minimum and maximum value so that only an integer can be entered, without any decimal places available | `42`, `-42` |

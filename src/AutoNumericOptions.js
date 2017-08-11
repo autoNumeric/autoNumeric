@@ -716,6 +716,20 @@ Object.defineProperty(AutoNumeric, 'options', {
                 keepCurrentValue: false,
             },
 
+            /* Provide a way for automatically replacing the formatted value with a pre-defined string, when the raw value is equal to a specific value
+             * Here you can specify as many 'conversion' as possible.
+             */
+            valuesToStrings: {
+                none         : null,
+                zeroDash     : {
+                    0: '-',
+                },
+                oneAroundZero: {
+                    '-1': 'Min',
+                    1   : 'Max',
+                },
+            },
+
             /* That option is linked to the `modifyValueOnWheel` one and will only be used if the latter is set to `true`.
              * This option will modify the wheel behavior and can be used in two ways, either by setting :
              * - a 'fixed' step value (a positive float or integer number `1000`), or

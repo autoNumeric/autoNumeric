@@ -2,6 +2,7 @@
 
 ### 4.1.0-beta.1
 + Fix issue #475 Migrate to eslint 4
++ Fix issue #450 Add the `valuesToStrings` option to allow displaying a pre-defined string when the `rawValue` equal a specific value
 
 ### 4.0.3
 + Fix issue #474 `AutoNumeric.format()` and `AutoNumeric.unformat()` do not accept named options

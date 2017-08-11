@@ -737,6 +737,14 @@
 			<p id="result_452">Testing the raw value</p>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #450</p>
+			<input id="issue_450" type="text" placeholder="#450" value="">
+			<input id="issue_450_limits" type="text" placeholder="#450" value="">
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1600,6 +1608,19 @@
     input452.addEventListener('drop', () => {
         result452.textContent = anElement452.getNumber();
     }, false);
+
+    //-------------- Issue #450
+    new AutoNumeric('#issue_450', 42, { valuesToStrings: AutoNumeric.options.valuesToStrings.zeroDash });
+    new AutoNumeric('#issue_450_limits', 222, {
+        valuesToStrings: {
+            0  : 'zero',
+            100: 'Min',
+            200: 'Ok',
+            400: 'Max',
+        },
+        minimumValue   : 100,
+        maximumValue   : 400,
+    });
 </script>
 </body>
 </html>

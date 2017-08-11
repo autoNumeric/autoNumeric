@@ -87,6 +87,7 @@ Object.defineProperty(AutoNumeric, 'defaultSettings', {
             symbolWhenUnfocused          : AutoNumeric.options.symbolWhenUnfocused.none,
             unformatOnHover              : AutoNumeric.options.unformatOnHover.unformat,
             unformatOnSubmit             : AutoNumeric.options.unformatOnSubmit.keepCurrentValue,
+            valuesToStrings              : AutoNumeric.options.valuesToStrings.none,
             wheelStep                    : AutoNumeric.options.wheelStep.progressive,
         };
     },

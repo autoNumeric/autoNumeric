@@ -124,6 +124,7 @@ describe('The autoNumeric object', () => {
             symbolWhenUnfocused          : null,
             unformatOnHover              : true,
             unformatOnSubmit             : false,
+            valuesToStrings              : null,
             wheelStep                    : 'progressive',
         };
 
@@ -277,6 +278,7 @@ describe('The autoNumeric object', () => {
             expect(defaultSettings.symbolWhenUnfocused       ).toEqual(aNInputSettings.symbolWhenUnfocused        );
             expect(defaultSettings.unformatOnHover           ).toEqual(aNInputSettings.unformatOnHover            );
             expect(defaultSettings.unformatOnSubmit          ).toEqual(aNInputSettings.unformatOnSubmit           );
+            expect(defaultSettings.valuesToStrings           ).toEqual(aNInputSettings.valuesToStrings            );
             expect(defaultSettings.wheelStep                 ).toEqual(aNInputSettings.wheelStep                  );
         });
 
@@ -1924,6 +1926,65 @@ describe('autoNumeric options and `options.*` methods', () => {
                 expect(aNInput.getFormatted()).toEqual('');
                 expect(aNInput.getNumber()).toEqual(null);
             });
+        });
+    });
+
+    describe('`valuesToStrings` option', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.nuke();
+        });
+
+        it('should display the given string when the rawValue is set to a specific value', () => {
+            aNInput = new AutoNumeric(newInput, { valuesToStrings: AutoNumeric.options.valuesToStrings.zeroDash });
+            aNInput.set(10);
+            expect(aNInput.getFormatted()).toEqual('10.00');
+            expect(aNInput.getNumber()).toEqual(10);
+
+            aNInput.set(0);
+            expect(aNInput.getFormatted()).toEqual('-');
+            expect(aNInput.getNumber()).toEqual(0);
+
+            aNInput.set(100);
+            expect(aNInput.getFormatted()).toEqual('100.00');
+            expect(aNInput.getNumber()).toEqual(100);
+
+            // Update the settings for other values
+            aNInput.update({
+                minimumValue   : 100,
+                maximumValue   : 400,
+            });
+            aNInput.options.valuesToStrings({
+                0  : 'zero',
+                100: 'Min',
+                200: 'Ok',
+                400: 'Max',
+            });
+            expect(aNInput.getFormatted()).toEqual('Min');
+            expect(aNInput.getNumber()).toEqual(100);
+
+            aNInput.set(101);
+            expect(aNInput.getFormatted()).toEqual('101.00');
+            expect(aNInput.getNumber()).toEqual(101);
+
+            aNInput.set(200);
+            expect(aNInput.getFormatted()).toEqual('Ok');
+            expect(aNInput.getNumber()).toEqual(200);
+
+            aNInput.set(201);
+            expect(aNInput.getFormatted()).toEqual('201.00');
+            expect(aNInput.getNumber()).toEqual(201);
+
+            aNInput.set(400);
+            expect(aNInput.getFormatted()).toEqual('Max');
+            expect(aNInput.getNumber()).toEqual(400);
         });
     });
 
@@ -6386,6 +6447,13 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ failOnUnknownOption: false })).not.toThrow();
             expect(() => AutoNumeric.validate({ failOnUnknownOption: 'true' })).not.toThrow();
             expect(() => AutoNumeric.validate({ failOnUnknownOption: 'false' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ valuesToStrings: null })).not.toThrow();
+            expect(() => AutoNumeric.validate({ valuesToStrings: {} })).not.toThrow();
+            expect(() => AutoNumeric.validate({ valuesToStrings: { 0: null } })).not.toThrow();
+            expect(() => AutoNumeric.validate({ valuesToStrings: { 0: '-' } })).not.toThrow();
+            expect(() => AutoNumeric.validate({ valuesToStrings: { 0: 'zero' } })).not.toThrow();
+            expect(() => AutoNumeric.validate({ valuesToStrings: { '-225.34': 'foobar' } })).not.toThrow();
         });
 
         it('should validate, with warnings', () => {
@@ -6745,6 +6813,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ failOnUnknownOption: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ failOnUnknownOption: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ failOnUnknownOption: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ valuesToStrings: true })).toThrow();
+            expect(() => AutoNumeric.validate({ valuesToStrings: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ valuesToStrings: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ valuesToStrings: 'foobar' })).toThrow();
         });
 
         it('should only send a warning, and not throw', () => {

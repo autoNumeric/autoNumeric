@@ -2,7 +2,7 @@
  *               AutoNumeric.js
  *
  * @version      4.1.0-beta.1
- * @date         2017-08-11 UTC 04:12
+ * @date         2017-08-11 UTC 21:45
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -801,6 +801,11 @@ class AutoNumeric {
 
                 return this;
             },
+            valuesToStrings               : valuesToStrings => {
+                this.update({ valuesToStrings });
+
+                return this;
+            },
             wheelStep                    : wheelStep => {
                 this.settings.wheelStep = wheelStep; //FIXME test this
 
@@ -1549,7 +1554,7 @@ class AutoNumeric {
      * @example anElement.northAmerican().set('$12,345.67') // Set an already formatted value (this does not _exactly_ respect the currency symbol/negative placements, but only remove all non-numbers characters, according to the ones given in the settings)
      * @example anElement.set(null) // Set the rawValue and element value to `null`
      *
-     * @param {number|string|null} newValue The value must be a number, a numeric string or `null` (if `emptyInputBehavior` is set to `'null'`)
+     * @param {number|string|null} newValue The value must be a Number, a numeric string or `null` (if `emptyInputBehavior` is set to `'null'`)
      * @param {object} options A settings object that will override the current settings. Note: the update is done only if the `newValue` is defined.
      * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history table
      * @returns {AutoNumeric}
@@ -1598,6 +1603,16 @@ class AutoNumeric {
 
         if (value !== '') {
             const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(value, this.settings);
+
+            // Modify the formatted value if the rawValue is found in the `valuesToStrings` option
+            if (minTest && maxTest && this.settings.valuesToStrings && this._checkValuesToStrings(value)) {
+                // Set the raw value normally, and the formatted value with the corresponding string
+                this._setElementAndRawValue(this.settings.valuesToStrings[value], value, saveChangeToHistory);
+                this._saveValueToPersistentStorage();
+
+                return this;
+            }
+
             // This test is needed by the `showPositiveSign` option
             const isZero = AutoNumericHelper.isZeroOrHasNoValue(value);
             if (isZero) {
@@ -1816,6 +1831,17 @@ class AutoNumeric {
         }
 
         return rawValueForTheElementValue;
+    }
+
+    /**
+     * Check if the given value has a corresponding key in the `valuesToStrings` option object.
+     *
+     * @param {number|string} value
+     * @returns {boolean} Returns `true` if such a key is found.
+     * @private
+     */
+    _checkValuesToStrings(value) {
+        return AutoNumericHelper.isInArray(String(value), this.valuesToStringsKeys);
     }
 
     /**
@@ -3429,6 +3455,11 @@ class AutoNumeric {
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.unformatOnSubmit) && !AutoNumericHelper.isBoolean(options.unformatOnSubmit)) {
             AutoNumericHelper.throwError(`The remove formatting on submit option 'unformatOnSubmit' is invalid ; it should be either 'false' or 'true', [${options.unformatOnSubmit}] given.`);
+        }
+
+        if (!AutoNumericHelper.isNull(options.valuesToStrings) &&
+            !(AutoNumericHelper.isObject(options.valuesToStrings))) {
+            AutoNumericHelper.throwError(`The option 'valuesToStrings' is invalid ; it should be an object, ideally with 'key -> value' entries, [${options.valuesToStrings}] given.`);
         }
 
         if (!AutoNumericHelper.isNull(options.outputFormat) && !AutoNumericHelper.isInArray(options.outputFormat, [
@@ -5721,62 +5752,84 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
             // Use the rawValue, multiplied by `rawValueDivisor` if defined
             const rawValueToFormat = this._getRawValueToFormat(this.rawValue);
-
-            let value;
             const isRawValueNull = AutoNumericHelper.isNull(rawValueToFormat);
-            if (isRawValueNull || rawValueToFormat === '') {
-                value = rawValueToFormat;
-            } else {
-                value = String(rawValueToFormat);
-            }
+            const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(rawValueToFormat, this.settings);
 
+            // Directly set the formatted value if the `rawValue` is found in `valuesToStrings`
+            let elementValueIsAlreadySet = false;
             if (rawValueToFormat !== '' && !isRawValueNull) {
-                const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(rawValueToFormat, this.settings);
-                if (minTest && maxTest && !this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(rawValueToFormat, this.settings)) {
-                    value = this._modifyNegativeSignAndDecimalCharacterForRawValue(value);
+                if (!minTest) {
+                    AutoNumericHelper.triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
+                }
 
-                    if (this.settings.divisorWhenUnfocused && !AutoNumericHelper.isNull(value)) {
-                        value = value / this.settings.divisorWhenUnfocused;
-                        value = value.toString();
-                    }
+                if (!maxTest) {
+                    AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
+                }
 
-                    value = this.constructor._roundFormattedValueShownOnBlur(value, this.settings);
-                    value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
+                if (this.settings.valuesToStrings && this._checkValuesToStrings(rawValueToFormat)) {
+                    // Set the formatted value with the corresponding string
+                    this._setElementValue(this.settings.valuesToStrings[rawValueToFormat]);
+                    elementValueIsAlreadySet = true;
+                }
+            }
+
+            // Only generate the formatted value if no `valuesToStrings` have been found
+            if (!elementValueIsAlreadySet) {
+                let value;
+                if (isRawValueNull || rawValueToFormat === '') {
+                    value = rawValueToFormat;
                 } else {
-                    if (!minTest) {
-                        AutoNumericHelper.triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
-                    }
-                    if (!maxTest) {
-                        AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
-                    }
-                }
-            } else if (rawValueToFormat === '' && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {
-                this._setRawValue('0');
-                value = this.constructor._roundValue('0', this.settings, 0);
-            }
-
-
-            let groupedValue = this.constructor._orderValueCurrencySymbolAndSuffixText(value, this.settings, false);
-            if (!(this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(value, this.settings) ||
-                (isRawValueNull && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.null))) {
-                groupedValue = this.constructor._addGroupSeparators(value, this.settings, false, rawValueToFormat);
-            }
-
-            // Testing for `allowDecimalPadding.never` or `allowDecimalPadding.floats` is needed to make sure we do not keep a trailing decimalCharacter (like '500.') in the element, since the raw value would still be a correctly formatted integer ('500')
-            if (groupedValue !== rawValueToFormat ||
-                rawValueToFormat === '' || // This make sure we get rid on any currency symbol or suffix that might have been added on focus
-                this.settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.never ||
-                this.settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.floats) {
-                if (this.settings.symbolWhenUnfocused && rawValueToFormat !== '' && rawValueToFormat !== null) {
-                    groupedValue = `${groupedValue}${this.settings.symbolWhenUnfocused}`;
+                    value = String(rawValueToFormat);
                 }
 
-                this._setElementValue(groupedValue);
-            }
+                if (rawValueToFormat !== '' && !isRawValueNull) {
+                    if (minTest && maxTest && !this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(rawValueToFormat, this.settings)) {
+                        value = this._modifyNegativeSignAndDecimalCharacterForRawValue(value);
 
-            if (groupedValue !== this.valueOnFocus) {
-                AutoNumericHelper.triggerEvent(AutoNumeric.events.native.change, this.domElement);
-                delete this.valueOnFocus;
+                        if (this.settings.divisorWhenUnfocused && !AutoNumericHelper.isNull(value)) {
+                            value = value / this.settings.divisorWhenUnfocused;
+                            value = value.toString();
+                        }
+
+                        value = this.constructor._roundFormattedValueShownOnBlur(value, this.settings);
+                        value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
+                    } else {
+                        if (!minTest) {
+                            AutoNumericHelper.triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
+                        }
+
+                        if (!maxTest) {
+                            AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
+                        }
+                    }
+                } else if (rawValueToFormat === '' && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {
+                    this._setRawValue('0');
+                    value = this.constructor._roundValue('0', this.settings, 0);
+                }
+
+
+                let groupedValue = this.constructor._orderValueCurrencySymbolAndSuffixText(value, this.settings, false);
+                if (!(this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(value, this.settings) ||
+                        (isRawValueNull && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.null))) {
+                    groupedValue = this.constructor._addGroupSeparators(value, this.settings, false, rawValueToFormat);
+                }
+
+                // Testing for `allowDecimalPadding.never` or `allowDecimalPadding.floats` is needed to make sure we do not keep a trailing decimalCharacter (like '500.') in the element, since the raw value would still be a correctly formatted integer ('500')
+                if (groupedValue !== rawValueToFormat ||
+                    rawValueToFormat === '' || // This make sure we get rid on any currency symbol or suffix that might have been added on focus
+                    this.settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.never ||
+                    this.settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.floats) {
+                    if (this.settings.symbolWhenUnfocused && rawValueToFormat !== '' && rawValueToFormat !== null) {
+                        groupedValue = `${groupedValue}${this.settings.symbolWhenUnfocused}`;
+                    }
+
+                    this._setElementValue(groupedValue);
+                }
+
+                if (groupedValue !== this.valueOnFocus) {
+                    AutoNumericHelper.triggerEvent(AutoNumeric.events.native.change, this.domElement);
+                    delete this.valueOnFocus;
+                }
             }
 
             this._onBlur(e);
@@ -6731,6 +6784,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Analyze and save the minimumValue and maximumValue integer size for later uses
+     * @private
      */
     _calculateVMinAndVMaxIntegerSizes() {
         let [maximumValueIntegerPart] = this.settings.maximumValue.toString().split('.');
@@ -6741,8 +6795,22 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this.settings.mIntPos = Math.max(maximumValueIntegerPart.length, 1);
         this.settings.mIntNeg = Math.max(minimumValueIntegerPart.length, 1);
     }
+
+    /**
+     * Calculate once what are the `valuesToStrings` option keys.
+     * @private
+     */
+    _calculateValuesToStringsKeys() {
+        if (this.settings.valuesToStrings) {
+            this.valuesToStringsKeys = Object.keys(this.settings.valuesToStrings);
+        } else {
+            this.valuesToStringsKeys = [];
+        }
+    }
+
     /**
      * Sets the alternative decimal separator key.
+     * @private
      */
     _setAlternativeDecimalSeparatorCharacter() {
         if (AutoNumericHelper.isNull(this.settings.decimalCharacterAlternative) && Number(this.settings.decimalPlaces) > 0) {
@@ -6891,6 +6959,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             symbolWhenUnfocused               : true,
             unformatOnHover                   : true,
             unformatOnSubmit                  : true,
+            valuesToStrings                   : true,
             wheelStep                         : true,
 
             // Additional information that are added to the `settings` object :
@@ -7020,6 +7089,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this.regex = {}; // Create the object that will store the regular expressions
         this.constructor._cachesUsualRegularExpressions(this.settings, this.regex);
         this._setBrackets();
+        this._calculateValuesToStringsKeys();
 
         // Validate the settings. Both tests throws if necessary.
         if (AutoNumericHelper.isEmptyObj(this.settings)) {

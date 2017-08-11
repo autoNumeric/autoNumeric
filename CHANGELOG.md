@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.1
++ Fix issue #475 Migrate to eslint 4
+
 ### 4.0.3
 + Fix issue #474 `AutoNumeric.format()` and `AutoNumeric.unformat()` do not accept named options
 

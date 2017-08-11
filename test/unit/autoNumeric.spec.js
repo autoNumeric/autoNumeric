@@ -46,7 +46,6 @@ const autoNumericOptionsEuro = {
     decimalCharacterAlternative: '.',
     currencySymbol             : ' €',
     currencySymbolPlacement    : 's',
-    roundingMethod             : 'U',
 };
 const autoNumericOptionsEuroNumber = {
     digitGroupSeparator        : '.',
@@ -54,7 +53,6 @@ const autoNumericOptionsEuroNumber = {
     decimalCharacterAlternative: '.',
     currencySymbol             : ' €',
     currencySymbolPlacement    : 's',
-    roundingMethod             : 'U',
     outputFormat               : 'number',
 };
 const autoNumericOptionsDollar = {
@@ -62,7 +60,6 @@ const autoNumericOptionsDollar = {
     decimalCharacter       : '.',
     currencySymbol         : '$',
     currencySymbolPlacement: 'p',
-    roundingMethod         : 'U',
 };
 
 describe('The autoNumeric object', () => {
@@ -3666,6 +3663,23 @@ describe('Instantiated autoNumeric functions', () => {
             expect(aNInput.getFormatted()).toEqual('$6,789,012.35');
         });
 
+        it('should set a formatted value and result in a formatted value', () => {
+            // Euros
+            aNInput.update(autoNumericOptionsEuro);
+            aNInput.set('1.234,56');
+            expect(aNInput.getFormatted()).toEqual('1.234,56 €');
+            aNInput.set('6.789.012,345');
+            expect(aNInput.getFormatted()).toEqual('6.789.012,35 €'); // Rounding happens here
+
+            // Dollars
+            aNInput.update(autoNumericOptionsDollar);
+            expect(aNInput.getFormatted()).toEqual('$6,789,012.35'); // First check if updating the options changed the results accordingly
+            aNInput.set('1,234.56');
+            expect(aNInput.getFormatted()).toEqual('$1,234.56');
+            aNInput.set('6,789,012.345');
+            expect(aNInput.getFormatted()).toEqual('$6,789,012.35');
+        });
+
         it('should respect the minimumValue and maximumValue settings', () => {
             aNInput.update({ minimumValue: '999999.99', maximumValue: '1111111111111.11' });
             expect(() => aNInput.set(999999.99)).not.toThrow();
@@ -5503,6 +5517,8 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.unformat('$0.00')).toEqual(NaN);
             expect(AutoNumeric.unformat(0)).not.toEqual('0.00'); //XXX This is false because 'real' non-numeric numbers are directly returned
             expect(AutoNumeric.unformat(0)).toEqual(0);
+            expect(AutoNumeric.unformat('-123.45')).toEqual('-123.45');
+            expect(AutoNumeric.unformat(-123.45)).toEqual(-123.45);
 
             expect(AutoNumeric.unformat('$1,234.56', { outputFormat : 'number' })).toEqual(NaN);
             expect(AutoNumeric.unformat('$123.45', { outputFormat : 'number' })).toEqual(NaN);
@@ -5510,6 +5526,82 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.unformat(null)).toEqual(null);
             expect(AutoNumeric.unformat(1234.56, { outputFormat : 'number' })).toEqual(1234.56);
             expect(AutoNumeric.unformat(0, { outputFormat : 'number' })).toEqual(0);
+        });
+
+        it('should unformat the value retrieved from a DOM element, with default options', () => {
+            // Create the DOM element
+            const newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+
+            // Run the tests
+            expect(AutoNumeric.unformat(newInput)).toEqual('0.00'); // An input value cannot be equal to `undefined`, but is transformed into '' when trying to retrieve the not defined `value` attribute
+            newInput.value = '$1,234,567.89';
+            expect(AutoNumeric.unformat(newInput)).toEqual(NaN);
+            newInput.value = '$1,234.56';
+            expect(AutoNumeric.unformat(newInput)).toEqual(NaN);
+            newInput.value = '$123.45';
+            expect(AutoNumeric.unformat(newInput)).toEqual(NaN);
+            newInput.value = '$0.00';
+            expect(AutoNumeric.unformat(newInput)).toEqual(NaN);
+            newInput.value = 0;
+            expect(AutoNumeric.unformat(newInput)).toEqual('0.00'); // This behave differently than if we passed the `0` directly since retrieving the value from the DOM element converts its to a string
+            newInput.value = '-123.45';
+            expect(AutoNumeric.unformat(newInput)).toEqual('-123.45');
+            newInput.value = -123.45;
+            expect(AutoNumeric.unformat(newInput)).toEqual('-123.45');
+            newInput.value = '$1,234.56';
+            expect(AutoNumeric.unformat(newInput, { outputFormat : 'number' })).toEqual(NaN);
+            newInput.value = '$123.45';
+            expect(AutoNumeric.unformat(newInput, { outputFormat : 'number' })).toEqual(NaN);
+            newInput.value = '$0.00';
+            expect(AutoNumeric.unformat(newInput, { outputFormat : 'number' })).toEqual(NaN);
+            newInput.value = null;
+            expect(AutoNumeric.unformat(newInput)).toEqual('0.00'); // An input value cannot be equal to 'null', but is transformed into ''
+            newInput.value = 1234.56;
+            expect(AutoNumeric.unformat(newInput, { outputFormat : 'number' })).toEqual(1234.56);
+            newInput.value = 0;
+            expect(AutoNumeric.unformat(newInput, { outputFormat : 'number' })).toEqual(0);
+
+            // Delete the DOM element
+            document.body.removeChild(newInput);
+        });
+
+        it('should unformat the value retrieved from a DOM element, with custom options', () => {
+            // Create the DOM element
+            const newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+
+            // Run the tests
+            expect(AutoNumeric.unformat(newInput)).toEqual('0.00'); // An input value cannot be equal to `undefined`, but is transformed into '' when trying to retrieve the not defined `value` attribute
+            newInput.value = '$1,234,567.89';
+            expect(AutoNumeric.unformat(newInput, { currencySymbol: '$' })).toEqual('1234567.89');
+            newInput.value = '$1,234.56';
+            expect(AutoNumeric.unformat(newInput, { currencySymbol: '$' })).toEqual('1234.56');
+            newInput.value = '$123.45';
+            expect(AutoNumeric.unformat(newInput, { currencySymbol: '$' })).toEqual('123.45');
+            newInput.value = '$0.00';
+            expect(AutoNumeric.unformat(newInput, { currencySymbol: '$' })).toEqual('0.00');
+            newInput.value = 0;
+            expect(AutoNumeric.unformat(newInput, { currencySymbol: '$' })).toEqual('0.00'); // This behave differently than if we passed the `0` directly since retrieving the value from the DOM element converts its to a string
+            newInput.value = '-123.45';
+            expect(AutoNumeric.unformat(newInput)).toEqual('-123.45');
+            newInput.value = -123.45;
+            expect(AutoNumeric.unformat(newInput)).toEqual('-123.45');
+            newInput.value = '$1,234.56';
+            expect(AutoNumeric.unformat(newInput, { outputFormat : 'number', currencySymbol: '$' })).toEqual(1234.56);
+            newInput.value = '$123.45';
+            expect(AutoNumeric.unformat(newInput, { outputFormat : 'number', currencySymbol: '$' })).toEqual(123.45);
+            newInput.value = '$0.00';
+            expect(AutoNumeric.unformat(newInput, { outputFormat : 'number', currencySymbol: '$' })).toEqual(0);
+            newInput.value = null;
+            expect(AutoNumeric.unformat(newInput, { outputFormat : 'number', currencySymbol: '$' })).toEqual(0); // An input value cannot be equal to 'null', but is transformed into ''
+            newInput.value = 1234.56;
+            expect(AutoNumeric.unformat(newInput, { outputFormat : 'number', currencySymbol: '$' })).toEqual(1234.56);
+            newInput.value = 0;
+            expect(AutoNumeric.unformat(newInput, { outputFormat : 'number', currencySymbol: '$' })).toEqual(0);
+
+            // Delete the DOM element
+            document.body.removeChild(newInput);
         });
 
         it('should unformat with a currency symbol options', () => {
@@ -5530,14 +5622,30 @@ describe('Static autoNumeric functions', () => {
 
         it('should unformat with user options', () => {
             expect(AutoNumeric.unformat('1.234.567,89 €', autoNumericOptionsEuroNumber)).toEqual(1234567.89);
+            expect(AutoNumeric.unformat('1.234.567,86123 €', autoNumericOptionsEuroNumber)).toEqual(1234567.86);
             expect(AutoNumeric.unformat('1.234,56 €', autoNumericOptionsEuroNumber)).toEqual(1234.56);
             expect(AutoNumeric.unformat('123,45 €', autoNumericOptionsEuroNumber)).toEqual(123.45);
             expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuroNumber)).toEqual(0);
+
+            expect(AutoNumeric.unformat('1.234,56\u202f€', AutoNumeric.getPredefinedOptions().euro)).toEqual('1234.56');
+            expect(AutoNumeric.unformat('1.234,56\u202f€', 'euro')).toEqual('1234.56');
+            expect(AutoNumeric.unformat('1.234,56\u202f€', ['euro'])).toEqual('1234.56');
+            expect(AutoNumeric.unformat('1.234,56 CFP', ['euro', { currencySymbol: ' CFP' }])).toEqual('1234.56');
+            expect(AutoNumeric.unformat('1.234,56 CFP', 'euro', { currencySymbol: ' CFP' })).toEqual('1234.56');
+            expect(AutoNumeric.unformat('72.687,41\u202f€', AutoNumeric.getPredefinedOptions().euro)).toEqual('72687.41');
+            expect(AutoNumeric.unformat('72.687,41\u202f€', 'euro')).toEqual('72687.41');
+            expect(AutoNumeric.unformat('72.687,41\u202f€', ['euro'])).toEqual('72687.41');
 
             expect(AutoNumeric.unformat('1.234,56 €', autoNumericOptionsEuro)).toEqual('1234.56');
             expect(AutoNumeric.unformat('123,45 €', autoNumericOptionsEuro)).toEqual('123.45');
             expect(AutoNumeric.unformat('0,00 €', autoNumericOptionsEuro)).toEqual('0.00');
             expect(AutoNumeric.unformat(null, autoNumericOptionsEuro)).toEqual(null);
+
+            expect(AutoNumeric.unformat('4,797\u202f%', AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0.04797');
+            expect(AutoNumeric.unformat('-2,541\u202f%', AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('-0.02541');
+            expect(AutoNumeric.unformat('0,480\u202f%', AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0.00480');
+            expect(AutoNumeric.unformat('0,474\u202f%', AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0.00474');
+            expect(AutoNumeric.unformat('-0,254\u202f%', AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('-0.00254');
         });
 
         it('should unformat with multiple user options overwriting each other in the right order', () => {
@@ -5545,8 +5653,8 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.unformat('241800,02 $',
                                         AutoNumeric.getPredefinedOptions().French,
                                         { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
-                                        { currencySymbol: AutoNumeric.options.currencySymbol.pound },
-                                        { currencySymbol: AutoNumeric.options.currencySymbol.dollar }
+                                        { currencySymbol     : AutoNumeric.options.currencySymbol.pound },
+                                        { currencySymbol     : AutoNumeric.options.currencySymbol.dollar }
             )).toEqual('241800.02');
         });
 
@@ -5556,14 +5664,27 @@ describe('Static autoNumeric functions', () => {
                                             AutoNumeric.getPredefinedOptions().French,
                                             { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
                                         ])).toEqual('241800.02');
+
             expect(AutoNumeric.unformat('241800,02 $',
                                         [
                                             AutoNumeric.getPredefinedOptions().French,
                                             { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
-                                            { currencySymbol: AutoNumeric.options.currencySymbol.pound },
-                                            { currencySymbol: AutoNumeric.options.currencySymbol.dollar },
+                                            { currencySymbol     : AutoNumeric.options.currencySymbol.pound },
+                                            { currencySymbol     : AutoNumeric.options.currencySymbol.dollar },
                                         ]
             )).toEqual('241800.02');
+
+            expect(AutoNumeric.unformat('-24',
+                                        [
+                                            'integerPos',
+                                            { wheelStep: 6 },
+                                            {
+                                                overrideMinMaxLimits: AutoNumeric.options.overrideMinMaxLimits.ignore,
+                                                minimumValue        : AutoNumeric.options.minimumValue.tenTrillions,
+                                                maximumValue        : AutoNumeric.options.maximumValue.tenTrillions,
+                                            },
+                                        ]
+            )).toEqual('-24');
         });
 
         it('should unformat with multiple user options in one array, with named pre-defined options', () => {
@@ -5576,8 +5697,8 @@ describe('Static autoNumeric functions', () => {
                                         [
                                             'euro',
                                             { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
-                                            { currencySymbol: AutoNumeric.options.currencySymbol.pound },
-                                            { currencySymbol: AutoNumeric.options.currencySymbol.dollar },
+                                            { currencySymbol     : AutoNumeric.options.currencySymbol.pound },
+                                            { currencySymbol     : AutoNumeric.options.currencySymbol.dollar },
                                         ]
             )).toEqual('241800.02');
         });
@@ -5785,17 +5906,59 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.format('1234,56')).toEqual('123,456.00'); // By default, ',' is a group separator, which gets removed
             expect(AutoNumeric.format('1.234,56')).toEqual('1.23'); // By default, '.' is the decimal separator
             expect(AutoNumeric.format(0)).toEqual('0.00');
+            expect(AutoNumeric.format('-123.45')).toEqual('-123.45');
+            expect(AutoNumeric.format(-123.45)).toEqual('-123.45');
             expect(AutoNumeric.format(null)).toEqual(null);
             expect(AutoNumeric.format(undefined)).toEqual(null);
         });
 
+        it('should format the value retrieved from a DOM element', () => {
+            // Create the DOM element
+            const newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+
+            // Run the tests
+            expect(AutoNumeric.format(newInput)).toEqual('0.00'); // An input value cannot be equal to `undefined`, but is transformed into '' when trying to retrieve the not defined `value` attribute
+            newInput.value = 1234.56;
+            expect(AutoNumeric.format(newInput)).toEqual('1,234.56');
+            newInput.value = '1234.56';
+            expect(AutoNumeric.format(newInput)).toEqual('1,234.56');
+            newInput.value = 123.45;
+            expect(AutoNumeric.format(newInput)).toEqual('123.45');
+            newInput.value = '1234,56';
+            expect(AutoNumeric.format(newInput)).toEqual('123,456.00'); // By default, ',' is a group separator, which gets removed
+            newInput.value = '1.234,56';
+            expect(AutoNumeric.format(newInput)).toEqual('1.23'); // By default, '.' is the decimal separator
+            newInput.value = 0;
+            expect(AutoNumeric.format(newInput)).toEqual('0.00');
+            newInput.value = '-123.45';
+            expect(AutoNumeric.format(newInput)).toEqual('-123.45');
+            newInput.value = -123.45;
+            expect(AutoNumeric.format(newInput)).toEqual('-123.45');
+            newInput.value = null;
+            expect(AutoNumeric.format(newInput)).toEqual('0.00'); // An input value cannot be equal to 'null', but is transformed into ''
+
+            // Delete the DOM element
+            document.body.removeChild(newInput);
+        });
+
         it('should format with user options', () => {
             expect(AutoNumeric.format(1234.56, autoNumericOptionsEuro)).toEqual('1.234,56 €');
+            expect(AutoNumeric.format(1234.56123, autoNumericOptionsEuro)).toEqual('1.234,56 €');
             expect(AutoNumeric.format('1.234,56 €', autoNumericOptionsEuro)).toEqual('1.234,56 €');
             expect(AutoNumeric.format('1234.56', autoNumericOptionsEuro)).toEqual('1.234,56 €');
             expect(AutoNumeric.format(123.45, autoNumericOptionsEuro)).toEqual('123,45 €');
             expect(AutoNumeric.format('123,45 €', autoNumericOptionsEuro)).toEqual('123,45 €');
             expect(AutoNumeric.format(0, autoNumericOptionsEuro)).toEqual('0,00 €');
+
+            expect(AutoNumeric.format(1234.56, AutoNumeric.getPredefinedOptions().euro)).toEqual('1.234,56\u202f€');
+            expect(AutoNumeric.format(1234.56, 'euro')).toEqual('1.234,56\u202f€');
+            expect(AutoNumeric.format(1234.56, ['euro'])).toEqual('1.234,56\u202f€');
+            expect(AutoNumeric.format(1234.56, ['euro', { currencySymbol: ' CFP' }])).toEqual('1.234,56 CFP');
+            expect(AutoNumeric.format(1234.56, 'euro', { currencySymbol: ' CFP' })).toEqual('1.234,56 CFP');
+            expect(AutoNumeric.format(72687.408552029, AutoNumeric.getPredefinedOptions().euro)).toEqual('72.687,41\u202f€');
+            expect(AutoNumeric.format(72687.408552029, 'euro')).toEqual('72.687,41\u202f€');
+            expect(AutoNumeric.format(72687.408552029, ['euro'])).toEqual('72.687,41\u202f€');
 
             expect(AutoNumeric.format(1234.56, autoNumericOptionsDollar)).toEqual('$1,234.56');
             expect(AutoNumeric.format(123.45, autoNumericOptionsDollar)).toEqual('$123.45');
@@ -5804,9 +5967,15 @@ describe('Static autoNumeric functions', () => {
 
             expect(AutoNumeric.format(null, autoNumericOptionsEuro)).toEqual(null);
             expect(AutoNumeric.format(undefined, autoNumericOptionsEuro)).toEqual(null);
+
+            expect(AutoNumeric.format(0.04796656, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('4,797\u202f%');
+            expect(AutoNumeric.format(-0.02541148, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('-2,541\u202f%');
+            expect(AutoNumeric.format(0.004796656, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0,480\u202f%');
+            expect(AutoNumeric.format(0.004742656, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0,474\u202f%');
+            expect(AutoNumeric.format(-0.002541148, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('-0,254\u202f%');
         });
 
-        it('should format with multiple options', () => {
+        it('should format with multiple user options overwriting each other in the right order', () => {
             expect(AutoNumeric.format(241800.02, [
                 AutoNumeric.getPredefinedOptions().French,
                 { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
@@ -5814,9 +5983,38 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.format(241800.02, [
                 AutoNumeric.getPredefinedOptions().French,
                 { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
-                { currencySymbol: AutoNumeric.options.currencySymbol.pound },
-                { currencySymbol: AutoNumeric.options.currencySymbol.dollar },
+                { currencySymbol     : AutoNumeric.options.currencySymbol.pound },
+                { currencySymbol     : AutoNumeric.options.currencySymbol.dollar },
             ])).toEqual('241800,02$');
+        });
+
+        it('should format with multiple user options in one array, overwriting each other in the right order', () => {
+            expect(AutoNumeric.format(241800.02,
+                                      [
+                                          AutoNumeric.getPredefinedOptions().French,
+                                          { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                                      ])).toEqual('241800,02 €');
+
+            expect(AutoNumeric.format(241800.02,
+                                      [
+                                          AutoNumeric.getPredefinedOptions().French,
+                                          { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator },
+                                          { currencySymbol     : AutoNumeric.options.currencySymbol.pound },
+                                          { currencySymbol     : AutoNumeric.options.currencySymbol.dollar },
+                                      ]
+            )).toEqual('241800,02$');
+
+            expect(AutoNumeric.format(-24,
+                                      [
+                                          'integerPos',
+                                          { wheelStep: 6 },
+                                          {
+                                              overrideMinMaxLimits: AutoNumeric.options.overrideMinMaxLimits.ignore,
+                                              minimumValue        : AutoNumeric.options.minimumValue.tenTrillions,
+                                              maximumValue        : AutoNumeric.options.maximumValue.tenTrillions,
+                                          },
+                                      ]
+            )).toEqual('-24');
         });
 
         it('should format with multiple options, with named pre-defined options', () => {

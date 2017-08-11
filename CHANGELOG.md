@@ -1,12 +1,79 @@
 ## Changelog for autoNumeric
 
+### 4.0.3
++ Fix issue #474 `AutoNumeric.format()` and `AutoNumeric.unformat()` do not accept named options
+
+### 4.0.2
++ Fix issue #473 Static `format()` and `unformat()` functions ignores the `rawValueDivisor` option
++ Fix `AutoNumeric.unformat()` that used the number of decimal places shown on focus instead of the one for the raw value.
+
+### 4.0.1
++ Fix issue #471 The static `format()` function does not keep the negative sign
++ Fix issue #472 The static `AutoNumeric.format()` function does not accept DOM element as its first parameter
+
+### 4.0.0
++ Release `v4.0.0`
++ The highlights of this new version are:
+  - AutoNumeric is now fully converted to an ES6 module.
+  - No more jQuery dependency.
+  - `AutoNumeric` is now a class. You can access the class method directly from the AutoNumeric object (ie. `const aNElement = new AutoNumeric(input, {options})); aNElement.set(123).update({options2});`).
+  - The number of decimal places is now explicitly set via the `decimalPlaces` option.
+  - You can now specify a different number of decimal place to show when focused and unfocused, and for the internal `rawValue`.
+    If you relied on the number of decimals in `minimumValue` or `maximumValue` to define how many decimal places should be shown on the formatted value, or kept as the precision in the `rawValue`, you now need to explicitly define how many decimal places your want, whatever number of decimal places `minimumValue` and `maximumValue` have.
+  - You can now 'cancel' any edits made to the element by hitting the `Escape` key. If no changes are detected, hitting `Esc` will select the element value (according to the `selectNumberOnly` option).
+  - Undo/Redo are now supported.
+  - You can modify the value of the element by using the mouse wheel on it, if `modifyValueOnWheel` is set. The `wheelStep` option defines the step to use.
+  - An AutoNumeric object can now initialize other DOM elements with `init(domElement)`, which will then use the same options.
+    The AutoNumeric-managed elements that initialized each other share a common list, allowing the user to perform a single action on many elements at once (via the `.global.*` functions, ie. `aNElement.update({options})` to update the options of all the elements, or `aNElement.set(42)` to set the same value for each elements).
+    The `.global.*` functions you can use are : `set()`, `setUnformatted()`, `get()`, `getNumericString()`, `getFormatted()`, `getNumber()`, `getLocalized()`, `reformat()`, `unformat()`, `unformatLocalized()`, `update()`, `isPristine()`, `clear()`, `remove()`, `wipe()`, `nuke()`, `has()`, `addObject()`, `removeObject()`, `empty()`, `elements()`, `getList()` and `size()`.
+    Managing that shared list is possible via `attach()` and `detach()`.
+  - The options can now be updated one by one using the handy functions `aNElement.options.<nameOfTheOption>({newOption})`, ie. `aNElement.options.currencySymbol('€')`.
+    You can also reset the options to the default ones using `aNElement.options.reset()`.
+  - Lots of new options (`rawValueDivisor`, `decimalPlaces`, `decimalPlacesRawValue`, `decimalPlacesShownOnBlur`, `serializeSpaces`, `noEventListeners`, `readOnly`, `selectOnFocus`, `caretPositionOnFocus`, etc.).
+  - While the AutoNumeric objects provides many methods, you can also directly use the AutoNumeric class static functions without having to instantiate an object. Those methods are `version()`, `test()`, `validate()`, `areSettingsValid()`, `getDefaultConfig()`, `getPredefinedOptions()`, `format()`, `formatAndSet()`, `unformat`. `unformatAndSet()`, `localize()`, `localizeAndSet()`, `isManagedByAutoNumeric()` and `getAutoNumericElement()`.
+  - Lots of new functions (`isPristine()`, `clear()`, `nuke()`, `formatOther()` and `unformatOther()` which allows to format/unformat a numeric string or another DOM element with the current object settings, `setValue()`, etc.).
+  - The `get()` function has been deprecated, in favor of more explicit `get*` methods : `getNumericString()`, `getFormatted()`, `getNumber()` and `getLocalized()`.
+  - By default, `new AutoNumeric('.myClass')` will only initialize *one* element. If you want to initialize multiple DOM elements in one go, you need to use the static `AutoNumeric.multiple()` function.
+   It allows to initialize numerous AutoNumeric objects (on numerous DOM elements) in one call (and possibly pass multiple values that will be mapped to each DOM element).
+  - Support for the Android Chrome mobile browser (v57) (this is a work in progress though, since it's quite hard to work around its limitations).
+  - Functions can now be chained (ie. `aNElement.clear().set(22).formSubmitJsonNumericString().nuke()`).
+   Modify how updating the settings works ; before, all modifications to the settings were directly accepted and stored, then we immediately tried to `set()` back the current value with those new settings.
+    This could lead to an object state where the object value would be out of the minimum and maximum value range, ie. we would accept the range modification, then immediately throw an error since the current value would then be out of range.
+    For instance, if `minimumValue` equal `0`, `maximumValue` equal `100` and the current element value equal `50`, trying to change the `minimumValue` to `75` will fail, and the `minimumValue` will be reverted back to`0`.
+    The new behavior is leaner ; if the new settings do not pass the `validate()` method or the following `set()` call fails, then the settings are reverted to the previous valid ones.
+  - The `rawValueDivisor` option allows to display a formatted value different than the raw value. For instance you can display percentages like `'1.23%'`, while keeping the `rawValue` `0.0123` 'unmultiplied', if `rawValueDivisor` is set to `100`.
+  
++ And also:
+  - The new `selectNumber()`, `selectInteger()` and `selectDecimal()` function to select the element content as needed.
+  - The DOM-specific functions to manipulate it ; `node()` (returns the DOM element managed by AutoNumeric), `parent()`, `form()` (returns the parent <form> element, if any).
+  - More than 20 functions to manages html forms ; how to retrieve info from them, or submit the info (formatted, unformatted, localized).
+  - Predefined options so that the user do not have to configure AutoNumeric manually.
+    Those options are `dotDecimalCharCommaSeparator`, `commaDecimalCharDotSeparator`, `integer`, `integerPos`, `integerNeg`, `float`, `floatPos`, `floatNeg`, `numeric`, `numericPos`, `numericNeg`, `euro`, `euroPos`, `euroNeg`, `euroSpace`, `euroSpacePos`, `euroSpaceNeg`, `percentageEU2dec`, `percentageEU2decPos`, `percentageEU2decNeg`, `percentageEU3dec`, `percentageEU3decPos`, `percentageEU3decNeg`, `dollar`, `dollarPos`, `dollarNeg`, `percentageUS2dec`, `percentageUS2decPos`, `percentageUS2decNeg`, `percentageUS3dec`, `percentageUS3decPos` and `percentageUS3decNeg`.
+  - Some language options are now shipped directly and you can use the language name as a function to activate those settings (ie. `aNElement.french()`).
+  - Better support for `contenteditable` elements so that AutoNumeric is not only limited to `<input>` elements.
+  - AutoNumeric send the `'autoNumeric:formatted'` event whenever it formats the element content.
+  - The raw unformatted value can always be accessible with the `rawValue` attribute (ie. `aNElement.rawValue`).
+  - When pressing the `Alt` key, you can hover your mouse over the AutoNumeric-managed elements to see their raw value.
+  - You can prevent the mouse wheel to increment/decrement an element value by pressing the `Shift` key while using the mouse wheel.
+  - Default values for each options can be easily accessed with an IDE autocompletion when using `AutoNumeric.options.|`.
+  - Support for drag and dropping numbers into AutoNumeric-managed elements.
+  - The `styleRules` option allows to either change the style of the current element based on the `rawValue` value, or just call any custom callbacks whenever the `rawValue` changes.
+  - Allow setting the `rawValue` to `null`, either by setting it directly (ie. `aNElement.set(null)`), or by emptying the element, if `emptyInputBehavior` is set to `'null'`.
+  - All `get*()` method accepts a callback function. The callback is passed the result of the `get*` functions as its first argument, and the current AutoNumeric object as its second.
+  - Allow initializing an AutoNumeric element with an array of options objects or pre-defined option names (ie. `'euroPos'`).
+  - Add a static `AutoNumeric.mergeOptions()` function that accepts an array of option objects and / or pre-defined option names, and return a single option object where the latter element overwrite the settings from the previous ones.
+  
++ *Lots* of bug fixes and code simplification (#387, #391, #393, #397, #399, #398, #244, #396, #395, #401, #403, #408, #320, #411, #412, #413, #417, #423, #415, #418, #409, #416, #414, #427, #248, #425, #264, #250, #404, #434, #440, #442, #447, #448, #449, #454, #453, #388, #461, #452).
++ Better test coverage, both for unit tests and end-to-end tests.
++ Rewrite the documentation (README.md) to make it more 'browsable'.
++ For a more detailed changelog, you can read the changes listed from `v3.0.0-beta.1` to `v3.0.0-beta.14` and from `v4.0.0-beta.1` to `v4.0.0-beta.23`.
+
 ### 4.0.0-beta.23
 + Fix issue #453 Rename the `noSeparatorOnFocus` option to `showOnlyNumbersOnFocus`
 + Add the missing `options.historySize()` method that allows to update the `historySize` option
 + Move the raw value from `this.settings.rawValue` to `this.rawValue`. This prevent polluting the settings object.
 + Fix issue #388 autoNumeric does not work with Browserify
 + Fix issue #461 Fixed problem on Android Chrome browsers when a currency symbol is used
-
 + Fix issue #452 Add a new `rawValueDivisor` option to display a formatted value different than the raw value.
   This allows for instance to display percentages like `'1.23%'`, while keeping the `rawValue` `0.0123` 'unmultiplied', if `rawValueDivisor` is set to `100`.
 + Merge the `blur` event listeners into one.
@@ -38,7 +105,7 @@
 
 ### 4.0.0-beta.22
 + Fix issue #454 Rewrite how the number of decimal places for the formatted and the raw values are set
-+ If you relied of the number of decimals in `minimumValue` or `maximumValue` to define how many decimal places should be shown on the formatted value, or kept as the precision in the `rawValue`, you now need to explicitly define how many decimal places your want, whatever number of decimal places `minimumValue` and `maximumValue` have.
++ If you relied on the number of decimals in `minimumValue` or `maximumValue` to define how many decimal places should be shown on the formatted value, or kept as the precision in the `rawValue`, you now need to explicitly define how many decimal places your want, whatever number of decimal places `minimumValue` and `maximumValue` have.
 + To do so, you now need to define at least the `decimalPlaces` option.
 + If you want, you can also separately define `decimalPlacesRawValue`, `decimalPlacesShownOnBlur` and `decimalPlacesShownOnFocus`. For more details, read on.
 + Rename `scaleDecimalPlaces` to `decimalPlacesShownOnBlur`.
@@ -78,7 +145,7 @@
 + Allow using a pre-defined option name directly when initializing an AutoNumeric element
 + Fix the initialization method to accepts arrays of options object/pre-defined options when using an initial value.
 + Fix an issue related to issue #447 when the focus out action produce an error when the input raw value is set to `null`
-+ Fix a rare bug when `scaleSymbol` is a castable to a Number, and would be added to the formatted value, instead of concatenated.
++ Fix a rare bug when `scaleSymbol` is a castable to a `Number`, and would be added to the formatted value, instead of concatenated.
 + Remove an unneeded temporary variable in `set()`.
 + Add more details in some JSDoc.
 + Fix `validate()` so that it throws an error early if `scaleDivisor` is wrongly set to `0`.
@@ -116,7 +183,7 @@
   Additionally, when this option is set, if the AutoNumeric element is emptied, then `rawValue` is set to `null`.
   Note: if the current raw value is equal to `null`, changing the `emptyInputBehavior` option to something different than `null` will update the rawValue to `''`.
   **Known limitation** : Initializing an AutoNumeric object with the `null` value is not allowed since using `null` for the initial value means that AutoNumeric needs to use the current html value instead of `null`.
-+ Fix issue #448 When searching for the parent form element, the tagName can be undefined.
++ Fix issue #448 When searching for the parent form element, the `tagName` can be undefined.
 + The `form()` method now accepts a `true` argument that will force it to discard the current parent form and search for a new one.
 + Enforce the use of `settings.showWarnings` for most calls to `AutoNumericHelper.warning()`, wherever possible.
 

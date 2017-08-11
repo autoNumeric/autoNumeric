@@ -873,7 +873,7 @@ describe('Issue #317', () => {
     });
 });
 
-describe('Issue #303', () => { //FIXME Finish this
+describe('Issue #303', () => {
     it('should test for default values', () => {
         browser.url(testUrl);
 

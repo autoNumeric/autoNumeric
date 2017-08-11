@@ -12,7 +12,11 @@ autoNumeric is a standalone Javascript library that provides live *as-you-type* 
 <br>
 [![Gitter chat][gitter-image]][gitter-url]
 
-The latest stable branch is [4.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>For older stable versions, please take a look [here](#older-versions), while for the latest development version, check the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br><br>
+The latest stable branch is always on `master`. Currently this is version [4.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>
+if you want to live dangerously, you can check out the latest development version in the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br>
+<br>
+For older stable versions, please take a look [here](#older-versions).<br>
+Alternatively, you can **use our [guide](doc/HowToUpgradeToV4.md) for upgrading from version `1.9`/`2` to version `4`.**<br><br>
 Moreover, you can take a look at what could be the next features coming to autoNumeric on our [project](https://github.com/autoNumeric/autoNumeric/projects) page *(feel free to participate!)*.
 
 #### Highlights
@@ -56,9 +60,9 @@ anElement.french()
 - 8 pre-defined [currency options](#predefined-language-options) as well as 31 [common options](#predefined-common-options) allows you to directly use autoNumeric by skipping the option configuration step
 - 26 built-in [methods](#methods) gives you the flexibility needed to use autoNumeric to its full potential
 - 22 [global methods](#perform-actions-globally-on-a-shared-list-of-autonumeric-elements) that allows to control sets of AutoNumeric-managed elements at once
-- 21 additional [methods](#methods) specialized for managing form submission
+- 21 additional [methods](#methods) specialized for managing form management and submission
 - 17 [static functions](#static-methods) provided by the `AutoNumeric` class
-- And more than 40 [options](#options) allowing you to customize your currency format
+- And more than 40 [options](#options) allowing you to precisely customize your currency format and behavior
 
 With that said, autoNumeric supports most international numeric formats and currencies including those used in Europe, Asia, and North and South America.
 
@@ -120,7 +124,7 @@ With that said, autoNumeric supports most international numeric formats and curr
 You can install autoNumeric with your preferred dependency manager:
 ```bash
 # with `yarn` :
-yarn add autonumeric --save
+yarn add autonumeric
 # or with `npm` :
 npm install autonumeric --save
 ```
@@ -133,9 +137,9 @@ Simply include **autoNumeric** in your html `<header>` tag.<br>No other files or
 ```html
 <script src="autoNumeric.min.js" type="text/javascript"></script>
 <!-- ...or, you may also directly use a CDN :-->
-<script src="https://cdn.jsdelivr.net/autonumeric/4.0.0/autoNumeric.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/autonumeric@4.0.1"></script>
 <!-- ...or -->
-<script src="https://unpkg.com/autonumeric@4.0.0"></script>
+<script src="https://unpkg.com/autonumeric@4.0.1/dist/autoNumeric.min.js"></script>
 ```
 
 #### In another script
@@ -366,40 +370,40 @@ If you feel a common currency option is missing, please [create a pull request](
 
 Moreover, autoNumeric provides the following common options:
 
-| Option name | Description |
-| :---------------- | :---------------- |
-| `dotDecimalCharCommaSeparator` | Set the decimal character as a dot `.` and the group separator as a comma `,` |
-| `commaDecimalCharDotSeparator` | Set the decimal character as a comma `,` and the group separator as a dot `.` |
-| `integer` | Set the minimum and maximum value so that only an integer can be entered, without any decimal places available |
-| `integerPos` | Set the minimum and maximum value so that only a positive integer can be entered |
-| `integerNeg` | Set the minimum and maximum value so that only a negative integer can be entered |
-| `float` | Set the minimum and maximum value so that a float can be entered, without the default `2` decimal places |
-| `floatPos` | Set the minimum and maximum value so that only a positive float can be entered |
-| `floatNeg` | Set the minimum and maximum value so that only a negative float can be entered |
-| `numeric` | Format the value as a numeric string (with no digit group separator, and a dot for the decimal point) |
-| `numericPos` | Idem above, but only allow positive values |
-| `numericNeg` | Idem above, but only allow negative values |
-| `euro` | Same configuration than `French` |
-| `euroPos` | Idem above, but only allow positive values |
-| `euroNeg` | Idem above, but only allow negative values |
-| `euroSpace` | Same configuration than `French` except a space is used for the group separator instead of the dot |
-| `euroSpacePos` | Idem above, but only allow positive values |
-| `euroSpaceNeg` | Idem above, but only allow negative values |
-| `dollar` | Same configuration than `NorthAmerican`  |
-| `dollarPos` | Idem above, but only allow positive values |
-| `dollarNeg` | Idem above, but only allow negative values |
-| `percentageEU2dec` | Same configuration than `French`, but display a percent `%` sign instead of the currency sign, with `2` decimal places |
-| `percentageEU2decPos` | Idem above, but only allow positive values |
-| `percentageEU2decNeg` | Idem above, but only allow negative values |
-| `percentageEU3dec` | Same configuration than `French`, but display a percent `%` sign instead of the currency sign, with `3` decimal places |
-| `percentageEU3decPos` | Idem above, but only allow positive values |
-| `percentageEU3decNeg` | Idem above, but only allow negative values |
-| `percentageUS2dec` | Same configuration than `NorthAmerican`, but display a percent `%` sign instead of the currency sign, with `2` decimal places |
-| `percentageUS2decPos` | Idem above, but only allow positive values |
-| `percentageUS2decNeg` | Idem above, but only allow negative values |
-| `percentageUS3dec` | Same configuration than `NorthAmerican`, but display a percent `%` sign instead of the currency sign, with `3` decimal places |
-| `percentageUS3decPos` | Idem above, but only allow positive values |
-| `percentageUS3decNeg` | Idem above, but only allow negative values |
+| Option name | Description | Examples |
+| :---------------- | :---------------- | ----------------: |
+| `dotDecimalCharCommaSeparator` | Set the decimal character as a dot `.` and the group separator as a comma `,` | `1,234.56` |
+| `commaDecimalCharDotSeparator` | Set the decimal character as a comma `,` and the group separator as a dot `.` | `1.234,56` |
+| `integer` | Set the minimum and maximum value so that only an integer can be entered, without any decimal places available | `42`, `-42` |
+| `integerPos` | Set the minimum and maximum value so that only a positive integer can be entered | `42` |
+| `integerNeg` | Set the minimum and maximum value so that only a negative integer can be entered | `-42` |
+| `float` | Set the minimum and maximum value so that a float can be entered, without the default `2` decimal places | `1.234`, `-1.234` |
+| `floatPos` | Set the minimum and maximum value so that only a positive float can be entered | `1.234` |
+| `floatNeg` | Set the minimum and maximum value so that only a negative float can be entered | `-1.234` |
+| `numeric` | Format the value as a numeric string (with no digit group separator, and a dot for the decimal point) | `1234.56` |
+| `numericPos` | Idem above, but only allow positive values | `1234.56` |
+| `numericNeg` | Idem above, but only allow negative values | `-1234.56` |
+| `euro` | Same configuration than `French` | `1.234,56 €` |
+| `euroPos` | Idem above, but only allow positive values | `1.234,56 €` |
+| `euroNeg` | Idem above, but only allow negative values | `-1.234,56 €` |
+| `euroSpace` | Same configuration than `French` except a space is used for the group separator instead of the dot | `1 234,56 €` |
+| `euroSpacePos` | Idem above, but only allow positive values | `1 234,56 €` |
+| `euroSpaceNeg` | Idem above, but only allow negative values | `-1 234,56 €` |
+| `dollar` | Same configuration than `NorthAmerican`  | `$1,234.56` |
+| `dollarPos` | Idem above, but only allow positive values | `$1,234.56` |
+| `dollarNeg` | Idem above, but only allow negative values | `-$1,234.56` |
+| `percentageEU2dec` | Same configuration than `French`, but display a percent `%` sign instead of the currency sign, with `2` decimal places | `12,34 %` |
+| `percentageEU2decPos` | Idem above, but only allow positive values | `12,34 %` |
+| `percentageEU2decNeg` | Idem above, but only allow negative values | `-12,34 %` |
+| `percentageEU3dec` | Same configuration than `French`, but display a percent `%` sign instead of the currency sign, with `3` decimal places | `12,345 %` |
+| `percentageEU3decPos` | Idem above, but only allow positive values | `12,345 %` |
+| `percentageEU3decNeg` | Idem above, but only allow negative values | `-12,345 %` |
+| `percentageUS2dec` | Same configuration than `NorthAmerican`, but display a percent `%` sign instead of the currency sign, with `2` decimal places | `12.34%` |
+| `percentageUS2decPos` | Idem above, but only allow positive values | `12.34%` |
+| `percentageUS2decNeg` | Idem above, but only allow negative values | `-12.34%` |
+| `percentageUS3dec` | Same configuration than `NorthAmerican`, but display a percent `%` sign instead of the currency sign, with `3` decimal places | `12.345%` |
+| `percentageUS3decPos` | Idem above, but only allow positive values | `12.345%` |
+| `percentageUS3decNeg` | Idem above, but only allow negative values | `-12.345%` |
 
 You can set those pre-defined options like so:
 ```js
@@ -788,7 +792,6 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 | `getDefaultConfig` | Return the default autoNumeric settings | `AutoNumeric.getDefaultConfig()` |
 | `getPredefinedOptions` | Return all the predefined options in one object | `AutoNumeric.getPredefinedOptions()` |
 | `getPredefinedOptions` | Return a specific pre-defined language option object | `AutoNumeric.getPredefinedOptions().French` |
-| `unformat` | Idem above, but you can pass as many option objects you want to this function, the latter overwriting the previous ones. This allows to correctly unformat currencies that have a predefined option as its base, but has been slightly modified. | `AutoNumeric.unformat('241800,02 €', AutoNumeric.getPredefinedOptions().French, { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator });` |
 | `isManagedByAutoNumeric` | Return `true` if the given DOM element has an AutoNumeric object that manages it. | `AutoNumeric.isManagedByAutoNumeric(domElement);` |
 | `localize` | Unformat and localize the given formatted string with the given options. This returns a string. | `AutoNumeric.localize('1.234,56 €', { options });` |
 | `localize` | Idem as above, but return the localized DOM element value. This does *not* update that element value. | `AutoNumeric.localize(domElement, { options });` |
@@ -797,6 +800,7 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 | `reformatAndSet` | Recursively format all the autoNumeric-managed elements that are a child to the `referenceToTheDomElement` element given as a parameter (this is usually the parent `<form>` element), with the settings of each AutoNumeric elements. | `AutoNumeric.reformatAndSet(referenceToTheDomElement);` |
 | `test` | Test if the given domElement is already managed by AutoNumeric (if it is initialized) | `AutoNumeric.test(domElement);` |
 | `unformat` | Unformat the given formatted string with the given options. This returns a numeric string. | `AutoNumeric.unformat('1.234,56 €', { options });` |
+| `unformat` | Idem above, but you can pass as many option objects you want to this function, the latter overwriting the previous ones. This allows to correctly unformat currencies that have a predefined option as its base, but has been slightly modified. | `AutoNumeric.unformat('241800,02 €', AutoNumeric.getPredefinedOptions().French, { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator });` |
 | `unformat` | Idem above, using multiple option objects in one array. This way allows for using a pre-defined option name. | `AutoNumeric.unformat('1.234,56 €', [{ options1 }, 'euroPos', { options2 }]);` |
 | `unformat` | Unformat the `domElement` value with the given options and returns the unformatted numeric string. This does *not* update that element value. | `AutoNumeric.unformat(domElement, { options });` |
 | `unformatAndSet` | Unformat the `domElement` value with the given options and returns the unformatted value as a numeric string. This function does update that element value with the newly unformatted value in the process. | `AutoNumeric.unformatAndSet(domElement, { options });` |
@@ -872,7 +876,7 @@ For questions and support please use the [Gitter chat room](https://gitter.im/au
 
 ## How to contribute?
 Contributors and pull requests are welcome.<br>Feel free to [contact](#questions) us for any questions.<br>
-For more information about how to contribute, please check the [CONTRIBUTING](CONTRIBUTING.md) file which has more details about it.
+For more information about how to contribute, please check the [CONTRIBUTING](doc/CONTRIBUTING.md) file which has more details about it.
 
 In a nutshell :
 - Get the latest source `git clone -b next https://github.com/autoNumeric/autoNumeric.git && cd autoNumeric && yarn install`
@@ -881,14 +885,16 @@ In a nutshell :
   - If you encounter any linting problems, you can try to automatically fix those with `yarn lintfix` 
 - Create a pull request, and we'll check it out as soon as possible!
 
-Again, be sure to check the [CONTRIBUTING](CONTRIBUTING.md) guidelines for more details.<br>
+Again, be sure to check the [CONTRIBUTING](doc/CONTRIBUTING.md) guidelines for more details.<br>
 Also, feel free to follow our RSS feeds on [master](https://github.com/autoNumeric/autoNumeric/commits/master.atom) and [next](https://github.com/autoNumeric/autoNumeric/commits/next.atom) to keep up with the latest commits.
 
 ## Dependencies
 None!
 
 ## Older versions
-The previous stable autoNumeric version `v1.9.46` can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/1.9.46), and the `v2.*` branch can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/v2.0.12).
+The previous stable autoNumeric version `v2.0.13` can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/v2.0.13), while the older `v1.9.46` can be found [here](https://github.com/autoNumeric/autoNumeric/releases/tag/1.9.46).
+
+Check out the [upgrade guide](doc/HowToUpgradeToV4.md) if you need help upgrading from version `1.9`/`2` to version `4`.
 
 ## Related projects
 For integration into [Rails](http://rubyonrails.org/) projects, you can use the [autonumeric-rails](https://github.com/randoum/autonumeric-rails) project.
@@ -904,7 +910,7 @@ For integration into Javascript frameworks, you can use:
 *Note: Some of those projects may lag with the latest AutoNumeric stable version, or even be incomplete*
 
 ## Other documentation
-The old and outdated documentation can be found in the [Documentation](Documentation.md) file.<br>
+The old and outdated documentation can be found in the [Documentation](doc/Documentation.md) file.<br>
 For some examples and an option code generator for the old v1.9.* version, take a look [here](http://www.decorplanit.com/plugin/).
 
 ## Licence

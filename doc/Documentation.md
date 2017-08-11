@@ -1,6 +1,6 @@
 ## *(Old)* Documentation
 
-**Disclaimer** : This documentation may be outdated.<br>Please consider using the [Readme](README.md) that always has up-to-date information.
+**Disclaimer** : This documentation may be outdated.<br>Please consider using the [Readme](../README.md) that always has up-to-date information.
 
 ### Changing the defaults options
 
@@ -255,7 +255,7 @@ $.fn.autoFormat(number, autoNumericOptions); // Returns "1.234,56 €"
 ###  Default settings &#38; supported options
 [visit autoNumeric's home page for an easy to use settings and option code generator ](http://www.decorplanit.com/plugin/)
 
-Disclaimer : This may be outdated. Please refer to the [Readme](README.md) or directly in the detailed comments in the source code for the `defaultSettings` object.
+Disclaimer : This may be outdated. Please refer to the [Readme](../README.md) or directly in the detailed comments in the source code for the `defaultSettings` object.
 
 ##### digitGroupSeparator
 *controls the thousand separator character*

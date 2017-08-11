@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.0.0-beta.23
- * @date         2017-07-28 UTC 08:30
+ * @version      4.0.3
+ * @date         2017-08-02 UTC 02:50
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -551,7 +551,7 @@ class AutoNumeric {
 
                 return this;
             },
-            caretPositionOnFocus         : caretPositionOnFocus => { //FIXME à tester
+            caretPositionOnFocus         : caretPositionOnFocus => { //FIXME test this
                 this.settings.caretPositionOnFocus = caretPositionOnFocus;
 
                 return this;
@@ -602,7 +602,7 @@ class AutoNumeric {
 
                 return this;
             },
-            decimalPlacesRawValue        : decimalPlacesRawValue => { //FIXME à tester
+            decimalPlacesRawValue        : decimalPlacesRawValue => { //FIXME test this
                 this.update({ decimalPlacesRawValue });
 
                 return this;
@@ -651,12 +651,12 @@ class AutoNumeric {
                 return this;
             },
             failOnUnknownOption          : failOnUnknownOption => {
-                this.settings.failOnUnknownOption = failOnUnknownOption; //FIXME à tester
+                this.settings.failOnUnknownOption = failOnUnknownOption; //FIXME test this
 
                 return this;
             },
             formatOnPageLoad             : formatOnPageLoad => {
-                this.settings.formatOnPageLoad = formatOnPageLoad; //FIXME à tester
+                this.settings.formatOnPageLoad = formatOnPageLoad; //FIXME test this
 
                 return this;
             },
@@ -666,7 +666,7 @@ class AutoNumeric {
                 return this;
             },
             isCancellable                : isCancellable => {
-                this.settings.isCancellable = isCancellable; //FIXME à tester
+                this.settings.isCancellable = isCancellable; //FIXME test this
 
                 return this;
             },
@@ -686,7 +686,7 @@ class AutoNumeric {
                 return this;
             },
             modifyValueOnWheel           : modifyValueOnWheel => {
-                this.settings.modifyValueOnWheel = modifyValueOnWheel; //FIXME à tester
+                this.settings.modifyValueOnWheel = modifyValueOnWheel; //FIXME test this
 
                 return this;
             },
@@ -700,7 +700,7 @@ class AutoNumeric {
 
                 return this;
             },
-            noEventListeners             : noEventListeners => { //FIXME à tester
+            noEventListeners             : noEventListeners => { //FIXME test this
                 if (noEventListeners === AutoNumeric.options.noEventListeners.noEvents && this.settings.noEventListeners === AutoNumeric.options.noEventListeners.addEvents) {
                     // Remove the events once
                     this._removeEventListeners();
@@ -711,7 +711,7 @@ class AutoNumeric {
                 return this;
             },
             onInvalidPaste               : onInvalidPaste => {
-                this.settings.onInvalidPaste = onInvalidPaste; //FIXME à tester
+                this.settings.onInvalidPaste = onInvalidPaste; //FIXME test this
 
                 return this;
             },
@@ -730,7 +730,7 @@ class AutoNumeric {
 
                 return this;
             },
-            readOnly                     : readOnly => { //FIXME à tester
+            readOnly                     : readOnly => { //FIXME test this
                 this.settings.readOnly = readOnly;
                 this._setReadOnly();
 
@@ -752,17 +752,17 @@ class AutoNumeric {
                 return this;
             },
             selectNumberOnly             : selectNumberOnly => {
-                this.settings.selectNumberOnly = selectNumberOnly; //FIXME à tester
+                this.settings.selectNumberOnly = selectNumberOnly; //FIXME test this
 
                 return this;
             },
             selectOnFocus                : selectOnFocus => {
-                this.settings.selectOnFocus = selectOnFocus; //FIXME à tester
+                this.settings.selectOnFocus = selectOnFocus; //FIXME test this
 
                 return this;
             },
             serializeSpaces              : serializeSpaces => {
-                this.settings.serializeSpaces = serializeSpaces; //FIXME à tester
+                this.settings.serializeSpaces = serializeSpaces; //FIXME test this
 
                 return this;
             },
@@ -777,7 +777,7 @@ class AutoNumeric {
                 return this;
             },
             showWarnings                 : showWarnings => {
-                this.settings.showWarnings = showWarnings; //FIXME à tester
+                this.settings.showWarnings = showWarnings; //FIXME test this
 
                 return this;
             },
@@ -792,17 +792,17 @@ class AutoNumeric {
                 return this;
             },
             unformatOnHover              : unformatOnHover => {
-                this.settings.unformatOnHover = unformatOnHover; //FIXME à tester
+                this.settings.unformatOnHover = unformatOnHover; //FIXME test this
 
                 return this;
             },
             unformatOnSubmit             : unformatOnSubmit => {
-                this.settings.unformatOnSubmit = unformatOnSubmit; //FIXME à tester
+                this.settings.unformatOnSubmit = unformatOnSubmit; //FIXME test this
 
                 return this;
             },
             wheelStep                    : wheelStep => {
-                this.settings.wheelStep = wheelStep; //FIXME à tester
+                this.settings.wheelStep = wheelStep; //FIXME test this
 
                 return this;
             },
@@ -815,7 +815,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.0.0-beta.23';
+        return '4.0.3';
     }
 
     /**
@@ -1108,7 +1108,7 @@ class AutoNumeric {
      * Remove all the autoNumeric-related event listeners for the given DOM element
      * @private
      */
-    _removeEventListeners() { //FIXME à tester
+    _removeEventListeners() { //FIXME test this
         this.domElement.removeEventListener('focusin', this._onFocusInFunc, false);
         this.domElement.removeEventListener('focus', this._onFocusInAndMouseEnterFunc, false);
         this.domElement.removeEventListener('focus', this._onFocusFunc, false);
@@ -2235,7 +2235,7 @@ class AutoNumeric {
      * @param {AutoNumeric} otherAnElement
      * @returns {AutoNumeric}
      */
-    detach(otherAnElement = null) { //FIXME à tester
+    detach(otherAnElement = null) { //FIXME test this
         let domElementToDetach;
         if (!AutoNumericHelper.isNull(otherAnElement)) {
             domElementToDetach = otherAnElement.node();
@@ -2257,7 +2257,7 @@ class AutoNumeric {
      * @param {boolean} reFormat
      * @returns {AutoNumeric}
      */
-    attach(otherAnElement, reFormat = true) { //FIXME à tester
+    attach(otherAnElement, reFormat = true) { //FIXME test this
         this._addToLocalList(otherAnElement.node()); //FIXME Should we make sure the element is not already in the list?
         if (reFormat) {
             otherAnElement.update(this.settings);
@@ -2275,7 +2275,7 @@ class AutoNumeric {
      * @param {null|object} optionOverride
      * @returns {string|null}
      */
-    formatOther(valueOrElement, optionOverride = null) { //FIXME à tester
+    formatOther(valueOrElement, optionOverride = null) { //FIXME test this
         return this._formatOrUnformatOther(true, valueOrElement, optionOverride);
     }
 
@@ -2288,7 +2288,7 @@ class AutoNumeric {
      * @param {null|object} optionOverride
      * @returns {string|null}
      */
-    unformatOther(stringOrElement, optionOverride = null) { //FIXME à tester
+    unformatOther(stringOrElement, optionOverride = null) { //FIXME test this
         return this._formatOrUnformatOther(false, stringOrElement, optionOverride);
     }
 
@@ -2307,7 +2307,7 @@ class AutoNumeric {
      * @returns {string|null}
      * @private
      */
-    _formatOrUnformatOther(isFormatting, valueOrStringOrElement, optionOverride = null) { //FIXME à tester
+    _formatOrUnformatOther(isFormatting, valueOrStringOrElement, optionOverride = null) { //FIXME test this
         // If the user wants to override the current element settings temporarily
         let settingsToUse;
         if (!AutoNumericHelper.isNull(optionOverride)) {
@@ -2642,7 +2642,7 @@ class AutoNumeric {
      *
      * @returns {AutoNumeric}
      */
-    formUnformat() { //FIXME à tester
+    formUnformat() { //FIXME test this
         const inputs = this.constructor._getChildANInputElement(this.form());
         inputs.forEach(input => {
             AutoNumeric.getAutoNumericElement(input).unformat();
@@ -2656,7 +2656,7 @@ class AutoNumeric {
      *
      * @returns {AutoNumeric}
      */
-    formUnformatLocalized() { //FIXME à tester
+    formUnformatLocalized() { //FIXME test this
         const inputs = this.constructor._getChildANInputElement(this.form());
         inputs.forEach(input => {
             AutoNumeric.getAutoNumericElement(input).unformatLocalized();
@@ -2670,7 +2670,7 @@ class AutoNumeric {
      *
      * @returns {AutoNumeric}
      */
-    formReformat() { //FIXME à tester
+    formReformat() { //FIXME test this
         const inputs = this.constructor._getChildANInputElement(this.form());
         inputs.forEach(input => {
             AutoNumeric.getAutoNumericElement(input).reformat();
@@ -2687,7 +2687,7 @@ class AutoNumeric {
      * @param {function|null} callback
      * @returns {AutoNumeric}
      */
-    formSubmitNumericString(callback = null) { //FIXME à tester
+    formSubmitNumericString(callback = null) { //FIXME test this
         if (AutoNumericHelper.isNull(callback)) {
             this.formUnformat();
             this.form().submit();
@@ -2709,7 +2709,7 @@ class AutoNumeric {
      * @param {function|null} callback
      * @returns {AutoNumeric}
      */
-    formSubmitFormatted(callback = null) { //FIXME à tester
+    formSubmitFormatted(callback = null) { //FIXME test this
         if (AutoNumericHelper.isNull(callback)) {
             this.form().submit();
         } else if (AutoNumericHelper.isFunction(callback)) {
@@ -2730,7 +2730,7 @@ class AutoNumeric {
      * @param {function|null} callback
      * @returns {AutoNumeric}
      */
-    formSubmitLocalized(forcedOutputFormat = null, callback = null) { //FIXME à tester
+    formSubmitLocalized(forcedOutputFormat = null, callback = null) { //FIXME test this
         if (AutoNumericHelper.isNull(callback)) {
             this.formUnformatLocalized();
             this.form().submit();
@@ -2751,7 +2751,7 @@ class AutoNumeric {
      * @param {function} callback
      * @returns {AutoNumeric}
      */
-    formSubmitArrayNumericString(callback) { //FIXME à tester
+    formSubmitArrayNumericString(callback) { //FIXME test this
         if (AutoNumericHelper.isFunction(callback)) {
             callback(this.formArrayNumericString());
         } else {
@@ -2768,7 +2768,7 @@ class AutoNumeric {
      * @param {function} callback
      * @returns {AutoNumeric}
      */
-    formSubmitArrayFormatted(callback) { //FIXME à tester
+    formSubmitArrayFormatted(callback) { //FIXME test this
         if (AutoNumericHelper.isFunction(callback)) {
             callback(this.formArrayFormatted());
         } else {
@@ -2786,7 +2786,7 @@ class AutoNumeric {
      * @param {null|string} forcedOutputFormat If set to something different than `null`, then this is used as an overriding outputFormat option
      * @returns {AutoNumeric}
      */
-    formSubmitArrayLocalized(callback, forcedOutputFormat = null) { //FIXME à tester
+    formSubmitArrayLocalized(callback, forcedOutputFormat = null) { //FIXME test this
         if (AutoNumericHelper.isFunction(callback)) {
             callback(this.formArrayLocalized(forcedOutputFormat));
         } else {
@@ -2803,7 +2803,7 @@ class AutoNumeric {
      * @param {function} callback
      * @returns {AutoNumeric}
      */
-    formSubmitJsonNumericString(callback) { //FIXME à tester
+    formSubmitJsonNumericString(callback) { //FIXME test this
         if (AutoNumericHelper.isFunction(callback)) {
             callback(this.formJsonNumericString());
         } else {
@@ -2820,7 +2820,7 @@ class AutoNumeric {
      * @param {function} callback
      * @returns {AutoNumeric}
      */
-    formSubmitJsonFormatted(callback) { //FIXME à tester
+    formSubmitJsonFormatted(callback) { //FIXME test this
         if (AutoNumericHelper.isFunction(callback)) {
             callback(this.formJsonFormatted());
         } else {
@@ -2838,7 +2838,7 @@ class AutoNumeric {
      * @param {null|string} forcedOutputFormat If set to something different than `null`, then this is used as an overriding outputFormat option
      * @returns {AutoNumeric}
      */
-    formSubmitJsonLocalized(callback, forcedOutputFormat = null) { //FIXME à tester
+    formSubmitJsonLocalized(callback, forcedOutputFormat = null) { //FIXME test this
         if (AutoNumericHelper.isFunction(callback)) {
             callback(this.formJsonLocalized(forcedOutputFormat));
         } else {
@@ -2877,7 +2877,7 @@ class AutoNumeric {
      * @returns {Array}
      * @private
      */
-    static _getChildANInputElement(formNode) { //FIXME à tester
+    static _getChildANInputElement(formNode) { //FIXME test this
         const inputList = formNode.getElementsByTagName('input');
 
         // Loop this list and keep only the inputs that are managed by AutoNumeric
@@ -2972,7 +2972,7 @@ class AutoNumeric {
      * @param {AutoNumeric} autoNumericObject
      * @private
      */
-    static _removeFromGlobalList(autoNumericObject) { //FIXME à tester
+    static _removeFromGlobalList(autoNumericObject) { //FIXME test this
         if (this._doesGlobalListExists()) {
             window[this.autoNumericGlobalListName].delete(autoNumericObject.node());
         }
@@ -2986,7 +2986,7 @@ class AutoNumeric {
      * @returns {null|AutoNumeric}
      * @private
      */
-    static _getFromGlobalList(domElement) { //FIXME à tester
+    static _getFromGlobalList(domElement) { //FIXME test this
         if (this._doesGlobalListExists()) {
             return window[this.autoNumericGlobalListName].get(domElement);
         }
@@ -3001,7 +3001,7 @@ class AutoNumeric {
      * @returns {boolean}
      * @private
      */
-    static _isInGlobalList(domElement) { //FIXME à tester
+    static _isInGlobalList(domElement) { //FIXME test this
         if (!this._doesGlobalListExists()) {
             return false;
         }
@@ -3580,7 +3580,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Analyse the given array `options` and return a single 'merged' option objet.
      * `options` can be `null`, or an array of an option objects, or an array containing another array of option objects / strings (pre-defined option names)
      *
-     * @param {null|Array<object|Array<string|object>>} options
+     * @param {null|Array<object|string|Array<string|object>>} options
      * @returns {null|object}
      * @private
      */
@@ -3597,7 +3597,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 });
             } else if (options.length >= 1) {
                 options.forEach(optionObject => {
-                    Object.assign(optionsResult, optionObject);
+                    Object.assign(optionsResult, this._getOptionObject(optionObject));
                 });
             }
         }
@@ -3607,20 +3607,29 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Format the given number (or numeric string) with the given options. This returns the formatted value as a string.
-     * This can also format the give DOM element value with the given options and returns the formatted value as a string.
-     * Note : This function does update that element value with the newly formatted value in the process.
+     * This can also format the given DOM element value with the given options and returns the formatted value as a string.
+     * Note : This function does *not* update that element value with the newly formatted value.
+     * This basically allows to get the formatted value without first having to initialize an AutoNumeric object.
      *
-     * @param {number|string|HTMLElement|HTMLInputElement} valueOrDomElement A number, or a string that represent a javascript number, or a DOM element
-     * @param {object|null} options
+     * @param {number|string|HTMLElement|HTMLInputElement} numericStringOrDomElement A number, or a string that represent a javascript number, or a DOM element
+     * @param {object|null} options Multiple objects can be passed, the latter overwriting the settings from the former ones
      * @returns {string|null}
      */
-    static format(valueOrDomElement, ...options) {
-        if (AutoNumericHelper.isUndefined(valueOrDomElement) || valueOrDomElement === null) {
+    static format(numericStringOrDomElement, ...options) {
+        if (AutoNumericHelper.isUndefined(numericStringOrDomElement) || numericStringOrDomElement === null) {
             return null;
         }
 
-        if (!AutoNumericHelper.isString(valueOrDomElement) && !AutoNumericHelper.isNumber(valueOrDomElement)) {
-            AutoNumericHelper.throwError(`The value "${valueOrDomElement}" being "set" is not numeric and therefore cannot be used appropriately.`);
+        // Retrieve the value to format
+        let value;
+        if (AutoNumericHelper.isElement(numericStringOrDomElement)) {
+            value = AutoNumericHelper.getElementValue(numericStringOrDomElement);
+        } else {
+            value = numericStringOrDomElement;
+        }
+
+        if (!AutoNumericHelper.isString(value) && !AutoNumericHelper.isNumber(value)) {
+            AutoNumericHelper.throwError(`The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`);
         }
 
         // Manage options
@@ -3628,16 +3637,18 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // Initiate a very basic settings object
         const settings = Object.assign({}, this.getDefaultConfig(), optionsToUse);
-        if (valueOrDomElement < 0) {
+        if (value < 0) {
             settings.negativeSignCharacter = '-';
+        } else {
+            settings.negativeSignCharacter = '';
         }
 
         const regex = {};
         this._cachesUsualRegularExpressions(settings, regex); // This is needed by `_stripAllNonNumberCharacters` that uses those regex
 
-        // Check the validity of the `valueOrDomElement` parameter
-        // Convert the valueOrDomElement to a numeric string, stripping unnecessary characters in the process
-        let valueString = this._toNumericValue(valueOrDomElement, settings);
+        // Check the validity of the `value` parameter
+        // Convert the value to a numeric string, stripping unnecessary characters in the process
+        let valueString = this._toNumericValue(value, settings);
         if (isNaN(Number(valueString))) {
             AutoNumericHelper.throwError(`The value [${valueString}] that you are trying to format is not a recognized number.`);
         }
@@ -3650,8 +3661,16 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             AutoNumericHelper.throwError(`The value [${valueString}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`);
         }
 
+        // Generate the `negativePositiveSignPlacement` option as needed
+        this._correctNegativePositiveSignPlacementOption(settings);
         // Calculate the needed decimal places
         this._calculateDecimalPlacesOnInit(settings);
+
+        // Multiply the raw value with `rawValueDivisor` if defined
+        if ((!AutoNumericHelper.isUndefinedOrNullOrEmpty(settings.rawValueDivisor) && settings.rawValueDivisor !== 0) && // Only divide if the `rawValueDivisor` option is set
+            valueString !== '' && valueString !== null) { // Do not modify the `valueString` if it's an empty string or null
+            valueString *= settings.rawValueDivisor;
+        }
 
         // Everything is ok, proceed to rounding, formatting and grouping
         valueString = this._roundFormattedValueShownOnFocus(valueString, settings);
@@ -3668,7 +3687,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {object} options
      * @returns {string|null}
      */
-    static formatAndSet(domElement, options = null) { //FIXME à tester
+    static formatAndSet(domElement, options = null) { //FIXME test this
         const formattedValue = this.format(domElement, options);
         AutoNumericHelper.setElementValue(domElement, formattedValue);
 
@@ -3681,9 +3700,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Note: This does *not* update that element value.
      * This basically allows to get the unformatted value without first having to initialize an AutoNumeric object.
      *
-     * @param {string|number|HTMLElement|HTMLInputElement} numericStringOrDomElement
+     * @param {string|number|HTMLElement|HTMLInputElement} numericStringOrDomElement A number, or a string that represent a javascript number, or a DOM element
      * @param {object|null} options Multiple objects can be passed, the latter overwriting the settings from the former ones
-     * @returns {*}
+     * @returns {string|number|NaN}
      */
     static unformat(numericStringOrDomElement, ...options) {
         if (AutoNumericHelper.isNumberStrict(numericStringOrDomElement)) {
@@ -3691,6 +3710,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             return numericStringOrDomElement;
         }
 
+        // Retrieve the value to unformat
         let value;
         if (AutoNumericHelper.isElement(numericStringOrDomElement)) {
             value = AutoNumericHelper.getElementValue(numericStringOrDomElement);
@@ -3732,10 +3752,24 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             return NaN;
         }
 
+        // Generate the `negativePositiveSignPlacement` option as needed
+        this._correctNegativePositiveSignPlacementOption(settings);
         // Calculate the needed decimal places
+        if (settings.decimalPlacesRawValue) { // `originalDecimalPlacesRawValue` needs to be defined
+            settings.originalDecimalPlacesRawValue = settings.decimalPlacesRawValue;
+        } else {
+            settings.originalDecimalPlacesRawValue = settings.decimalPlaces;
+        }
+
         this._calculateDecimalPlacesOnInit(settings);
+
+        // Divide the raw value with `rawValueDivisor` if defined
+        if ((!AutoNumericHelper.isUndefinedOrNullOrEmpty(settings.rawValueDivisor) && settings.rawValueDivisor !== 0) && // Only divide if the `rawValueDivisor` option is set
+            value !== '' && value !== null) { // Do not modify the `value` if it's an empty string or null
+            value /= settings.rawValueDivisor;
+        }
         
-        value = this._roundFormattedValueShownOnFocus(value, settings);
+        value = this._roundRawValue(value, settings);
         value = value.replace(settings.decimalCharacter, '.'); // Here we need to convert back the decimal character to a period since `_roundValue` adds it in some cases
         value = this._toLocale(value, settings.outputFormat);
 
@@ -3749,7 +3783,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {object} options
      * @returns {*}
      */
-    static unformatAndSet(domElement, options = null) { //FIXME à tester
+    static unformatAndSet(domElement, options = null) { //FIXME test this
         const unformattedValue = this.unformat(domElement, options);
         AutoNumericHelper.setElementValue(domElement, unformattedValue);
 
@@ -3795,7 +3829,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         return this._toLocale(value, outputFormatToUse);
     }
 
-    static localizeAndSet(domElement, options = null) { //FIXME à tester
+    static localizeAndSet(domElement, options = null) { //FIXME test this
         const localizedValue = this.localize(domElement, options);
         AutoNumericHelper.setElementValue(domElement, localizedValue);
 
@@ -3808,7 +3842,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {HTMLElement} domElement
      * @returns {boolean}
      */
-    static isManagedByAutoNumeric(domElement) { //FIXME à tester
+    static isManagedByAutoNumeric(domElement) { //FIXME test this
         return this._isInGlobalList(domElement);
     }
 
@@ -3818,7 +3852,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {HTMLElement} domElement
      * @returns {null|AutoNumeric}
      */
-    static getAutoNumericElement(domElement) { //FIXME à tester
+    static getAutoNumericElement(domElement) { //FIXME test this
         if (!this.isManagedByAutoNumeric(domElement)) {
             return null;
         }
@@ -3961,7 +3995,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * The callback takes the current AutoNumeric element as the first argument, and the key name as the second.
      * @example callback(this, 'currencySymbol')
      */
-    _runCallbacksFoundInTheSettingsObject() { //FIXME à tester
+    _runCallbacksFoundInTheSettingsObject() { //FIXME test this
         // Loops through the this.settings object (option array) to find the following
         for (const key in this.settings) {
             if (this.settings.hasOwnProperty(key)) {
@@ -6497,29 +6531,32 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * then we modify the default value of `negativePositiveSignPlacement` in order to keep the resulting output logical by default :
      * - "$-1,234.56" instead of "-$1,234.56" ({currencySymbol: "$", negativePositiveSignPlacement: "r"})
      * - "-1,234.56$" instead of "1,234.56-$" ({currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "p"})
+     *
+     * @param {object} settings
      */
-    _correctNegativePositiveSignPlacementOption() {
+    static _correctNegativePositiveSignPlacementOption(settings) {
+        //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
         // If negativePositiveSignPlacement is already set, we do not overwrite it
-        if (!AutoNumericHelper.isNull(this.settings.negativePositiveSignPlacement)) {
+        if (!AutoNumericHelper.isNull(settings.negativePositiveSignPlacement)) {
             return;
         }
 
-        if (!AutoNumericHelper.isUndefined(this.settings) &&
-            AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.negativePositiveSignPlacement) &&
-            !AutoNumericHelper.isUndefinedOrNullOrEmpty(this.settings.currencySymbol)) {
-            switch (this.settings.currencySymbolPlacement) {
+        if (!AutoNumericHelper.isUndefined(settings) &&
+            AutoNumericHelper.isUndefinedOrNullOrEmpty(settings.negativePositiveSignPlacement) &&
+            !AutoNumericHelper.isUndefinedOrNullOrEmpty(settings.currencySymbol)) {
+            switch (settings.currencySymbolPlacement) {
                 case AutoNumeric.options.currencySymbolPlacement.suffix:
-                    this.settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix; // Default -1,234.56 €
+                    settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.prefix; // Default -1,234.56 €
                     break;
                 case AutoNumeric.options.currencySymbolPlacement.prefix:
-                    this.settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.left; // Default -$1,234.56
+                    settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.left; // Default -$1,234.56
                     break;
                 default :
                 //
             }
         } else {
             // Sets the default value if `negativePositiveSignPlacement` is `null`
-            this.settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.left;
+            settings.negativePositiveSignPlacement = AutoNumeric.options.negativePositiveSignPlacement.left;
         }
     }
 
@@ -6950,7 +6987,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this._runCallbacksFoundInTheSettingsObject();
 
         // Improve the `negativePositiveSignPlacement` option if needed
-        this._correctNegativePositiveSignPlacementOption();
+        this.constructor._correctNegativePositiveSignPlacementOption(this.settings);
 
         // Set the `caretPositionOnFocus` and `selectOnFocus` options so that they do not conflict, if one of those have been set manually by the user.
         // If order to check that, we take a look at the original options the user passed as an argument, not `this.settings` that have been merged with the default settings. //TODO Check the validity of that comment

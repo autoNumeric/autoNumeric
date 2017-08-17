@@ -5,11 +5,11 @@ Version `4` has seen a [lots of improvements and new features](https://github.co
 ### Initialization
 
 Initialization of an AutoNumeric object [has changed](https://github.com/autoNumeric/autoNumeric/#initialization) a bit.<br>
-Since AutoNumeric is now an ES6 module, *`AutoNumeric` being the name of the `class`*, and since the jQuery dependency has been dropped, you now longer need to first select the DOM element with jQuery, then call the `$(yourElement).autoNumeric('init', {options})` method, but only need to instantiate an `AutoNumeric` object using `new AutoNumeric(yourElement, {options})`.
+Since AutoNumeric is now an ES6 module, *`AutoNumeric` being the name of the `class`*, and since the jQuery dependency has been dropped, you now longer need to first select the DOM element with jQuery, then call the `$(yourElement).autoNumeric('init', { options })` method, but only need to instantiate an `AutoNumeric` object using `new AutoNumeric(yourElement, { options })`.
 
 | <= `v2` (Before)          | `v4` (After) |
 | :---------------- | :-----------  |
-| `$('.myInput').autoNumeric('init', {options});` | If you want to initialize [only one element](https://github.com/autoNumeric/autoNumeric/#initialize-one-autonumeric-object): `new AutoNumeric('.myInput', {options});` |
+| `$('.myInput').autoNumeric('init', { options });` | If you want to initialize [only one element](https://github.com/autoNumeric/autoNumeric/#initialize-one-autonumeric-object): `new AutoNumeric('.myInput', { options });` |
 |  | If you want to initialize [multiple elements](https://github.com/autoNumeric/autoNumeric/#initialize-multiple-autonumeric-objects-at-once): `AutoNumeric.multiple('.myCssClass > input', { options });` |
 
 ### Configuration
@@ -50,15 +50,15 @@ To help you switch to the new names, detailed warning messages are displayed in 
 ### Method calls
 
 Moreover, since we are now using an `AutoNumeric` object, we can now directly call its [methods](https://github.com/autoNumeric/autoNumeric/#methods) (and [chain](https://github.com/autoNumeric/autoNumeric/#function-chaining) them if needed).<br> 
-In the following table, the `anElement` variable is created using `const anElement = new AutoNumeric(domElement, {options})`.
+In the following table, the `anElement` variable is created using `const anElement = new AutoNumeric(domElement, { options })`.
 
 The methods are now called like so:
 
 | <= `v2` (Before)          | `v4` (After) |
 | :---------------- | :-----------  |
-| `$(someSelector).autoFormat('1234.56', {options});` | `AutoNumeric.format(1234.56, { options });` |
-| `$(someSelector).autoUnFormat('1.234,56 €', {options});` | `AutoNumeric.unformat('1.234,56 €', { options });` |
-| `$(someSelector).autoValidate({options});` | `AutoNumeric.validate({ options })` |
+| `$(someSelector).autoFormat('1234.56', { options });` | `AutoNumeric.format(1234.56, { options });` |
+| `$(someSelector).autoUnFormat('1.234,56 €', { options });` | `AutoNumeric.unformat('1.234,56 €', { options });` |
+| `$(someSelector).autoValidate({ options });` | `AutoNumeric.validate({ options })` |
 | `$.fn.autoNumeric.defaults` | `AutoNumeric.getDefaultConfig()` |
 | `$(someSelector).autoNumeric("destroy");` | `anElement.remove();` |
 | `$(someSelector).autoNumeric('get');` | `anElement.getNumericString();` |
@@ -69,9 +69,9 @@ The methods are now called like so:
 | `$(someSelector).autoNumeric('getString');` | `anElement.formNumericString();` |
 | `$.fn.autoNumeric.lang` | `AutoNumeric.getPredefinedOptions()` |
 | `$(someSelector).autoNumeric('reSet');` | `anElement.reformat();` |
-| `$(someSelector).autoNumeric('set', '12345.67');` |  |
+| `$(someSelector).autoNumeric('set', '12345.67');` | `anElement.set(12345.67);` |
 | `$(someSelector).autoNumeric('unSet');` | `anElement.unformat();` |
-| `$(someSelector).autoNumeric("update", {options});` |  |
+| `$(someSelector).autoNumeric("update", { options });` | `anElement.update({ options });` |
 | `$(someSelector).autoNumeric("wipe");` | `anElement.wipe();` |
 
 Check the [documentation](https://github.com/autoNumeric/autoNumeric/#instantiated-methods) to see how some of those functions signatures changed.

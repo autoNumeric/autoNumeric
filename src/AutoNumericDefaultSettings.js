@@ -67,11 +67,13 @@ Object.defineProperty(AutoNumeric, 'defaultSettings', {
             modifyValueOnWheel           : AutoNumeric.options.modifyValueOnWheel.modifyValue,
             negativeBracketsTypeOnBlur   : AutoNumeric.options.negativeBracketsTypeOnBlur.none,
             negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
+            negativeSignCharacter        : AutoNumeric.options.negativeSignCharacter.hyphen,
             noEventListeners             : AutoNumeric.options.noEventListeners.addEvents,
             //TODO Shouldn't we use `truncate` as the default value?
             onInvalidPaste               : AutoNumeric.options.onInvalidPaste.error,
             outputFormat                 : AutoNumeric.options.outputFormat.none,
             overrideMinMaxLimits         : AutoNumeric.options.overrideMinMaxLimits.doNotOverride,
+            positiveSignCharacter        : AutoNumeric.options.positiveSignCharacter.plus,
             rawValueDivisor              : AutoNumeric.options.rawValueDivisor.none,
             readOnly                     : AutoNumeric.options.readOnly.readWrite,
             roundingMethod               : AutoNumeric.options.roundingMethod.halfUpSymmetric,

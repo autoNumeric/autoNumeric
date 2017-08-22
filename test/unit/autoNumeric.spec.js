@@ -105,10 +105,12 @@ describe('The autoNumeric object', () => {
             modifyValueOnWheel           : true,
             negativeBracketsTypeOnBlur   : null,
             negativePositiveSignPlacement: null,
+            negativeSignCharacter        : '-',
             noEventListeners             : false,
             onInvalidPaste               : 'error',
             outputFormat                 : null,
             overrideMinMaxLimits         : null,
+            positiveSignCharacter        : '+',
             rawValueDivisor              : null,
             readOnly                     : false,
             roundingMethod               : 'S',
@@ -1317,6 +1319,12 @@ describe('autoNumeric options and `options.*` methods', () => {
             aNInput.options.outputFormat(AutoNumeric.options.outputFormat.negativeComma);
             expect(aNInput.getLocalized()).toEqual('-12356,78');
 
+            aNInput.options.negativeSignCharacter('#');
+            expect(aNInput.getFormatted()).toEqual('#12.356,78\u202f€');
+            aNInput.options.positiveSignCharacter('¤');
+            aNInput.set(2202, { showPositiveSign: true });
+            expect(aNInput.getFormatted()).toEqual('¤2.202,00\u202f€');
+
             // Test function chaining on `options.*`
             aNInput.options.reset().french().set(6666);
             expect(aNInput.getFormatted()).toEqual('6.666,00\u202f€');
@@ -1388,6 +1396,27 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual('-1,119.99');
         });
 
+        it('should round correctly with the method halfUpAsymmetric and a custom negative sign', () => {
+            aNInput.update({
+                roundingMethod       : AutoNumeric.options.roundingMethod.halfUpAsymmetric,
+                negativeSignCharacter: '@',
+            });
+            // Positive values
+            aNInput.set(1119.444);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.445);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,120.00');
+            // Negative values
+            aNInput.set(-1119.444);
+            expect(aNInput.getFormatted()).toEqual('@1,119.44');
+            aNInput.set(-1119.445);
+            expect(aNInput.getFormatted()).toEqual('@1,119.44');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('@1,119.99');
+        });
+
         it('should round correctly with the method halfDownSymmetric', () => {
             aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.halfDownSymmetric });
             // Positive values
@@ -1422,6 +1451,27 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual('-1,119.45');
             aNInput.set(-1119.995);
             expect(aNInput.getFormatted()).toEqual('-1,120.00');
+        });
+
+        it('should round correctly with the method halfDownAsymmetric and a custom negative sign', () => {
+            aNInput.update({
+                roundingMethod       : AutoNumeric.options.roundingMethod.halfDownAsymmetric,
+                negativeSignCharacter: '@',
+            });
+            // Positive values
+            aNInput.set(1119.444);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.445);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,119.99');
+            // Negative values
+            aNInput.set(-1119.444);
+            expect(aNInput.getFormatted()).toEqual('@1,119.44');
+            aNInput.set(-1119.445);
+            expect(aNInput.getFormatted()).toEqual('@1,119.45');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('@1,120.00');
         });
 
         it('should round correctly with the method halfEvenBankersRounding', () => {
@@ -1516,6 +1566,27 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual('-1,119.99');
         });
 
+        it('should round correctly with the method toCeilingTowardPositiveInfinity and a custom negative sign', () => {
+            aNInput.update({
+                roundingMethod       : AutoNumeric.options.roundingMethod.toCeilingTowardPositiveInfinity,
+                negativeSignCharacter: '@',
+            });
+            // Positive values
+            aNInput.set(1119.444);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.445);
+            expect(aNInput.getFormatted()).toEqual('1,119.45');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,120.00');
+            // Negative values
+            aNInput.set(-1119.444);
+            expect(aNInput.getFormatted()).toEqual('@1,119.44');
+            aNInput.set(-1119.445);
+            expect(aNInput.getFormatted()).toEqual('@1,119.44');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('@1,119.99');
+        });
+
         it('should round correctly with the method toFloorTowardNegativeInfinity', () => {
             aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.toFloorTowardNegativeInfinity });
             // Positive values
@@ -1532,6 +1603,27 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual('-1,119.45');
             aNInput.set(-1119.995);
             expect(aNInput.getFormatted()).toEqual('-1,120.00');
+        });
+
+        it('should round correctly with the method toFloorTowardNegativeInfinity', () => {
+            aNInput.update({
+                roundingMethod       : AutoNumeric.options.roundingMethod.toFloorTowardNegativeInfinity,
+                negativeSignCharacter: '@',
+            });
+            // Positive values
+            aNInput.set(1119.444);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.445);
+            expect(aNInput.getFormatted()).toEqual('1,119.44');
+            aNInput.set(1119.995);
+            expect(aNInput.getFormatted()).toEqual('1,119.99');
+            // Negative values
+            aNInput.set(-1119.444);
+            expect(aNInput.getFormatted()).toEqual('@1,119.45');
+            aNInput.set(-1119.445);
+            expect(aNInput.getFormatted()).toEqual('@1,119.45');
+            aNInput.set(-1119.995);
+            expect(aNInput.getFormatted()).toEqual('@1,120.00');
         });
 
         it('should round correctly with the method toNearest05Alt', () => {
@@ -2493,6 +2585,114 @@ describe('autoNumeric options and `options.*` methods', () => {
 
             aNInput.set(1234.70);
             expect(aNInput.getFormatted()).toEqual('1.234,70\u202f€');
+        });
+    });
+
+    describe('`negativeSignCharacter` option', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.nuke();
+        });
+
+        it('should show the custom negative sign, on the prefix position', () => {
+            aNInput = new AutoNumeric(newInput).french({ negativeSignCharacter: AutoNumeric.options.negativeSignCharacter.not });
+            aNInput.set(2500.01);
+            expect(aNInput.getFormatted()).toEqual('2.500,01\u202f€');
+            aNInput.set(-2500.01);
+            expect(aNInput.getFormatted()).toEqual('¬2.500,01\u202f€');
+
+            // Update the option
+            aNInput.options.negativeSignCharacter(AutoNumeric.options.negativeSignCharacter.hyphen);
+            expect(aNInput.getFormatted()).toEqual('-2.500,01\u202f€');
+            aNInput.options.negativeSignCharacter(AutoNumeric.options.negativeSignCharacter.minus);
+            expect(aNInput.getFormatted()).toEqual('−2.500,01\u202f€');
+            aNInput.options.negativeSignCharacter(AutoNumeric.options.negativeSignCharacter.heavyMinus);
+            expect(aNInput.getFormatted()).toEqual('➖2.500,01\u202f€');
+            aNInput.options.negativeSignCharacter(AutoNumeric.options.negativeSignCharacter.fullWidthHyphen);
+            expect(aNInput.getFormatted()).toEqual('－2.500,01\u202f€');
+            aNInput.options.negativeSignCharacter(AutoNumeric.options.negativeSignCharacter.circledMinus);
+            expect(aNInput.getFormatted()).toEqual('⊖2.500,01\u202f€');
+            aNInput.options.negativeSignCharacter(AutoNumeric.options.negativeSignCharacter.squaredMinus);
+            expect(aNInput.getFormatted()).toEqual('⊟2.500,01\u202f€');
+            aNInput.options.negativeSignCharacter(AutoNumeric.options.negativeSignCharacter.triangleMinus);
+            expect(aNInput.getFormatted()).toEqual('⨺2.500,01\u202f€');
+            aNInput.options.negativeSignCharacter(AutoNumeric.options.negativeSignCharacter.plusMinus);
+            expect(aNInput.getFormatted()).toEqual('±2.500,01\u202f€');
+            aNInput.options.negativeSignCharacter(AutoNumeric.options.negativeSignCharacter.minusPlus);
+            expect(aNInput.getFormatted()).toEqual('∓2.500,01\u202f€');
+            aNInput.options.negativeSignCharacter(AutoNumeric.options.negativeSignCharacter.dotMinus);
+            expect(aNInput.getFormatted()).toEqual('∸2.500,01\u202f€');
+            aNInput.options.negativeSignCharacter(AutoNumeric.options.negativeSignCharacter.minusTilde);
+            expect(aNInput.getFormatted()).toEqual('≂2.500,01\u202f€');
+
+            aNInput.set(1234.70);
+            expect(aNInput.getFormatted()).toEqual('1.234,70\u202f€');
+        });
+    });
+
+    describe('`positiveSignCharacter` option', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.nuke();
+        });
+
+        it('should show brackets on negative numbers', () => {
+            aNInput = new AutoNumeric(newInput).french();
+            aNInput.set(2500.01);
+            expect(aNInput.getFormatted()).toEqual('2.500,01\u202f€');
+            aNInput.update({ showPositiveSign: AutoNumeric.options.showPositiveSign.show });
+            expect(aNInput.getFormatted()).toEqual('+2.500,01\u202f€');
+
+            // Update the option
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.plus);
+            expect(aNInput.getFormatted()).toEqual('+2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.fullWidthPlus);
+            expect(aNInput.getFormatted()).toEqual('＋2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.heavyPlus);
+            expect(aNInput.getFormatted()).toEqual('➕2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.doublePlus);
+            expect(aNInput.getFormatted()).toEqual('⧺2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.triplePlus);
+            expect(aNInput.getFormatted()).toEqual('⧻2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.circledPlus);
+            expect(aNInput.getFormatted()).toEqual('⊕2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.squaredPlus);
+            expect(aNInput.getFormatted()).toEqual('⊞2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.trianglePlus);
+            expect(aNInput.getFormatted()).toEqual('⨹2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.plusMinus);
+            expect(aNInput.getFormatted()).toEqual('±2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.minusPlus);
+            expect(aNInput.getFormatted()).toEqual('∓2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.dotPlus);
+            expect(aNInput.getFormatted()).toEqual('∔2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.altHebrewPlus);
+            expect(aNInput.getFormatted()).toEqual('﬩2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.normalSpace);
+            expect(aNInput.getFormatted()).toEqual(' 2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.thinSpace);
+            expect(aNInput.getFormatted()).toEqual('\u20092.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.narrowNoBreakSpace);
+            expect(aNInput.getFormatted()).toEqual('\u202f2.500,01\u202f€');
+            aNInput.options.positiveSignCharacter(AutoNumeric.options.positiveSignCharacter.noBreakSpace);
+            expect(aNInput.getFormatted()).toEqual('\u00a02.500,01\u202f€');
+
+            aNInput.set(1234.70);
+            expect(aNInput.getFormatted()).toEqual('\u00a01.234,70\u202f€');
         });
     });
 
@@ -6347,6 +6547,20 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '‹,›' })).not.toThrow();
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '«,»' })).not.toThrow();
 
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: '-' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: '+', positiveSignCharacter: '∅' })).not.toThrow(); // Not recommended, but possible
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: '_' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: ' ' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: 'a' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: AutoNumeric.options.negativeSignCharacter.not })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: '+' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: '-', negativeSignCharacter: '∅' })).not.toThrow(); // Not recommended, but possible
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: '_' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: ' ' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: 'a' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: AutoNumeric.options.positiveSignCharacter.plusMinus })).not.toThrow();
+
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 'focus' })).not.toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 'press' })).not.toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 'always' })).not.toThrow();
@@ -6690,6 +6904,24 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: 5 })).toThrow();
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: -5 })).toThrow();
 
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: 'ab' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: true })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: {} })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: null })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: '' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: 2 })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: 2.5 })).toThrow();
+
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: 'ab' })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: true })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: {} })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: null })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: '' })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: 2 })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: 2.5 })).toThrow();
+
             expect(() => AutoNumeric.validate({ emptyInputBehavior: [] })).toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: true })).toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 'foobar' })).toThrow();
@@ -6818,6 +7050,44 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ valuesToStrings: [] })).toThrow();
             expect(() => AutoNumeric.validate({ valuesToStrings: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ valuesToStrings: 'foobar' })).toThrow();
+        });
+
+        it('should not allow the `negativeSignCharacter` and `positiveSignCharacter` to be equal', () => {
+            expect(() => AutoNumeric.validate({
+                negativeSignCharacter: '¼',
+                positiveSignCharacter: '¼',
+            })).toThrow();
+        });
+
+        it('should not validate the `negativeSignCharacter` in specific conditions', () => {
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: ' ', digitGroupSeparator: ' ' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: '.', decimalCharacter: '.' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: ',', decimalCharacterAlternative: ',' })).toThrow();
+            // Test that the neg/pos sign can be the 'comma' (when the brackets are defined, ie. with a comma separator in the option definition)
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: ',', negativeBracketsTypeOnBlur: '(,)', digitGroupSeparator: '' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: '(', negativeBracketsTypeOnBlur: '(,)' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: ')', negativeBracketsTypeOnBlur: '(,)' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: 'B', suffixText: 'Bar' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: 'a', suffixText: 'Bar' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: 'r', suffixText: 'Bar' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: 'b', suffixText: 'Bar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: 'A', suffixText: 'Bar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativeSignCharacter: 'R', suffixText: 'Bar' })).not.toThrow();
+        });
+
+        it('should not validate the `positiveSignCharacter` in specific conditions', () => {
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: ' ', digitGroupSeparator: ' ' })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: '.', decimalCharacter: '.' })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: ',', decimalCharacterAlternative: ',' })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: ',', negativeBracketsTypeOnBlur: '(,)', digitGroupSeparator: '' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: '(', negativeBracketsTypeOnBlur: '(,)' })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: ')', negativeBracketsTypeOnBlur: '(,)' })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: 'B', suffixText: 'Bar' })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: 'a', suffixText: 'Bar' })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: 'r', suffixText: 'Bar' })).toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: 'b', suffixText: 'Bar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: 'A', suffixText: 'Bar' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ positiveSignCharacter: 'R', suffixText: 'Bar' })).not.toThrow();
         });
 
         it('should only send a warning, and not throw', () => {

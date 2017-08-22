@@ -745,6 +745,33 @@
 			<input id="issue_450_limits" type="text" placeholder="#450" value="">
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #478</p>
+			<div>
+				<div>
+					<input id="issue_478_neg1" type="text" placeholder="#478" value="">
+					<input id="issue_478_neg2" type="text" placeholder="#478" value="">
+					<input id="issue_478_neg3" type="text" placeholder="#478" value="">
+					<input id="issue_478_pos1" type="text" placeholder="#478" value="">
+					<input id="issue_478_pos2" type="text" placeholder="#478" value="">
+					<input id="issue_478_negPos" type="text" placeholder="#478" value="">
+				</div>
+				<div>
+					<input id="issue_478_RightPlacement_neg1" type="text" placeholder="#478" value="">
+					<input id="issue_478_RightPlacement_neg2" type="text" placeholder="#478" value="">
+					<input id="issue_478_RightPlacement_neg3" type="text" placeholder="#478" value="">
+					<input id="issue_478_RightPlacement_pos1" type="text" placeholder="#478" value="">
+					<input id="issue_478_RightPlacement_pos2" type="text" placeholder="#478" value="">
+					<input id="issue_478_RightPlacement_negPos" type="text" placeholder="#478" value="">
+				</div>
+				<div>
+					<input id="issue_478_neg4" type="text" placeholder="#478" value="">
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1610,7 +1637,6 @@
     }, false);
 
     //-------------- Issue #450
-    new AutoNumeric('#issue_450', 42, { valuesToStrings: AutoNumeric.options.valuesToStrings.zeroDash });
     new AutoNumeric('#issue_450_limits', 222, {
         valuesToStrings: {
             0  : 'zero',
@@ -1620,6 +1646,63 @@
         },
         minimumValue   : 100,
         maximumValue   : 400,
+    });
+
+    //-------------- Issue #478
+    new AutoNumeric('#issue_478_neg1', -0.20, { negativeSignCharacter: AutoNumeric.options.negativeSignCharacter.hyphen });
+    new AutoNumeric('#issue_478_neg2', -12, { negativeSignCharacter: AutoNumeric.options.negativeSignCharacter.minusTilde });
+    new AutoNumeric('#issue_478_neg3', -200, {
+        negativeBracketsTypeOnBlur: AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses,
+    });
+    new AutoNumeric('#issue_478_pos1', -14, {
+        positiveSignCharacter: AutoNumeric.options.positiveSignCharacter.plus,
+        negativeSignCharacter: 'z',
+        showPositiveSign     : AutoNumeric.options.showPositiveSign.show,
+    });
+    new AutoNumeric('#issue_478_pos2', -0.42, {
+        positiveSignCharacter: AutoNumeric.options.positiveSignCharacter.doublePlus,
+        showPositiveSign     : AutoNumeric.options.showPositiveSign.show,
+    });
+    new AutoNumeric('#issue_478_negPos', -1234.78, {
+        negativeSignCharacter: AutoNumeric.options.negativeSignCharacter.dotMinus,
+        positiveSignCharacter: AutoNumeric.options.positiveSignCharacter.triplePlus,
+        showPositiveSign     : AutoNumeric.options.showPositiveSign.show,
+    });
+
+    new AutoNumeric('#issue_478_RightPlacement_neg1', 0.20, {
+        negativeSignCharacter        : AutoNumeric.options.negativeSignCharacter.hyphen,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+    });
+    new AutoNumeric('#issue_478_RightPlacement_neg2', 12, {
+        negativeSignCharacter        : AutoNumeric.options.negativeSignCharacter.minusTilde,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+    });
+    new AutoNumeric('#issue_478_RightPlacement_neg3', 200, {
+        negativeSignCharacter        : AutoNumeric.options.negativeSignCharacter.minusTilde,
+        negativeBracketsTypeOnBlur   : AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+    });
+    new AutoNumeric('#issue_478_RightPlacement_pos1', 14, {
+        positiveSignCharacter        : 'p',
+        showPositiveSign             : AutoNumeric.options.showPositiveSign.show,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+    });
+    new AutoNumeric('#issue_478_RightPlacement_pos2', 0.42, {
+        positiveSignCharacter        : AutoNumeric.options.positiveSignCharacter.doublePlus,
+        showPositiveSign             : AutoNumeric.options.showPositiveSign.show,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+    });
+    new AutoNumeric('#issue_478_RightPlacement_negPos', 1234.78, {
+        negativeSignCharacter        : AutoNumeric.options.negativeSignCharacter.dotMinus,
+        positiveSignCharacter        : AutoNumeric.options.positiveSignCharacter.triplePlus,
+        showPositiveSign             : AutoNumeric.options.showPositiveSign.show,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+    });
+
+    new AutoNumeric('#issue_478_neg4', -468.31, {
+        negativeBracketsTypeOnBlur: AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses,
+        negativeSignCharacter     : AutoNumeric.options.negativeSignCharacter.dotMinus,
+        positiveSignCharacter     : AutoNumeric.options.positiveSignCharacter.triplePlus,
     });
 </script>
 </body>

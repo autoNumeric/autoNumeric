@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.1
- * @date         2017-08-11 UTC 21:45
+ * @version      4.1.0-beta.2
+ * @date         2017-08-22 UTC 01:00
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -700,6 +700,11 @@ class AutoNumeric {
 
                 return this;
             },
+            negativeSignCharacter        : negativeSignCharacter => {
+                this.update({ negativeSignCharacter });
+
+                return this;
+            },
             noEventListeners             : noEventListeners => { //FIXME test this
                 if (noEventListeners === AutoNumeric.options.noEventListeners.noEvents && this.settings.noEventListeners === AutoNumeric.options.noEventListeners.addEvents) {
                     // Remove the events once
@@ -722,6 +727,11 @@ class AutoNumeric {
             },
             overrideMinMaxLimits         : overrideMinMaxLimits => {
                 this.update({ overrideMinMaxLimits });
+
+                return this;
+            },
+            positiveSignCharacter        : positiveSignCharacter => {
+                this.update({ positiveSignCharacter });
 
                 return this;
             },
@@ -820,7 +830,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.1';
+        return '4.1.0-beta.2';
     }
 
     /**
@@ -1948,7 +1958,7 @@ class AutoNumeric {
         if (this.rawValue === null) {
             result = null;
         } else {
-            result = this.constructor._toLocale(this.getNumericString(), 'number');
+            result = this.constructor._toLocale(this.getNumericString(), 'number', this.settings);
         }
 
         this._executeCallback(result, callback);
@@ -1999,7 +2009,7 @@ class AutoNumeric {
             outputFormatToUse = forcedOutputFormat;
         }
 
-        const result = this.constructor._toLocale(value, outputFormatToUse);
+        const result = this.constructor._toLocale(value, outputFormatToUse, this.settings);
         this._executeCallback(result, callback);
 
         return result;
@@ -2103,7 +2113,7 @@ class AutoNumeric {
         const valueLen = unformattedValue.length;
         const currencySymbolSize = this.settings.currencySymbol.length;
         const currencySymbolPlacement = this.settings.currencySymbolPlacement;
-        const negLen = (!AutoNumericHelper.isNegative(unformattedValue))?0:1;
+        const negLen = (!AutoNumericHelper.isNegative(unformattedValue, this.settings.negativeSignCharacter))?0:1;
         const suffixTextLen = this.settings.suffixText.length;
 
         let start;
@@ -3298,8 +3308,45 @@ class AutoNumeric {
             AutoNumericHelper.throwError(`The show positive sign option 'showPositiveSign' is invalid ; it should be either 'false' or 'true', [${options.showPositiveSign}] given.`);
         }
 
-        if (!AutoNumericHelper.isString(options.suffixText) || (options.suffixText !== '' && (AutoNumericHelper.isNegative(options.suffixText) || testNumericalCharacters.test(options.suffixText)))) {
-            AutoNumericHelper.throwError(`The additional suffix option 'suffixText' is invalid ; it should not contains the negative sign '-' nor any numerical characters, [${options.suffixText}] given.`);
+        if (!AutoNumericHelper.isString(options.suffixText) || (options.suffixText !== '' && (AutoNumericHelper.isNegative(options.suffixText, options.negativeSignCharacter) || testNumericalCharacters.test(options.suffixText)))) {
+            AutoNumericHelper.throwError(`The additional suffix option 'suffixText' is invalid ; it should not contains the negative sign '${this.settings.negativeSignCharacter}' nor any numerical characters, [${options.suffixText}] given.`);
+        }
+
+        if (!AutoNumericHelper.isString(options.negativeSignCharacter) ||
+            options.negativeSignCharacter.length !== 1 ||
+            AutoNumericHelper.isUndefinedOrNullOrEmpty(options.negativeSignCharacter) ||
+            testNumericalCharacters.test(options.negativeSignCharacter)) {
+            AutoNumericHelper.throwError(`The negative sign character option 'negativeSignCharacter' is invalid ; it should be a single character, and cannot be any numerical characters, [${options.negativeSignCharacter}] given.`);
+        }
+
+        if (!AutoNumericHelper.isString(options.positiveSignCharacter) ||
+            options.positiveSignCharacter.length !== 1 ||
+            AutoNumericHelper.isUndefinedOrNullOrEmpty(options.positiveSignCharacter) ||
+            testNumericalCharacters.test(options.positiveSignCharacter)) {
+            AutoNumericHelper.throwError(`The positive sign character option 'positiveSignCharacter' is invalid ; it should be a single character, and cannot be any numerical characters, [${options.positiveSignCharacter}] given.\nIf you want to hide the positive sign character, you need to set the \`showPositiveSign\` option to \`true\`.`);
+        }
+
+        if (options.negativeSignCharacter === options.positiveSignCharacter) {
+            AutoNumericHelper.throwError(`The positive 'positiveSignCharacter' and negative 'negativeSignCharacter' sign characters cannot be equal ; [${options.negativeSignCharacter}] given.`);
+        }
+
+        const [leftBracket, rightBracket] = AutoNumericHelper.isNull(options.negativeBracketsTypeOnBlur)?['', '']:options.negativeBracketsTypeOnBlur.split(',');
+        if (AutoNumericHelper.contains(options.digitGroupSeparator, options.negativeSignCharacter) ||
+            AutoNumericHelper.contains(options.decimalCharacter, options.negativeSignCharacter) ||
+            AutoNumericHelper.contains(options.decimalCharacterAlternative, options.negativeSignCharacter) ||
+            AutoNumericHelper.contains(leftBracket, options.negativeSignCharacter) ||
+            AutoNumericHelper.contains(rightBracket, options.negativeSignCharacter) ||
+            AutoNumericHelper.contains(options.suffixText, options.negativeSignCharacter)) {
+            AutoNumericHelper.throwError(`The negative sign character option 'negativeSignCharacter' is invalid ; it should not be equal or a part of the digit separator, the decimal character, the decimal character alternative, the negative brackets or the suffix text, [${options.negativeSignCharacter}] given.`);
+        }
+
+        if (AutoNumericHelper.contains(options.digitGroupSeparator, options.positiveSignCharacter) ||
+            AutoNumericHelper.contains(options.decimalCharacter, options.positiveSignCharacter) ||
+            AutoNumericHelper.contains(options.decimalCharacterAlternative, options.positiveSignCharacter) ||
+            AutoNumericHelper.contains(leftBracket, options.positiveSignCharacter) ||
+            AutoNumericHelper.contains(rightBracket, options.positiveSignCharacter) ||
+            AutoNumericHelper.contains(options.suffixText, options.positiveSignCharacter)) {
+            AutoNumericHelper.throwError(`The positive sign character option 'positiveSignCharacter' is invalid ; it should not be equal or a part of the digit separator, the decimal character, the decimal character alternative, the negative brackets or the suffix text, [${options.positiveSignCharacter}] given.`);
         }
 
         if (!AutoNumericHelper.isNull(options.overrideMinMaxLimits) && !AutoNumericHelper.isInArray(options.overrideMinMaxLimits, [
@@ -3668,11 +3715,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // Initiate a very basic settings object
         const settings = Object.assign({}, this.getDefaultConfig(), optionsToUse);
-        if (value < 0) {
-            settings.negativeSignCharacter = '-';
-        } else {
-            settings.negativeSignCharacter = '';
-        }
+        settings.isNegativeSignAllowed = value < 0;
+        settings.isPositiveSignAllowed = value >= 0;
 
         const regex = {};
         this._cachesUsualRegularExpressions(settings, regex); // This is needed by `_stripAllNonNumberCharacters` that uses those regex
@@ -3763,16 +3807,20 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // Generate the settings
         const settings = Object.assign({}, this.getDefaultConfig(), optionsToUse);
+        settings.isNegativeSignAllowed = false;
+        settings.isPositiveSignAllowed = true;
         value = value.toString();
 
         // This checks if a negative sign is anywhere in the `value`, not just on the very first character (ie. '12345.67-')
-        if (AutoNumericHelper.isNegative(value)) {
-            settings.negativeSignCharacter = '-';
+        if (AutoNumericHelper.isNegative(value, settings.negativeSignCharacter)) {
+            settings.isNegativeSignAllowed = true;
+            settings.isPositiveSignAllowed = false;
         } else if (!AutoNumericHelper.isNull(settings.negativeBracketsTypeOnBlur)) {
             [settings.firstBracket, settings.lastBracket] = settings.negativeBracketsTypeOnBlur.split(',');
             if (value.charAt(0) === settings.firstBracket &&
                 value.charAt(value.length - 1) === settings.lastBracket) {
-                settings.negativeSignCharacter = '-';
+                settings.isNegativeSignAllowed = true;
+                settings.isPositiveSignAllowed = false;
                 value = this._removeBrackets(value, settings, false);
             }
         }
@@ -3802,7 +3850,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         
         value = this._roundRawValue(value, settings);
         value = value.replace(settings.decimalCharacter, '.'); // Here we need to convert back the decimal character to a period since `_roundValue` adds it in some cases
-        value = this._toLocale(value, settings.outputFormat);
+        value = this._toLocale(value, settings.outputFormat, settings);
 
         return value;
     }
@@ -3828,10 +3876,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * This basically allows to get the localized value without first having to initialize an AutoNumeric object.
      *
      * @param {string|number|HTMLElement|HTMLInputElement} numericStringOrDomElement
-     * @param {object} options
+     * @param {object} settings
      * @returns {*}
      */
-    static localize(numericStringOrDomElement, options = null) {
+    static localize(numericStringOrDomElement, settings = null) {
         let value;
         if (AutoNumericHelper.isElement(numericStringOrDomElement)) {
             value = AutoNumericHelper.getElementValue(numericStringOrDomElement);
@@ -3839,25 +3887,25 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             value = numericStringOrDomElement;
         }
 
-        if (AutoNumericHelper.isNull(options)) {
-            options = AutoNumeric.defaultSettings;
+        if (AutoNumericHelper.isNull(settings)) {
+            settings = AutoNumeric.defaultSettings;
         }
 
-        value = this.unformat(value, options);
+        value = this.unformat(value, settings);
 
         //XXX The following code is pretty close to the one you can find in `getLocalized()`, but different enough so we won't refactor it.
-        if (Number(value) === 0 && options.leadingZero !== AutoNumeric.options.leadingZero.keep) {
+        if (Number(value) === 0 && settings.leadingZero !== AutoNumeric.options.leadingZero.keep) {
             value = '0';
         }
 
         let outputFormatToUse;
-        if (AutoNumericHelper.isNull(options)) {
-            outputFormatToUse = options.outputFormat;
+        if (AutoNumericHelper.isNull(settings)) {
+            outputFormatToUse = settings.outputFormat;
         } else {
             outputFormatToUse = AutoNumeric.defaultSettings.outputFormat;
         }
 
-        return this._toLocale(value, outputFormatToUse);
+        return this._toLocale(value, outputFormatToUse, settings);
     }
 
     static localizeAndSet(domElement, options = null) { //FIXME test this
@@ -4084,7 +4132,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             s = s.replace(settings.suffixText, '');
         }
 
-        //TODO Remove the positive sign too?
+        if (settings.negativeSignCharacter !== '-') {
+            // Replace the custom negative sign with an hyphen
+            s = s.replace(settings.negativeSignCharacter, '-');
+        }
 
         // First replace anything before digits
         s = s.replace(settings.skipFirstAutoStrip, '$1$2');
@@ -4092,7 +4143,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Then replace anything after digits
         s = s.replace(settings.skipLastAutoStrip, '$1');
 
-        // Then remove any uninteresting characters
+        // Then remove any uninteresting characters (this also remove any custom positive sign)
         s = s.replace(settings.allowedAutoStrip, '');
         if (settings.decimalCharacterAlternative) {
             s = s.replace(settings.decimalCharacterAlternative, settings.decimalCharacter);
@@ -4195,7 +4246,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 result = this._mergeCurrencySignNegativePositiveSignAndValue(result, settings, true, false); //TODO This assume the value is negative and non-empty. Is this always the case?
             } else {
                 // Here we only want to add the negative sign since we removed the brackets, without reordering
-                result = '-' + result;
+                result = `${settings.negativeSignCharacter}${result}`;
             }
         } else {
             result = value;
@@ -4245,9 +4296,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         // Move the trailing negative sign to the right position, if any
-        if (AutoNumericHelper.isNegative(s) && s.lastIndexOf('-') === s.length - 1) {
-            s = s.replace('-', '');
-            s = '-' + s;
+        if (AutoNumericHelper.isNegative(s, settings.negativeSignCharacter) && s.lastIndexOf(settings.negativeSignCharacter) === s.length - 1) {
+            s = s.replace(settings.negativeSignCharacter, '');
+            s = `-${s}`;
         }
 
         // Convert arabic numbers to latin ones, if any
@@ -4263,12 +4314,14 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     /**
      * Converts the ISO numeric string to the locale decimal and minus sign placement.
      * See the "outputFormat" option definition for more details.
+     * Note: If the `outputFormat` is set to a number, the custom `negativeSignCharacter` is ignored.
      *
-     * @param {string|null} value
+     * @param {string|null} value The unformatted value
      * @param {string|null} locale
+     * @param {object} settings
      * @returns {*}
      */
-    static _toLocale(value, locale) {
+    static _toLocale(value, locale, settings) {
         if (AutoNumericHelper.isNull(locale) || locale === AutoNumeric.options.outputFormat.string) {
             return value;
         }
@@ -4298,21 +4351,26 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 AutoNumericHelper.throwError(`The given outputFormat [${locale}] option is not recognized.`);
         }
 
+        if (locale !== AutoNumeric.options.outputFormat.number && settings.negativeSignCharacter !== '-') {
+            // Modify the default minus sign with the custom one, if any
+            result = result.replace('-', settings.negativeSignCharacter);
+        }
+
         return result;
     }
 
     /**
      * Modify the negative sign and the decimal character of the given string value to an hyphen (-) and a dot (.) in order to make that value 'typecastable' to a real number.
      *
-     * @param {string} s
-     * @returns {string}
+     * @param {string} s The formatted value
+     * @returns {string} The value with the 'normal' minus sign and decimal character
      */
     _modifyNegativeSignAndDecimalCharacterForRawValue(s) {
         if (this.settings.decimalCharacter !== '.') {
             s = s.replace(this.settings.decimalCharacter, '.');
         }
 
-        if (this.settings.negativeSignCharacter !== '-' && this.settings.negativeSignCharacter !== '') {
+        if (this.settings.negativeSignCharacter !== '-' && this.settings.isNegativeSignAllowed) {
             s = s.replace(this.settings.negativeSignCharacter, '-');
         }
 
@@ -4333,7 +4391,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      */
     static _modifyNegativeSignAndDecimalCharacterForFormattedValue(s, settings) {
         //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
-        if (settings.negativeSignCharacter !== '-' && settings.negativeSignCharacter !== '') {
+        if (settings.negativeSignCharacter !== '-') {
             s = s.replace('-', settings.negativeSignCharacter);
         }
 
@@ -4381,7 +4439,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
-     * Modify the input value by adding the group separators, as defined in the settings.
+     * Modify the input value by adding the group separators, as defined in the settings, and the negative brackets if needed.
      *
      * @param {string} inputValue The formatted value (ie. with the `decimalCharacter` defined in the settings, not the raw value)
      * @param {object} settings
@@ -4393,7 +4451,13 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     static _addGroupSeparators(inputValue, settings, isFocused, currentRawValue, forcedRawValue = null) {
         //TODO Test if `inputValue` === '', and return '' directly if that's the case,
         //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
-        const isValueNegative = AutoNumericHelper.isNegative(inputValue) || AutoNumericHelper.isNegativeWithBrackets(inputValue, settings.firstBracket, settings.lastBracket); // Test if the value is negative before removing the negative sign
+        let isValueNegative;
+        if (!AutoNumericHelper.isNull(forcedRawValue)) {
+            // Prefer directly testing if the raw value is negative in order for the test to be more performant than manipulating the formatted value
+            isValueNegative = forcedRawValue < 0;
+        } else {
+            isValueNegative = AutoNumericHelper.isNegative(inputValue, settings.negativeSignCharacter) || AutoNumericHelper.isNegativeWithBrackets(inputValue, settings.firstBracket, settings.lastBracket); // Test if the value is negative before removing the negative sign
+        }
 
         inputValue = this._stripAllNonNumberCharacters(inputValue, settings, false, isFocused);
 
@@ -4405,7 +4469,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // Temporarily remove the negative sign if present
         if (isValueNegative) {
-            inputValue = inputValue.replace('-', '');
+            inputValue = inputValue.replace('-', ''); // At this point the `inputValue` has been normalized with a 'normal' negative sign `'-'`
         }
 
         settings.digitalGroupSpacing = settings.digitalGroupSpacing.toString();
@@ -4468,7 +4532,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         // Toggle the negative sign and brackets
-        if (settings.negativeBracketsTypeOnBlur !== null && (forcedRawValue < 0 || AutoNumericHelper.isNegativeStrict(inputValue))) {
+        if (settings.negativeBracketsTypeOnBlur !== null && (forcedRawValue < 0 || AutoNumericHelper.isNegativeStrict(inputValue, settings.negativeSignCharacter))) {
             inputValue = this._toggleNegativeBracket(inputValue, settings, isFocused);
         }
 
@@ -4572,8 +4636,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         let hasDecimalChar = false;
         let offsetDecimalChar = 0;
         if (this.settings.caretPositionOnFocus !== AutoNumeric.options.caretPositionOnFocus.start) {
-            value = value.replace('-', '');
-            value = value.replace('+', '');
+            value = value.replace(this.settings.negativeSignCharacter, '');
+            value = value.replace(this.settings.positiveSignCharacter, '');
             value = value.replace(this.settings.currencySymbol, '');
             valueSize = value.length;
             hasDecimalChar = AutoNumericHelper.contains(value, this.settings.decimalCharacter);
@@ -4969,7 +5033,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Modify the given `value` in order to make it usable for the rest of the rounding function.
      * This convert the `value` to a positive one, trim any leading zeros and make sure it does not starts with a leading dot.
      *
-     * @param {string} value
+     * @param {string} value The unformatted value
      * @param {object} settings
      * @returns {[string, string]}
      * @private
@@ -4977,7 +5041,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     static _prepareValueForRounding(value, settings) {
         // Checks if `inputValue` is a negative value
         let negativeSign = '';
-        if (AutoNumericHelper.isNegativeStrict(value)) {
+        if (AutoNumericHelper.isNegativeStrict(value, '-')) { // The value being unformatted, we check for the minus sign
             negativeSign = '-';
 
             // Removes the negative sign that will be added back later if required
@@ -5008,7 +5072,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * 
      * @param {number} lastDigit
      * @param {object} settings
-     * @param {string} negativeSign
+     * @param {string} negativeSign This variable comes from `_prepareValueForRounding()`, which return `'-'` if the initial value was negative
      * @param {number} odd
      * @returns {boolean}
      * @private
@@ -5066,6 +5130,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @returns {*}
      */
     static _checkIfInRangeWithOverrideOption(value, settings) {
+        if (AutoNumericHelper.isNull(value) && settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.null) {
+            // When the `null` value is accepted as the `rawValue`, the limits are ignored
+            return [true, true];
+        }
+        
         value = value.toString();
         value = value.replace(',', '.');
         const minParse = AutoNumericHelper.parseStr(settings.minimumValue);
@@ -5260,7 +5329,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @private
      */
     _onFocusInAndMouseEnter(e) {
-        this.isEditing = false; // Just in case no `keyUp` event have been sent (if the user lost the focus to the window while typing)
+        this.isEditing = false; // Just in case no `keyUp` event have been sent (ie. if the user lost the focus from the current window while typing)
 
         //TODO `AutoNumericHelper.setElementValue` is called 3 times sequentially here, fix that
         //TODO Create separate handlers for the focus and mouseenter events
@@ -5273,7 +5342,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         if (e.type === 'focus') { //TODO Move that back to the 'focus' event handler when the separation between the 'focus' and 'mouseenter' handler will be done
-            // We keep track if the element is currently focused
+            // Keep track if the element is currently focused
             this.isFocused = true;
         }
 
@@ -5281,11 +5350,13 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             this.constructor._reformatAltHovered(this);
         }
 
+        //TODO Modify the following block to prevent calling `setElementValue()` multiple times in a row
         if (e.type === 'focus' || e.type === 'mouseenter' && !this.isFocused) {
             if (this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus &&
-                this.rawValue < 0 && this.settings.negativeBracketsTypeOnBlur !== null && this.settings.negativeSignCharacter !== '') { //FIXME this is called a second time in _addGroupSeparators too. Prevent this, if possible.
+                this.rawValue < 0 && this.settings.negativeBracketsTypeOnBlur !== null && this.settings.isNegativeSignAllowed) { //FIXME this is called a second time in _addGroupSeparators too. Prevent this, if possible.
                 // Only remove the brackets if the value is negative
                 AutoNumericHelper.setElementValue(this.domElement, this.constructor._removeBrackets(AutoNumericHelper.getElementValue(this.domElement), this.settings));
+                //FIXME The element value is set here, why continue and set it again later in that same parent logic block?
             }
 
             // Use the rawValue, multiplied by `rawValueDivisor` if defined
@@ -5314,6 +5385,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     } else {
                         formattedValue = this.constructor._addGroupSeparators(roundedValue.replace('.', this.settings.decimalCharacter), this.settings, this.isFocused, rawValueToFormat);
                     }
+
                     AutoNumericHelper.setElementValue(this.domElement, formattedValue);
                 }
             }
@@ -5411,6 +5483,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {KeyboardEvent} e
      */
     _onKeydown(e) {
+        this.formatted = false; // Keep track if the element has been formatted already. If that's the case, prevent further format calculations.
         this.isEditing = true; // Keep track if the user is currently editing the element manually
 
         if (!this.isFocused && this.settings.unformatOnHover && e.altKey && this.domElement === AutoNumericHelper.getHoveredElement()) {
@@ -5485,11 +5558,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
             this.lastVal = targetValue;
             this.throwInput = true;
-
-            return;
         }
-
-        this.formatted = false; //TODO Is this line needed? (I mean, _formatValue always set it to `true`, and this overwrite that info)
     }
 
     /**
@@ -5543,8 +5612,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         e.preventDefault();
-
-        this.formatted = false; //TODO Is this line needed? (I mean, _formatValue always set it to `true`, and this overwrite that info)
     }
 
     /**
@@ -5609,8 +5676,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 }
 
                 e.preventDefault(); //TODO Check how that is affecting the normal trigger of the input event
-
-                this.formatted = false;
             } else {
                 // Character deleted
                 //XXX The change in length could also be the result of the `Delete` key, but there usually are no such key in the Android virtual keyboards
@@ -5842,7 +5907,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {Event|ClipboardEvent} e
      */
     _onPaste(e) {
-        //TODO Using ctrl+z after a paste should cancel it -> How would that affect other frameworks/component built with that feature in mind though?
         //FIXME When pasting '000' on a thousand group selection, the whole selection gets deleted, and only one '0' is pasted (cf. issue #302)
         // The event is prevented by default, since otherwise the user would be able to paste invalid characters into the input
         e.preventDefault();
@@ -5863,14 +5927,35 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         const selectionStart = e.target.selectionStart || 0;
         const selectionEnd = e.target.selectionEnd || 0;
         const selectionSize = selectionEnd - selectionStart;
-        let isAllInputTextSelected = false;
 
-        if (selectionSize === initialFormattedValue.length) {
-            isAllInputTextSelected = true;
+        if (selectionSize === initialFormattedValue.length) { // If all the element text is selected
+            //TODO Refactor this with the tests below
+            // Since the whole element content will be replaced, no need to complicate things and directly test for the validity of the pasted content, then set the `rawValue` and caret position (fix issue #482)
+            // 1. Strip all thousand separators, brackets and currency sign, and convert the decimal character to a dot
+            const untranslatedPastedText = this._preparePastedText(rawPastedText);
+            const pastedRawValue = AutoNumericHelper.arabicToLatinNumbers(untranslatedPastedText, false, false, false); // Allow pasting arabic numbers
+
+            // 2. Check that the paste is a valid number once it has been normalized to a raw value
+            if (pastedRawValue === '.' || pastedRawValue === '' || (pastedRawValue !== '.' && !AutoNumericHelper.isNumber(pastedRawValue))) {
+                this.formatted = true; // This prevent the `keyup` event on the `v` key during a paste to try to format an empty value.
+                // If the user tries to paste a single decimal character (that has been translated to '.' already) or the empty value, ignore the paste
+                if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.error) {
+                    AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' is not a valid paste content.`);
+                }
+
+                return;
+            }
+
+            // 3. Then try to set it as the new value. The `set()` method will run the additional tests (ie. limits) as needed.
+            this.set(pastedRawValue);
+            this.formatted = true;
+
+            // 4. Return since the job is done
+            return;
         }
 
         // 1. Check if the paste has a negative sign (only if it's the first character), and store that information for later use
-        const isPasteNegative = AutoNumericHelper.isNegativeStrict(rawPastedText);
+        const isPasteNegative = AutoNumericHelper.isNegativeStrict(rawPastedText, this.settings.negativeSignCharacter);
         if (isPasteNegative) {
             // 1a. Remove the negative sign from the pasted text
             rawPastedText = rawPastedText.slice(1, rawPastedText.length);
@@ -5891,8 +5976,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // 3. Test if the paste is valid (only has numbers and eventually a decimal character). If it's not valid, stop here.
         if (pastedText !== '.' && (!AutoNumericHelper.isNumber(pastedText) || pastedText === '')) {
+            this.formatted = true; // This prevent the `keyup` event on the `v` key during a paste to try to format an empty value (fix issue #484)
             if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.error) {
-                //TODO Should we send a warning instead of throwing an error?
                 AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' is not a valid paste content.`);
             }
 
@@ -5901,14 +5986,12 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // 4. Calculate the paste result
         let caretPositionOnInitialTextAfterPasting;
-        let initialUnformattedNumber = this.getNumericString();
-        let isInitialValueNegative = AutoNumericHelper.isNegativeStrict(initialUnformattedNumber);
+        let isInitialValueNegative = AutoNumericHelper.isNegativeStrict(this.getNumericString(), this.settings.negativeSignCharacter);
         let isPasteNegativeAndInitialValueIsPositive;
         let result;
 
         // If the pasted content is negative, then the result will be negative too
         if (isPasteNegative && !isInitialValueNegative) {
-            initialUnformattedNumber = `-${initialUnformattedNumber}`;
             isInitialValueNegative = true;
             isPasteNegativeAndInitialValueIsPositive = true;
         }
@@ -6097,6 +6180,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                         leftPartContainedADot = true;
                         leftPart = leftPart.replace('.', '');
                     }
+
                     rightPart = rightPart.replace('.', '');
                 }
                 // -- Here, we are good to go to continue on the same basis
@@ -6109,34 +6193,27 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     // There is no selection, then the caret position is set after the pasted text
                     const indexWherePastedTextHasBeenInserted = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, this.settings.decimalCharacter));
                     caretPositionOnInitialTextAfterPasting = indexWherePastedTextHasBeenInserted + pastedText.length; // I must not count the characters that have been removed from the pasted text (ie. '.')
+                } else if (rightPart === '') {
+                    // If the user selected from the caret position to the end of the input (on the far right)
+                    caretPositionOnInitialTextAfterPasting = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, this.settings.decimalCharacter)) + pastedText.length;
                 } else {
-                    if (isAllInputTextSelected) {
-                        // Special case when all the input text is selected before pasting, which means we'll completely erase its content and paste only the clipboard content
-                        caretPositionOnInitialTextAfterPasting = result.length;
-                    } else if (rightPart === '') {
-                        // If the user selected from the caret position to the end of the input (on the far right)
-                        caretPositionOnInitialTextAfterPasting = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, this.settings.decimalCharacter)) + pastedText.length;
-                    } else {
-                        // Normal case
-                        const indexSelectionEndInRawValue = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionEnd, this.settings.decimalCharacter));
+                    // Normal case
+                    const indexSelectionEndInRawValue = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionEnd, this.settings.decimalCharacter));
 
-                        // Here I must not count the characters that have been removed from the pasted text (ie. '.'), or the thousand separators in the initial selected text
-                        const selectedText = AutoNumericHelper.getElementValue(e.target).slice(selectionStart, selectionEnd);
-                        caretPositionOnInitialTextAfterPasting = indexSelectionEndInRawValue - selectionSize + AutoNumericHelper.countCharInText(this.settings.digitGroupSeparator, selectedText) + pastedText.length;
-                    }
+                    // Here I must not count the characters that have been removed from the pasted text (ie. '.'), or the thousand separators in the initial selected text
+                    const selectedText = AutoNumericHelper.getElementValue(e.target).slice(selectionStart, selectionEnd);
+                    caretPositionOnInitialTextAfterPasting = indexSelectionEndInRawValue - selectionSize + AutoNumericHelper.countCharInText(this.settings.digitGroupSeparator, selectedText) + pastedText.length;
                 }
 
                 // Modify the caret position for special cases, only if the whole input has not been selected
-                if (!isAllInputTextSelected) {
-                    if (isPasteNegativeAndInitialValueIsPositive) {
-                        // If the pasted value has a '-' sign, but the initial value does not, offset the index by one
-                        caretPositionOnInitialTextAfterPasting++;
-                    }
+                if (isPasteNegativeAndInitialValueIsPositive) {
+                    // If the pasted value has a negative sign ('-'), but the initial value does not, offset the index by one
+                    caretPositionOnInitialTextAfterPasting++;
+                }
 
-                    if (leftPartContainedADot) {
-                        // If a dot has been removed for the part on the left of the caret, we decrement the caret index position
-                        caretPositionOnInitialTextAfterPasting--;
-                    }
+                if (leftPartContainedADot) {
+                    // If a dot has been removed for the part on the left of the caret, we decrement the caret index position
+                    caretPositionOnInitialTextAfterPasting--;
                 }
         }
 
@@ -6172,7 +6249,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
          * If 'replace' :
          *      - Replace paste behavior.
          *      - Try to set the new value, until it fails (if the result is out of the min and max value limits).
-         *     - Then try to replace as many numbers as possible with the pasted ones. Once it fails, keep the last known non-failing result.
+         *      - Then try to replace as many numbers as possible with the pasted ones. Once it fails, keep the last known non-failing result.
          *      - Change the caret position to be positioned after the last pasted character.
          */
         let valueHasBeenSet = false;
@@ -6535,7 +6612,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                         if ((this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix ||
                             (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.prefix && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix)) &&
                             this.settings.negativeSignCharacter !== '' &&
-                            AutoNumericHelper.isNegative(currentValue)) {
+                            AutoNumericHelper.isNegative(currentValue, this.settings.negativeSignCharacter)) {
                             this._setRawValue(this.settings.negativeSignCharacter + this.constructor._stripAllNonNumberCharacters(toStrip, this.settings, true, this.isFocused));
                         } else {
                             this._setRawValue(this.constructor._stripAllNonNumberCharacters(toStrip, this.settings, true, this.isFocused));
@@ -6789,8 +6866,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     _calculateVMinAndVMaxIntegerSizes() {
         let [maximumValueIntegerPart] = this.settings.maximumValue.toString().split('.');
         let [minimumValueIntegerPart] = (!this.settings.minimumValue && this.settings.minimumValue !== 0)?[]:this.settings.minimumValue.toString().split('.');
-        maximumValueIntegerPart = maximumValueIntegerPart.replace('-', '');
-        minimumValueIntegerPart = minimumValueIntegerPart.replace('-', '');
+        maximumValueIntegerPart = maximumValueIntegerPart.replace(this.settings.negativeSignCharacter, '');
+        minimumValueIntegerPart = minimumValueIntegerPart.replace(this.settings.negativeSignCharacter, '');
 
         this.settings.mIntPos = Math.max(maximumValueIntegerPart.length, 1);
         this.settings.mIntNeg = Math.max(minimumValueIntegerPart.length, 1);
@@ -6940,10 +7017,12 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             modifyValueOnWheel                : true,
             negativeBracketsTypeOnBlur        : true,
             negativePositiveSignPlacement     : true,
+            negativeSignCharacter             : true,
             noEventListeners                  : true,
             onInvalidPaste                    : true,
             outputFormat                      : true,
             overrideMinMaxLimits              : true,
+            positiveSignCharacter             : true,
             rawValueDivisor                   : true,
             readOnly                          : true,
             roundingMethod                    : true,
@@ -6963,15 +7042,15 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             wheelStep                         : true,
 
             // Additional information that are added to the `settings` object :
-            //FIXME Find a way to exclude those internal data from the settings object (ideally by using another object, or better yet, class attributes) -->
+            //TODO Find a way to exclude those internal data from the settings object (ideally by using another object, or better yet, class attributes) -->
             allowedAutoStrip                  : true,
+            isNegativeSignAllowed             : true,
+            isPositiveSignAllowed             : true,
             mIntNeg                           : true,
             mIntPos                           : true,
-            negativeSignCharacter             : true,
             numRegAutoStrip                   : true,
             originalDecimalPlaces             : true,
             originalDecimalPlacesRawValue     : true,
-            positiveSignCharacter             : true,
             skipFirstAutoStrip                : true,
             skipLastAutoStrip                 : true,
             stripReg                          : true,
@@ -7062,9 +7141,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // If order to check that, we take a look at the original options the user passed as an argument, not `this.settings` that have been merged with the default settings. //TODO Check the validity of that comment
         this.constructor._correctCaretPositionOnFocusAndSelectOnFocusOptions(this.settings);
 
-        // Set the negative and positive signs, as needed
-        this.settings.negativeSignCharacter = this.settings.minimumValue < 0 ? '-' : '';
-        this.settings.positiveSignCharacter = this.settings.maximumValue >= 0 ? '+' : '';
+        // Define if the negative or positive signs are allowed
+        this.constructor._setNegativePositiveSignPermissions(this.settings);
 
         // Calculate the number of decimal places (during the element initialization)
         if (!update) {
@@ -7100,6 +7178,17 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // Original settings saved for use when decimalPlacesShownOnFocus, divisorWhenUnfocused & showOnlyNumbersOnFocus options are being used
         this._keepAnOriginalSettingsCopy();
+    }
+
+    /**
+     * Define if the negative or positive signs are allowed, and update the given settings object directly.
+     *
+     * @param {object} settings
+     * @private
+     */
+    static _setNegativePositiveSignPermissions(settings) {
+        settings.isNegativeSignAllowed = settings.minimumValue < 0;
+        settings.isPositiveSignAllowed = settings.maximumValue >= 0;
     }
 
     /**
@@ -7161,9 +7250,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Update the selection values as well as resets the internal state of the current AutoNumeric object.
-     * This keeps tracks of the current selection and resets the 'processed' and 'formatted' state.
+     * This keeps tracks of the current selection and resets the 'processed' state.
      *
-     * Note : Those two can change between the keydown, keypress and keyup events, that's why
+     * Note : This state can change between the keydown, keypress and keyup events, that's why
      *        this function is called on each event handler.
      *
      * @private
@@ -7171,7 +7260,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     _updateInternalProperties() {
         this.selection = AutoNumericHelper.getElementSelection(this.domElement);
         this.processed = false;
-        this.formatted = false;
     }
 
     /**
@@ -7249,7 +7337,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Return an array containing the string parts located on the left and right side of the caret or selection.
-     * Those parts are unformatted (stripped) of any non-numbers characters.
+     * Those parts are unformatted (stripped) of any non-numbers characters, and any trailing negative character is put back on the left hand side of the number.
      *
      * @returns {[string, string]} The parts on the left and right of the caret or selection, unformatted.
      * @private
@@ -7262,16 +7350,24 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // If changing the sign and `left` is equal to the number zero, prevent stripping the leading zero(s)
         let stripZeros = true;
-        if (this.eventKey === AutoNumericEnum.keyName.Hyphen && Number(left) === 0) {
+        if ((this.eventKey === AutoNumericEnum.keyName.Hyphen || this.eventKey === AutoNumericEnum.keyName.Minus) && Number(left) === 0) {
             stripZeros = false;
         }
 
+        //TODO DRY that with `_normalizeParts()` -->
         if (this.isTrailingNegative &&
-            AutoNumericHelper.isNegative(right) &&
-            !AutoNumericHelper.isNegative(left)) {
-            // Only set the negative sign if the value is negative
-            left = '-' + left;
+            ((AutoNumericHelper.isNegative(right, this.settings.negativeSignCharacter) && // The caret is placed on the left of the negative sign
+            !AutoNumericHelper.isNegative(left, this.settings.negativeSignCharacter)) ||
+            (right === '' && // ..or the caret is placed on the far right of the input (Fix issue #481)
+            AutoNumericHelper.isNegative(left, this.settings.negativeSignCharacter, true)))) {
+            left = left.replace(this.settings.negativeSignCharacter, '');
             right = right.replace(this.settings.negativeSignCharacter, '');
+            // This is done here because `_getUnformattedLeftAndRightPartAroundTheSelection()` is called multiple times during the same key event, and at one point the left/right value has been normalized already..
+            left = left.replace('-', '');
+            right = right.replace('-', '');
+
+            // Then finally set back the normalized minus character at the right place
+            left = `-${left}`;
         }
 
         left = AutoNumeric._stripAllNonNumberCharacters(left, this.settings, stripZeros, this.isFocused);
@@ -7292,15 +7388,15 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         //TODO Refactor with `_getUnformattedLeftAndRightPartAroundTheSelection` which share a lot of similar code
         // If changing the sign and left is equal to the number zero - prevents stripping the leading zeros
         let stripZeros = true;
-        if (this.eventKey === AutoNumericEnum.keyName.Hyphen && Number(left) === 0) {
+        if ((this.eventKey === AutoNumericEnum.keyName.Hyphen || this.eventKey === AutoNumericEnum.keyName.Minus) && Number(left) === 0) {
             stripZeros = false;
         }
 
         if (this.isTrailingNegative &&
-            AutoNumericHelper.isNegative(right) &&
-            !AutoNumericHelper.isNegative(left)) {
+            AutoNumericHelper.isNegative(right, this.settings.negativeSignCharacter) &&
+            !AutoNumericHelper.isNegative(left, this.settings.negativeSignCharacter)) {
             // Only set the negative sign if the value is negative
-            left = '-' + left;
+            left = `-${left}`;
             right = right.replace(this.settings.negativeSignCharacter, '');
         }
 
@@ -7459,6 +7555,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Try to strip pasted value to digits
      */
     _checkPaste() {
+        // Do not process anything if the value has already been formatted
+        if (this.formatted) {
+            return;
+        }
+
         if (!AutoNumericHelper.isUndefined(this.valuePartsBeforePaste)) {
             const oldParts = this.valuePartsBeforePaste;
             const [left, right] = this._getLeftAndRightPartAroundTheSelection();
@@ -7549,6 +7650,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             return e.type === 'keydown' || e.type === 'keypress' || this.eventKey === AutoNumericEnum.keyName.c;
         }
 
+
+        // The undo shortcut
         if (e.ctrlKey || e.metaKey) {
             if (this.eventKey === AutoNumericEnum.keyName.Z || this.eventKey === AutoNumericEnum.keyName.z) {
                 return false;
@@ -7603,7 +7706,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 if (this.selection.start >= value.indexOf(this.settings.currencySymbol) + this.settings.currencySymbol.length) {
                     right = right.substring(1, right.length);
                 }
-                if (AutoNumericHelper.isNegative(left) && value.charAt(this.selection.start) === '-') {
+                if (AutoNumericHelper.isNegative(left, this.settings.negativeSignCharacter) && value.charAt(this.selection.start) === '-') {
                     left = left.substring(1);
                 }
             }
@@ -7666,7 +7769,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 this.throwInput = false;
             }
 
-            if (this.isTrailingNegative && AutoNumericHelper.isNegative(AutoNumericHelper.getElementValue(this.domElement))) {
+            if (this.isTrailingNegative && AutoNumericHelper.isNegative(AutoNumericHelper.getElementValue(this.domElement), this.settings.negativeSignCharacter)) {
                 [left, right] = this._processCharacterDeletionIfTrailingNegativeSign([left, right]);
             } else {
                 if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
@@ -7739,18 +7842,19 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             return true;
         }
 
-        // Prevent entering the minus sign if it's not allowed (Note: `this.settings.negativeSignCharacter` is only set if the minimumValue or maximumValue is lower than zero, allowing negative numbers to be entered)
-        if ((this.eventKey === '-' || this.eventKey === '+') && this.settings.negativeSignCharacter === '-') {
-            if (left === '' && AutoNumericHelper.contains(right, this.settings.negativeSignCharacter)) {
+        // Prevent entering the minus sign if it's not allowed (Note: `this.settings.isNegativeSignAllowed` is only set to `true` if the minimumValue is lower than zero, allowing negative numbers to be entered)
+        if ((this.eventKey === '-' || this.eventKey === '+') && this.settings.isNegativeSignAllowed) {
+            // Here, the left and right parts have been normalized already, hence the minus sign usage
+            if (left === '' && AutoNumericHelper.contains(right, '-')) {
                 // The value is originally negative (with a trailing negative sign)
-                right = right.replace(this.settings.negativeSignCharacter, '');
-            } else if (AutoNumericHelper.isNegative(left)) {
+                right = right.replace('-', '');
+            } else if (AutoNumericHelper.isNegative(left, '-')) {
                 // The value is originally negative (with a leading negative sign)
                 // Remove the negative sign, effectively converting the value to a positive one
-                left = left.replace('-', ''); //TODO replace with '+' if `showPositiveSign`?
+                left = left.replace('-', ''); //TODO replace with '+' if `showPositiveSign` too?
             } else {
-                // The value is originally positive
-                left = this.settings.negativeSignCharacter + left;
+                // The value is originally positive, so we toggle the state to a negative one (unformatted, which means even with a trailing negative sign, we add the minus sign on the far left)
+                left = `${this.settings.negativeSignCharacter}${left}`;
             }
 
             this._setValueParts(left, right);
@@ -7761,16 +7865,16 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // If the user tries to insert a digit before the minus sign
         const eventNumber = Number(this.eventKey);
         if (eventNumber >= 0 && eventNumber <= 9) {
-            if (this.settings.negativeSignCharacter && left === '' && AutoNumericHelper.contains(right, this.settings.negativeSignCharacter)) {
-                left = this.settings.negativeSignCharacter;
+            if (this.settings.isNegativeSignAllowed && left === '' && AutoNumericHelper.contains(right, '-')) {
+                left = '-';
                 right = right.substring(1, right.length);
             }
 
             if (this.settings.maximumValue <= 0 && this.settings.minimumValue < this.settings.maximumValue && !AutoNumericHelper.contains(AutoNumericHelper.getElementValue(this.domElement), this.settings.negativeSignCharacter) && this.eventKey !== '0') {
-                left = this.settings.negativeSignCharacter + left;
+                left = `-${left}`;
             }
 
-            this._setValueParts(left + this.eventKey, right);
+            this._setValueParts(`${left}${this.eventKey}`, right);
 
             return true;
         }
@@ -7796,10 +7900,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             (this.settings.currencySymbol === '' || (this.settings.currencySymbol !== '' && !AutoNumericHelper.contains(elementValue, this.settings.currencySymbol)))) {
             let [subParts] = elementValue.split(this.settings.decimalCharacter);
             let negativeSign = '';
-            if (AutoNumericHelper.isNegative(subParts)) {
-                negativeSign = '-';
-                subParts = subParts.replace('-', '');
-                left = left.replace('-', '');
+            if (AutoNumericHelper.isNegative(subParts, this.settings.negativeSignCharacter)) {
+                negativeSign = this.settings.negativeSignCharacter;
+                subParts = subParts.replace(this.settings.negativeSignCharacter, '');
+                left = left.replace('-', ''); // Here we modify the unformatted value (with the 'normal' minus sign)
             }
 
             // Strip leading zero on positive value if needed
@@ -7808,11 +7912,13 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             }
 
             // Strip leading zero on negative value if needed
-            if (negativeSign === '-' && subParts.length > this.settings.mIntNeg && left.charAt(0) === '0') {
+            if (negativeSign === this.settings.negativeSignCharacter && subParts.length > this.settings.mIntNeg && left.charAt(0) === '0') {
                 left = left.slice(1);
             }
 
-            left = negativeSign + left;
+            if (!this.isTrailingNegative) { // Only add the minus sign if it's needed on that side of the numbers
+                left = `${negativeSign}${left}`;
+            }
         }
 
         const value = this.constructor._addGroupSeparators(elementValue, this.settings, this.isFocused, this.rawValue);
@@ -7824,18 +7930,19 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             // Fixes caret position with trailing minus sign
             if ((this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix ||
                 (this.settings.negativePositiveSignPlacement !== AutoNumeric.options.negativePositiveSignPlacement.prefix && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix)) &&
-                leftAr[0] === '-' && this.settings.negativeSignCharacter !== '') {
-                leftAr.shift();
+                leftAr[0] === this.settings.negativeSignCharacter && !this.settings.isNegativeSignAllowed) {
+                leftAr.shift(); // Remove the negative sign character
 
                 if ((this.eventKey === AutoNumericEnum.keyName.Backspace || this.eventKey === AutoNumericEnum.keyName.Delete) &&
                     this.caretFix) {
                     if ((this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.left) ||
                         (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.suffix)) {
-                        leftAr.push('-');
+                        leftAr.push(this.settings.negativeSignCharacter);
                         this.caretFix = e.type === 'keydown';
                     }
 
-                    if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.right) {
+                    if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix &&
+                        this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.right) {
                         const signParts = this.settings.currencySymbol.split('');
                         const escapeChr = ['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '['];
                         const escapedParts = [];
@@ -7848,7 +7955,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                             }
                         });
 
-                        if (this.eventKey === AutoNumericEnum.keyName.Backspace) {
+                        if (this.eventKey === AutoNumericEnum.keyName.Backspace && this.settings.negativeSignCharacter === '-') {
                             escapedParts.push('-');
                         }
 
@@ -7887,7 +7994,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 if (((position === 0 && value.charAt(0) !== this.settings.negativeSignCharacter) || (position === 1 && value.charAt(0) === this.settings.negativeSignCharacter)) && this.settings.currencySymbol && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix) {
                     // Place caret after prefix sign
                     //TODO Should the test be 'isNegative' instead of 'isNegativeStrict' in order to search for '-' everywhere in the string?
-                    position = this.settings.currencySymbol.length + (AutoNumericHelper.isNegativeStrict(value) ? 1 : 0);
+                    position = this.settings.currencySymbol.length + (AutoNumericHelper.isNegativeStrict(value, this.settings.negativeSignCharacter) ? 1 : 0);
                 }
             } else {
                 if (this.settings.currencySymbol && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {

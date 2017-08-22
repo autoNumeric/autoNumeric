@@ -1,5 +1,19 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.2
++ Fix issue #478 Allow the positive & negative signs to be specified via options 
++ Fix issue #480 On Firefox, the end-to-end tests fails when trying to send the minus `'-'` character.
++ Also fix the selenium tests where entering the hyphen (`'-'`) character was not correctly accepted under Firefox.
+  This was due to the fact that the wrong keyCode `173` is sent instead of `189` like in all the other browsers for that character.
++ Fix issue #481 When the caret is on the far right and the negative sign too, entering `'+'` or `'-'` does not toggle the positive state, and only move the caret from one character to the left.
++ Fix issue #482 Pasting a positive value while selecting the entire content of an element that has a negative value result in an error.
++ Update the 'Options' chapter in the documentation to add some details on a few options.
++ Simplify `_checkPaste()` so that it's not processed any more times if the element has already been formatted.
++ Fix the range check so that when the `rawValue` is allowed to be `null` and is effectively `null`, the min/max limits are ignored.
++ Modify how `this.formatted` is used so it tracks if the element value has been formatted already. If that's the case, prevent further format calculations.
+  This is a start and `this.formatted` usage should be reviewed in depth.
++ Fix issue #484 Pasting an invalid string into either a selection or at the caret position modify the element value.
+  
 ### 4.1.0-beta.1
 + Fix issue #475 Migrate to eslint 4
 + Fix issue #450 Add the `valuesToStrings` option to allow displaying a pre-defined string when the `rawValue` equal a specific value

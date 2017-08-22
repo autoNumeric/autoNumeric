@@ -35,6 +35,7 @@
 // High default timeout need when debugging the tests
 /* eslint no-undef: 0 */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+// jasmine.DEFAULT_TIMEOUT_INTERVAL = 999999999; // Useful when using `./node_modules/.bin/wdio repl firefox` to test the Webdriver.io commands (in combination with `browser.debug()`)
 
 //-----------------------------------------------------------------------------
 // ---- Configuration
@@ -183,6 +184,19 @@ const selectors = {
     issue452Unfocus                   : '#issue_452_unfocus',
     issue452Formatted                 : '#issue_452_formatted',
     result452                         : '#result_452',
+    issue478Neg1                      : '#issue_478_neg1',
+    issue478Neg2                      : '#issue_478_neg2',
+    issue478Neg3                      : '#issue_478_neg3',
+    issue478Pos1                      : '#issue_478_pos1',
+    issue478Pos2                      : '#issue_478_pos2',
+    issue478NegPos                    : '#issue_478_negPos',
+    issue478RightPlacementNeg1        : '#issue_478_RightPlacement_neg1',
+    issue478RightPlacementNeg2        : '#issue_478_RightPlacement_neg2',
+    issue478RightPlacementNeg3        : '#issue_478_RightPlacement_neg3',
+    issue478RightPlacementPos1        : '#issue_478_RightPlacement_pos1',
+    issue478RightPlacementPos2        : '#issue_478_RightPlacement_pos2',
+    issue478RightPlacementNegPos      : '#issue_478_RightPlacement_negPos',
+    issue478Neg4                      : '#issue_478_neg4',
 };
 
 //-----------------------------------------------------------------------------
@@ -352,7 +366,7 @@ describe('Issue #327 (using inputs from issue #183)', () => {
             return { start: input.selectionStart, end: input.selectionEnd };
         }).value;
         expect(inputCaretPosition.start).toEqual(0);
-        expect(inputCaretPosition.end).toEqual(13); //XXX This does not work under Firefox 45.7, but does under firefox 53. Since we only support the browsers last version - 2, let's ignore it.
+        expect(inputCaretPosition.end).toEqual(13); //XXX This does not work under Firefox 45.7, but does under firefox 56. Since we only support the browsers last version - 2, let's ignore it.
 
         browser.keys('Tab');
         // Check the text selection
@@ -1309,14 +1323,14 @@ describe('Negative numbers & brackets notations', () => {
         expect(browser.getValue(selectors.negativeBrackets1)).toEqual('1.352.468,24 €');
     });
 
-    xit('should toggle to positive and negative values when inputting `-` or `+`', () => {
+    it('should toggle to positive and negative values when inputting `-` or `+`', () => {
         const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
         const negativeBracketsInput5 = $(selectors.negativeBracketsInput5);
 
         negativeBracketsInput1.click();
         expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
         browser.keys(['Home', '-']);
-        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57'); //FIXME This is working manually, but not when using selenium under Firefox 52
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
         browser.keys(['-']);
         expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
         browser.keys(['-']);
@@ -1516,7 +1530,7 @@ describe('Negative numbers & brackets notations', () => {
         expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('+1.234,57 €');
     });
 
-    xit('should correctly change back the element value to negative ones, with tabbing (Issue #414)', () => {
+    it('should correctly change back the element value to negative ones, with tabbing (Issue #414)', () => {
         const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
 
         // Focus in the input
@@ -1549,7 +1563,7 @@ describe('Negative numbers & brackets notations', () => {
         $(selectors.negativeBrackets1).click();
 
         // Check that the values are correctly formatted when unfocused
-        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('(1.234,57)'); //FIXME This is working manually, but not when using selenium under Firefox 52
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('(1.234,57)');
         expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('(1.234,57)');
         expect(browser.getValue(selectors.negativeBracketsInput3)).toEqual('(€ 1.234,57)');
         expect(browser.getValue(selectors.negativeBracketsInput4)).toEqual('(€ 1.234,57)');
@@ -1559,7 +1573,7 @@ describe('Negative numbers & brackets notations', () => {
         expect(browser.getValue(selectors.negativeBracketsInput8)).toEqual('(1.234,57 €)');
     });
 
-    xit('should correctly remove the brackets when the value is set to a positive one, when the caret in on the far right (Issue #414)', () => { //FIXME Currently, the user need to type the negative sign two times for it to be taken into account. This needs to be fixed!
+    it('should correctly remove the brackets when the value is set to a positive one, when the caret in on the far right (Issue #414)', () => {
         const negativeBracketsInput1 = $(selectors.negativeBracketsInput1);
         const negativeBracketsInput2 = $(selectors.negativeBracketsInput2);
         const negativeBracketsInput3 = $(selectors.negativeBracketsInput3);
@@ -2689,7 +2703,7 @@ describe('Options updates', () => {
         browser.keys(['*']); // Ignored
         expect(browser.getValue(selectors.optionUpdate2)).toEqual('444.466 €');
         browser.keys(['#']);
-        expect(browser.getValue(selectors.optionUpdate2)).toEqual('4.444,66 €'); //FIXME This fails under Firefox 52
+        expect(browser.getValue(selectors.optionUpdate2)).toEqual('4.444,66 €'); //FIXME This fails under Firefox 56
 
 
         const input3 = $(selectors.optionUpdate3);
@@ -3272,5 +3286,426 @@ describe('`rawValueDivisor` option', () => {
             return an.getNumericString();
         }).value;
         expect(result).toEqual('0.1235');
+    });
+});
+
+describe('`negativeSignCharacter` option', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue478Neg1)).toEqual('-0.20');
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('≂12.00');
+        expect(browser.getValue(selectors.issue478Neg3)).toEqual('(200.00)');
+        expect(browser.getValue(selectors.issue478Pos1)).toEqual('z14.00');
+        expect(browser.getValue(selectors.issue478Pos2)).toEqual('-0.42');
+        expect(browser.getValue(selectors.issue478NegPos)).toEqual('∸1,234.78');
+
+        expect(browser.getValue(selectors.issue478RightPlacementNeg1)).toEqual('0.20');
+        expect(browser.getValue(selectors.issue478RightPlacementNeg2)).toEqual('12.00');
+        expect(browser.getValue(selectors.issue478RightPlacementNeg3)).toEqual('200.00');
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00p');
+        expect(browser.getValue(selectors.issue478RightPlacementPos2)).toEqual('0.42⧺');
+        expect(browser.getValue(selectors.issue478RightPlacementNegPos)).toEqual('1,234.78⧻');
+
+        expect(browser.getValue(selectors.issue478Neg4)).toEqual('(468.31)');
+    });
+
+    it('should display the correct negative/positive value on focus, when the positive and negative signs are customized', () => {
+        $(selectors.issue478Neg1).click(); // Focus on the input element
+        expect(browser.getValue(selectors.issue478Neg1)).toEqual('-0.20');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('≂12.00');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478Neg3)).toEqual('-200.00');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478Pos1)).toEqual('z14.00');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478Pos2)).toEqual('-0.42');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478NegPos)).toEqual('∸1,234.78');
+        browser.keys('Tab');
+
+        expect(browser.getValue(selectors.issue478RightPlacementNeg1)).toEqual('0.20');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478RightPlacementNeg2)).toEqual('12.00');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478RightPlacementNeg3)).toEqual('200.00');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00p');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478RightPlacementPos2)).toEqual('0.42⧺');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478RightPlacementNegPos)).toEqual('1,234.78⧻');
+        browser.keys('Tab');
+
+        expect(browser.getValue(selectors.issue478Neg4)).toEqual('∸468.31');
+    });
+
+    it('should display the correct negative/positive value on blur, when the positive and negative signs are customized', () => {
+        $(selectors.issue478RightPlacementNegPos).click();
+        expect(browser.getValue(selectors.issue478Neg1)).toEqual('-0.20');
+        $(selectors.issue478Neg1).click();
+        expect(browser.getValue(selectors.issue478Neg1)).toEqual('-0.20');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478Neg1)).toEqual('-0.20');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('≂12.00');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478Neg3)).toEqual('(200.00)');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478Pos1)).toEqual('z14.00');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478Pos2)).toEqual('-0.42');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478NegPos)).toEqual('∸1,234.78');
+        browser.keys('Tab');
+
+        expect(browser.getValue(selectors.issue478RightPlacementNeg1)).toEqual('0.20');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478RightPlacementNeg2)).toEqual('12.00');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478RightPlacementNeg3)).toEqual('200.00');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00p');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478RightPlacementPos2)).toEqual('0.42⧺');
+        browser.keys('Tab');
+        expect(browser.getValue(selectors.issue478RightPlacementNegPos)).toEqual('1,234.78⧻');
+        browser.keys('Tab');
+
+        expect(browser.getValue(selectors.issue478Neg4)).toEqual('(468.31)');
+    });
+
+    it('should allow modifying the negative/positive state using the hyphen key, when the negative sign is the hyphen character', () => {
+        $(selectors.issue478Neg1).click(); // Focus on the input element
+        expect(browser.getValue(selectors.issue478Neg1)).toEqual('-0.20');
+        browser.keys(['End', '-']);
+        expect(browser.getValue(selectors.issue478Neg1)).toEqual('0.20');
+        browser.keys('-');
+        expect(browser.getValue(selectors.issue478Neg1)).toEqual('-0.20');
+        browser.keys(['Home', '-']);
+        expect(browser.getValue(selectors.issue478Neg1)).toEqual('0.20');
+        browser.keys('-');
+        expect(browser.getValue(selectors.issue478Neg1)).toEqual('-0.20');
+
+        // Test the rawValue directly
+        const result = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            const an    = AutoNumeric.getAutoNumericElement(input);
+            return an.getNumericString();
+        }, selectors.issue478Neg1).value;
+        expect(result).toEqual('-0.2');
+
+        browser.keys(['Home', '234']);
+        expect(browser.getValue(selectors.issue478Neg1)).toEqual('-2,340.20');
+    });
+
+    //FIXME Test the localized value when using a custom negative sign and `outputFormat.dotNegative`, `outputFormat.commaNegative` and `outputFormat.number`
+    //FIXME Test the rounded value when rounding a positive and negative value with `roundingMethod.halfUpAsymmetric`, `roundingMethod.halfDownAsymmetric`, `roundingMethod.toCeilingTowardPositiveInfinity` and `roundingMethod.toFloorTowardNegativeInfinity`
+
+    it('should allow modifying the negative/positive state using the hyphen key if a custom negative sign is used', () => {
+        $(selectors.issue478Neg2).click(); // Focus on the input element
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('≂12.00');
+        browser.keys(['Home', '-']); // Check that when entering '-' while the caret is on the far left of the negative number (with a custom negative sign), the whole value is replaced by '-', while it should just toggle the negative/positive state
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('12.00');
+        browser.keys('-');
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('≂12.00');
+        browser.keys('≂');
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('≂12.00');
+        browser.keys('-');
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('12.00');
+        browser.keys('≂');
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('12.00');
+        browser.keys('-');
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('≂12.00');
+
+        // Test the rawValue directly
+        const result = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            const an    = AutoNumeric.getAutoNumericElement(input);
+            return an.getNumericString();
+        }, selectors.issue478Neg2).value;
+        expect(result).toEqual('-12');
+
+        // Having the caret on the far left and entering a number should automatically set that number at the right position
+        browser.keys(['Home', '7']);
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('≂712.00');
+        // Check the text selection
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }, selectors.issue478Neg2).value;
+        expect(inputCaretPosition.start).toEqual(2);
+        expect(inputCaretPosition.end).toEqual(2);
+
+        // Continue adding numbers
+        browser.keys('34');
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('≂73,412.00');
+        browser.keys(['End', '-']);
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('73,412.00');
+        browser.keys('-');
+        expect(browser.getValue(selectors.issue478Neg2)).toEqual('≂73,412.00');
+    });
+
+    it('should not allow modifying the negative/positive state using the custom negative sign', () => {
+        $(selectors.issue478Pos1).click(); // Focus on the input element
+        expect(browser.getValue(selectors.issue478Pos1)).toEqual('z14.00');
+        browser.keys(['End', '-']);
+        expect(browser.getValue(selectors.issue478Pos1)).toEqual('+14.00');
+        browser.keys('-');
+        expect(browser.getValue(selectors.issue478Pos1)).toEqual('z14.00');
+        browser.keys(['Home', '-']);
+        expect(browser.getValue(selectors.issue478Pos1)).toEqual('+14.00');
+        browser.keys('-');
+        expect(browser.getValue(selectors.issue478Pos1)).toEqual('z14.00');
+        browser.keys('z'); // This should have no effect on the negative/positive sign
+        expect(browser.getValue(selectors.issue478Pos1)).toEqual('z14.00');
+
+        // Test the rawValue directly
+        const result = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            const an    = AutoNumeric.getAutoNumericElement(input);
+            return an.getNumericString();
+        }, selectors.issue478Pos1).value;
+        expect(result).toEqual('-14');
+
+        browser.keys(['Home', '234']);
+        expect(browser.getValue(selectors.issue478Pos1)).toEqual('z23,414.00');
+    });
+
+    it('should allow setting the positive state using the `+` character, while a custom positive sign is defined', () => {
+        $(selectors.issue478RightPlacementPos1).click(); // Focus on the input element
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00p');
+        browser.keys(['Home', '+']);
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00-');
+        browser.keys(['Home', '+']);
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00p');
+        browser.keys('+');
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00-');
+
+        // Check that the caret position is at the correct position
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }, selectors.issue478RightPlacementPos1).value;
+        expect(inputCaretPosition.start).toEqual(0);
+        expect(inputCaretPosition.end).toEqual(0);
+
+        browser.keys(['End', '+']); // Check that if the caret is after the positive sign, you can still modify the positive/negative state
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00p'); // Fixed in issue #481
+        browser.keys('+');
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00-');
+        browser.keys('p'); // This should have no effect on the negative/positive sign
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00-');
+        browser.keys('+');
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00p');
+
+        // Test the rawValue directly
+        const result = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            const an    = AutoNumeric.getAutoNumericElement(input);
+            return an.getNumericString();
+        }, selectors.issue478RightPlacementPos1).value;
+        expect(result).toEqual('14');
+
+        browser.keys(['Home', '234']);
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('23,414.00p');
+    });
+
+    it('should toggle the negative state and set the caret at the correct position when using custom negative and positive trailing signs', () => {
+        // issue_478_RightPlacement_negPos
+        $(selectors.issue478RightPlacementNegPos).click(); // Focus on the input element
+        expect(browser.getValue(selectors.issue478RightPlacementNegPos)).toEqual('1,234.78⧻');
+        browser.keys(['End', '-']);
+        expect(browser.getValue(selectors.issue478RightPlacementNegPos)).toEqual('1,234.78∸');
+        // Check that the caret position is at the correct position
+        let inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }, selectors.issue478RightPlacementNegPos).value;
+        expect(inputCaretPosition.start).toEqual(8);
+        expect(inputCaretPosition.end).toEqual(8);
+
+        browser.keys('-');
+        expect(browser.getValue(selectors.issue478RightPlacementNegPos)).toEqual('1,234.78⧻');
+        // Check that the caret position is at the correct position
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }, selectors.issue478RightPlacementNegPos).value;
+        expect(inputCaretPosition.start).toEqual(8);
+        expect(inputCaretPosition.end).toEqual(8);
+
+        browser.keys(['End', '+']);
+        expect(browser.getValue(selectors.issue478RightPlacementNegPos)).toEqual('1,234.78∸');
+        // Check that the caret position is at the correct position
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }, selectors.issue478RightPlacementNegPos).value;
+        expect(inputCaretPosition.start).toEqual(8);
+        expect(inputCaretPosition.end).toEqual(8);
+
+        browser.keys('+');
+        expect(browser.getValue(selectors.issue478RightPlacementNegPos)).toEqual('1,234.78⧻');
+        // Check that the caret position is at the correct position
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }, selectors.issue478RightPlacementNegPos).value;
+        expect(inputCaretPosition.start).toEqual(8);
+        expect(inputCaretPosition.end).toEqual(8);
+    });
+
+    it('should not allow setting the positive state using the custom positive sign', () => {
+        $(selectors.issue478RightPlacementPos1).click(); // Focus on the input element
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('23,414.00p');
+        browser.keys(['Home', '+']);
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('23,414.00-');
+        browser.keys('+');
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('23,414.00p');
+        browser.keys('p'); // This should have no effect on the negative/positive sign
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('23,414.00p');
+        browser.keys('+');
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('23,414.00-');
+    });
+
+    it('should display the brackets when `negativeBracketsTypeOnBlur`, `negativeSignCharacter` and `positiveSignCharacter` are set, on focus and blur', () => {
+        expect(browser.getValue(selectors.issue478Neg4)).toEqual('(468.31)');
+        $(selectors.issue478Neg4).click();
+        // When removing the brackets, the custom negative sign must be shown
+        expect(browser.getValue(selectors.issue478Neg4)).toEqual('∸468.31');
+        $(selectors.issue478Neg1).click();
+        expect(browser.getValue(selectors.issue478Neg4)).toEqual('(468.31)');
+    });
+
+    it('should allow pasting values with custom positive and negative signs', () => {
+        // First, paste a positive value
+        const inputClassic = $(selectors.inputClassic);
+        inputClassic.click();
+        // Clear the input content
+        browser.keys(['Control', 'a', 'Control', 'Backspace']);
+        browser.keys('⧺67890.42');
+
+        // Copy
+        browser.keys(['Control', 'a', 'c', 'Control']);
+
+        // Paste
+        $(selectors.issue478Pos2).click();
+        browser.keys(['Control', 'a', 'v', 'Control']);
+        expect(browser.getValue(selectors.issue478Pos2)).toEqual('⧺67,890.42');
+
+
+        // Then paste a negative value
+        inputClassic.click();
+        // Clear the input content
+        browser.keys(['Control', 'a', 'Control', 'Backspace']);
+        browser.keys('∸234,220.08');
+
+        // Copy
+        browser.keys(['Control', 'a', 'c', 'Control']);
+
+        // Paste
+        $(selectors.issue478NegPos).click();
+        browser.keys(['Control', 'a', 'v', 'Control']);
+        expect(browser.getValue(selectors.issue478NegPos)).toEqual('∸234,220.08');
+    });
+
+    it('should allow pasting the exact same value without setting the final result to zero (Issue #483)', () => {
+        // First, paste a positive value
+        const inputClassic = $(selectors.inputClassic);
+        inputClassic.click();
+        // Clear the input content
+        browser.keys(['Control', 'a', 'Control', 'Backspace']);
+        browser.keys('⧺111222.33');
+
+        // Copy
+        browser.keys(['Control', 'a', 'c', 'Control']);
+
+        $(selectors.issue478Pos2).click();
+        // Paste number 1
+        browser.keys(['Control', 'a', 'v', 'Control']);
+        expect(browser.getValue(selectors.issue478Pos2)).toEqual('⧺111,222.33');
+        // Paste number 2 ; this should not change the result
+        browser.keys(['Control', 'a', 'v', 'Control']);
+        expect(browser.getValue(selectors.issue478Pos2)).toEqual('⧺111,222.33');
+    });
+
+    xit('should allow using the wheel to modify the input value when both the positive and negative signs are customized', () => { //FIXME Finish this -->
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('23,414.00-');
+        browser.moveToObject(selectors.issue478RightPlacementPos1); // Move the mouse over the element
+        browser.scroll(0, 250); //FIXME This is not the right function to call here
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('23,914.00-');
+    });
+
+    xit('should correctly modify the value when using the mouse wheel event on an element where `negativeBracketsTypeOnBlur` and `negativeSignCharacter` are set, when the value is changed once, then blurred, then changed again with the mouse wheel while it\'s negative', () => { //FIXME Finish this -->
+        //
+    });
+
+    xit('should correctly display the negative value with the custom negative sign on mouseover (without adding the default minus sign)', () => { //FIXME Finish this -->
+        expect(browser.getValue(selectors.issue478Neg3)).toEqual('(200.00)');
+        browser.moveToObject(selectors.issue478Neg3); // Move the mouse over the element //FIXME This does not work
+        expect(browser.getValue(selectors.issue478Neg3)).toEqual('-200.00');
+    });
+});
+
+describe('Pasting', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+    });
+
+    it('should not be possible to paste any invalid numbers in an element if the whole content is not already selected', () => {
+        const inputClassic = $(selectors.inputClassic);
+        inputClassic.click();
+        // Clear the input content
+        browser.keys(['Control', 'a', 'Control', 'Backspace']);
+        browser.keys('foobar');
+        expect(browser.getValue(selectors.inputClassic)).toEqual('foobar');
+
+        // Copy
+        browser.keys(['Control', 'a', 'c', 'Control']);
+
+        // Paste
+        $(selectors.issue387inputCancellable).click();
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight']);
+        browser.keys(['Control', 'v', 'Control']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+    });
+
+    it('should not be possible to paste any invalid numbers in an element if the whole content is already selected', () => {
+        const inputClassic = $(selectors.inputClassic);
+        inputClassic.click();
+        // Clear the input content
+        browser.keys(['Control', 'a', 'Control', 'Backspace']);
+        browser.keys('foobar');
+        expect(browser.getValue(selectors.inputClassic)).toEqual('foobar');
+
+        // Copy
+        browser.keys(['Control', 'a', 'c', 'Control']);
+
+        // Paste
+        $(selectors.issue387inputCancellable).click();
+        browser.keys(['Control', 'a', 'v', 'Control']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
+    });
+
+    it('should not be possible to paste an invalid number on a selection which does not include the currency symbol', () => {
+        const inputClassic = $(selectors.inputClassic);
+        inputClassic.click();
+        // Clear the input content
+        browser.keys(['Control', 'a', 'Control', 'Backspace']);
+        browser.keys('foobar');
+        expect(browser.getValue(selectors.inputClassic)).toEqual('foobar');
+
+        // Copy
+        browser.keys(['Control', 'a', 'c', 'Control']);
+
+        // Paste
+        $(selectors.issue387inputCancellable).click();
+        browser.keys(['Home', 'ArrowRight', 'Shift', 'ArrowRight', 'ArrowRight', 'Shift']);
+        browser.keys(['Control', 'a', 'v', 'Control']);
+        expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
     });
 });

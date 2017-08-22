@@ -479,11 +479,12 @@ export default class AutoNumericHelper {
      * - on the first character only if the `checkEverywhere` parameter is set to `false`.
      *
      * @param {number|string} numberOrNumericString A Number, or a number represented by a string
+     * @param {string} negativeSignCharacter The single character that represent the negative sign
      * @param {boolean} checkEverywhere If TRUE, then the negative sign is search everywhere in the numeric string (this is needed for instance if the string is '1234.56-')
      * @returns {boolean}
      */
-    static isNegative(numberOrNumericString, checkEverywhere = true) {
-        if (numberOrNumericString === '-') {
+    static isNegative(numberOrNumericString, negativeSignCharacter = '-', checkEverywhere = true) {
+        if (numberOrNumericString === negativeSignCharacter) {
             return true;
         }
 
@@ -491,16 +492,15 @@ export default class AutoNumericHelper {
             return false;
         }
 
-        //TODO Use the `negativeSignCharacter` from the settings here
         if (AutoNumericHelper.isNumber(numberOrNumericString)) {
             return numberOrNumericString < 0;
         }
 
         if (checkEverywhere) {
-            return this.contains(numberOrNumericString, '-');
+            return this.contains(numberOrNumericString, negativeSignCharacter);
         }
 
-        return this.isNegativeStrict(numberOrNumericString);
+        return this.isNegativeStrict(numberOrNumericString, negativeSignCharacter);
     }
 
     /**
@@ -512,11 +512,11 @@ export default class AutoNumericHelper {
      * @example isNegativeStrict('-1,234.56 €') => true
      *
      * @param {string} numericString
+     * @param {string} negativeSignCharacter The single character that represent the negative sign
      * @returns {boolean}
      */
-    static isNegativeStrict(numericString) {
-        //TODO Using the `negativeSignCharacter` from the settings here
-        return numericString.charAt(0) === '-';
+    static isNegativeStrict(numericString, negativeSignCharacter = '-') {
+        return numericString.charAt(0) === negativeSignCharacter;
     }
 
     /**
@@ -544,12 +544,13 @@ export default class AutoNumericHelper {
 
     /**
      * Return the negative version of the value (represented as a string) given as a parameter.
+     * The numeric string is a valid Javascript number when typecast to a `Number`.
      *
      * @param {string} value
      * @returns {*}
      */
     static setRawNegativeSign(value) {
-        if (!this.isNegativeStrict(value)) {
+        if (!this.isNegativeStrict(value, '-')) {
             return `-${value}`;
         }
 
@@ -1028,7 +1029,7 @@ export default class AutoNumericHelper {
      * By default, if no element is given, the event is thrown from `document`.
      *
      * @param {string} eventName
-     * @param {HTMLElement|HTMLDocument} element
+     * @param {HTMLElement|HTMLDocument|EventTarget} element
      * @param {object} detail
      */
     static triggerEvent(eventName, element = document, detail = null) {
@@ -1066,7 +1067,7 @@ export default class AutoNumericHelper {
 
         // Determine sign. 1 positive, -1 negative
         n = n.toString();
-        if (this.isNegativeStrict(n)) {
+        if (this.isNegativeStrict(n, '-')) {
             n = n.slice(1);
             x.s = -1;
         } else {

@@ -289,14 +289,14 @@ If you know you want to initialize multiple elements in one call, you must then 
 Multiple options allow you to customize precisely how a form input will format your key strokes as you type :
 
 | Option           | Description | Default Value |
-| :---------------- | :-----------:  | :-----------:  |
+| :----------------: | :-----------:  | :-----------:  |
 | `allowDecimalPadding` | Allow padding the decimal places with zeros. If set to `'floats'`, padding is only done when there are some decimals. | `true` |
 | `caretPositionOnFocus` | Determine where should be positioned the caret on focus | `null` |
 | `createLocalList` | Determine if a local list of AutoNumeric objects must be kept when initializing the elements and others | `true` |
-| `currencySymbol` | Currency symbol | `''` |
-| `currencySymbolPlacement` | Placement of the currency sign, relative to the number (as a prefix or a suffix) | `'p'` |
+| `currencySymbol` | Define the currency symbol to display | `''` |
+| `currencySymbolPlacement` | Placement of the currency sign, relative to the number shown (as a prefix or a suffix) | `'p'` |
 | `decimalCharacter` | Decimal separator character | `'.'` |
-| `decimalCharacterAlternative` | Allow to declare alternative decimal separator which is automatically replaced by the *real* decimal character (useful in countries where the keyboard numeric pad have a period as the decimal character) | `null` |
+| `decimalCharacterAlternative` | Allow to declare an alternative decimal separator which is automatically replaced by the *real* decimal character when entered (This is useful in countries where the keyboard numeric pad has a period as the decimal character) | `null` |
 | `decimalPlaces` | Defines the default number of decimal places to show on the formatted value, and to keep as the precision for the `rawValue`. This can be overridden by the other `decimalPlaces*` options. | `2` |
 | `decimalPlacesRawValue` | Defines how many decimal places should be kept for the raw value. This is the precision for float values. | `null` |
 | `decimalPlacesShownOnBlur` | The number of decimal places to show when *unfocused* | `null` |
@@ -306,37 +306,39 @@ Multiple options allow you to customize precisely how a form input will format y
 | `digitGroupSeparator` | Thousand separator character  | `','` |
 | `divisorWhenUnfocused` | Define the number that will divide the current value shown when unfocused | `null` |
 | `emptyInputBehavior` | Define what to display when the input value is empty (possible options are `null`, `focus`, `press`, `always` and `zero`) | `'focus'` |
-| `failOnUnknownOption ` | This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object. | `false` |
+| `failOnUnknownOption ` | This option is the 'strict mode' *(aka 'debug' mode)*, which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the `options` object. | `false` |
 | `formatOnPageLoad` | Determine if the default value will be formatted on initialization | `true` |
 | `historySize` | Determine how many undo states an AutoNumeric object should keep in memory | `20` |
 | `isCancellable` | Determine if the user can *'cancel'* the last modifications done to the element value when using the `Escape` key | `true` |
 | `leadingZero` | Controls the leading zero behavior (possible options are `allow`, `deny` and `keep`) | `'deny'` |
-| `maximumValue` | Maximum possible value | `'9999999999999.99'` |
-| `minimumValue` | Minimum possible value | `'-9999999999999.99'` |
+| `maximumValue` | The maximum value that can be entered | `'9999999999999.99'` |
+| `minimumValue` | The minimum value that can be entered  | `'-9999999999999.99'` |
 | `modifyValueOnWheel` | Determine if the element value can be incremented / decremented with the mouse wheel. The wheel behavior is modified with the `wheelStep` option. | `true` |
-| `negativeBracketsTypeOnBlur` | Adds brackets `[]`, parenthesis `()`, curly braces `{}`, chevrons `<>`, angle brackets `〈,〉`, Japanese quotation marks `｢,｣`, half brackets `⸤,⸥`, white square brackets `⟦,⟧`, quotation marks `‹,›` or guillemets `«,»` on negative values when unfocused | `null` |
+| `negativeBracketsTypeOnBlur` | Adds brackets `[]`, parenthesis `()`, curly braces `{}`, chevrons `<>`, angle brackets `〈〉`, Japanese quotation marks `｢｣`, half brackets `⸤⸥`, white square brackets `⟦⟧`, quotation marks `‹›` or guillemets `«»` on negative values when unfocused. The value must be formatted like `'<leftBracket>,<rightBracket>'`. | `null` |
 | `negativePositiveSignPlacement` | Placement of negative/positive sign relative to the currency symbol (possible options are `l` (left), `r` (right), `p` (prefix) and `s` (suffix)) | `null` |
-| `noEventListeners` | Defines if the element should have event listeners activated on it | `false` |
+| `negativeSignCharacter` | Defines the negative sign character to use | `'-'` |
+| `noEventListeners` | Defines if the element should have event listeners activated on it.<br>*Note: Setting this to `true` will prevent any format to be applied once the user starts modifying the element value. This is unlikely what you want.* | `false` |
 | `onInvalidPaste` | Manage how autoNumeric react when the user tries to paste an invalid number (possible options are `error`, `ignore`, `clamp`, `truncate` or `replace`) | `'error'` |
-| `outputFormat` | Defines the localized output format of the `get`, `getString` & `getArray` methods | `null` |
+| `outputFormat` | Defines the localized output format of the `getLocalized`, `form*`, `formArray*` and `formJson*` methods | `null` |
 | `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor` and `ignore`) | `null` |
+| `positiveSignCharacter` | Defines the positive sign character to use (Note: It's only shown if `showPositiveSign` is set to `true`) | `'+'` |
 | `rawValueDivisor` | Define the number that will divide the formatted value into the raw value (ie. when displaying `'1.23%'`, the raw value kept is `0.0123` if `rawValueDivisor` is set to `100`) | `null` |
 | `readOnly` | Defines if the `<input>` element should be set as read only on initialization | `false` |
-| `roundingMethod` | Method used for rounding. The possible options are `S` (Round-Half-Up Symmetric (default)), `A` (Round-Half-Up Asymmetric), `s` (Round-Half-Down Symmetric (lower case s)), `a` (Round-Half-Down Asymmetric (lower case a)), `B` (Round-Half-Even 'Bankers Rounding'), `U` (Round Up 'Round-Away-From-Zero'), `D` (Round Down 'Round-Toward-Zero' - same as truncate), `C` (Round to Ceiling 'Toward Positive Infinity'), `F` (Round to Floor 'Toward Negative Infinity'), `N05` (Rounds to the nearest .05 (same as `'CHF'` used in v1.9.* and still valid)), `U05` (Rounds up to next .05), `D05` (Rounds down to next .05) | `'S'` |
+| `roundingMethod` | Method used for rounding. The possible options are:<br>`S` (Round-Half-Up Symmetric (default)),<br>`A` (Round-Half-Up Asymmetric),<br>`s` (Round-Half-Down Symmetric (lower case s)),<br>`a` (Round-Half-Down Asymmetric (lower case a)),<br>`B` (Round-Half-Even 'Bankers Rounding'),<br>`U` (Round Up 'Round-Away-From-Zero'),<br>`D` (Round Down 'Round-Toward-Zero' - same as truncate),<br>`C` (Round to Ceiling 'Toward Positive Infinity'),<br>`F` (Round to Floor 'Toward Negative Infinity'),<br>`N05` (Rounds to the nearest .05 (same as `'CHF'` used in v1.9.* and still valid)),<br>`U05` (Rounds up to next .05),<br>`D05` (Rounds down to next .05) | `'S'` |
 | `saveValueToSessionStorage` | Allow the `decimalPlacesShownOnFocus` value to be saved into session storage | `false` |
-| `selectNumberOnly` | Determine if the select all keyboard command will select the complete input text, or only the input numeric value | `false` |
-| `selectOnFocus` | Defines if the element value should be selected on focus | `true` |
+| `selectNumberOnly` | Determine if the 'Select All' keyboard command will select the complete input text content (including the currency symbol and suffix text), or only the input numeric value | `false` |
+| `selectOnFocus` | Defines if the element value should be selected on focus. That selection is dependant on the `selectNumberOnly` option value. | `true` |
 | `serializeSpaces` | Defines how the serialize functions should treat spaces when serializing (convert them to `'%20'` or `'+'`) | `'+'` |
 | `showOnlyNumbersOnFocus` | Remove the thousand separator, currency symbol and suffix on focus | `false` |
 | `showPositiveSign` | Allow the positive sign symbol `+` to be displayed for positive numbers | `false` |
-| `showWarnings` | Defines if warnings should be shown | `true` |
-| `styleRules` | Defines the rules that calculate the CSS class(es) to apply on the element, based on the raw unformatted value.<br>This can also be used to call callbacks whenever the `rawValue` is updated. | `null` |
+| `showWarnings` | Defines if warnings should be shown. This is safe to disable in production. | `true` |
+| `styleRules` | Defines the rules that calculate the CSS class(es) to apply on the element, based on the raw unformatted value.<br>**This can also be used to call callbacks whenever the `rawValue` is updated**. | `null` |
 | `suffixText` | Additional text suffix that is added after the number | `''` |
 | `symbolWhenUnfocused` | Symbol placed as a suffix when unfocused. This is used in combination with the `divisorWhenUnfocused` option. | `null` |
 | `unformatOnHover` | Defines if the element value should be unformatted when the user hover his mouse over it while holding the `Alt` key | `true` |
 | `unformatOnSubmit` | Removes formatting on submit event | `false` |
-| `valuesToStrings` | Provide a way for automatically replacing the formatted value with a pre-defined string, when the raw value is equal to a specific value.<br>For instance when using `{ 0: '-' }`, the hyphen `'-'` is displayed when the `rawValue` is equal to `0`. Multiple 'replacements' can be defined. | `null` |
-| `wheelStep` | Used in conjonction with the `modifyValueOnWheel` option, this allow to either define a *fixed* step (ie. `1000`), or a *progressive* one | `'progressive'` |
+| `valuesToStrings` | Provide a way for automatically and transparently replacing the formatted value with a pre-defined string, when the raw value is equal to a specific value.<br>For instance when using `{ 0: '-' }`, the hyphen `'-'` is displayed when the `rawValue` is equal to `0`. Multiple 'replacements' can be defined. | `null` |
+| `wheelStep` | Used in conjonction with the `modifyValueOnWheel` option, this allow to either define a *fixed* step (ie. `1000`), or a *progressive* one that is calculated based on the size of the current value | `'progressive'` |
 
 #### Predefined options
 

@@ -416,6 +416,24 @@ Object.defineProperty(AutoNumeric, 'options', {
                 none  : null,
             },
 
+            /* Defines the negative sign symbol.
+             * It can be a string of only one character.
+             */
+            negativeSignCharacter: {
+                hyphen         : '-',
+                minus          : '−',
+                heavyMinus     : '➖',
+                fullWidthHyphen: '－',
+                circledMinus   : '⊖',
+                squaredMinus   : '⊟',
+                triangleMinus  : '⨺',
+                plusMinus      : '±',
+                minusPlus      : '∓',
+                dotMinus       : '∸',
+                minusTilde     : '≂',
+                not            : '¬',
+            },
+
             /* Defines if the element should have event listeners activated on it.
              * By default, those event listeners are only added to <input> elements and html element with the `contenteditable` attribute set to `true`, but not on the other html tags.
              * This allows to initialize elements without any event listeners.
@@ -454,6 +472,8 @@ Object.defineProperty(AutoNumeric, 'options', {
              * - ',' or '-,'      => 'nnnn,nn' or '-nnnn,nn'
              * - '.-'             => 'nnnn.nn' or 'nnnn.nn-'
              * - ',-'             => 'nnnn,nn' or 'nnnn,nn-'
+             *
+             * Note: The hyphen '-' is translated to the custom negative sign defined in `negativeSignCharacter`
              */
             outputFormat: {
                 string       : 'string',
@@ -477,6 +497,29 @@ Object.defineProperty(AutoNumeric, 'options', {
                 floor        : 'floor',
                 ignore       : 'ignore',
                 doNotOverride: null,
+            },
+
+            /* Defines the positive sign symbol.
+             * It can be a string of only one character.
+             * This is shown only if `showPositiveSign` is set to `true`.
+             */
+            positiveSignCharacter: {
+                plus              : '+',
+                fullWidthPlus     : '＋',
+                heavyPlus         : '➕',
+                doublePlus        : '⧺',
+                triplePlus        : '⧻',
+                circledPlus       : '⊕',
+                squaredPlus       : '⊞',
+                trianglePlus      : '⨹',
+                plusMinus         : '±',
+                minusPlus         : '∓',
+                dotPlus           : '∔',
+                altHebrewPlus     : '﬩',
+                normalSpace       : ' ',
+                thinSpace         : '\u2009',
+                narrowNoBreakSpace: '\u202f',
+                noBreakSpace      : '\u00a0',
             },
 
             /* The `rawValueDivisor` divides the formatted value shown in the AutoNumeric element and store the result in `rawValue`.

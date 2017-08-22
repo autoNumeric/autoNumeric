@@ -13,6 +13,7 @@
 + Modify how `this.formatted` is used so it tracks if the element value has been formatted already. If that's the case, prevent further format calculations.
   This is a start and `this.formatted` usage should be reviewed in depth.
 + Fix issue #484 Pasting an invalid string into either a selection or at the caret position modify the element value.
++ Fix issue #483 Pasting a content over an element that already has the same exact content resets its value to zero.
   
 ### 4.1.0-beta.1
 + Fix issue #475 Migrate to eslint 4

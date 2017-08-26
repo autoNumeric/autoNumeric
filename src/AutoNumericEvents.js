@@ -38,6 +38,7 @@ Object.defineProperty(AutoNumeric, 'events', {
     get() {
         return {
             formatted       : 'autoNumeric:formatted',
+            rawValueModified: 'autoNumeric:rawValueModified',
             minRangeExceeded: 'autoNumeric:minExceeded',
             maxRangeExceeded: 'autoNumeric:maxExceeded',
             native          : {

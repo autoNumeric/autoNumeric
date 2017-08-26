@@ -7139,9 +7139,33 @@ describe(`The AutoNumeric event lifecycle`, () => {
         aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
 
         customFunction = { // Dummy function used for spying
-            formattedEvent(value) {
+            formattedEvent(event) {
                 // console.log(`formattedEvent called!`); //DEBUG
-                return value;
+                return event;
+            },
+            testFormattedEvent(event) {
+                expect(event.detail.hasOwnProperty('oldValue')).toEqual(true);
+                expect(event.detail.hasOwnProperty('newValue')).toEqual(true);
+                expect(event.detail.hasOwnProperty('oldRawValue')).toEqual(true);
+                expect(event.detail.hasOwnProperty('newRawValue')).toEqual(true);
+                expect(event.detail.hasOwnProperty('isPristine')).toEqual(true);
+                expect(event.detail.hasOwnProperty('error')).toEqual(true);
+                expect(event.detail.error).toEqual(null);
+                expect(event.detail.hasOwnProperty('aNElement')).toEqual(true);
+            },
+            rawValueModifiedEvent(event) {
+                // console.log(`rawValueModified called!`); //DEBUG
+                return event;
+            },
+            testRawValueModifiedEvent(event) {
+                expect(event.detail.hasOwnProperty('oldValue')).toEqual(false);
+                expect(event.detail.hasOwnProperty('newValue')).toEqual(false);
+                expect(event.detail.hasOwnProperty('oldRawValue')).toEqual(true);
+                expect(event.detail.hasOwnProperty('newRawValue')).toEqual(true);
+                expect(event.detail.hasOwnProperty('isPristine')).toEqual(true);
+                expect(event.detail.hasOwnProperty('error')).toEqual(true);
+                expect(event.detail.error).toEqual(null);
+                expect(event.detail.hasOwnProperty('aNElement')).toEqual(true);
             },
         };
     });
@@ -7151,7 +7175,8 @@ describe(`The AutoNumeric event lifecycle`, () => {
     });
 
     it(`should send the 'autoNumeric:formatted' event when formatting is done`, () => {
-        newInput.addEventListener('autoNumeric:formatted', e => customFunction.formattedEvent(e));
+        newInput.addEventListener(AutoNumeric.events.formatted, e => customFunction.formattedEvent(e));
+        newInput.addEventListener(AutoNumeric.events.formatted, e => customFunction.testFormattedEvent(e));
         spyOn(customFunction, 'formattedEvent');
 
         aNInput.set(2000);
@@ -7169,5 +7194,50 @@ describe(`The AutoNumeric event lifecycle`, () => {
         aNInput.node().focus(); //TODO This fails under Chrome _only_ when the tests are run with PhantomJS and Firefox. That test does not fail when running only the `test:unitc` task!?
         expect(customFunction.formattedEvent).toHaveBeenCalledTimes(6);
         expect(aNInput.getFormatted()).toEqual('-5.600,78 €');
+    });
+
+    it(`should send the 'autoNumeric:formatted' event with the old and new values`, () => {
+        aNInput.set(1234.56);
+        newInput.addEventListener(AutoNumeric.events.formatted, event => {
+            expect(event.detail.oldValue).toEqual('1,234.56');
+            expect(event.detail.newValue).toEqual('2,000.00');
+            expect(event.detail.isPristine).toEqual(false);
+            expect(event.detail.error).toEqual(null);
+            expect(event.detail.aNElement).toEqual(aNInput);
+        });
+        aNInput.set(2000);
+    });
+
+    it(`should send the 'autoNumeric:rawValueModified' event when the rawValue is modified`, () => {
+        newInput.addEventListener(AutoNumeric.events.rawValueModified, e => customFunction.rawValueModifiedEvent(e));
+        newInput.addEventListener(AutoNumeric.events.rawValueModified, e => customFunction.testRawValueModifiedEvent(e));
+        spyOn(customFunction, 'rawValueModifiedEvent');
+
+        aNInput.set(2000);
+        expect(customFunction.rawValueModifiedEvent).toHaveBeenCalled();
+        aNInput.french();
+        expect(customFunction.rawValueModifiedEvent).toHaveBeenCalledTimes(1);
+        aNInput.set('');
+        expect(customFunction.rawValueModifiedEvent).toHaveBeenCalledTimes(2);
+        aNInput.set(-5600.78);
+        expect(customFunction.rawValueModifiedEvent).toHaveBeenCalledTimes(3);
+        expect(aNInput.getFormatted()).toEqual('-5.600,78 €');
+        aNInput.options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.curlyBraces);
+        expect(aNInput.getFormatted()).toEqual('{5.600,78 €}');
+        expect(customFunction.rawValueModifiedEvent).toHaveBeenCalledTimes(3);
+        aNInput.node().focus(); //TODO This fails under Chrome _only_ when the tests are run with PhantomJS and Firefox. That test does not fail when running only the `test:unitc` task!?
+        expect(customFunction.rawValueModifiedEvent).toHaveBeenCalledTimes(3);
+    });
+
+    it(`should send the 'autoNumeric:rawValueModified' event with the old and new values`, () => {
+        aNInput.set(1234.56);
+        newInput.addEventListener(AutoNumeric.events.rawValueModified, event => {
+            expect(event.detail.oldRawValue).toEqual('1234.56');
+            expect(event.detail.newRawValue).toEqual('2000');
+            expect(event.detail.isPristine).toEqual(false);
+            expect(event.detail.error).toEqual(null);
+            expect(event.detail.aNElement).toEqual(aNInput);
+        });
+        aNInput.set(2000);
     });
 });

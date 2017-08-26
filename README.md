@@ -36,7 +36,7 @@ const autoNumericOptionsEuro = {
     decimalCharacterAlternative: '.',
     currencySymbol             : '\u202f€',
     currencySymbolPlacement    : AutoNumeric.options.currencySymbolPlacement.suffix,
-    roundingMethod             : 'U',
+    roundingMethod             : AutoNumeric.options.roundingMethod.halfUpSymmetric,
 };
 
 // Initialization
@@ -110,6 +110,7 @@ With that said, autoNumeric supports most international numeric formats and curr
     - [Function chaining](#function-chaining)
   - [Static methods](#static-methods)
 - [Event lifecycle](#event-lifecycle)
+  - [AutoNumeric custom events details](#autonumeric-custom-events-details)
 - [Questions](#questions)
 - [How to contribute?](#how-to-contribute)
 - [Dependencies](#dependencies)
@@ -827,24 +828,29 @@ By default a 'normal' printable character input (ie. `'2'` or `','`) will result
 1. `'input'`
 1. `'keyup'`
 1. `'autoNumeric:formatted'` when all the formatting is done
-  - Note: The `event` variable in the event handler provide access to the old and new value in `{ detail : { oldValue: 1, newValue: 2 } }`
+1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
+
+*Note: Please check below how is structured the payload attached to the `event` variable. The event detail provides easy access to the old and new value.*
 
 When inputting a modifier key (ie. `Control`), we get:
 1. `'keydown'`
 1. `'keyup'`
 1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
+1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
 
 If `Delete` or `backspace` is entered, the following events are sent:
 1. `'keydown'`
 1. `'input'`
 1. `'keyup'`
 1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
+1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
 
 If `Enter` is entered and the value has not changed, the following events are sent:
 1. `'keydown'`
 1. `'keypress'`
 1. `'keyup'`
 1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
+1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
 
 If `Enter` is entered and the value has been changed, the following events are sent:
 1. `'keydown'`
@@ -852,6 +858,7 @@ If `Enter` is entered and the value has been changed, the following events are s
 1. `'change'`
 1. `'keyup'`
 1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
+1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
 
 When a `paste` is done with the mouse, the following events are sent:
 1. `'input'`
@@ -860,6 +867,7 @@ When a `paste` is done with the mouse, the following events are sent:
 1. `'keyup'`
 1. `'keyup'`
 1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
+1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
 
 And when a `paste` is done with the keyboard shortcut (ie `ctrl+v`), the following events are sent:
 1. `'keydown'`
@@ -868,10 +876,60 @@ And when a `paste` is done with the keyboard shortcut (ie `ctrl+v`), the followi
 1. `'keyup'`
 1. `'keyup'`
 1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
+1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
 
 Finally, the `'change'` event is sent on `blur` if the value has been changed since the `focus` one.
 
 *Note: the `AutoNumeric.format()` static function does trigger an `'autoNumeric:formatted'` event if the value that the user is trying to format is outside the `minimumValue` and `maximumValue` range, with the `detail` attribute containing the range error message.*
+
+### AutoNumeric custom events details
+
+The `'autoNumeric:formatted'` event has a payload that contains the following `detail` attribute:
+```js
+// This is an example of `CustomEvent` object sent by AutoNumeric when its value is formatted:
+const theCustomEvent = {
+    detail    : {
+        oldValue   : "78,00 €",  // The previous formatted value
+        newValue   : "788,00 €", // The new formatted value
+        oldRawValue: 78,         // The previous raw value
+        newRawValue: 788,        // The new raw value
+        isPristine : false,      // Is the element value still pristine? In other words, has its value changed since its initialization?
+        error      : null,       // The error message as a string, `null` if no errors.
+        aNElement  : theAutoNumericObject, // The AutoNumeric object emitting this event
+    },
+    // ...and the usual `bubbles` and `cancelable` attributes
+}
+
+// When caught, you can access the event attributes like so:
+function onFormattedEvent(event) {
+    if (!event.detail.isPristine) {
+        console.log(`The element value has been changed from ${event.detail.oldValue} to ${event.detail.newValue}.`);
+    }
+}
+```
+
+The `'autoNumeric:rawValueModified'` event has a payload that contains the following `detail` attribute:
+```js
+// This is an example of `CustomEvent` object sent by AutoNumeric when the `rawValue` is modified:
+const theCustomEvent = {
+    detail    : {
+        oldRawValue: 78,    // The previous raw value
+        newRawValue: 788,   // The new raw value
+        isPristine : false, // Is the `rawValue` still pristine? In other words, did it changed since the object initialization?
+        error      : null,  // The error message as a string, `null` if no errors.
+        aNElement  : theAutoNumericObject, // The AutoNumeric object emitting this event
+    },
+    // ...
+}
+```
+
+This can then be used within another script.<br>For instance, you could listen to that event in a Vue.js [component template](https://vuejs.org/v2/guide/syntax.html#ad) like so:
+```html
+<autonumeric 
+    v-on:autoNumeric:formatted.native="funcCall1"
+    v-on:autoNumeric:rawValueModified.native="funcCall2"
+></autonumeric>
+```
 
 ## Questions
 For questions and support please use the [Gitter chat room](https://gitter.im/autoNumeric/autoNumeric) or IRC on Freenode #autoNumeric.<br>The issue list of this repository is **exclusively** for bug reports and feature requests.

@@ -1,5 +1,9 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.3
++ Fix issue #485 Add more details to the `'autoNumeric:formatted'` event payload
++ Fix issue #488 Add a new event hook `autoNumeric:rawValueModified` that will be sent only when the `rawValue` is modified
+ 
 ### 4.1.0-beta.2
 + Fix issue #478 Allow the positive & negative signs to be specified via options 
 + Fix issue #480 On Firefox, the end-to-end tests fails when trying to send the minus `'-'` character.

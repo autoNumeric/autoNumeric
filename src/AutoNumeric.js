@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.2
- * @date         2017-08-22 UTC 01:00
+ * @version      4.1.0-beta.3
+ * @date         2017-08-26 UTC 03:30
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -830,7 +830,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.2';
+        return '4.1.0-beta.3';
     }
 
     /**
@@ -1753,6 +1753,7 @@ class AutoNumeric {
     _setRawValue(rawValue, saveChangeToHistory = true) {
         // Only set the raw value if the given value is different than the current one
         if (this.rawValue !== rawValue) { //TODO Manage the case where one value is a string while the other is a number?
+            const oldRawValue = this.rawValue;
             // Update the raw value
             this.rawValue = rawValue; // By default, if the `rawValue` is changed programmatically
 
@@ -1761,6 +1762,15 @@ class AutoNumeric {
                 this._isUserManuallyEditingTheValue()) { // If the user is manually changing the element value
                 this.rawValue /= this.settings.rawValueDivisor;
             }
+
+            // Broadcast the `rawValueModified` event since the `rawValue` has been modified
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.rawValueModified, this.domElement, {
+                oldRawValue,
+                newRawValue: this.rawValue,
+                isPristine : this.isPristine(true),
+                error      : null,
+                aNElement  : this,
+            });
 
             // Change the element style or use the relevant callbacks
             this._parseStyleRules();
@@ -1788,7 +1798,15 @@ class AutoNumeric {
         if (newElementValue !== oldElementValue) {
             // Only update the value if it's different from the current one
             AutoNumericHelper.setElementValue(this.domElement, newElementValue);
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, this.domElement, { oldValue: oldElementValue, newValue: newElementValue });
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, this.domElement, {
+                oldValue   : oldElementValue,
+                newValue   : newElementValue,
+                oldRawValue: this.rawValue,
+                newRawValue: this.rawValue,
+                isPristine : this.isPristine(false),
+                error      : null,
+                aNElement  : this,
+            });
         }
 
         return this;
@@ -3732,7 +3750,15 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         const [minTest, maxTest] = this._checkIfInRangeWithOverrideOption(valueString, settings);
         if (!minTest || !maxTest) {
             // Throw a custom event
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, document, 'Range test failed');
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, document, {
+                oldValue   : null,
+                newValue   : null,
+                oldRawValue: null,
+                newRawValue: null,
+                isPristine : null,
+                error      : 'Range test failed',
+                aNElement  : null,
+            });
             AutoNumericHelper.throwError(`The value [${valueString}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`);
         }
 
@@ -5334,6 +5360,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         //TODO `AutoNumericHelper.setElementValue` is called 3 times sequentially here, fix that
         //TODO Create separate handlers for the focus and mouseenter events
         const initialElementValue = AutoNumericHelper.getElementValue(this.domElement);
+        const initialRawValue = this.rawValue; // This copy is currently not needed, but in the future we could change the `this.rawValue` value before triggering the event. Therefore, to future-proof this feature, we still do this. When the automated tests will support the mouse actions, we won't need this anymore since we'll then be able to create the related tests.
         
         if (this.settings.unformatOnHover && e.type === 'mouseenter' && e.altKey) {
             this.constructor._unformatAltHovered(this);
@@ -5406,7 +5433,15 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         if (AutoNumericHelper.getElementValue(this.domElement) !== initialElementValue) {
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, this.domElement, { oldValue: initialElementValue, newValue: AutoNumericHelper.getElementValue(this.domElement) });
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, this.domElement, {
+                oldValue   : initialElementValue,
+                newValue   : AutoNumericHelper.getElementValue(this.domElement),
+                oldRawValue: initialRawValue,
+                newRawValue: this.rawValue,
+                isPristine : this.isPristine(false),
+                error      : null,
+                aNElement  : this,
+            });
         }
     }
 
@@ -5495,6 +5530,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         this._updateEventKeyInfo(e);
         this.initialValueOnKeydown = AutoNumericHelper.getElementValue(e.target); // This is needed in `onKeyup()` to check if the value as changed during the key press
+        this.initialRawValueOnKeydown = this.rawValue;
 
         if (this.domElement.readOnly) {
             this.processed = true;
@@ -5772,7 +5808,16 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // If the input value has changed during the key press event chain, an event is sent to alert that a formatting has been done (cf. Issue #187)
         if (targetValue !== this.initialValueOnKeydown) {
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, e.target, { oldValue: this.initialValueOnKeydown, newValue: targetValue }); //TODO Do I need to remove this since we now send this event on `set()`?
+            //TODO Do I need to remove this since we now send this event on `set()`?
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, e.target, {
+                oldValue   : this.initialValueOnKeydown,
+                newValue   : targetValue,
+                oldRawValue: this.initialRawValueOnKeydown,
+                newRawValue: this.rawValue,
+                isPristine : this.isPristine(false),
+                error      : null,
+                aNElement  : this,
+            });
         }
 
         // Update the selection of the current element of the history table
@@ -7892,6 +7937,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @private
      */
     _formatValue(e) {
+        //TODO Break apart and simplify this really long function
         const elementValue = AutoNumericHelper.getElementValue(this.domElement);
         let [left] = this._getUnformattedLeftAndRightPartAroundTheSelection();
 

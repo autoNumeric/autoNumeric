@@ -1,46 +1,8 @@
 // Karma configuration
-// Generated on Fri Nov 18 2016 15:23:52 GMT-1000 (TAHT)
 
-/* global require, __dirname */
+/* global require */
 
-const path = require('path');
-
-const webpackConfig = {
-    cache: true,
-    devtool: 'inline-source-map',
-    module: {
-        preLoaders: [
-            {
-                test: /\.spec\.js$/,
-                include: path.resolve(__dirname, 'test/unit'),
-                loader: 'babel',
-                query: {
-                    cacheDirectory: true,
-                },
-            },
-            {
-                test: /\.js?$/,
-                include: /src/,
-                exclude: /(node_modules|bower_components)/,
-                loader: 'babel-istanbul',
-                query: {
-                    cacheDirectory: true,
-                },
-            },
-        ],
-        loaders: [
-            {
-                test: /\.js$/,
-                include: path.resolve(__dirname, 'src'),
-                exclude: /(node_modules|bower_components)/,
-                loader: 'babel',
-                query: {
-                    cacheDirectory: true,
-                },
-            },
-        ],
-    },
-};
+const webpackConfig = require('../../config/webpack.config.test');
 
 /* global module */
 module.exports = function(config) {
@@ -56,8 +18,8 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            './node_modules/babel-polyfill/dist/polyfill.js',
-            'tests.webpack.js',
+            '../../node_modules/babel-polyfill/dist/polyfill.js',
+            './tests.webpack.js',
         ],
 
         // list of files to exclude
@@ -68,32 +30,42 @@ module.exports = function(config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            'tests.webpack.js': [
+            './tests.webpack.js': [
                 'webpack',
                 'sourcemap',
+                'coverage',
             ],
         },
 
+        // Compile the source before running the tests
         webpack: webpackConfig,
+        webpackMiddleware: {
+            noInfo: true,
+        },
 
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
         reporters: [
-            'progress',
+            // 'spec', // Uncomment if you want the full detail of all the tests
+            'mocha', // Display a clean explanation of the test failures, and the list of the successful tests
+            // 'progress', // Display the number of tests run/skipped/passed/failed
             'coverage',
         ],
 
         coverageReporter: {
-            dir      : './test/unit/coverage',
+            dir      : './coverage',
             reporters: [
                 {
                     type  : 'html',
                     subdir: 'html',
                 },
                 {
-                    type  : 'lcovonly',
+                    type  : 'lcov',
                     subdir: '.',
+                },
+                {
+                    type: 'text-summary',
                 },
             ],
         },

@@ -1,23 +1,33 @@
 /* global module */
 
-module.exports = {
-    entry: './src/main.js',
-    module: {
-        loaders: [{
-            test: /\.js$/,
-            exclude: /(bower_components|node_modules)/,
+var path = require('path');
 
-            // cf. chained loaders : http://webpack.github.io/docs/loaders.html#introduction
-            loader: 'imports?this=>window!babel',
-        }],
+function resolve(dir) {
+    return path.join(__dirname, '..', dir);
+}
+
+module.exports = {
+    entry  : {
+        app: './src/main.js',
+    },
+    module : {
+        rules: [
+            {
+                test   : /\.js$/,
+                loader : 'babel-loader',
+                exclude: /(bower_components|node_modules)/,
+                include: [resolve('src'), resolve('test')],
+            },
+        ],
     },
     output: {
         libraryTarget: 'umd',
         library: 'AutoNumeric',
+        filename: 'autoNumeric.js',
+        path: resolve('dist'),
     },
     resolve: {
         extensions: [
-            '',
             '.js',
         ],
     },

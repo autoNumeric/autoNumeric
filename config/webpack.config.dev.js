@@ -1,15 +1,20 @@
 /* global module, require */
 
-const webpack = require('webpack');
-const baseConfig = require('./webpack.config.base.js');
+const webpack           = require('webpack');
+const merge             = require('webpack-merge');
+const baseWebpackConfig = require('./webpack.config.base.js');
+// const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 
-const config = Object.create(baseConfig);
-config.devtool = 'eval-source-map';
-config.plugins = [
-    new webpack.optimize.OccurenceOrderPlugin(),
-    new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify('development'),
-    }),
-];
-
-module.exports = config;
+module.exports = merge(baseWebpackConfig, {
+    // cheap-module-eval-source-map is faster for development
+    devtool: '#cheap-module-eval-source-map',
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.env': {
+                NODE_ENV: '"development"',
+            },
+        }),
+        new webpack.NoEmitOnErrorsPlugin(),
+        // new FriendlyErrorsPlugin(),
+    ],
+});

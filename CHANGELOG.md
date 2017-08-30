@@ -1,5 +1,12 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.4
++ Fix issue #438 Upgrade Webpack to 3.*
++ Fix issue #490 Fix the generated coverage information
++ Modify the unit test reporter to use 'mocha' instead of 'progress', in order to get more insightful reports.
++ Move the configuration files for the unit tests in the `test/unit` directory.
++ Update the dev dependencies (Babel, Babel-polyfill, Uglify, PhantomJS, Jasmine).
+
 ### 4.1.0-beta.3
 + Fix issue #485 Add more details to the `'autoNumeric:formatted'` event payload
 + Fix issue #488 Add a new event hook `autoNumeric:rawValueModified` that will be sent only when the `rawValue` is modified

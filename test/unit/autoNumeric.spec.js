@@ -819,12 +819,12 @@ describe('The autoNumeric object', () => {
             document.body.removeChild(inputHidden);
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
+        it('should correctly initialize the AutoNumeric element with only a DOM element', () => {
             expect(() => new AutoNumeric(newInput)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
-            expect(() => new AutoNumeric(newInput, options)).not.toThrow(); // With one option object
+        it('should correctly initialize the AutoNumeric element with one option object', () => {
+            expect(() => new AutoNumeric(newInput, options)).not.toThrow();
         });
 
         it('should correctly initialize the AutoNumeric element when passed a pre-defined option name', () => {
@@ -903,8 +903,8 @@ describe('The autoNumeric object', () => {
             expect(anElement.set(1234567.89).getFormatted()).toEqual('1.234.567,89!');
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
-            expect(() => new AutoNumeric(newInput, null, options)).not.toThrow(); // With one option object and a null initial value
+        it('should correctly initialize the AutoNumeric element with one option object and a null initial value', () => {
+            expect(() => new AutoNumeric(newInput, null, options)).not.toThrow();
         });
 
         it('should correctly initialize the AutoNumeric element when passed an array of options', () => {
@@ -970,45 +970,44 @@ describe('The autoNumeric object', () => {
             expect(anElement.set(1234567.89).getFormatted()).toEqual('#1 234 567·89');
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
-            expect(() => new AutoNumeric(newInput, '', options)).not.toThrow(); // With one option object and an empty initial value
+        it('should correctly initialize the AutoNumeric element with one option object and an empty initial value', () => {
+            expect(() => new AutoNumeric(newInput, '', options)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
-            expect(() => new AutoNumeric(newInput).french()).not.toThrow(); // With one pre-defined language object
+        it('should correctly initialize the AutoNumeric element with one pre-defined language object', () => {
+            expect(() => new AutoNumeric(newInput).french()).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
-            expect(() => new AutoNumeric(newInput).french(options)).not.toThrow(); // With one pre-defined language object and additional options that will override the defaults
+        it('should correctly initialize the AutoNumeric element with one pre-defined language object and additional options that will override the defaults', () => {
+            expect(() => new AutoNumeric(newInput).french(options)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
-            // ...or init and set the value in one call :
-            expect(() => new AutoNumeric(newInput, 12345.789)).not.toThrow(); // With the default options, and an initial value
+        it('should correctly initialize the AutoNumeric element with the default options, and an initial value', () => {
+            expect(() => new AutoNumeric(newInput, 12345.789)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
+        it('should correctly initialize the AutoNumeric element with an number as the initial value and some options', () => {
             expect(() => new AutoNumeric(newInput, 12345.789, options)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
+        it('should correctly initialize the AutoNumeric element with a numeric string as the initial value and some options', () => {
             expect(() => new AutoNumeric(newInput, '12345.789', options)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
+        it('should correctly initialize the AutoNumeric element with an number as the initial value, then gets its options updated', () => {
             expect(() => new AutoNumeric(newInput, 12345.789).french(options)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
+        it('should correctly initialize the AutoNumeric element with the default options, and an initial value, then gets its options updated', () => {
             expect(() => new AutoNumeric(newInput, 12345.789, options).french(options)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
+        it('should correctly initialize the AutoNumeric element with a DOM selector and the default options', () => {
             // The AutoNumeric constructor class can also accept a string as a css selector. Under the hood this use `QuerySelector` and limit itself to only the first element it finds.
             expect(() => new AutoNumeric('input')).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
+        it('should correctly initialize the AutoNumeric element with a DOM selector and custom options', () => {
             expect(() => new AutoNumeric('input', options)).not.toThrow();
         });
 
@@ -1028,7 +1027,7 @@ describe('The autoNumeric object', () => {
             expect(anElement.set(1234567.89).getFormatted()).toEqual('#1 234 567·89');
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
+        it('should correctly initialize the AutoNumeric element with a DOM selector and an initial value', () => {
             expect(() => new AutoNumeric('input', 12345.789)).not.toThrow();
         });
 
@@ -1056,7 +1055,7 @@ describe('The autoNumeric object', () => {
             expect(() => anElement = new AutoNumeric('input', 1234567.89, 'foobar')).toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
+        it('should correctly initialize the AutoNumeric element with a DOM selector, an initial value and custom options', () => {
             expect(() => new AutoNumeric('input', 12345.789, options)).not.toThrow();
         });
 
@@ -1088,7 +1087,7 @@ describe('The autoNumeric object', () => {
             expect(() => new AutoNumeric('input', 12300.789).french(options)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element', () => {
+        it('should correctly initialize the AutoNumeric element with a DOM selector, an initial value and custom options, then gets its options updated', () => {
             expect(() => new AutoNumeric('input', 12345.789, options).french(options)).not.toThrow();
         });
 

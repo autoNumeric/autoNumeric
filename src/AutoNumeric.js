@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.4
+ * @version      4.1.0-beta.5
  * @date         2017-08-26 UTC 03:30
  *
  * @authors      Bob Knothe, Alexandre Bonneau
@@ -127,6 +127,24 @@ class AutoNumeric {
         if (!this.runOnce && this.settings.formatOnPageLoad) {
             // Format the element value if needed
             this._formatDefaultValueOnPageLoad(initialValue);
+        } else {
+            // Otherwise set the `rawValue` and the element value, but do not format the latter yet
+            let valueToSet;
+            if (AutoNumericHelper.isNull(initialValue)) {
+                switch (this.settings.emptyInputBehavior) {
+                    case AutoNumeric.options.emptyInputBehavior.zero:
+                        valueToSet = '0';
+                        break;
+                    case AutoNumeric.options.emptyInputBehavior.null:
+                    // In order to stay consistent when `formatOnPageLoad` is set to `true`, it's still impossible so set the `null` value as the initial value
+                    default :
+                        valueToSet = '';
+                }
+            } else {
+                valueToSet = initialValue;
+            }
+
+            this._setElementAndRawValue(valueToSet);
         }
 
         this.runOnce = true;
@@ -830,7 +848,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.4';
+        return '4.1.0-beta.5';
     }
 
     /**
@@ -5160,7 +5178,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             // When the `null` value is accepted as the `rawValue`, the limits are ignored
             return [true, true];
         }
-        
+
         value = value.toString();
         value = value.replace(',', '.');
         const minParse = AutoNumericHelper.parseStr(settings.minimumValue);

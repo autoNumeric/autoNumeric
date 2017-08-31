@@ -982,7 +982,7 @@ describe('The autoNumeric object', () => {
             expect(() => new AutoNumeric(newInput).french(options)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element with the default options, and an initial value', () => {
+        it('should correctly initialize the AutoNumeric element with the default options and an initial value', () => {
             expect(() => new AutoNumeric(newInput, 12345.789)).not.toThrow();
         });
 
@@ -994,11 +994,11 @@ describe('The autoNumeric object', () => {
             expect(() => new AutoNumeric(newInput, '12345.789', options)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element with an number as the initial value, then gets its options updated', () => {
+        it('should correctly initialize the AutoNumeric element with a number as the initial value, then gets its options updated', () => {
             expect(() => new AutoNumeric(newInput, 12345.789).french(options)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element with the default options, and an initial value, then gets its options updated', () => {
+        it('should correctly initialize the AutoNumeric element with the default options and an initial value, then gets its options updated', () => {
             expect(() => new AutoNumeric(newInput, 12345.789, options).french(options)).not.toThrow();
         });
 
@@ -1103,6 +1103,56 @@ describe('The autoNumeric object', () => {
             expect(() => new AutoNumeric('input', 'foobar')).toThrow();
             expect(() => new AutoNumeric('input', 1235, 'foobar')).toThrow();
             expect(() => new AutoNumeric('input', [])).toThrow();
+        });
+
+        it('should correctly initialize the AutoNumeric element when the `formatOnPageLoad` option is set', () => {
+            let aNInput;
+
+            // No format on load
+            aNInput = new AutoNumeric(newInput, 12234678.321, { currencySymbol:'$', formatOnPageLoad: false }); // An initial value, but not formatted on load
+            expect(aNInput.getNumericString()).toEqual('12234678.321');
+            expect(aNInput.getFormatted()).toEqual('12234678.321');
+            aNInput.node().focus();
+            expect(aNInput.getFormatted()).toEqual('$12,234,678.32');
+            aNInput.wipe();
+
+            aNInput = new AutoNumeric(newInput, null, { currencySymbol:'$', formatOnPageLoad: false }); // No initial value
+            expect(aNInput.getNumericString()).toEqual('');
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.wipe();
+
+            aNInput = new AutoNumeric(newInput, { currencySymbol:'$', formatOnPageLoad: false }); // No initial value
+            expect(aNInput.getNumericString()).toEqual('');
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.wipe();
+
+            aNInput = new AutoNumeric(newInput, null, { currencySymbol:'$', formatOnPageLoad: false, emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
+            expect(aNInput.getNumericString()).toEqual('');
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.set(null);
+            expect(aNInput.getNumericString()).toEqual(null);
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.wipe();
+
+
+            // Format on load
+            aNInput = new AutoNumeric(newInput, 12234678.321, { currencySymbol:'$', formatOnPageLoad: true }); // An initial value formatted on load
+            expect(aNInput.getNumericString()).toEqual('12234678.32');
+            expect(aNInput.getFormatted()).toEqual('$12,234,678.32');
+            aNInput.wipe();
+
+            aNInput = new AutoNumeric(newInput, null, { currencySymbol:'$', formatOnPageLoad: true });
+            expect(aNInput.getNumericString()).toEqual('');
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.wipe();
+
+            aNInput = new AutoNumeric(newInput, null, { currencySymbol:'$', formatOnPageLoad: true, emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
+            expect(aNInput.getNumericString()).toEqual('');
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.set(null);
+            expect(aNInput.getNumericString()).toEqual(null);
+            expect(aNInput.getFormatted()).toEqual('');
+            aNInput.wipe();
         });
     });
 });

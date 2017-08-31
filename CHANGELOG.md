@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.5
++ Fix issue #493 When `formatOnPageLoad` option is set to `false`, neither the `rawValue` nor the element value are set
+
 ### 4.1.0-beta.4
 + Fix issue #438 Upgrade Webpack to 3.*
 + Fix issue #490 Fix the generated coverage information

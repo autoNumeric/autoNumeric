@@ -772,6 +772,17 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #493</p>
+			<input id="issue_493_noFormat" type="text" placeholder="#493">
+			<input id="issue_493_noFormatNull" type="text" placeholder="#493">
+			<input id="issue_493_noFormatNoValue" type="text" placeholder="#493">
+			<input id="issue_493_format" type="text" placeholder="#493">
+			<input id="issue_493_formatNull" type="text" placeholder="#493">
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1708,6 +1719,16 @@
         negativeSignCharacter     : AutoNumeric.options.negativeSignCharacter.dotMinus,
         positiveSignCharacter     : AutoNumeric.options.positiveSignCharacter.triplePlus,
     });
+
+    //-------------- Issue #493
+    new AutoNumeric('#issue_493_noFormat', 12234678.321, { currencySymbol:'$', formatOnPageLoad: false });
+    new AutoNumeric('#issue_493_noFormatNull', null, { currencySymbol:'$', formatOnPageLoad: false });
+    let anElement493 = new AutoNumeric('#issue_493_noFormatNoValue', { currencySymbol:'$', formatOnPageLoad: false });
+    anElement493.update({ emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
+    anElement493.set(null);
+
+    new AutoNumeric('#issue_493_format', 12234678.321, { currencySymbol:'$', formatOnPageLoad: true });
+    new AutoNumeric('#issue_493_formatNull', null, { currencySymbol:'$', formatOnPageLoad: true });
 </script>
 </body>
 </html>

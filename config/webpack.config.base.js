@@ -31,8 +31,4 @@ module.exports = {
             '.js',
         ],
     },
-    /*externals: {
-        // cf. http://webpack.github.io/docs/library-and-externals.html#applications-and-externals
-        // and http://webpack.github.io/docs/configuration.html#externals
-    },*/
 };

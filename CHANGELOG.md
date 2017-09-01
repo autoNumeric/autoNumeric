@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.6
++ Fix issue #494 Allow AutoNumeric to be imported in web workers in a webpack setup
+
 ### 4.1.0-beta.5
 + Fix issue #493 When `formatOnPageLoad` option is set to `false`, neither the `rawValue` nor the element value are set
 

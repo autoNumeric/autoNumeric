@@ -3,6 +3,7 @@
 		"latest"
 	],
 	"plugins": [
+		"add-module-exports",
 		"transform-object-assign"
 	],
 	"comments": true,

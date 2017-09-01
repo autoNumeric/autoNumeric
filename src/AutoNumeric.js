@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.5
- * @date         2017-08-26 UTC 03:30
+ * @version      4.1.0-beta.6
+ * @date         2017-09-01 UTC 06:00
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -43,8 +43,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/* global module */
-
 //TODO Prevent having to enter relative path in the js files (ie. using `./AutoNumericHelper` instead of just `AutoNumericHelper`) (cf. http://moduscreate.com/es6-es2015-import-no-relative-path-webpack/)
 import AutoNumericHelper from './AutoNumericHelper';
 import AutoNumericEnum from './AutoNumericEnum';
@@ -54,8 +52,7 @@ import AutoNumericEnum from './AutoNumericEnum';
  *
  * An AutoNumeric element is an object wrapper that keeps a reference to the DOM element it manages (usually an <input> one), and provides autoNumeric-specific variables and functions.
  */
-class AutoNumeric {
-    //TODO Use the better notation `export default class` when webpack and babel will allow it (cf. https://github.com/webpack/webpack/issues/706)
+export default class AutoNumeric {
     /**
      * Initialize the AutoNumeric object onto the given DOM element, and attach the settings and related event listeners to it.
      * The options passed as a parameter is an object that contains the settings (ie. {digitGroupSeparator: ".", decimalCharacter: ",", currencySymbol: '€ '})
@@ -135,8 +132,8 @@ class AutoNumeric {
                     case AutoNumeric.options.emptyInputBehavior.zero:
                         valueToSet = '0';
                         break;
-                    case AutoNumeric.options.emptyInputBehavior.null:
                     // In order to stay consistent when `formatOnPageLoad` is set to `true`, it's still impossible so set the `null` value as the initial value
+                    case AutoNumeric.options.emptyInputBehavior.null:
                     default :
                         valueToSet = '';
                 }
@@ -848,7 +845,7 @@ class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.5';
+        return '4.1.0-beta.6';
     }
 
     /**
@@ -8399,7 +8396,7 @@ AutoNumeric.multiple = (arg1, initialValue = null, options = null) => {
  * //TODO Make sure we call that at least once when loading the AutoNumeric library
  */
 (function() {
-if (typeof window.CustomEvent === 'function') {
+if (typeof window === 'undefined' || window.CustomEvent === 'function') {
     return false;
 }
 
@@ -8413,14 +8410,3 @@ function CustomEvent(event, params) {
 CustomEvent.prototype = window.Event.prototype;
 window.CustomEvent = CustomEvent;
 })();
-
-
-/**
- * //XXX This is needed in order to get direct access to the `AutoNumeric` constructor without having to use `new AutoNumeric.default()` (cf. http://stackoverflow.com/a/36389244/2834898) : using `export var __useDefault = true;` does not work though.
- * //XXX The workaround (using `module.exports = AutoNumeric` instead of `export default class AutoNumeric {}`) comes from https://github.com/webpack/webpack/issues/706#issuecomment-167908576
- * //XXX And the explanation why Babel 6 changed the way Babel 5 worked : http://stackoverflow.com/a/33506169/2834898
- * //XXX Ideally, we should be able to just declare `export default class AutoNumeric {}` in the future, and remove the following `module.exports = AutoNumeric;` line
- *
- * @type {AutoNumeric}
- */
-module.exports = AutoNumeric;

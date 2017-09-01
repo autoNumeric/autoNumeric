@@ -28,8 +28,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/* global module */
-
 import AutoNumeric from './AutoNumeric';
 import AutoNumericEvents from './AutoNumericEvents';
 import AutoNumericOptions from './AutoNumericOptions';
@@ -40,9 +38,7 @@ import AutoNumericPredefinedOptions from './AutoNumericPredefinedOptions';
 
 /**
  * This file serve as the main entry point to the library.
- * cf. workaround detailed here http://stackoverflow.com/a/33683495/2834898
  *
  * @type {AutoNumeric}
  */
-module.exports = AutoNumeric;
-//TODO Also export the AutoNumericEnum module
+export default AutoNumeric;

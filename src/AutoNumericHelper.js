@@ -248,6 +248,11 @@ export default class AutoNumericHelper {
         // return !!(obj && obj.nodeName);
         // return obj && 'nodeType' in obj;
         // return obj instanceof Element || obj instanceof HTMLInputElement || obj instanceof HTMLElement;
+        if (typeof Element === 'undefined') {
+            // This test is needed in environnements where the Element object does not exist (ie. in web workers)
+            return false;
+        }
+
         return obj instanceof Element;
     }
 

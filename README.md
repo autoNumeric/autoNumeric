@@ -71,7 +71,7 @@ With that said, autoNumeric supports most international numeric formats and curr
 ## Table of contents
 - [Getting started](#getting-started)
   - [Installation](#installation)
-  - [How to use?](#how-to-use)
+  - **[How to use?](#how-to-use)**
     - [In the browser](#in-the-browser)
     - [In another script](#in-another-script)
     - [In Web Workers](#in-web-workers)
@@ -79,10 +79,10 @@ With that said, autoNumeric supports most international numeric formats and curr
     - [On `<input>` elements](#on-input-elements)
     - [On `contenteditable`-enabled elements](#on-contenteditable-enabled-elements)
     - [On other DOM elements](#on-other-dom-elements)
-- [Initialization](#initialization)
+- **[Initialization](#initialization)**
   - [Initialize one AutoNumeric object](#initialize-one-autonumeric-object)
   - [Initialize multiple AutoNumeric objects at once](#initialize-multiple-autonumeric-objects-at-once)
-- [Options](#options)
+- **[Options](#options)**
   - [Predefined options](#predefined-options)
     - [Predefined language options](#predefined-language-options)
     - [Predefined common options](#predefined-common-options)
@@ -96,7 +96,7 @@ With that said, autoNumeric supports most international numeric formats and curr
     - [noEventListeners](#noeventlisteners)
     - [readOnly](#readonly)
   - [Options update](#options-update)
-- [Methods](#methods)
+- **[Methods](#methods)**
   - [Instantiated methods](#instantiated-methods)
     - [Set, get, format, unformat and other usual AutoNumeric functions](#set-get-format-unformat-and-other-usual-autonumeric-functions)
       - [Using callback functions with `get*` methods](#using-callback-functions-with-get-methods)

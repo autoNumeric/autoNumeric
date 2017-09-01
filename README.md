@@ -104,7 +104,7 @@ With that said, autoNumeric supports most international numeric formats and curr
     - [Node manipulation](#node-manipulation)
     - [Format and unformat other numbers or DOM elements with an existing AutoNumeric element](#format-and-unformat-other-numbers-or-dom-elements-with-an-existing-autonumeric-element)
     - [Initialize other DOM Elements](#initialize-other-dom-elements)
-    - [Perform actions globally on a shared list of AutoNumeric elements](#perform-actions-globally-on-a-shared-list-of-autonumeric-elements)
+    - [Perform actions globally on a shared 'init' list of AutoNumeric elements](#perform-actions-globally-on-a-shared-init-list-of-autonumeric-elements)
       - [Using callback functions with `global.get*` methods](#using-callback-functions-with-globalget-methods)
     - [Form functions](#form-functions)
     - [Function chaining](#function-chaining)
@@ -574,25 +574,25 @@ The following functions are available on all autoNumeric-managed elements:
 | `setUnformatted` | Set the value (that will not be formatted immediately) | `anElement.setUnformatted(42.76);` |
 | `setUnformatted` | Set the value and update the setting in one go (the value will not be formatted immediately) | `anElement.setUnformatted(42.76, { options });` |
 | `getNumericString` | Return the unformatted number as a string | `anElement.getNumericString();` |
-| `get` | Alias for the `.getNumericString()` method | `anElement.get();` |
+| `get` | Alias for the `.getNumericString()` method (this is *deprecated* and will be removed soon™) | `anElement.get();` |
 | `getFormatted` | Return the formatted string | `anElement.getFormatted();` |
 | `getNumber` | Return the unformatted number as a number (**Warning**: If you are manipulating a number bigger than [`Number.MAX_SAFE_INTEGER`](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER), you **will** encounter problems if you try to retrieve it as a number and not a string) | `anElement.getNumber();` |
 | `getLocalized` | Return the localized unformatted number as a string | `anElement.getLocalized();` |
-| `getLocalized` | Return the localized unformatted number as a string, using the outputFormat option override passed as a parameter | `anElement.getLocalized(forcedOutputFormat);` |
-| `getLocalized` | Idem above, but with a callback function and a forced outputFormat | `anElement.getLocalized(forcedOutputFormat, callback);` |
+| `getLocalized` | Return the localized unformatted number as a string, using the `outputFormat` option override passed as a parameter | `anElement.getLocalized(forcedOutputFormat);` |
+| `getLocalized` | Idem above, but with a callback function and a forced `outputFormat` | `anElement.getLocalized(forcedOutputFormat, callback);` |
 | `getLocalized` | Idem above, but with a callback function | `anElement.getLocalized(callback);` |
 | `get*` | Pass the result of the `get*` function to the given callback, see [here](#using-callback-functions-with-get-methods) | `anElement.get*(funcCallback);` |
 | `reformat` | Force the element to reformat its value again (in case the formatting has been lost) | `anElement.reformat();` |
 | `unformat` | Remove the formatting and keep only the raw unformatted value in the element (as a numeric string) | `anElement.unformat();` |
 | `unformatLocalized` | Remove the formatting and keep only the localized unformatted value in the element | `anElement.unformatLocalized();` |
-| `unformatLocalized` | Idem above, but using the outputFormat option override passed as a parameter | `anElement.unformatLocalized(forcedOutputFormat);` |
-| `isPristine` | Return `true` if the current value is the same as when the element got initialized | `anElement.isPristine();` |
+| `unformatLocalized` | Idem above, but using the `outputFormat` option override passed as a parameter | `anElement.unformatLocalized(forcedOutputFormat);` |
+| `isPristine` | Return `true` if the current value is the same as when the element first got *initialized* (not `set()`) | `anElement.isPristine();` |
 | `select` | Select the formatted element content, based on the `selectNumberOnly` option | `anElement.select();` |
 | `selectNumber` | Select only the numbers in the formatted element content, leaving out the currency symbol, whatever the value of the `selectNumberOnly` option | `anElement.selectNumber();` |
 | `selectInteger` | Select only the integer part in the formatted element content, whatever the value of `selectNumberOnly` | `anElement.selectInteger(); ` |
 | `selectDecimal` | Select only the decimal part in the formatted element content, whatever the value of `selectNumberOnly` | `anElement.selectDecimal();` |
-| `clear` | Reset the element value to the empty string '' (or the currency sign, depending on the `emptyInputBehavior` option value) | `anElement.clear();` |
-| `clear` | Reset the element value to the empty string '' as above, no matter the `emptyInputBehavior` option value | `anElement.clear(true);` |
+| `clear` | Reset the element value to the empty string `''` (or the currency sign, depending on the `emptyInputBehavior` option value) | `anElement.clear();` |
+| `clear` | Always reset the element value to the empty string `''` as above, no matter the `emptyInputBehavior` option value | `anElement.clear(true);` |
 
 *Note: Most of them can be [chained](#function-chaining) together, if needed.*
 
@@ -626,9 +626,9 @@ funcCallback(result, anElement);
 
 | Method           | Description | Call example |
 | :----------------: | :-----------:  | :-----------:  |
-| `remove` | Remove the autoNumeric listeners from the element (previous name : 'destroy'). Keep the element content intact. | `anElement.remove();` |
-| `wipe` | Remove the autoNumeric listeners from the element, and reset its value to '' | `anElement.wipe();` |
-| `nuke` | Remove the autoNumeric listeners from the element, and delete the DOM element altogether | `anElement.nuke();` |
+| `remove` | Remove the autoNumeric listeners from the element (previous name : `'destroy'`). Keep the element content intact. | `anElement.remove();` |
+| `wipe` | Remove the autoNumeric listeners from the element, and reset its value to `''` | `anElement.wipe();` |
+| `nuke` | Remove the autoNumeric listeners from the element, then delete the DOM element altogether | `anElement.nuke();` |
 
 
 #### Node manipulation
@@ -637,9 +637,9 @@ funcCallback(result, anElement);
 | :----------------: | :-----------:  | :-----------:  |
 | `node` | Return the DOM element reference of the autoNumeric-managed element | `anElement.node();` |
 | `parent` | Return the DOM element reference of the parent node of the autoNumeric-managed element | `anElement.parent();` |
-| `detach` | Detach the current AutoNumeric element from the shared 'init' list (which means any changes made on that local shared list will not be transmitted to that element anymore) | `anElement.detach();` |
+| `detach` | Detach the current AutoNumeric element from the shared local *'init' list* (which means any changes made on that local shared list will not be transmitted to that element anymore) | `anElement.detach();` |
 | `detach` | Idem above, but detach the given AutoNumeric element, not the current one | `anElement.detach(otherAnElement);` |
-| `attach` | Attach the given AutoNumeric element to the shared local 'init' list. When doing that, by default the DOM content is left untouched. The user can force a reformat with the new shared list options by passing a second argument to `true`. | `anElement.attach(otherAnElement, reFormat = true);` |
+| `attach` | Attach the given AutoNumeric element to the shared local *'init' list*. When doing that, by default the DOM content is left untouched. The user can force a reformat with the new shared list options by passing a second argument valued `true`. | `anElement.attach(otherAnElement, reFormat = true);` |
 
 
 #### Format and unformat other numbers or DOM elements with an existing AutoNumeric element
@@ -651,16 +651,16 @@ This allows to format or unformat numbers, strings or directly other DOM element
 | Method           | Description | Call example |
 | :----------------: | :-----------:  | :-----------:  |
 | `formatOther` | This use the same function signature that when using the static AutoNumeric method directly (cf. below: `AutoNumeric.format`), but without having to pass the options | `anElement.formatOther(12345, { options });` |
-| `formatOther` | Idem above, but apply the formatting to the DOM element content directly | `anElement.formatOther(domElement5, { options }); ` |
+| `formatOther` | Idem above, but apply the formatting to the given DOM element by modifying its content directly | `anElement.formatOther(domElement, { options }); ` |
 | `unformatOther` | This use the same function signature that when using the static AutoNumeric method directly (cf. below: `AutoNumeric.unformat`), but without having to pass the options | `anElement.unformatOther('1.234,56 €', { options });` |
-| `unformatOther` | Idem above, but apply the unformatting to the DOM element content directly | `anElement.unformatOther(domElement5, { options });` |
+| `unformatOther` | Idem above, but apply the unformatting to the given DOM element by modifying its content directly | `anElement.unformatOther(domElement, { options });` |
 
 
 #### Initialize other DOM Elements
 
-Once you have an AutoNumeric element already setup correctly with the right options, you can use it as many times you want to initialize as many other DOM elements as needed (this works only on elements that can be managed by autoNumeric).
+Once you have an AutoNumeric element already setup correctly with the right options, you can use it as many times you want to initialize as many other DOM elements as needed *(this works only on elements that can be managed by autoNumeric)*.
 
-Whenever `init` is used to initialize other DOM elements, a shared 'local' list of those elements is stored in the AutoNumeric objects.<br>This allows for neat things like modifying all those *linked* AutoNumeric elements globally, with one call.
+Whenever `init` is used to initialize other DOM elements, a shared local *'init' list* of those elements is stored in the AutoNumeric objects.<br>This allows for neat things like modifying all those *linked* AutoNumeric elements globally, with only one call.
 
 | Method           | Description | Call example |
 | :----------------: | :-----------:  | :-----------:  |
@@ -670,9 +670,9 @@ Whenever `init` is used to initialize other DOM elements, a shared 'local' list 
 | `init` | Use an existing AutoNumeric element to initialize multiple other DOM elements from a CSS selector, with the same options | `const anElementsArray = anElement.init('.currency');` |
 
 
-#### Perform actions globally on a shared list of AutoNumeric elements
+#### Perform actions globally on a shared 'init' list of AutoNumeric elements
 
-This local list can be used to perform global operations on all those AutoNumeric elements, with one function call.<br>
+This local *'init' list* can be used to perform global operations on all those AutoNumeric elements, with **one function call**.<br>
 To do so, you must call the wanted function by prefixing `.global` before the method name (ie. `anElement.global.set(42)`).<br>
 Below are listed all the supported methods than can be called globally:
 
@@ -698,7 +698,7 @@ anElement.global.wipe();
 anElement.global.nuke();
 ```
 
-The shared local list also provide list-specific methods to manipulate it:
+The shared local list also provide *list-specific* methods to manipulate it:
 ```js
 anElement.global.has(domElementOrAutoNumericObject); // Return `true` if the given AutoNumeric object (or DOM element) is in the local AutoNumeric element list
 anElement.global.addObject(domElementOrAutoNumericObject); // Add an existing AutoNumeric object (or DOM element) to the local AutoNumeric element list, using the DOM element as the key
@@ -793,6 +793,7 @@ anElement.global.set(72)
 ### Static methods
 
 Without having to initialize any AutoNumeric object, you can directly use the static `AutoNumeric` class functions.
+<br>*Note: Some of those functions can be used in [Web Workers](#in-web-workers).*
 
 | Method           | Description | Call example |
 | :---------------- | :-----------:  | :-----------:  |
@@ -813,15 +814,15 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 | `localizeAndSet` | Unformat and localize the `domElement` value with the given options and returns the localized value as a string. This function does update that element value with the newly localized value in the process. | `AutoNumeric.localizeAndSet(domElement, { options });` |
 | `mergeOptions` | Accepts an array of option objects and / or pre-defined option names, and return a single option object where the latter element overwrite the settings from the previous ones | `AutoNumeric.mergeOptions(['euro', { currencySymbol: '#' }]);` |
 | `reformatAndSet` | Recursively format all the autoNumeric-managed elements that are a child to the `referenceToTheDomElement` element given as a parameter (this is usually the parent `<form>` element), with the settings of each AutoNumeric elements. | `AutoNumeric.reformatAndSet(referenceToTheDomElement);` |
-| `test` | Test if the given domElement is already managed by AutoNumeric (if it is initialized) | `AutoNumeric.test(domElement);` |
+| `test` | Test if the given DOM element is already managed by AutoNumeric (if it is initialized) | `AutoNumeric.test(domElement);` |
 | `unformat` | Unformat the given formatted string with the given options. This returns a numeric string. | `AutoNumeric.unformat('1.234,56 €', { options });` |
 | `unformat` | Idem above, but you can pass as many option objects you want to this function, the latter overwriting the previous ones. This allows to correctly unformat currencies that have a predefined option as its base, but has been slightly modified. | `AutoNumeric.unformat('241800,02 €', AutoNumeric.getPredefinedOptions().French, { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator });` |
 | `unformat` | Idem above, using multiple option objects in one array. This way allows for using a pre-defined option name. | `AutoNumeric.unformat('1.234,56 €', [{ options1 }, 'euroPos', { options2 }]);` |
 | `unformat` | Unformat the `domElement` value with the given options and returns the unformatted numeric string. This does *not* update that element value. | `AutoNumeric.unformat(domElement, { options });` |
 | `unformatAndSet` | Unformat the `domElement` value with the given options and returns the unformatted value as a numeric string. This function does update that element value with the newly unformatted value in the process. | `AutoNumeric.unformatAndSet(domElement, { options });` |
 | `unformatAndSet` | Recursively unformat all the autoNumeric-managed elements that are a child to the `referenceToTheDomElement` element given as a parameter (this is usually the parent `<form>` element) | `AutoNumeric.unformatAndSet(referenceToTheDomElement);` |
-| `validate` | Check if the given option object is valid, and that each option is valid as well. This throws an error if it's not. | `AutoNumeric.validate({ options })` |
-| `version` | Return the AutoNumeric version number (for debugging purpose) | `AutoNumeric.version();` |
+| `validate` | Check if the given option object is valid, and that each option is valid as well. This *throws an error* if it's not. | `AutoNumeric.validate({ options })` |
+| `version` | Return the current AutoNumeric version number *(for debugging purpose)* | `AutoNumeric.version();` |
 
 
 ## Event lifecycle

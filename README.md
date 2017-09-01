@@ -75,6 +75,7 @@ With that said, autoNumeric supports most international numeric formats and curr
   - [How to use?](#how-to-use)
     - [In the browser](#in-the-browser)
     - [In another script](#in-another-script)
+    - [In Web Workers](#in-web-workers)
   - [On which elements can it be used?](#on-which-elements-can-it-be-used)
     - [On `<input>` elements](#on-input-elements)
     - [On `contenteditable`-enabled elements](#on-contenteditable-enabled-elements)
@@ -166,6 +167,16 @@ anElement = new AutoNumeric('.myCssClass > input').french();
 You're done!
 
 *Note : an AutoNumeric object can be initialized in various ways, check those out [here](#initialization)*
+
+#### In Web Workers
+
+Some static AutoNumeric functions that do not access nor modify the DOM can be used in [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) (ie. `AutoNumeric.format()`, `AutoNumeric.unformat()`, etc.).<br>
+In order to be able to use AutoNumeric in those web workers, you need to import the **source** file `src/main.js`, not the generated one found in `dist/AutoNumeric.js`. For instance, by importing the library like that:
+```js
+import AutoNumeric from '../node_modules/autonumeric/src/main';
+```
+
+Doing this will allow your project [Webpack](https://webpack.github.io/) configuration to compile it correctly (and use tree shaking as needed).
 
 ### On which elements can it be used?
 

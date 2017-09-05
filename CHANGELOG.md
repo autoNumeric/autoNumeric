@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.7
++ Fix issue #495 `AutoNumeric.multiple()` fail on IE11 on unknown `Array.from()`
+
 ### 4.1.0-beta.6
 + Fix issue #494 Allow AutoNumeric to be imported in web workers in a webpack setup
 

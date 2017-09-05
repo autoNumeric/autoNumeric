@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.6
+ * @version      4.1.0-beta.7
  * @date         2017-09-01 UTC 06:00
  *
  * @authors      Bob Knothe, Alexandre Bonneau
@@ -845,7 +845,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.6';
+        return '4.1.0-beta.7';
     }
 
     /**
@@ -8392,10 +8392,10 @@ AutoNumeric.multiple = (arg1, initialValue = null, options = null) => {
 };
 
 /**
- * Polyfill from https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent for obsolete browsers (IE)
- * //TODO Make sure we call that at least once when loading the AutoNumeric library
+ * Polyfill for obsolete browsers like IE
  */
 (function() {
+// Polyfill for `CustomEvent` (cf. https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent)
 if (typeof window === 'undefined' || window.CustomEvent === 'function') {
     return false;
 }
@@ -8409,4 +8409,9 @@ function CustomEvent(event, params) {
 
 CustomEvent.prototype = window.Event.prototype;
 window.CustomEvent = CustomEvent;
+
+// Polyfill for `Array.from()` (Fix issue #495)
+if (!Array.from) {
+    Array.from = object => [].slice.call(object);
+}
 })();

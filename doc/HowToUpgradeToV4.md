@@ -14,8 +14,12 @@ Since AutoNumeric is now an ES6 module, *`AutoNumeric` being the name of the `cl
 
 ### Configuration
 
-The old option names have changed and are deprecated, in favor of the [new ones](https://github.com/autoNumeric/autoNumeric/#options).<br>
+The old option names have changed and are now deprecated, in favor of the [new ones](https://github.com/autoNumeric/autoNumeric/#options).<br>
 To help you switch to the new names, detailed warning messages are displayed in the console if an old option name is detected.
+
+> Do note that the option `mDec` (or its new name `decimalPlacesOverride` if you used `v2`) **is no longer used**.<br>
+If you want to specify the number of decimals, instead of relying on the maximum number of decimal places in `minimumValue` or `maximumValue` like before, you can now set `decimalPlaces` to set it globally.<br>
+If you wish, you can also specify a different number of decimal places for the formatted value (with `decimalPlacesShownOnFocus` and `decimalPlacesShownOnFocus`) or the `rawValue` (with `decimalPlacesRawValue`).
 
 | <= `v2` (Before)          | `v4` (After) |
 | :---------------- | :-----------  |
@@ -31,7 +35,7 @@ To help you switch to the new names, detailed warning messages are displayed in 
 | `oLimits`       | `overrideMinMaxLimits` |
 | `vMax`          | `maximumValue` |
 | `vMin`          | `minimumValue` |
-| `mDec`          | `decimalPlacesOverride` |
+| `mDec`          | `decimalPlacesOverride`<br>(Deprecated) |
 | `eDec`          | `decimalPlacesShownOnFocus` |
 | `scaleDecimal`  | `decimalPlacesShownOnBlur` |
 | `aStor`         | `saveValueToSessionStorage` |
@@ -46,6 +50,9 @@ To help you switch to the new names, detailed warning messages are displayed in 
 | `unSetOnSubmit` | `unformatOnSubmit` |
 | `outputType`    | `outputFormat` |
 | `debug`         | `showWarnings` |
+
+If you want more detail about the AutoNumeric options, feel free to browse the [AutoNumeric options source code](https://github.com/autoNumeric/autoNumeric/blob/master/src/AutoNumericOptions.js) which has detailed comment for each one.<br>
+*A website is being constructed as we speak to make that more accessible.*
 
 ### Method calls
 
@@ -74,7 +81,7 @@ The methods are now called like so:
 | `$(someSelector).autoNumeric("update", { options });` | `anElement.update({ options });` |
 | `$(someSelector).autoNumeric("wipe");` | `anElement.wipe();` |
 
-Check the [documentation](https://github.com/autoNumeric/autoNumeric/#instantiated-methods) to see how some of those functions signatures changed.
+Check the [methods documentation](https://github.com/autoNumeric/autoNumeric/#instantiated-methods) to see how some of those functions signatures changed.
 
 
 If you encounter any problem upgrading to `v4`, feel free to contacts us on our [Gitter channel](https://gitter.im/autoNumeric/autoNumeric) or on IRC on Freenode `#autoNumeric`!

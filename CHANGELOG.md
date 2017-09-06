@@ -2,6 +2,7 @@
 
 ### 4.0.3
 + Fix issue #474 `AutoNumeric.format()` and `AutoNumeric.unformat()` do not accept named options
++ Fix issue #496 The upgrade guide to v4 references the `decimalPlacesOverride` option without indicating it's deprecated
 
 ### 4.0.2
 + Fix issue #473 Static `format()` and `unformat()` functions ignores the `rawValueDivisor` option

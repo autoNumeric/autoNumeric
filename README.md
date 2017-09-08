@@ -1,4 +1,4 @@
-## What is [autoNumeric](http://www.decorplanit.com/plugin/)?
+## What is [autoNumeric](https://autonumeric.github.io)?
 
 autoNumeric is a standalone Javascript library that provides live *as-you-type* formatting for international numbers and currencies.
 

@@ -1154,6 +1154,30 @@ describe('The autoNumeric object', () => {
             expect(aNInput.getFormatted()).toEqual('');
             aNInput.wipe();
         });
+
+        it('should correctly initialize the AutoNumeric element when the `formatOnPageLoad` option is set and the html `value` attribute has a whitespace on the left', () => {
+            newInput.setAttribute('value', ' 42.34');
+            expect(newInput.getAttribute('value')).toEqual(' 42.34');
+            const aNInput = new AutoNumeric(newInput);
+            expect(aNInput.getNumericString()).toEqual('42.34');
+            expect(aNInput.getFormatted()).toEqual('42.34');
+        });
+
+        it('should correctly initialize the AutoNumeric element when the `formatOnPageLoad` option is set and the html `value` attribute has a whitespace on the right', () => {
+            newInput.setAttribute('value', '24.78 ');
+            expect(newInput.getAttribute('value')).toEqual('24.78 ');
+            const aNInput = new AutoNumeric(newInput);
+            expect(aNInput.getNumericString()).toEqual('24.78');
+            expect(aNInput.getFormatted()).toEqual('24.78');
+        });
+
+        it('should correctly initialize the AutoNumeric element when the `formatOnPageLoad` option is set and the html `value` attribute  has whitespaces on both sides', () => {
+            newInput.setAttribute('value', ' 1222.7993 ');
+            expect(newInput.getAttribute('value')).toEqual(' 1222.7993 ');
+            const aNInput = new AutoNumeric(newInput);
+            expect(aNInput.getNumericString()).toEqual('1222.8');
+            expect(aNInput.getFormatted()).toEqual('1,222.80');
+        });
     });
 });
 

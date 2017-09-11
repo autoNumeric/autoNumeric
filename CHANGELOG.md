@@ -2,6 +2,7 @@
 
 ### 4.1.0-beta.8
 + Fix issue #496 The upgrade guide to v4 references the `decimalPlacesOverride` option without indicating it's deprecated
++ Fix issue #479 Whitespace on the left hand side of the  html `value` attribute adds a zero on the formatted value on page load
 
 ### 4.1.0-beta.7
 + Fix issue #495 `AutoNumeric.multiple()` fail on IE11 on unknown `Array.from()`

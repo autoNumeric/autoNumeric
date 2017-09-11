@@ -783,6 +783,19 @@
 			<input id="issue_493_formatNull" type="text" placeholder="#493">
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #479</p>
+			<div>
+				<div>
+					<input id="issue_479_left" type="text" placeholder="#479" value=" 42.34">
+					<input id="issue_479_right" type="text" placeholder="#479" value="24.78 ">
+					<input id="issue_479_both" type="text" placeholder="#479" value=" 1222.7993 ">
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1729,6 +1742,11 @@
 
     new AutoNumeric('#issue_493_format', 12234678.321, { currencySymbol:'$', formatOnPageLoad: true });
     new AutoNumeric('#issue_493_formatNull', null, { currencySymbol:'$', formatOnPageLoad: true });
+
+    //-------------- Issue #479
+    new AutoNumeric('#issue_479_left');
+    new AutoNumeric('#issue_479_right');
+    new AutoNumeric('#issue_479_both');
 </script>
 </body>
 </html>

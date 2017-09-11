@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.7
+ * @version      4.1.0-beta.8
  * @date         2017-09-01 UTC 06:00
  *
  * @authors      Bob Knothe, Alexandre Bonneau
@@ -845,7 +845,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.7';
+        return '4.1.0-beta.8';
     }
 
     /**
@@ -6619,7 +6619,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         if (!AutoNumericHelper.isNull(forcedInitialValue)) {
             currentValue = forcedInitialValue;
         } else {
-            currentValue = AutoNumericHelper.getElementValue(this.domElement);
+            // Make sure the initial value does not have any superfluous whitespaces around it (Fix issue #479)
+            currentValue = AutoNumericHelper.getElementValue(this.domElement).trim();
+            // Correct the DOM attribute in case some whitespaces were present
+            this.domElement.setAttribute('value', currentValue);
         }
 
         if (this.isInputElement || this.isContentEditable) {

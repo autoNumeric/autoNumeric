@@ -361,37 +361,37 @@ describe('Issue #327 (using inputs from issue #183)', () => {
         // Then 'tab' on each other inputs
         browser.keys('Tab');
         // Check the text selection
-        let inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_183_ignore');
+        let inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return { start: input.selectionStart, end: input.selectionEnd };
-        }).value;
+        }, selectors.issue183ignore).value;
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual(13); //XXX This does not work under Firefox 45.7, but does under firefox 56. Since we only support the browsers last version - 2, let's ignore it.
 
         browser.keys('Tab');
         // Check the text selection
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_183_clamp');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return { start: input.selectionStart, end: input.selectionEnd };
-        }).value;
+        }, selectors.issue183clamp).value;
         expect(inputCaretPosition.start).toEqual(2);
         expect(inputCaretPosition.end).toEqual(15);
 
         browser.keys('Tab');
         // Check the text selection
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_183_truncate');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return { start: input.selectionStart, end: input.selectionEnd };
-        }).value;
+        }, selectors.issue183truncate).value;
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual(13);
 
         browser.keys('Tab');
         // Check the text selection
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_183_replace');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return { start: input.selectionStart, end: input.selectionEnd };
-        }).value;
+        }, selectors.issue183replace).value;
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual(13);
     });
@@ -427,10 +427,10 @@ describe('Issue #306', () => {
         expect(browser.getValue(selectors.issue306input)).toEqual('0');
 
         // Check the caret position
-        let inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306');
+        let inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306input).value;
         expect(inputCaretPosition).toEqual(1);
 
 
@@ -441,10 +441,10 @@ describe('Issue #306', () => {
         expect(browser.getValue(selectors.issue306input)).toEqual('0.');
 
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306input).value;
         expect(inputCaretPosition).toEqual(2);
 
 
@@ -452,10 +452,10 @@ describe('Issue #306', () => {
         expect(browser.getValue(selectors.issue306input)).toEqual('0.0');
 
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306input).value;
         expect(inputCaretPosition).toEqual(3);
     });
 
@@ -473,61 +473,61 @@ describe('Issue #306', () => {
         expect(browser.getValue(selectors.issue306inputDecimals)).toEqual('0,12345');
         browser.keys(['Home', 'ArrowRight', '00000']);
         expect(browser.getValue(selectors.issue306inputDecimals)).toEqual('0,00000');
-        let inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306decimals');
+        let inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306inputDecimals).value;
         expect(inputCaretPosition).toEqual(7);
 
         // Tests that it does not allow adding a leading 0
         browser.keys(['Home', '0']);
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306decimals');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306inputDecimals).value;
         expect(inputCaretPosition).toEqual(0);
 
         // Tests that entering a 0 while in the decimal places moves the caret to the right
         browser.keys(['ArrowRight', '0']);
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306decimals');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306inputDecimals).value;
         expect(inputCaretPosition).toEqual(3);
         // ...and another
         browser.keys('0');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306decimals');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306inputDecimals).value;
         expect(inputCaretPosition).toEqual(4);
         // ...and another
         browser.keys('0');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306decimals');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306inputDecimals).value;
         expect(inputCaretPosition).toEqual(5);
         // ...and another
         browser.keys('0');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306decimals');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306inputDecimals).value;
         expect(inputCaretPosition).toEqual(6);
         // ...and another
         browser.keys('0');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306decimals');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306inputDecimals).value;
         expect(inputCaretPosition).toEqual(7);
         // ...and another that should be dropped
         browser.keys('0');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306decimals');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306inputDecimals).value;
         expect(inputCaretPosition).toEqual(7);
     });
 
@@ -541,31 +541,31 @@ describe('Issue #306', () => {
         browser.setValue(selectors.issue306inputDecimals2, '50000,00');
         expect(browser.getValue(selectors.issue306inputDecimals2)).toEqual('50.000,00');
         browser.keys(['End', 'ArrowLeft', 'ArrowLeft', 'ArrowRight']);
-        let inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306decimals2');
+        let inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306inputDecimals2).value;
         expect(inputCaretPosition).toEqual(7);
 
         browser.keys('0');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306decimals2');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306inputDecimals2).value;
         expect(inputCaretPosition).toEqual(8);
 
         browser.keys('0');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306decimals2');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306inputDecimals2).value;
         expect(inputCaretPosition).toEqual(9);
 
         browser.keys('0');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_306decimals2');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue306inputDecimals2).value;
         expect(inputCaretPosition).toEqual(9);
     });
 });
@@ -597,10 +597,10 @@ describe('Issue #283', () => {
         expect(browser.getValue(selectors.issue283Input1)).toEqual('1.1235');
 
         // Check the final caret position
-        const inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue283Input1');
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue283Input1).value;
         expect(inputCaretPosition).toEqual(0);
     });
 
@@ -620,10 +620,10 @@ describe('Issue #283', () => {
         expect(browser.getValue(selectors.issue283Input4)).toEqual('8.000,00\u00a0€');
 
         // Check the final caret position
-        const inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue283Input4');
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue283Input4).value;
         expect(inputCaretPosition).toEqual(0);
     });
 
@@ -643,10 +643,10 @@ describe('Issue #283', () => {
         expect(browser.getValue(selectors.issue283Input3)).toEqual('08.000,00\u00a0€');
 
         // Check the final caret position
-        const inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue283Input3');
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue283Input3).value;
         expect(inputCaretPosition).toEqual(1);
     });
 
@@ -666,10 +666,10 @@ describe('Issue #283', () => {
         expect(browser.getValue(selectors.issue283Input4)).toEqual('80.000,00\u00a0€');
 
         // Check the final caret position
-        const inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue283Input4');
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue283Input4).value;
         expect(inputCaretPosition).toEqual(4);
     });
 });
@@ -801,10 +801,10 @@ describe('Issue #322', () => {
         expect(browser.getValue(selectors.issue322input)).toEqual('12,111,678.00');
 
         // Check the caret position
-        const inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_322');
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue322input).value;
         expect(inputCaretPosition).toEqual(6);
     });
 });
@@ -829,10 +829,10 @@ describe('Issue #317', () => {
 
         // Check that the value did not change, and that the caret is correctly positioned
         expect(browser.getValue(selectors.issue317input)).toEqual('0.00');
-        const inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_317');
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue317input).value;
         expect(inputCaretPosition).toEqual(1);
     });
 
@@ -849,40 +849,40 @@ describe('Issue #317', () => {
 
         // Check that the value did not change, and that the caret is correctly positioned
         expect(browser.getValue(selectors.issue317input)).toEqual('2,342,423,423,423.00');
-        let inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_317');
+        let inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue317input).value;
         expect(inputCaretPosition).toEqual(17);
 
         // Enter a decimal character that will make the caret move into the decimal place part
         // ...with the alternate decimal character
         browser.keys(',');
         expect(browser.getValue(selectors.issue317input)).toEqual('2,342,423,423,423.00');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_317');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue317input).value;
         expect(inputCaretPosition).toEqual(18);
 
         // ...with the period '.'
         browser.keys('ArrowLeft');
         browser.keys('.');
         expect(browser.getValue(selectors.issue317input)).toEqual('2,342,423,423,423.00');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_317');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue317input).value;
         expect(inputCaretPosition).toEqual(18);
 
         // ...with the numpad dot
         browser.keys('ArrowLeft');
         browser.keys('Decimal');
         expect(browser.getValue(selectors.issue317input)).toEqual('2,342,423,423,423.00');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_317');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue317input).value;
         expect(inputCaretPosition).toEqual(18);
     });
 });
@@ -904,20 +904,20 @@ describe('Issue #303', () => {
         // Then 'tab' to the next one
         browser.keys('Tab');
         expect(browser.getValue(selectors.issue303inputP)).toEqual('$'); //FIXME This fails while it should not
-        let inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_303p');
+        let inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue303inputP).value;
         expect(inputCaretPosition).toEqual(1);
 
 
         // Then 'tab' to the next one
         browser.keys('Tab');
         expect(browser.getValue(selectors.issue303inputS)).toEqual('\u00a0€'); //FIXME This fails while it should not
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_303p');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue303inputP).value;
         expect(inputCaretPosition).toEqual(0);
     });
 });
@@ -943,10 +943,10 @@ describe('Issue #387', () => {
         browser.keys(['Escape']);
         expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
         // Check the text selection
-        const inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_387_cancellable');
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return { start: input.selectionStart, end: input.selectionEnd };
-        }).value;
+        }, selectors.issue387inputCancellable).value;
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual('$220,242.76'.length);
 
@@ -985,10 +985,10 @@ describe('Issue #387', () => {
         // Test the initial value
         expect(browser.getValue(selectors.issue387inputCancellableNumOnly)).toEqual('$220,242.76');
         // Check the text selection
-        const inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_387_cancellable_numOnly');
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return { start: input.selectionStart, end: input.selectionEnd };
-        }).value;
+        }, selectors.issue387inputCancellableNumOnly).value;
         // Since `selectNumberOnly` is set to `true`, the currency symbol is not selected by default
         expect(inputCaretPosition.start).toEqual(1); //XXX This does not work under Firefox 45.7, but does under firefox 53. Since we only support the browsers last version - 2, let's ignore it.
         expect(inputCaretPosition.end).toEqual('$220,242.76'.length);
@@ -1011,10 +1011,10 @@ describe('Issue #387', () => {
         browser.keys(['Escape']);
         expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$22,024.76');
         // Check the text selection
-        const inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_387_cancellable');
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return { start: input.selectionStart, end: input.selectionEnd };
-        }).value;
+        }, selectors.issue387inputCancellable).value;
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual('$22,024.76'.length);
 
@@ -1040,10 +1040,10 @@ describe('Issue #387', () => {
         browser.keys(['Escape']);
         expect(browser.getValue(selectors.issue387inputNotCancellable)).toEqual('$2,202.76');
         // Check the text selection
-        const inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_387_not_cancellable');
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return { start: input.selectionStart, end: input.selectionEnd };
-        }).value;
+        }, selectors.issue387inputNotCancellable).value;
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual('$2,202.76'.length);
 
@@ -1655,12 +1655,12 @@ describe('remove() function', () => {
         expect(browser.getValue(selectors.remove1)).toEqual('1.152.468,42 €');
 
         // Call the `remove()` function
-        browser.execute(() => {
-            const inputRemove1 = document.querySelector('#remove1');
+        browser.execute(domId => {
+            const inputRemove1 = document.querySelector(domId);
             // eslint-disable-next-line
             const anElement = AutoNumeric.getAutoNumericElement(inputRemove1);
             anElement.remove();
-        });
+        }, selectors.remove1);
 
         // Check that the value has not changed
         expect(browser.getValue(selectors.remove1)).toEqual('1.152.468,42 €');
@@ -1690,46 +1690,46 @@ describe('undo and redo functions', () => {
         browser.keys(['Home', '0']); // Input a character that will be dropped and won't be set in the history list
         expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €'); // |1.357,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(0);
 
         browser.keys(['1']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('11.357,92 €'); // 1|1.357,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(1);
 
         browser.keys(['ArrowRight', '2']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('112.357,92 €'); // 11.|357,92 € -> 112|.357,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(3);
 
         browser.keys(['4']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124|.357,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(5);
 
         browser.keys(['ArrowRight', 'ArrowRight', '6']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 1.124.|357,92 € -> 1.124.3|57,92 € -> 11.243.6|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(8);
 
 
@@ -1737,55 +1737,55 @@ describe('undo and redo functions', () => {
         browser.keys(['Control', 'z']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(7);
 
         browser.keys(['z']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('112.357,92 €'); // 112|.357,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(3);
 
         browser.keys(['z']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('11.357,92 €'); // 11.|357,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(3);
 
         browser.keys(['z']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €'); // |1.357,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(0);
 
         browser.keys(['z']); // This makes sure we cannot go back too far
         expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €'); // |1.357,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(0);
 
         browser.keys(['Control']); // Release the control key
         expect(browser.getValue(selectors.undoRedo1)).toEqual('1.357,92 €'); // |1.357,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(0);
     });
 
@@ -1795,64 +1795,64 @@ describe('undo and redo functions', () => {
         browser.keys(['Control', 'Shift', 'z']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('11.357,92 €'); // 11.|357,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(3);
 
         browser.keys(['z']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('112.357,92 €'); // 112|.357,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(3);
 
         browser.keys(['z']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(7);
 
         browser.keys(['z']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(8);
 
         browser.keys(['z']); // This makes sure we cannot go back too far
         expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(8);
 
         browser.keys(['Shift']); // Release the Shift key
         expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(8);
 
         browser.keys(['Control']); // Release the control key
         expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(8);
     });
 
@@ -1870,37 +1870,37 @@ describe('undo and redo functions', () => {
         browser.keys(['Control', 'Shift', 'z']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(7);
 
         browser.keys(['z']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(8);
 
         browser.keys(['Control']); // Release the control key
         expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(8);
 
         browser.keys(['Shift']); // Release the Shift key
         expect(browser.getValue(selectors.undoRedo1)).toEqual('11.243.657,92 €'); // 11.243.6|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(8);
     });
 
@@ -1910,19 +1910,19 @@ describe('undo and redo functions', () => {
         browser.keys(['1']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('112.436.157,92 €'); // 112.436.1|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(9);
 
         browser.keys(['2']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.361.257,92 €'); // 1.124.361.2|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(11);
 
         // Undo
@@ -1931,20 +1931,20 @@ describe('undo and redo functions', () => {
         browser.keys(['Control']); // Release the control key
         expect(browser.getValue(selectors.undoRedo1)).toEqual('112.436.157,92 €'); // 112.436.1|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(9);
 
         // Redo
         browser.keys(['Control', 'Shift', 'z', 'Shift', 'Control']);
         expect(browser.getValue(selectors.undoRedo1)).toEqual('1.124.361.257,92 €'); // 1.124.361.2|57,92 €
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo1).value;
         expect(inputCaretPosition).toEqual(11);
     });
 
@@ -1959,46 +1959,46 @@ describe('undo and redo functions', () => {
         browser.keys(['Home', 'ArrowRight', 'Shift', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Shift', '5']);
         expect(browser.getValue(selectors.undoRedo3)).toEqual('1.540'); // 1|2.3|40 -> 1.5|40
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo3');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo3).value;
         expect(inputCaretPosition).toEqual(3);
 
         browser.keys(['Home', 'Shift', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'Shift', '6']);
         expect(browser.getValue(selectors.undoRedo3)).toEqual('640'); // 1.5|40 -> 6|40
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo3');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo3).value;
         expect(inputCaretPosition).toEqual(1);
 
         browser.keys(['Backspace']);
         expect(browser.getValue(selectors.undoRedo3)).toEqual('40'); // 6|40 -> |40
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo3');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo3).value;
         expect(inputCaretPosition).toEqual(0);
 
         browser.keys(['2']);
         expect(browser.getValue(selectors.undoRedo3)).toEqual('240'); // |40 -> 2|40
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo3');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo3).value;
         expect(inputCaretPosition).toEqual(1);
 
         browser.keys(['8']);
         expect(browser.getValue(selectors.undoRedo3)).toEqual('2.840'); // 2|40 -> 2.8|40
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo3');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo3).value;
         expect(inputCaretPosition).toEqual(3);
 
 
@@ -2006,10 +2006,10 @@ describe('undo and redo functions', () => {
         browser.keys(['Control', 'zzzzz', 'Control']);
         expect(browser.getValue(selectors.undoRedo3)).toEqual('1.540'); // 1.5|40
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo3');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return { start: input.selectionStart, end: input.selectionEnd };
-        }).value;
+        }, selectors.undoRedo3).value;
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual(3);
 
@@ -2018,10 +2018,10 @@ describe('undo and redo functions', () => {
         browser.keys(['Control', 'Shift', 'zzzzz', 'Shift', 'Control']);
         expect(browser.getValue(selectors.undoRedo3)).toEqual('2.840'); // 2.8|40
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo3');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo3).value;
         expect(inputCaretPosition).toEqual(3);
 
 
@@ -2029,30 +2029,30 @@ describe('undo and redo functions', () => {
         browser.keys(['Home', '6']);
         expect(browser.getValue(selectors.undoRedo3)).toEqual('62.840'); // |2.840 -> 6|2.840
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo3');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo3).value;
         expect(inputCaretPosition).toEqual(1);
 
         // Undo to the max history size
         browser.keys(['Control', 'zzzzz', 'Control']);
         expect(browser.getValue(selectors.undoRedo3)).toEqual('640'); // 6|40
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo3');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo3).value;
         expect(inputCaretPosition).toEqual(1);
 
         // Try to undo once more ; this stays on the same state, since the first one got deleted
         browser.keys(['Control', 'z', 'Control']);
         expect(browser.getValue(selectors.undoRedo3)).toEqual('640'); // 6|40
         // Check the caret position
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#undoRedo3');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.undoRedo3).value;
         expect(inputCaretPosition).toEqual(1);
 
         // Try to redo more states that there is in the history table should only return the last state
@@ -2693,12 +2693,12 @@ describe('Options updates', () => {
         expect(browser.getValue(selectors.optionUpdate2)).toEqual('444.466 €');
 
         // Update the option
-        const anElementVersion = browser.execute(() => {
-            const input = document.querySelector('#optionUpdate2');
+        const anElementVersion = browser.execute(domId => {
+            const input = document.querySelector(domId);
             const anElement = AutoNumeric.getAutoNumericElement(input);
             anElement.options.decimalCharacterAlternative('#');
             return anElement.rawValue;
-        }).value;
+        }, selectors.optionUpdate2).value;
         expect(anElementVersion).toEqual('444466');
         browser.keys(['*']); // Ignored
         expect(browser.getValue(selectors.optionUpdate2)).toEqual('444.466 €');
@@ -2733,12 +2733,12 @@ describe('`decimalPlacesShownOnFocus` and selections', () => {
         input1.click();
 
         // Check the text selection in the first input
-        const inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selection1');
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             const anElement = AutoNumeric.getAutoNumericElement(input);
             anElement.selectDecimal();
             return { start: input.selectionStart, end: input.selectionEnd };
-        }).value;
+        }, selectors.selection1).value;
         expect(inputCaretPosition.start).toEqual(7);
         expect(inputCaretPosition.end).toEqual(13);
     });
@@ -2832,329 +2832,329 @@ describe('`caretPositionOnFocus` option', () => {
         // Serie 1
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus1');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus1).value;
         expect(inputCaretPosition).toEqual(3);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus2');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus2).value;
         expect(inputCaretPosition).toEqual(3);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus3');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus3).value;
         expect(inputCaretPosition).toEqual(3);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus4');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus4).value;
         expect(inputCaretPosition).toEqual(2);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus5');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus5).value;
         expect(inputCaretPosition).toEqual(3);
 
         // Serie 2
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus6');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus6).value;
         expect(inputCaretPosition).toEqual(13);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus7');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus7).value;
         expect(inputCaretPosition).toEqual(13);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus8');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus8).value;
         expect(inputCaretPosition).toEqual(13);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus9');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus9).value;
         expect(inputCaretPosition).toEqual(12);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus10');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus10).value;
         expect(inputCaretPosition).toEqual(13);
 
         // Serie 3
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus11');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus11).value;
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus12');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus12).value;
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus13');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus13).value;
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus14');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus14).value;
         expect(inputCaretPosition).toEqual(9);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus15');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus15).value;
         expect(inputCaretPosition).toEqual(10);
 
         // Serie 4
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus16');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus16).value;
         expect(inputCaretPosition).toEqual(11);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus17');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus17).value;
         expect(inputCaretPosition).toEqual(11);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus18');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus18).value;
         expect(inputCaretPosition).toEqual(11);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus19');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus19).value;
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus20');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus20).value;
         expect(inputCaretPosition).toEqual(11);
 
         // Serie 5
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus21');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus21).value;
         expect(inputCaretPosition).toEqual(1);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus22');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus22).value;
         expect(inputCaretPosition).toEqual(0);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus23');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus23).value;
         expect(inputCaretPosition).toEqual(0);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus24');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus24).value;
         expect(inputCaretPosition).toEqual(0);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus25');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus25).value;
         expect(inputCaretPosition).toEqual(1);
 
         // Serie 6
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus26');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus26).value;
         expect(inputCaretPosition).toEqual(11);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus27');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus27).value;
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus28');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus28).value;
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus29');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus29).value;
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus30');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus30).value;
         expect(inputCaretPosition).toEqual(11);
 
         // Serie 7
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus31');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus31).value;
         expect(inputCaretPosition).toEqual(8);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus32');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus32).value;
         expect(inputCaretPosition).toEqual(7);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus33');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus33).value;
         expect(inputCaretPosition).toEqual(7);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus34');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus34).value;
         expect(inputCaretPosition).toEqual(7);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus35');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus35).value;
         expect(inputCaretPosition).toEqual(8);
 
         // Serie 8
         // Focus on the input and check the caret position -246.813,58jk
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus36');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus36).value;
         expect(inputCaretPosition).toEqual(9);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus37');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus37).value;
         expect(inputCaretPosition).toEqual(8);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus38');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus38).value;
         expect(inputCaretPosition).toEqual(8);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus39');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus39).value;
         expect(inputCaretPosition).toEqual(8);
 
         // Focus on the input and check the caret position
         browser.keys('Tab');
-        inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#selectOnFocus40');
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.selectOnFocus40).value;
         expect(inputCaretPosition).toEqual(9);
     });
 });
@@ -3203,11 +3203,11 @@ describe('`emptyInputBehavior` option', () => {
         expect(browser.getValue(selectors.issue447)).toEqual('');
 
         // Then we test if the rawValue is correctly set to `null`
-        const result = browser.execute(() => {
-            const input = document.querySelector('#issue_447');
+        const result = browser.execute(domId => {
+            const input = document.querySelector(domId);
             const an = AutoNumeric.getAutoNumericElement(input);
             return an.getNumber();
-        }).value;
+        }, selectors.issue447).value;
         expect(result).toBeNull();
     });
 
@@ -3231,11 +3231,11 @@ describe('`rawValueDivisor` option', () => {
         expect(browser.getText(selectors.result452)).toEqual('12.34');
 
         // Test the rawValue directly
-        const result = browser.execute(() => {
-            const input = document.querySelector('#issue_452');
+        const result = browser.execute(domId => {
+            const input = document.querySelector(domId);
             const an    = AutoNumeric.getAutoNumericElement(input);
             return an.getNumericString();
-        }).value;
+        }, selectors.issue452).value;
         expect(result).toEqual('12.34');
 
         browser.keys('567.8');
@@ -3252,13 +3252,13 @@ describe('`rawValueDivisor` option', () => {
 
     it('should update the raw value when divided by a `rawValueDivisor`, and the value is modified via a script, while the element is unfocused', () => {
         // Modify the element value while it does not have the focus
-        const result = browser.execute(() => {
-            const input = document.querySelector('#issue_452');
+        const result = browser.execute(domId => {
+            const input = document.querySelector(domId);
             const an = AutoNumeric.getAutoNumericElement(input);
             an.update(AutoNumeric.getPredefinedOptions().percentageEU3dec);
             an.set(0.0221456); // This makes sure that if the element is currently unfocused, and an external script modify its value with `set`, the `rawValueDivisor` option is not used. This should only be used when the user is actually inputting numbers manually.
             return an.getNumericString();
-        }).value;
+        }, selectors.issue452).value;
         expect(result).toEqual('0.02215');
         expect(browser.getValue(selectors.issue452)).toEqual('2,215\u202f%');
         // browser.keys('Esc', 'Esc');
@@ -3268,23 +3268,23 @@ describe('`rawValueDivisor` option', () => {
     it('should update the raw value when divided by a `rawValueDivisor`, and the value is modified via a script, while the element is focused', () => {
         // Modify the element value while it has the focus
         $(selectors.issue452).click(); // Focus on the input element
-        const result = browser.execute(() => {
-            const input = document.querySelector('#issue_452');
+        const result = browser.execute(domId => {
+            const input = document.querySelector(domId);
             const an = AutoNumeric.getAutoNumericElement(input);
             an.set(0.07621327); // This makes sure that if the element is currently focused in, and an external script modify its value with `set`, the `rawValueDivisor` option is not used. This should only be used when the user is actually inputting numbers manually.
             return an.getNumericString();
-        }).value;
+        }, selectors.issue452).value;
         expect(result).toEqual('0.07621');
         expect(browser.getValue(selectors.issue452)).toEqual('7,621\u202f%');
     });
 
     it('should update on load the formatted and raw value when divided by a `rawValueDivisor`', () => {
         expect(browser.getValue(selectors.issue452Formatted)).toEqual('12,35\u202f%');
-        const result = browser.execute(() => {
-            const input = document.querySelector('#issue_452_formatted');
+        const result = browser.execute(domId => {
+            const input = document.querySelector(domId);
             const an = AutoNumeric.getAutoNumericElement(input);
             return an.getNumericString();
-        }).value;
+        }, selectors.issue452Formatted).value;
         expect(result).toEqual('0.1235');
     });
 });

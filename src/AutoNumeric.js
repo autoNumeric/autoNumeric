@@ -3293,8 +3293,13 @@ export default class AutoNumeric {
             AutoNumericHelper.throwError(`The 'showOnlyNumbersOnFocus' option is invalid ; it should be either 'false' or 'true', [${options.showOnlyNumbersOnFocus}] given.`);
         }
 
-        if (!testPositiveInteger.test(options.digitalGroupSpacing)) {
-            AutoNumericHelper.throwError(`The digital grouping for thousand separator option 'digitalGroupSpacing' is invalid ; it should be a positive integer, [${options.digitalGroupSpacing}] given.`);
+        if (!AutoNumericHelper.isInArray(options.digitalGroupSpacing, [
+            AutoNumeric.options.digitalGroupSpacing.two,
+            AutoNumeric.options.digitalGroupSpacing.twoScaled,
+            AutoNumeric.options.digitalGroupSpacing.three,
+            AutoNumeric.options.digitalGroupSpacing.four,
+        ]) && !(options.digitalGroupSpacing >= 2 && options.digitalGroupSpacing <= 4)) {
+            AutoNumericHelper.throwError(`The grouping separator option for thousands 'digitalGroupSpacing' is invalid ; it should be '2', '2s', '3', or '4', [${options.digitalGroupSpacing}] given.`);
         }
 
         if (!AutoNumericHelper.isInArray(options.decimalCharacter, [

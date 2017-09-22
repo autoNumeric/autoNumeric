@@ -796,6 +796,13 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #498</p>
+			<input id="issue_498" type="text" placeholder="#498">
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1747,6 +1754,12 @@
     new AutoNumeric('#issue_479_left');
     new AutoNumeric('#issue_479_right');
     new AutoNumeric('#issue_479_both');
+
+    //-------------- Issue #498
+    new AutoNumeric('#issue_498', 12345678901234.5678, {
+        digitalGroupSpacing: '2s',
+	    maximumValue       : '999999999999999',
+    });
 </script>
 </body>
 </html>

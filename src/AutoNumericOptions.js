@@ -141,7 +141,7 @@ Object.defineProperty(AutoNumeric, 'options', {
             },
 
             /* Allow to declare an alternative decimal separator which is automatically replaced by `decimalCharacter` when typed.
-             * This is used by countries that use a comma "," as the decimal character and have keyboards\numeric pads that have
+             * This is used by countries that use a comma ',' as the decimal character and have keyboards with a numeric pads that have
              * a period 'full stop' as the decimal character (France or Spain for instance).
              */
             decimalCharacterAlternative: {
@@ -184,7 +184,7 @@ Object.defineProperty(AutoNumeric, 'options', {
              * This means this is optional ; if omitted the decimal places will be the same when the input has the focus.
              *
              * This option can be used in conjonction with the two other `scale*` options, which allows to display a different formatted value when the element is unfocused, while another formatted value is shown when focused.
-             * For those `scale*` option to have any effect, `divisorWhenUnfocused` must not be `null`.
+             * For those `scale*` options to have any effect, `divisorWhenUnfocused` must not be `null`.
              */
             decimalPlacesShownOnBlur: {
                 useDefault: null,
@@ -201,7 +201,7 @@ Object.defineProperty(AutoNumeric, 'options', {
              * If this is set to `null`, then this option is ignored, and the `decimalPlaces` option value will be used instead.
              *
              * Example:
-             * Fon instance if `decimalPlacesShownOnFocus` is set to `5` and the default number of decimal places is `2`, then on focus `1,000.12345` will be shown, while without focus `1,000.12` will be set back.
+             * For instance if `decimalPlacesShownOnFocus` is set to `5` and the default number of decimal places is `2`, then on focus `1,000.12345` will be shown, while without focus `1,000.12` will be set back.
              * Note 1: the results depends on the rounding method used.
              * Note 2: the `getNumericString()` method returns the extended decimal places
              */
@@ -231,6 +231,7 @@ Object.defineProperty(AutoNumeric, 'options', {
              * - "2s", results in 99,999,99,99,999 India's lakhs scaled
              * - "3",  results in 999,999,999 (default)
              * - "4",  results in 9999,9999,9999 used in some Asian countries
+             * Note: This option does not accept other grouping choice.
              */
             digitalGroupSpacing: {
                 two      : '2',

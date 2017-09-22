@@ -1,6 +1,7 @@
 ## Changelog for autoNumeric
 
 ### 4.1.0-beta.9
++ Fix issue #498 The `twoScaled` choice for the `digitalGroupSpacing` option cannot be validated
 + Convert all the end-to-end test `browser.execute()` calls so that hardcoded DOM ids are not used anymore
 
 ### 4.1.0-beta.8

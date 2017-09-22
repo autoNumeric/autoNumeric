@@ -2769,6 +2769,47 @@ describe('autoNumeric options and `options.*` methods', () => {
         });
     });
 
+    describe('`digitalGroupSpacing` option', () => {
+        let aNInput;
+        let newInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.nuke();
+        });
+
+        it('should group the numbers with the allowed grouping choices', () => {
+            aNInput = new AutoNumeric(newInput, { digitalGroupSpacing: 2, maximumValue : '999999999999999' });
+            aNInput.set(12345678901234.5678);
+            expect(aNInput.getFormatted()).toEqual('1,23,45,67,89,01,234.57');
+            aNInput.update({ digitalGroupSpacing: '2s' });
+            expect(aNInput.getFormatted()).toEqual('12,34,567,89,01,234.57');
+
+            // Update the option
+            aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.two);
+            expect(aNInput.getFormatted()).toEqual('1,23,45,67,89,01,234.57');
+            aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.three);
+            expect(aNInput.getFormatted()).toEqual('12,345,678,901,234.57');
+            aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.four);
+            expect(aNInput.getFormatted()).toEqual('12,3456,7890,1234.57');
+
+            aNInput.options.digitalGroupSpacing(2);
+            expect(aNInput.getFormatted()).toEqual('1,23,45,67,89,01,234.57');
+            aNInput.options.digitalGroupSpacing(3);
+            expect(aNInput.getFormatted()).toEqual('12,345,678,901,234.57');
+            aNInput.options.digitalGroupSpacing(4);
+            expect(aNInput.getFormatted()).toEqual('12,3456,7890,1234.57');
+
+            expect(() => aNInput.options.digitalGroupSpacing(5)).toThrow();
+            expect(() => aNInput.options.digitalGroupSpacing(1)).toThrow();
+            expect(() => aNInput.options.digitalGroupSpacing(10)).toThrow();
+        });
+    });
+
     /*
     describe('`unformatOnSubmit` option', () => {
         it('should unformat on submit', () => {
@@ -6461,7 +6502,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: 'true' })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: '2' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: 2 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: '2s' })).not.toThrow();
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: '3' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: 3 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: '4' })).not.toThrow();
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: 4 })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ decimalCharacter: ',', digitGroupSeparator: ' ' })).not.toThrow();
@@ -6798,8 +6843,20 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: null })).toThrow();
 
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: '-2' })).toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: -2 })).toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: '5' })).toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: 5 })).toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: '10' })).toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: 10 })).toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: '2ss' })).toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: 'a37' })).toThrow();
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: '37foo' })).toThrow();
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: null })).toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: [] })).toThrow();
+            expect(() => AutoNumeric.validate({ digitalGroupSpacing: {} })).toThrow();
 
             expect(() => AutoNumeric.validate({ decimalCharacter: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ decimalCharacter: true })).toThrow();

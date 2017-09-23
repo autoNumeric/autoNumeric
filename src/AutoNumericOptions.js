@@ -259,7 +259,7 @@ Object.defineProperty(AutoNumeric, 'options', {
             /* The `divisorWhenUnfocused` divide the element value on focus.
              * On blur, the element value is multiplied back.
              *
-             * Example : Given the option { divisorWhenUnfocused: 1000 } (or directly in the html `<input data-divisor-when-unfocused="1000">`)
+             * Example : Display percentages using { divisorWhenUnfocused: 100 } (or directly in the Html with `<input data-divisor-when-unfocused="100">`)
              * The divisor value does not need to be an integer, but please understand that Javascript has limited accuracy in math ; use with caution.
              * Note: The `getNumericString` method returns the full value, including the 'hidden' decimals.
              */
@@ -341,7 +341,7 @@ Object.defineProperty(AutoNumeric, 'options', {
 
             /* Defines the maximum possible value a user can enter.
              * Notes:
-             * - this value must a string and use the period for the decimal point
+             * - this value must be a string and use the period for the decimal point
              * - this value needs to be larger than `minimumValue`
              */
             maximumValue: {
@@ -353,7 +353,7 @@ Object.defineProperty(AutoNumeric, 'options', {
 
             /* Defines the minimum possible value a user can enter.
              * Notes:
-             * - this value must a string and use the period for the decimal point
+             * - this value must be a string and use the period for the decimal point
              * - this value needs to be smaller than `maximumValue`
              * - if this is superior to 0, then you'll effectively prevent your user to entirely delete the content of your element
              */
@@ -364,9 +364,9 @@ Object.defineProperty(AutoNumeric, 'options', {
                 zero                  : '0',
             },
 
-            /* Allow the user to increment or decrement the element value with the mouse wheel.
-             * The wheel behavior can by modified by the `wheelStep` option.
-             * This `wheelStep` options can be used in two ways, either by setting :
+            /* Allows the user to increment or decrement the element value with the mouse wheel.
+             * The wheel behavior can be modified by the `wheelStep` option.
+             * This `wheelStep` option can be used in two ways, either by setting:
              * - a 'fixed' step value (`wheelStep : 1000`), or
              * - the 'progressive' string (`wheelStep : 'progressive'`), which will then activate a special mode where the step is automatically calculated based on the element value size.
              *
@@ -379,7 +379,7 @@ Object.defineProperty(AutoNumeric, 'options', {
                 doNothing  : false,
             },
 
-            /* Adds brackets on negative values (ie. transforms '-$ 999.99' to '(999.99)')
+            /* Adds brackets on negative values (ie. transforms '-$ 999.99' to '($999.99)')
              * Those brackets are visible only when the field does NOT have the focus.
              * The left and right symbols should be enclosed in quotes and separated by a comma.
              */
@@ -613,7 +613,7 @@ Object.defineProperty(AutoNumeric, 'options', {
             /* Defines if the element value should be converted to the raw value on focus (and back to the formatted on blur).
              * If set to `true`, then autoNumeric remove the thousand separator, currency symbol and suffix on focus.
              * Example:
-             * If the input value is '$ 1,999.88 suffix', on focus it becomes '1999.88' and back to '$ 1,999.88 suffix' on focus out.
+             * If the input value is '$ 1,999.88 suffix', on focus it becomes '1999.88' and back to '$ 1,999.88 suffix' on blur.
              */
             showOnlyNumbersOnFocus: {
                 onlyNumbers: true,
@@ -629,7 +629,7 @@ Object.defineProperty(AutoNumeric, 'options', {
                 hide: false,
             },
 
-            /* Defines if warnings should be shown in the console
+            /* Defines if warnings should be shown in the console.
              * Those warnings can be ignored, but are usually printed when something could be improved by the user (ie. option conflicts).
              */
             showWarnings: {
@@ -698,7 +698,8 @@ Object.defineProperty(AutoNumeric, 'options', {
                                 }
 
                                 return null;  // In case the rawValue is outside those ranges
-                            }, classes: [
+                            },
+                            classes: [
                                 'autoNumeric-small-negative',
                                 'autoNumeric-zero',
                                 'autoNumeric-small-positive',
@@ -745,11 +746,11 @@ Object.defineProperty(AutoNumeric, 'options', {
              * - if we detect a mouseleave event.
              *
              * We unformat again if :
-             * - while the mouse is over the element, the user hit ctrl again
+             * - while the mouse is over the element, the user hit `Alt` again
              */
             unformatOnHover: {
                 unformat     : true,
-                doNotUnformat: false,
+                doNotUnformat: false, //TODO Rename to `keepFormat`
             },
 
             /* Removes the formatting and use the raw value in each autoNumeric elements of the parent form element, on the form `submit` event.
@@ -760,8 +761,8 @@ Object.defineProperty(AutoNumeric, 'options', {
                 keepCurrentValue: false,
             },
 
-            /* Provide a way for automatically replacing the formatted value with a pre-defined string, when the raw value is equal to a specific value
-             * Here you can specify as many 'conversion' as possible.
+            /* Provides a way for automatically replacing the formatted value with a pre-defined string, when the raw value is equal to a specific value
+             * Here you can specify as many 'conversion' as needed.
              */
             valuesToStrings: {
                 none         : null,

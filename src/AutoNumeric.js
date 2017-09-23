@@ -6,15 +6,17 @@
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
- * @copyright    2009 Robert J. Knothe http://www.decorplanit.com/plugin/
+ * @copyright    2009 Robert J. Knothe
  * @since        2009-08-09
  *
  * @summary      autoNumeric is a standalone Javascript library
  *               that provides live *as-you-type* formatting for
  *               international numbers and currencies.
  *
+ * @link         http://autonumeric.org
+ *
  *               Note : Some functions are borrowed from big.js
- * @link         https://github.com/MikeMcl/big.js/
+ * @see          https://github.com/MikeMcl/big.js/
  *
  * Please report any bugs to https://github.com/autoNumeric/autoNumeric
  *

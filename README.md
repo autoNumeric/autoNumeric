@@ -1,4 +1,4 @@
-## What is [autoNumeric](https://autonumeric.github.io)?
+## What is [autoNumeric](http://autonumeric.org)?
 
 autoNumeric is a standalone Javascript library that provides live *as-you-type* formatting for international numbers and currencies.
 
@@ -297,7 +297,8 @@ If you know you want to initialize multiple elements in one call, you must then 
 *Note: Using an array of option objects / pre-defined names will always merge those settings. The resulting setting objet will then be applied to all the selected elements ; they will share the exact same settings.*
 
 ## Options
-Multiple options allow you to customize precisely how a form input will format your key strokes as you type :
+Multiple options allow you to customize precisely how a form input will format your key strokes as you type.<br>
+You can check what are the predefined choices for each option as well as a more detailed explanation of how they work on the [official documentation page](http://autonumeric.org/#/guide).
 
 | Option           | Description | Default Value |
 | :----------------: | :-----------:  | :-----------:  |

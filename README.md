@@ -230,6 +230,10 @@ const allowedTagList = [
 ]
 ```
 
+> Tips:<br>
+Since the `number` type is not supported, if you want to display a numeric keyboard when selecting an AutoNumeric-managed element in a mobile browser, you can use the input `tel` type.<br><br>
+In the [future](http://caniuse.com/#search=inputmode), you'll be able to add the `inputmode="numeric"` [Html attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Input) in order to achieve the same effect.
+
 ## Initialization
 
 An AutoNumeric object can be initialized in various ways.

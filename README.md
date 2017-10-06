@@ -1,16 +1,21 @@
+<p align="center"><a href="http://autonumeric.org"><img src="http://autonumeric.org/statics/icons/apple-icon-152x152.png" alt="autonumeric.org"></a></p>
+
+<p align="center">
+<a href="https://npmjs.org/package/autonumeric"><img src="https://img.shields.io/npm/v/autonumeric.svg" alt="Latest Version"></a>
+<a href="https://travis-ci.org/autoNumeric/autoNumeric"><img src="https://img.shields.io/travis/autoNumeric/autoNumeric.svg" alt="Build Status"></a>
+<a href="https://snyk.io/test/github/autoNumeric/autoNumeric"><img src="https://snyk.io/test/github/autoNumeric/autoNumeric/badge.svg" alt="Known Vulnerabilities"></a>
+<a href="https://coveralls.io/github/autoNumeric/autoNumeric?branch=next"><img src="https://coveralls.io/repos/github/autoNumeric/autoNumeric/badge.svg?branch=next" alt="Coverage Status"></a>
+<br>
+<a href="https://gitter.im/autoNumeric/autoNumeric"><img src="https://img.shields.io/badge/gitter-autoNumeric%2FautoNumeric-brightgreen.svg" alt="Gitter chat"></a>
+<a href="http://badge.fury.io/js/autonumeric"><img src="http://img.shields.io/npm/dm/autonumeric.svg" alt="Downloads per month"></a>
+<br>
+<br>
+<a href="https://nodei.co/npm/autonumeric"><img src="https://nodei.co/npm/autonumeric.png?downloads=true&downloadRank=true&stars=true" alt="AutoNumeric npm info"></a>
+</p>
+
 ## What is [autoNumeric](http://autonumeric.org)?
 
 autoNumeric is a standalone Javascript library that provides live *as-you-type* formatting for international numbers and currencies.
-
-[![NPM][nodei-image]][nodei-url]
-<br>
-[![NPM version][npm-image]][npm-url]
-[![Downloads][downloads-image]][downloads-url]
-[![Build Status][travis-image]][travis-url]
-[![Known Vulnerabilities][snyk-image]][snyk-url]
-[![Coverage Status][coveralls-image]][coveralls-url]
-<br>
-[![Gitter chat][gitter-image]][gitter-url]
 
 The latest stable branch is always on `master`. Currently this is version [4.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>
 if you want to live dangerously, you can check out the latest development version in the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br>

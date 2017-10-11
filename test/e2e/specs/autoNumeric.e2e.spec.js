@@ -3708,4 +3708,24 @@ describe('Pasting', () => {
         browser.keys(['Control', 'a', 'v', 'Control']);
         expect(browser.getValue(selectors.issue387inputCancellable)).toEqual('$220,242.76');
     });
+
+    it('should not be possible to paste an valid number in a readOnly element', () => {
+        expect(browser.getValue(selectors.readOnlyElement)).toEqual('42.42');
+
+        const inputClassic = $(selectors.inputClassic);
+        inputClassic.click();
+        // Clear the input content
+        browser.keys(['Control', 'a', 'Control', 'Backspace']);
+        browser.keys('12345.67');
+        expect(browser.getValue(selectors.inputClassic)).toEqual('12345.67');
+
+        // Copy
+        browser.keys(['Control', 'a', 'c', 'Control']);
+
+        // Paste
+        $(selectors.readOnlyElement).click();
+        browser.keys(['Home', 'ArrowRight', 'Shift', 'ArrowRight', 'ArrowRight', 'Shift']);
+        browser.keys(['Control', 'a', 'v', 'Control']);
+        expect(browser.getValue(selectors.readOnlyElement)).toEqual('42.42'); // No changes!
+    });
 });

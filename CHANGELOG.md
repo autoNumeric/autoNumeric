@@ -2,6 +2,7 @@
 
 ### 4.1.0-beta.10
 + Fix issue #502 The end-to-end tests fails on Chrome 61
++ Fix issue #505 Pasting values in a `readOnly` element should not be possible
 
 ### 4.1.0-beta.9
 + Fix issue #498 The `twoScaled` choice for the `digitalGroupSpacing` option cannot be validated

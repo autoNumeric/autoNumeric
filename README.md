@@ -11,6 +11,7 @@ autoNumeric is a standalone Javascript library that provides live *as-you-type* 
 [![Coverage Status][coveralls-image]][coveralls-url]
 <br>
 [![Gitter chat][gitter-image]][gitter-url]
+[![jsDelivr Hits](https://data.jsdelivr.com/v1/package/npm/autonumeric/badge?style=rounded)](https://www.jsdelivr.com/package/npm/autonumeric)
 
 The latest stable branch is always on `master`. Currently this is version [4.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>
 if you want to live dangerously, you can check out the latest development version in the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br>

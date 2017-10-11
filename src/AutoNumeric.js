@@ -5978,6 +5978,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // The event is prevented by default, since otherwise the user would be able to paste invalid characters into the input
         e.preventDefault();
 
+        if (this.settings.readOnly) {
+            // Do not allow pasting in a readonly element (fix issue #505)
+            return;
+        }
+
         let rawPastedText;
         if (window.clipboardData && window.clipboardData.getData) {
             // Special case for the obsolete and non-standard IE browsers 10 and 11

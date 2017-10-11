@@ -803,6 +803,13 @@
 			<input id="issue_498" type="text" placeholder="#498">
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #455</p>
+			<input id="issue_455" type="text" placeholder="#455">
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1758,7 +1765,13 @@
     //-------------- Issue #498
     new AutoNumeric('#issue_498', 12345678901234.5678, {
         digitalGroupSpacing: '2s',
-	    maximumValue       : '999999999999999',
+        maximumValue       : '999999999999999',
+    });
+
+    //-------------- Issue #455
+    new AutoNumeric('#issue_455', 1234.56, {
+        caretPositionOnFocus: AutoNumeric.options.caretPositionOnFocus.doNoForceCaretPosition,
+        selectOnFocus: AutoNumeric.options.selectOnFocus.doNotSelect,
     });
 </script>
 </body>

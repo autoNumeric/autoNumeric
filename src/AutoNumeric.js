@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.10
- * @date         2017-09-01 UTC 06:00
+ * @version      4.1.0-beta.11
+ * @date         2017-10-10 UTC 22:00
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -847,7 +847,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.10';
+        return '4.1.0-beta.11';
     }
 
     /**
@@ -4671,7 +4671,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @private
      */
     _initialCaretPosition(value) {
-        if (AutoNumericHelper.isNull(this.settings.caretPositionOnFocus)) {
+        if (AutoNumericHelper.isNull(this.settings.caretPositionOnFocus) &&
+            this.settings.selectOnFocus === AutoNumeric.options.selectOnFocus.doNotSelect) {
             AutoNumericHelper.throwError('`_initialCaretPosition()` should never be called when the `caretPositionOnFocus` option is `null`.');
         }
 
@@ -5493,7 +5494,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             this.select();
         } else {
             // Or we decide where to put the caret using the `caretPositionOnFocus` option
-            AutoNumericHelper.setElementSelection(e.target, this._initialCaretPosition(AutoNumericHelper.getElementValue(this.domElement)));
+            if (!AutoNumericHelper.isNull(this.settings.caretPositionOnFocus)) {
+                AutoNumericHelper.setElementSelection(e.target, this._initialCaretPosition(AutoNumericHelper.getElementValue(this.domElement)));
+            }
         }
     }
 

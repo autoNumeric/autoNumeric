@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.11
++ Fix issue #455 Uncaught Error: `_initialCaretPosition()` should never be called when the `caretPositionOnFocus` option is `null`
+
 ### 4.1.0-beta.10
 + Fix issue #502 The end-to-end tests fails on Chrome 61
 + Fix issue #505 Pasting values in a `readOnly` element should not be possible

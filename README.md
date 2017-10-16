@@ -7,7 +7,8 @@
 <a href="https://coveralls.io/github/autoNumeric/autoNumeric?branch=next"><img src="https://coveralls.io/repos/github/autoNumeric/autoNumeric/badge.svg?branch=next" alt="Coverage Status"></a>
 <br>
 <a href="https://gitter.im/autoNumeric/autoNumeric"><img src="https://img.shields.io/badge/gitter-autoNumeric%2FautoNumeric-brightgreen.svg" alt="Gitter chat"></a>
-<a href="http://badge.fury.io/js/autonumeric"><img src="http://img.shields.io/npm/dm/autonumeric.svg" alt="Downloads per month"></a>
+<a href="http://badge.fury.io/js/autonumeric"><img src="http://img.shields.io/npm/dm/autonumeric.svg" alt="Npm downloads per month"></a>
+<a href="https://www.jsdelivr.com/package/npm/autonumeric"><img src="https://data.jsdelivr.com/v1/package/npm/autonumeric/badge?style=rounded" alt="jsDelivr downloads per month"></a>
 <br>
 <br>
 <a href="https://nodei.co/npm/autonumeric"><img src="https://nodei.co/npm/autonumeric.png?downloads=true&downloadRank=true&stars=true" alt="AutoNumeric npm info"></a>

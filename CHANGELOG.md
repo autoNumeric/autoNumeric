@@ -2,6 +2,8 @@
 
 ### 4.1.0-beta.11
 + Fix issue #455 Uncaught Error: `_initialCaretPosition()` should never be called when the `caretPositionOnFocus` option is `null`
++ Fix issue #512 AutoNumeric serialized data return `0` instead of an empty value on empty inputs
+  This fix changes how form serialization is done, by outputting the empty string on empty inputs, instead of `0` or `0.00`.
 
 ### 4.1.0-beta.10
 + Fix issue #502 The end-to-end tests fails on Chrome 61

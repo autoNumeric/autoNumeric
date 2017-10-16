@@ -810,6 +810,21 @@
 			<input id="issue_455" type="text" placeholder="#455">
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #512</p>
+			<form name="testform">
+				<input type="text" id="fieldA" name="fieldA" class="issue512">
+				<input type="text" id="fieldB" name="fieldB" class="issue512">
+				<input type="text" id="fieldC" name="fieldC" class="issue512" value="54894">
+				<input type="text" id="fieldD" name="fieldD" class="issue512">
+				<br>
+				<button type="button" id="btn">Click for serialize</button>
+				<br>Result:<input type="text" id="issue_512" placeholder="#512">
+			</form>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1772,6 +1787,17 @@
     new AutoNumeric('#issue_455', 1234.56, {
         caretPositionOnFocus: AutoNumeric.options.caretPositionOnFocus.doNoForceCaretPosition,
         selectOnFocus: AutoNumeric.options.selectOnFocus.doNotSelect,
+    });
+
+    //-------------- Issue #512
+    const anElements = new AutoNumeric.multiple('.issue512');
+    const issue512 = document.getElementById('issue_512');
+
+    document.getElementById('btn').addEventListener('click', () => {
+        issue512.value = anElements[0].formNumericString();
+//        issue512.value = anElements[0].formLocalized('number');
+//        issue512.value = anElements[0].formLocalized();
+//        issue512.value = anElements[0].formFormatted();
     });
 </script>
 </body>

@@ -2,7 +2,7 @@
  *               AutoNumeric.js
  *
  * @version      4.1.0-beta.11
- * @date         2017-10-10 UTC 22:00
+ * @date         2017-10-16 UTC 20:00
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -3841,6 +3841,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             value = numericStringOrDomElement;
         }
 
+        if (value === '') {
+            // This allows to be coherent when serializing forms with empty inputs. Fix issue #512.
+            return '';
+        }
+
         if (AutoNumericHelper.isUndefined(value) || value === null) {
             return null;
         }
@@ -3933,6 +3938,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             value = AutoNumericHelper.getElementValue(numericStringOrDomElement);
         } else {
             value = numericStringOrDomElement;
+        }
+
+        if (value === '') {
+            // This allows to be coherent when serializing forms with empty inputs. Fix issue #512.
+            return '';
         }
 
         if (AutoNumericHelper.isNull(settings)) {
@@ -8149,6 +8159,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                                     if (!AutoNumericHelper.isNull(anObject)) {
                                         valueResult = this.unformat(element, anObject.getSettings());
                                     }
+
                                     break;
                                 case 'localized':
                                     anObject = this.getAutoNumericElement(element);
@@ -8161,6 +8172,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
                                         valueResult = this.localize(element, currentSettings);
                                     }
+
                                     break;
                                 case 'formatted':
                                 default:

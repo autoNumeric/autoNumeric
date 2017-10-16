@@ -4589,17 +4589,21 @@ describe('Instantiated autoNumeric functions', () => {
         let input3;
         let input4;
         let input5;
+        let input6;
+        let input7;
         let anInput1;
         let anInput2;
         let anInput3;
 
         beforeEach(() => { // Initialization
-            form = document.createElement('form');
+            form   = document.createElement('form');
             input1 = document.createElement('input');
             input2 = document.createElement('input');
             input3 = document.createElement('input');
             input4 = document.createElement('input');
             input5 = document.createElement('input');
+            input6 = document.createElement('input');
+            input7 = document.createElement('input');
 
             document.body.appendChild(form);
             form.appendChild(input1);
@@ -4607,12 +4611,16 @@ describe('Instantiated autoNumeric functions', () => {
             form.appendChild(input3);
             form.appendChild(input4);
             form.appendChild(input5);
+            form.appendChild(input6);
+            form.appendChild(input7);
 
             input1.name = 'aa';
             input2.name = 'bb';
             input3.name = 'cc';
             input4.name = 'ab';
             input5.name = 'bc';
+            input6.name = 'empty';
+            input7.name = 'zero';
 
             input1.value = '1111.11';
             expect(input1.value).toEqual('1111.11');
@@ -4622,12 +4630,16 @@ describe('Instantiated autoNumeric functions', () => {
             expect(input4.value).toEqual('not autoNumeric test');
             input5.value = 'not autoNumeric $1,234.567';
             expect(input5.value).toEqual('not autoNumeric $1,234.567');
+            expect(input6.value).toEqual('');
+            input7.value = 0;
+            expect(input7.value).toEqual('0');
 
             // Initiate only 3 autoNumeric inputs
             const anOptions = { digitGroupSeparator: '.', decimalCharacter: ',', currencySymbol: '€ ' };
             anInput1 = new AutoNumeric(input1, anOptions);
             anInput2 = new AutoNumeric(input2, anOptions);
             anInput3 = new AutoNumeric(input3, anOptions);
+            new AutoNumeric(input6, anOptions); // Check that an AutoNumeric-managed input does not show a `0` when the input is empty
 
             expect(input1.value).toEqual('€ 1.111,11');
             expect(anInput1.getFormatted()).toEqual('€ 1.111,11');
@@ -4644,45 +4656,47 @@ describe('Instantiated autoNumeric functions', () => {
             form.removeChild(input3);
             form.removeChild(input4);
             form.removeChild(input5);
+            form.removeChild(input6);
+            form.removeChild(input7);
             document.body.removeChild(form);
         });
 
         it(`'formNumericString()' should return the correct string, with unformatted values`, () => {
-            expect(anInput1.formNumericString()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
-            anInput1.update({ serializeSpaces : '%20' });
-            expect(anInput1.formNumericString()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not%20autoNumeric%20test&bc=not%20autoNumeric%20%241%2C234.567');
+            expect(anInput1.formNumericString()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567&empty=&zero=0');
+            anInput1.update({ serializeSpaces: '%20' });
+            expect(anInput1.formNumericString()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not%20autoNumeric%20test&bc=not%20autoNumeric%20%241%2C234.567&empty=&zero=0');
         });
 
         it(`'formFormatted()' should return the correct string, with formatted values`, () => {
-            expect(anInput1.formFormatted()).toEqual('aa=%E2%82%AC+1.111%2C11&bb=-%E2%82%AC+2.222%2C22&cc=%E2%82%AC+3.333%2C33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
-            anInput1.update({ serializeSpaces : '%20' });
-            expect(anInput1.formFormatted()).toEqual('aa=%E2%82%AC%201.111%2C11&bb=-%E2%82%AC%202.222%2C22&cc=%E2%82%AC%203.333%2C33&ab=not%20autoNumeric%20test&bc=not%20autoNumeric%20%241%2C234.567');
+            expect(anInput1.formFormatted()).toEqual('aa=%E2%82%AC+1.111%2C11&bb=-%E2%82%AC+2.222%2C22&cc=%E2%82%AC+3.333%2C33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567&empty=&zero=0');
+            anInput1.update({ serializeSpaces: '%20' });
+            expect(anInput1.formFormatted()).toEqual('aa=%E2%82%AC%201.111%2C11&bb=-%E2%82%AC%202.222%2C22&cc=%E2%82%AC%203.333%2C33&ab=not%20autoNumeric%20test&bc=not%20autoNumeric%20%241%2C234.567&empty=&zero=0');
         });
 
         it(`'formLocalized()' should return the correct string, with formatted values`, () => {
-            anInput1.update({ outputFormat : null });
-            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
-            anInput1.update({ outputFormat : 'string' });
-            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
-            anInput1.update({ outputFormat : 'number' });
-            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
-            expect(anInput1.formLocalized(',-')).toEqual('aa=1111%2C11&bb=2222%2C22-&cc=3333%2C33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
-            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
-            anInput1.update({ outputFormat : ',-' });
-            expect(anInput1.formLocalized()).toEqual('aa=1111%2C11&bb=2222%2C22-&cc=3333%2C33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
-            anInput1.update({ outputFormat : '.-' });
-            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=2222.22-&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
-            anInput1.update({ outputFormat : '-,' });
-            expect(anInput1.formLocalized()).toEqual('aa=1111%2C11&bb=-2222%2C22&cc=3333%2C33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
-            anInput1.update({ outputFormat : '-.' });
-            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567');
+            anInput1.update({ outputFormat: null });
+            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567&empty=&zero=0');
+            anInput1.update({ outputFormat: 'string' });
+            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567&empty=&zero=0');
+            anInput1.update({ outputFormat: 'number' });
+            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567&empty=&zero=0');
+            expect(anInput1.formLocalized(',-')).toEqual('aa=1111%2C11&bb=2222%2C22-&cc=3333%2C33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567&empty=&zero=0');
+            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567&empty=&zero=0');
+            anInput1.update({ outputFormat: ',-' });
+            expect(anInput1.formLocalized()).toEqual('aa=1111%2C11&bb=2222%2C22-&cc=3333%2C33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567&empty=&zero=0');
+            anInput1.update({ outputFormat: '.-' });
+            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=2222.22-&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567&empty=&zero=0');
+            anInput1.update({ outputFormat: '-,' });
+            expect(anInput1.formLocalized()).toEqual('aa=1111%2C11&bb=-2222%2C22&cc=3333%2C33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567&empty=&zero=0');
+            anInput1.update({ outputFormat: '-.' });
+            expect(anInput1.formLocalized()).toEqual('aa=1111.11&bb=-2222.22&cc=3333.33&ab=not+autoNumeric+test&bc=not+autoNumeric+%241%2C234.567&empty=&zero=0');
         });
 
         it(`'formArrayNumericString()' should return the correct array`, () => {
             const arrayResult = [
                 {
-                    name: 'aa',
-                    value: '1111.11' ,
+                    name : 'aa',
+                    value: '1111.11',
                 },
                 {
                     name : 'bb',
@@ -4693,12 +4707,20 @@ describe('Instantiated autoNumeric functions', () => {
                     value: '3333.33',
                 },
                 {
-                    name: 'ab',
+                    name : 'ab',
                     value: 'not autoNumeric test',
                 },
                 {
-                    name: 'bc',
+                    name : 'bc',
                     value: 'not autoNumeric $1,234.567',
+                },
+                {
+                    name : 'empty',
+                    value: '',
+                },
+                {
+                    name : 'zero',
+                    value: '0',
                 },
             ];
             expect(anInput1.formArrayNumericString()).toEqual(arrayResult);
@@ -4707,7 +4729,7 @@ describe('Instantiated autoNumeric functions', () => {
         it(`'formArrayFormatted()' should return the correct array`, () => {
             const arrayResult = [
                 {
-                    name: 'aa',
+                    name : 'aa',
                     value: '€ 1.111,11',
                 },
                 {
@@ -4719,12 +4741,20 @@ describe('Instantiated autoNumeric functions', () => {
                     value: '€ 3.333,33',
                 },
                 {
-                    name: 'ab',
+                    name : 'ab',
                     value: 'not autoNumeric test',
                 },
                 {
-                    name: 'bc',
+                    name : 'bc',
                     value: 'not autoNumeric $1,234.567',
+                },
+                {
+                    name : 'empty',
+                    value: '',
+                },
+                {
+                    name : 'zero',
+                    value: '0',
                 },
             ];
             expect(anInput1.formArrayFormatted()).toEqual(arrayResult);
@@ -4733,8 +4763,8 @@ describe('Instantiated autoNumeric functions', () => {
         it(`'formArrayLocalized()' should return the correct array`, () => {
             const arrayResult1 = [
                 {
-                    name: 'aa',
-                    value: '1111.11' ,
+                    name : 'aa',
+                    value: '1111.11',
                 },
                 {
                     name : 'bb',
@@ -4745,19 +4775,27 @@ describe('Instantiated autoNumeric functions', () => {
                     value: '3333.33',
                 },
                 {
-                    name: 'ab',
+                    name : 'ab',
                     value: 'not autoNumeric test',
                 },
                 {
-                    name: 'bc',
+                    name : 'bc',
                     value: 'not autoNumeric $1,234.567',
+                },
+                {
+                    name : 'empty',
+                    value: '',
+                },
+                {
+                    name : 'zero',
+                    value: '0',
                 },
             ];
             expect(anInput1.formArrayLocalized()).toEqual(arrayResult1);
             const arrayResult2 = [
                 {
-                    name: 'aa',
-                    value: '1111,11' ,
+                    name : 'aa',
+                    value: '1111,11',
                 },
                 {
                     name : 'bb',
@@ -4768,24 +4806,32 @@ describe('Instantiated autoNumeric functions', () => {
                     value: '3333,33',
                 },
                 {
-                    name: 'ab',
+                    name : 'ab',
                     value: 'not autoNumeric test',
                 },
                 {
-                    name: 'bc',
+                    name : 'bc',
                     value: 'not autoNumeric $1,234.567',
+                },
+                {
+                    name : 'empty',
+                    value: '',
+                },
+                {
+                    name : 'zero',
+                    value: '0',
                 },
             ];
             expect(anInput1.formArrayLocalized(',-')).toEqual(arrayResult2);
-            anInput1.update({ outputFormat : ',-' });
+            anInput1.update({ outputFormat: ',-' });
             expect(anInput1.formArrayLocalized()).toEqual(arrayResult2);
         });
 
         it(`'formJsonNumericString()' should return the correct JSON object`, () => {
             const jsonResult = JSON.stringify([
                 {
-                    name: 'aa',
-                    value: '1111.11' ,
+                    name : 'aa',
+                    value: '1111.11',
                 },
                 {
                     name : 'bb',
@@ -4796,12 +4842,20 @@ describe('Instantiated autoNumeric functions', () => {
                     value: '3333.33',
                 },
                 {
-                    name: 'ab',
+                    name : 'ab',
                     value: 'not autoNumeric test',
                 },
                 {
-                    name: 'bc',
+                    name : 'bc',
                     value: 'not autoNumeric $1,234.567',
+                },
+                {
+                    name : 'empty',
+                    value: '',
+                },
+                {
+                    name : 'zero',
+                    value: '0',
                 },
             ]);
             expect(anInput1.formJsonNumericString()).toEqual(jsonResult);
@@ -4810,7 +4864,7 @@ describe('Instantiated autoNumeric functions', () => {
         it(`'formJsonFormatted()' should return the correct JSON object`, () => {
             const jsonResult = JSON.stringify([
                 {
-                    name: 'aa',
+                    name : 'aa',
                     value: '€ 1.111,11',
                 },
                 {
@@ -4822,12 +4876,20 @@ describe('Instantiated autoNumeric functions', () => {
                     value: '€ 3.333,33',
                 },
                 {
-                    name: 'ab',
+                    name : 'ab',
                     value: 'not autoNumeric test',
                 },
                 {
-                    name: 'bc',
+                    name : 'bc',
                     value: 'not autoNumeric $1,234.567',
+                },
+                {
+                    name : 'empty',
+                    value: '',
+                },
+                {
+                    name : 'zero',
+                    value: '0',
                 },
             ]);
             expect(anInput1.formJsonFormatted()).toEqual(jsonResult);
@@ -4836,8 +4898,8 @@ describe('Instantiated autoNumeric functions', () => {
         it(`'formJsonLocalized()' should return the correct JSON object`, () => {
             const jsonResult1 = JSON.stringify([
                 {
-                    name: 'aa',
-                    value: '1111.11' ,
+                    name : 'aa',
+                    value: '1111.11',
                 },
                 {
                     name : 'bb',
@@ -4848,19 +4910,27 @@ describe('Instantiated autoNumeric functions', () => {
                     value: '3333.33',
                 },
                 {
-                    name: 'ab',
+                    name : 'ab',
                     value: 'not autoNumeric test',
                 },
                 {
-                    name: 'bc',
+                    name : 'bc',
                     value: 'not autoNumeric $1,234.567',
+                },
+                {
+                    name : 'empty',
+                    value: '',
+                },
+                {
+                    name : 'zero',
+                    value: '0',
                 },
             ]);
             expect(anInput1.formJsonLocalized()).toEqual(jsonResult1);
             const jsonResult2 = JSON.stringify([
                 {
-                    name: 'aa',
-                    value: '1111,11' ,
+                    name : 'aa',
+                    value: '1111,11',
                 },
                 {
                     name : 'bb',
@@ -4871,16 +4941,24 @@ describe('Instantiated autoNumeric functions', () => {
                     value: '3333,33',
                 },
                 {
-                    name: 'ab',
+                    name : 'ab',
                     value: 'not autoNumeric test',
                 },
                 {
-                    name: 'bc',
+                    name : 'bc',
                     value: 'not autoNumeric $1,234.567',
+                },
+                {
+                    name : 'empty',
+                    value: '',
+                },
+                {
+                    name : 'zero',
+                    value: '0',
                 },
             ]);
             expect(anInput1.formJsonLocalized(',-')).toEqual(jsonResult2);
-            anInput1.update({ outputFormat : ',-' });
+            anInput1.update({ outputFormat: ',-' });
             expect(anInput1.formJsonLocalized()).toEqual(jsonResult2);
         });
 
@@ -5886,6 +5964,7 @@ describe('Static autoNumeric functions', () => {
 
     describe('`unformat`', () => {
         it('should unformat with default options', () => {
+            expect(AutoNumeric.unformat('')).toEqual('');
             expect(AutoNumeric.unformat('$1,234,567.89')).toEqual(NaN);
             expect(AutoNumeric.unformat('$1,234.56')).toEqual(NaN);
             expect(AutoNumeric.unformat('$123.45')).toEqual(NaN);
@@ -5909,7 +5988,7 @@ describe('Static autoNumeric functions', () => {
             document.body.appendChild(newInput);
 
             // Run the tests
-            expect(AutoNumeric.unformat(newInput)).toEqual('0.00'); // An input value cannot be equal to `undefined`, but is transformed into '' when trying to retrieve the not defined `value` attribute
+            expect(AutoNumeric.unformat(newInput)).toEqual(''); // By default when an input value is not defined, `unformat` return the empty string. This allows to be coherent when serializing forms with empty inputs.
             newInput.value = '$1,234,567.89';
             expect(AutoNumeric.unformat(newInput)).toEqual(NaN);
             newInput.value = '$1,234.56';
@@ -5931,7 +6010,7 @@ describe('Static autoNumeric functions', () => {
             newInput.value = '$0.00';
             expect(AutoNumeric.unformat(newInput, { outputFormat : 'number' })).toEqual(NaN);
             newInput.value = null;
-            expect(AutoNumeric.unformat(newInput)).toEqual('0.00'); // An input value cannot be equal to 'null', but is transformed into ''
+            expect(AutoNumeric.unformat(newInput)).toEqual(''); // An input value cannot be equal to 'null', but is transformed into ''
             newInput.value = 1234.56;
             expect(AutoNumeric.unformat(newInput, { outputFormat : 'number' })).toEqual(1234.56);
             newInput.value = 0;
@@ -5947,7 +6026,7 @@ describe('Static autoNumeric functions', () => {
             document.body.appendChild(newInput);
 
             // Run the tests
-            expect(AutoNumeric.unformat(newInput)).toEqual('0.00'); // An input value cannot be equal to `undefined`, but is transformed into '' when trying to retrieve the not defined `value` attribute
+            expect(AutoNumeric.unformat(newInput)).toEqual(''); // By default when an input value is not defined, `unformat` return the empty string. This allows to be coherent when serializing forms with empty inputs.
             newInput.value = '$1,234,567.89';
             expect(AutoNumeric.unformat(newInput, { currencySymbol: '$' })).toEqual('1234567.89');
             newInput.value = '$1,234.56';
@@ -5969,7 +6048,7 @@ describe('Static autoNumeric functions', () => {
             newInput.value = '$0.00';
             expect(AutoNumeric.unformat(newInput, { outputFormat : 'number', currencySymbol: '$' })).toEqual(0);
             newInput.value = null;
-            expect(AutoNumeric.unformat(newInput, { outputFormat : 'number', currencySymbol: '$' })).toEqual(0); // An input value cannot be equal to 'null', but is transformed into ''
+            expect(AutoNumeric.unformat(newInput, { outputFormat : 'number', currencySymbol: '$' })).toEqual(''); // An input value cannot be equal to 'null', but is transformed into ''
             newInput.value = 1234.56;
             expect(AutoNumeric.unformat(newInput, { outputFormat : 'number', currencySymbol: '$' })).toEqual(1234.56);
             newInput.value = 0;
@@ -5980,6 +6059,7 @@ describe('Static autoNumeric functions', () => {
         });
 
         it('should unformat with a currency symbol options', () => {
+            expect(AutoNumeric.unformat('', { currencySymbol: '$' })).toEqual('');
             expect(AutoNumeric.unformat('$1,234,567.89', { currencySymbol: '$' })).toEqual('1234567.89');
             expect(AutoNumeric.unformat('$1,234.56', { currencySymbol: '$' })).toEqual('1234.56');
             expect(AutoNumeric.unformat('$123.45', { currencySymbol: '$' })).toEqual('123.45');

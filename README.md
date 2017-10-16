@@ -6,12 +6,13 @@ autoNumeric is a standalone Javascript library that provides live *as-you-type* 
 <br>
 [![NPM version][npm-image]][npm-url]
 [![Downloads][downloads-image]][downloads-url]
+[![jsDelivr Hits][jsdelivr-image]][jsdelivr-url]
 [![Build Status][travis-image]][travis-url]
 [![Known Vulnerabilities][snyk-image]][snyk-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
 <br>
 [![Gitter chat][gitter-image]][gitter-url]
-[![jsDelivr Hits](https://data.jsdelivr.com/v1/package/npm/autonumeric/badge?style=rounded)](https://www.jsdelivr.com/package/npm/autonumeric)
+
 
 The latest stable branch is always on `master`. Currently this is version [4.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>
 if you want to live dangerously, you can check out the latest development version in the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br>
@@ -946,3 +947,5 @@ Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] *(Robert)* 
 [patreon-image]: https://img.shields.io/badge/patreon-donate-orange.svg
 [browserstack-url]: https://www.browserstack.com
 [browserstack-image]: http://i.imgur.com/kjddhbT.png
+[jsdelivr-image]: https://data.jsdelivr.com/v1/package/npm/autonumeric/badge?style=rounded
+[jsdelivr-url]: https://www.jsdelivr.com/package/npm/autonumeric

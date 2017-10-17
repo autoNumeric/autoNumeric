@@ -533,6 +533,9 @@ describe('The autoNumeric object', () => {
             expect(() => aNInput.formatOther(27368)).not.toThrow();
             expect(() => aNInput.unformatOther('1.234.789,89 €')).not.toThrow();
             expect(() => aNInput.init(otherDomElement)).not.toThrow();
+            // Check that `getAutoNumericElement()` transparently selects the same object when passed a DOM element or a selector string
+            otherDomElement.id = 'idOtherDomElement';
+            expect(AutoNumeric.getAutoNumericElement(otherDomElement)).toEqual(AutoNumeric.getAutoNumericElement('#idOtherDomElement'));
             AutoNumeric.getAutoNumericElement(otherDomElement).remove(); // This prevent reinitializing an already initialized DOM element
             expect(() => aNInput.init(otherDomElement, false)).not.toThrow();
 
@@ -1077,6 +1080,8 @@ describe('The autoNumeric object', () => {
 
         it('should correctly initialize the AutoNumeric element', () => {
             const an = new AutoNumeric('input', 12300.789); //FIXME Move those tests in another test suite
+            an.node().id = 'idInputNode';
+            expect(AutoNumeric.test('#idInputNode')).toEqual(true); // Check that `test()` accept either a DOM element or a selector string
             expect(AutoNumeric.test(an.node())).toEqual(true);
             expect(an.getFormatted()).toEqual('12,300.79');
             an.french();

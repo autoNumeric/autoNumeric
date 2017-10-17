@@ -1195,6 +1195,23 @@ export default class AutoNumericHelper {
     }
 
     /**
+     * Return the DOM element when passed either a DOM element or a selector string.
+     *
+     * @param {HTMLElement|string} domElementOrSelector
+     * @returns {HTMLElement}
+     */
+    static domElement(domElementOrSelector) {
+        let domElement;
+        if (AutoNumericHelper.isString(domElementOrSelector)) {
+            domElement = document.querySelector(domElementOrSelector);
+        } else {
+            domElement = domElementOrSelector;
+        }
+
+        return domElement;
+    }
+
+    /**
      * Retrieve the current element value.
      *
      * @param {HTMLElement|HTMLInputElement|EventTarget} element

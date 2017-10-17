@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.12
++ Fix issue #514 Modify the static `getAutoNumericElement()`, `test()` and `isManagedByAutoNumeric()` functions so that they accept either a DOM element or a selector string
+
 ### 4.1.0-beta.11
 + Fix issue #455 Uncaught Error: `_initialCaretPosition()` should never be called when the `caretPositionOnFocus` option is `null`
 + Fix issue #512 AutoNumeric serialized data return `0` instead of an empty value on empty inputs

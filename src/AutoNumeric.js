@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.11
- * @date         2017-10-16 UTC 20:00
+ * @version      4.1.0-beta.12
+ * @date         2017-10-17 UTC 08:00
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -423,7 +423,7 @@ export default class AutoNumeric {
                     otherAutoNumericObject = domElementOrAutoNumericObject;
                 } else {
                     domElement = domElementOrAutoNumericObject;
-                    otherAutoNumericObject = AutoNumeric.getAutoNumericElement(domElementOrAutoNumericObject);
+                    otherAutoNumericObject = AutoNumeric.getAutoNumericElement(domElement);
                 }
 
                 // Check if the current autoNumeric object has a local list
@@ -476,7 +476,7 @@ export default class AutoNumeric {
                     otherAutoNumericObject = domElementOrAutoNumericObject;
                 } else {
                     domElement = domElementOrAutoNumericObject;
-                    otherAutoNumericObject = AutoNumeric.getAutoNumericElement(domElementOrAutoNumericObject);
+                    otherAutoNumericObject = AutoNumeric.getAutoNumericElement(domElement);
                 }
 
                 // Remove the other object from the local list
@@ -847,7 +847,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.11';
+        return '4.1.0-beta.12';
     }
 
     /**
@@ -2965,13 +2965,13 @@ export default class AutoNumeric {
 
     // Static methods
     /**
-     * Test if the given domElement is already managed by AutoNumeric (if it has been initialized on the current page).
+     * Test if the given DOM element, or the element selected by the given selector string is already managed by AutoNumeric (if it has been initialized on the current page).
      *
-     * @param {HTMLElement} domElement
+     * @param {HTMLElement|string} domElementOrSelector Accepts either directly a DOM element to test, or a string selector (that will return one and only one element, if any)
      * @returns {boolean}
      */
-    static test(domElement) {
-        return this._isInGlobalList(domElement);
+    static test(domElementOrSelector) {
+        return this._isInGlobalList(AutoNumericHelper.domElement(domElementOrSelector));
     }
 
     /**
@@ -3975,21 +3975,25 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Return `true` if the given DOM element has an AutoNumeric object that manages it.
+     * This function also accepts a selector string.
      *
-     * @param {HTMLElement} domElement
+     * @param {HTMLElement|string} domElementOrSelector Accepts either directly a DOM element to test, or a string selector (that will return one and only one element, if any)
      * @returns {boolean}
      */
-    static isManagedByAutoNumeric(domElement) { //FIXME test this
-        return this._isInGlobalList(domElement);
+    static isManagedByAutoNumeric(domElementOrSelector) { //FIXME test this
+        return this._isInGlobalList(AutoNumericHelper.domElement(domElementOrSelector));
     }
 
     /**
      * Return the AutoNumeric object that manages the given DOM element.
+     * This function also accepts a selector string.
      *
-     * @param {HTMLElement} domElement
+     * @param {HTMLElement|string} domElementOrSelector Accepts either directly a DOM element to test, or a string selector (that will return one and only one element, if any)
      * @returns {null|AutoNumeric}
      */
-    static getAutoNumericElement(domElement) { //FIXME test this
+    static getAutoNumericElement(domElementOrSelector) {
+        const domElement = AutoNumericHelper.domElement(domElementOrSelector);
+
         if (!this.isManagedByAutoNumeric(domElement)) {
             return null;
         }

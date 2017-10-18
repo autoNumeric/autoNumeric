@@ -2,6 +2,7 @@
 
 ### 4.1.0-beta.12
 + Fix issue #514 Modify the static `getAutoNumericElement()`, `test()` and `isManagedByAutoNumeric()` functions so that they accept either a DOM element or a selector string
++ Fix issue #515 Add the static `set` and `get*` functions
 
 ### 4.1.0-beta.11
 + Fix issue #455 Uncaught Error: `_initialCaretPosition()` should never be called when the `caretPositionOnFocus` option is `null`

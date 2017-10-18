@@ -2,7 +2,7 @@
  *               AutoNumeric.js
  *
  * @version      4.1.0-beta.12
- * @date         2017-10-17 UTC 08:00
+ * @date         2017-10-18 UTC 08:00
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -4001,6 +4001,107 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         return this._getFromGlobalList(domElement);
     }
 
+    /**
+     * Set the given element value, and format it immediately.
+     * Return `null` if no AutoNumeric object is found, else, return the AutoNumeric object.
+     *
+     * @param {HTMLElement|string} domElementOrSelector Either a DOM element reference, or a selector string can be used
+     * @param {number|string|null} newValue The value must be a Number, a numeric string or `null` (if `emptyInputBehavior` is set to `'null'`)
+     * @param {object} options A settings object that will override the current settings. Note: the update is done only if the `newValue` is defined.
+     * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history table
+     * @returns {AutoNumeric|null}
+     */
+    static set(domElementOrSelector, newValue, options = null, saveChangeToHistory = true) {
+        const domElement = AutoNumericHelper.domElement(domElementOrSelector);
+
+        if (!this.isManagedByAutoNumeric(domElement)) {
+            let showWarnings;
+            if (!AutoNumericHelper.isNull(options) && options.hasOwnProperty('showWarnings')) {
+                showWarnings = options.showWarnings;
+            } else {
+                showWarnings = true;
+            }
+
+            AutoNumericHelper.warning(`Impossible to find an AutoNumeric object for the given DOM element or selector.`, showWarnings);
+
+            return null;
+        }
+
+        return this.getAutoNumericElement(domElement).set(newValue, options, saveChangeToHistory);
+    }
+
+    /**
+     * Return the unformatted value as a string from the given DOM element or query selector.
+     * This can also return `null` if `rawValue` is null.
+     *
+     * @param {HTMLElement|string} domElementOrSelector
+     * @param {function|null} callback
+     * @returns {string|null}
+     */
+    static getNumericString(domElementOrSelector, callback = null) {
+        return this._get(domElementOrSelector, AutoNumeric.getNumericString.name, callback);
+    }
+
+    /**
+     * Return the current formatted value of the AutoNumeric element as a string, from the given DOM element or query selector.
+     *
+     * @param {HTMLElement|string} domElementOrSelector
+     * @param {function|null} callback
+     * @returns {string}
+     */
+    static getFormatted(domElementOrSelector, callback = null) {
+        return this._get(domElementOrSelector, AutoNumeric.getFormatted.name, callback);
+    }
+
+    /**
+     * Return the element unformatted value as a real Javascript number, from the given DOM element or query selector.
+     * Warning: This can lead to precision problems with big numbers that should be stored as strings.
+     *
+     * @param {HTMLElement|string} domElementOrSelector
+     * @param {function|null} callback
+     * @returns {number|null}
+     */
+    static getNumber(domElementOrSelector, callback = null) {
+        return this._get(domElementOrSelector, AutoNumeric.getNumber.name, callback);
+    }
+
+    /**
+     * DRY the code between the static `get*` functions
+     *
+     * @param {HTMLElement|string} domElementOrSelector
+     * @param {string} getFunction The name of the non-static `get*` function as a string
+     * @param {function|null} callback
+     * @returns {*}
+     * @private
+     */
+    static _get(domElementOrSelector, getFunction, callback = null) {
+        const domElement = AutoNumericHelper.domElement(domElementOrSelector);
+
+        if (!this.isManagedByAutoNumeric(domElement)) {
+            AutoNumericHelper.throwError(`Impossible to find an AutoNumeric object for the given DOM element or selector.`);
+        }
+
+        return this.getAutoNumericElement(domElement)[getFunction](callback);
+    }
+
+    /**
+     * Returns the unformatted value following the `outputFormat` setting, from the given DOM element or query selector.
+     * See the non-static `getLocalized()` method documentation for more details.
+     *
+     * @param {HTMLElement|string} domElementOrSelector
+     * @param {null|string|function} forcedOutputFormat
+     * @param {function|null} callback
+     * @returns {*}
+     */
+    static getLocalized(domElementOrSelector, forcedOutputFormat = null, callback = null) {
+        const domElement = AutoNumericHelper.domElement(domElementOrSelector);
+
+        if (!this.isManagedByAutoNumeric(domElement)) {
+            AutoNumericHelper.throwError(`Impossible to find an AutoNumeric object for the given DOM element or selector.`);
+        }
+
+        return this.getAutoNumericElement(domElement).getLocalized(forcedOutputFormat, callback);
+    }
 
     // Pre-defined options can be called to update the current default options with their specificities
     //XXX A better way would be to not initialize first, but that's not possible since `new` is called first and we do not pass the language options (ie. `French`) to the constructor

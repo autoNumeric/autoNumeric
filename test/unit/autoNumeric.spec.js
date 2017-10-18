@@ -6516,6 +6516,133 @@ describe('Static autoNumeric functions', () => {
         });
     });
 
+    describe('`set`', () => {
+        it('should set the given value on the AutoNumeric element', () => {
+            // Create a form element, 3 inputs, and only 2 autoNumeric ones
+            const theForm = document.createElement('form');
+            document.body.appendChild(theForm);
+            const input1 = document.createElement('input');
+            input1.id = 'inputSet1';
+            const input2 = document.createElement('input');
+            input2.id = 'inputSet2';
+            theForm.appendChild(input1);
+            theForm.appendChild(input2);
+            
+            // Initialize the two autoNumeric inputs
+            const aNInput1 = new AutoNumeric(input1);
+            const aNInput2 = new AutoNumeric(input2);
+            
+            expect(aNInput1.getNumericString()).toEqual('');
+            expect(aNInput2.getNumericString()).toEqual('');
+            AutoNumeric.set('#inputSet1', 1234578.32);
+            expect(aNInput1.getNumericString()).toEqual('1234578.32');
+
+            spyOn(console, 'warn');
+            AutoNumeric.set('#inputSet2', null);
+            expect(console.warn).toHaveBeenCalledTimes(1);
+            expect(aNInput2.getNumericString()).toEqual('');
+            AutoNumeric.set('#inputSet2', null, { emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
+            expect(aNInput2.getNumericString()).toEqual(null);
+
+            // Remove the 3 inputs and the form elements
+            theForm.removeChild(input1);
+            theForm.removeChild(input2);
+            document.body.removeChild(theForm);
+        });
+
+        it('should not set any value on non-AutoNumeric elements', () => {
+            // Create a form element and one non-AutoNumeric input
+            const theForm = document.createElement('form');
+            document.body.appendChild(theForm);
+            const theInput = document.createElement('input');
+            theInput.id = 'inputSet';
+            theForm.appendChild(theInput);
+
+            expect(theInput.value).toEqual('');
+            spyOn(console, 'warn');
+            AutoNumeric.set('#inputSet3', 42);
+            expect(console.warn).toHaveBeenCalledTimes(1);
+            expect(theInput.value).toEqual('');
+            expect(AutoNumeric.set('#inputSet', 42)).toBeNull();
+            expect(console.warn).toHaveBeenCalledTimes(2);
+
+            // Remove the input and the form elements
+            theForm.removeChild(theInput);
+            document.body.removeChild(theForm);
+        });
+    });
+
+    describe('static `get*` functions', () => {
+        let aNInput;
+        let newInput;
+        let anotherInput;
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            newInput.id = 'theNewInputId';
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput).french(); // Initiate the autoNumeric input
+
+            anotherInput = document.createElement('input');
+            anotherInput.id = 'anotherInputId';
+            document.body.appendChild(anotherInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            document.body.removeChild(newInput);
+            document.body.removeChild(anotherInput);
+        });
+
+        it('`getNumericString` should return the numeric string', () => {
+            aNInput.set(1234567.89);
+            expect(AutoNumeric.getNumericString('#theNewInputId')).toEqual(aNInput.getNumericString());
+            aNInput.set(0);
+            expect(AutoNumeric.getNumericString('#theNewInputId')).toEqual(aNInput.getNumericString());
+        });
+
+        it('`getFormatted` should return the formatted value', () => {
+            aNInput.set(1234567.89);
+            expect(AutoNumeric.getFormatted('#theNewInputId')).toEqual(aNInput.getFormatted());
+            aNInput.set(0);
+            expect(AutoNumeric.getFormatted('#theNewInputId')).toEqual(aNInput.getFormatted());
+        });
+
+        it('`getNumber` should return a number', () => {
+            aNInput.set(1234567.89);
+            expect(AutoNumeric.getNumber('#theNewInputId')).toEqual(aNInput.getNumber());
+            aNInput.set(0);
+            expect(AutoNumeric.getNumber('#theNewInputId')).toEqual(aNInput.getNumber());
+        });
+
+        it('`getLocalized` should return a localized string', () => {
+            aNInput.set(1234567.89);
+            expect(AutoNumeric.getLocalized('#theNewInputId')).toEqual(aNInput.getLocalized());
+            aNInput.set(0);
+            expect(AutoNumeric.getLocalized('#theNewInputId')).toEqual(aNInput.getLocalized());
+        });
+
+        it('`getNumericString` should throw when trying to get a non-AutoNumeric-managed element', () => {
+            expect(() => AutoNumeric.getNumericString('#anotherInputId')).toThrow();
+            expect(() => AutoNumeric.getNumericString('#nonExistentId')).toThrow();
+        });
+
+        it('`getFormatted` should throw when trying to get a non-AutoNumeric-managed element', () => {
+            expect(() => AutoNumeric.getFormatted('#anotherInputId')).toThrow();
+            expect(() => AutoNumeric.getFormatted('#nonExistentId')).toThrow();
+        });
+
+        it('`getNumber` should throw when trying to get a non-AutoNumeric-managed element', () => {
+            expect(() => AutoNumeric.getNumber('#anotherInputId')).toThrow();
+            expect(() => AutoNumeric.getNumber('#nonExistentId')).toThrow();
+        });
+
+        it('`getLocalized` should throw when trying to get a non-AutoNumeric-managed element', () => {
+            expect(() => AutoNumeric.getLocalized('#anotherInputId')).toThrow();
+            expect(() => AutoNumeric.getLocalized('#nonExistentId')).toThrow();
+        });
+    });
+
     describe('`validate`', () => {
         it('should validate any old setting name, while outputting a warning', () => {
             const oldOptionObject = { aSep: ' ' };

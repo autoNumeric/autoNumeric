@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.12
+ * @version      4.1.0-beta.13
  * @date         2017-10-18 UTC 08:00
  *
  * @authors      Bob Knothe, Alexandre Bonneau
@@ -847,7 +847,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.12';
+        return '4.1.0-beta.13';
     }
 
     /**
@@ -6618,7 +6618,14 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     _onDrop(e) {
         this.isDropEvent = true;
         e.preventDefault();
-        const droppedText = e.dataTransfer.getData('text/plain');
+        let format;
+        if (AutoNumericHelper.isIE11()) {
+            format = 'text';
+        } else {
+            format = 'text/plain';
+        }
+
+        const droppedText = e.dataTransfer.getData(format);
         const cleanedValue = this.unformatOther(droppedText);
         this.set(cleanedValue);
         this.isDropEvent = false;

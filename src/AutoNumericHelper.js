@@ -188,6 +188,17 @@ export default class AutoNumericHelper {
     }
 
     /**
+     * Return `true` if the current browser is the obsolete Internet Explorer 11 (IE11) one
+     * cf. https://stackoverflow.com/a/21825207/2834898
+     *
+     * @returns {boolean}
+     */
+    static isIE11() {
+        // noinspection JSUnresolvedVariable
+        return !!window.MSInputMethodContext && !!document.documentMode;
+    }
+
+    /**
      * Return `true` is the string `str` contains the string `needle`
      * Note: this function does not coerce the parameters types
      *

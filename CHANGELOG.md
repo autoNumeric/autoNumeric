@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.13
++ Fix issue #518 'Drag-and-Drop' operation does not work in IE11
+
 ### 4.1.0-beta.12
 + Fix issue #514 Modify the static `getAutoNumericElement()`, `test()` and `isManagedByAutoNumeric()` functions so that they accept either a DOM element or a selector string
 + Fix issue #515 Add the static `set` and `get*` functions

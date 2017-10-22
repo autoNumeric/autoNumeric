@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.14
++ Fix issue #516 'Del' key does not work in IE browser
+
 ### 4.1.0-beta.13
 + Fix issue #518 'Drag-and-Drop' operation does not work in IE11
 

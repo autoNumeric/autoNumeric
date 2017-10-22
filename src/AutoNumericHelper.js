@@ -393,8 +393,8 @@ export default class AutoNumericHelper {
                     break;
                 case 'Del':
                     browser = this.browser();
-                    if ((browser.name = 'firefox' && browser.version <= 36) ||
-                        (browser.name = 'ie' && browser.version <= 9)) {
+                    if ((browser.name === 'firefox' && browser.version <= 36) ||
+                        (browser.name === 'ie' && browser.version <= 9)) {
                         // Special workaround for the obsolete browser IE11 which output a 'Delete' key when using the numpad 'dot' one! This fixes issue #401
                         // This workaround break the usage of the 'Delete' key for Firefox <=36, and IE9, since those browser send 'Del' instead of 'Delete', therefore we only use it for those obsolete browsers
                         result = AutoNumericEnum.keyName.Dot;

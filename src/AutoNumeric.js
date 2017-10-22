@@ -2,7 +2,7 @@
  *               AutoNumeric.js
  *
  * @version      4.1.0-beta.14
- * @date         2017-10-22 UTC 11:22
+ * @date         2017-10-22 UTC 22:22
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -3245,8 +3245,7 @@ export default class AutoNumeric {
         }
 
         if ((options.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.never ||
-            options.allowDecimalPadding === 'false' || //TODO Make sure for the other options that 'false' and 'true' are correctly taken into account
-            options.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.floats) &&
+            options.allowDecimalPadding === 'false') &&
             (options.decimalPlaces !== AutoNumeric.options.decimalPlaces.none ||
             options.decimalPlacesShownOnBlur !== AutoNumeric.options.decimalPlacesShownOnBlur.none ||
             options.decimalPlacesShownOnFocus !== AutoNumeric.options.decimalPlacesShownOnFocus.none)) {

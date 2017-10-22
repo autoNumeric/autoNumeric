@@ -2,6 +2,7 @@
 
 ### 4.1.0-beta.14
 + Fix issue #516 'Del' key does not work in IE browser
++ Fix issue #509 `allowDecimalPadding` set to `'floats'` when `decimalPlaces` is different from `0` output a warning
 
 ### 4.1.0-beta.13
 + Fix issue #518 'Drag-and-Drop' operation does not work in IE11

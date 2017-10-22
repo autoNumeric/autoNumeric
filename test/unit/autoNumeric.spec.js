@@ -1354,7 +1354,7 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual('-1.234.567,8\u202f€');
             aNInput.set(-1234567);
             aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.floats);
-            expect(console.warn).toHaveBeenCalledTimes(3);
+            expect(console.warn).toHaveBeenCalledTimes(2);
             expect(aNInput.getFormatted()).toEqual('-1.234.567\u202f€');
             aNInput.set(-1234567.8);
             expect(aNInput.getFormatted()).toEqual('-1.234.567,80\u202f€');
@@ -1367,7 +1367,7 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getNumber()).toEqual(null);
             // Special case where changing the `emptyInputBehavior` option to something different from `AutoNumeric.options.emptyInputBehavior.null` while the rawValue is equal to `null`, modify that rawValue to '' automatically
             aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.focus);
-            expect(console.warn).toHaveBeenCalledTimes(4);
+            expect(console.warn).toHaveBeenCalledTimes(3);
             expect(aNInput.getFormatted()).toEqual('');
             expect(aNInput.getNumber()).toEqual(0);
 
@@ -6864,6 +6864,7 @@ describe('Static autoNumeric functions', () => {
 
             expect(() => AutoNumeric.validate({ allowDecimalPadding: true })).not.toThrow();
             expect(() => AutoNumeric.validate({ allowDecimalPadding: 'true' })).not.toThrow();
+            // The allowDecimalPadding tests with the `false` value is done in the next test, since it outputs a warning
 
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: null })).not.toThrow();
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '(,)' })).not.toThrow();
@@ -7003,20 +7004,29 @@ describe('Static autoNumeric functions', () => {
         it('should validate, with warnings', () => {
             spyOn(console, 'warn');
             expect(() => AutoNumeric.validate({ decimalPlaces: '3', decimalPlacesShownOnFocus: '2' })).not.toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(1);
             expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never, decimalPlaces: '2' })).not.toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(2);
 
             expect(() => AutoNumeric.validate({ selectOnFocus: AutoNumeric.options.selectOnFocus.select, caretPositionOnFocus: AutoNumeric.options.caretPositionOnFocus.decimalLeft })).not.toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(3);
             expect(() => AutoNumeric.validate({}, true, { selectOnFocus: AutoNumeric.options.selectOnFocus.select, caretPositionOnFocus: AutoNumeric.options.caretPositionOnFocus.decimalLeft })).not.toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(4);
 
             expect(() => AutoNumeric.validate({ decimalPlacesRawValue: '0' })).not.toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(5);
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: '0' })).not.toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(6);
 
-            expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats })).not.toThrow();
             expect(() => AutoNumeric.validate({ allowDecimalPadding: false })).not.toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(7);
             expect(() => AutoNumeric.validate({ allowDecimalPadding: 'false' })).not.toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(8);
+        });
 
-            expect(console.warn).toHaveBeenCalled();
-            expect(console.warn).toHaveBeenCalledTimes(9);
+        it('should validate, without warnings', () => {
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats })).not.toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats, decimalPlaces: '2' })).not.toThrow();
         });
 
         it('should not validate', () => {

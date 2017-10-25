@@ -36,7 +36,7 @@ import AutoNumericOptions from './AutoNumericOptions';
  * The defaults options.
  * These can be overridden by the following methods:
  * - HTML5 data attributes (ie. `<input type="text" data-currency-symbol=" €">`)
- * - Options passed to the `update` method (ie. `anElement.update({ currencySymbol: ' €' });`), or simply during the initialization (ie. `new AutoNumeric(domElement, {options});`)
+ * - Options passed to the `update` method (ie. `anElement.update({ currencySymbol: ' €' });`), or simply during the initialization (ie. `new AutoNumeric(domElement, { options });`)
  */
 Object.defineProperty(AutoNumeric, 'defaultSettings', {
     get() {

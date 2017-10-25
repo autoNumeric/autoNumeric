@@ -56,7 +56,7 @@ const japanese = { // 日本語
 };
 
 
-// Here we need to clone the initial objects in order to be able to edit it without affecting it
+// Here we need to clone the initial objects in order to be able to edit the clones without affecting the originals
 const euroPos                         = AutoNumericHelper.cloneObject(euro);
 euroPos.minimumValue                  = 0;
 const euroNeg                         = AutoNumericHelper.cloneObject(euro);

@@ -361,6 +361,7 @@ You can check what are the predefined choices for each option as well as a more 
 | `unformatOnHover` | Defines if the element value should be unformatted when the user hover his mouse over it while holding the `Alt` key | `true` |
 | `unformatOnSubmit` | Removes formatting on submit event | `false` |
 | `valuesToStrings` | Provide a way for automatically and transparently replacing the formatted value with a pre-defined string, when the raw value is equal to a specific value.<br>For instance when using `{ 0: '-' }`, the hyphen `'-'` is displayed when the `rawValue` is equal to `0`. Multiple 'replacements' can be defined. | `null` |
+| `wheelOn` | Used in conjonction with the `modifyValueOnWheel` option, defines when the wheel event will increment or decrement the element value, either when the element is focused, or hovered | `'focus'` |
 | `wheelStep` | Used in conjonction with the `modifyValueOnWheel` option, this allow to either define a *fixed* step (ie. `1000`), or a *progressive* one that is calculated based on the size of the current value | `'progressive'` |
 
 #### Predefined options

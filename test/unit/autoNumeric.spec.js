@@ -127,6 +127,7 @@ describe('The autoNumeric object', () => {
             unformatOnHover              : true,
             unformatOnSubmit             : false,
             valuesToStrings              : null,
+            wheelOn                      : 'focus',
             wheelStep                    : 'progressive',
         };
 
@@ -281,6 +282,7 @@ describe('The autoNumeric object', () => {
             expect(defaultSettings.unformatOnHover           ).toEqual(aNInputSettings.unformatOnHover            );
             expect(defaultSettings.unformatOnSubmit          ).toEqual(aNInputSettings.unformatOnSubmit           );
             expect(defaultSettings.valuesToStrings           ).toEqual(aNInputSettings.valuesToStrings            );
+            expect(defaultSettings.wheelOn                   ).toEqual(aNInputSettings.wheelOn                    );
             expect(defaultSettings.wheelStep                 ).toEqual(aNInputSettings.wheelStep                  );
         });
 
@@ -2871,6 +2873,7 @@ describe('autoNumeric options and `options.*` methods', () => {
      serializeSpaces
      showWarnings
      unformatOnHover
+     wheelOn
      wheelStep
      */
 });
@@ -7034,6 +7037,9 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ modifyValueOnWheel: 'true' })).not.toThrow();
             expect(() => AutoNumeric.validate({ modifyValueOnWheel: 'false' })).not.toThrow();
 
+            expect(() => AutoNumeric.validate({ wheelOn: 'focus' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ wheelOn: 'hover' })).not.toThrow();
+
             expect(() => AutoNumeric.validate({ wheelStep: 'progressive' })).not.toThrow();
             expect(() => AutoNumeric.validate({ wheelStep: '1000' })).not.toThrow();
             expect(() => AutoNumeric.validate({ wheelStep: '422.345' })).not.toThrow();
@@ -7424,6 +7430,13 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ modifyValueOnWheel: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ modifyValueOnWheel: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ modifyValueOnWheel: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ wheelOn: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ wheelOn: true })).toThrow();
+            expect(() => AutoNumeric.validate({ wheelOn: false })).toThrow();
+            expect(() => AutoNumeric.validate({ wheelOn: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ wheelOn: -42 })).toThrow();
+            expect(() => AutoNumeric.validate({ wheelOn: '-42.67' })).toThrow();
 
             expect(() => AutoNumeric.validate({ wheelStep: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ wheelStep: true })).toThrow();

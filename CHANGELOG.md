@@ -1,5 +1,11 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.16
++ Fix issue #456 Change the `modifyValueOnWheel` default behaviour to act only when the element is focused
++ Add a new `wheelOn` option that will define when the `wheel` event will increment/decrement the element value.
+  By default the `wheel` event is only used when the element is focused (`wheelOn` is set to `'focus'`), but you can also use the `'hover'` option if you want to keep the previous behavior.
+  Note: There is a small caveat since the `Shift + mouse wheel event` is reserved by browsers for horizontal scrolling, using the `Shift` key and the `wheelOn` option set to `'hover'` will only scroll the page while the mouse *is hovered* over the AutoNumeric-managed element. Once it out of the way, the page won't scroll since you'll be holding the `Shift` key. You'll then be able to scroll the page normally without having to hold the `Shift` key.
+
 ### 4.1.0-beta.15
 + Fix issue #513 Setting the input `value` directly with Javascript without using the `set()` method is not supported
   From now on, if an external change is detected when a script modify the input `value` attribute directly, AutoNumeric tries to format the new value.

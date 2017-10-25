@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.15
- * @date         2017-10-25 UTC 02:55
+ * @version      4.1.0-beta.16
+ * @date         2017-10-25 UTC 20:30
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -833,8 +833,13 @@ export default class AutoNumeric {
 
                 return this;
             },
-            valuesToStrings               : valuesToStrings => {
+            valuesToStrings              : valuesToStrings => {
                 this.update({ valuesToStrings });
+
+                return this;
+            },
+            wheelOn                      : wheelOn => {
+                this.settings.wheelOn = wheelOn; //FIXME test this
 
                 return this;
             },
@@ -852,7 +857,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.15';
+        return '4.1.0-beta.16';
     }
 
     /**
@@ -3673,6 +3678,13 @@ export default class AutoNumeric {
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.modifyValueOnWheel) && !AutoNumericHelper.isBoolean(options.modifyValueOnWheel)) {
             AutoNumericHelper.throwError(`The increment/decrement on mouse wheel option 'modifyValueOnWheel' is invalid ; it should be either 'false' or 'true', [${options.modifyValueOnWheel}] given.`);
+        }
+
+        if (!AutoNumericHelper.isInArray(options.wheelOn, [
+            AutoNumeric.options.wheelOn.focus,
+            AutoNumeric.options.wheelOn.hover,
+        ])) {
+            AutoNumericHelper.throwError(`The wheel behavior option 'wheelOn' is invalid ; it should either be 'focus' or 'hover', [${options.wheelOn}] given.`);
         }
 
         if (!(AutoNumericHelper.isString(options.wheelStep) || AutoNumericHelper.isNumber(options.wheelStep)) ||
@@ -6632,81 +6644,107 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {WheelEvent} e
      */
     _onWheel(e) {
-        // If the user is using the 'Shift' key modifier, then we ignore the wheel event
-        // This special behavior is applied in order to avoid preventing the user to scroll the page if the inputs are covering the whole available space.
-        // If that's the case, then he can use the 'Shift' modifier key while using the mouse wheel in order to bypass the increment/decrement feature
-        // This is useful on small screen where some badly configured inputs could use all the available space.
-        if (!e.shiftKey && this.settings.modifyValueOnWheel) {
-            this.isWheelEvent = true; // Keep the info that we are currently managing a mouse wheel event
-
-            // 0) First, save the caret position so we can set it back once the value has been changed
-            const selectionStart = e.target.selectionStart || 0;
-            const selectionEnd = e.target.selectionEnd || 0;
-
-            // 1) Get the unformatted value
-            const currentUnformattedValue = this.rawValue;
-
-            let result;
-            if (AutoNumericHelper.isUndefinedOrNullOrEmpty(currentUnformattedValue)) {
-                // If by default the input is empty, start at '0'
-                if (this.settings.minimumValue > 0 || this.settings.maximumValue < 0) {
-                    // or if '0' is not between min and max value, 'minimumValue' if the user does a wheelup, 'maximumValue' if the user does a wheeldown
-                    if (AutoNumericHelper.isWheelUpEvent(e)) {
-                        result = this.settings.minimumValue;
-                    } else if (AutoNumericHelper.isWheelDownEvent(e)) {
-                        result = this.settings.maximumValue;
-                    } else {
-                        AutoNumericHelper.throwError(`The event is not a 'wheel' event.`);
+        if (this.settings.modifyValueOnWheel) {
+            if (this.settings.wheelOn === AutoNumeric.options.wheelOn.focus) {
+                if (this.isFocused) {
+                    if (!e.shiftKey) {
+                        this.wheelAction(e);
                     }
+                } else if (e.shiftKey) {
+                    this.wheelAction(e);
+                }
+            } else if (this.settings.wheelOn === AutoNumeric.options.wheelOn.hover) {
+                if (!e.shiftKey) {
+                    this.wheelAction(e);
                 } else {
-                    result = 0;
+                    // Note: When not `defaultPrevented`, Shift + mouse wheel is reserved by the browsers for horizontal scrolling.
+                    // Hence, using the Shift key with the `wheelOn` 'hover' option will only scroll the page if we prevent the default behavior
+                    e.preventDefault(); // Do not scroll horizontally
+
+                    // Scroll vertically
+                    window.scrollBy(0, AutoNumericHelper.isNegativeStrict(String(e.deltaY))?-50:50); // `e.deltaY` is usually too small compared to how the page is scrolled. That's why we use a fixed offset.
                 }
             } else {
-                result = currentUnformattedValue;
+                AutoNumericHelper.throwError('Unknown `wheelOn` option.');
             }
-
-            result = +result; // Typecast to a number needed for the following addition/subtraction
-
-            // 2) Increment/Decrement the value
-            // But first, choose the increment/decrement method ; fixed or progressive
-            if (AutoNumericHelper.isNumber(this.settings.wheelStep)) {
-                const step = +this.settings.wheelStep; // Typecast to a number needed for the following addition/subtraction
-                // Fixed method
-                // This is the simplest method, where a fixed offset in added/subtracted from the current value
-                if (AutoNumericHelper.isWheelUpEvent(e)) { // Increment
-                    result += step;
-                } else if (AutoNumericHelper.isWheelDownEvent(e)) { // Decrement
-                    result -= step;
-                }
-            } else {
-                // Progressive method
-                // For this method, we calculate an offset that is in relation to the size of the current number (using only the integer part size).
-                // The bigger the number, the bigger the offset (usually the number count in the integer part minus 3, except for small numbers where a different behavior is better for the user experience).
-                //TODO Known limitation : The progressive method does not play well with numbers between 0 and 1 where to modify the decimal places the rawValue first has to go from '1' to '0'
-                if (AutoNumericHelper.isWheelUpEvent(e)) { // Increment
-                    result = AutoNumericHelper.addAndRoundToNearestAuto(result, this.settings.decimalPlacesRawValue);
-                } else if (AutoNumericHelper.isWheelDownEvent(e)) { // Decrement
-                    result = AutoNumericHelper.subtractAndRoundToNearestAuto(result, this.settings.decimalPlacesRawValue);
-                }
-            }
-
-            // 3) Set the new value so it gets formatted
-            // First clamp the result if needed
-            result = AutoNumericHelper.clampToRangeLimits(result, this.settings);
-            if (result !== +currentUnformattedValue) {
-                // Only 'set' the value if it has changed. For instance 'set' should not happen if the user hits a limit and continue to try to go past it since we clamp the value.
-                this.set(result);
-            }
-
-            //XXX Do not prevent if the value is not modified? From a UX point of view, preventing the wheel event when the user use it on top of an autoNumeric element should always be done, even if the value does not change. Perhaps that could affect other scripts relying on this event to be sent though.
-            e.preventDefault(); // We prevent the page to scroll while we increment/decrement the value
-
-            // 4) Finally, we set back the caret position/selection
-            // There is no need to take into account the fact that the number count could be different at the end of the wheel event ; it would be too complex and most of the time unreliable
-            this._setSelection(selectionStart, selectionEnd);
-
-            this.isWheelEvent = false; // Set back the mouse wheel indicator to its default
         }
+    }
+
+    /**
+     * Increment or decrement the element value according to the `wheelStep` option chosen
+     *
+     * @param {WheelEvent} e The `wheel` event
+     */
+    wheelAction(e) {
+        this.isWheelEvent = true; // Keep the info that we are currently managing a mouse wheel event
+
+        // 0) First, save the caret position so we can set it back once the value has been changed
+        const selectionStart = e.target.selectionStart || 0;
+        const selectionEnd = e.target.selectionEnd || 0;
+
+        // 1) Get the unformatted value
+        const currentUnformattedValue = this.rawValue;
+
+        let result;
+        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(currentUnformattedValue)) {
+            // If by default the input is empty, start at '0'
+            if (this.settings.minimumValue > 0 || this.settings.maximumValue < 0) {
+                // or if '0' is not between min and max value, 'minimumValue' if the user does a wheelup, 'maximumValue' if the user does a wheeldown
+                if (AutoNumericHelper.isWheelUpEvent(e)) {
+                    result = this.settings.minimumValue;
+                } else if (AutoNumericHelper.isWheelDownEvent(e)) {
+                    result = this.settings.maximumValue;
+                } else {
+                    AutoNumericHelper.throwError(`The event is not a 'wheel' event.`);
+                }
+            } else {
+                result = 0;
+            }
+        } else {
+            result = currentUnformattedValue;
+        }
+
+        result = +result; // Typecast to a number needed for the following addition/subtraction
+
+        // 2) Increment/Decrement the value
+        // But first, choose the increment/decrement method ; fixed or progressive
+        if (AutoNumericHelper.isNumber(this.settings.wheelStep)) {
+            const step = +this.settings.wheelStep; // Typecast to a number needed for the following addition/subtraction
+            // Fixed method
+            // This is the simplest method, where a fixed offset in added/subtracted from the current value
+            if (AutoNumericHelper.isWheelUpEvent(e)) { // Increment
+                result += step;
+            } else if (AutoNumericHelper.isWheelDownEvent(e)) { // Decrement
+                result -= step;
+            }
+        } else {
+            // Progressive method
+            // For this method, we calculate an offset that is in relation to the size of the current number (using only the integer part size).
+            // The bigger the number, the bigger the offset (usually the number count in the integer part minus 3, except for small numbers where a different behavior is better for the user experience).
+            //TODO Known limitation : The progressive method does not play well with numbers between 0 and 1 where to modify the decimal places the rawValue first has to go from '1' to '0'
+            if (AutoNumericHelper.isWheelUpEvent(e)) { // Increment
+                result = AutoNumericHelper.addAndRoundToNearestAuto(result, this.settings.decimalPlacesRawValue);
+            } else if (AutoNumericHelper.isWheelDownEvent(e)) { // Decrement
+                result = AutoNumericHelper.subtractAndRoundToNearestAuto(result, this.settings.decimalPlacesRawValue);
+            }
+        }
+
+        // 3) Set the new value so it gets formatted
+        // First clamp the result if needed
+        result = AutoNumericHelper.clampToRangeLimits(result, this.settings);
+        if (result !== +currentUnformattedValue) {
+            // Only 'set' the value if it has changed. For instance 'set' should not happen if the user hits a limit and continue to try to go past it since we clamp the value.
+            this.set(result);
+        }
+
+        //XXX Do not prevent if the value is not modified? From a UX point of view, preventing the wheel event when the user use it on top of an autoNumeric element should always be done, even if the value does not change. Perhaps that could affect other scripts relying on this event to be sent though.
+        e.preventDefault(); // We prevent the page to scroll while we increment/decrement the value
+
+        // 4) Finally, we set back the caret position/selection
+        // There is no need to take into account the fact that the number count could be different at the end of the wheel event ; it would be too complex and most of the time unreliable
+        this._setSelection(selectionStart, selectionEnd);
+
+        this.isWheelEvent = false; // Set back the mouse wheel indicator to its default
     }
 
     /**
@@ -7333,6 +7371,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             unformatOnHover                   : true,
             unformatOnSubmit                  : true,
             valuesToStrings                   : true,
+            wheelOn                           : true,
             wheelStep                         : true,
 
             // Additional information that are added to the `settings` object :

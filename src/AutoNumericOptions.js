@@ -371,8 +371,7 @@ Object.defineProperty(AutoNumeric, 'options', {
              * - the 'progressive' string (`wheelStep : 'progressive'`), which will then activate a special mode where the step is automatically calculated based on the element value size.
              *
              * Note :
-             * A special behavior is applied in order to avoid preventing the user to scroll the page if the inputs are covering the whole available space.
-             * You can use the 'Shift' modifier key while using the mouse wheel in order to temporarily disable the increment/decrement feature (useful on small screen where some badly configured inputs could use all the available space).
+             * You can activate/deactivate the wheel event for each `wheelOn` option value by using the 'Shift' modifier key while using the mouse wheel.
              */
             modifyValueOnWheel: {
                 modifyValue: true,
@@ -773,6 +772,19 @@ Object.defineProperty(AutoNumeric, 'options', {
                     '-1': 'Min',
                     1   : 'Max',
                 },
+            },
+
+            /* Defines when the wheel event will increment or decrement the element value.
+             * When set to `'focus'`, the AutoNumeric-managed element needs to be focused for the wheel event to change the value.
+             * When set to `'hover'`, using the wheel event while the mouse is hovering the element is sufficient (no focus needed).
+             *
+             * Note :
+             * When `wheelOn` is set to `'focus'`, you can use the 'Shift' modifier key while using the mouse wheel in order to temporarily activate the increment/decrement feature even if the element is not focused.
+             * When `wheelOn` is set to `'hover'`, you can use the 'Shift' modifier key while using the mouse wheel in order to temporarily disable the increment/decrement feature even if the element is not hovered.
+             */
+            wheelOn: {
+                focus: 'focus',
+                hover: 'hover',
             },
 
             /* That option is linked to the `modifyValueOnWheel` one and will only be used if the latter is set to `true`.

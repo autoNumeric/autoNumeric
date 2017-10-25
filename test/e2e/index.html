@@ -825,6 +825,14 @@
 			</form>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #456</p>
+			<input id="issue_456_focus" type="text" placeholder="wheel focus" value="42000">
+			<input id="issue_456_hover" type="text" placeholder="wheel focus" value="22000">
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1799,6 +1807,10 @@
 //        issue512.value = anElements[0].formLocalized();
 //        issue512.value = anElements[0].formFormatted();
     });
+
+    //-------------- Issue #456
+    new AutoNumeric('#issue_456_focus', { wheelOn: AutoNumeric.options.wheelOn.focus });
+    new AutoNumeric('#issue_456_hover', { wheelOn: AutoNumeric.options.wheelOn.hover });
 </script>
 </body>
 </html>

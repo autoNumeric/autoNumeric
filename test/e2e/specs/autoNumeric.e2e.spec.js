@@ -768,10 +768,10 @@ describe('Issue #322', () => {
         expect(browser.getValue(selectors.issue322input)).toEqual('12,345,111,678.00');
 
         // Check the caret position
-        const inputCaretPosition = browser.execute(() => {
-            const input = document.querySelector('#issue_322');
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
             return input.selectionStart;
-        }).value;
+        }, selectors.issue322input).value;
         expect(inputCaretPosition).toEqual(10);
     });
 

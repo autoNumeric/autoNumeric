@@ -3729,3 +3729,5 @@ describe('Pasting', () => {
         expect(browser.getValue(selectors.readOnlyElement)).toEqual('42.42'); // No changes!
     });
 });
+
+//TODO Add some tests to make sure the correct number of `AutoNumeric.events.formatted` is sent during each keypress

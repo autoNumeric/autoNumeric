@@ -1,5 +1,13 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.15
++ Fix issue #513 Setting the input `value` directly with Javascript without using the `set()` method is not supported
+  From now on, if an external change is detected when a script modify the input `value` attribute directly, AutoNumeric tries to format the new value.
+  Note: watching the external changes to `textContent` is not supported yet.
++ Fix `_onFocusInAndMouseEnter()` where `setElementValue()` was called multiple times in a row
++ Fix the `AutoNumeric.events.formatted` event so that only one is sent for each user action
++ Change: The `AutoNumeric.events.formatted` event is not sent anymore when wiping an AutoNumeric object
+
 ### 4.1.0-beta.14
 + Fix issue #516 'Del' key does not work in IE browser
 + Fix issue #509 `allowDecimalPadding` set to `'floats'` when `decimalPlaces` is different from `0` output a warning

@@ -830,7 +830,7 @@ describe('The autoNumeric object', () => {
             expect(() => new AutoNumeric(newInput, options)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element when passed a pre-defined option name', () => {
+        it('should correctly initialize the AutoNumeric element when passed a pre-defined option name and a DOM element', () => {
             let anElement = null;
 
             // new AutoNumeric(domElement, 'euroPos'); // With one pre-defined option name
@@ -839,7 +839,6 @@ describe('The autoNumeric object', () => {
             anElement.wipe();
             expect(() => anElement = new AutoNumeric(newInput, 'dollar')).not.toThrow();
             expect(anElement.set(1234567.89).getFormatted()).toEqual('$1,234,567.89');
-
             anElement.wipe();
             expect(() => anElement = new AutoNumeric(newInput, 'foobar')).toThrow();
 
@@ -1034,7 +1033,7 @@ describe('The autoNumeric object', () => {
             expect(() => new AutoNumeric('input', 12345.789)).not.toThrow();
         });
 
-        it('should correctly initialize the AutoNumeric element when passed a pre-defined option name', () => {
+        it('should correctly initialize the AutoNumeric element when passed a pre-defined option name and a query selector', () => {
             let anElement = null;
 
             // new AutoNumeric('.myCssClass > input', 'euroPos'); // With one pre-defined option name
@@ -3708,6 +3707,82 @@ describe('Initialization calls', () => {
                 expect(() => AutoNumeric.multiple({ rootElement: formElement, exclude: 'foobar' })).toThrow();
             });
         });
+    });
+});
+
+xdescribe('Managing external changes', () => { //XXX This test is deactivated since PhantomJS is failing when defining some properties with `Object.defineProperty`. See issue https://github.com/ariya/phantomjs/issues/13895
+    it(`should watch for external change to the input 'value' attribute`, () => {
+        // Initialization
+        const inputElement = document.createElement('input');
+        document.body.appendChild(inputElement);
+
+        // Test the external modification
+        let aNInput = new AutoNumeric(inputElement, autoNumericOptionsEuro);
+        aNInput.set(6789.02);
+        expect(aNInput.getNumericString()).toEqual('6789.02');
+        expect(aNInput.getFormatted()).toEqual('6.789,02 €');
+
+        aNInput.node().value = '1234567.2345';
+        expect(aNInput.getNumericString()).toEqual('1234567.23');
+        expect(aNInput.getFormatted()).toEqual('1.234.567,23 €');
+
+        // Remove the AutoNumeric object
+        aNInput.remove();
+
+        // Test that the default getter and setters are ok
+        const testingGetter = inputElement.value;
+        expect(testingGetter).toEqual('1.234.567,23 €');
+        inputElement.value = '42';
+        expect(inputElement.value).toEqual('42');
+
+        // Add back the AutoNumeric object and check that there are no errors shown
+        aNInput = new AutoNumeric(inputElement, autoNumericOptionsEuro);
+        expect(aNInput.getNumericString()).toEqual('42');
+        expect(aNInput.getFormatted()).toEqual('42,00 €');
+        aNInput.set(116789.02);
+        expect(aNInput.getNumericString()).toEqual('116789.02');
+        expect(aNInput.getFormatted()).toEqual('116.789,02 €');
+
+        // Un-initialization
+        aNInput.remove();
+        document.body.removeChild(inputElement);
+    });
+
+    xit(`should watch for external change to the input 'textContent' attribute`, () => {
+        // Initialization
+        const pElement = document.createElement('p');
+        document.body.appendChild(pElement);
+
+        // Test the external modification
+        let aNElement = new AutoNumeric(pElement, autoNumericOptionsEuro);
+        aNElement.set(6789.02);
+        expect(aNElement.getNumericString()).toEqual('6789.02');
+        expect(aNElement.getFormatted()).toEqual('6.789,02 €');
+
+        aNElement.node().textContent = '1234567.2345'; //FIXME Fails since `this.getterSetter` is undefined when trying to getOwnPropertyDescriptor the `textContent` attribute
+        expect(aNElement.getNumericString()).toEqual('1234567.23');
+        expect(aNElement.getFormatted()).toEqual('1.234.567,23 €');
+
+        // Remove the AutoNumeric object
+        aNElement.remove();
+
+        // Test that the default getter and setters are ok
+        const testingGetter = pElement.textContent;
+        expect(testingGetter).toEqual('1.234.567,23 €');
+        pElement.textContent = '42';
+        expect(pElement.textContent).toEqual('42');
+
+        // Add back the AutoNumeric object and check that there are no errors shown
+        aNElement = new AutoNumeric(pElement, autoNumericOptionsEuro);
+        expect(aNElement.getNumericString()).toEqual('42');
+        expect(aNElement.getFormatted()).toEqual('42,00 €');
+        aNElement.set(116789.02);
+        expect(aNElement.getNumericString()).toEqual('116789.02');
+        expect(aNElement.getFormatted()).toEqual('116.789,02 €');
+
+        // Un-initialization
+        aNElement.remove();
+        document.body.removeChild(pElement);
     });
 });
 

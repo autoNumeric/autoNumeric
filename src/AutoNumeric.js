@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.14
- * @date         2017-10-22 UTC 22:22
+ * @version      4.1.0-beta.15
+ * @date         2017-10-25 UTC 02:55
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -176,6 +176,11 @@ export default class AutoNumeric {
         this.isDropEvent = false;
         // Keep track if the user is currently editing the element
         this.isEditing = false;
+        // Watch any external changes to the element value/textContent/nodeValue and `set()` the new value so that it gets formatted/saved in the history
+        this.internalModification = false; // This is temporarily set to `true` only when the AutoNumeric object does update the element value
+        this.attributeToWatch = this._getAttributeToWatch();
+        this.getterSetter = Object.getOwnPropertyDescriptor(this.domElement.__proto__, this.attributeToWatch);
+        this._addWatcher();
 
         if (this.settings.createLocalList) {
             // Keep track of every AutoNumeric elements that this object initialized
@@ -847,7 +852,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.14';
+        return '4.1.0-beta.15';
     }
 
     /**
@@ -1171,6 +1176,101 @@ export default class AutoNumeric {
         if (this.isInputElement && this.settings.readOnly) {
             this.domElement.readOnly = true;
         }
+    }
+
+    /**
+     * Add a watcher so that any external change to the AutoNumeric-managed element would be detected.
+     * As soon as such change is detected, AutoNumeric then tries to `set()` the value so that it gets formatted and stored in the history.
+     * //XXX For now, this only works when watching the `value` attribute, not the `textContent` one
+     * @private
+     */
+    _addWatcher() {
+        // `getterSetter` can be undefined when a non-input element is used
+        if (!AutoNumericHelper.isUndefined(this.getterSetter)) {
+            const { set: setter, get: getter } = this.getterSetter;
+            Object.defineProperty(this.domElement, this.attributeToWatch, {
+                configurable: true, // This is needed in some rare cases
+                get         : () => getter.call(this.domElement),
+                set         : val => {
+                    setter.call(this.domElement, val);
+                    // Only `set()` the value if the modification comes from an external source
+                    if (!this.internalModification) {
+                        this.set(val);
+                    }
+                },
+            });
+        }
+
+        //FIXME The code above fails for the `textContent` attribute since `this.getterSetter` is undefined when using `getOwnPropertyDescriptor()`
+        /* //XXX The code below *almost* work for the textContent, but breaks some unit tests
+        this.valueWatched = this.domElement[this.attributeToWatch];
+        Object.defineProperty(this.domElement, this.attributeToWatch, {
+            configurable: true, // This is needed in some rare cases
+            get         : () => this.valueWatched,
+            set         : val => {
+                this.valueWatched = val;
+                // Only `set()` the value if the modification comes from an external source
+                if (!this.internalModification) {
+                    this.set(val);
+                }
+            },
+        });
+        */
+    }
+
+    /**
+     * Remove the watcher on the AutoNumeric-managed element
+     * Note: This needs to be called when the AutoNumeric element is 'removed', otherwise the getter/setter stays on the DOM element and that can lead to problem if the user initialize another AutoNumeric object on it.
+     * @private
+     */
+    _removeWatcher() {
+        // `getterSetter` can be undefined when a non-input element is used
+        if (!AutoNumericHelper.isUndefined(this.getterSetter)) {
+            const { set: setter, get: getter } = this.getterSetter;
+            Object.defineProperty(this.domElement, this.attributeToWatch, {
+                configurable: true, // This is needed in some rare cases
+                get         : () => getter.call(this.domElement),
+                set         : val => {
+                    setter.call(this.domElement, val);
+                },
+            });
+        }
+
+        //FIXME The code above fails for the `textContent` attribute since `this.getterSetter` is undefined when using `getOwnPropertyDescriptor()`
+        /* //XXX The code below *almost* work for the textContent, but breaks some unit tests
+        this.valueWatched = this.domElement[this.attributeToWatch];
+        Object.defineProperty(this.domElement, this.attributeToWatch, {
+            configurable: true, // This is needed in some rare cases
+            get         : () => this.valueWatched,
+            set         : val => {
+                this.valueWatched = val;
+            },
+        });
+        */
+    }
+
+    /**
+     * Return the name of the object attribute that store the current formatted data in the DOM element.
+     *
+     * @returns {string}
+     * @private
+     */
+    _getAttributeToWatch() {
+        let attributeToWatch;
+        if (this.isInputElement) {
+            attributeToWatch = 'value';
+        } else {
+            const nodeType = this.domElement.nodeType;
+            if (nodeType === Node.ELEMENT_NODE ||
+                nodeType === Node.DOCUMENT_NODE ||
+                nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+                attributeToWatch = 'textContent';
+            } else if (nodeType === Node.TEXT_NODE) {
+                attributeToWatch = 'nodeValue';
+            }
+        }
+
+        return attributeToWatch;
     }
 
     /**
@@ -1804,26 +1904,31 @@ export default class AutoNumeric {
      * This send an 'autoNumeric:formatted' event if the new value is different than the old one.
      *
      * @param {number|string} newElementValue
+     * @param {boolean} sendFormattedEvent If set to `true`, then the `AutoNumeric.events.formatted` event is sent if the value has changed
      * @returns {AutoNumeric}
      * @private
      */
-    _setElementValue(newElementValue) {
+    _setElementValue(newElementValue, sendFormattedEvent = true) {
         //TODO Use an internal attribute to track the current value of the element `formattedValue` (like its counterpart `rawValue`). This would allow us to avoid calling `getElementValue` many times
-        // `oldElementValue` is the previous value that will be overwritten. This is used to decide if an event should be sent or not.
         const oldElementValue = AutoNumericHelper.getElementValue(this.domElement);
 
+        // Only update the value if it's different from the current one
         if (newElementValue !== oldElementValue) {
-            // Only update the value if it's different from the current one
+            this.internalModification = true;
             AutoNumericHelper.setElementValue(this.domElement, newElementValue);
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, this.domElement, {
-                oldValue   : oldElementValue,
-                newValue   : newElementValue,
-                oldRawValue: this.rawValue,
-                newRawValue: this.rawValue,
-                isPristine : this.isPristine(false),
-                error      : null,
-                aNElement  : this,
-            });
+            this.internalModification = false;
+
+            if (sendFormattedEvent) {
+                AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, this.domElement, {
+                    oldValue   : oldElementValue,
+                    newValue   : newElementValue,
+                    oldRawValue: this.rawValue,
+                    newRawValue: this.rawValue,
+                    isPristine : this.isPristine(false),
+                    error      : null,
+                    aNElement  : this,
+                });
+            }
         }
 
         return this;
@@ -2516,6 +2621,7 @@ export default class AutoNumeric {
     remove() {
         this._removeValueFromPersistentStorage();
         this._removeEventListeners();
+        this._removeWatcher();
 
         // Also remove the element from the local AutoNumeric list
         this._removeFromLocalList(this.domElement);
@@ -2530,7 +2636,7 @@ export default class AutoNumeric {
      * @example anElement.wipe()
      */
     wipe() {
-        this._setElementValue('');
+        this._setElementValue('', false); // Do not send the 'AutoNumeric.events.formatted' event when wiping an AutoNumeric object
         this.remove();
     }
 
@@ -5493,12 +5599,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      */
     _onFocusInAndMouseEnter(e) {
         this.isEditing = false; // Just in case no `keyUp` event have been sent (ie. if the user lost the focus from the current window while typing)
-
-        //TODO `AutoNumericHelper.setElementValue` is called 3 times sequentially here, fix that
         //TODO Create separate handlers for the focus and mouseenter events
-        const initialElementValue = AutoNumericHelper.getElementValue(this.domElement);
-        const initialRawValue = this.rawValue; // This copy is currently not needed, but in the future we could change the `this.rawValue` value before triggering the event. Therefore, to future-proof this feature, we still do this. When the automated tests will support the mouse actions, we won't need this anymore since we'll then be able to create the related tests.
-        
+
         if (this.settings.unformatOnHover && e.type === 'mouseenter' && e.altKey) {
             this.constructor._unformatAltHovered(this);
 
@@ -5514,16 +5616,17 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             this.constructor._reformatAltHovered(this);
         }
 
-        //TODO Modify the following block to prevent calling `setElementValue()` multiple times in a row
         if (e.type === 'focus' || e.type === 'mouseenter' && !this.isFocused) {
+            let elementValueToSet = null; // Store the value we want to set on the element, and only call `_setElementValue()` once
+
             if (this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus &&
                 this.rawValue < 0 && this.settings.negativeBracketsTypeOnBlur !== null && this.settings.isNegativeSignAllowed) { //FIXME this is called a second time in _addGroupSeparators too. Prevent this, if possible.
                 // Only remove the brackets if the value is negative
-                AutoNumericHelper.setElementValue(this.domElement, this.constructor._removeBrackets(AutoNumericHelper.getElementValue(this.domElement), this.settings));
+                elementValueToSet = this.constructor._removeBrackets(AutoNumericHelper.getElementValue(this.domElement), this.settings);
                 //FIXME The element value is set here, why continue and set it again later in that same parent logic block?
             }
 
-            // Use the rawValue, multiplied by `rawValueDivisor` if defined
+            // Use the `rawValue`, multiplied by `rawValueDivisor` if defined
             const rawValueToFormat = this._getRawValueToFormat(this.rawValue);
 
             // Modify the element value according to the number of decimal places to show on focus or the `showOnlyNumbersOnFocus` option
@@ -5541,7 +5644,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     this.settings.digitGroupSeparator = '';
                     this.settings.currencySymbol      = '';
                     this.settings.suffixText          = '';
-                    AutoNumericHelper.setElementValue(this.domElement, roundedValue.replace('.', this.settings.decimalCharacter));
+                    elementValueToSet = roundedValue.replace('.', this.settings.decimalCharacter);
                 } else {
                     let formattedValue;
                     if (AutoNumericHelper.isNull(roundedValue)) {
@@ -5550,35 +5653,33 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                         formattedValue = this.constructor._addGroupSeparators(roundedValue.replace('.', this.settings.decimalCharacter), this.settings, this.isFocused, rawValueToFormat);
                     }
 
-                    AutoNumericHelper.setElementValue(this.domElement, formattedValue);
+                    elementValueToSet = formattedValue;
                 }
             }
 
             // In order to send a 'native' change event when blurring the input, we need to first store the initial input value on focus.
-            this.valueOnFocus = AutoNumericHelper.getElementValue(e.target);
+            if (AutoNumericHelper.isNull(elementValueToSet)) {
+                this.valueOnFocus = '';
+            } else {
+                this.valueOnFocus = elementValueToSet;
+            }
+
             this.lastVal = this.valueOnFocus;
             const isEmptyValue = this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(this.valueOnFocus, this.settings);
             const orderedValue = this.constructor._orderValueCurrencySymbolAndSuffixText(this.valueOnFocus, this.settings, true); // This displays the currency sign on hover even if the rawValue is empty
-            if ((isEmptyValue && orderedValue !== '') && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus) {
-                AutoNumericHelper.setElementValue(this.domElement, orderedValue);
-
-                // If there is a currency symbol and its on the right hand side, then we place the caret accordingly on the far left side
-                if (orderedValue === this.settings.currencySymbol && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
-                    AutoNumericHelper.setElementSelection(e.target, 0);
-                }
+            const orderedValueTest = (isEmptyValue && orderedValue !== '') && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.focus;
+            if (orderedValueTest) {
+                elementValueToSet = orderedValue;
             }
-        }
 
-        if (AutoNumericHelper.getElementValue(this.domElement) !== initialElementValue) {
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, this.domElement, {
-                oldValue   : initialElementValue,
-                newValue   : AutoNumericHelper.getElementValue(this.domElement),
-                oldRawValue: initialRawValue,
-                newRawValue: this.rawValue,
-                isPristine : this.isPristine(false),
-                error      : null,
-                aNElement  : this,
-            });
+            if (!AutoNumericHelper.isNull(elementValueToSet)) {
+                this._setElementValue(elementValueToSet);
+            }
+
+            if (orderedValueTest && orderedValue === this.settings.currencySymbol && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
+                // If there is a currency symbol and its on the right hand side, then we place the caret accordingly on the far left side
+                AutoNumericHelper.setElementSelection(e.target, 0);
+            }
         }
     }
 
@@ -5845,7 +5946,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     return;
                 } else {
                     // The entered character is not allowed ; overwrite the new invalid value with the previous valid one, and set back the caret/selection
-                    AutoNumericHelper.setElementValue(this.lastVal); //TODO Update the rawValue here too via _setValue()?
+                    this._setElementValue(this.lastVal, false); //TODO Update the rawValue here too via _setValue()?
                     AutoNumericHelper.setElementSelection(this.domElement, selection.start, selection.end);
                     this.androidSelectionStart = selection.start;
                 }
@@ -5947,7 +6048,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // If the input value has changed during the key press event chain, an event is sent to alert that a formatting has been done (cf. Issue #187)
         if (targetValue !== this.initialValueOnKeydown) {
-            //TODO Do I need to remove this since we now send this event on `set()`?
             AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, e.target, {
                 oldValue   : this.initialValueOnKeydown,
                 newValue   : targetValue,
@@ -6842,14 +6942,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             } else if (setValue && currentValue === this.domElement.getAttribute('value')) {
                 this.set(currentValue);
             }
-        } else {
-            if (this.settings.defaultValueOverride === null) {
-                this.set(currentValue);
-            } else {
-                if (this.settings.defaultValueOverride === currentValue) {
-                    this.set(currentValue);
-                }
-            }
+        } else if (this.settings.defaultValueOverride === null ||
+            this.settings.defaultValueOverride === currentValue) {
+            this.set(currentValue);
         }
     }
 
@@ -7679,7 +7774,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 }
             }
 
-            AutoNumericHelper.setElementValue(this.domElement, roundedValueToShow);
+            this._setElementValue(roundedValueToShow, false);
             this._setCaretPosition(position);
 
             return true;
@@ -7768,7 +7863,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
             const modifiedLeftPart = left.substr(0, oldParts[0].length) + AutoNumeric._stripAllNonNumberCharacters(left.substr(oldParts[0].length), this.settings, true, this.isFocused);
             if (!this._setValueParts(modifiedLeftPart, right, true)) {
-                AutoNumericHelper.setElementValue(this.domElement, oldParts.join(''));
+                this._setElementValue(oldParts.join(''), false);
                 this._setCaretPosition(oldParts[0].length);
             }
         }
@@ -8214,7 +8309,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Only update the value if it has changed. This prevents modifying the selection, if any.
         if (value !== elementValue ||
             value === elementValue && (this.eventKey === AutoNumericEnum.keyName.num0 || this.eventKey === AutoNumericEnum.keyName.numpad0)) {
-            this._setElementValue(value);
+            this._setElementValue(value, false);
             this._setCaretPosition(position);
         }
 

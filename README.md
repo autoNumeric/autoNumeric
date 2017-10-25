@@ -19,11 +19,12 @@
 autoNumeric is a standalone Javascript library that provides live *as-you-type* formatting for international numbers and currencies.
 
 The latest stable branch is always on `master`. Currently this is version [4.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>
-if you want to live dangerously, you can check out the latest development version in the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br>
+If you want to try the new features, you can check out the latest development version in the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br>
+That `next` branch can see changes in the API (check the [semver](http://semver.org/)), but is always fully tested for regressions.<br> 
 <br>
 For older stable versions, please take a look [here](#older-versions).<br>
 Alternatively, you can **use our [guide](doc/HowToUpgradeToV4.md) for upgrading from version `1.9`/`2` to version `4`.**<br><br>
-Moreover, you can take a look at what could be the next features coming to autoNumeric on our [project](https://github.com/autoNumeric/autoNumeric/projects) page *(feel free to participate!)*.
+Finally, you can check what could be the next features coming to autoNumeric on the [projects](https://github.com/autoNumeric/autoNumeric/projects) page *(feel free to [participate](#how-to-contribute)!)*.
 
 #### Highlights
 autoNumeric main features are :

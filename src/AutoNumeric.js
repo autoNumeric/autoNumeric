@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.16
- * @date         2017-10-25 UTC 20:30
+ * @version      4.1.0-beta.17
+ * @date         2017-10-26 UTC 22:22
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -857,7 +857,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.16';
+        return '4.1.0-beta.17';
     }
 
     /**
@@ -1115,10 +1115,9 @@ export default class AutoNumeric {
         this._onFocusOutAndMouseLeaveFunc = e => { this._onFocusOutAndMouseLeave(e); };
         this._onPasteFunc = e => { this._onPaste(e); };
         this._onWheelFunc = e => { this._onWheel(e); };
-        this._onFormSubmitFunc = () => { this._onFormSubmit(); };
+        this._onDropFunc = e => { this._onDrop(e); };
         this._onKeydownGlobalFunc = e => { this._onKeydownGlobal(e); };
         this._onKeyupGlobalFunc = e => { this._onKeyupGlobal(e); };
-        this._onDropFunc = e => { this._onDrop(e); };
 
         // Add the event listeners
         this.domElement.addEventListener('focusin', this._onFocusInFunc, false);
@@ -1134,10 +1133,7 @@ export default class AutoNumeric {
         this.domElement.addEventListener('paste', this._onPasteFunc, false);
         this.domElement.addEventListener('wheel', this._onWheelFunc, false);
         this.domElement.addEventListener('drop', this._onDropFunc, false);
-
-        if (!AutoNumericHelper.isNull(this.parentForm)) {
-            this.parentForm.addEventListener('submit', this._onFormSubmitFunc, false);
-        }
+        this._setupFormListener();
 
         // Create one global event listener for the keyup event on the document object, which will be shared by all the autoNumeric elements
         if (!AutoNumeric._doesGlobalListExists()) {
@@ -1163,13 +1159,229 @@ export default class AutoNumeric {
         this.domElement.removeEventListener('keyup', this._onKeyupFunc, false);
         this.domElement.removeEventListener('paste', this._onPasteFunc, false);
         this.domElement.removeEventListener('wheel', this._onWheelFunc, false);
+        this.domElement.removeEventListener('drop', this._onDropFunc, false);
+        this._removeFormListener();
 
         document.removeEventListener('keydown', this._onKeydownGlobalFunc, false);
         document.removeEventListener('keyup', this._onKeyupGlobalFunc, false);
+    }
 
+    /**
+     * Mark the parent <form> so that other AutoNumeric object will not add more listeners.
+     * Add a counter so that when removing the AutoNumeric object, we only remove the submit listener if that count is equal to 0.
+     * Also keep a reference to the 'submit' event handler function to be able to remove that handler later if the `_removeFormListener()` function is called from another AutoNumeric object.
+     *
+     * @private
+     */
+    _setupFormListener() {
         if (!AutoNumericHelper.isNull(this.parentForm)) {
-            this.parentForm.removeEventListener('submit', this._onFormSubmitFunc, false);
+            // Setup the handler function
+            this._onFormSubmitFunc = () => { this._onFormSubmit(); };
+
+            // Check if the parent form already has the AutoNumeric mark
+            if (this._hasParentFormCounter()) {
+                this._incrementParentFormCounter();
+            } else {
+                // If not, add the counter
+                this._initializeFormCounterToOne();
+                // And add the submit event listener
+                this.parentForm.addEventListener('submit', this._onFormSubmitFunc, false);
+                // Also keep a reference to the handler function so that we can remove it later
+                this._storeFormHandlerFunction();
+            }
         }
+    }
+
+    /**
+     * Remove the form 'submit' event listener, as well as the `dataset` info (`anCount` and `anFormHandler`) from the parent form, only when there are only one AutoNumeric child element left in that <form>.
+     * Otherwise decrement the `anCount`.
+     *
+     * @private
+     */
+    _removeFormListener() {
+        if (!AutoNumericHelper.isNull(this.parentForm)) {
+            // Check the parent form counter value
+            const anCount = this._getParentFormCounter();
+
+            if (anCount === 1) {
+                // If it's 1, remove the listener
+                this.parentForm.removeEventListener('submit', this._getFormHandlerFunction(), false);
+                // Also remove the dataset info
+                this._removeFormDataSetInfo();
+            } else if (anCount > 1) {
+                // Otherwise if it's >1 decrement the counter
+                this._decrementParentFormCounter();
+            } else {
+                // If it's <1, throw an error
+                AutoNumericHelper.throwError(`The AutoNumeric object count on the form is incoherent.`);
+            }
+        }
+    }
+
+    /**
+     * Return `true` if the parent form has the form counter attribute
+     *
+     * @returns {boolean}
+     * @private
+     */
+    _hasParentFormCounter() {
+        return 'anCount' in this.parentForm.dataset;
+    }
+
+    /**
+     * Return the count of AutoNumeric form children
+     *
+     * @returns {number}
+     * @private
+     */
+    _getParentFormCounter() {
+        return Number(this.parentForm.dataset.anCount);
+    }
+
+    /**
+     * Set the count of AutoNumeric form children to 1 for the given form element, or if none are passed, the current `this.parentForm` one.
+     *
+     * @param {HTMLFormElement|null} formElement
+     * @private
+     */
+    _initializeFormCounterToOne(formElement = null) {
+        this._getFormElement(formElement).dataset.anCount = 1;
+    }
+
+    /**
+     * Increment the AutoNumeric form children count for the given form element, or if none are passed, the current `this.parentForm` one.
+     *
+     * @param {HTMLFormElement|null} formElement
+     * @private
+     */
+    _incrementParentFormCounter(formElement = null) {
+        this._getFormElement(formElement).dataset.anCount++;
+    }
+
+    /**
+     * Decrement the AutoNumeric form children count for the current `this.parentForm` form element.
+     *
+     * @private
+     */
+    _decrementParentFormCounter() {
+        this.parentForm.dataset.anCount--;
+    }
+
+    /**
+     * Return `true` if the global form handler list exists on the `window` object.
+     *
+     * @returns {boolean}
+     * @private
+     */
+    static _doesFormHandlerListExists() {
+        const type = typeof window.aNFormHandlerMap;
+
+        return type !== 'undefined' && type === 'object';
+    }
+
+    /**
+     * Create the global form handler list on the `window` object.
+     *
+     * @private
+     */
+    static _createFormHandlerList() {
+        window.aNFormHandlerMap = new Map(); // I would have used a `WeakMap` here, but that does not allow using non-object for keys
+    }
+
+    /**
+     * Return `true` if the given form element, or if none are passed, the current `this.parentForm` one has a form handler name.
+     *
+     * @param {HTMLFormElement|null} formElement
+     * @returns {boolean}
+     * @private
+     */
+    _hasFormHandlerFunction(formElement = null) {
+        return 'anFormHandler' in this._getFormElement(formElement).dataset;
+    }
+
+    /**
+     * Return the given form element, or defaults to `this.parentForm` if no argument is passed.
+     *
+     * @param {HTMLFormElement|null} formElement
+     * @returns {*}
+     * @private
+     */
+    _getFormElement(formElement = null) {
+        let formElementToUse;
+        if (!AutoNumericHelper.isNull(formElement)) {
+            formElementToUse = formElement;
+        } else {
+            formElementToUse = this.parentForm;
+        }
+
+        return formElementToUse;
+    }
+
+    /**
+     * Generate a form handler unique name and store it in the global form handler list.
+     * This also save that name in the dataset of the given form element.
+     *
+     * @param {HTMLFormElement|null} formElement
+     * @private
+     */
+    _storeFormHandlerFunction(formElement = null) {
+        // Create the weakMap if it does not exist
+        if (!this.constructor._doesFormHandlerListExists()) {
+            this.constructor._createFormHandlerList();
+        }
+
+        // Generate a unique name and save it in the form dataset
+        const formHandlerName = AutoNumericHelper.randomString();
+        this._getFormElement(formElement).dataset.anFormHandler = formHandlerName;
+
+        // Add the form handler name and handle function reference to the WeakMap
+        window.aNFormHandlerMap.set(formHandlerName, this._onFormSubmitFunc);
+    }
+
+    /**
+     * Return the form handler key name from the parent form element, for the global form handler list.
+     *
+     * @returns {string|*}
+     * @private
+     */
+    _getFormHandlerKey() {
+        if (!this._hasFormHandlerFunction()) {
+            AutoNumericHelper.throwError(`Unable to retrieve the form handler name`);
+        }
+
+        const formHandlerName = this.parentForm.dataset.anFormHandler;
+        if (formHandlerName === '') {
+            AutoNumericHelper.throwError(`The form handler name is invalid`);
+        }
+
+        return formHandlerName;
+    }
+
+    /**
+     * Return the 'submit' event handler function used for the parent form.
+     *
+     * @returns {function}
+     * @private
+     */
+    _getFormHandlerFunction() {
+        const formHandlerName = this._getFormHandlerKey();
+
+        return window.aNFormHandlerMap.get(formHandlerName);
+    }
+
+    /**
+     * Remove the dataset attributes `data-an-count` and `data-an-form-handler` from the parent form element.
+     *
+     * @private
+     */
+    _removeFormDataSetInfo() {
+        // Just in case, set the counter to 0
+        this._decrementParentFormCounter();
+        // Remove the form handler function from the FormHandlerFunction Map
+        window.aNFormHandlerMap.delete(this._getFormHandlerKey());
+        // Lastly, remove the dataset attributes
+        this.parentForm.removeAttribute('data-an-count');
+        this.parentForm.removeAttribute('data-an-form-handler');
     }
 
     /**
@@ -2663,15 +2875,51 @@ export default class AutoNumeric {
      * However, you can force AutoNumeric to search again for its reference by passing `true` as a parameter to this method.
      * This method updates the `this.parentForm` attribute.
      *
+     * In either case, whenever a new parent form is set for the current AutoNumeric element, we make sure to update the anCount and anFormHandler attributes on both the old form and the new one (for instance in case the user moved the input elements with `appendChild()` since AutoNumeric cannot not detect that).
+     *
      * @param {boolean} forceSearch If set to `true`, the parent form is searched again, even if `this.parentForm` is already set.
      * @returns {HTMLFormElement|null}
      */
     form(forceSearch = false) {
         if (forceSearch || AutoNumericHelper.isUndefinedOrNullOrEmpty(this.parentForm)) {
-            this.parentForm = this._getParentForm();
+            const newParentForm = this._getParentForm();
+            if (!AutoNumericHelper.isNull(newParentForm) && newParentForm !== this.parentForm) {
+                // If the current parent form exists and is different from the previous parent form
+
+                // Search for all the AutoNumeric elements in the old parent form
+                const oldANChildren = this._getFormAutoNumericChildren(this.parentForm);
+                // Update the anCount with the correct number of AutoNumeric elements
+                this.parentForm.dataset.anCount = oldANChildren.length;
+
+                // Check if the new parent form already has a anFormHandler name
+                if (this._hasFormHandlerFunction(newParentForm)) {
+                    this._incrementParentFormCounter(newParentForm); // Increment its counter
+                } else {
+                    // Create one and set the anCount to 1
+                    this._storeFormHandlerFunction(newParentForm);
+                    this._initializeFormCounterToOne(newParentForm);
+                }
+            }
+
+            this.parentForm = newParentForm;
         }
 
         return this.parentForm;
+    }
+
+    /**
+     * Return an array of the AutoNumeric-managed elements for the given form element is passed, otherwise for the current `this.parentForm` element.
+     *
+     * @param {HTMLFormElement|null} formElement
+     * @returns {Array.<HTMLInputElement>}
+     * @private
+     */
+    _getFormAutoNumericChildren(formElement) {
+        // Search for all the child AutoNumeric elements in that parent form
+        //XXX This only search for <input> elements, not contenteditable non-input tag ones, for now
+        const inputList = [... formElement.querySelectorAll('input')];
+
+        return inputList.filter(input => this.constructor.isManagedByAutoNumeric(input));
     }
 
     /**
@@ -6775,11 +7023,23 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @returns {boolean}
      */
     _onFormSubmit() {
+        // Search for all the AutoNumeric children of the form element and call the `_unformatOnSubmit()` function
+        const inputElements = this._getFormAutoNumericChildren(this.parentForm);
+        const aNElements = inputElements.map(aNElement => this.constructor.getAutoNumericElement(aNElement));
+        aNElements.forEach(aNElement => aNElement._unformatOnSubmit());
+
+        return true;
+    }
+
+    /**
+     * Unformat the element value according to the `unformatOnSubmit` option
+     *
+     * @private
+     */
+    _unformatOnSubmit() {
         if (this.settings.unformatOnSubmit) {
             this._setElementValue(this.rawValue);
         }
-
-        return true;
     }
 
     /**

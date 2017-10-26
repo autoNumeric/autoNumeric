@@ -2818,6 +2818,7 @@ describe('autoNumeric options and `options.*` methods', () => {
 
     /*
     describe('`unformatOnSubmit` option', () => {
+        //XXX This test cannot be activated since reloading the page in Jasmine test is not allowed
         it('should unformat on submit', () => {
             // Create the form elements
             const newInput = document.createElement('input');
@@ -4677,6 +4678,7 @@ describe('Instantiated autoNumeric functions', () => {
         let anInput1;
         let anInput2;
         let anInput3;
+        let anInput6;
 
         beforeEach(() => { // Initialization
             form   = document.createElement('form');
@@ -4722,7 +4724,7 @@ describe('Instantiated autoNumeric functions', () => {
             anInput1 = new AutoNumeric(input1, anOptions);
             anInput2 = new AutoNumeric(input2, anOptions);
             anInput3 = new AutoNumeric(input3, anOptions);
-            new AutoNumeric(input6, anOptions); // Check that an AutoNumeric-managed input does not show a `0` when the input is empty
+            anInput6 = new AutoNumeric(input6, anOptions); // Check that an AutoNumeric-managed input does not show a `0` when the input is empty
 
             expect(input1.value).toEqual('€ 1.111,11');
             expect(anInput1.getFormatted()).toEqual('€ 1.111,11');
@@ -4734,6 +4736,7 @@ describe('Instantiated autoNumeric functions', () => {
             anInput1.remove();
             anInput2.remove();
             anInput3.remove();
+            anInput6.remove();
             form.removeChild(input1);
             form.removeChild(input2);
             form.removeChild(input3);
@@ -5066,6 +5069,45 @@ describe('Instantiated autoNumeric functions', () => {
             // Un-initialize the form element
             form.appendChild(input1);
             document.body.removeChild(secondForm);
+        });
+
+        it(`should only add a single 'submit' event listener, and remove it when all the AutoNumeric element are removed`, () => {
+            // Get the initial parent form element reference
+            const initialForm = anInput1.form();
+            const formHandlerName = initialForm.dataset.anFormHandler;
+            expect(Number(initialForm.dataset.anCount)).toEqual(4);
+
+            anInput1.wipe();
+            expect(Number(initialForm.dataset.anCount)).toEqual(3);
+            expect(initialForm.dataset.anFormHandler).toEqual(formHandlerName);
+            anInput2.wipe();
+            expect(Number(initialForm.dataset.anCount)).toEqual(2);
+            expect(initialForm.dataset.anFormHandler).toEqual(formHandlerName);
+
+            anInput2 = new AutoNumeric(input2);
+            expect(Number(initialForm.dataset.anCount)).toEqual(3);
+            expect(initialForm.dataset.anFormHandler).toEqual(formHandlerName);
+            anInput2.wipe();
+            expect(Number(initialForm.dataset.anCount)).toEqual(2);
+            expect(initialForm.dataset.anFormHandler).toEqual(formHandlerName);
+            anInput6.wipe();
+            expect(Number(initialForm.dataset.anCount)).toEqual(1);
+            expect(initialForm.dataset.anFormHandler).toEqual(formHandlerName);
+            expect(window.aNFormHandlerMap.has(formHandlerName)).toEqual(true);
+
+            // Remove the very last from child AutoNumeric element
+            anInput3.wipe();
+            expect(initialForm.dataset.anCount).toBeUndefined();
+            expect(initialForm.dataset.anFormHandler).toBeUndefined();
+
+            // Also check that the name does not exist as key in the global map window.aNFormHandlerMap
+            expect(window.aNFormHandlerMap.has(formHandlerName)).toEqual(false);
+
+            // Reinitialize the AutoNumeric object for the `afterEach` un-initialization step
+            anInput1 = new AutoNumeric(input1);
+            anInput2 = new AutoNumeric(input2);
+            anInput3 = new AutoNumeric(input3);
+            anInput6 = new AutoNumeric(input6);
         });
 
         //FIXME Add the tests for : formUnformat, formReformat, formSubmit*

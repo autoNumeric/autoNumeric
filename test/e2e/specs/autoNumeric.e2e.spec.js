@@ -176,7 +176,10 @@ const selectors = {
     selectOnFocus38                   : '#selectOnFocus38',
     selectOnFocus39                   : '#selectOnFocus39',
     selectOnFocus40                   : '#selectOnFocus40',
-    issue442                          : '#issue_442',
+    issue442One                       : '#issue_442_1',
+    issue442Two                       : '#issue_442_2',
+    issue442Three                     : '#issue_442_3',
+    issue442Four                      : '#issue_442_4',
     issue442Submit                    : '#issue_442_submit',
     issue447                          : '#issue_447',
     result447                         : '#result_447',
@@ -3163,14 +3166,20 @@ describe('`unformatOnSubmit` option', () => {
     it('should test for default values', () => {
         browser.url(testUrl);
 
-        expect(browser.getValue(selectors.issue442)).toEqual('12.345,67\u202f€');
+        expect(browser.getValue(selectors.issue442One)).toEqual('12.345,67\u202f€');
+        expect(browser.getValue(selectors.issue442Two)).toEqual('1.111.222,21\u202f€');
+        expect(browser.getValue(selectors.issue442Three)).toEqual('22.432.392,23\u202f€');
+        expect(browser.getValue(selectors.issue442Four)).toEqual('0,00\u202f€');
     });
 
-    it('should unformat on submit', () => {
+    it('should unformat on submit only the elements that activated the `unformatOnSubmit` option', () => {
         const submitButton = $(selectors.issue442Submit);
 
         submitButton.click(); // Submit the form by clicking on the submit button
-        expect(browser.getValue(selectors.issue442)).toEqual('12345.67');
+        expect(browser.getValue(selectors.issue442One)).toEqual('12345.67');
+        expect(browser.getValue(selectors.issue442Two)).toEqual('1.111.222,21\u202f€');
+        expect(browser.getValue(selectors.issue442Three)).toEqual('22432392.23');
+        expect(browser.getValue(selectors.issue442Four)).toEqual('0,00\u202f€');
     });
 });
 

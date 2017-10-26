@@ -710,10 +710,13 @@
 
 	<div class="testSuite">
 		<div class="test">
-			<p class="description">Issue #442</p>
+			<p class="description">Issue #442 & #457</p>
 			<div>
 				<form action="#" id="issue_442_form">
-					<input id="issue_442" type="text" placeholder="#442" value="12345.67">
+					<input id="issue_442_1" type="text" placeholder="#442" value="12345.67">
+					<input id="issue_442_2" type="text" placeholder="#442" value="1111222.21">
+					<input id="issue_442_3" type="text" placeholder="#442">
+					<input id="issue_442_4" type="text" placeholder="#442" value="0">
 					<input id="issue_442_submit" type="submit" value="Submit">
 				</form>
 			</div>
@@ -1665,10 +1668,11 @@
         console.log(`'${AutoNumeric.events.rawValueModified}' sent with`, e); //DEBUG
     });
 
-    //-------------- Issue #442
-    new AutoNumeric('#issue_442', {
-        unformatOnSubmit: AutoNumeric.options.unformatOnSubmit.unformat,
-    }).french();
+    //-------------- Issue #442 & #457
+    new AutoNumeric('#issue_442_1', { unformatOnSubmit: AutoNumeric.options.unformatOnSubmit.unformat }).french();
+    new AutoNumeric('#issue_442_2', { unformatOnSubmit: AutoNumeric.options.unformatOnSubmit.keepCurrentValue }).french();
+    new AutoNumeric('#issue_442_3', 22432392.23, { unformatOnSubmit: AutoNumeric.options.unformatOnSubmit.unformat }).french();
+    new AutoNumeric('#issue_442_4', { unformatOnSubmit: AutoNumeric.options.unformatOnSubmit.keepCurrentValue }).french();
     const form442 = document.getElementById('issue_442_form');
     form442.onsubmit = function(e) {
         e.preventDefault();

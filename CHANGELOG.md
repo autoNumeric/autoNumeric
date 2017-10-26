@@ -1,5 +1,10 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.17
++ Fix issue #457 Using `AutoNumeric.multiple()` generate many `submit` event listeners on the parent `form`
++ Fix the `drop` event handler removal that was omitted.
++ Add a global `aNFormHandlerMap` Map on the `window` object, that keep track of all `submit` event handler for each `<form>` element that has at least one AutoNumeric-managed element child.
+
 ### 4.1.0-beta.16
 + Fix issue #456 Change the `modifyValueOnWheel` default behaviour to act only when the element is focused
 + Add a new `wheelOn` option that will define when the `wheel` event will increment/decrement the element value.

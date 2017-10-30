@@ -1047,14 +1047,16 @@ export default class AutoNumericHelper {
      * @param {string} eventName
      * @param {HTMLElement|HTMLDocument|EventTarget} element
      * @param {object} detail
+     * @param {boolean} bubbles Set to `true` if the event must bubble up
+     * @param {boolean} cancelable Set to `true` if the event must be cancelable
      */
-    static triggerEvent(eventName, element = document, detail = null) {
+    static triggerEvent(eventName, element = document, detail = null, bubbles = true, cancelable = true) {
         let event;
         if (window.CustomEvent) {
-            event = new CustomEvent(eventName, { detail, bubbles: false, cancelable: false }); // This is not supported by default by IE ; We use the polyfill for IE9 and later.
+            event = new CustomEvent(eventName, { detail, bubbles , cancelable }); // This is not supported by default by IE ; We use the polyfill for IE9 and later.
         } else {
             event = document.createEvent('CustomEvent');
-            event.initCustomEvent(eventName, true, true, { detail });
+            event.initCustomEvent(eventName, bubbles, cancelable, { detail });
         }
 
         element.dispatchEvent(event);

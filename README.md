@@ -316,7 +316,7 @@ You can check what are the predefined choices for each option as well as a more 
 | `allowDecimalPadding` | Allow padding the decimal places with zeros. If set to `'floats'`, padding is only done when there are some decimals. | `true` |
 | `caretPositionOnFocus` | Determine where should be positioned the caret on focus | `null` |
 | `createLocalList` | Determine if a local list of AutoNumeric objects must be kept when initializing the elements and others | `true` |
-| `currencySymbol` | Define the currency symbol to display | `''` |
+| `currencySymbol` | Defines the currency symbol to display | `''` |
 | `currencySymbolPlacement` | Placement of the currency sign, relative to the number shown (as a prefix or a suffix) | `'p'` |
 | `decimalCharacter` | Decimal separator character | `'.'` |
 | `decimalCharacterAlternative` | Allow to declare an alternative decimal separator which is automatically replaced by the *real* decimal character when entered (This is useful in countries where the keyboard numeric pad has a period as the decimal character) | `null` |
@@ -327,8 +327,10 @@ You can check what are the predefined choices for each option as well as a more 
 | `defaultValueOverride` | Helper option for the ASP.NET-specific postback issue | `null` |
 | `digitalGroupSpacing` | Digital grouping for the thousand separator | `'3'` |
 | `digitGroupSeparator` | Thousand separator character  | `','` |
-| `divisorWhenUnfocused` | Define the number that will divide the current value shown when unfocused | `null` |
-| `emptyInputBehavior` | Define what to display when the input value is empty (possible options are `null`, `focus`, `press`, `always` and `zero`) | `'focus'` |
+| `divisorWhenUnfocused` | Defines the number that will divide the current value shown when unfocused | `null` |
+| `emptyInputBehavior` | Defines what to display when the input value is empty (possible options are `null`, `focus`, `press`, `always` and `zero`) | `'focus'` |
+| `eventBubbles` | Defines if the custom and native events triggered by AutoNumeric should bubble up or not | `true` |
+| `eventIsCancelable` | Defines if the custom and native events triggered by AutoNumeric should be cancelable | `true` |
 | `failOnUnknownOption ` | This option is the 'strict mode' *(aka 'debug' mode)*, which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the `options` object. | `false` |
 | `formatOnPageLoad` | Determine if the default value will be formatted on initialization | `true` |
 | `historySize` | Determine how many undo states an AutoNumeric object should keep in memory | `20` |
@@ -847,6 +849,8 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 
 AutoNumeric elements are transparent to the native `input` and `change` events, which means those are correctly sent when using an `<input>` element managed by AutoNumeric.<br>
 In addition to the native events, custom events sent by AutoNumeric elements allows you to hook into the formatting lifecycle, as you see fit.
+
+*Note: You can also set if the events triggered by the AutoNumeric elements, custom or native, should bubble up (option `eventBubbles`) or be cancelable (option `eventIsCancelable`).*<br>
 
 Following are listed how AutoNumeric react to different types of key inputs.
 

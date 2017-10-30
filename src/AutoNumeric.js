@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.17
- * @date         2017-10-26 UTC 22:22
+ * @version      4.1.0-beta.18
+ * @date         2017-10-30 UTC 23:45
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -672,6 +672,16 @@ export default class AutoNumeric {
 
                 return this;
             },
+            eventBubbles                 : eventBubbles => {
+                this.settings.eventBubbles = eventBubbles;
+
+                return this;
+            },
+            eventIsCancelable            : eventIsCancelable => {
+                this.settings.eventIsCancelable = eventIsCancelable;
+
+                return this;
+            },
             failOnUnknownOption          : failOnUnknownOption => {
                 this.settings.failOnUnknownOption = failOnUnknownOption; //FIXME test this
 
@@ -857,7 +867,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.17';
+        return '4.1.0-beta.18';
     }
 
     /**
@@ -1995,11 +2005,11 @@ export default class AutoNumeric {
                 return this;
             } else {
                 if (!minTest) {
-                    AutoNumericHelper.triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
+                    this._triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
                 }
 
                 if (!maxTest) {
-                    AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
+                    this._triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
                 }
 
                 AutoNumericHelper.throwError(`The value [${value}] being set falls outside of the minimumValue [${this.settings.minimumValue}] and maximumValue [${this.settings.maximumValue}] range set for this element`);
@@ -2098,7 +2108,7 @@ export default class AutoNumeric {
             }
 
             // Broadcast the `rawValueModified` event since the `rawValue` has been modified
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.rawValueModified, this.domElement, {
+            this._triggerEvent(AutoNumeric.events.rawValueModified, this.domElement, {
                 oldRawValue,
                 newRawValue: this.rawValue,
                 isPristine : this.isPristine(true),
@@ -2136,7 +2146,7 @@ export default class AutoNumeric {
             this.internalModification = false;
 
             if (sendFormattedEvent) {
-                AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, this.domElement, {
+                this._triggerEvent(AutoNumeric.events.formatted, this.domElement, {
                     oldValue   : oldElementValue,
                     newValue   : newElementValue,
                     oldRawValue: this.rawValue,
@@ -2233,6 +2243,19 @@ export default class AutoNumeric {
         if (!AutoNumericHelper.isNull(callback) && AutoNumericHelper.isFunction(callback)) {
             callback(result, this);
         }
+    }
+
+    /**
+     * Trigger the given event on the given element with the given detail.
+     * This takes into account the `eventBubbles` and `eventIsCancelable` options.
+     *
+     * @param {string} eventName
+     * @param {HTMLElement|HTMLDocument|EventTarget} element
+     * @param {object} detail
+     * @private
+     */
+    _triggerEvent(eventName, element = document, detail = null) {
+        AutoNumericHelper.triggerEvent(eventName, element, detail, this.settings.eventBubbles, this.settings.eventIsCancelable);
     }
 
     /**
@@ -3870,6 +3893,14 @@ export default class AutoNumeric {
             AutoNumericHelper.throwError(`The 'emptyInputBehavior' option is set to 'zero', but this value is outside of the range defined by 'minimumValue' and 'maximumValue' [${options.minimumValue}, ${options.maximumValue}].`);
         }
 
+        if (!AutoNumericHelper.isTrueOrFalseString(options.eventBubbles) && !AutoNumericHelper.isBoolean(options.eventBubbles)) {
+            AutoNumericHelper.throwError(`The event bubbles option 'eventBubbles' is invalid ; it should be either 'true' or 'false', [${options.eventBubbles}] given.`);
+        }
+
+        if (!AutoNumericHelper.isTrueOrFalseString(options.eventIsCancelable) && !AutoNumericHelper.isBoolean(options.eventIsCancelable)) {
+            AutoNumericHelper.throwError(`The event is cancelable option 'eventIsCancelable' is invalid ; it should be either 'true' or 'false', [${options.eventIsCancelable}] given.`);
+        }
+
         if (!AutoNumericHelper.isInArray(options.leadingZero, [
             AutoNumeric.options.leadingZero.allow,
             AutoNumeric.options.leadingZero.deny,
@@ -4137,7 +4168,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         const [minTest, maxTest] = this._checkIfInRangeWithOverrideOption(valueString, settings);
         if (!minTest || !maxTest) {
             // Throw a custom event
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, document, {
+            this._triggerEvent(AutoNumeric.events.formatted, document, {
                 oldValue   : null,
                 newValue   : null,
                 oldRawValue: null,
@@ -6049,7 +6080,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     // Do not set the value again if it has not changed
                     this.set(this.savedCancellableValue);
                     // And we need to send an 'input' event when setting back the initial value in order to make other scripts aware of the value change...
-                    AutoNumericHelper.triggerEvent(AutoNumeric.events.native.input, e.target);
+                    this._triggerEvent(AutoNumeric.events.native.input, e.target);
                 }
             }
 
@@ -6061,7 +6092,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // The "enter" key throws a `change` event if the value has changed since the `focus` event
         let targetValue = AutoNumericHelper.getElementValue(e.target);
         if (this.eventKey === AutoNumericEnum.keyName.Enter && this.valueOnFocus !== targetValue) {
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.native.change, e.target);
+            this._triggerEvent(AutoNumeric.events.native.change, e.target);
             this.valueOnFocus = targetValue;
 
             if (this.settings.isCancellable) {
@@ -6088,7 +6119,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             targetValue = AutoNumericHelper.getElementValue(e.target); // Update the value since it could have been changed during the deletion
             if ((targetValue !== this.lastVal) && this.throwInput) {
                 // Throw an input event when a character deletion is detected
-                AutoNumericHelper.triggerEvent(AutoNumeric.events.native.input, e.target);
+                this._triggerEvent(AutoNumeric.events.native.input, e.target);
                 e.preventDefault(); // ...and immediately prevent the browser to delete a second character
             }
 
@@ -6128,7 +6159,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             const targetValue = AutoNumericHelper.getElementValue(e.target);
             if ((targetValue !== this.lastVal) && this.throwInput) {
                 // Throws input event on adding a character
-                AutoNumericHelper.triggerEvent(AutoNumeric.events.native.input, e.target);
+                this._triggerEvent(AutoNumeric.events.native.input, e.target);
                 e.preventDefault(); // ...and immediately prevent the browser to add a second character
             } else {
                 if ((this.eventKey === this.settings.decimalCharacter || this.eventKey === this.settings.decimalCharacterAlternative) &&
@@ -6308,7 +6339,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // If the input value has changed during the key press event chain, an event is sent to alert that a formatting has been done (cf. Issue #187)
         if (targetValue !== this.initialValueOnKeydown) {
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, e.target, {
+            this._triggerEvent(AutoNumeric.events.formatted, e.target, {
                 oldValue   : this.initialValueOnKeydown,
                 newValue   : targetValue,
                 oldRawValue: this.initialRawValueOnKeydown,
@@ -6368,11 +6399,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             let elementValueIsAlreadySet = false;
             if (rawValueToFormat !== '' && !isRawValueNull) {
                 if (!minTest) {
-                    AutoNumericHelper.triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
+                    this._triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
                 }
 
                 if (!maxTest) {
-                    AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
+                    this._triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
                 }
 
                 if (this.settings.valuesToStrings && this._checkValuesToStrings(rawValueToFormat)) {
@@ -6404,11 +6435,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                         value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
                     } else {
                         if (!minTest) {
-                            AutoNumericHelper.triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
+                            this._triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
                         }
 
                         if (!maxTest) {
-                            AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
+                            this._triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
                         }
                     }
                 } else if (rawValueToFormat === '' && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {
@@ -6436,7 +6467,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 }
 
                 if (groupedValue !== this.valueOnFocus) {
-                    AutoNumericHelper.triggerEvent(AutoNumeric.events.native.change, this.domElement);
+                    this._triggerEvent(AutoNumeric.events.native.change, this.domElement);
                     delete this.valueOnFocus;
                 }
             }
@@ -6865,7 +6896,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // 8. We make sure we send an input event only if the result is different than the initial value before the paste
         if (valueHasBeenSet && initialFormattedValue !== targetValue) {
             // On a 'normal' non-autoNumeric input, an `input` event is sent when a paste is done. We mimic that.
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.native.input, e.target);
+            this._triggerEvent(AutoNumeric.events.native.input, e.target);
         }
     }
 
@@ -6882,7 +6913,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this.isEditing = false;
 
         if (AutoNumericHelper.getElementValue(e.target) !== this.valueOnFocus) {
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.native.change, e.target);
+            this._triggerEvent(AutoNumeric.events.native.change, e.target);
         }
     }
 
@@ -7599,6 +7630,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             digitGroupSeparator               : true,
             divisorWhenUnfocused              : true,
             emptyInputBehavior                : true,
+            eventBubbles                      : true,
+            eventIsCancelable                 : true,
             failOnUnknownOption               : true,
             formatOnPageLoad                  : true,
             historySize                       : true,
@@ -8080,9 +8113,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         if (!minTest) {
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
+            this._triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
         } else if (!maxTest) {
-            AutoNumericHelper.triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
+            this._triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
         }
 
         return false;

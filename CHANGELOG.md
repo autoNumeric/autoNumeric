@@ -1,5 +1,9 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.18
++ Fix issue #524 Allow changing the `bubble` and `cancelable` attributes of events sent by AutoNumeric
++ Add two new options `eventBubbles` and `eventIsCancelable` that defaults to `true` to manage the event attributes.
+
 ### 4.1.0-beta.17
 + Fix issue #457 Using `AutoNumeric.multiple()` generate many `submit` event listeners on the parent `form`
 + Fix the `drop` event handler removal that was omitted.

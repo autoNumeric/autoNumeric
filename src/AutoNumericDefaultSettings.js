@@ -57,6 +57,8 @@ Object.defineProperty(AutoNumeric, 'defaultSettings', {
             digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.comma,
             divisorWhenUnfocused         : AutoNumeric.options.divisorWhenUnfocused.none,
             emptyInputBehavior           : AutoNumeric.options.emptyInputBehavior.focus,
+            eventBubbles                 : AutoNumeric.options.eventBubbles.bubbles,
+            eventIsCancelable            : AutoNumeric.options.eventIsCancelable.isCancelable,
             failOnUnknownOption          : AutoNumeric.options.failOnUnknownOption.ignore,
             formatOnPageLoad             : AutoNumeric.options.formatOnPageLoad.format,
             historySize                  : AutoNumeric.options.historySize.medium,

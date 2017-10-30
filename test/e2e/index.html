@@ -530,8 +530,10 @@
 		<div class="test">
 			<div class="test">
 				<p class="description">Input type 'tel'</p>
-				<input id="inputTel1" type="tel" value="12345.678">
-				<input id="inputTel2" type="tel" value="12345.678">
+				<div>
+					<input id="inputTel1" type="tel" value="12345.678">
+					<input id="inputTel2" type="tel" value="12345.678">
+				</div>
 			</div>
 		</div>
 	</div>
@@ -734,9 +736,11 @@
 	<div class="testSuite">
 		<div class="test">
 			<p class="description">Issue #452</p>
-			<input id="issue_452" type="text" placeholder="#452" value="">
-			<input id="issue_452_unfocus" type="text" placeholder="unfocus here" value="">
-			<input id="issue_452_formatted" type="text" placeholder="Formatted on load" value="0.12345">
+			<div>
+				<input id="issue_452" type="text" placeholder="#452" value="">
+				<input id="issue_452_unfocus" type="text" placeholder="unfocus here" value="">
+				<input id="issue_452_formatted" type="text" placeholder="Formatted on load" value="0.12345">
+			</div>
 			<p id="result_452">Testing the raw value</p>
 		</div>
 	</div>
@@ -744,8 +748,10 @@
 	<div class="testSuite">
 		<div class="test">
 			<p class="description">Issue #450</p>
-			<input id="issue_450" type="text" placeholder="#450" value="">
-			<input id="issue_450_limits" type="text" placeholder="#450" value="">
+			<div>
+				<input id="issue_450" type="text" placeholder="#450" value="">
+				<input id="issue_450_limits" type="text" placeholder="#450" value="">
+			</div>
 		</div>
 	</div>
 
@@ -779,11 +785,13 @@
 	<div class="testSuite">
 		<div class="test">
 			<p class="description">Issue #493</p>
-			<input id="issue_493_noFormat" type="text" placeholder="#493">
-			<input id="issue_493_noFormatNull" type="text" placeholder="#493">
-			<input id="issue_493_noFormatNoValue" type="text" placeholder="#493">
-			<input id="issue_493_format" type="text" placeholder="#493">
-			<input id="issue_493_formatNull" type="text" placeholder="#493">
+			<div>
+				<input id="issue_493_noFormat" type="text" placeholder="#493">
+				<input id="issue_493_noFormatNull" type="text" placeholder="#493">
+				<input id="issue_493_noFormatNoValue" type="text" placeholder="#493">
+				<input id="issue_493_format" type="text" placeholder="#493">
+				<input id="issue_493_formatNull" type="text" placeholder="#493">
+			</div>
 		</div>
 	</div>
 
@@ -832,8 +840,23 @@
 	<div class="testSuite">
 		<div class="test">
 			<p class="description">Issue #456</p>
-			<input id="issue_456_focus" type="text" placeholder="wheel focus" value="42000">
-			<input id="issue_456_hover" type="text" placeholder="wheel focus" value="22000">
+			<div>
+				<input id="issue_456_focus" type="text" placeholder="wheel focus" value="42000">
+				<input id="issue_456_hover" type="text" placeholder="wheel focus" value="22000">
+			</div>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #524</p>
+			<div id="issue_524_parent">
+				<input id="issue_524_bubble" type="text" placeholder="Bubble: true" value="42">
+				<input id="issue_524_no_bubble" type="text" placeholder="Bubble: false" value="22">
+				<input id="issue_524_cancelable" type="text" placeholder="Cancelable: true" value="1234">
+				<input id="issue_524_not_cancelable" type="text" placeholder="Cancelable: false" value="4321">
+				<input id="issue_524_test" type="text" placeholder="Result">
+			</div>
 		</div>
 	</div>
 </div>
@@ -1815,6 +1838,24 @@
     //-------------- Issue #456
     new AutoNumeric('#issue_456_focus', { wheelOn: AutoNumeric.options.wheelOn.focus });
     new AutoNumeric('#issue_456_hover', { wheelOn: AutoNumeric.options.wheelOn.hover });
+
+    //-------------- Issue #524
+    new AutoNumeric('#issue_524_bubble', { eventBubbles: AutoNumeric.options.eventBubbles.bubbles });
+    new AutoNumeric('#issue_524_no_bubble', { eventBubbles: AutoNumeric.options.eventBubbles.doesNotBubble });
+    new AutoNumeric('#issue_524_cancelable', { eventIsCancelable: AutoNumeric.options.eventIsCancelable.isCancelable });
+    new AutoNumeric('#issue_524_not_cancelable', { eventIsCancelable: AutoNumeric.options.eventIsCancelable.isNotCancelable });
+    const testElement524 = document.querySelector('#issue_524_test');
+    const parentElement524 = document.querySelector('#issue_524_parent');
+    parentElement524.addEventListener('input', e => {
+	    console.log(`Input event detected in a child`, e.target, e); //DEBUG
+        testElement524.value = 'input bubble detected';
+    }, false);
+
+    const cancelableElement524 = document.querySelector('#issue_524_cancelable');
+    cancelableElement524.addEventListener('input', e => {
+        console.log(`Input event detected in a child`, e.target, e); //DEBUG
+        testElement524.value = 'input cancelable detected';
+    }, false);
 </script>
 </body>
 </html>

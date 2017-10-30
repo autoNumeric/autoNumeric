@@ -95,6 +95,8 @@ describe('The autoNumeric object', () => {
             digitGroupSeparator          : ',',
             divisorWhenUnfocused         : null,
             emptyInputBehavior           : 'focus',
+            eventBubbles                 : true,
+            eventIsCancelable            : true,
             failOnUnknownOption          : false,
             formatOnPageLoad             : true,
             historySize                  : 20,
@@ -251,6 +253,8 @@ describe('The autoNumeric object', () => {
             expect(defaultSettings.digitGroupSeparator       ).toEqual(aNInputSettings.digitGroupSeparator        );
             expect(defaultSettings.divisorWhenUnfocused      ).toEqual(aNInputSettings.divisorWhenUnfocused       );
             expect(defaultSettings.emptyInputBehavior        ).toEqual(aNInputSettings.emptyInputBehavior         );
+            expect(defaultSettings.eventBubbles              ).toEqual(aNInputSettings.eventBubbles               );
+            expect(defaultSettings.eventIsCancelable         ).toEqual(aNInputSettings.eventIsCancelable          );
             expect(defaultSettings.failOnUnknownOption       ).toEqual(aNInputSettings.failOnUnknownOption        );
             expect(defaultSettings.formatOnPageLoad          ).toEqual(aNInputSettings.formatOnPageLoad           );
             expect(String(defaultSettings.historySize)       ).toEqual(aNInputSettings.historySize                );
@@ -1410,6 +1414,8 @@ describe('autoNumeric options and `options.*` methods', () => {
             aNInput.options.digitGroupSeparator(AutoNumeric.options.digitGroupSeparator.narrowNoBreakSpace)
                 .options.decimalCharacter(AutoNumeric.options.decimalCharacter.decimalSeparatorKeySymbol);
             expect(aNInput.getFormatted()).toEqual('6\u202f666⎖00\u202f€');
+
+            //FIXME Add the WheelOn tests
         });
 
         it('should correctly update the `decimalPlacesShownOnFocus` option', () => {
@@ -1421,6 +1427,204 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual('2.222,12\u202f€');
             aNInput.node().focus();
             expect(aNInput.getFormatted()).toEqual('2.222,1235\u202f€');
+        });
+    });
+
+    describe('`eventBubbles` option', () => {
+        let form;
+        let input;
+        let aNInput;
+        let customFunction;
+
+        beforeEach(() => { // Initialization
+            form = document.createElement('form');
+            input = document.createElement('input');
+
+            document.body.appendChild(form);
+            form.appendChild(input);
+
+            // Setup the spying functions
+            customFunction = { // Dummy function used for spying
+                testingFunc(event) {
+                    console.log(`testingFunc() called from ${event.target.tagName} on ${event.currentTarget.tagName}.`); //DEBUG
+
+                    return event;
+                },
+            };
+
+            // Setup the event listeners
+            form.addEventListener('click', customFunction.testingFunc);
+            input.addEventListener('click', customFunction.testingFunc);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            form.removeChild(input);
+            document.body.removeChild(form);
+        });
+
+        xit('should not modify how non-AutoNumeric or input event bubble up', () => { //FIXME The `testingFunc()` is called, but somehow Jasmine spy does not pick that up
+            const spy = spyOn(customFunction, 'testingFunc');
+            aNInput = new AutoNumeric(input, { eventBubbles: AutoNumeric.options.eventBubbles.doesNotBubble });
+            aNInput.node().click();
+            expect(customFunction.testingFunc).toHaveBeenCalledTimes(2);
+
+            spy.calls.reset();
+            expect(customFunction.testingFunc).toHaveBeenCalledTimes(0);
+            aNInput.options.eventBubbles(AutoNumeric.options.eventBubbles.bubbles);
+            aNInput.node().click();
+            expect(customFunction.testingFunc).toHaveBeenCalledTimes(2);
+        });
+
+        it('should allow the AutoNumeric events to bubble up', () => {
+            const spy = spyOn(customFunction, 'testingFunc');
+            aNInput = new AutoNumeric(input, { eventBubbles: AutoNumeric.options.eventBubbles.bubbles });
+            // Add the custom event listeners
+            form.addEventListener(AutoNumeric.events.formatted, e => customFunction.testingFunc(e));
+            input.addEventListener(AutoNumeric.events.formatted, e => customFunction.testingFunc(e));
+
+            // Trigger the AutoNumeric event
+            aNInput.set(2000);
+            expect(customFunction.testingFunc).toHaveBeenCalledTimes(2);
+
+            // Check that modifying the `eventBubbles` option on the fly works as intended
+            spy.calls.reset();
+            aNInput.options.eventBubbles(AutoNumeric.options.eventBubbles.doesNotBubble);
+            aNInput.set(666);
+            expect(customFunction.testingFunc).toHaveBeenCalledTimes(1);
+
+            // And back
+            spy.calls.reset();
+            aNInput.options.eventBubbles(AutoNumeric.options.eventBubbles.bubbles);
+            aNInput.set(400);
+            expect(customFunction.testingFunc).toHaveBeenCalledTimes(2);
+        });
+
+        it('should not allow the AutoNumeric events to bubble up', () => {
+            const spy = spyOn(customFunction, 'testingFunc');
+            aNInput = new AutoNumeric(input, { eventBubbles: AutoNumeric.options.eventBubbles.doesNotBubble });
+            // Add the custom event listeners
+            form.addEventListener(AutoNumeric.events.formatted, e => customFunction.testingFunc(e));
+            input.addEventListener(AutoNumeric.events.formatted, e => customFunction.testingFunc(e));
+
+            // Trigger the AutoNumeric event
+            aNInput.set(2000);
+            expect(customFunction.testingFunc).toHaveBeenCalledTimes(1);
+
+            // Check that modifying the `eventBubbles` option on the fly works as intended
+            spy.calls.reset();
+            aNInput.options.eventBubbles(AutoNumeric.options.eventBubbles.bubbles);
+            aNInput.set(666);
+            expect(customFunction.testingFunc).toHaveBeenCalledTimes(2);
+
+            // And back
+            spy.calls.reset();
+            aNInput.options.eventBubbles(AutoNumeric.options.eventBubbles.doesNotBubble);
+            aNInput.set(400);
+            expect(customFunction.testingFunc).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('`eventIsCancelable` option', () => {
+        let form;
+        let input;
+        let aNInput;
+        let customFunction;
+
+        beforeEach(() => { // Initialization
+            form = document.createElement('form');
+            input = document.createElement('input');
+
+            document.body.appendChild(form);
+            form.appendChild(input);
+
+            // Setup the spying functions
+            customFunction = { // Dummy function used for spying
+                testingCancelableFunc(event) {
+                    // console.log('event.cancelable:', event.cancelable); //DEBUG
+                    // event.preventDefault(); //XXX The important bit to test if this is allowed. This should throw an error when the event is not cancelable.
+                    //XXX The documentation contradicts itself on that part. It says that calling `preventDefault()` on a non-cancelable event throws an error here (https://developer.mozilla.org/en-US/docs/Web/API/Event/cancelable), but also says that it's just ignored here (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)...
+                    // console.log(`testingCancelableFunc() called from ${event.target.tagName} on ${event.currentTarget.tagName}.`); //DEBUG
+
+                    return event.cancelable;
+                },
+
+                resetTestVariables() {
+                    return { cancelableResultForm: 'foo', cancelableResultInput: 'foo' };
+                },
+            };
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.remove();
+            form.removeChild(input);
+            document.body.removeChild(form);
+        });
+
+        it('should allow the AutoNumeric events to be cancelled', () => {
+            aNInput = new AutoNumeric(input, { eventIsCancelable: AutoNumeric.options.eventIsCancelable.isCancelable });
+            // Add the custom event listeners
+            let cancelableResultForm;
+            let cancelableResultInput;
+            ({ cancelableResultForm, cancelableResultInput } = customFunction.resetTestVariables());
+            form.addEventListener(AutoNumeric.events.formatted, e => {
+                cancelableResultForm = customFunction.testingCancelableFunc(e);
+            });
+            input.addEventListener(AutoNumeric.events.formatted, e => {
+                cancelableResultInput = customFunction.testingCancelableFunc(e);
+            });
+
+            // Trigger the AutoNumeric event
+            aNInput.set(2000);
+            expect(cancelableResultForm).toEqual(true);
+            expect(cancelableResultInput).toEqual(true);
+
+            // Check that modifying the `eventIsCancelable` option on the fly works as intended
+            ({ cancelableResultForm, cancelableResultInput } = customFunction.resetTestVariables());
+            aNInput.options.eventIsCancelable(AutoNumeric.options.eventIsCancelable.isNotCancelable);
+            aNInput.set(666);
+            expect(cancelableResultForm).toEqual(false);
+            expect(cancelableResultInput).toEqual(false);
+
+            // And back
+            ({ cancelableResultForm, cancelableResultInput } = customFunction.resetTestVariables());
+            aNInput.options.eventIsCancelable(AutoNumeric.options.eventIsCancelable.isCancelable);
+            aNInput.set(400);
+            expect(cancelableResultForm).toEqual(true);
+            expect(cancelableResultInput).toEqual(true);
+        });
+
+        it('should not allow the AutoNumeric events to be cancelled', () => {
+            aNInput = new AutoNumeric(input, { eventIsCancelable: AutoNumeric.options.eventIsCancelable.isNotCancelable });
+            // Add the custom event listeners
+            let cancelableResultForm;
+            let cancelableResultInput;
+            ({ cancelableResultForm, cancelableResultInput } = customFunction.resetTestVariables());
+            form.addEventListener(AutoNumeric.events.formatted, e => {
+                cancelableResultForm = customFunction.testingCancelableFunc(e);
+            });
+            input.addEventListener(AutoNumeric.events.formatted, e => {
+                cancelableResultInput = customFunction.testingCancelableFunc(e);
+            });
+
+            // Trigger the AutoNumeric event
+            aNInput.set(2000);
+            expect(cancelableResultForm).toEqual(false);
+            expect(cancelableResultInput).toEqual(false);
+
+            // Check that modifying the `eventIsCancelable` option on the fly works as intended
+            ({ cancelableResultForm, cancelableResultInput } = customFunction.resetTestVariables());
+            aNInput.options.eventIsCancelable(AutoNumeric.options.eventIsCancelable.isCancelable);
+            aNInput.set(666);
+            expect(cancelableResultForm).toEqual(true);
+            expect(cancelableResultInput).toEqual(true);
+
+            // And back
+            ({ cancelableResultForm, cancelableResultInput } = customFunction.resetTestVariables());
+            aNInput.options.eventIsCancelable(AutoNumeric.options.eventIsCancelable.isNotCancelable);
+            aNInput.set(400);
+            expect(cancelableResultForm).toEqual(false);
+            expect(cancelableResultInput).toEqual(false);
         });
     });
 
@@ -7018,6 +7222,16 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 'zero' })).not.toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 'null' })).not.toThrow();
 
+            expect(() => AutoNumeric.validate({ eventBubbles: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ eventBubbles: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ eventBubbles: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ eventBubbles: 'false' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ eventIsCancelable: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ eventIsCancelable: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ eventIsCancelable: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ eventIsCancelable: 'false' })).not.toThrow();
+
             expect(() => AutoNumeric.validate({ leadingZero: 'allow' })).not.toThrow();
             expect(() => AutoNumeric.validate({ leadingZero: 'deny' })).not.toThrow();
             expect(() => AutoNumeric.validate({ leadingZero: 'keep' })).not.toThrow();
@@ -7405,6 +7619,18 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 5 })).toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: -5 })).toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: null })).toThrow();
+
+            expect(() => AutoNumeric.validate({ eventBubbles: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ eventBubbles: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ eventBubbles: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ eventBubbles: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ eventBubbles: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ eventIsCancelable: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ eventIsCancelable: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ eventIsCancelable: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ eventIsCancelable: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ eventIsCancelable: 'foobar' })).toThrow();
 
             expect(() => AutoNumeric.validate({ leadingZero: [] })).toThrow();
             expect(() => AutoNumeric.validate({ leadingZero: true })).toThrow();

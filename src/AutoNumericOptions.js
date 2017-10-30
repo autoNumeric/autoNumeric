@@ -285,6 +285,20 @@ Object.defineProperty(AutoNumeric, 'options', {
                 zero  : 'zero',
             },
 
+            /* Defines if the custom and native events triggered by AutoNumeric should bubble up or not.
+             */
+            eventBubbles: {
+                bubbles: true,
+                doesNotBubble: false,
+            },
+
+            /* Defines if the custom and native events triggered by AutoNumeric should be cancelable.
+             */
+            eventIsCancelable: {
+                isCancelable: true,
+                isNotCancelable: false,
+            },
+
             /* This option is the 'strict mode' (aka 'debug' mode), which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the settings object.
              * You should set that to `true` if you want to make sure you are only using 'pure' autoNumeric settings objects in your code.
              * If you see uncaught errors in the console and your code starts to fail, this means somehow those options gets polluted by another program (which usually happens when using frameworks).

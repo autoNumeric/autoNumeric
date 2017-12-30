@@ -129,6 +129,7 @@ describe('The autoNumeric object', () => {
             unformatOnHover              : true,
             unformatOnSubmit             : false,
             valuesToStrings              : null,
+            watchExternalChanges         : false,
             wheelOn                      : 'focus',
             wheelStep                    : 'progressive',
         };
@@ -286,6 +287,7 @@ describe('The autoNumeric object', () => {
             expect(defaultSettings.unformatOnHover           ).toEqual(aNInputSettings.unformatOnHover            );
             expect(defaultSettings.unformatOnSubmit          ).toEqual(aNInputSettings.unformatOnSubmit           );
             expect(defaultSettings.valuesToStrings           ).toEqual(aNInputSettings.valuesToStrings            );
+            expect(defaultSettings.watchExternalChanges      ).toEqual(aNInputSettings.watchExternalChanges       );
             expect(defaultSettings.wheelOn                   ).toEqual(aNInputSettings.wheelOn                    );
             expect(defaultSettings.wheelStep                 ).toEqual(aNInputSettings.wheelStep                  );
         });
@@ -3078,6 +3080,7 @@ describe('autoNumeric options and `options.*` methods', () => {
      serializeSpaces
      showWarnings
      unformatOnHover
+     watchExternalChanges
      wheelOn
      wheelStep
      */
@@ -3925,7 +3928,7 @@ xdescribe('Managing external changes', () => { //XXX This test is deactivated si
         document.body.appendChild(inputElement);
 
         // Test the external modification
-        let aNInput = new AutoNumeric(inputElement, autoNumericOptionsEuro);
+        let aNInput = new AutoNumeric(inputElement, [autoNumericOptionsEuro, { watchExternalChanges: AutoNumeric.options.watchExternalChanges.watch }]);
         aNInput.set(6789.02);
         expect(aNInput.getNumericString()).toEqual('6789.02');
         expect(aNInput.getFormatted()).toEqual('6.789,02 €');
@@ -3944,7 +3947,7 @@ xdescribe('Managing external changes', () => { //XXX This test is deactivated si
         expect(inputElement.value).toEqual('42');
 
         // Add back the AutoNumeric object and check that there are no errors shown
-        aNInput = new AutoNumeric(inputElement, autoNumericOptionsEuro);
+        aNInput = new AutoNumeric(inputElement, [autoNumericOptionsEuro, { watchExternalChanges: AutoNumeric.options.watchExternalChanges.watch }]);
         expect(aNInput.getNumericString()).toEqual('42');
         expect(aNInput.getFormatted()).toEqual('42,00 €');
         aNInput.set(116789.02);
@@ -3956,13 +3959,50 @@ xdescribe('Managing external changes', () => { //XXX This test is deactivated si
         document.body.removeChild(inputElement);
     });
 
-    xit(`should watch for external change to the input 'textContent' attribute`, () => {
+    it(`should not watch for external change to the input 'value' attribute`, () => {
+        // Initialization
+        const inputElement = document.createElement('input');
+        document.body.appendChild(inputElement);
+
+        // Test the external modification
+        let aNInput = new AutoNumeric(inputElement, [autoNumericOptionsEuro, { watchExternalChanges: AutoNumeric.options.watchExternalChanges.doNotWatch }]);
+        aNInput.set(6789.02);
+        expect(aNInput.getNumericString()).toEqual('6789.02');
+        expect(aNInput.getFormatted()).toEqual('6.789,02 €');
+
+        aNInput.node().value = '1234567.2345';
+        expect(aNInput.getNumericString()).toEqual('6789.02');
+        expect(aNInput.getFormatted()).toEqual('1234567.2345');
+
+        // Remove the AutoNumeric object
+        aNInput.remove();
+
+        // Test that the default getter and setters are ok
+        const testingGetter = inputElement.value;
+        expect(testingGetter).toEqual('1234567.2345');
+        inputElement.value = '42';
+        expect(inputElement.value).toEqual('42');
+
+        // Add back the AutoNumeric object and check that there are no errors shown
+        aNInput = new AutoNumeric(inputElement, [autoNumericOptionsEuro, { watchExternalChanges: AutoNumeric.options.watchExternalChanges.doNotWatch }]);
+        expect(aNInput.getNumericString()).toEqual('42');
+        expect(aNInput.getFormatted()).toEqual('42,00 €');
+        aNInput.set(116789.02);
+        expect(aNInput.getNumericString()).toEqual('116789.02');
+        expect(aNInput.getFormatted()).toEqual('116.789,02 €');
+
+        // Un-initialization
+        aNInput.remove();
+        document.body.removeChild(inputElement);
+    });
+
+    it(`should watch for external change to the input 'textContent' attribute`, () => {
         // Initialization
         const pElement = document.createElement('p');
         document.body.appendChild(pElement);
 
         // Test the external modification
-        let aNElement = new AutoNumeric(pElement, autoNumericOptionsEuro);
+        let aNElement = new AutoNumeric(pElement, [autoNumericOptionsEuro, { watchExternalChanges: AutoNumeric.options.watchExternalChanges.watch }]);
         aNElement.set(6789.02);
         expect(aNElement.getNumericString()).toEqual('6789.02');
         expect(aNElement.getFormatted()).toEqual('6.789,02 €');
@@ -3981,7 +4021,44 @@ xdescribe('Managing external changes', () => { //XXX This test is deactivated si
         expect(pElement.textContent).toEqual('42');
 
         // Add back the AutoNumeric object and check that there are no errors shown
-        aNElement = new AutoNumeric(pElement, autoNumericOptionsEuro);
+        aNElement = new AutoNumeric(pElement, [autoNumericOptionsEuro, { watchExternalChanges: AutoNumeric.options.watchExternalChanges.watch }]);
+        expect(aNElement.getNumericString()).toEqual('42');
+        expect(aNElement.getFormatted()).toEqual('42,00 €');
+        aNElement.set(116789.02);
+        expect(aNElement.getNumericString()).toEqual('116789.02');
+        expect(aNElement.getFormatted()).toEqual('116.789,02 €');
+
+        // Un-initialization
+        aNElement.remove();
+        document.body.removeChild(pElement);
+    });
+
+    it(`should not watch for external change to the input 'textContent' attribute`, () => {
+        // Initialization
+        const pElement = document.createElement('p');
+        document.body.appendChild(pElement);
+
+        // Test the external modification
+        let aNElement = new AutoNumeric(pElement, [autoNumericOptionsEuro, { watchExternalChanges: AutoNumeric.options.watchExternalChanges.doNotWatch }]);
+        aNElement.set(6789.02);
+        expect(aNElement.getNumericString()).toEqual('6789.02');
+        expect(aNElement.getFormatted()).toEqual('6.789,02 €');
+
+        aNElement.node().textContent = '1234567.2345'; //FIXME Fails since `this.getterSetter` is undefined when trying to getOwnPropertyDescriptor the `textContent` attribute
+        expect(aNElement.getNumericString()).toEqual('6789.02');
+        expect(aNElement.getFormatted()).toEqual('1234567.2345');
+
+        // Remove the AutoNumeric object
+        aNElement.remove();
+
+        // Test that the default getter and setters are ok
+        const testingGetter = pElement.textContent;
+        expect(testingGetter).toEqual('1234567.2345');
+        pElement.textContent = '42';
+        expect(pElement.textContent).toEqual('42');
+
+        // Add back the AutoNumeric object and check that there are no errors shown
+        aNElement = new AutoNumeric(pElement, [autoNumericOptionsEuro, { watchExternalChanges: AutoNumeric.options.watchExternalChanges.doNotWatch }]);
         expect(aNElement.getNumericString()).toEqual('42');
         expect(aNElement.getFormatted()).toEqual('42,00 €');
         aNElement.set(116789.02);
@@ -7336,6 +7413,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ valuesToStrings: { 0: '-' } })).not.toThrow();
             expect(() => AutoNumeric.validate({ valuesToStrings: { 0: 'zero' } })).not.toThrow();
             expect(() => AutoNumeric.validate({ valuesToStrings: { '-225.34': 'foobar' } })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ watchExternalChanges: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ watchExternalChanges: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ watchExternalChanges: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ watchExternalChanges: 'false' })).not.toThrow();
         });
 
         it('should validate, with warnings', () => {
@@ -7758,6 +7840,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ valuesToStrings: [] })).toThrow();
             expect(() => AutoNumeric.validate({ valuesToStrings: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ valuesToStrings: 'foobar' })).toThrow();
+
+            expect(() => AutoNumeric.validate({ watchExternalChanges: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ watchExternalChanges: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ watchExternalChanges: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ watchExternalChanges: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ watchExternalChanges: 'foobar' })).toThrow();
         });
 
         it('should not allow the `negativeSignCharacter` and `positiveSignCharacter` to be equal', () => {

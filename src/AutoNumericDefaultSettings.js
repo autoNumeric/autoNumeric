@@ -92,6 +92,7 @@ Object.defineProperty(AutoNumeric, 'defaultSettings', {
             unformatOnHover              : AutoNumeric.options.unformatOnHover.unformat,
             unformatOnSubmit             : AutoNumeric.options.unformatOnSubmit.keepCurrentValue,
             valuesToStrings              : AutoNumeric.options.valuesToStrings.none,
+            watchExternalChanges         : AutoNumeric.options.watchExternalChanges.doNotWatch,
             wheelOn                      : AutoNumeric.options.wheelOn.focus,
             wheelStep                    : AutoNumeric.options.wheelStep.progressive,
         };

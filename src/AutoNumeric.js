@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.18
+ * @version      4.1.0-beta.19
  * @date         2017-10-30 UTC 23:45
  *
  * @authors      Bob Knothe, Alexandre Bonneau
@@ -848,6 +848,11 @@ export default class AutoNumeric {
 
                 return this;
             },
+            watchExternalChanges         : watchExternalChanges => { //FIXME test this
+                this.update({ watchExternalChanges });
+
+                return this;
+            },
             wheelOn                      : wheelOn => {
                 this.settings.wheelOn = wheelOn; //FIXME test this
 
@@ -867,7 +872,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.18';
+        return '4.1.0-beta.19';
     }
 
     /**
@@ -1413,6 +1418,7 @@ export default class AutoNumeric {
      */
     _addWatcher() {
         // `getterSetter` can be undefined when a non-input element is used
+        //TODO We need to either add an option here to prevent reacting to external changes, or find a way to allow third party scripts to change the data without AutoNumeric emitting the formatted event back. Indeed, this breaks some existing Vue.js components that rely and updating the values externally
         if (!AutoNumericHelper.isUndefined(this.getterSetter)) {
             const { set: setter, get: getter } = this.getterSetter;
             Object.defineProperty(this.domElement, this.attributeToWatch, {
@@ -1421,7 +1427,7 @@ export default class AutoNumeric {
                 set         : val => {
                     setter.call(this.domElement, val);
                     // Only `set()` the value if the modification comes from an external source
-                    if (!this.internalModification) {
+                    if (this.settings.watchExternalChanges && !this.internalModification) {
                         this.set(val);
                     }
                 },
@@ -1437,7 +1443,7 @@ export default class AutoNumeric {
             set         : val => {
                 this.valueWatched = val;
                 // Only `set()` the value if the modification comes from an external source
-                if (!this.internalModification) {
+                if (this.settings.watchExternalChanges && !this.internalModification) {
                     this.set(val);
                 }
             },
@@ -3957,6 +3963,10 @@ export default class AutoNumeric {
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.modifyValueOnWheel) && !AutoNumericHelper.isBoolean(options.modifyValueOnWheel)) {
             AutoNumericHelper.throwError(`The increment/decrement on mouse wheel option 'modifyValueOnWheel' is invalid ; it should be either 'false' or 'true', [${options.modifyValueOnWheel}] given.`);
+        }
+
+        if (!AutoNumericHelper.isTrueOrFalseString(options.watchExternalChanges) && !AutoNumericHelper.isBoolean(options.watchExternalChanges)) {
+            AutoNumericHelper.throwError(`The option 'watchExternalChanges' is invalid ; it should be either 'false' or 'true', [${options.watchExternalChanges}] given.`);
         }
 
         if (!AutoNumericHelper.isInArray(options.wheelOn, [
@@ -7664,6 +7674,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             unformatOnHover                   : true,
             unformatOnSubmit                  : true,
             valuesToStrings                   : true,
+            watchExternalChanges              : true,
             wheelOn                           : true,
             wheelStep                         : true,
 

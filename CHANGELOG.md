@@ -1,5 +1,10 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.19
++ Add an option `watchExternalChanges` to react to external changes
+  By default, an AutoNumeric element only format the value set with the `.set()` function.
+  If you want the element to watch and format value set by third party script using the `aNElement.node().value = 42` notation, then you need to set the `watchExternalChanges` option to `true`.
+
 ### 4.1.0-beta.18
 + Fix issue #524 Allow changing the `bubble` and `cancelable` attributes of events sent by AutoNumeric
 + Add two new options `eventBubbles` and `eventIsCancelable` that defaults to `true` to manage the event attributes.

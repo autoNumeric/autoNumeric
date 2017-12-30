@@ -788,6 +788,15 @@ Object.defineProperty(AutoNumeric, 'options', {
                 },
             },
 
+            /* Defines if the AutoNumeric element should watch external changes made without using `.set()`, but by using the basic `aNElement.node().value = 42` notation.
+             * If set to `watch`, then AutoNumeric will format the new value using `.set()` internally.
+             * Otherwise it will neither format it, nor save it in the history.
+             */
+            watchExternalChanges: {
+                watch     : true,
+                doNotWatch: false,
+            },
+
             /* Defines when the wheel event will increment or decrement the element value.
              * When set to `'focus'`, the AutoNumeric-managed element needs to be focused for the wheel event to change the value.
              * When set to `'hover'`, using the wheel event while the mouse is hovering the element is sufficient (no focus needed).

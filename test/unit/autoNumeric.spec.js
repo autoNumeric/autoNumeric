@@ -6509,6 +6509,20 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.unformat('-0,254\u202f%', AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('-0.00254');
         });
 
+        it('should correctly format `valuesToStrings` values', () => {
+            expect(AutoNumeric.unformat('1.234,56\u202f€', ['euro'])).toEqual('1234.56');
+            expect(AutoNumeric.unformat('1.234,56\u202f€', ['euro', { valuesToStrings: AutoNumeric.options.valuesToStrings.zeroDash }])).toEqual('1234.56');
+            expect(AutoNumeric.unformat('-', ['euro', { valuesToStrings: AutoNumeric.options.valuesToStrings.zeroDash }])).toEqual('0');
+            expect(AutoNumeric.unformat('-', ['euro', { valuesToStrings: { 42: '-' } }])).toEqual('42');
+            expect(AutoNumeric.unformat('Min', ['euro', { valuesToStrings: AutoNumeric.options.valuesToStrings.oneAroundZero }])).toEqual('-1');
+            expect(AutoNumeric.unformat('0,00\u202f€', ['euro', { valuesToStrings: AutoNumeric.options.valuesToStrings.oneAroundZero }])).toEqual('0.00');
+            expect(AutoNumeric.unformat('Max', ['euro', { valuesToStrings: AutoNumeric.options.valuesToStrings.oneAroundZero }])).toEqual('1');
+        });
+
+        it('should fail when trying to format unknown `valuesToStrings` values', () => {
+            expect(AutoNumeric.unformat('Min', 'euro')).toBeNaN();
+        });
+
         it('should unformat with multiple user options overwriting each other in the right order', () => {
             expect(AutoNumeric.unformat('241800,02 €', AutoNumeric.getPredefinedOptions().French, { digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator })).toEqual('241800.02');
             expect(AutoNumeric.unformat('241800,02 $',
@@ -6834,6 +6848,15 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.format(0.004796656, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0,480\u202f%');
             expect(AutoNumeric.format(0.004742656, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0,474\u202f%');
             expect(AutoNumeric.format(-0.002541148, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('-0,254\u202f%');
+        });
+
+        it('should correctly format `valuesToStrings` values', () => {
+            expect(AutoNumeric.format(1234.56, ['euro'])).toEqual('1.234,56\u202f€');
+            expect(AutoNumeric.format(1234.56, ['euro', { valuesToStrings: AutoNumeric.options.valuesToStrings.zeroDash }])).toEqual('1.234,56\u202f€');
+            expect(AutoNumeric.format(0, ['euro', { valuesToStrings: AutoNumeric.options.valuesToStrings.zeroDash }])).toEqual('-');
+            expect(AutoNumeric.format(-1, ['euro', { valuesToStrings: AutoNumeric.options.valuesToStrings.oneAroundZero }])).toEqual('Min');
+            expect(AutoNumeric.format(0, ['euro', { valuesToStrings: AutoNumeric.options.valuesToStrings.oneAroundZero }])).toEqual('0,00\u202f€');
+            expect(AutoNumeric.format(1, ['euro', { valuesToStrings: AutoNumeric.options.valuesToStrings.oneAroundZero }])).toEqual('Max');
         });
 
         it('should format with multiple user options overwriting each other in the right order', () => {

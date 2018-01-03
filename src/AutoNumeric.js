@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.19
- * @date         2017-10-30 UTC 23:45
+ * @version      4.1.0-beta.20
+ * @date         2018-01-03 UTC 03:15
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -872,7 +872,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.19';
+        return '4.1.0-beta.20';
     }
 
     /**
@@ -2224,7 +2224,43 @@ export default class AutoNumeric {
      * @private
      */
     _checkValuesToStrings(value) {
-        return AutoNumericHelper.isInArray(String(value), this.valuesToStringsKeys);
+        return this.constructor._checkValuesToStringsArray(value, this.valuesToStringsKeys);
+    }
+
+    /**
+     * Check if the given value has a corresponding key in the `stringsArray` array.
+     *
+     * @param {number|string} key
+     * @param {array} stringsArray Array where the `key` is checked against its keys
+     * @returns {boolean} Returns `true` if such a key is found.
+     * @private
+     */
+    static _checkValuesToStringsArray(key, stringsArray) {
+        return AutoNumericHelper.isInArray(String(key), stringsArray);
+    }
+
+    /**
+     * Static helper for checking if the given `key` is found in the settings' `valuesToStrings` option object.
+     *
+     * @param {number|string} key
+     * @param {object} settings
+     * @returns {boolean}
+     * @private
+     */
+    static _checkValuesToStringsSettings(key, settings) {
+        return this._checkValuesToStringsArray(key, Object.keys(settings.valuesToStrings));
+    }
+
+    /**
+     * Static helper for checking if the given `value` is found in the settings' `valuesToStrings` option object.
+     *
+     * @param {number|string} value
+     * @param {object} settings
+     * @returns {boolean}
+     * @private
+     */
+    static _checkStringsToValuesSettings(value, settings) {
+        return this._checkValuesToStringsArray(value, Object.values(settings.valuesToStrings));
     }
 
     /**
@@ -4190,6 +4226,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             AutoNumericHelper.throwError(`The value [${valueString}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`);
         }
 
+        // Directly format any `valuesToStrings` values, if found
+        if (settings.valuesToStrings && this._checkValuesToStringsSettings(value, settings)) {
+            return settings.valuesToStrings[value];
+        }
+
         // Generate the `negativePositiveSignPlacement` option as needed
         this._correctNegativePositiveSignPlacementOption(settings);
         // Calculate the needed decimal places
@@ -4269,6 +4310,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         settings.isNegativeSignAllowed = false;
         settings.isPositiveSignAllowed = true;
         value = value.toString();
+
+        // Directly unformat any `valuesToStrings` values, if found
+        if (settings.valuesToStrings && this._checkStringsToValuesSettings(value, settings)) {
+            return AutoNumericHelper.objectKeyLookup(settings.valuesToStrings, value);
+        }
 
         // This checks if a negative sign is anywhere in the `value`, not just on the very first character (ie. '12345.67-')
         if (AutoNumericHelper.isNegative(value, settings.negativeSignCharacter)) {

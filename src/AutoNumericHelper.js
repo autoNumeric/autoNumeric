@@ -1441,4 +1441,21 @@ export default class AutoNumericHelper {
     static mergeMaps(...mapObjects) {
         return new Map(mapObjects.reduce((as, b) => as.concat([...b]), []));
     }
+
+    /**
+     * Search the given `value` in the object `obj`, and return the very first key it finds
+     *
+     * @param {object} obj
+     * @param {string|number} value
+     * @returns {*|null}
+     */
+    static objectKeyLookup(obj, value) {
+        const result = Object.entries(obj).find(array => array[1] === value);
+        let key = null;
+        if (result !== void(0)) {
+            key = result[0];
+        }
+
+        return key;
+    }
 }

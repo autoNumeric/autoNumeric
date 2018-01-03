@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.20
++ Fix issue #489 `valuesToStrings` is ignored when using the static `format()` and `unformat()` functions
+
 ### 4.1.0-beta.19
 + Add an option `watchExternalChanges` to react to external changes
   By default, an AutoNumeric element only format the value set with the `.set()` function.

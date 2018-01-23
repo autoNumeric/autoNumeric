@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.21
++ Fix issue #541 The value of a read-only field can be changed with a scroll input
+
 ### 4.1.0-beta.20
 + Fix issue #489 `valuesToStrings` is ignored when using the static `format()` and `unformat()` functions
 

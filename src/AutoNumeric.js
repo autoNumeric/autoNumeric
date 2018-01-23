@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.20
- * @date         2018-01-03 UTC 03:15
+ * @version      4.1.0-beta.21
+ * @date         2018-01-23 UTC 19:25
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -872,7 +872,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.20';
+        return '4.1.0-beta.21';
     }
 
     /**
@@ -6542,7 +6542,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // The event is prevented by default, since otherwise the user would be able to paste invalid characters into the input
         e.preventDefault();
 
-        if (this.settings.readOnly) {
+        if (this.settings.readOnly || this.domElement.readOnly) {
             // Do not allow pasting in a readonly element (fix issue #505)
             return;
         }
@@ -6979,6 +6979,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {WheelEvent} e
      */
     _onWheel(e) {
+        if (this.settings.readOnly || this.domElement.readOnly) {
+            // Do not allow scrolling in a readonly element (fix issue #541)
+            return;
+        }
+
         if (this.settings.modifyValueOnWheel) {
             if (this.settings.wheelOn === AutoNumeric.options.wheelOn.focus) {
                 if (this.isFocused) {

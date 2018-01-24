@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.23
- * @date         2018-01-24 UTC 01:50
+ * @version      4.1.0-beta.24
+ * @date         2018-01-24 UTC 07:50
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -872,7 +872,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.23';
+        return '4.1.0-beta.24';
     }
 
     /**
@@ -6351,6 +6351,18 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             this.onGoingRedo = false;
         }
 
+        // Manage the Cut event
+        if ((e.ctrlKey || e.metaKey) && this.eventKey === AutoNumericEnum.keyName.x) {
+            // Save the caret position at the start of the selection
+            const caretPosition = AutoNumericHelper.getElementSelection(this.domElement).start;
+            // Convert the remaining 'formatted' numbers in a Js number
+            const cutNumber = this.constructor._toNumericValue(AutoNumericHelper.getElementValue(e.target), this.settings);
+            // Try to set that value with `set()`
+            this.set(cutNumber);
+            // Set back the initial caret position
+            this._setCaretPosition(caretPosition);
+        }
+
         // Manage the reformat when hovered with the Alt key pressed
         if (this.eventKey === AutoNumericEnum.keyName.Alt && this.hoveredWithAlt) {
             this.constructor._reformatAltHovered(this);
@@ -8331,7 +8343,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         // If a "Copy", "Paste" or "Cut" keyboard shortcut is detected (respectively 'ctrl + c', 'ctrl + v' or 'ctrl + x')
-        if ((e.ctrlKey || e.metaKey) && (this.eventKey === AutoNumericEnum.keyName.c || this.eventKey === AutoNumericEnum.keyName.v || this.eventKey === AutoNumericEnum.keyName.x)) {
+        if ((e.ctrlKey || e.metaKey) &&
+            (this.eventKey === AutoNumericEnum.keyName.c ||
+             this.eventKey === AutoNumericEnum.keyName.v ||
+             this.eventKey === AutoNumericEnum.keyName.x)) {
             if (e.type === 'keydown') {
                 this._expandSelectionOnSign();
             }

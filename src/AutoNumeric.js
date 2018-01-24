@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.21
- * @date         2018-01-23 UTC 19:25
+ * @version      4.1.0-beta.22
+ * @date         2018-01-24 UTC 00:45
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -872,7 +872,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.21';
+        return '4.1.0-beta.22';
     }
 
     /**
@@ -7075,6 +7075,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         if (result !== +currentUnformattedValue) {
             // Only 'set' the value if it has changed. For instance 'set' should not happen if the user hits a limit and continue to try to go past it since we clamp the value.
             this.set(result);
+
+            // Since we changed the input value, we send a native `input` event
+            this._triggerEvent(AutoNumeric.events.native.input, e.target);
         }
 
         //XXX Do not prevent if the value is not modified? From a UX point of view, preventing the wheel event when the user use it on top of an autoNumeric element should always be done, even if the value does not change. Perhaps that could affect other scripts relying on this event to be sent though.

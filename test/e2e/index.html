@@ -481,10 +481,22 @@
 
 	<div class="testSuite">
 		<div class="test">
+			<p class="description">Disabled input</p>
+			<div>
+				<input id="disabledInput" type="text" placeholder="" value="217804.81" disabled>
+				<p id="contentEditableDisabled" contenteditable="false">876321.04</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="testSuite">
+		<div class="test">
 			<p class="description">contentEditable option</p>
-			<p id="contentEditable1" contenteditable="true"></p>
-			<p id="contentEditable2" contenteditable="true">12345678.9012</p>
-			<p id="contentEditableNotActivated" contenteditable="false">69.02</p>
+			<div>
+				<p id="contentEditable1" contenteditable="true"></p>
+				<p id="contentEditable2" contenteditable="true">12345678.9012</p>
+				<p id="contentEditableNotActivated" contenteditable="false">69.02</p>
+			</div>
 		</div>
 	</div>
 
@@ -1215,6 +1227,10 @@
 
     //-------------- readOnly option
     new AutoNumeric('#readOnly_option', { readOnly: true });
+
+    //-------------- Disabled input
+    new AutoNumeric('#disabledInput', 'euro');
+    new AutoNumeric('#contentEditableDisabled', 'euro');
 
     //-------------- contentEditable elements
     new AutoNumeric('#contentEditable1').french();

@@ -2,7 +2,7 @@
  *               AutoNumeric.js
  *
  * @version      4.1.0-beta.23
- * @date         2018-01-24 UTC 01:40
+ * @date         2018-01-24 UTC 01:50
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -6542,7 +6542,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // The event is prevented by default, since otherwise the user would be able to paste invalid characters into the input
         e.preventDefault();
 
-        if (this.settings.readOnly || this.domElement.readOnly) {
+        if (this.settings.readOnly || this.domElement.readOnly || this.domElement.disabled) {
             // Do not allow pasting in a readonly element (fix issue #505)
             return;
         }
@@ -6987,7 +6987,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {WheelEvent} e
      */
     _onWheel(e) {
-        if (this.settings.readOnly || this.domElement.readOnly) {
+        if (this.settings.readOnly || this.domElement.readOnly || this.domElement.disabled) {
             // Do not allow scrolling in a readonly element (fix issue #541)
             return;
         }
@@ -7104,6 +7104,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {DragEvent} e
      */
     _onDrop(e) {
+        // Note: by default browsers already prevent the drop on readOnly and disabled elements
         this.isDropEvent = true;
         e.preventDefault();
         let format;

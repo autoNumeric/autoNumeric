@@ -2,6 +2,8 @@
 
 ### 4.1.0-beta.23
 + Fix issue #547 Newer version of Firefox breaks pasting in `contenteditable` elements
++ Fix issue #510 Pasting values in a `disabled` element should not be possible
++ Also prevent using the `wheel` event on `disabled` input elements.
 
 ### 4.1.0-beta.22
 + Fix issue #525 The `input` event is not fired on mouse wheel

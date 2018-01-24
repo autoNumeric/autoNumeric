@@ -871,6 +871,16 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #527</p>
+			<div>
+				<input id="issue_527" type="text" placeholder="" value="1357246.81">
+				<input id="issue_527_blur" type="text" placeholder="Click here to blur">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1872,6 +1882,9 @@
         console.log(`Input event detected in a child`, e.target, e); //DEBUG
         testElement524.value = 'input cancelable detected';
     }, false);
+
+    //-------------- Issue #527
+    new AutoNumeric('#issue_527');
 </script>
 </body>
 </html>

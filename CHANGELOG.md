@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.24
++ Fix issue #527 Cut text reappears when leaving the field
+
 ### 4.1.0-beta.23
 + Fix issue #547 Newer version of Firefox breaks pasting in `contenteditable` elements
 + Fix issue #510 Pasting values in a `disabled` element should not be possible

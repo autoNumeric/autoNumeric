@@ -1,7 +1,7 @@
 /**
  * End-to-end tests for autoNumeric.js
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
- * @copyright © 2017 Alexandre Bonneau
+ * @copyright © 2018 Alexandre Bonneau
  *
  * The MIT License (http://www.opensource.org/licenses/mit-license.php)
  *
@@ -200,6 +200,8 @@ const selectors = {
     issue478RightPlacementPos2        : '#issue_478_RightPlacement_pos2',
     issue478RightPlacementNegPos      : '#issue_478_RightPlacement_negPos',
     issue478Neg4                      : '#issue_478_neg4',
+    issue527input                     : '#issue_527',
+    issue527Blur                      : '#issue_527_blur',
 };
 
 //-----------------------------------------------------------------------------
@@ -809,6 +811,38 @@ describe('Issue #322', () => {
             return input.selectionStart;
         }, selectors.issue322input).value;
         expect(inputCaretPosition).toEqual(6);
+    });
+});
+
+xdescribe('Issue #527', () => { //FIXME Uncomment that test when PhantomJS will correctly run it
+    it('should test for default values, and focus on it', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue527input)).toEqual('1,357,246.81');
+    });
+
+    it('should correctly cut the number when using ctrl+x, format the result and set the caret position', () => {
+        const input = $(selectors.issue527input);
+        const inputForBlur = $(selectors.issue527Blur);
+
+        input.click();
+        browser.keys('Home');
+        browser.keys(['ArrowRight', 'ArrowRight', 'ArrowRight']);
+
+        // Cut
+        browser.keys('Shift');
+        browser.keys(['ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight']);
+        browser.keys('Shift');
+        browser.keys('Control');
+        browser.keys('x');
+        browser.keys('Control');
+        expect(browser.getValue(selectors.issue527input)).toEqual('1,356.81');
+
+        // Blur that input
+        inputForBlur.click();
+
+        // Then check that the input value is still the same
+        expect(browser.getValue(selectors.issue527input)).toEqual('1,356.81');
     });
 });
 

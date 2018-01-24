@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.23
++ Fix issue #547 Newer version of Firefox breaks pasting in `contenteditable` elements
+
 ### 4.1.0-beta.22
 + Fix issue #525 The `input` event is not fired on mouse wheel
 

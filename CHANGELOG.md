@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.22
++ Fix issue #525 The `input` event is not fired on mouse wheel
+
 ### 4.1.0-beta.21
 + Fix issue #541 The value of a read-only field can be changed with a scroll input
 

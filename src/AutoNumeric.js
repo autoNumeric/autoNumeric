@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.22
- * @date         2018-01-24 UTC 00:45
+ * @version      4.1.0-beta.23
+ * @date         2018-01-24 UTC 01:40
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -872,7 +872,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.22';
+        return '4.1.0-beta.23';
     }
 
     /**
@@ -6558,10 +6558,18 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             AutoNumericHelper.throwError('Unable to retrieve the pasted value. Please use a modern browser (ie. Firefox or Chromium).');
         }
 
+        // Fix for firefox paste handling on `contenteditable` elements where `e.target` is the the text node, not the element
+        let eventTarget;
+        if (!e.target.tagName) {
+            eventTarget = e.explicitOriginalTarget;
+        } else {
+            eventTarget = e.target;
+        }
+
         // 0. Special case if the user has selected all the input text before pasting
-        const initialFormattedValue = AutoNumericHelper.getElementValue(e.target);
-        const selectionStart = e.target.selectionStart || 0;
-        const selectionEnd = e.target.selectionEnd || 0;
+        const initialFormattedValue = AutoNumericHelper.getElementValue(eventTarget);
+        const selectionStart = eventTarget.selectionStart || 0;
+        const selectionEnd = eventTarget.selectionEnd || 0;
         const selectionSize = selectionEnd - selectionStart;
 
         if (selectionSize === initialFormattedValue.length) { // If all the element text is selected
@@ -6837,7 +6845,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     const indexSelectionEndInRawValue = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionEnd, this.settings.decimalCharacter));
 
                     // Here I must not count the characters that have been removed from the pasted text (ie. '.'), or the thousand separators in the initial selected text
-                    const selectedText = AutoNumericHelper.getElementValue(e.target).slice(selectionStart, selectionEnd);
+                    const selectedText = AutoNumericHelper.getElementValue(eventTarget).slice(selectionStart, selectionEnd);
                     caretPositionOnInitialTextAfterPasting = indexSelectionEndInRawValue - selectionSize + AutoNumericHelper.countCharInText(this.settings.digitGroupSeparator, selectedText) + pastedText.length;
                 }
 
@@ -6923,16 +6931,16 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         // 7. Then lastly, set the caret position at the right logical place
-        const targetValue = AutoNumericHelper.getElementValue(e.target);
+        const targetValue = AutoNumericHelper.getElementValue(eventTarget);
         let caretPositionInFormattedNumber;
         if (valueHasBeenSet) {
             switch (this.settings.onInvalidPaste) {
                 case AutoNumeric.options.onInvalidPaste.clamp:
                     if (valueHasBeenClamped) {
                         if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
-                            AutoNumericHelper.setElementSelection(e.target, targetValue.length - this.settings.currencySymbol.length); // This puts the caret on the right of the last decimal place
+                            AutoNumericHelper.setElementSelection(eventTarget, targetValue.length - this.settings.currencySymbol.length); // This puts the caret on the right of the last decimal place
                         } else {
-                            AutoNumericHelper.setElementSelection(e.target, targetValue.length); // ..and this on the far right
+                            AutoNumericHelper.setElementSelection(eventTarget, targetValue.length); // ..and this on the far right
                         }
 
                         break;
@@ -6945,14 +6953,14 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 default :
                     // Whenever one or multiple characters are pasted, this means we have to manage the potential thousand separators that could be added by the formatting
                     caretPositionInFormattedNumber = AutoNumericHelper.findCaretPositionInFormattedNumber(result, caretPositionOnInitialTextAfterPasting, targetValue, this.settings.decimalCharacter);
-                    AutoNumericHelper.setElementSelection(e.target, caretPositionInFormattedNumber);
+                    AutoNumericHelper.setElementSelection(eventTarget, caretPositionInFormattedNumber);
             }
         }
 
         // 8. We make sure we send an input event only if the result is different than the initial value before the paste
         if (valueHasBeenSet && initialFormattedValue !== targetValue) {
             // On a 'normal' non-autoNumeric input, an `input` event is sent when a paste is done. We mimic that.
-            this._triggerEvent(AutoNumeric.events.native.input, e.target);
+            this._triggerEvent(AutoNumeric.events.native.input, eventTarget);
         }
     }
 

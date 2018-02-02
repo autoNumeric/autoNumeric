@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.25
++ Add a new custom AutoNumeric event `'autoNumeric:initialized'` sent as soon as an AutoNumeric element is initialized
+
 ### 4.1.0-beta.24
 + Fix issue #527 Cut text reappears when leaving the field
 

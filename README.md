@@ -912,6 +912,8 @@ And when a `paste` is done with the keyboard shortcut (ie `ctrl+v`), the followi
 1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
 1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
 
+Whenever an AutoNumeric element is initialized, the custom `'autoNumeric:initialized'` event is sent.<br>When using `AutoNumeric.multiple()` to initialized numerous elements at once, as many `'autoNumeric:initialized'` events are sent as initialized elements.
+
 Finally, the `'change'` event is sent on `blur` if the value has been changed since the `focus` one.
 
 *Note: the `AutoNumeric.format()` static function does trigger an `'autoNumeric:formatted'` event if the value that the user is trying to format is outside the `minimumValue` and `maximumValue` range, with the `detail` attribute containing the range error message.*
@@ -957,12 +959,27 @@ const theCustomEvent = {
 }
 ```
 
+The `'autoNumeric:initialized'` event has a payload that contains the following `detail` attribute:
+```js
+// This is an example of `CustomEvent` object sent by AutoNumeric when the object is first initialized:
+const theCustomEvent = {
+    detail    : {
+        newValue   : "788,00 €", // The new formatted value
+        newRawValue: 788,        // The new raw value
+        error      : null,       // The error message as a string, `null` if no errors.
+        aNElement  : theAutoNumericObject, // The AutoNumeric object emitting this event
+    },
+    // ...
+}
+```
+
 This can then be used within another script.<br>For instance, you could listen to that event in a Vue.js [component template](https://vuejs.org/v2/guide/syntax.html#ad) like so:
 ```html
-<autonumeric 
+<vue-autonumeric 
     v-on:autoNumeric:formatted.native="funcCall1"
     v-on:autoNumeric:rawValueModified.native="funcCall2"
-></autonumeric>
+    v-on:autoNumeric:initialized.native="funcCall3"
+/>
 ```
 
 ## Questions

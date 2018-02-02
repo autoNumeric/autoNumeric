@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.24
- * @date         2018-01-24 UTC 07:50
+ * @version      4.1.0-beta.25
+ * @date         2018-02-01 UTC 22:00
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -864,6 +864,15 @@ export default class AutoNumeric {
                 return this;
             },
         };
+
+        // Once the autoNumeric element has been initialized, broadcast that message with additional info.
+        // Note: When using `AutoNumeric.multiple()`, one event is sent *per* element initialized
+        this._triggerEvent(AutoNumeric.events.initialized, this.domElement, {
+            newValue   : AutoNumericHelper.getElementValue(this.domElement),
+            newRawValue: this.rawValue,
+            error      : null,
+            aNElement  : this,
+        });
     }
 
     /**
@@ -872,7 +881,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.24';
+        return '4.1.0-beta.25';
     }
 
     /**

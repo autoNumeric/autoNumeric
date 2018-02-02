@@ -32,11 +32,12 @@ import AutoNumeric from './AutoNumeric';
 /**
  * Event list managed by AutoNumeric
  *
- * @type {{formatted: string, minRangeExceeded: string, maxRangeExceeded: string, native: {input: string, change: string}}}
+ * @type {{initialized: string, formatted: string, minRangeExceeded: string, maxRangeExceeded: string, native: {input: string, change: string}}}
  */
 Object.defineProperty(AutoNumeric, 'events', {
     get() {
         return {
+            initialized     : 'autoNumeric:initialized',
             formatted       : 'autoNumeric:formatted',
             rawValueModified: 'autoNumeric:rawValueModified',
             minRangeExceeded: 'autoNumeric:minExceeded',

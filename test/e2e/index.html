@@ -881,6 +881,16 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">autonumeric:initialized event</p>
+			<div id="initializedEventListener">
+				<input id="initializedEventInput1" class="multipleInitialization" type="text" placeholder="" value="4222336.66">
+				<input id="initializedEventInput2" class="multipleInitialization" type="text" placeholder="Enter numbers here">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1873,7 +1883,7 @@
     const testElement524 = document.querySelector('#issue_524_test');
     const parentElement524 = document.querySelector('#issue_524_parent');
     parentElement524.addEventListener('input', e => {
-	    console.log(`Input event detected in a child`, e.target, e); //DEBUG
+        console.log(`Input event detected in a child`, e.target, e); //DEBUG
         testElement524.value = 'input bubble detected';
     }, false);
 
@@ -1885,6 +1895,19 @@
 
     //-------------- Issue #527
     new AutoNumeric('#issue_527');
+
+    //-------------- autonumeric:initialized event
+    const initializedEventListener = document.querySelector('#initializedEventListener');
+    initializedEventListener.addEventListener('autoNumeric:initialized', e => {
+        console.log('autoNumeric:initialized event detected:', e); //DEBUG
+    });
+
+    // Create each an element separately
+    // new AutoNumeric('#initializedEventInput1');
+    // new AutoNumeric('#initializedEventInput2');
+
+    // Create all the element once
+    AutoNumeric.multiple('.multipleInitialization');
 </script>
 </body>
 </html>

@@ -136,7 +136,7 @@
     "test:unitfp": "karma start test/unit/karma.conf.js --single-run --browsers Firefox --reporters 'progress'",
     "test:unitcp": "karma start test/unit/karma.conf.js --single-run --browsers Chrome --reporters 'progress'",
     "test:e2e": "wdio test/e2e/wdio.local.conf.js",
-    "travis:test": "yarn test:unitp && yarn test:e2e",
+    "travis:test": "yarn test:unitp",
     "travis:lint": "yarn lint"
   },
   "repository": {

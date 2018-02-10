@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.27
++ Fix issue #432 The `decimalCharacterAlternative` option does not ignore the comma when it's set to `none`
+
 ### 4.1.0-beta.26
 + Fix issue #522 Input is duplicated and reversed on devices with Android < 7.0
 + Remove the `input` event listener

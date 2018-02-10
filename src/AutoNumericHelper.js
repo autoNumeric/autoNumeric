@@ -1098,7 +1098,7 @@ export default class AutoNumericHelper {
             n = n.replace('.', '');
         }
 
-        // length of string if no decimal character
+        // Length of string if no decimal character
         if (e < 0) {
             // Integer
             e = n.length;

@@ -1,5 +1,20 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.26
++ Fix issue #522 Input is duplicated and reversed on devices with Android < 7.0
++ Remove the `input` event listener
++ Refactor parts of the `_stripAllNonNumberCharacters` and `_convertToNumericString()` functions by creating a `_normalizeCurrencySuffixAndNegativeSignCharacters()` function
++ Rename `_stripAllNonNumberCharacters()` to `_stripAllNonNumberCharactersExceptCustomDecimalChar()`
++ Create a `_stripAllNonNumberCharacters()` function that also normalize the decimal character
++ Remove the obsolete `skipFirstAutoStrip` and `skipLastAutoStrip` regex
++ Prevent the conversion of the `decimalCharacterAlternative` into the `decimalCharacter` when stripping the value
++ Simplify `_addBrackets()` and `_setBrackets()`
++ Simplify the `_removeBrackets()` calls
++ Fix `_convertToNumericString()` so that it normalize the positive sign and remove the brackets if any
++ Fix the bug where the formatted numbers on Android Chrome gets deleted on blur
++ Simplify the generated cached regex
++ Refactor `_processCharacterDeletionIfTrailingNegativeSign()` so `contains()` is called only once
+
 ### 4.1.0-beta.25
 + Add a new custom AutoNumeric event `'autoNumeric:initialized'` sent as soon as an AutoNumeric element is initialized
 

@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.26
- * @date         2018-02-10 UTC 09:10
+ * @version      4.1.0-beta.27
+ * @date         2018-02-10 UTC 23:59
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -881,7 +881,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.26';
+        return '4.1.0-beta.27';
     }
 
     /**
@@ -7568,20 +7568,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
-     * Sets the alternative decimal separator key.
-     * @private
-     */
-    _setAlternativeDecimalSeparatorCharacter() { //FIXME Delete this in order to fix issue #432
-        if (AutoNumericHelper.isNull(this.settings.decimalCharacterAlternative) && Number(this.settings.decimalPlaces) > 0) {
-            if (this.settings.decimalCharacter === '.' && this.settings.digitGroupSeparator !== ',') {
-                this.settings.decimalCharacterAlternative = ',';
-            } else if (this.settings.decimalCharacter === ',' && this.settings.digitGroupSeparator !== '.') {
-                this.settings.decimalCharacterAlternative = '.';
-            }
-        }
-    }
-
-    /**
      * Caches regular expressions for _stripAllNonNumberCharactersExceptCustomDecimalChar
      *
      * @param {object} settings
@@ -7836,7 +7822,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // Additional changes to the settings object
         this._calculateVMinAndVMaxIntegerSizes();
-        this._setAlternativeDecimalSeparatorCharacter();
         this._setTrailingNegativeSignInfo();
         this.regex = {}; // Create the object that will store the regular expressions
         this.constructor._cachesUsualRegularExpressions(this.settings, this.regex);
@@ -8491,8 +8476,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Start rules when the decimal character key is pressed always use numeric pad dot to insert decimal separator
         // Do not allow decimal character if no decimal part allowed
         if (this.eventKey === this.settings.decimalCharacter ||
-            (this.settings.decimalCharacterAlternative && this.eventKey === this.settings.decimalCharacterAlternative) ||
-            (this.eventKey === '.' || this.eventKey === ',' || this.eventKey === AutoNumericEnum.keyName.NumpadDot)) { //FIXME Remove the hardcoded '.' and ',' for fixing issue #432?
+            (this.settings.decimalCharacterAlternative && this.eventKey === this.settings.decimalCharacterAlternative)) {
             if (!this._isDecimalCharacterInsertionAllowed() || !this.settings.decimalCharacter) {
                 return true;
             }

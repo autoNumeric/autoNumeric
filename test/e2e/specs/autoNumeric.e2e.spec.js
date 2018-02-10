@@ -202,6 +202,8 @@ const selectors = {
     issue478Neg4                      : '#issue_478_neg4',
     issue527input                     : '#issue_527',
     issue527Blur                      : '#issue_527_blur',
+    issue432dot                       : '#issue_432_dot',
+    issue432none                      : '#issue_432_none',
 };
 
 //-----------------------------------------------------------------------------
@@ -3770,6 +3772,43 @@ describe('Pasting', () => {
         browser.keys(['Home', 'ArrowRight', 'Shift', 'ArrowRight', 'ArrowRight', 'Shift']);
         browser.keys(['Control', 'a', 'v', 'Control']);
         expect(browser.getValue(selectors.readOnlyElement)).toEqual('42.42'); // No changes!
+    });
+});
+
+describe('Issue #432', () => {
+    it('should test for default values, and focus on it', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue432dot)).toEqual('');
+        expect(browser.getValue(selectors.issue432none)).toEqual('');
+    });
+
+    it('should accept the alternative decimal character', () => {
+        const inputWithDecimalCharAlternative = $(selectors.issue432dot);
+
+        inputWithDecimalCharAlternative.click();
+        // With the comma: ok
+        browser.keys('123,45');
+        expect(browser.getValue(selectors.issue432dot)).toEqual('123,45 €');
+
+        // With the dot: ok
+        browser.keys(['Home', 'Control', 'a', 'Control', 'Delete']);
+        browser.keys('123.45');
+        expect(browser.getValue(selectors.issue432dot)).toEqual('123,45 €');
+    });
+
+    it('should not accept any alternative decimal character', () => {
+        const inputWithoutDecimalCharAlternative = $(selectors.issue432none);
+
+        inputWithoutDecimalCharAlternative.click();
+        // With the comma: ok
+        browser.keys('123,45');
+        expect(browser.getValue(selectors.issue432none)).toEqual('123,45 €');
+
+        // With the dot: ko
+        browser.keys(['Home', 'Control', 'a', 'Control', 'Delete']);
+        browser.keys('123.45');
+        expect(browser.getValue(selectors.issue432none)).toEqual('12.345 €');
     });
 });
 

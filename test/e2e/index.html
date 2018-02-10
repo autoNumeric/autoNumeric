@@ -891,6 +891,16 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #432</p>
+			<div>
+				<input id="issue_432_dot" type="text" placeholder="with dot as alternative">
+				<input id="issue_432_none" type="text" placeholder="without alternative">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1908,6 +1918,22 @@
 
     // Create all the element once
     AutoNumeric.multiple('.multipleInitialization');
+
+    //-------------- Issue #432
+    new AutoNumeric('#issue_432_dot', [
+        'euro',
+        {
+            decimalCharacter           : AutoNumeric.options.decimalCharacter.comma,
+            decimalCharacterAlternative: AutoNumeric.options.decimalCharacterAlternative.dot,
+        },
+    ]);
+    new AutoNumeric('#issue_432_none', [
+        'euro',
+        {
+            decimalCharacter           : AutoNumeric.options.decimalCharacter.comma,
+            decimalCharacterAlternative: AutoNumeric.options.decimalCharacterAlternative.none,
+        },
+    ]);
 </script>
 </body>
 </html>

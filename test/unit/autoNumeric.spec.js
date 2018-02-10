@@ -634,7 +634,8 @@ describe('The autoNumeric object', () => {
             expect(() => aNInput._removeFromLocalList()).toThrow();
             expect(() => aNInput._runCallbacksFoundInTheSettingsObject()).toThrow();
             expect(() => aNInput._maximumVMinAndVMaxDecimalLength()).toThrow();
-            expect(() => aNInput._stripAllNonNumberCharacters()).toThrow();
+            expect(() => aNInput._stripAllNonNumberCharactersFull()).toThrow();
+            expect(() => aNInput._stripAllNonNumberCharactersExceptCustomDecimalChar()).toThrow();
             expect(() => aNInput._toggleNegativeBracket()).toThrow();
             expect(() => aNInput._convertToNumericString()).toThrow();
             expect(() => aNInput._toLocale()).toThrow();
@@ -1404,6 +1405,7 @@ describe('autoNumeric options and `options.*` methods', () => {
             aNInput.options.outputFormat(AutoNumeric.options.outputFormat.negativeComma);
             expect(aNInput.getLocalized()).toEqual('-12356,78');
 
+            expect(aNInput.getFormatted()).toEqual('-12.356,78\u202f€');
             aNInput.options.negativeSignCharacter('#');
             expect(aNInput.getFormatted()).toEqual('#12.356,78\u202f€');
             aNInput.options.positiveSignCharacter('¤');

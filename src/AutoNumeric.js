@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.0-beta.27
- * @date         2018-02-10 UTC 23:59
+ * @version      4.1.0-beta.28
+ * @date         2018-02-11 UTC 21:10
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -881,7 +881,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.0-beta.27';
+        return '4.1.0-beta.28';
     }
 
     /**
@@ -8679,8 +8679,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         // Only update the value if it has changed. This prevents modifying the selection, if any.
-        if (value !== elementValue ||
-            value === elementValue && (this.eventKey === AutoNumericEnum.keyName.num0 || this.eventKey === AutoNumericEnum.keyName.numpad0)) {
+        if (value !== elementValue) {
             this._setElementValue(value, false);
             this._setCaretPosition(position);
         }

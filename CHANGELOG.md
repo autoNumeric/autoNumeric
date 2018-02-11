@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.0-beta.28
++ Fix issue #477 Modifying an input by selecting all its content and entering `0` drop the current selection, if 0 is out of the limit boundaries
+
 ### 4.1.0-beta.27
 + Fix issue #432 The `decimalCharacterAlternative` option does not ignore the comma when it's set to `none`
 

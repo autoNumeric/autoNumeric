@@ -901,6 +901,13 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #477</p>
+			<input id="issue_477" type="text" value="42">
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1934,6 +1941,9 @@
             decimalCharacterAlternative: AutoNumeric.options.decimalCharacterAlternative.none,
         },
     ]);
+
+    //-------------- Issue #477
+    new AutoNumeric('#issue_477', { minimumValue: 1 });
 </script>
 </body>
 </html>

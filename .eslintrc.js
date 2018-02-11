@@ -64,6 +64,7 @@ module.exports = {
             },
         ],
         'no-confusing-arrow'           : 'error',
+        'no-unexpected-multiline'      : 'error',
         'space-before-function-paren'  : [
             'error',
             {

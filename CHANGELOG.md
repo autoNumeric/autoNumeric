@@ -28,7 +28,7 @@ The highlights of this version are:
   + Unit test now use the `mocha` profile as default instead of `progress`
 + Fixes
   + Coverage information is back (#490)
-  + Workaround geckodriver bug when trying to input an hyphen (#480)
+  + Workaround a geckodriver bug when trying to input an hyphen (#480)
   + Fix lots of pasting issues (#481, #482, #483, #484, #505, #510, #547)
   + Create workarounds (*hacks* really) for various IE-related bugs (#495, #516, #518)
   + `AutoNumeric.multiple()` now correctly add only one event listener to the parent form, if any (#457)

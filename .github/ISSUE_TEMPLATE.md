@@ -10,7 +10,7 @@
 1. Use autoNumeric version `<vX.X.X>`
 2. In the browser `<Chrome|Firefox>` version `<YY>`
 3. On the `<Linux>` operating system
-4. Then instantiate the autoNumeric object with the options defined above (Define them here if that's not the case:
+4. Then instantiate the autoNumeric object with the following options:
 ```js
 new AutoNumeric(domElement, { options });
 ```
@@ -18,6 +18,7 @@ new AutoNumeric(domElement, { options });
 
 ### Link to live example (ie. [Codepen](http://codepen.io/pen/))
 <Providing a live example of your problem that reproduce what you are experiencing usually means we'll be able to fix your issue *much more quickly* than if you don't.>
+
 <Also, when creating an extract of your problem, you are likely to find the cause of it, and fix it yourself, :tada: ;)>
 
-Thanks for reporting a bug or giving us great ideas with your feature request!
+<Thanks for reporting a bug or giving us great ideas with your feature request!>

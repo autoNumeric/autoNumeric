@@ -1175,7 +1175,7 @@ describe('Elements with the `contenteditable` attribute set to `true`', () => {
         expect(browser.getText(selectors.contentEditable2)).toEqual('$12,345,678.90');
     });
 
-    it('should change the input value accordingly when focusing on the element', () => {
+    it('should change the input value accordingly when focusing on the element', () => { //FIXME Fails on Firefox where the contenteditable field is said to be not visible, see upstream bug https://github.com/mozilla/geckodriver/issues/1074
         const contentEditable1 = $(selectors.contentEditable1);
         const contentEditable2 = $(selectors.contentEditable2);
 
@@ -1480,7 +1480,7 @@ describe('Negative numbers & brackets notations', () => {
         negativeBracketsInput1.click();
         expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
         browser.keys(['Home', '+']);
-        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57'); //FIXME Fails on Chrome only; there is a bug in the selenium chromedriver
 
         negativeBracketsInput2.click();
         expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57-');

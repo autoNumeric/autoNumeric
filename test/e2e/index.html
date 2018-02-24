@@ -915,6 +915,16 @@
 			<input id="issue_535" type="text" placeholder="#535">
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #553</p>
+			<div>
+				<input id="issue_553_one" type="text">
+				<input id="issue_553_two" type="text">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1960,6 +1970,10 @@
         decimalCharacter           : ',',
         decimalCharacterAlternative: '.'
     });
+
+    //-------------- Issue #553
+    new AutoNumeric('#issue_553_one', 1.23e-13, { decimalPlaces: 2 });
+    new AutoNumeric('#issue_553_two', -123.4567e-6, { decimalPlaces: 10 });
 </script>
 </body>
 </html>

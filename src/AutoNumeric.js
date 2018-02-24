@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.2.0
- * @date         2018-02-43 UTC 01:55
+ * @version      4.2.1
+ * @date         2018-02-24 UTC 10:40
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -881,7 +881,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.2.0';
+        return '4.2.1';
     }
 
     /**
@@ -1108,7 +1108,7 @@ export default class AutoNumeric {
     _saveInitialValues(initialValue) {
         // Keep the very first initial values (in the html attribute and set by the script). This is needed to check if the element is pristine.
         // Save the html attribute 'value'
-        this.initialValueHtmlAttribute = this.domElement.getAttribute('value');
+        this.initialValueHtmlAttribute = AutoNumericHelper.scientificToDecimal(this.domElement.getAttribute('value'));
         if (AutoNumericHelper.isNull(this.initialValueHtmlAttribute)) {
             // Set the default empty value attribute instead of `null`, since if the initial value is null, the empty string is used
             this.initialValueHtmlAttribute = '';
@@ -7853,6 +7853,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     /**
      * Convert the `value` parameter that can either be :
      * - a real number,
+     * - a number represented in the scientific notation (ie. -123.4567e-6)
      * - a string representing a real number, or
      * - a string representing a localized number (with specific group separators and decimal character),
      * ...to a string representing a real 'javascript' number (ie. '1234' or '1234.567').
@@ -7868,7 +7869,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         let result;
         if (AutoNumericHelper.isNumber(Number(value))) {
             // The value has either already been stripped, or a 'real' javascript number is passed as a parameter
-            result = value;
+            result = AutoNumericHelper.scientificToDecimal(value);
         } else {
             // Else if it's a string that `Number()` cannot typecast, then we try to convert the localized numeric string to a numeric one
             // Convert the value to a numeric string, stripping unnecessary characters in the process
@@ -7888,7 +7889,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Return the pasted text that will be used, by stripping most non-numeric characters
      *
      * @param {string} text
-     * @returns {string|void|XML|*}
+     * @returns {string}
      */
     _preparePastedText(text) {
         return this.constructor._stripAllNonNumberCharacters(text, this.settings, true, this.isFocused);

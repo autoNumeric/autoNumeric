@@ -3385,6 +3385,98 @@ describe('Initialization calls', () => {
             expect(aNInput.getFormatted()).toEqual('-13256.68');
         });
 
+        it('should init the element with an initial value in scientific notation', () => {
+            // Test the `scientificToDecimal` function directly
+            function testFunc(value) {
+                const decimalValue = AutoNumericHelper.scientificToDecimal(value);
+                if (isNaN(Number(value))) {
+                    expect(decimalValue).toBeNaN();
+                } else {
+                    expect(Number(decimalValue)).toEqual(Number(value));
+                }
+            }
+            const valuesToTest = [
+                '12345E1',
+                '12345e3',
+                '7342.56e40',
+                '7342.561e40',
+                '7342.561E40',
+                '73.42561e42',
+                '7.342561e43',
+                '12345e-3',
+                '12345.67e-3',
+                '-123.4567e-6',
+                '6.1349392e-13',
+                '6.1349392E-13',
+                '6.13FOO2e-13',
+                '1e3',
+                '-1e3',
+                '-1e8',
+                '-1e76',
+                '-1E76',
+                '-1e',
+                '-e12',
+                '1.2345e4',
+                '1.23456789e4',
+                '1.e4',
+                '.234e4',
+                '1.234e10',
+                '12345e3',
+                '12345e1',
+                '1.23456789e-4',
+                '1.234e-6',
+                '12.34e-2',
+                '.123e-5',
+                '123.456e-6',
+                '12345e-1',
+                '12345e-2',
+                '12345e-3',
+                '12345.67e-3',
+                '-12345e3',
+                '123e-6',
+                '-123.4567e-6',
+                '-1e8',
+                'foobar',
+            ];
+            valuesToTest.map(testFunc);
+
+            // Then test it in the AutoNumeric context
+            // When initialized with a value on the html
+            newInput.value = '12345E1';
+            aNInput = new AutoNumeric(newInput);
+            expect(aNInput.getNumericString()).toEqual('123450');
+            aNInput.remove();
+
+            // When initialized with a given value
+            aNInput = new AutoNumeric(newInput, '12345E1', {
+                maximumValue : '100000000000000000000000000000000000000000000',
+                decimalPlaces: 40,
+            });
+            expect(aNInput.getNumericString()).toEqual('123450');
+
+            // Also check that using `set()` with a scientific value is supported
+            aNInput.set('12345e3');
+            expect(aNInput.getNumericString()).toEqual('12345000');
+            aNInput.set('7342.561e40');
+            expect(aNInput.getNumericString()).toEqual('73425610000000000000000000000000000000000000');
+            aNInput.set('73.42561e42');
+            expect(aNInput.getNumericString()).toEqual('73425610000000000000000000000000000000000000');
+            aNInput.set('7.342561e43');
+            expect(aNInput.getNumericString()).toEqual('73425610000000000000000000000000000000000000');
+            aNInput.set('12345.67e-3');
+            expect(aNInput.getNumericString()).toEqual('12.34567');
+            aNInput.set('6.1349392e-13');
+            expect(aNInput.getNumericString()).toEqual('0.00000000000061349392');
+            aNInput.set('-1e8');
+            expect(aNInput.getNumericString()).toEqual('-100000000');
+            aNInput.set('1.23456789e4');
+            expect(aNInput.getNumericString()).toEqual('12345.6789');
+
+            aNInput.update({ decimalPlaces: 2 });
+            aNInput.set('1.23e-13');
+            expect(aNInput.getNumericString()).toEqual('0');
+        });
+
         // Test the showPositiveSign option
         // +1.234,00
         const noneLeft = {
@@ -6914,6 +7006,21 @@ describe('Static autoNumeric functions', () => {
                 { currencySymbol: AutoNumeric.options.currencySymbol.pound },
                 { currencySymbol: AutoNumeric.options.currencySymbol.dollar },
             ])).toEqual('241800,02$');
+        });
+
+        it('should format values wrote in scientific notation', () => {
+            const bigNumber = {
+                maximumValue : '100000000000000000000000000000000000000000000',
+            };
+            expect(AutoNumeric.format(12345e3)).toEqual('12,345,000.00');
+            expect(AutoNumeric.format('7342.561e40', bigNumber)).toEqual('73,425,610,000,000,000,000,000,000,000,000,000,000,000,000.00');
+            expect(AutoNumeric.format('73.42561e42', bigNumber)).toEqual('73,425,610,000,000,000,000,000,000,000,000,000,000,000,000.00');
+            expect(AutoNumeric.format('7.342561e43', bigNumber)).toEqual('73,425,610,000,000,000,000,000,000,000,000,000,000,000,000.00');
+            expect(AutoNumeric.format('12345.67e-3', { decimalPlaces: 7 })).toEqual('12.3456700');
+            expect(AutoNumeric.format('6.1349392e-13', { decimalPlaces: 24 })).toEqual('0.000000000000613493920000');
+            expect(AutoNumeric.format('-1e8', { decimalPlaces: 0 })).toEqual('-100,000,000');
+            expect(AutoNumeric.format('1.23456789e4', { decimalPlaces: 4 })).toEqual('12,345.6789');
+            expect(AutoNumeric.format('1.23e-13')).toEqual('0.00');
         });
 
         it('should only send a warning, and not throw', () => {

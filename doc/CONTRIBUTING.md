@@ -16,11 +16,11 @@ git clone -b next https://github.com/autoNumeric/autoNumeric.git
 ```
 
 ### Make your changes
-```sh
-cd autoNumeric
-```
+*Note: you can use either `npm` or `yarn` for running the install/build scripts. We'll use `yarn` in the following examples*
+
 First things first, in order to be able to compile the ES6 source to something that can be interpreted by the browsers, and get the tools (linter, test runners, etc.) used by the developers, you need to install them by doing :
 ```sh
+cd autoNumeric
 yarn install
 ```
 
@@ -39,7 +39,7 @@ yarn run clean
 *Note: do **not** use `yarn clean` as it's a [different command](https://yarnpkg.com/en/docs/cli/clean) entirely.*
 
 ### Run the mandatory tools for linting and testing
-We strive to keep the tests green at all times. Hence whenever you change the source, be sure to :
+We strive to keep the tests green at all times. Hence whenever you change the source, be sure to:
 
 1. Write at least 2 tests for each change :
   - One that validate your changes
@@ -83,7 +83,7 @@ yarn lintfix
 ```
 
 #### How to push?
-Every changes that you pushed in its own branch in your personal autoNumeric copy should be based on the latest version of the `next` branch.
+Every changes that you pushed in its own branch in your personal autoNumeric repository copy should be based on the latest version of the `next` branch *(the development branch)*.
 
 When you create a pull request, make sure to push against the `next` branch.
 
@@ -91,5 +91,11 @@ Please try to break down your pull requests and commits into small and manageabl
 - to make them easier to process, and more importantly
 - to keep each logical set of changes in its own commit.
 
-Additionally, your commits must not contain any generated files (ie. files built in the `/dist/` directory, or logs).<br>
-*Note: Generated `dist` files (ie. `autoNumeric.js` and `autoNumeric.min.js`) are built and force-added to the git repository only once for each official release on `master`.*
+Additionally, your commits must not contain any generated files (ie. files built in the `/dist/` directory, or logs).
+
+## Important changes regarding the generated `dist` files
+Since the version `4.1.3`, the generated `dist` files (ie. `autoNumeric.js` and `autoNumeric.min.js`) are not pushed into the repository anymore.
+
+However, all tagged commits are now automatically built and published on npm.<br>
+
+This means if you want to download the minified library directly, you need to use npm to install it (`yarn add autonumeric` or `npm install autonumeric`).*

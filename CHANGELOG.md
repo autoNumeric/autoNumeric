@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.3
++ Fix the `.travis.yml` file so that the `dist` file are built on the CI server
+
 ### 4.1.2
 + Fix the `.npmignore` file so that the npm autonumeric package can be installed
 

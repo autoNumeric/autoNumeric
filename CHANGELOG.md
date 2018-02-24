@@ -2,6 +2,8 @@
 
 ### 4.1.1
 + Fix issue #554 Automatize the build and publishing process of releases with Travis CI
++ Remove the generated files from the git repository
+  + Instead of polluting the repo with the `dist/*` files that can be generated using `yarn build`, those files are now generated and published to npm automatically when tagging a commit.
 
 ### 4.1.0
 + Release `v4.1.0`

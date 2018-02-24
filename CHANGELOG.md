@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.1
++ Fix issue #554 Automatize the build and publishing process of releases with Travis CI
+
 ### 4.1.0
 + Release `v4.1.0`
 

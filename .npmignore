@@ -1,3 +1,6 @@
+# NPM Configuration
+# cf. https://docs.npmjs.com/misc/developers#keeping-files-out-of-your-package
+
 .DS_Store
 node_modules/
 
@@ -20,8 +23,10 @@ test/unit/coverage
 .idea
 
 # Other files you do not want to upload when publishing to npmjs
+.github/
 config/
+doc/Documentation.md
 test/
+tools/
 .*
-karma.conf.js
-tests.webpack.js
+yarn*

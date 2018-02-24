@@ -17,7 +17,3 @@ test/unit/coverage
 
 # Config and settings directory from PhpStorm/WebStorm
 .idea
-
-# Floobits files
-.floo
-.flooignore

@@ -18,7 +18,7 @@
 
 autoNumeric is a standalone Javascript library that provides live *as-you-type* formatting for international numbers and currencies.
 
-The latest stable branch is always on `master`. Currently this is version [4.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>
+The latest stable branch is always on `master`. Currently this is version [4.1.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>
 If you want to try the new features, you can check out the latest development version in the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br>
 That `next` branch can see changes in the API (check the [semver](http://semver.org/)), but is always fully tested for regressions.<br> 
 <br>
@@ -57,7 +57,7 @@ anElement.french()
          .clear();
 ```
 - Supports most **international** numeric formats and currencies<br>*(If the one you use is not supported yet, open an [issue](https://github.com/autoNumeric/autoNumeric/issues/new) and we'll add it as soon as possible!)*
-- The mobile Android Chrome browser is now partially supported!
+- The mobile Android Chrome browser is partially supported
 
 *And also:*
 - Any number of different formats can be used at the same time on the same page.<br>Each input can be configured by either setting the options as HTML5 data attributes, or directly passed as an argument in the Javascript code
@@ -146,9 +146,9 @@ Simply include **autoNumeric** in your html `<header>` tag.<br>No other files or
 ```html
 <script src="autoNumeric.min.js" type="text/javascript"></script>
 <!-- ...or, you may also directly use a CDN :-->
-<script src="https://cdn.jsdelivr.net/npm/autonumeric@4.0.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/autonumeric@4.1.0"></script>
 <!-- ...or -->
-<script src="https://unpkg.com/autonumeric@4.0.1/dist/autoNumeric.min.js"></script>
+<script src="https://unpkg.com/autonumeric"></script>
 ```
 
 #### In another script
@@ -848,71 +848,18 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 
 ## Event lifecycle
 
-AutoNumeric elements are transparent to the native `input` and `change` events, which means those are correctly sent when using an `<input>` element managed by AutoNumeric.<br>
-In addition to the native events, custom events sent by AutoNumeric elements allows you to hook into the formatting lifecycle, as you see fit.
+AutoNumeric elements are transparent to the native `input` and `change` events, which means those are correctly sent when using an `<input>` element managed by AutoNumeric.
 
-*Note: You can also set if the events triggered by the AutoNumeric elements, custom or native, should bubble up (option `eventBubbles`) or be cancelable (option `eventIsCancelable`).*<br>
+In addition to the native events, custom events sent by AutoNumeric elements allows you to hook into the formatting lifecycle, as you see fit:
+- `'autoNumeric:initialized'` when the AutoNumeric element is initialized
+- `'autoNumeric:rawValueModified'` when the `rawValue` is modified
+- `'autoNumeric:formatted'` when all the formatting is done and the formatted string is modified
+- `'autoNumeric:minExceeded'` if the `minimumValue` is not respected
+- `'autoNumeric:maxExceeded'` if the `maximumValue` is not respected
 
-Following are listed how AutoNumeric react to different types of key inputs.
+*Note: You can also set if the events triggered by the AutoNumeric elements, custom or native, should bubble up (option `eventBubbles`) or be cancelable (option `eventIsCancelable`).*<br><br>
 
-By default a 'normal' printable character input (ie. `'2'` or `','`) will result in those events, in that specific order:
-1. `'keydown'`
-1. `'autoNumeric:minExceeded'` or `'autoNumeric:maxExceeded'` if there was a range problem
-1. `'keypress'` (this is deprecated and will be removed *soon*)
-1. `'input'`
-1. `'keyup'`
-1. `'autoNumeric:formatted'` when all the formatting is done
-1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
-
-*Note: Please check below how is structured the payload attached to the `event` variable. The event detail provides easy access to the old and new value.*
-
-When inputting a modifier key (ie. `Control`), we get:
-1. `'keydown'`
-1. `'keyup'`
-1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
-1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
-
-If `Delete` or `backspace` is entered, the following events are sent:
-1. `'keydown'`
-1. `'input'`
-1. `'keyup'`
-1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
-1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
-
-If `Enter` is entered and the value has not changed, the following events are sent:
-1. `'keydown'`
-1. `'keypress'`
-1. `'keyup'`
-1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
-1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
-
-If `Enter` is entered and the value has been changed, the following events are sent:
-1. `'keydown'`
-1. `'keypress'`
-1. `'change'`
-1. `'keyup'`
-1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
-1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
-
-When a `paste` is done with the mouse, the following events are sent:
-1. `'input'`
-1. `'keydown'`
-1. `'input'`
-1. `'keyup'`
-1. `'keyup'`
-1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
-1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
-
-And when a `paste` is done with the keyboard shortcut (ie `ctrl+v`), the following events are sent:
-1. `'keydown'`
-1. `'keydown'`
-1. `'input'`
-1. `'keyup'`
-1. `'keyup'`
-1. `'autoNumeric:formatted'` if a change as been detected and that all the formatting is done
-1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
-
-Whenever an AutoNumeric element is initialized, the custom `'autoNumeric:initialized'` event is sent.<br>When using `AutoNumeric.multiple()` to initialized numerous elements at once, as many `'autoNumeric:initialized'` events are sent as initialized elements.
+Whenever an AutoNumeric element is initialized, the custom `'autoNumeric:initialized'` event is sent.<br>When using `AutoNumeric.multiple()` to initialize numerous elements at once, as many `'autoNumeric:initialized'` events are sent as there are initialized elements.
 
 Finally, the `'change'` event is sent on `blur` if the value has been changed since the `focus` one.
 
@@ -973,7 +920,7 @@ const theCustomEvent = {
 }
 ```
 
-This can then be used within another script.<br>For instance, you could listen to that event in a Vue.js [component template](https://vuejs.org/v2/guide/syntax.html#ad) like so:
+This can then be used within another script.<br>For instance, you could listen to that event in a Vue.js [component template](https://vuejs.org/v2/guide/syntax.html) like so:
 ```html
 <vue-autonumeric 
     v-on:autoNumeric:formatted.native="funcCall1"
@@ -981,6 +928,69 @@ This can then be used within another script.<br>For instance, you could listen t
     v-on:autoNumeric:initialized.native="funcCall3"
 />
 ```
+
+*(Check out the official [vue-autonumeric](https://github.com/autoNumeric/vue-autoNumeric) component for more info)*
+
+### Key inputs
+
+Following are listed how AutoNumeric react to different types of key inputs.
+
+By default a 'normal' printable character input (ie. `'2'` or `','`) will result in those events, in that specific order:
+1. `'keydown'`
+1. `'autoNumeric:minExceeded'` or `'autoNumeric:maxExceeded'` if there was a range problem
+1. `'keypress'` (this is deprecated and will be removed *soon*)
+1. `'input'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'` when all the formatting is done
+1. `'autoNumeric:rawValueModified'` when the `rawValue` is modified
+
+*Note: Please check below how is structured the payload attached to the `event` variable. The event detail provides easy access to the old and new value.*
+
+When inputting a modifier key (ie. `Control`), we get:
+1. `'keydown'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'`
+1. `'autoNumeric:rawValueModified'`
+
+If `Delete` or `backspace` is entered, the following events are sent:
+1. `'keydown'`
+1. `'input'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'`
+1. `'autoNumeric:rawValueModified'`
+
+If `Enter` is entered and the value has *not* changed, the following events are sent:
+1. `'keydown'`
+1. `'keypress'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'`
+1. `'autoNumeric:rawValueModified'`
+
+If `Enter` is entered and the value has been changed, the following events are sent:
+1. `'keydown'`
+1. `'keypress'`
+1. `'change'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'`
+1. `'autoNumeric:rawValueModified'`
+
+When a `paste` is done with the mouse, the following events are sent:
+1. `'input'`
+1. `'keydown'`
+1. `'input'`
+1. `'keyup'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'`
+1. `'autoNumeric:rawValueModified'`
+
+And when a `paste` is done with the keyboard shortcut (ie `ctrl+v`), the following events are sent:
+1. `'keydown'`
+1. `'keydown'`
+1. `'input'`
+1. `'keyup'`
+1. `'keyup'`
+1. `'autoNumeric:formatted'`
+1. `'autoNumeric:rawValueModified'`
 
 ## Questions
 For questions and support please use the [Gitter chat room](https://gitter.im/autoNumeric/autoNumeric) or IRC on Freenode #autoNumeric.<br>The issue list of this repository is **exclusively** for bug reports and feature requests.
@@ -1058,5 +1068,3 @@ Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] *(Robert)* 
 [patreon-image]: https://img.shields.io/badge/patreon-donate-orange.svg
 [browserstack-url]: https://www.browserstack.com
 [browserstack-image]: http://i.imgur.com/kjddhbT.png
-[jsdelivr-image]: https://data.jsdelivr.com/v1/package/npm/autonumeric/badge?style=rounded
-[jsdelivr-url]: https://www.jsdelivr.com/package/npm/autonumeric

@@ -204,6 +204,7 @@ const selectors = {
     issue527Blur                      : '#issue_527_blur',
     issue432dot                       : '#issue_432_dot',
     issue432none                      : '#issue_432_none',
+    issue535                          : '#issue_535',
 };
 
 //-----------------------------------------------------------------------------
@@ -1175,7 +1176,7 @@ describe('Elements with the `contenteditable` attribute set to `true`', () => {
         expect(browser.getText(selectors.contentEditable2)).toEqual('$12,345,678.90');
     });
 
-    it('should change the input value accordingly when focusing on the element', () => {
+    it('should change the input value accordingly when focusing on the element', () => { //FIXME Fails on Firefox where the contenteditable field is said to be not visible, see upstream bug https://github.com/mozilla/geckodriver/issues/1074
         const contentEditable1 = $(selectors.contentEditable1);
         const contentEditable2 = $(selectors.contentEditable2);
 
@@ -1480,7 +1481,7 @@ describe('Negative numbers & brackets notations', () => {
         negativeBracketsInput1.click();
         expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
         browser.keys(['Home', '+']);
-        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57'); //FIXME Fails on Chrome only; there is a bug in the selenium chromedriver
 
         negativeBracketsInput2.click();
         expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57-');
@@ -3809,6 +3810,28 @@ describe('Issue #432', () => {
         browser.keys(['Home', 'Control', 'a', 'Control', 'Delete']);
         browser.keys('123.45');
         expect(browser.getValue(selectors.issue432none)).toEqual('12.345 €');
+    });
+});
+
+describe('Issue #535', () => {
+    it('should test for default values, and focus on it', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue535)).toEqual('');
+    });
+
+    it('should not accept the decimal character or its alternative, and not change the selection', () => {
+        const inputWithDecimalCharAlternative = $(selectors.issue535);
+
+        inputWithDecimalCharAlternative.click();
+        // With the default decimal character
+        browser.keys('123.456');
+        expect(browser.getValue(selectors.issue535)).toEqual('123456');
+
+        // With the alternative decimal character
+        browser.keys(['Home', 'Control', 'a', 'Control', 'Delete']);
+        browser.keys('123,456');
+        expect(browser.getValue(selectors.issue535)).toEqual('123456');
     });
 });
 

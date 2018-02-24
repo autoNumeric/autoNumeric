@@ -1,5 +1,63 @@
 ## Changelog for autoNumeric
 
+### 4.2.0
++ Fix issue #535 Prevent entering any decimal character when only positive numbers are accepted
++ Change how the decimal character can be entered:
+  + Before, the comma `','` and dot `'.'` where always accepted
+  + Now, only the characters defined in `decimalCharacter` and `decimalCharacterAlternative` are accepted
+
+### 4.1.3
++ Fix the `.travis.yml` file so that the `dist` file are built on the CI server
+
+### 4.1.2
++ Fix the `.npmignore` file so that the npm autonumeric package can be installed
+
+### 4.1.1
++ Fix issue #554 Automatize the build and publishing process of releases with Travis CI
++ Remove the generated files from the git repository
+  + Instead of polluting the repo with the `dist/*` files that can be generated using `yarn build`, those files are now generated and published to npm automatically when tagging a commit.
+
+### 4.1.0
++ Release `v4.1.0`
+
+The highlights of this version are:
++ New features
+  + AutoNumeric static functions can now be used in web workers (#494)
+  + Add the new `valuesToStrings` option to allow displaying a pre-defined string depending on the `rawValue` (#450)
+  + Allow the positive & negative signs to be specified via the two options `positiveSignCharacter` and `negativeSignCharacter` (#478)
+  + Add more details to the `'autoNumeric:formatted'` event payload (#485)
+  + Add a new event hook `autoNumeric:rawValueModified` that will be sent only when the `rawValue` is modified (#488)
+  + Add a new custom AutoNumeric event `'autoNumeric:initialized'` sent as soon as an AutoNumeric element is initialized
+  + Add the static `set` and `get*` functions that will allow setting the given DOM element on getting its value without having a reference to its AutoNumeric object (#515)
+  + Add support for watching external changes when setting the input `value` directly with Javascript without using the `set()` method (Note: watching the external changes from `textContent` is not yet supported) (#513)
+  + Add the new option `watchExternalChanges` (set to `false` by default) that defines if the AutoNumeric object should watch and react to external changes (not made via `.set()`)
+  + Add the new option `wheelOn` that defines when we should be listening to the `wheel` event, either on 'hover' or on 'focus' (#456)
++ Changes
+  + Change the `modifyValueOnWheel` default behaviour to act only when the element is focused. If you want to be able to use the mouse wheel on a non-focused AutoNumeric element, you'll now need to press the `Shift` key while doing so. You can change that behavior back like it was before by setting the new option `wheelOn` to `hover` (#456)
+  + Allow changing the `bubble` and `cancelable` attributes of events sent by AutoNumeric. This adds two new options `eventBubbles` and `eventIsCancelable` that defaults to `true` to manage those event attributes (#524)
+  + Modify the static `getAutoNumericElement()`, `test()` and `isManagedByAutoNumeric()` functions so that they accept either a DOM element or a selector string (#514)
+  + When the `rawValue` is allowed to be `null` and is effectively `null`, the min/max limits are now ignored
+  + Form serialization now outputs the empty string `''` on empty inputs, instead of `0` or `0.00` (#512)
++ Improvements
+  + Switch to Webpack 3.* for leaner bundle creations (#438)
+  + Migration to eslint 4.* for a cleaner codebase (#475)
+  + The `decimalCharacterAlternative` now correctly ignores the 'comma' or 'dot' when set to `none` (#432)
+  + Unit test now use the `mocha` profile as default instead of `progress`
++ Fixes
+  + Coverage information is back (#490)
+  + Workaround a geckodriver bug when trying to input an hyphen (#480)
+  + Fix lots of pasting issues (#481, #482, #483, #484, #505, #510, #547)
+  + Create workarounds (*hacks* really) for various IE-related bugs (#495, #516, #518)
+  + `AutoNumeric.multiple()` now correctly add only one event listener to the parent form, if any (#457)
+  + The `input` event is not fired on mouse wheel (#525)
+  + Prevent using the `wheel` event on `disabled` input elements
+  + The value of a read-only field can be changed with a scroll input (#541)
+  + Cut text reappears when leaving the field (#527)
+  + Input is duplicated and reversed on devices with Android < 7.0 using Android Chrome (#522)
+  + Formatted numbers on Android Chrome do not get deleted on blur anymore
+
+...and [more](https://github.com/autoNumeric/autoNumeric/projects/2).
+
 ### 4.1.0-beta.28
 + Fix issue #477 Modifying an input by selecting all its content and entering `0` drop the current selection, if 0 is out of the limit boundaries
 
@@ -59,7 +117,7 @@
 + Fix issue #456 Change the `modifyValueOnWheel` default behaviour to act only when the element is focused
 + Add a new `wheelOn` option that will define when the `wheel` event will increment/decrement the element value.
   By default the `wheel` event is only used when the element is focused (`wheelOn` is set to `'focus'`), but you can also use the `'hover'` option if you want to keep the previous behavior.
-  Note: There is a small caveat since the `Shift + mouse wheel event` is reserved by browsers for horizontal scrolling, using the `Shift` key and the `wheelOn` option set to `'hover'` will only scroll the page while the mouse *is hovered* over the AutoNumeric-managed element. Once it out of the way, the page won't scroll since you'll be holding the `Shift` key. You'll then be able to scroll the page normally without having to hold the `Shift` key.
+  Note: There is a small caveat since the `Shift + mouse wheel event` is reserved by browsers for horizontal scrolling, using the `Shift` key and the `wheelOn` option set to `'hover'` will only scroll the page while the mouse *is hovered* over the AutoNumeric-managed element. Once it's out of the way, the page won't scroll since you'll be holding the `Shift` key. You'll then be able to scroll the page normally without having to hold that `Shift` key.
 
 ### 4.1.0-beta.15
 + Fix issue #513 Setting the input `value` directly with Javascript without using the `set()` method is not supported
@@ -95,7 +153,7 @@
 
 ### 4.1.0-beta.8
 + Fix issue #496 The upgrade guide to v4 references the `decimalPlacesOverride` option without indicating it's deprecated
-+ Fix issue #479 Whitespace on the left hand side of the  html `value` attribute adds a zero on the formatted value on page load
++ Fix issue #479 Whitespace on the left hand side of the html `value` attribute adds a zero on the formatted value on page load
 
 ### 4.1.0-beta.7
 + Fix issue #495 `AutoNumeric.multiple()` fail on IE11 on unknown `Array.from()`

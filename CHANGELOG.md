@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.1.2
++ Fix the `.npmignore` file so that the npm autonumeric package can be installed
+
 ### 4.1.1
 + Fix issue #554 Automatize the build and publishing process of releases with Travis CI
 + Remove the generated files from the git repository

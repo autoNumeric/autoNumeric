@@ -204,6 +204,7 @@ const selectors = {
     issue527Blur                      : '#issue_527_blur',
     issue432dot                       : '#issue_432_dot',
     issue432none                      : '#issue_432_none',
+    issue535                          : '#issue_535',
 };
 
 //-----------------------------------------------------------------------------
@@ -3809,6 +3810,28 @@ describe('Issue #432', () => {
         browser.keys(['Home', 'Control', 'a', 'Control', 'Delete']);
         browser.keys('123.45');
         expect(browser.getValue(selectors.issue432none)).toEqual('12.345 €');
+    });
+});
+
+describe('Issue #535', () => {
+    it('should test for default values, and focus on it', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue535)).toEqual('');
+    });
+
+    it('should not accept the decimal character or its alternative, and not change the selection', () => {
+        const inputWithDecimalCharAlternative = $(selectors.issue535);
+
+        inputWithDecimalCharAlternative.click();
+        // With the default decimal character
+        browser.keys('123.456');
+        expect(browser.getValue(selectors.issue535)).toEqual('123456');
+
+        // With the alternative decimal character
+        browser.keys(['Home', 'Control', 'a', 'Control', 'Delete']);
+        browser.keys('123,456');
+        expect(browser.getValue(selectors.issue535)).toEqual('123456');
     });
 });
 

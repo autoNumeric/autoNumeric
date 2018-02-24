@@ -1,5 +1,11 @@
 ## Changelog for autoNumeric
 
+### 4.2.0
++ Fix issue #535 Prevent entering any decimal character when only positive numbers are accepted
++ Change how the decimal character can be entered:
+  + Before, the comma `','` and dot `'.'` where always accepted
+  + Now, only the characters defined in `decimalCharacter` and `decimalCharacterAlternative` are accepted
+
 ### 4.1.3
 + Fix the `.travis.yml` file so that the `dist` file are built on the CI server
 

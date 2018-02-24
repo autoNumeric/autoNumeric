@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.1.3
+ * @version      4.2.0
  * @date         2018-02-43 UTC 01:55
  *
  * @authors      Bob Knothe, Alexandre Bonneau
@@ -881,7 +881,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.1.3';
+        return '4.2.0';
     }
 
     /**
@@ -8457,7 +8457,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @private
      */
     _isDecimalCharacterInsertionAllowed() {
-        return this.settings.decimalPlacesShownOnFocus !== AutoNumeric.options.decimalPlacesShownOnFocus.none;
+        return String(this.settings.decimalPlacesShownOnFocus) !== String(AutoNumeric.options.decimalPlacesShownOnFocus.none) &&
+            String(this.settings.decimalPlaces) !== String(AutoNumeric.options.decimalPlaces.none);
     }
 
     /**
@@ -8478,7 +8479,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         if (this.eventKey === this.settings.decimalCharacter ||
             (this.settings.decimalCharacterAlternative && this.eventKey === this.settings.decimalCharacterAlternative)) {
             if (!this._isDecimalCharacterInsertionAllowed() || !this.settings.decimalCharacter) {
-                return true;
+                return false;
             }
 
             // Do not allow decimal character before negativeSignCharacter character

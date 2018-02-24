@@ -908,6 +908,13 @@
 			<input id="issue_477" type="text" value="42">
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #535</p>
+			<input id="issue_535" type="text" placeholder="#535">
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1944,6 +1951,15 @@
 
     //-------------- Issue #477
     new AutoNumeric('#issue_477', { minimumValue: 1 });
+
+    //-------------- Issue #535
+    new AutoNumeric('#issue_535', {
+        digitGroupSeparator        : '',
+        decimalPlaces              : 0,
+        minimumValue               : 0,
+        decimalCharacter           : ',',
+        decimalCharacterAlternative: '.'
+    });
 </script>
 </body>
 </html>

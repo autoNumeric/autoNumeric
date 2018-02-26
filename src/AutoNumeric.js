@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.2.1
- * @date         2018-02-24 UTC 10:40
+ * @version      4.2.2
+ * @date         2018-02-26 UTC 11:45
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -881,7 +881,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.2.1';
+        return '4.2.2';
     }
 
     /**
@@ -1857,7 +1857,7 @@ export default class AutoNumeric {
      * @example anElement.update({ options }) // Updates the settings
      * @example anElement.update({ options1 }, { options2 }) // Updates the settings with multiple option objects
      *
-     * @param {object} newOptions
+     * @param {object|string} newOptions
      * @returns {AutoNumeric}
      */
     update(...newOptions) {
@@ -1873,6 +1873,11 @@ export default class AutoNumeric {
             optionsToUse = null;
         } else if (newOptions.length >= 1) {
             newOptions.forEach(optionObject => {
+                if (this.constructor._isPreDefinedOptionValid(optionObject)) {
+                    // The option object is a predefined option name (ie. 'euro')
+                    optionObject = this.constructor._getOptionObject(optionObject);
+                }
+
                 Object.assign(optionsToUse, optionObject);
             });
         }

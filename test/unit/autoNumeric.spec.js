@@ -4015,6 +4015,69 @@ describe('Initialization calls', () => {
     });
 });
 
+describe('Modifying the options after initialization', () => {
+    describe(`Options updates`, () => {
+        let aNInput;
+        let newInput;
+        const basicOptions = {
+            digitGroupSeparator: '٬',
+            decimalPlaces      : 2,
+            currencySymbol     : '#',
+        };
+
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+            aNInput = new AutoNumeric(newInput, 12345678.912, basicOptions);
+            expect(aNInput.getNumericString()).toEqual('12345678.91');
+            expect(aNInput.getFormatted()).toEqual('#12٬345٬678.91');
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.wipe();
+            document.body.removeChild(newInput);
+        });
+
+        it('should allow updating the options with a custom object', () => {
+            aNInput.update({
+                digitGroupSeparator: '˙',
+                decimalPlaces      : 1,
+                currencySymbol     : 'K',
+            });
+            expect(aNInput.getNumericString()).toEqual('12345678.9');
+            expect(aNInput.getFormatted()).toEqual('K12˙345˙678.9');
+        });
+
+        it('should allow updating the options with a predefined object', () => {
+            aNInput.update(AutoNumeric.getPredefinedOptions().euro);
+            expect(aNInput.getNumericString()).toEqual('12345678.91');
+            expect(aNInput.getFormatted()).toEqual('12.345.678,91\u202f€');
+        });
+
+        it('should allow updating the options with a predefined option name', () => {
+            aNInput.update('euro');
+            expect(aNInput.getNumericString()).toEqual('12345678.91');
+            expect(aNInput.getFormatted()).toEqual('12.345.678,91\u202f€');
+        });
+
+        it('should allow updating the options with many options objects, including a predefined option name', () => {
+            aNInput.update(
+                'euro',
+                {
+                    digitGroupSeparator: '˙',
+                    decimalPlaces      : 1,
+                    currencySymbol     : 'K',
+                },
+                {
+                    currencySymbol: 'L',
+                }
+            );
+            expect(aNInput.getNumericString()).toEqual('12345678.9');
+            expect(aNInput.getFormatted()).toEqual('12˙345˙678,9L');
+        });
+    });
+});
+
 xdescribe('Managing external changes', () => { //XXX This test is deactivated since PhantomJS is failing when defining some properties with `Object.defineProperty`. See issue https://github.com/ariya/phantomjs/issues/13895
     it(`should watch for external change to the input 'value' attribute`, () => {
         // Initialization

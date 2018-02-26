@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.2.2
++ Fix issue #555 The `update()` function does not accept predefined option names (ie. `'euro'`)
+
 ### 4.2.1
 + Fix issue #553 Missing support for very small or very big numbers displayed by Javascript as scientific numbers
   + This adds support for using scientific notation for setting the input value (ie. `aNInput.set('6.1349392e-13');`, `<input value="7342.561e40">`)

@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.2.3
++ Fix issue #556 Modify the `update()` function so that it can accept an array of options
+
 ### 4.2.2
 + Fix issue #555 The `update()` function does not accept predefined option names (ie. `'euro'`)
 

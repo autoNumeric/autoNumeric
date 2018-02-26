@@ -545,7 +545,9 @@ anElement.update(AutoNumeric.getPredefinedOptions().NorthAmerican); // Update th
 
 by passing multiple option objects, the latter overwriting the settings from the former ones...
 ```js
-anElement.update({ moreOptions1 }, { moreOptions2 }, { moreOptions3 });
+anElement.update({ moreOptions1 }, { moreOptions2 }, 'euro');
+// or in a single array
+anElement.update([{ moreOptions1 }, { moreOptions2 }, 'euro']);
 ```
 
 ...or by changing the options one by one (or by calling a pre-defined option object).

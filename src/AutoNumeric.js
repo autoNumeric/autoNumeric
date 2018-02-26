@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.2.2
- * @date         2018-02-26 UTC 11:45
+ * @version      4.2.3
+ * @date         2018-02-26 UTC 20:15
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -881,7 +881,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.2.2';
+        return '4.2.3';
     }
 
     /**
@@ -1856,11 +1856,17 @@ export default class AutoNumeric {
      *
      * @example anElement.update({ options }) // Updates the settings
      * @example anElement.update({ options1 }, { options2 }) // Updates the settings with multiple option objects
+     * @example anElement.update([{ options1 }, { options2 }]) // Updates the settings with multiple option objects in a single array
      *
-     * @param {object|string} newOptions
+     * @param {object|string|array} newOptions
      * @returns {AutoNumeric}
      */
     update(...newOptions) {
+        if (Array.isArray(newOptions) && Array.isArray(newOptions[0])) {
+            // Allows to pass a single array of options
+            newOptions = newOptions[0];
+        }
+
         // Keep a copy of the original settings before changing them, in case they do not validate correctly, so we can switch back to them
         const originalSettings = AutoNumericHelper.cloneObject(this.settings); //TODO Check that the `styleRules` option is correctly cloned (due to depth cloning limitation)
 

@@ -4075,6 +4075,22 @@ describe('Modifying the options after initialization', () => {
             expect(aNInput.getNumericString()).toEqual('12345678.9');
             expect(aNInput.getFormatted()).toEqual('12˙345˙678,9L');
         });
+
+        it('should allow updating the options with an array of options objects, including a predefined option name', () => { // Issue #556
+            aNInput.update([
+                'euro',
+                {
+                    digitGroupSeparator: '˙',
+                    decimalPlaces      : 1,
+                    currencySymbol     : 'K',
+                },
+                {
+                    currencySymbol: 'L',
+                },
+            ]);
+            expect(aNInput.getNumericString()).toEqual('12345678.9');
+            expect(aNInput.getFormatted()).toEqual('12˙345˙678,9L');
+        });
     });
 });
 

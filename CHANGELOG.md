@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.2.4
++ Fix issue #558 Switch the webpack 4
+
 ### 4.2.3
 + Fix issue #556 Modify the `update()` function so that it can accept an array of options
 

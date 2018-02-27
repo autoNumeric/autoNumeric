@@ -20,11 +20,11 @@ module.exports = {
             },
         ],
     },
-    output: {
+    output : {
         libraryTarget: 'umd',
-        library: 'AutoNumeric',
-        filename: 'autoNumeric.js',
-        path: resolve('dist'),
+        library      : 'AutoNumeric',
+        filename     : 'autoNumeric.js',
+        path         : resolve('dist'),
     },
     resolve: {
         extensions: [

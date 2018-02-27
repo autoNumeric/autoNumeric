@@ -11,6 +11,7 @@ function resolve(dir) {
 
 // Configuration for building the library
 const webpackConfig = merge(baseWebpackConfig, {
+    mode   : 'production',
     module : {
         rules: [ // Only activate the linting when building for the production
             {
@@ -25,25 +26,13 @@ const webpackConfig = merge(baseWebpackConfig, {
         ],
     },
     devtool: '#source-map',
-    output: {
+    output : {
         libraryTarget: 'umd',
         library      : 'AutoNumeric',
         filename     : 'autoNumeric.min.js',
         path         : resolve('dist'),
     },
-    plugins: [
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: '"production"',
-            },
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress : {
-                warnings: false,
-            },
-            sourceMap: true,
-        }),
-    ],
+    plugins: [],
 });
 
 // Compress the library

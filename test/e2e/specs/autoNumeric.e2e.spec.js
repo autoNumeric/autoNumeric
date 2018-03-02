@@ -205,6 +205,10 @@ const selectors = {
     issue432dot                       : '#issue_432_dot',
     issue432none                      : '#issue_432_none',
     issue535                          : '#issue_535',
+    issue550                          : '#issue_550',
+    issue550Blur                      : '#issue_550_blur',
+    issue550ChangeDetector            : '#issue_550_change_detector',
+    issue550Button                    : '#issue_550_button',
 };
 
 //-----------------------------------------------------------------------------
@@ -3832,6 +3836,69 @@ describe('Issue #535', () => {
         browser.keys(['Home', 'Control', 'a', 'Control', 'Delete']);
         browser.keys('123,456');
         expect(browser.getValue(selectors.issue535)).toEqual('123456');
+    });
+});
+
+describe('Issue #550', () => {
+    it('should test for default values, and focus on it', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue550)).toEqual('(1,357,246.81)');
+    });
+
+    it(`should not send a 'change' event when focusing then blurring the input`, () => {
+        const input = $(selectors.issue550);
+        input.click();
+        const inputBlur = $(selectors.issue550Blur);
+        inputBlur.click();
+
+        expect(browser.getValue(selectors.issue550ChangeDetector)).toEqual('0');
+
+        // Reset the change event counter
+        $(selectors.issue550Button).click();
+        expect(browser.getValue(selectors.issue550ChangeDetector)).toEqual('0');
+    });
+
+    it(`should send a single 'change' event when modifying the value, then blurring`, () => {
+        const input = $(selectors.issue550);
+        const inputBlur = $(selectors.issue550Blur);
+        input.click();
+
+        expect(browser.getValue(selectors.issue550ChangeDetector)).toEqual('0');
+        browser.keys(['Home', '5']);
+        expect(browser.getValue(selectors.issue550)).toEqual('-51,357,246.81');
+        inputBlur.click();
+        expect(browser.getValue(selectors.issue550ChangeDetector)).toEqual('1');
+
+        // Modify the input again
+        input.click();
+        browser.keys(['Home', '6']);
+        expect(browser.getValue(selectors.issue550)).toEqual('-651,357,246.81');
+        inputBlur.click();
+        expect(browser.getValue(selectors.issue550ChangeDetector)).toEqual('2');
+        input.click();
+        browser.keys(['Home', '2']);
+        expect(browser.getValue(selectors.issue550)).toEqual('-2,651,357,246.81');
+        inputBlur.click();
+        expect(browser.getValue(selectors.issue550ChangeDetector)).toEqual('3');
+
+        // Reset the change event counter
+        $(selectors.issue550Button).click();
+        expect(browser.getValue(selectors.issue550ChangeDetector)).toEqual('0');
+    });
+
+    it(`should send a single 'change' event when modifying the value, then hitting the enter key (and then blurring the input)`, () => {
+        const input = $(selectors.issue550);
+        const inputBlur = $(selectors.issue550Blur);
+        input.click();
+
+        expect(browser.getValue(selectors.issue550ChangeDetector)).toEqual('0');
+        browser.keys(['Home', '1']);
+        expect(browser.getValue(selectors.issue550)).toEqual('-12,651,357,246.81');
+        browser.keys('Enter');
+        expect(browser.getValue(selectors.issue550ChangeDetector)).toEqual('1');
+        inputBlur.click();
+        expect(browser.getValue(selectors.issue550ChangeDetector)).toEqual('1');
     });
 });
 

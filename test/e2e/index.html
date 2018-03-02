@@ -925,6 +925,18 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #550</p>
+			<div>
+				<input id="issue_550" type="text" placeholder="" value="-1357246.81">
+				<input id="issue_550_blur" type="text" placeholder="Click here to blur">
+				<input id="issue_550_change_detector" type="text">
+				<button id="issue_550_button">Reset the change event tracker</button>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1751,7 +1763,9 @@
     new AutoNumeric('#selectOnFocus40').french().update(doNotSelectOption).update(case40);
 
     //-------------- AutoNumeric events
-    new AutoNumeric('#autoNumericEventInput');
+    new AutoNumeric('#autoNumericEventInput', {
+        negativeBracketsTypeOnBlur: AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses,
+    });
 //	    .update({ valuesToStrings : AutoNumeric.options.valuesToStrings.zeroDash }); //DEBUG
     const autoNumericEventInput = document.querySelector('#autoNumericEventInput');
     autoNumericEventInput.addEventListener(AutoNumeric.events.formatted, e => {
@@ -1759,6 +1773,12 @@
     });
     autoNumericEventInput.addEventListener(AutoNumeric.events.rawValueModified, e => {
         console.log(`'${AutoNumeric.events.rawValueModified}' sent with`, e); //DEBUG
+    });
+    autoNumericEventInput.addEventListener(AutoNumeric.events.native.change, e => {
+        console.log(`'${AutoNumeric.events.native.change}' sent with`, e); //DEBUG
+    });
+    autoNumericEventInput.addEventListener(AutoNumeric.events.native.input, e => {
+        console.log(`'${AutoNumeric.events.native.input}' sent with`, e); //DEBUG
     });
 
     //-------------- Issue #442 & #457
@@ -1974,6 +1994,25 @@
     //-------------- Issue #553
     new AutoNumeric('#issue_553_one', 1.23e-13, { decimalPlaces: 2 });
     new AutoNumeric('#issue_553_two', -123.4567e-6, { decimalPlaces: 10 });
+
+    //-------------- Issue #550
+    new AutoNumeric('#issue_550', {
+        negativeBracketsTypeOnBlur: AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses,
+    });
+    const issue550 = document.querySelector('#issue_550');
+    const issue550ChangeDetector = document.querySelector('#issue_550_change_detector');
+    const issue550Button = document.querySelector('#issue_550_button');
+
+    let issue550ChangeCount = 0;
+    issue550ChangeDetector.value = 0;
+
+    issue550.addEventListener('change', () => {
+        issue550ChangeDetector.value = ++issue550ChangeCount;
+    });
+    issue550Button.addEventListener('click', () => {
+        issue550ChangeCount = 0;
+        issue550ChangeDetector.value = 0;
+    });
 </script>
 </body>
 </html>

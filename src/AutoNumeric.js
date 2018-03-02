@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.2.4
- * @date         2018-02-27 UTC 21:00
+ * @version      4.2.5
+ * @date         2018-03-02 UTC 06:15
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -176,6 +176,8 @@ export default class AutoNumeric {
         this.isDropEvent = false;
         // Keep track if the user is currently editing the element
         this.isEditing = false;
+        // Keep track of the rawValue (needed to define if a change event must be sent on blur or enter key)
+        this.rawValueOnFocus = void(0);
         // Watch any external changes to the element value/textContent/nodeValue and `set()` the new value so that it gets formatted/saved in the history
         this.internalModification = false; // This is temporarily set to `true` only when the AutoNumeric object does update the element value
         this.attributeToWatch = this._getAttributeToWatch();
@@ -881,7 +883,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.2.4';
+        return '4.2.5';
     }
 
     /**
@@ -5991,8 +5993,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @private
      */
     _onFocusInAndMouseEnter(e) {
-        this.isEditing = false; // Just in case no `keyUp` event have been sent (ie. if the user lost the focus from the current window while typing)
         //TODO Create separate handlers for the focus and mouseenter events
+        this.isEditing = false; // Just in case no `keyUp` event have been sent (ie. if the user lost the focus from the current window while typing)
+        this.rawValueOnFocus = this.rawValue; // Keep track of the initial rawValue. This is needed to define if a change event must be dispatched later
 
         if (this.settings.unformatOnHover && e.type === 'mouseenter' && e.altKey) {
             this.constructor._unformatAltHovered(this);
@@ -6191,11 +6194,12 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             //TODO Add an option to select either the integer or decimal part with `Esc`
         }
 
-        // The "enter" key throws a `change` event if the value has changed since the `focus` event
+        // The "enter" key throws a `change` event if the raw value has changed since the `focus` event
         let targetValue = AutoNumericHelper.getElementValue(e.target);
-        if (this.eventKey === AutoNumericEnum.keyName.Enter && this.valueOnFocus !== targetValue) {
+        if (this.eventKey === AutoNumericEnum.keyName.Enter && this.rawValue !== this.rawValueOnFocus) {
             this._triggerEvent(AutoNumeric.events.native.change, e.target);
             this.valueOnFocus = targetValue;
+            this.rawValueOnFocus = this.rawValue;
 
             if (this.settings.isCancellable) {
                 // If the user activated the 'cancellable' feature, we save the validated value when 'Enter' is hit
@@ -6432,9 +6436,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {Event} e
      */
     _onFocusOutAndMouseLeave(e) {
+        //TODO Create separate handlers for blur and mouseleave
         this.isEditing = false; // Just in case no `keyUp` event have been sent (if the user lost the focus to the window while typing)
 
-        //TODO Create separate handlers for blur and mouseleave
         //FIXME Do not call `set()` if the current raw value is the same as the one we are trying to set (currently, on focus out, `set()` is always called, even if the value has not changed
         if (this.settings.unformatOnHover && e.type === 'mouseleave' && this.hoveredWithAlt) {
             this.constructor._reformatAltHovered(this);
@@ -6524,11 +6528,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     }
 
                     this._setElementValue(groupedValue);
-                }
-
-                if (groupedValue !== this.valueOnFocus) {
-                    this._triggerEvent(AutoNumeric.events.native.change, this.domElement);
-                    delete this.valueOnFocus;
                 }
             }
 
@@ -6980,9 +6979,12 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Keep track if the user is currently editing the element
         this.isEditing = false;
 
-        if (AutoNumericHelper.getElementValue(e.target) !== this.valueOnFocus) {
+        // Send a `change` event if the raw value has been changed since the last focus or 'enter' validation
+        if (this.rawValue !== this.rawValueOnFocus) {
             this._triggerEvent(AutoNumeric.events.native.change, e.target);
         }
+
+        this.rawValueOnFocus = void(0); // Reset the tracker
     }
 
     /**

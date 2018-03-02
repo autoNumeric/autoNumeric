@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.2.6
++ Fixes #561 Webpack bundles the already compiled library when imported in another project
+
 ### 4.2.5
 + Fix issue #550 The `change` event is sent twice on change
 + Fix the bug when an input with the `negativeBracketsTypeOnBlur` options was focused then blurred, it would dispatch a `change` event.

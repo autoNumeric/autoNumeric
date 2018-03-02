@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.2.7
++ Fixes #521 The `input` event is not fired on `paste` if the element is empty or is completely selected beforehand
+
 ### 4.2.6
 + Fixes #561 Webpack bundles the already compiled library when imported in another project
 

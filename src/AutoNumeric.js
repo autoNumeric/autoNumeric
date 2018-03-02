@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.2.6
- * @date         2018-03-02 UTC 19:20
+ * @version      4.2.7
+ * @date         2018-03-02 UTC 20:40
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -883,7 +883,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.2.6';
+        return '4.2.7';
     }
 
     /**
@@ -6597,7 +6597,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             this.set(pastedRawValue);
             this.formatted = true;
 
-            // 4. Return since the job is done
+            // 4. On a 'normal' non-autoNumeric input, an `input` event is sent when a paste is done. We mimic that.
+            this._triggerEvent(AutoNumeric.events.native.input, eventTarget);
+
+            // 5. Return since the job is done
             return;
         }
 

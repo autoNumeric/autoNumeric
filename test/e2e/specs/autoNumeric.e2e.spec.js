@@ -209,6 +209,10 @@ const selectors = {
     issue550Blur                      : '#issue_550_blur',
     issue550ChangeDetector            : '#issue_550_change_detector',
     issue550Button                    : '#issue_550_button',
+    issue521                          : '#issue_521',
+    issue521Set                       : '#issue_521_set',
+    issue521InputDetector             : '#issue_521_input_detector',
+    issue521Button                    : '#issue_521_button',
 };
 
 //-----------------------------------------------------------------------------
@@ -3899,6 +3903,61 @@ describe('Issue #550', () => {
         expect(browser.getValue(selectors.issue550ChangeDetector)).toEqual('1');
         inputBlur.click();
         expect(browser.getValue(selectors.issue550ChangeDetector)).toEqual('1');
+    });
+});
+
+describe('Issue #521', () => {
+    it('should test for default values, and focus on it', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue521)).toEqual('');
+        expect(browser.getValue(selectors.issue521Set)).toEqual('1,234.57');
+
+        // Prepare the text to paste
+        const inputClassic = $(selectors.inputClassic);
+        inputClassic.click();
+        expect(browser.getValue(selectors.inputClassic)).toEqual('987654321');
+        browser.keys(['Home', 'Shift', 'ArrowRight', 'ArrowRight', 'Shift']);
+        browser.keys(['Control', 'c', 'Control']); // 98 in the clipboard
+    });
+
+    it(`should send an 'input' event when pasting a valid value in an empty input`, () => {
+        const input = $(selectors.issue521);
+        input.click();
+        expect(browser.getValue(selectors.issue521InputDetector)).toEqual('0');
+        browser.keys(['Control', 'v', 'Control']); // Paste
+        expect(browser.getValue(selectors.issue521InputDetector)).toEqual('1');
+        expect(browser.getValue(selectors.issue521)).toEqual('98.00');
+
+        // Reset the input event counter
+        $(selectors.issue521Button).click();
+        expect(browser.getValue(selectors.issue521InputDetector)).toEqual('0');
+    });
+
+    it(`should send an 'input' event when pasting a valid value at a caret position in an non-empty input`, () => {
+        const input = $(selectors.issue521Set);
+        input.click();
+        expect(browser.getValue(selectors.issue521InputDetector)).toEqual('0');
+
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight']); // Move the caret
+        browser.keys(['Control', 'v', 'Control']); // Paste
+        expect(browser.getValue(selectors.issue521InputDetector)).toEqual('1');
+        expect(browser.getValue(selectors.issue521Set)).toEqual('129,834.57');
+
+        // Reset the change event counter
+        $(selectors.issue521Button).click();
+        expect(browser.getValue(selectors.issue521InputDetector)).toEqual('0');
+    });
+
+    it(`should send an 'input' event when pasting a valid value in an non-empty input with all its content selected`, () => {
+        const input = $(selectors.issue521Set);
+        input.click();
+        expect(browser.getValue(selectors.issue521InputDetector)).toEqual('0');
+
+        browser.keys(['Home', 'Shift', 'End', 'Shift']); // Select all the input content
+        browser.keys(['Control', 'v', 'Control']); // Paste
+        expect(browser.getValue(selectors.issue521InputDetector)).toEqual('1');
+        expect(browser.getValue(selectors.issue521Set)).toEqual('98.00');
     });
 });
 

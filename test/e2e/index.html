@@ -937,6 +937,18 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #521</p>
+			<div>
+				<input id="issue_521" type="text" value="">
+				<input id="issue_521_set" type="text" value="1234.567">
+				<input id="issue_521_input_detector" type="text">
+				<button id="issue_521_button">Reset the input event tracker</button>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -2012,6 +2024,28 @@
     issue550Button.addEventListener('click', () => {
         issue550ChangeCount = 0;
         issue550ChangeDetector.value = 0;
+    });
+
+    //-------------- Issue #521
+    new AutoNumeric('#issue_521');
+    new AutoNumeric('#issue_521_set');
+    const issue521 = document.querySelector('#issue_521');
+    const issue521Set = document.querySelector('#issue_521_set');
+    const issue521InputDetector = document.querySelector('#issue_521_input_detector');
+    const issue521Button = document.querySelector('#issue_521_button');
+
+    let issue521InputCount = 0;
+    issue521InputDetector.value = 0;
+
+    issue521.addEventListener('input', () => {
+        issue521InputDetector.value = ++issue521InputCount;
+    });
+    issue521Set.addEventListener('input', () => {
+        issue521InputDetector.value = ++issue521InputCount;
+    });
+    issue521Button.addEventListener('click', () => {
+        issue521InputCount = 0;
+        issue521InputDetector.value = 0;
     });
 </script>
 </body>

@@ -2,6 +2,7 @@
 
 ### 4.2.7
 + Fixes #521 The `input` event is not fired on `paste` if the element is empty or is completely selected beforehand
++ Fixes #563 The `import AutoNumeric from 'AutoNumeric'` line in the readme does not work on case sensitive OS (like Linux)
 
 ### 4.2.6
 + Fixes #561 Webpack bundles the already compiled library when imported in another project

@@ -154,7 +154,7 @@ Simply include **autoNumeric** in your html `<header>` tag.<br>No other files or
 #### In another script
 If you want to use AutoNumeric in your code, you can import the `src/AutoNumeric.js` file as an ES6 module using:
 ```js
-import AutoNumeric from 'AutoNumeric';
+import AutoNumeric from 'autonumeric';
 ```
 
 Then you can initialize autoNumeric with or without options :

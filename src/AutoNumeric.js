@@ -4888,7 +4888,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             this.settings.firstBracket = '';
             this.settings.lastBracket  = '';
         } else {
-            [this.settings.firstBracket, this.settings.lastBracket] = this.settings.negativeBracketsTypeOnBlur.split(',');
+            const [firstBracket, lastBracket] = this.settings.negativeBracketsTypeOnBlur.split(',');
+            this.settings.firstBracket = firstBracket;
+            this.settings.lastBracket = lastBracket;
         }
     }
 

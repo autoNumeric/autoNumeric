@@ -4888,7 +4888,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             this.settings.firstBracket = '';
             this.settings.lastBracket  = '';
         } else {
-            [this.settings.firstBracket, this.settings.lastBracket] = this.settings.negativeBracketsTypeOnBlur.split(',');
+            // Use temporary variables to fix the MS Edge destructuring issue (see pull request #564)
+            const [firstBracket, lastBracket] = this.settings.negativeBracketsTypeOnBlur.split(',');
+            this.settings.firstBracket = firstBracket;
+            this.settings.lastBracket = lastBracket;
         }
     }
 

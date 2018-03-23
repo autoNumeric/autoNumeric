@@ -115,6 +115,9 @@ percentageUS3decPos.decimalPlaces = 3;
 const percentageUS3decNeg         = AutoNumericHelper.cloneObject(percentageUS2decNeg);
 percentageUS3decNeg.decimalPlaces = 3;
 
+const turkish = AutoNumericHelper.cloneObject(euro);
+turkish.currencySymbol = AutoNumeric.options.currencySymbol.lira;
+
 /**
  * Predefined options for the most common languages
  */
@@ -169,6 +172,7 @@ Object.defineProperty(AutoNumeric, 'predefinedOptions', {
                 currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
                 negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
             },
+            Turkish                     : turkish,
             dotDecimalCharCommaSeparator: {
                 digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.comma,
                 decimalCharacter   : AutoNumeric.options.decimalCharacter.dot,

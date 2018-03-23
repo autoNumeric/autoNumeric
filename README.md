@@ -394,6 +394,7 @@ Currently, the predefined language options are:
 | :jp: | `Japanese` |
 | :cn: | `Chinese` |
 | <span>&#x1f1e7;&#x1f1f7;</span> | `Brazilian` |
+| :tr: | `Turkish` |
 
 If you feel a common currency option is missing, please [create a pull request](https://github.com/autoNumeric/autoNumeric/compare) and we'll add it!
 

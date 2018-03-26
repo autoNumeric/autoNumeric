@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.2.8
- * @date         2018-03-02 UTC 20:40
+ * @version      4.2.9
+ * @date         2018-03-26 UTC 19:10
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -883,7 +883,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.2.8';
+        return '4.2.9';
     }
 
     /**
@@ -4216,6 +4216,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         const settings = Object.assign({}, this.getDefaultConfig(), optionsToUse);
         settings.isNegativeSignAllowed = value < 0;
         settings.isPositiveSignAllowed = value >= 0;
+        this._setBrackets(settings);
 
         const regex = {};
         this._cachesUsualRegularExpressions(settings, regex); // This is needed by `_stripAllNonNumberCharactersExceptCustomDecimalChar` that uses those regex
@@ -4881,17 +4882,19 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Analyze the `negativeBracketsTypeOnBlur` options and keep track of the first and last bracket characters to use.
+     *
+     * @param {object} settings
      * @private
      */
-    _setBrackets() {
-        if (AutoNumericHelper.isNull(this.settings.negativeBracketsTypeOnBlur)) {
-            this.settings.firstBracket = '';
-            this.settings.lastBracket  = '';
+    static _setBrackets(settings) {
+        if (AutoNumericHelper.isNull(settings.negativeBracketsTypeOnBlur)) {
+            settings.firstBracket = '';
+            settings.lastBracket  = '';
         } else {
             // Use temporary variables to fix the MS Edge destructuring issue (see pull request #564)
-            const [firstBracket, lastBracket] = this.settings.negativeBracketsTypeOnBlur.split(',');
-            this.settings.firstBracket = firstBracket;
-            this.settings.lastBracket = lastBracket;
+            const [firstBracket, lastBracket] = settings.negativeBracketsTypeOnBlur.split(',');
+            settings.firstBracket = firstBracket;
+            settings.lastBracket = lastBracket;
         }
     }
 
@@ -7844,7 +7847,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this._setTrailingNegativeSignInfo();
         this.regex = {}; // Create the object that will store the regular expressions
         this.constructor._cachesUsualRegularExpressions(this.settings, this.regex);
-        this._setBrackets();
+        this.constructor._setBrackets(this.settings);
         this._calculateValuesToStringsKeys();
 
         // Validate the settings. Both tests throws if necessary.

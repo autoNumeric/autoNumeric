@@ -7102,6 +7102,12 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.format('1.23e-13')).toEqual('0.00');
         });
 
+        it('should format negative values with brackets', () => {
+            expect(AutoNumeric.format(-20, AutoNumeric.predefinedOptions.dollarNegBrackets)).toEqual('($20.00)');
+            expect(AutoNumeric.format(-0.024, { negativeBracketsTypeOnBlur: AutoNumeric.options.negativeBracketsTypeOnBlur.japaneseQuotationMarks })).toEqual('｢0.02｣');
+            expect(AutoNumeric.format(123.4578, { negativeBracketsTypeOnBlur: AutoNumeric.options.negativeBracketsTypeOnBlur.chevrons })).toEqual('123.46');
+        });
+
         it('should only send a warning, and not throw', () => {
             spyOn(console, 'warn');
             expect(() => AutoNumeric.validate({ decimalPlaces: 3, decimalPlacesShownOnFocus: 2 })).not.toThrow();

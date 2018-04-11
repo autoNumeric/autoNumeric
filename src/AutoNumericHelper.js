@@ -1502,7 +1502,7 @@ export default class AutoNumericHelper {
 
         // Check if the number is in a scientific notation
         val                = String(val);
-        const isScientific = val.includes('e') || val.includes('E');
+        const isScientific = this.contains(val, 'e') || this.contains(val, 'E');
 
         if (!isScientific) {
             return val;

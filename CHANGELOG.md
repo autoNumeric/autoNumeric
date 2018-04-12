@@ -1,5 +1,13 @@
 ## Changelog for autoNumeric
 
+### 4.2.10
++ Fix various bugs regarding the incorrect static and instantiated function calls
++ Fix the polyfill so that `Array.from()` is correctly 'polyfilled' even if the `CustomEvent` object already exists
++ Fix the `CustomEvent` polyfill
++ Merges PR #572 Use `AutoNumericHelper.contains()` instead of `String.includes()` for the time being
++ Update the dev dependencies
++ Update the babel preset from `latest` to `env`
+
 ### 4.2.9
 + Fixes #568 Using brackets for negative numbers in AutoNumeric.format returns "undefined"
 

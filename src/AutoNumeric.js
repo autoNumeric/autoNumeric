@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.2.9
- * @date         2018-03-26 UTC 19:10
+ * @version      4.2.10
+ * @date         2018-04-12 UTC 08:40
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -883,7 +883,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.2.9';
+        return '4.2.10';
     }
 
     /**
@@ -3789,7 +3789,7 @@ export default class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isString(options.suffixText) || (options.suffixText !== '' && (AutoNumericHelper.isNegative(options.suffixText, options.negativeSignCharacter) || testNumericalCharacters.test(options.suffixText)))) {
-            AutoNumericHelper.throwError(`The additional suffix option 'suffixText' is invalid ; it should not contains the negative sign '${this.settings.negativeSignCharacter}' nor any numerical characters, [${options.suffixText}] given.`);
+            AutoNumericHelper.throwError(`The additional suffix option 'suffixText' is invalid ; it should not contains the negative sign '${options.negativeSignCharacter}' nor any numerical characters, [${options.suffixText}] given.`);
         }
 
         if (!AutoNumericHelper.isString(options.negativeSignCharacter) ||
@@ -4232,7 +4232,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         const [minTest, maxTest] = this._checkIfInRangeWithOverrideOption(valueString, settings);
         if (!minTest || !maxTest) {
             // Throw a custom event
-            this._triggerEvent(AutoNumeric.events.formatted, document, {
+            AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, document, {
                 oldValue   : null,
                 newValue   : null,
                 oldRawValue: null,
@@ -4240,7 +4240,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 isPristine : null,
                 error      : 'Range test failed',
                 aNElement  : null,
-            });
+            }, true, true);
             AutoNumericHelper.throwError(`The value [${valueString}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`);
         }
 
@@ -5956,7 +5956,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             if (this.sessionStorageAvailable) {
                 result = sessionStorage.getItem(this.rawValueStorageName);
             } else {
-                result = this._readCookie(this.rawValueStorageName);
+                result = this.constructor._readCookie(this.rawValueStorageName);
             }
 
             return result;
@@ -5995,7 +5995,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      *
      * Note: On focusin, the `rawValue` is never changed. Only the formatted value can be modified.
      *
-     * @param {Event} e
+     * @param {KeyboardEvent|MouseEvent} e
      * @private
      */
     _onFocusInAndMouseEnter(e) {
@@ -8338,11 +8338,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // The undo shortcut
         if (e.ctrlKey || e.metaKey) {
-            if (this.eventKey === AutoNumericEnum.keyName.Z || this.eventKey === AutoNumericEnum.keyName.z) {
-                return false;
-            } else {
-                return true;
-            }
+            return !(this.eventKey === AutoNumericEnum.keyName.Z || this.eventKey === AutoNumericEnum.keyName.z);
         }
 
         // Jump over the thousand separator
@@ -9019,8 +9015,13 @@ AutoNumeric.multiple = (arg1, initialValue = null, options = null) => {
  * Polyfill for obsolete browsers like IE
  */
 (function() {
+// Polyfill for `Array.from()` (Fix issue #495)
+if (!Array.from) {
+    Array.from = object => [].slice.call(object);
+}
+
 // Polyfill for `CustomEvent` (cf. https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent)
-if (typeof window === 'undefined' || window.CustomEvent === 'function') {
+if (typeof window === 'undefined' || typeof window.CustomEvent === 'function') {
     return false;
 }
 
@@ -9033,9 +9034,4 @@ function CustomEvent(event, params) {
 
 CustomEvent.prototype = window.Event.prototype;
 window.CustomEvent = CustomEvent;
-
-// Polyfill for `Array.from()` (Fix issue #495)
-if (!Array.from) {
-    Array.from = object => [].slice.call(object);
-}
 })();

@@ -4,6 +4,7 @@ const path              = require('path');
 const webpack           = require('webpack');
 const merge             = require('webpack-merge');
 const baseWebpackConfig = require('./webpack.config.base.js');
+const UglifyJsPlugin    = require('uglifyjs-webpack-plugin');
 
 function resolve(dir) {
     return path.join(__dirname, '..', dir);
@@ -23,6 +24,34 @@ const webpackConfig = merge(baseWebpackConfig, {
                     formatter: require('eslint-friendly-formatter'),
                 },
             },
+        ],
+    },
+    optimization: {
+        minimizer   : [
+            new UglifyJsPlugin({
+                cache        : true,
+                parallel     : true,
+                sourceMap    : true,
+                uglifyOptions: {
+                    nameCache: {},
+                    ie8      : false,
+                    safari10 : true,
+                    compress : { // see https://github.com/mishoo/UglifyJS2#compress-options
+                        dead_code    : true,
+                        drop_debugger: true,
+                        keep_fnames  : false,
+                        passes       : 4,
+                    },
+                    output   : { // See https://github.com/mishoo/UglifyJS2#output-options
+                        beautify: false,
+                        comments: false,
+                    },
+                    mangle   : { // see https://github.com/mishoo/UglifyJS2#mangle-options
+                        keep_fnames: false,
+                        toplevel   : true,
+                    },
+                }
+            }),
         ],
     },
     devtool: '#source-map',

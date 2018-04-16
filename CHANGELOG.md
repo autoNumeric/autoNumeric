@@ -1,5 +1,11 @@
 ## Changelog for autoNumeric
 
+### 4.2.11
++ Fixes #570 The minified version of AutoNumeric does not expose some of its static functions (ie. `AutoNumeric.getNumber()`)
+  + Removing the non-standard `Function.name` feature fixes the bug in IE, and in subsequent standard-abiding browsers
++ Reduce the size of the generated library by tuning the UglifyJs options
++ Fix the end-to-end tests so that they are run against AutoNumeric's minified version 
+
 ### 4.2.10
 + Fix various bugs regarding the incorrect static and instantiated function calls
 + Fix the polyfill so that `Array.from()` is correctly 'polyfilled' even if the `CustomEvent` object already exists

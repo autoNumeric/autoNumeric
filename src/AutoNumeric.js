@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.2.10
- * @date         2018-04-12 UTC 08:40
+ * @version      4.2.11
+ * @date         2018-04-16 UTC 20:25
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -883,7 +883,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.2.10';
+        return '4.2.11';
     }
 
     /**
@@ -4509,7 +4509,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @returns {string|null}
      */
     static getNumericString(domElementOrSelector, callback = null) {
-        return this._get(domElementOrSelector, AutoNumeric.getNumericString.name, callback);
+        return this._get(domElementOrSelector, 'getNumericString', callback);
     }
 
     /**
@@ -4520,7 +4520,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @returns {string}
      */
     static getFormatted(domElementOrSelector, callback = null) {
-        return this._get(domElementOrSelector, AutoNumeric.getFormatted.name, callback);
+        return this._get(domElementOrSelector, 'getFormatted', callback);
     }
 
     /**
@@ -4532,7 +4532,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @returns {number|null}
      */
     static getNumber(domElementOrSelector, callback = null) {
-        return this._get(domElementOrSelector, AutoNumeric.getNumber.name, callback);
+        return this._get(domElementOrSelector, 'getNumber', callback);
     }
 
     /**

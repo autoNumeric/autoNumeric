@@ -509,7 +509,7 @@ export default class AutoNumericHelper {
         }
 
         if (AutoNumericHelper.isNumber(numberOrNumericString)) {
-            return numberOrNumericString < 0;
+            return numberOrNumericString < 0 || this.isNegativeStrict(numberOrNumericString, negativeSignCharacter);
         }
 
         if (checkEverywhere) {

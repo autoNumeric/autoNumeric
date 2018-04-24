@@ -508,12 +508,12 @@ export default class AutoNumericHelper {
             return false;
         }
 
-        if (checkEverywhere) {
-            return this.contains(numberOrNumericString, negativeSignCharacter);
+        if (AutoNumericHelper.isNumber(numberOrNumericString)) {
+            return numberOrNumericString < 0 || this.isNegativeStrict(numberOrNumericString, negativeSignCharacter);
         }
 
-        if (AutoNumericHelper.isNumber(numberOrNumericString)) {
-            return numberOrNumericString < 0;
+        if (checkEverywhere) {
+            return this.contains(numberOrNumericString, negativeSignCharacter);
         }
 
         return this.isNegativeStrict(numberOrNumericString, negativeSignCharacter);

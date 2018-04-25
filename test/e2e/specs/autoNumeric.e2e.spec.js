@@ -213,6 +213,7 @@ const selectors = {
     issue521Set                       : '#issue_521_set',
     issue521InputDetector             : '#issue_521_input_detector',
     issue521Button                    : '#issue_521_button',
+    issue574                          : '#issue_574',
 };
 
 //-----------------------------------------------------------------------------
@@ -3958,6 +3959,23 @@ describe('Issue #521', () => {
         browser.keys(['Control', 'v', 'Control']); // Paste
         expect(browser.getValue(selectors.issue521InputDetector)).toEqual('1');
         expect(browser.getValue(selectors.issue521Set)).toEqual('98.00');
+    });
+});
+
+describe('Issue #574', () => {
+    it('should test for default values, and focus on it', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue574)).toEqual('-0.05');
+    });
+
+    it(`should send an 'input' event when pasting a valid value in an empty input`, () => {
+        const input = $(selectors.issue574);
+        input.click();
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', '-']);
+        expect(browser.getValue(selectors.issue574)).toEqual('0.05');
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.issue574)).toEqual('-0.05');
     });
 });
 

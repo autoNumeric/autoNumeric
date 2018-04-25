@@ -949,6 +949,13 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #574</p>
+			<input id="issue_574" type="text" placeholder="#574">
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -2047,6 +2054,9 @@
         issue521InputCount = 0;
         issue521InputDetector.value = 0;
     });
+
+    //-------------- Issue #574
+    new AutoNumeric('#issue_574', -0.05);
 </script>
 </body>
 </html>

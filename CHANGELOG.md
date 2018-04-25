@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.2.12
++ Fixes #574 The fractional part is converted to an integer if the part on the cursor left-hand side is equal to 0
+
 ### 4.2.11
 + Fixes #570 The minified version of AutoNumeric does not expose some of its static functions (ie. `AutoNumeric.getNumber()`)
   + Removing the standard `Function.name` feature fixes the bug in IE now. In the near future IE users will need to require a polyfill for this.

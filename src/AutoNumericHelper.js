@@ -494,6 +494,8 @@ export default class AutoNumericHelper {
      * - everywhere in the string (by default), or
      * - on the first character only if the `checkEverywhere` parameter is set to `false`.
      *
+     * Note: `-0` is not a negative number since it's equal to `0`.
+     *
      * @param {number|string} numberOrNumericString A Number, or a number represented by a string
      * @param {string} negativeSignCharacter The single character that represent the negative sign
      * @param {boolean} checkEverywhere If TRUE, then the negative sign is search everywhere in the numeric string (this is needed for instance if the string is '1234.56-')

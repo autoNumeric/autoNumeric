@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.2.11
- * @date         2018-04-16 UTC 20:25
+ * @version      4.2.12
+ * @date         2018-04-25 UTC 07:17
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -883,7 +883,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.2.11';
+        return '4.2.12';
     }
 
     /**
@@ -8530,7 +8530,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             if (left === '' && AutoNumericHelper.contains(right, '-')) {
                 // The value is originally negative (with a trailing negative sign)
                 right = right.replace('-', '');
-            } else if (AutoNumericHelper.isNegative(left, '-')) {
+            } else if (AutoNumericHelper.isNegativeStrict(left, '-')) {
                 // The value is originally negative (with a leading negative sign)
                 // Remove the negative sign, effectively converting the value to a positive one
                 left = left.replace('-', ''); //TODO replace with '+' if `showPositiveSign` too?

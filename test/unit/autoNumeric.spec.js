@@ -4605,28 +4605,51 @@ describe('Instantiated autoNumeric functions', () => {
             expect(() => aNInput.set(1111111111111.111)).toThrow(); // Max
         });
 
-        it('should respect the minimumValue and maximumValue settings', () => {
-            aNInput.update({ minimumValue: '999999.99', maximumValue: '1111111111111.11' });
-            expect(() => aNInput.set(999999.99)).not.toThrow();
-            expect(() => aNInput.set(1111111111111.11)).not.toThrow();
+        it('should respect the minimumValue and maximumValue settings when one of the limit is equal to zero', () => {
+            aNInput.update({ minimumValue: '0', maximumValue: '2000' });
+            expect(() => aNInput.set(0)).not.toThrow();
+            expect(() => aNInput.set(2000)).not.toThrow();
+            expect(() => aNInput.set(-0)).not.toThrow();
+            expect(() => aNInput.set(0.01)).not.toThrow();
 
-            expect(() => aNInput.set(999999.984)).toThrow(); // Min, with rounding up
-            expect(() => aNInput.set(999999.989)).toThrow(); // Min, even without rounding
-            expect(() => aNInput.set(999999.991)).not.toThrow();
-            expect(() => aNInput.set(1111111111111.109)).not.toThrow();
-            expect(() => aNInput.set(1111111111111.111)).toThrow(); // Max
+            expect(() => aNInput.set(-0.01)).toThrow();
+            expect(() => aNInput.set(2000.01)).toThrow();
         });
 
-        it('should respect the minimumValue and maximumValue settings', () => {
-            aNInput.update({ minimumValue: '999999.99', maximumValue: '1111111111111.11' });
-            expect(() => aNInput.set(999999.99)).not.toThrow();
-            expect(() => aNInput.set(1111111111111.11)).not.toThrow();
+        it('should respect the minimumValue and maximumValue settings when one of the limit is negative', () => {
+            aNInput.update({ minimumValue: '-666', maximumValue: '100' });
+            expect(() => aNInput.set(-666)).not.toThrow();
+            expect(() => aNInput.set(100)).not.toThrow();
 
-            expect(() => aNInput.set(999999.984)).toThrow(); // Min, with rounding up
-            expect(() => aNInput.set(999999.989)).toThrow(); // Min, even without rounding
-            expect(() => aNInput.set(999999.991)).not.toThrow();
-            expect(() => aNInput.set(1111111111111.109)).not.toThrow();
-            expect(() => aNInput.set(1111111111111.111)).toThrow(); // Max
+            expect(() => aNInput.set(-666.01)).toThrow();
+            expect(() => aNInput.set(100.01)).toThrow();
+        });
+
+        it('should respect the minimumValue and maximumValue settings when both limits are negative', () => {
+            aNInput.update({ minimumValue: '-4400', maximumValue: '-4200' });
+            expect(() => aNInput.set(-4400)).not.toThrow();
+            expect(() => aNInput.set(-4200)).not.toThrow();
+
+            expect(() => aNInput.set(-4400.01)).toThrow();
+            expect(() => aNInput.set(-4199.99)).toThrow();
+            expect(() => aNInput.set(-4199.994)).toThrow();
+            expect(() => aNInput.set(-4199.995)).toThrow();
+            expect(() => aNInput.set(-4199.995, { roundingMethod: AutoNumeric.options.roundingMethod.toFloorTowardNegativeInfinity })).toThrow();
+        });
+
+        it('should respect the minimumValue and maximumValue settings, when setting arabic numbers', () => {
+            aNInput.update({ minimumValue: '-1234', maximumValue: '789' });
+            expect(() => aNInput.set('-۱۲۳۴')).not.toThrow();
+            expect(aNInput.getNumber()).toEqual(-1234);
+            expect(() => aNInput.set('٧٨٩')).not.toThrow();
+            expect(aNInput.getNumber()).toEqual(789);
+
+            expect(() => aNInput.set('-۱۲۳۴.۰۱')).toThrow();
+            expect(() => aNInput.set('٧٨٩.۰۱')).toThrow();
+        });
+
+        it('should throw when the minimumValue and maximumValue settings are inverted', () => {
+            expect(() => aNInput.update({ minimumValue: '100', maximumValue: '-666' })).toThrow();
         });
     });
 

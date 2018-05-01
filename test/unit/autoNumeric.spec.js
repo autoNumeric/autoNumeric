@@ -4604,30 +4604,6 @@ describe('Instantiated autoNumeric functions', () => {
             expect(() => aNInput.set(1111111111111.109)).not.toThrow();
             expect(() => aNInput.set(1111111111111.111)).toThrow(); // Max
         });
-
-        it('should respect the minimumValue and maximumValue settings', () => {
-            aNInput.update({ minimumValue: '999999.99', maximumValue: '1111111111111.11' });
-            expect(() => aNInput.set(999999.99)).not.toThrow();
-            expect(() => aNInput.set(1111111111111.11)).not.toThrow();
-
-            expect(() => aNInput.set(999999.984)).toThrow(); // Min, with rounding up
-            expect(() => aNInput.set(999999.989)).toThrow(); // Min, even without rounding
-            expect(() => aNInput.set(999999.991)).not.toThrow();
-            expect(() => aNInput.set(1111111111111.109)).not.toThrow();
-            expect(() => aNInput.set(1111111111111.111)).toThrow(); // Max
-        });
-
-        it('should respect the minimumValue and maximumValue settings', () => {
-            aNInput.update({ minimumValue: '999999.99', maximumValue: '1111111111111.11' });
-            expect(() => aNInput.set(999999.99)).not.toThrow();
-            expect(() => aNInput.set(1111111111111.11)).not.toThrow();
-
-            expect(() => aNInput.set(999999.984)).toThrow(); // Min, with rounding up
-            expect(() => aNInput.set(999999.989)).toThrow(); // Min, even without rounding
-            expect(() => aNInput.set(999999.991)).not.toThrow();
-            expect(() => aNInput.set(1111111111111.109)).not.toThrow();
-            expect(() => aNInput.set(1111111111111.111)).toThrow(); // Max
-        });
     });
 
     describe('`set` and non-ascii numbers', () => {
@@ -4647,7 +4623,7 @@ describe('Instantiated autoNumeric functions', () => {
 
         it('should accepts Arabic numbers', () => {
             expect(aNInput.getNumericString()).toEqual('');
-            aNInput.set('١٠٢٣٤٥٦٧.٨٩');
+            aNInput.set('۱٠۲۳۴۵۶۷.۸۹');
             expect(aNInput.getNumericString()).toEqual('10234567.89');
             expect(aNInput.getNumber()).toEqual(10234567.89);
             expect(aNInput.getFormatted()).toEqual('10,234,567.89');

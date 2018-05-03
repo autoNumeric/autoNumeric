@@ -282,6 +282,8 @@ Object.defineProperty(AutoNumeric, 'options', {
                 focus : 'focus',
                 press : 'press',
                 always: 'always',
+                min   : 'min',
+                max   : 'max',
                 zero  : 'zero',
             },
 

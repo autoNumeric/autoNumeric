@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.2.12
- * @date         2018-04-25 UTC 07:17
+ * @version      4.2.13
+ * @date         2018-05-23 UTC 21:10
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -148,14 +148,14 @@ export default class AutoNumeric {
 
         this.runOnce = true;
 
-        // Add the events listeners only on input elements
+        // Add the events listeners only on input or editable elements
         if (this.isInputElement || this.isContentEditable) {
             if (!this.settings.noEventListeners) {
                 //XXX Here we make sure the global list is created after creating the event listeners, to only create the event listeners on `document` once
                 this._createEventListeners();
             }
 
-            this._setReadOnly();
+            this._setWritePermissions();
         }
 
         // Save the initial values (html attribute + element.value) for the pristine test
@@ -774,9 +774,10 @@ export default class AutoNumeric {
 
                 return this;
             },
-            readOnly                     : readOnly => { //FIXME test this
+            readOnly                     : readOnly => {
+                // When changing the readOnly attribute, the raw and formatted values do not change, so no need to call the costly 'update()` method
                 this.settings.readOnly = readOnly;
-                this._setReadOnly();
+                this._setWritePermissions();
 
                 return this;
             },
@@ -883,7 +884,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.2.12';
+        return '4.2.13';
     }
 
     /**
@@ -1408,13 +1409,42 @@ export default class AutoNumeric {
     }
 
     /**
-     * Set the element attribute 'readonly' according to the current settings.
+     * Set the DOM element write permissions according to the current settings, by setting the `readonly` or `contenteditable` attributes depending of its tag type.
+     *
+     * @private
+     */
+    _setWritePermissions() {
+        if (this.settings.readOnly) {
+            this._setReadOnly();
+        } else {
+            this._setReadWrite();
+        }
+    }
+
+    /**
+     * Set the element to be read-only.
+     * If the DOM element tag is not an `input`, then it `contenteditable` attribute is set to `false`.
      *
      * @private
      */
     _setReadOnly() {
-        if (this.isInputElement && this.settings.readOnly) {
+        if (this.isInputElement) {
             this.domElement.readOnly = true;
+        } else {
+            this.domElement.setAttribute('contenteditable', false);
+        }
+    }
+
+    /**
+     * Set the element to be read-write.
+     *
+     * @private
+     */
+    _setReadWrite() {
+        if (this.isInputElement) {
+            this.domElement.readOnly = false;
+        } else {
+            this.domElement.setAttribute('contenteditable', true);
         }
     }
 
@@ -1893,6 +1923,7 @@ export default class AutoNumeric {
         // Update the settings
         try {
             this._setSettings(optionsToUse, true);
+            this._setWritePermissions(); // Update the read/write permissions
 
             // Reformat the input value with the new settings
             // Note: we always `set`, even when `numericString` is the empty string '', since `emptyInputBehavior` (set to `always` or `zero`) can change how the empty input is formatted

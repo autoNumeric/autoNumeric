@@ -309,7 +309,8 @@ If you know you want to initialize multiple elements in one call, you must then 
 
 ## Options
 Multiple options allow you to customize precisely how a form input will format your key strokes as you type.<br>
-You can check what are the predefined choices for each option as well as a more detailed explanation of how they work on the [official documentation page](http://autonumeric.org/#/guide).
+You can check what are the predefined choices for each option as well as a more detailed explanation of how they work on the [official documentation page](http://autonumeric.org/guide).<br>
+You can also generate your custom options object and try those live with the [AutoNumeric configurator](http://autonumeric.org/configurator).
 
 | Option           | Description | Default Value |
 | :----------------: | :-----------:  | :-----------:  |
@@ -348,7 +349,7 @@ You can check what are the predefined choices for each option as well as a more 
 | `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor` and `ignore`) | `null` |
 | `positiveSignCharacter` | Defines the positive sign character to use (Note: It's only shown if `showPositiveSign` is set to `true`) | `'+'` |
 | `rawValueDivisor` | Define the number that will divide the formatted value into the raw value (ie. when displaying `'1.23%'`, the raw value kept is `0.0123` if `rawValueDivisor` is set to `100`) | `null` |
-| `readOnly` | Defines if the `<input>` element should be set as read only on initialization | `false` |
+| `readOnly` | Defines if the element (`<input>` or another allowed html tag) should be set as read-only on initialization | `false` |
 | `roundingMethod` | Method used for rounding. The possible options are:<br>`S` (Round-Half-Up Symmetric (default)),<br>`A` (Round-Half-Up Asymmetric),<br>`s` (Round-Half-Down Symmetric (lower case s)),<br>`a` (Round-Half-Down Asymmetric (lower case a)),<br>`B` (Round-Half-Even 'Bankers Rounding'),<br>`U` (Round Up 'Round-Away-From-Zero'),<br>`D` (Round Down 'Round-Toward-Zero' - same as truncate),<br>`C` (Round to Ceiling 'Toward Positive Infinity'),<br>`F` (Round to Floor 'Toward Negative Infinity'),<br>`N05` (Rounds to the nearest .05 (same as `'CHF'` used in v1.9.* and still valid)),<br>`U05` (Rounds up to next .05),<br>`D05` (Rounds down to next .05) | `'S'` |
 | `saveValueToSessionStorage` | Allow the `decimalPlacesShownOnFocus` value to be saved into session storage | `false` |
 | `selectNumberOnly` | Determine if the 'Select All' keyboard command will select the complete input text content (including the currency symbol and suffix text), or only the input numeric value | `false` |

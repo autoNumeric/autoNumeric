@@ -1,5 +1,13 @@
 ## Changelog for autoNumeric
 
+### 4.2.13
++ Fixes #580 Allow non-input tags with the `readOnly` option to set the `contenteditable` attribute to `false`
++ Fix the `readonly` and `contenteditable` attributes so that they can be updated to read/write mode
++ Modify `_setReadOnly()` so that it *always* sets the element to read-only mode
++ Create a new `_setReadWrite()` function that sets the element to read-write mode
++ Create a new `_setWritePermissions()` function that sets the element read only/write mode according to the `readOnly` setting
++ Fix the urls to autonumeric.org in the readme
+
 ### 4.2.12
 + Fixes #574 The fractional part is converted to an integer if the part on the cursor left-hand side is equal to 0
 

@@ -3143,6 +3143,59 @@ describe('Initialization calls', () => {
             expect(aNInput.getFormatted()).toEqual('$256,789.02');
         });
 
+        it('should init and update the <input> element with the readOnly option', () => {
+            aNInput = new AutoNumeric(newInput, 12345.67, {
+                readOnly               : true,
+                currencySymbol         : ' Rp',
+                currencySymbolPlacement: 's',
+            });
+            expect(aNInput.getNumericString()).toEqual('12345.67');
+            expect(aNInput.getFormatted()).toEqual('12,345.67 Rp');
+
+            expect(aNInput.node().hasAttribute('readonly')).toEqual(true);
+            aNInput.update({ readOnly : false });
+            expect(aNInput.node().hasAttribute('readonly')).toEqual(false);
+            aNInput.update({ readOnly : true });
+            expect(aNInput.node().hasAttribute('readonly')).toEqual(true);
+
+            aNInput.options.readOnly(false);
+            expect(aNInput.node().hasAttribute('readonly')).toEqual(false);
+            aNInput.options.readOnly(true);
+            expect(aNInput.node().hasAttribute('readonly')).toEqual(true);
+        });
+
+        it('should init and update the non-<input> element with the readOnly option', () => {
+            // Element initialization
+            const newDiv = document.createElement('div');
+            newDiv.setAttribute('contenteditable', true);
+            expect(newDiv.getAttribute('contenteditable')).toEqual('true');
+            document.body.appendChild(newDiv);
+
+            // The test
+            const aNDiv = new AutoNumeric(newDiv, 12345.67, {
+                readOnly               : true,
+                currencySymbol         : ' Rp',
+                currencySymbolPlacement: 's',
+            });
+            expect(aNDiv.getNumericString()).toEqual('12345.67');
+            expect(aNDiv.getFormatted()).toEqual('12,345.67 Rp');
+
+            expect(aNDiv.node().getAttribute('contenteditable')).toEqual('false');
+            aNDiv.update({ readOnly : false });
+            expect(aNDiv.node().getAttribute('contenteditable')).toEqual('true');
+            aNDiv.update({ readOnly : true });
+            expect(aNDiv.node().getAttribute('contenteditable')).toEqual('false');
+
+            aNDiv.options.readOnly(false);
+            expect(aNDiv.node().getAttribute('contenteditable')).toEqual('true');
+            aNDiv.options.readOnly(true);
+            expect(aNDiv.node().getAttribute('contenteditable')).toEqual('false');
+
+            // Destroy the elements
+            aNDiv.remove();
+            document.body.removeChild(newDiv);
+        });
+
         it('should init and update the element with the correct predefined settings', () => {
             newInput.value = '1256789.02';
             aNInput = new AutoNumeric(newInput, AutoNumeric.getPredefinedOptions().dotDecimalCharCommaSeparator);

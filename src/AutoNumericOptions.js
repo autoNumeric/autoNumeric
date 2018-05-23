@@ -548,8 +548,10 @@ Object.defineProperty(AutoNumeric, 'options', {
                 basisPoint: 10000,
             },
 
-            /* Defines if the <input> element should be set as read only on initialization.
-             * When set to `true`, then the `readonly` html property is added to the <input> element on initialization.
+            /* Defines if the element (`<input>` or another allowed html tag) should be set as read-only on initialization.
+             * When set to `true`, then:
+             * - the `readonly` html property is added to the <input> element on initialization, or
+             * - the `contenteditable` attribute is set to `false` on non-input elements.
              */
             readOnly: {
                 readOnly : true,

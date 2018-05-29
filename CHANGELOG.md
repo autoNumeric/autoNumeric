@@ -2,6 +2,8 @@
 
 ### 4.2.14
 + Fixes #526 Memory / speed improvement in options
++ Fixes #583 AutoNumeric `v4.2.13` forces the contenteditable attribute to `true` when set on the html source
++ Fixes #584 Event listeners are not set/reset on option updates
 
 ### 4.2.13
 + Fixes #580 Allow non-input tags with the `readOnly` option to set the `contenteditable` attribute to `false`

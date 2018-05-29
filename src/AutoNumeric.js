@@ -2,7 +2,7 @@
  *               AutoNumeric.js
  *
  * @version      4.2.14
- * @date         2018-05-29 UTC 19:40
+ * @date         2018-05-29 UTC 20:55
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -149,6 +149,7 @@ export default class AutoNumeric {
         this.runOnce = true;
 
         // Add the events listeners only on input or editable elements
+        this.hasEventListeners = false;
         if (this.isInputElement || this.isContentEditable) {
             if (!this.settings.noEventListeners) {
                 //XXX Here we make sure the global list is created after creating the event listeners, to only create the event listeners on `document` once
@@ -1160,6 +1161,9 @@ export default class AutoNumeric {
         this.domElement.addEventListener('drop', this._onDropFunc, false);
         this._setupFormListener();
 
+        // Keep track if the event listeners have been initialized on this object
+        this.hasEventListeners = true;
+
         // Create one global event listener for the keyup event on the document object, which will be shared by all the autoNumeric elements
         if (!AutoNumeric._doesGlobalListExists()) {
             document.addEventListener('keydown', this._onKeydownGlobalFunc, false);
@@ -1186,8 +1190,27 @@ export default class AutoNumeric {
         this.domElement.removeEventListener('drop', this._onDropFunc, false);
         this._removeFormListener();
 
+        // Keep track if the event listeners have been initialized on this object
+        this.hasEventListeners = false;
+
         document.removeEventListener('keydown', this._onKeydownGlobalFunc, false);
         document.removeEventListener('keyup', this._onKeyupGlobalFunc, false);
+    }
+
+    /**
+     * Toggle the event listeners according to the `noEventListeners` option, if those were not activated/deactivated before
+     * @private
+     */
+    _updateEventListeners() {
+        if (!this.settings.noEventListeners && !this.hasEventListeners) {
+            // Special case where an update is done on an element that did not activate its event listeners in the first place
+            // ie. when an element is first created with `contenteditable="false"`, then an update is done with `anElement.french()`
+            this._createEventListeners();
+        }
+
+        if (this.settings.noEventListeners && this.hasEventListeners) {
+            this._removeEventListeners();
+        }
     }
 
     /**
@@ -1414,7 +1437,7 @@ export default class AutoNumeric {
      * @private
      */
     _setWritePermissions() {
-        if (this.settings.readOnly) { //FIXME Finish Also check that the contenteditable attribute is not set in the html already
+        if (this.settings.readOnly) {
             this._setReadOnly();
         } else {
             this._setReadWrite();
@@ -1924,6 +1947,7 @@ export default class AutoNumeric {
         try {
             this._setSettings(optionsToUse, true);
             this._setWritePermissions(); // Update the read/write permissions
+            this._updateEventListeners();
 
             // Reformat the input value with the new settings
             // Note: we always `set`, even when `numericString` is the empty string '', since `emptyInputBehavior` (set to `always` or `zero`) can change how the empty input is formatted
@@ -7265,9 +7289,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Check if the DOM element is supported by autoNumeric.
-     * A supported element is either an <input> element with the right 'type' attribute, or a tag whitelisted in the `allowedTagList`.
+     * A supported element is either an <input> element with the correct 'type' attribute, or a tag whitelisted in the `allowedTagList` array.
      * If the check fails, this method throws.
-     * This function also set the info `this.isInputElement` which keep tracks if the DOM element is an <input> or not, and the `this.isContentEditable` if the element has the `contenteditable` attribute set to `true`.
+     * This function also sets the info `this.isInputElement` which keep tracks if the DOM element is an <input> or not, and the `this.isContentEditable` if the element has the `contenteditable` attribute set to `true` initially.
      *
      * @throws
      * @private

@@ -495,6 +495,7 @@
 			<div>
 				<p id="contentEditable1" contenteditable="true"></p>
 				<p id="contentEditable2" contenteditable="true">12345678.9012</p>
+				<p id="contentEditableNotActivatedYet" contenteditable="false">123456.789</p>
 				<p id="contentEditableNotActivated" contenteditable="false">69.02</p>
 			</div>
 		</div>
@@ -1320,6 +1321,7 @@
     //-------------- contentEditable elements
     new AutoNumeric('#contentEditable1').french();
     new AutoNumeric('#contentEditable2').northAmerican();
+    new AutoNumeric('#contentEditableNotActivatedYet', { currencySymbol: '©' });
     new AutoNumeric('#contentEditableNotActivated').swiss();
 
     //-------------- Issue #395

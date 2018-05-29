@@ -87,6 +87,7 @@ const selectors = {
     issue393inputLimitOneSideDown     : '#issue_393_limitOneSideDown',
     contentEditable1                  : '#contentEditable1',
     contentEditable2                  : '#contentEditable2',
+    contentEditableNotActivatedYet    : '#contentEditableNotActivatedYet',
     contentEditableNotActivated       : '#contentEditableNotActivated',
     issue403a                         : '#issue_403a',
     issue403b                         : '#issue_403b',
@@ -1210,19 +1211,36 @@ describe('Elements with the `contenteditable` attribute set to `true`', () => {
         expect(browser.getText(selectors.contentEditable2)).toEqual('$226,778.90');
     });
 
-    it('should not change the element value since `contenteditable` is set to `false`', () => {
+    it('should be able change the element value since `contenteditable` is initially set to `false`, but an option update sets the `readOnly` option to `false`', () => {
         const contentEditableNotActivated = $(selectors.contentEditableNotActivated);
 
         // Focus in the input
         contentEditableNotActivated.click();
 
         // Test the `contenteditable` attribute
-        expect(browser.getAttribute(selectors.contentEditableNotActivated, 'contenteditable')).toEqual(false);
+        expect(browser.getAttribute(selectors.contentEditableNotActivated, 'contenteditable')).toEqual('true');
 
         // Test the values
         expect(browser.getText(selectors.contentEditableNotActivated)).toEqual('69.02 CHF');
+        browser.keys(['Home']);
+        browser.keys(['ArrowLeft']); //FIXME This is a hack to circumvent a geckodriver bug where `Home` is not taken into account on the preceding line
+        browser.keys(['1234']);
+        expect(browser.getText(selectors.contentEditableNotActivated)).toEqual("123'469.02 CHF");
+    });
+
+    it('should not change the element value since `contenteditable` is set to `false`', () => {
+        const contentEditableNotActivatedYet = $(selectors.contentEditableNotActivatedYet);
+
+        // Focus in the input
+        contentEditableNotActivatedYet.click();
+
+        // Test the `contenteditable` attribute
+        expect(browser.getAttribute(selectors.contentEditableNotActivatedYet, 'contenteditable')).toEqual('false');
+
+        // Test the values
+        expect(browser.getText(selectors.contentEditableNotActivatedYet)).toEqual('©123,456.79');
         browser.keys(['Home', '1234']);
-        expect(browser.getText(selectors.contentEditableNotActivated)).toEqual('69.02 CHF');
+        expect(browser.getText(selectors.contentEditableNotActivatedYet)).toEqual('©123,456.79');
     });
 
     //FIXME Add the paste tests (and check the resulting caret position)

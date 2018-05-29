@@ -121,110 +121,112 @@ turkish.currencySymbol = AutoNumeric.options.currencySymbol.lira;
 /**
  * Predefined options for the most common languages
  */
-Object.defineProperty(AutoNumeric, 'predefinedOptions', {
-    get() {
-        return {
-            euro,
-            euroPos,
-            euroNeg,
-            euroSpace,
-            euroSpacePos,
-            euroSpaceNeg,
-            percentageEU2dec,
-            percentageEU2decPos,
-            percentageEU2decNeg,
-            percentageEU3dec,
-            percentageEU3decPos,
-            percentageEU3decNeg,
-            dollar,
-            dollarPos,
-            dollarNeg,
-            dollarNegBrackets,
-            percentageUS2dec,
-            percentageUS2decPos,
-            percentageUS2decNeg,
-            percentageUS3dec,
-            percentageUS3decPos,
-            percentageUS3decNeg,
-            French                      : euro, // Français
-            Spanish                     : euro, // Español
-            NorthAmerican               : dollar,
-            British                     : {
-                digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.comma,
-                decimalCharacter             : AutoNumeric.options.decimalCharacter.dot,
-                currencySymbol               : AutoNumeric.options.currencySymbol.pound,
-                currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
-                negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
-            },
-            Swiss                       : { // Suisse
-                digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.apostrophe,
-                decimalCharacter             : AutoNumeric.options.decimalCharacter.dot,
-                currencySymbol               : '\u202fCHF',
-                currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
-                negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
-            },
-            Japanese                    : japanese, // 日本語
-            Chinese                     : japanese, // 中国語 (Chinese)
-            Brazilian                   : {
-                digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.dot,
-                decimalCharacter             : AutoNumeric.options.decimalCharacter.comma,
-                currencySymbol               : AutoNumeric.options.currencySymbol.real,
-                currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
-                negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
-            },
-            Turkish                     : turkish,
-            dotDecimalCharCommaSeparator: {
-                digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.comma,
-                decimalCharacter   : AutoNumeric.options.decimalCharacter.dot,
-            },
-            commaDecimalCharDotSeparator: {
-                digitGroupSeparator        : AutoNumeric.options.digitGroupSeparator.dot,
-                decimalCharacter           : AutoNumeric.options.decimalCharacter.comma,
-                decimalCharacterAlternative: AutoNumeric.options.decimalCharacterAlternative.dot,
-            },
-            integer                     : {
-                decimalPlaces: 0,
-            },
-            integerPos                  : {
-                minimumValue : AutoNumeric.options.minimumValue.zero,
-                decimalPlaces: 0,
-            },
-            integerNeg                  : {
-                maximumValue : AutoNumeric.options.maximumValue.zero,
-                decimalPlaces: 0,
-            },
-            float                       : {
-                allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never,
-            },
-            floatPos                    : {
-                allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never,
-                minimumValue       : AutoNumeric.options.minimumValue.zero,
-                maximumValue       : AutoNumeric.options.maximumValue.tenTrillions,
-            },
-            floatNeg                    : {
-                allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never,
-                minimumValue       : AutoNumeric.options.minimumValue.tenTrillions,
-                maximumValue       : AutoNumeric.options.maximumValue.zero,
-            },
-            numeric                     : {
-                digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator,
-                decimalCharacter   : AutoNumeric.options.decimalCharacter.dot,
-                currencySymbol     : AutoNumeric.options.currencySymbol.none,
-            },
-            numericPos                  : {
-                digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator,
-                decimalCharacter   : AutoNumeric.options.decimalCharacter.dot,
-                currencySymbol     : AutoNumeric.options.currencySymbol.none,
-                minimumValue       : AutoNumeric.options.minimumValue.zero,
-                maximumValue       : AutoNumeric.options.maximumValue.tenTrillions,
-            },
-            numericNeg                  : {
-                digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator,
-                decimalCharacter   : AutoNumeric.options.decimalCharacter.dot,
-                currencySymbol     : AutoNumeric.options.currencySymbol.none,
-                minimumValue       : AutoNumeric.options.minimumValue.tenTrillions,
-                maximumValue       : AutoNumeric.options.maximumValue.zero,
-            },
-        };
+AutoNumeric.predefinedOptions = {
+    euro,
+    euroPos,
+    euroNeg,
+    euroSpace,
+    euroSpacePos,
+    euroSpaceNeg,
+    percentageEU2dec,
+    percentageEU2decPos,
+    percentageEU2decNeg,
+    percentageEU3dec,
+    percentageEU3decPos,
+    percentageEU3decNeg,
+    dollar,
+    dollarPos,
+    dollarNeg,
+    dollarNegBrackets,
+    percentageUS2dec,
+    percentageUS2decPos,
+    percentageUS2decNeg,
+    percentageUS3dec,
+    percentageUS3decPos,
+    percentageUS3decNeg,
+    French                      : euro, // Français
+    Spanish                     : euro, // Español
+    NorthAmerican               : dollar,
+    British                     : {
+        digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.comma,
+        decimalCharacter             : AutoNumeric.options.decimalCharacter.dot,
+        currencySymbol               : AutoNumeric.options.currencySymbol.pound,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
     },
+    Swiss                       : { // Suisse
+        digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.apostrophe,
+        decimalCharacter             : AutoNumeric.options.decimalCharacter.dot,
+        currencySymbol               : '\u202fCHF',
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.suffix,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
+    },
+    Japanese                    : japanese, // 日本語
+    Chinese                     : japanese, // 中国語 (Chinese)
+    Brazilian                   : {
+        digitGroupSeparator          : AutoNumeric.options.digitGroupSeparator.dot,
+        decimalCharacter             : AutoNumeric.options.decimalCharacter.comma,
+        currencySymbol               : AutoNumeric.options.currencySymbol.real,
+        currencySymbolPlacement      : AutoNumeric.options.currencySymbolPlacement.prefix,
+        negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
+    },
+    Turkish                     : turkish,
+    dotDecimalCharCommaSeparator: {
+        digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.comma,
+        decimalCharacter   : AutoNumeric.options.decimalCharacter.dot,
+    },
+    commaDecimalCharDotSeparator: {
+        digitGroupSeparator        : AutoNumeric.options.digitGroupSeparator.dot,
+        decimalCharacter           : AutoNumeric.options.decimalCharacter.comma,
+        decimalCharacterAlternative: AutoNumeric.options.decimalCharacterAlternative.dot,
+    },
+    integer                     : {
+        decimalPlaces: 0,
+    },
+    integerPos                  : {
+        minimumValue : AutoNumeric.options.minimumValue.zero,
+        decimalPlaces: 0,
+    },
+    integerNeg                  : {
+        maximumValue : AutoNumeric.options.maximumValue.zero,
+        decimalPlaces: 0,
+    },
+    float                       : {
+        allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never,
+    },
+    floatPos                    : {
+        allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never,
+        minimumValue       : AutoNumeric.options.minimumValue.zero,
+        maximumValue       : AutoNumeric.options.maximumValue.tenTrillions,
+    },
+    floatNeg                    : {
+        allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.never,
+        minimumValue       : AutoNumeric.options.minimumValue.tenTrillions,
+        maximumValue       : AutoNumeric.options.maximumValue.zero,
+    },
+    numeric                     : {
+        digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator,
+        decimalCharacter   : AutoNumeric.options.decimalCharacter.dot,
+        currencySymbol     : AutoNumeric.options.currencySymbol.none,
+    },
+    numericPos                  : {
+        digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator,
+        decimalCharacter   : AutoNumeric.options.decimalCharacter.dot,
+        currencySymbol     : AutoNumeric.options.currencySymbol.none,
+        minimumValue       : AutoNumeric.options.minimumValue.zero,
+        maximumValue       : AutoNumeric.options.maximumValue.tenTrillions,
+    },
+    numericNeg                  : {
+        digitGroupSeparator: AutoNumeric.options.digitGroupSeparator.noSeparator,
+        decimalCharacter   : AutoNumeric.options.decimalCharacter.dot,
+        currencySymbol     : AutoNumeric.options.currencySymbol.none,
+        minimumValue       : AutoNumeric.options.minimumValue.tenTrillions,
+        maximumValue       : AutoNumeric.options.maximumValue.zero,
+    },
+};
+
+Object.getOwnPropertyNames(AutoNumeric.predefinedOptions).forEach(optionName => {
+    Object.freeze(AutoNumeric.predefinedOptions[optionName]);
 });
+Object.freeze(AutoNumeric.predefinedOptions);
+Object.defineProperty(AutoNumeric, 'predefinedOptions', { configurable: false, writable: false });

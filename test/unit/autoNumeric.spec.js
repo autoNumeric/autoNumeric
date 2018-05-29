@@ -62,7 +62,7 @@ const autoNumericOptionsDollar = {
     currencySymbolPlacement: 'p',
 };
 
-describe('The autoNumeric object', () => {
+describe('The AutoNumeric object', () => {
     describe('manages default options', () => {
         let aNInput;
         let newInput;
@@ -153,28 +153,46 @@ describe('The autoNumeric object', () => {
             expect(defaultSettings).toEqual(defaultOption);
         });
 
-        it('should prevent modifying the default settings object', () => {
+        it('should prevent modifying the `AutoNumeric.defaultSettings` object', () => {
+            expect(AutoNumeric.defaultSettings.caretPositionOnFocus).toEqual(null);
+            expect(() => { AutoNumeric.defaultSettings.caretPositionOnFocus = 'foo'; }).toThrow();
+            expect(AutoNumeric.defaultSettings.caretPositionOnFocus).toEqual(null);
             expect(() => { AutoNumeric.defaultSettings = {}; }).toThrow();
         });
 
-        it('should prevent modifying the enumeration objects', () => {
+        it('should prevent modifying the `AutoNumericEnum` object', () => {
+            expect(AutoNumericEnum.keyName._allFnKeys).toEqual(['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']);
+            expect(() => { AutoNumericEnum.keyName._allFnKeys = ['foo']; }).toThrow();
+            expect(AutoNumericEnum.keyName._allFnKeys).toEqual(['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']);
+
             expect(() => { AutoNumericEnum.allowedTagList = ['foobar']; }).toThrow();
             expect(() => { AutoNumericEnum.keyCode = {}; }).toThrow();
             expect(() => { AutoNumericEnum.fromCharCodeKeyCode = []; }).toThrow();
-            expect(() => { AutoNumericEnum.fromCharCodeKeyCode[91] = 'foobar'; }).not.toThrow();
-            AutoNumericEnum.fromCharCodeKeyCode[91] = 'OS'; // Set back the initial value
+            expect(() => { AutoNumericEnum.fromCharCodeKeyCode[91] = 'foobar'; }).toThrow();
             expect(() => { AutoNumericEnum.keyName = {}; }).toThrow();
         });
 
-        it('should prevent modifying the events object', () => {
+        it('should prevent modifying the `AutoNumeric.events` object', () => {
+            expect(AutoNumeric.events.initialized).toEqual('autoNumeric:initialized');
+            expect(AutoNumeric.events.native.input).toEqual('input');
+            expect(() => { AutoNumeric.events.initialized = 'foo'; }).toThrow();
+            expect(() => { AutoNumeric.events.native.input = 'foo'; }).toThrow();
+            expect(AutoNumeric.events.initialized).toEqual('autoNumeric:initialized');
+            expect(AutoNumeric.events.native.input).toEqual('input');
             expect(() => { AutoNumeric.events = {}; }).toThrow();
         });
 
-        it('should prevent modifying the options object', () => {
+        it('should prevent modifying the `AutoNumeric.options` object', () => {
+            expect(AutoNumeric.options.wheelStep.progressive).toEqual('progressive');
+            expect(() => { AutoNumeric.options.wheelStep.progressive = 'foo'; }).toThrow();
+            expect(AutoNumeric.options.wheelStep.progressive).toEqual('progressive');
             expect(() => { AutoNumeric.options = {}; }).toThrow();
         });
 
-        it('should prevent modifying the predefinedOptions object', () => {
+        it('should prevent modifying the `AutoNumeric.predefinedOptions` object', () => {
+            expect(AutoNumeric.predefinedOptions.integer).toEqual({ decimalPlaces: 0 });
+            expect(() => { AutoNumeric.predefinedOptions.integer = 'foo'; }).toThrow();
+            expect(AutoNumeric.predefinedOptions.integer).toEqual({ decimalPlaces: 0 });
             expect(() => { AutoNumeric.predefinedOptions = {}; }).toThrow();
         });
 

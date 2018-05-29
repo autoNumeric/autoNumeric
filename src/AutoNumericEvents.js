@@ -34,18 +34,18 @@ import AutoNumeric from './AutoNumeric';
  *
  * @type {{initialized: string, formatted: string, minRangeExceeded: string, maxRangeExceeded: string, native: {input: string, change: string}}}
  */
-Object.defineProperty(AutoNumeric, 'events', {
-    get() {
-        return {
-            initialized     : 'autoNumeric:initialized',
-            formatted       : 'autoNumeric:formatted',
-            rawValueModified: 'autoNumeric:rawValueModified',
-            minRangeExceeded: 'autoNumeric:minExceeded',
-            maxRangeExceeded: 'autoNumeric:maxExceeded',
-            native          : {
-                input : 'input',
-                change: 'change',
-            },
-        };
+AutoNumeric.events = {
+    initialized     : 'autoNumeric:initialized',
+    formatted       : 'autoNumeric:formatted',
+    rawValueModified: 'autoNumeric:rawValueModified',
+    minRangeExceeded: 'autoNumeric:minExceeded',
+    maxRangeExceeded: 'autoNumeric:maxExceeded',
+    native          : {
+        input : 'input',
+        change: 'change',
     },
-});
+};
+
+Object.freeze(AutoNumeric.events.native);
+Object.freeze(AutoNumeric.events);
+Object.defineProperty(AutoNumeric, 'events', { configurable: false, writable: false });

@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.2.14
++ Fixes #526 Memory / speed improvement in options
+
 ### 4.2.13
 + Fixes #580 Allow non-input tags with the `readOnly` option to set the `contenteditable` attribute to `false`
 + Fix the `readonly` and `contenteditable` attributes so that they can be updated to read/write mode

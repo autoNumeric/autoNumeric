@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.2.13
- * @date         2018-05-23 UTC 21:10
+ * @version      4.2.14
+ * @date         2018-05-29 UTC 19:40
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -884,7 +884,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.2.13';
+        return '4.2.14';
     }
 
     /**
@@ -1414,7 +1414,7 @@ export default class AutoNumeric {
      * @private
      */
     _setWritePermissions() {
-        if (this.settings.readOnly) {
+        if (this.settings.readOnly) { //FIXME Finish Also check that the contenteditable attribute is not set in the html already
             this._setReadOnly();
         } else {
             this._setReadWrite();

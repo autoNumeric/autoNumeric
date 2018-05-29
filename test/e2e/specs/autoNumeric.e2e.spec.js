@@ -1216,6 +1216,9 @@ describe('Elements with the `contenteditable` attribute set to `true`', () => {
         // Focus in the input
         contentEditableNotActivated.click();
 
+        // Test the `contenteditable` attribute
+        expect(browser.getAttribute(selectors.contentEditableNotActivated, 'contenteditable')).toEqual(false);
+
         // Test the values
         expect(browser.getText(selectors.contentEditableNotActivated)).toEqual('69.02 CHF');
         browser.keys(['Home', '1234']);

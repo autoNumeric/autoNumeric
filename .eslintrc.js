@@ -9,7 +9,7 @@ module.exports = {
     },
     extends      : 'eslint:recommended',
     parserOptions: {
-        sourceType: 'module',
+        sourceType : 'module',
         ecmaVersion: 2017,
     },
     rules        : {
@@ -35,6 +35,21 @@ module.exports = {
                 CallExpression     : {
                     arguments: 'first',
                 },
+            },
+        ],
+        'object-property-newline'      : [
+            'error',
+            {
+                'allowAllPropertiesOnSameLine': true,
+            },
+        ],
+        'object-curly-newline'         : [
+            'error',
+            {
+                'ObjectExpression' : { 'multiline': true, 'consistent': true },
+                'ObjectPattern'    : { 'multiline': true },
+                'ImportDeclaration': { 'multiline': true, 'minProperties': 2 },
+                'ExportDeclaration': { 'multiline': true, 'minProperties': 2 },
             },
         ],
         'keyword-spacing'              : [
@@ -226,7 +241,7 @@ module.exports = {
         // allow debugger during development
         'no-debugger': (process.env.NODE_ENV === 'production')?2:0,
 
-        'valid-jsdoc': [
+        'valid-jsdoc'    : [
             'error', {
                 prefer                  : {
                     arg     : 'param',
@@ -241,18 +256,18 @@ module.exports = {
             }
         ],
         //TODO This should really be enabled by default :
-        // 'no-invalid-this': "error",
-        /*"wrap-iife": [
-         "error",
-         "inside"
-         ],*/
-        /*"yoda": [
-         "error",
-         "always",
-         {
-         "onlyEquality": true,
-         },
-         ],*/
+        'no-invalid-this': 'error',
+        'wrap-iife'      : [
+            'error',
+            'inside'
+        ],
+        /*'yoda'           : [
+            'error',
+            'always',
+            {
+                'onlyEquality': true,
+            },
+        ],*/
         // "no-param-reassign"              : "error",
         // "import/prefer-default-export"   : "error",
         // "import/first"                   : "error",

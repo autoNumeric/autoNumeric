@@ -2531,31 +2531,37 @@ describe('autoNumeric options and `options.*` methods', () => {
                         { callback: rawValue => rawValue % 2 === 0, classes: ['autoNumeric-even', 'autoNumeric-odd'] },
 
                         // Return a single array index to use
-                        { callback: rawValue => {
-                            if (10 <= rawValue && rawValue < 12) {
-                                return 0;
-                            }
-                            if (24 <= rawValue && rawValue < 26) {
-                                return 1;
-                            }
-                            if (42 <= rawValue && rawValue < 69) {
-                                return 2;
-                            }
+                        {
+                            callback: rawValue => {
+                                if (10 <= rawValue && rawValue < 12) {
+                                    return 0;
+                                }
+                                if (24 <= rawValue && rawValue < 26) {
+                                    return 1;
+                                }
+                                if (42 <= rawValue && rawValue < 69) {
+                                    return 2;
+                                }
 
-                            return null;  // In case the rawValue is outside those ranges
-                        }, classes: ['one1', 'one2', 'one3'] },
+                                return null;  // In case the rawValue is outside those ranges
+                            },
+                            classes: ['one1', 'one2', 'one3'],
+                        },
 
                         // Return an array of array indexes to use
-                        { callback: rawValue => {
-                            if (90 <= rawValue && rawValue < 100) {
-                                return [0, 1];
-                            }
-                            if (rawValue >= 120) {
-                                return [1, 2];
-                            }
+                        {
+                            callback: rawValue => {
+                                if (90 <= rawValue && rawValue < 100) {
+                                    return [0, 1];
+                                }
+                                if (rawValue >= 120) {
+                                    return [1, 2];
+                                }
 
-                            return null; // In case the rawValue is not valid
-                        }, classes: ['multiple1', 'multiple2', 'multiple3'] },
+                                return null; // In case the rawValue is not valid
+                            },
+                            classes: ['multiple1', 'multiple2', 'multiple3'],
+                        },
 
                         // If 'classes' is `undefined` or `null`, then the callback is called with the AutoNumeric object as a parameter
                         {

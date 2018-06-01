@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.2.15
++ Fixes #585 Internet Explorer 11 throws when freezing the options
+
 ### 4.2.14
 + Fixes #526 Memory / speed improvement in options
 + Fixes #583 AutoNumeric `v4.2.13` forces the contenteditable attribute to `true` when set on the html source

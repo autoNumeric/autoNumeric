@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.3.2
++ Fixes #589 The `percentageUS*` predefined options do not have the `rawValueDivisor` option set
+
 ### 4.3.1
 + Modify the `tenTrillions` and `oneBillion` limits to be exact
 + Remove the `maximumValue` and `minimumValue` `tenTrillionsNoDecimals` option, and update `tenTrillions` so that it equals ten trillions

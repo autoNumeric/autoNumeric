@@ -967,6 +967,16 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #589</p>
+			<div>
+				<input id="issue_589_eu" type="text" placeholder="#589" value="0.123456789">
+				<input id="issue_589_us" type="text" placeholder="#589" value="0.123456789">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -2073,6 +2083,16 @@
     //-------------- Issue #559
     new AutoNumeric('#issue_559', { alwaysAllowDecimalCharacter: true });
     new AutoNumeric('#issue_559_2', { alwaysAllowDecimalCharacter: false });
+
+    //-------------- Issue #589
+    const an589EU = new AutoNumeric('#issue_589_eu', AutoNumeric.getPredefinedOptions().percentageEU3dec);
+    an589EU.node().addEventListener('input', () => {
+        console.log('an589EU.getNumericString():', an589EU.getNumericString()); //DEBUG
+    }, false);
+    const an589US = new AutoNumeric('#issue_589_us', AutoNumeric.getPredefinedOptions().percentageUS3dec);
+    an589US.node().addEventListener('input', () => {
+        console.log('an589EU.getNumericString():', an589US.getNumericString()); //DEBUG
+    }, false);
 </script>
 </body>
 </html>

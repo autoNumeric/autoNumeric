@@ -338,8 +338,8 @@ You can also generate your custom options object and try those live with the [Au
 | `historySize` | Determine how many undo states an AutoNumeric object should keep in memory | `20` |
 | `isCancellable` | Determine if the user can *'cancel'* the last modifications done to the element value when using the `Escape` key | `true` |
 | `leadingZero` | Controls the leading zero behavior (possible options are `allow`, `deny` and `keep`) | `'deny'` |
-| `maximumValue` | The maximum value that can be entered | `'9999999999999.99'` |
-| `minimumValue` | The minimum value that can be entered  | `'-9999999999999.99'` |
+| `maximumValue` | The maximum value that can be entered (10 trillions by default) | `'10000000000000'` |
+| `minimumValue` | The minimum value that can be entered (-10 trillions by default) | `'-10000000000000'` |
 | `modifyValueOnWheel` | Determine if the element value can be incremented / decremented with the mouse wheel. The wheel behavior is modified with the `wheelStep` option. | `true` |
 | `negativeBracketsTypeOnBlur` | Adds brackets `[]`, parenthesis `()`, curly braces `{}`, chevrons `<>`, angle brackets `〈〉`, Japanese quotation marks `｢｣`, half brackets `⸤⸥`, white square brackets `⟦⟧`, quotation marks `‹›` or guillemets `«»` on negative values when unfocused. The value must be formatted like `'<leftBracket>,<rightBracket>'`. | `null` |
 | `negativePositiveSignPlacement` | Placement of negative/positive sign relative to the currency symbol (possible options are `l` (left), `r` (right), `p` (prefix) and `s` (suffix)) | `null` |

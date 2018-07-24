@@ -367,9 +367,8 @@ AutoNumeric.options = {
      * - this value needs to be larger than `minimumValue`
      */
     maximumValue: {
-        tenTrillions          : '9999999999999.99', // 9.999.999.999.999,99 ~= 10000 billions
-        tenTrillionsNoDecimals: '9999999999999', //FIXME Update all those limits to the 'real' numbers
-        oneBillion            : '999999999.99',
+        tenTrillions          : '10000000000000', // 10000 billions
+        oneBillion            : '1000000000',
         zero                  : '0',
     },
 
@@ -380,9 +379,8 @@ AutoNumeric.options = {
      * - if this is superior to 0, then you'll effectively prevent your user to entirely delete the content of your element
      */
     minimumValue: {
-        tenTrillions          : '-9999999999999.99', // -9.999.999.999.999,99 ~= 10000 billions
-        tenTrillionsNoDecimals: '-9999999999999',
-        oneBillion            : '-999999999.99',
+        tenTrillions          : '-10000000000000', // 10000 billions
+        oneBillion            : '-1000000000',
         zero                  : '0',
     },
 

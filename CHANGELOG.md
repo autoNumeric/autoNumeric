@@ -1,5 +1,11 @@
 ## Changelog for autoNumeric
 
+### 4.3.1
++ Modify the `tenTrillions` and `oneBillion` limits to be exact
++ Remove the `maximumValue` and `minimumValue` `tenTrillionsNoDecimals` option, and update `tenTrillions` so that it equals ten trillions
++ The `tenTrillions` sub-option is now equal to `'10000000000000'`, and the `oneBillion` sub-option is now equal to `'1000000000'`
++ This change was long overdue since we modified in `v4.0.0-beta.22` how the number of decimal places was defined by the user using the `decimalPlaces` options instead of adding a specific number of decimal to the min/max values.
+
 ### 4.3.0
 + Fixes #559 Allow AutoNumeric to accept the decimal character input even when there is already one in the element
   + Add the new `alwaysAllowDecimalCharacter` option set to `false` by default
@@ -389,7 +395,7 @@ The highlights of this version are:
 + Update the tests with the new changes.
 + Modify how decimal places are set.
   Before you needed to add that many decimals to the `minimumValue` or `maximumValue`, and that maximum number of decimal place was used everywhere (except if you also defined `decimalPlacesOverride`, `decimalPlacesShownOnFocus` or `scaleDecimalPlaces`).
-  Now you need to explicitely define the number of decimal places using the `decimalPlaces` option.
+  Now you need to explicitly define the number of decimal places using the `decimalPlaces` option.
   If only `decimalPlaces` is defined, then the other `decimalPlaces*` options `decimalPlacesRawValue`, `decimalPlacesShownOnBlur` and `decimalPlacesShownOnFocus` are calculated from it.
   This way, you can now define clearly how many decimal places needs to be shown when focused/unfocused, and as the raw value precision.
   Note: updating the `decimalPlaces` will overwrite any `decimalPlaces*` option previously set.

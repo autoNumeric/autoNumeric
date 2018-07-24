@@ -103,8 +103,8 @@ describe('The AutoNumeric object', () => {
             historySize                  : 20,
             isCancellable                : true,
             leadingZero                  : 'deny',
-            maximumValue                 : '9999999999999.99',
-            minimumValue                 : '-9999999999999.99',
+            maximumValue                 : '10000000000000',
+            minimumValue                 : '-10000000000000',
             modifyValueOnWheel           : true,
             negativeBracketsTypeOnBlur   : null,
             negativePositiveSignPlacement: null,
@@ -209,8 +209,8 @@ describe('The AutoNumeric object', () => {
                     negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.prefix,
                     roundingMethod               : 'U',
                     leadingZero                  : 'deny',
-                    minimumValue                 : '-9999999999999.99',
-                    maximumValue                 : '9999999999999.99',
+                    minimumValue                 : '-10000000000000',
+                    maximumValue                 : '10000000000000',
                 },
                 NorthAmerican: {
                     selectNumberOnly             : true,
@@ -221,8 +221,8 @@ describe('The AutoNumeric object', () => {
                     negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right,
                     roundingMethod               : 'U',
                     leadingZero                  : 'deny',
-                    minimumValue                 : '-9999999999999.99',
-                    maximumValue                 : '9999999999999.99',
+                    minimumValue                 : '-10000000000000',
+                    maximumValue                 : '10000000000000',
                 },
             };
 
@@ -7503,8 +7503,8 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ maximumValue: '-42' })).not.toThrow();
             expect(() => AutoNumeric.validate({ maximumValue: '-42.4' })).not.toThrow();
             expect(() => AutoNumeric.validate({ maximumValue: '-42.42' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ maximumValue: '9999999999999.99' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ maximumValue: '-9999999999999.99' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '10000000000000' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ maximumValue: '-10000000000000' })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ minimumValue: '42' })).not.toThrow();
             expect(() => AutoNumeric.validate({ minimumValue: '42.4' })).not.toThrow();
@@ -7512,8 +7512,8 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ minimumValue: '-42' })).not.toThrow();
             expect(() => AutoNumeric.validate({ minimumValue: '-42.4' })).not.toThrow();
             expect(() => AutoNumeric.validate({ minimumValue: '-42.42' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ minimumValue: '9999999999999.99' })).not.toThrow();
-            expect(() => AutoNumeric.validate({ minimumValue: '-9999999999999.99' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '10000000000000' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ minimumValue: '-10000000000000' })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ minimumValue: '-10', maximumValue: '-5' })).not.toThrow();
             expect(() => AutoNumeric.validate({ minimumValue: '-10', maximumValue:  '0' })).not.toThrow();

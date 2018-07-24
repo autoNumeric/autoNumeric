@@ -977,6 +977,17 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #593</p>
+			<div>
+				<input id="issue_593_truncate" type="text" placeholder="#593">
+				<input id="issue_593" type="text" placeholder="#593">
+				<input id="issue_593_paste" type="text" placeholder="#593" value="-1234">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -2093,6 +2104,10 @@
     an589US.node().addEventListener('input', () => {
         console.log('an589EU.getNumericString():', an589US.getNumericString()); //DEBUG
     }, false);
+
+    //-------------- Issue #593
+    new AutoNumeric('#issue_593_truncate', -1, ['French', { onInvalidPaste: AutoNumeric.options.onInvalidPaste.truncate }]);
+    new AutoNumeric('#issue_593', -1, 'French');
 </script>
 </body>
 </html>

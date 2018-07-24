@@ -217,6 +217,9 @@ const selectors = {
     issue574                          : '#issue_574',
     issue559                          : '#issue_559',
     issue559Default                   : '#issue_559_2',
+    issue593                          : '#issue_593',
+    issue593Paste                     : '#issue_593_paste',
+    issue593Truncate                  : '#issue_593_truncate',
 };
 
 //-----------------------------------------------------------------------------
@@ -4053,6 +4056,79 @@ describe('Issue #559', () => {
         expect(browser.getValue(selectors.issue559)).toEqual('-1.23');
         browser.keys(['6']);
         expect(browser.getValue(selectors.issue559)).toEqual('-1.62');
+    });
+});
+
+describe('Issue #593', () => {
+    it('should test for default values, and focus on it', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue593)).toEqual('-1,00 €');
+        expect(browser.getValue(selectors.issue593Paste)).toEqual('-1234');
+    });
+
+    it(`should correctly paste a negative value on a negative value using the French predefined option`, () => {
+        // Copy the text to paste
+        const inputPaste = $(selectors.issue593Paste);
+        inputPaste.click();
+        browser.keys(['Control', 'a', 'c', 'Control']);
+
+        // Paste into the AutoNumeric element with the default `onInvalidPaste` option
+        browser.keys(['Shift', 'Tab', 'Shift']); // Go to the other input
+        browser.keys(['Control', 'v', 'Control']);
+        expect(browser.getValue(selectors.issue593)).toEqual('-1.234,00 €');
+        // Also test the caret position after the paste
+        let inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }, selectors.issue593).value;
+        expect(inputCaretPosition.start).toEqual(6);
+
+        // Paste into the other AutoNumeric element with the `truncate` `onInvalidPaste` option
+        browser.keys(['Shift', 'Tab', 'Shift']); // Go to the other input
+        browser.keys(['Control', 'v', 'Control']);
+        expect(browser.getValue(selectors.issue593Truncate)).toEqual('-1.234,00 €');
+        // Also test the caret position after the paste
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }, selectors.issue593Truncate).value;
+        expect(inputCaretPosition.start).toEqual(6);
+    });
+
+    it(`should correctly paste a negative value on a positive value using the French predefined option`, () => {
+        // Copy the text to paste
+        const inputPaste = $(selectors.issue593Paste);
+        inputPaste.click();
+        browser.keys(['Control', 'a', 'c', 'Control']);
+
+        // Paste into the AutoNumeric element with the default `onInvalidPaste` option
+        browser.keys(['Shift', 'Tab', 'Shift']); // Go to the other input
+        browser.keys(['Home', '-']); // Switch to a positive number
+        browser.keys(['Control', 'a', 'v', 'Control']);
+        expect(browser.getValue(selectors.issue593)).toEqual('-1.234,00 €');
+        // Also test the caret position after the paste
+        /*
+        let inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }, selectors.issue593).value;
+        expect(inputCaretPosition.start).toEqual(6);
+        */ //FIXME Manually this returns the correct caret position, with selenium is fails
+
+        // Paste into the other AutoNumeric element with the `truncate` `onInvalidPaste` option
+        browser.keys(['Shift', 'Tab', 'Shift']); // Go to the other input
+        browser.keys(['Home', '-']); // Switch to a positive number
+        browser.keys(['Control', 'a', 'v', 'Control']);
+        expect(browser.getValue(selectors.issue593Truncate)).toEqual('-1.234,00 €');
+        // Also test the caret position after the paste
+        /*
+        inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }, selectors.issue593Truncate).value;
+        expect(inputCaretPosition.start).toEqual(6);
+        */ //FIXME Manually this returns the correct caret position, with selenium is fails
     });
 });
 

@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.3.2
- * @date         2018-07-25 UTC 18:05
+ * @version      4.3.3
+ * @date         2018-07-25 UTC 20:35
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -890,7 +890,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.3.2';
+        return '4.3.3';
     }
 
     /**
@@ -1022,6 +1022,13 @@ export default class AutoNumeric {
             domElement = document.querySelector(arg1);
             initialValue = arg2;
             userOptions = this._getOptionObject(arg3);
+        } else if (isArg1String && isArg2Number && isArg3Array) {
+            // new AutoNumeric('.myCssClass > input', 12345.789, [{ options1 }, 'euroPos', { options2 }]);
+            // new AutoNumeric('.myCssClass > input', '12345.789', [{ options1 }, 'euroPos', { options2 }]);
+            // new AutoNumeric('.myCssClass > input', '', [{ options1 }, 'euroPos', { options2 }]);
+            domElement = document.querySelector(arg1);
+            initialValue = arg2;
+            userOptions = this.mergeOptions(arg3);
         } else if (isArg1Element && isArg2Number && isArg3Object) {
             // new AutoNumeric(domElement, 12345.789, { options });
             // new AutoNumeric(domElement, '12345.789', { options });
@@ -6720,14 +6727,62 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             isPasteNegativeAndInitialValueIsPositive = false;
         }
 
+        // 1. Generate the unformatted result
+        const leftFormattedPart  = initialFormattedValue.slice(0, selectionStart);
+        const rightFormattedPart = initialFormattedValue.slice(selectionEnd, initialFormattedValue.length);
+
+        if (selectionStart !== selectionEnd) {
+            // a. If there is a selection, remove the selected part, and return the left and right part
+            result = this._preparePastedText(leftFormattedPart + rightFormattedPart);
+        } else {
+            // b. Else if this is only one caret (and therefore no selection), then return the left and right part
+            result = this._preparePastedText(initialFormattedValue);
+        }
+
+        // Add back the negative sign if needed
+        if (isInitialValueNegative) {
+            result = AutoNumericHelper.setRawNegativeSign(result);
+        }
+
+        // Build the unformatted result string
+        caretPositionOnInitialTextAfterPasting = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, this.settings.decimalCharacter));
+        if (isPasteNegativeAndInitialValueIsPositive) {
+            // If the initial paste is negative and the initial value is not, then I must offset the caret position by one place to the right to take the additional hyphen into account
+            caretPositionOnInitialTextAfterPasting++;
+            //TODO Quid if the negative sign is not on the left (negativePositiveSignPlacement and currencySymbolPlacement)?
+            //TODO Quid if the positive sign is shown?
+        }
+
+        let leftPart  = result.slice(0, caretPositionOnInitialTextAfterPasting);
+        let rightPart = result.slice(caretPositionOnInitialTextAfterPasting, result.length);
         let leftPartContainedADot = false;
-        let leftPart;
-        let rightPart;
+        if (pastedText === '.') {
+            if (AutoNumericHelper.contains(leftPart, '.')) {
+                // If I remove a dot here, then I need to update the caret position (decrement it by 1) when positioning it
+                // To do so, we keep that info in order to modify the caret position later
+                leftPartContainedADot = true;
+                leftPart              = leftPart.replace('.', '');
+            }
+
+            rightPart = rightPart.replace('.', '');
+        }
+
+        // Manage the case where a negative number is pasted onto another negative number that is entirely selected (cf. issue #593)
+        let negativePasteOnNegativeNumber = false;
+        if (leftPart === '' && rightPart === '-') {
+            leftPart = '-';
+            rightPart = '';
+            // When pasting a negative number on a negative number, we need to offset the caret position one place to the right to take into account the negative sign
+            negativePasteOnNegativeNumber = true;
+        }
+
+        // -- Here, we are good to go to continue on the same basis for each value of the `onInvalidPaste` option
+
         switch (this.settings.onInvalidPaste) {
             /* 4a. Truncate paste behavior:
              * Insert as many numbers as possible on the right hand side of the caret from the pasted text content, until the input reach its range limit.
              * If there is more characters in the clipboard once a limit is reached, drop the extraneous characters.
-             * Otherwise paste all the numbers in the clipboard.
+             * Otherwise paste all the numbers from the clipboard.
              * While doing so, we check if the result is within the minimum and maximum values allowed, and stop as soon as we encounter one of those.
              *
              * 4b. Replace paste behavior:
@@ -6736,44 +6791,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             /* eslint no-case-declarations: 0 */
             case AutoNumeric.options.onInvalidPaste.truncate:
             case AutoNumeric.options.onInvalidPaste.replace:
-                const leftFormattedPart = initialFormattedValue.slice(0, selectionStart);
-                const rightFormattedPart = initialFormattedValue.slice(selectionEnd, initialFormattedValue.length);
-
-                if (selectionStart !== selectionEnd) {
-                    // a. If there is a selection, remove the selected part, and return the left and right part
-                    result = this._preparePastedText(leftFormattedPart + rightFormattedPart);
-                } else {
-                    // b. Else if this is only one caret (and therefore no selection), then return the left and right part
-                    result = this._preparePastedText(initialFormattedValue);
-                }
-
-                // Add back the negative sign if needed
-                if (isInitialValueNegative) {
-                    result = AutoNumericHelper.setRawNegativeSign(result);
-                }
-
-                // Build the unformatted result string
-                caretPositionOnInitialTextAfterPasting = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, this.settings.decimalCharacter));
-                if (isPasteNegativeAndInitialValueIsPositive) {
-                    // If the initial paste is negative and the initial value is not, then I must offset the caret position by one place to the right to take the additional hyphen into account
-                    caretPositionOnInitialTextAfterPasting++;
-                    //TODO Quid if the negative sign is not on the left (negativePositiveSignPlacement and currencySymbolPlacement)?
-                }
-
-                leftPart = result.slice(0, caretPositionOnInitialTextAfterPasting);
-                rightPart = result.slice(caretPositionOnInitialTextAfterPasting, result.length);
-                if (pastedText === '.') {
-                    if (AutoNumericHelper.contains(leftPart, '.')) {
-                        // If I remove a dot here, then I need to update the caret position (decrement it by 1) when positioning it
-                        // To do so, we keep that info in order to modify the caret position later
-                        leftPartContainedADot = true;
-                        leftPart = leftPart.replace('.', '');
-                    }
-
-                    rightPart = rightPart.replace('.', '');
-                }
-                // -- Here, we are good to go to continue on the same basis
-
                 // c. Add numbers one by one at the caret position, while testing if the result is valid and within the range of the minimum and maximum value
                 //    Continue until you either run out of numbers to paste, or that you get out of the range limits
                 const minParse = AutoNumericHelper.parseStr(this.settings.minimumValue);
@@ -6802,6 +6819,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
                 // Update the last caret position where to insert a new number
                 caretPositionOnInitialTextAfterPasting += pastedTextIndex;
+                if (negativePasteOnNegativeNumber) caretPositionOnInitialTextAfterPasting++;
 
                 //XXX Here we have the result for the `truncate` option
                 if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.truncate) {
@@ -6860,52 +6878,12 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
                 break;
             /* 4c. Normal paste behavior:
-             * Insert the pasted number inside the current unformatted text, at the right caret position or selection
+             * Insert the pasted number inside the current unformatted text, at the correct caret position or selection
              */
             case AutoNumeric.options.onInvalidPaste.error:
             case AutoNumeric.options.onInvalidPaste.ignore:
             case AutoNumeric.options.onInvalidPaste.clamp:
             default:
-                // 1. Generate the unformatted result
-                const leftFormattedPart2 = initialFormattedValue.slice(0, selectionStart);
-                const rightFormattedPart2 = initialFormattedValue.slice(selectionEnd, initialFormattedValue.length);
-
-                if (selectionStart !== selectionEnd) {
-                    // a. If there is a selection, remove the selected part, and return the left and right part
-                    result = this._preparePastedText(leftFormattedPart2 + rightFormattedPart2);
-                } else {
-                    // b. Else if this is only one caret (and therefore no selection), then return the left and right part
-                    result = this._preparePastedText(initialFormattedValue);
-                }
-
-                // Add back the negative sign if needed
-                if (isInitialValueNegative) {
-                    result = AutoNumericHelper.setRawNegativeSign(result);
-                }
-
-                // Build the unformatted result string
-                caretPositionOnInitialTextAfterPasting = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, this.settings.decimalCharacter));
-                if (isPasteNegativeAndInitialValueIsPositive) {
-                    // If the initial paste is negative and the initial value is not, then I must offset the caret position by one place to the right to take the additional hyphen into account
-                    caretPositionOnInitialTextAfterPasting++;
-                    //TODO Quid if the negative sign is not on the left (negativePositiveSignPlacement and currencySymbolPlacement)?
-                }
-
-                leftPart = result.slice(0, caretPositionOnInitialTextAfterPasting);
-                rightPart = result.slice(caretPositionOnInitialTextAfterPasting, result.length);
-                if (pastedText === '.') {
-                    // If the user only paste a single decimal character, then we remove the previously existing one (if any)
-                    if (AutoNumericHelper.contains(leftPart, '.')) {
-                        // If I remove a dot here, then I need to update the caret position (decrement it by 1) when positioning it
-                        // To do so, we keep that info in order to modify the caret position later
-                        leftPartContainedADot = true;
-                        leftPart = leftPart.replace('.', '');
-                    }
-
-                    rightPart = rightPart.replace('.', '');
-                }
-                // -- Here, we are good to go to continue on the same basis
-
                 // Generate the unformatted result
                 result = `${leftPart}${pastedText}${rightPart}`;
 
@@ -6917,8 +6895,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 } else if (rightPart === '') {
                     // If the user selected from the caret position to the end of the input (on the far right)
                     caretPositionOnInitialTextAfterPasting = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, this.settings.decimalCharacter)) + pastedText.length;
+                    if (negativePasteOnNegativeNumber) caretPositionOnInitialTextAfterPasting++;
                 } else {
-                    // Normal case
+                    // Usual case
                     const indexSelectionEndInRawValue = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionEnd, this.settings.decimalCharacter));
 
                     // Here I must not count the characters that have been removed from the pasted text (ie. '.'), or the thousand separators in the initial selected text

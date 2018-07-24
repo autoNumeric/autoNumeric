@@ -1,5 +1,10 @@
 ## Changelog for autoNumeric
 
+### 4.3.3
++ Fixes #593 Pasting a negative value over a negative value that as a currency symbol and its numbers selected throws an error
++ Refactor the `_onPaste()` handler by removing duplicated parts
++ Fix the initialization call `new AutoNumeric()` where using as arguments a `string` (element selector), a `number` (initial value) and an `array` (array of options), in that particular order, would not be recognized
+
 ### 4.3.2
 + Fixes #589 The `percentageUS*` predefined options do not have the `rawValueDivisor` option set
 

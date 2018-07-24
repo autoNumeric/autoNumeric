@@ -215,6 +215,8 @@ const selectors = {
     issue521InputDetector             : '#issue_521_input_detector',
     issue521Button                    : '#issue_521_button',
     issue574                          : '#issue_574',
+    issue559                          : '#issue_559',
+    issue559Default                   : '#issue_559_2',
 };
 
 //-----------------------------------------------------------------------------
@@ -3997,6 +3999,60 @@ describe('Issue #574', () => {
         expect(browser.getValue(selectors.issue574)).toEqual('0.05');
         browser.keys(['-']);
         expect(browser.getValue(selectors.issue574)).toEqual('-0.05');
+    });
+});
+
+describe('Issue #559', () => {
+    it('should test for default values, and focus on it', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue559)).toEqual('12,345.68');
+        expect(browser.getValue(selectors.issue559Default)).toEqual('');
+    });
+
+    it(`should accept a decimal character on the far left of a negative number, when the \`alwaysAllowDecimalCharacter\` option is set to \`false\``, () => {
+        const input = $(selectors.issue559Default);
+        input.click();
+        browser.keys(['-12345']);
+        browser.keys(['Home', '.']);
+        expect(browser.getValue(selectors.issue559Default)).toEqual('-0.12');
+    });
+
+    it(`should not accept a decimal character if one is already present, by default`, () => {
+        const input = $(selectors.issue559Default);
+        input.click();
+        browser.keys(['Control', 'a', 'Control', 'Backspace', '-12345.67']);
+        expect(browser.getValue(selectors.issue559Default)).toEqual('-12,345.67');
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', '.']);
+        expect(browser.getValue(selectors.issue559Default)).toEqual('-12,345.67');
+    });
+
+    it(`should accept a decimal character everywhere, when the \`alwaysAllowDecimalCharacter\` option is set to \`true\``, () => {
+        const input = $(selectors.issue559);
+        input.click();
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', '.']);
+        expect(browser.getValue(selectors.issue559)).toEqual('123.45');
+        browser.keys(['End', 'ArrowLeft', '.']);
+        expect(browser.getValue(selectors.issue559)).toEqual('1,234.5');
+        browser.keys(['Home', '.']);
+        expect(browser.getValue(selectors.issue559)).toEqual('0.12');
+
+        // And with a negative number
+        browser.keys(['Esc', 'Backspace', '-12345']);
+        browser.keys(['Home', '.']);
+        expect(browser.getValue(selectors.issue559)).toEqual('-0.12');
+
+        browser.keys(['Control', 'a', 'Control', 'Backspace', '-12345', 'Home', 'ArrowRight', '.']);
+        expect(browser.getValue(selectors.issue559)).toEqual('-0.12');
+
+        // Test that entering a decimal character on another decimal character works (and moves the caret to the right)
+        browser.keys(['Control', 'a', 'Control', 'Backspace', '-12345']);
+        browser.keys(['Home', 'ArrowRight', 'ArrowRight', '.']);
+        expect(browser.getValue(selectors.issue559)).toEqual('-1.23');
+        browser.keys(['ArrowLeft', '.']);
+        expect(browser.getValue(selectors.issue559)).toEqual('-1.23');
+        browser.keys(['6']);
+        expect(browser.getValue(selectors.issue559)).toEqual('-1.62');
     });
 });
 

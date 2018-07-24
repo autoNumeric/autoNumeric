@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.2.15
- * @date         2018-06-01 UTC 19:05
+ * @version      4.3.0
+ * @date         2018-07-24 UTC 01:50
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -576,6 +576,11 @@ export default class AutoNumeric {
 
                 return this;
             },
+            alwaysAllowDecimalCharacter  : alwaysAllowDecimalCharacter => { //FIXME Test this
+                this.update({ alwaysAllowDecimalCharacter });
+
+                return this;
+            },
             caretPositionOnFocus         : caretPositionOnFocus => { //FIXME test this
                 this.settings.caretPositionOnFocus = caretPositionOnFocus;
 
@@ -885,7 +890,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.2.15';
+        return '4.3.0';
     }
 
     /**
@@ -3748,6 +3753,11 @@ export default class AutoNumeric {
             AutoNumericHelper.warning(`Setting 'allowDecimalPadding' to [${options.allowDecimalPadding}] will override the current 'decimalPlaces*' settings [${options.decimalPlaces}, ${options.decimalPlacesShownOnBlur} and ${options.decimalPlacesShownOnFocus}].`, options.showWarnings);
         }
 
+        if (!AutoNumericHelper.isTrueOrFalseString(options.alwaysAllowDecimalCharacter) &&
+            !AutoNumericHelper.isBoolean(options.alwaysAllowDecimalCharacter)) {
+            AutoNumericHelper.throwError(`The option 'alwaysAllowDecimalCharacter' is invalid ; it should either be \`true\` or \`false\`, [${options.alwaysAllowDecimalCharacter}] given.`);
+        }
+
         if (!AutoNumericHelper.isNull(options.caretPositionOnFocus) && !AutoNumericHelper.isInArray(options.caretPositionOnFocus, [
             AutoNumeric.options.caretPositionOnFocus.start,
             AutoNumeric.options.caretPositionOnFocus.end,
@@ -6297,7 +6307,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Handler for 'keypress' events.
-     * The user is still pressing the key, which will output a character (ie. '2') continuously until it releases the key.
+     * The user is still pressing the key, which will output a character (ie. '2') continuously until he releases the key.
      * Note: 'keypress' events are not sent for delete keys like Backspace/Delete.
      *
      * @param {KeyboardEvent} e
@@ -7728,6 +7738,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
             // Current options :
             allowDecimalPadding               : true,
+            alwaysAllowDecimalCharacter       : true,
             caretPositionOnFocus              : true,
             createLocalList                   : true,
             currencySymbol                    : true,
@@ -8556,22 +8567,32 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 return false;
             }
 
-            // Do not allow decimal character before negativeSignCharacter character
+            if (this.settings.alwaysAllowDecimalCharacter) {
+                // Remove any previous decimal character
+                left = left.replace(this.settings.decimalCharacter, '');
+                right = right.replace(this.settings.decimalCharacter, '');
+            } else {
+                // Do not allow a decimal character if another decimal character is already present
+                if (AutoNumericHelper.contains(left, this.settings.decimalCharacter)) {
+                    return true;
+                }
+
+                // Prevent adding a decimal character at the far right of the number
+                if (right.indexOf(this.settings.decimalCharacter) > 0) {
+                    return true;
+                }
+
+                // Remove the decimal character is found on the far left of the right part
+                if (right.indexOf(this.settings.decimalCharacter) === 0) {
+                    right = right.substr(1);
+                }
+            }
+
+            // If the user is trying to add a decimal character on the far left of the number, we allow it
             if (this.settings.negativeSignCharacter && AutoNumericHelper.contains(right, this.settings.negativeSignCharacter)) {
-                return true;
-            }
-
-            // Do not allow a decimal character if another decimal character is already present
-            if (AutoNumericHelper.contains(left, this.settings.decimalCharacter)) {
-                return true;
-            }
-
-            if (right.indexOf(this.settings.decimalCharacter) > 0) {
-                return true;
-            }
-
-            if (right.indexOf(this.settings.decimalCharacter) === 0) {
-                right = right.substr(1);
+                // We need however to move the negative sign from the right to the left part
+                left = `${this.settings.negativeSignCharacter}${left}`;
+                right = right.replace(this.settings.negativeSignCharacter, '');
             }
 
             this._setValueParts(left + this.settings.decimalCharacter, right);

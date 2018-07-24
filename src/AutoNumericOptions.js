@@ -46,6 +46,15 @@ AutoNumeric.options = {
         floats: 'floats',
     },
 
+    /* Defines if the decimal character or decimal character alternative should be accepted when there is already a decimal character shown in the element.
+     * If set to `true`, any decimal character input will be accepted and will subsequently modify the decimal character position, as well as the `rawValue`.
+     * If set to `false`, the decimal character and its alternative key will be dropped as before. This is the default setting.
+     */
+    alwaysAllowDecimalCharacter: {
+        alwaysAllow: true,
+        doNotAllow: false,
+    },
+
     /* Defines where should be positioned the caret on focus
      * null : Do not enforce any caret positioning on focus (this is needed when using `selectOnFocus`)
      * `'start'` : put the caret of the far left side of the value (excluding the positive/negative sign and currency symbol, if any)

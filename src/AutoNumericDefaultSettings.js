@@ -40,6 +40,7 @@ import AutoNumericOptions from './AutoNumericOptions';
  */
 AutoNumeric.defaultSettings = {
     allowDecimalPadding          : AutoNumeric.options.allowDecimalPadding.always,
+    alwaysAllowDecimalCharacter  : AutoNumeric.options.alwaysAllowDecimalCharacter.doNotAllow,
     caretPositionOnFocus         : AutoNumeric.options.caretPositionOnFocus.doNoForceCaretPosition,
     createLocalList              : AutoNumeric.options.createLocalList.createList,
     currencySymbol               : AutoNumeric.options.currencySymbol.none,

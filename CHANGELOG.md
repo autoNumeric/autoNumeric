@@ -1,5 +1,10 @@
 ## Changelog for autoNumeric
 
+### 4.3.0
++ Fixes #559 Allow AutoNumeric to accept the decimal character input even when there is already one in the element
+  + Add the new `alwaysAllowDecimalCharacter` option set to `false` by default
++ Fixes AutoNumeric so that elements now correctly accepts entering a decimal char on the far left of a negative number
+
 ### 4.2.15
 + Fixes #585 Internet Explorer 11 throws when freezing the options
 

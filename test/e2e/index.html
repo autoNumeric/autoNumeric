@@ -957,6 +957,16 @@
 			<input id="issue_574" type="text" placeholder="#574">
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #559</p>
+			<div>
+				<input id="issue_559" type="text" placeholder="#559" value="12345.6789">
+				<input id="issue_559_2" type="text" placeholder="#559" value="">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -2059,6 +2069,10 @@
 
     //-------------- Issue #574
     new AutoNumeric('#issue_574', -0.05);
+
+    //-------------- Issue #559
+    new AutoNumeric('#issue_559', { alwaysAllowDecimalCharacter: true });
+    new AutoNumeric('#issue_559_2', { alwaysAllowDecimalCharacter: false });
 </script>
 </body>
 </html>

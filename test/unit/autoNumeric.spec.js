@@ -81,6 +81,7 @@ describe('The AutoNumeric object', () => {
         const defaultOption = {
             allowDecimalPadding          : true,
             caretPositionOnFocus         : null,
+            alwaysAllowDecimalCharacter  : false,
             createLocalList              : true,
             currencySymbol               : '',
             currencySymbolPlacement      : 'p',
@@ -261,6 +262,7 @@ describe('The AutoNumeric object', () => {
 
             expect(defaultSettings.allowDecimalPadding        ).toEqual(aNInputSettings.allowDecimalPadding        );
             expect(defaultSettings.caretPositionOnFocus       ).toEqual(aNInputSettings.caretPositionOnFocus       );
+            expect(defaultSettings.alwaysAllowDecimalCharacter).toEqual(aNInputSettings.alwaysAllowDecimalCharacter);
             expect(defaultSettings.createLocalList            ).toEqual(aNInputSettings.createLocalList            );
             expect(defaultSettings.currencySymbol             ).toEqual(aNInputSettings.currencySymbol             );
             expect(defaultSettings.currencySymbolPlacement    ).toEqual(aNInputSettings.currencySymbolPlacement    );
@@ -7421,6 +7423,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ digitGroupSeparator: '٬' })).not.toThrow();
             expect(() => AutoNumeric.validate({ digitGroupSeparator: '˙' })).not.toThrow();
 
+            expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: 'false' })).not.toThrow();
+
             expect(() => AutoNumeric.validate({ createLocalList: true })).not.toThrow();
             expect(() => AutoNumeric.validate({ createLocalList: false })).not.toThrow();
             expect(() => AutoNumeric.validate({ createLocalList: 'true' })).not.toThrow();
@@ -7790,6 +7797,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ digitGroupSeparator: '.' })).toThrow(); // Since the default 'decimalCharacter' is '.' too
             expect(() => AutoNumeric.validate({ digitGroupSeparator: true })).toThrow();
             expect(() => AutoNumeric.validate({ digitGroupSeparator: null })).toThrow();
+
+            expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: 'foobar' })).toThrow();
 
             expect(() => AutoNumeric.validate({ createLocalList: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ createLocalList: 1 })).toThrow();

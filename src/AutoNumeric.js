@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.3.4
- * @date         2018-07-25 UTC 20:28
+ * @version      4.3.5
+ * @date         2018-07-25 UTC 20:47
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -890,7 +890,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.3.4';
+        return '4.3.5';
     }
 
     /**
@@ -6609,7 +6609,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 }
             }
 
-            this._onBlur(e);
+            if (e.type === 'blur') {
+                //TODO Create separate handlers for blur and mouseleave, really.
+                this._onBlur(e);
+            }
         }
     }
 

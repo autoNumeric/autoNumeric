@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.3.3
- * @date         2018-07-25 UTC 20:35
+ * @version      4.3.4
+ * @date         2018-07-25 UTC 20:28
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -890,7 +890,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.3.3';
+        return '4.3.4';
     }
 
     /**
@@ -6073,7 +6073,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     _onFocusInAndMouseEnter(e) {
         //TODO Create separate handlers for the focus and mouseenter events
         this.isEditing = false; // Just in case no `keyUp` event have been sent (ie. if the user lost the focus from the current window while typing)
-        this.rawValueOnFocus = this.rawValue; // Keep track of the initial rawValue. This is needed to define if a change event must be dispatched later
 
         if (this.settings.unformatOnHover && e.type === 'mouseenter' && e.altKey) {
             this.constructor._unformatAltHovered(this);
@@ -6084,6 +6083,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         if (e.type === 'focus') { //TODO Move that back to the 'focus' event handler when the separation between the 'focus' and 'mouseenter' handler will be done
             // Keep track if the element is currently focused
             this.isFocused = true;
+            this.rawValueOnFocus = this.rawValue; // Keep track of the initial rawValue. This is needed to define if a change event must be dispatched later
         }
 
         if (e.type === 'focus' && this.settings.unformatOnHover && this.hoveredWithAlt) {

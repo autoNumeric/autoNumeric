@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.3.4
++ Fixes #596 Change event not firing depending on cursor movement
+
 ### 4.3.3
 + Fixes #593 Pasting a negative value over a negative value that as a currency symbol and its numbers selected throws an error
 + Refactor the `_onPaste()` handler by removing duplicated parts

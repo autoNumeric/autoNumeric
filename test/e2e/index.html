@@ -988,6 +988,16 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #596</p>
+			<div>
+				<input id="issue_596" type="text" placeholder="" value="-1357246.81">
+				<input id="issue_596_change_detector" type="text">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -2108,6 +2118,17 @@
     //-------------- Issue #593
     new AutoNumeric('#issue_593_truncate', -1, ['French', { onInvalidPaste: AutoNumeric.options.onInvalidPaste.truncate }]);
     new AutoNumeric('#issue_593', -1, 'French');
+
+    //-------------- Issue #596
+    const issue596 = new AutoNumeric('#issue_596');
+    const issue596ChangeDetector = document.querySelector('#issue_596_change_detector');
+
+    let issue596ChangeCount = 0;
+    issue596ChangeDetector.value = 0;
+
+    issue596.node().addEventListener('change', () => {
+        issue596ChangeDetector.value = ++issue596ChangeCount;
+    });
 </script>
 </body>
 </html>

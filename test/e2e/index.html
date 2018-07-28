@@ -998,6 +998,23 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #219</p>
+			<div>
+				<form action="#" id="issue_219_form">
+					<input id="issue_219_1" type="text" placeholder="#219" value="1111.11">
+					<input id="issue_219_2" type="text" placeholder="#219" value="2222.22">
+					<input id="issue_219_3" type="text" placeholder="#219">
+					<input id="issue_219_4" type="text" placeholder="#219" value="0">
+					<input id="issue_219_5_no_an" type="text" placeholder="#219" value="Default Value">
+					<input id="issue_219_reset" type="reset" value="Reset">
+					<input id="issue_219_submit" type="submit" value="Submit">
+				</form>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -2129,6 +2146,21 @@
     issue596.node().addEventListener('change', () => {
         console.log(`Change detected with value '${issue596.getNumericString()}'`); //DEBUG
         issue596ChangeDetector.value = ++issue596ChangeCount;
+    });
+
+    //-------------- Issue #219
+    new AutoNumeric('#issue_219_1', 1).french();
+    new AutoNumeric('#issue_219_2', 2).northAmerican();
+    new AutoNumeric('#issue_219_3', 3.2345).french();
+    new AutoNumeric('#issue_219_4', 4.678).french();
+    document.getElementById('issue_219_5_no_an').value = 'Modified value';
+    const form219 = document.getElementById('issue_219_form');
+    form219.addEventListener('submit', e => {
+        console.log('Form submit detected', e); //DEBUG
+        e.preventDefault();
+    });
+    form219.addEventListener('reset', e => {
+        console.log('Form reset detected', e); //DEBUG
     });
 </script>
 </body>

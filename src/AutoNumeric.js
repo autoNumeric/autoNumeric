@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.3.5
+ * @version      4.3.6
  * @date         2018-07-25 UTC 20:47
  *
  * @authors      Bob Knothe, Alexandre Bonneau
@@ -890,7 +890,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.3.5';
+        return '4.3.6';
     }
 
     /**
@@ -1236,6 +1236,7 @@ export default class AutoNumeric {
         if (!AutoNumericHelper.isNull(this.parentForm)) {
             // Setup the handler function
             this._onFormSubmitFunc = () => { this._onFormSubmit(); };
+            this._onFormResetFunc = () => { this._onFormReset(); };
 
             // Check if the parent form already has the AutoNumeric mark
             if (this._hasParentFormCounter()) {
@@ -1243,8 +1244,9 @@ export default class AutoNumeric {
             } else {
                 // If not, add the counter
                 this._initializeFormCounterToOne();
-                // And add the submit event listener
+                // And add the submit and reset event listeners
                 this.parentForm.addEventListener('submit', this._onFormSubmitFunc, false);
+                this.parentForm.addEventListener('reset', this._onFormResetFunc, false);
                 // Also keep a reference to the handler function so that we can remove it later
                 this._storeFormHandlerFunction();
             }
@@ -1263,8 +1265,9 @@ export default class AutoNumeric {
             const anCount = this._getParentFormCounter();
 
             if (anCount === 1) {
-                // If it's 1, remove the listener
-                this.parentForm.removeEventListener('submit', this._getFormHandlerFunction(), false);
+                // If it's 1, remove the listeners
+                this.parentForm.removeEventListener('submit', this._getFormHandlerFunction().submitFn, false);
+                this.parentForm.removeEventListener('reset', this._getFormHandlerFunction().resetFn, false);
                 // Also remove the dataset info
                 this._removeFormDataSetInfo();
             } else if (anCount > 1) {
@@ -1394,7 +1397,7 @@ export default class AutoNumeric {
         this._getFormElement(formElement).dataset.anFormHandler = formHandlerName;
 
         // Add the form handler name and handle function reference to the WeakMap
-        window.aNFormHandlerMap.set(formHandlerName, this._onFormSubmitFunc);
+        window.aNFormHandlerMap.set(formHandlerName, { submitFn: this._onFormSubmitFunc, resetFn: this._onFormResetFunc });
     }
 
     /**
@@ -3027,6 +3030,7 @@ export default class AutoNumeric {
      * In either case, whenever a new parent form is set for the current AutoNumeric element, we make sure to update the anCount and anFormHandler attributes on both the old form and the new one (for instance in case the user moved the input elements with `appendChild()` since AutoNumeric cannot not detect that).
      *
      * @param {boolean} forceSearch If set to `true`, the parent form is searched again, even if `this.parentForm` is already set.
+     *
      * @returns {HTMLFormElement|null}
      */
     form(forceSearch = false) {
@@ -3060,12 +3064,13 @@ export default class AutoNumeric {
      * Return an array of the AutoNumeric-managed elements for the given form element is passed, otherwise for the current `this.parentForm` element.
      *
      * @param {HTMLFormElement|null} formElement
+     *
      * @returns {Array.<HTMLInputElement>}
      * @private
      */
     _getFormAutoNumericChildren(formElement) {
         // Search for all the child AutoNumeric elements in that parent form
-        //XXX This only search for <input> elements, not contenteditable non-input tag ones, for now
+        //TODO This only search for <input> elements, not contenteditable non-input tag ones, for now. Add a parameter to allow this function to search on every tags.
         const inputList = [... formElement.querySelectorAll('input')];
 
         return inputList.filter(input => this.constructor.isManagedByAutoNumeric(input));
@@ -6057,6 +6062,27 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
+     * Get the default value from the html `value` attribute.
+     * Return the empty string if such attribute is not found.
+     *
+     * @param {HTMLElement} domElement
+     *
+     * @returns {string}
+     * @private
+     */
+    _getDefaultValue(domElement) {
+        // Get the default html value
+        // Note: we do not use the simpler `return domElement.defaultValue;` code since the given domElement can sometime be a `contenteditable` element which does not support the `defaultValue` attribute.
+        const value = domElement.getAttribute('value');
+
+        if (AutoNumericHelper.isNull(value)) {
+            return '';
+        }
+
+        return value;
+    }
+
+    /**
      * Handler for 'focusin' and 'mouseenter' events
      * On focusin, multiple things happens :
      * - If `Alt` is pressed, unformat
@@ -7195,6 +7221,23 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         aNElements.forEach(aNElement => aNElement._unformatOnSubmit());
 
         return true;
+    }
+
+    /**
+     * Handler for 'reset' events caught on the parent <form> element.
+     * When such event is detected, then every child AutoNumeric elements must format their default value that the browser is forcing upon them.
+     *
+     * @private
+     */
+    _onFormReset() {
+        const inputElements = this._getFormAutoNumericChildren(this.parentForm);
+        const aNElements = inputElements.map(aNElement => this.constructor.getAutoNumericElement(aNElement));
+        // Tell all the AutoNumeric children to format their default value
+        aNElements.forEach(aNElement => {
+            const val = this._getDefaultValue(aNElement.node());
+            // aNElement.set(val); //XXX If I use that line, the format is first correctly done, but the form reset is still not finished and will overwrite the formatting. This is why we need to use the following setTimeout line.
+            setTimeout(() => aNElement.set(val), 0); //XXX This is an ugly hack, but it seems to be the accepted answer to this problem (https://stackoverflow.com/a/8152960/2834898). This is sad. Do note that I use '0ms' here since using `setTimeout` will push that code on the event stack, and as soon as the reset will be finished, this will be run (see https://stackoverflow.com/a/23987283/2834898).
+        });
     }
 
     /**

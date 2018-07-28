@@ -1,5 +1,12 @@
 ## Changelog for autoNumeric
 
+### 4.3.6
++ Fixes #219 'Bug on form reset' that was re-opened
++ AutoNumeric now listens to the `reset` event on the parent form, and react accordingly if detected 
+
+### 4.3.5
++ Really fixes issue #596 this time
+
 ### 4.3.4
 + Fixes #596 Change event not firing depending on cursor movement
 

@@ -686,6 +686,7 @@ describe('The AutoNumeric object', () => {
             expect(() => aNInput._onBlur()).toThrow();
             expect(() => aNInput._onWheel()).toThrow();
             expect(() => aNInput._onFormSubmit()).toThrow();
+            expect(() => aNInput._onFormReset()).toThrow();
             expect(() => aNInput._isElementSupported()).toThrow();
             expect(() => aNInput._formatDefaultValueOnPageLoad()).toThrow();
             expect(() => aNInput._correctNegativePositiveSignPlacementOption()).toThrow();
@@ -5627,7 +5628,7 @@ describe('Instantiated autoNumeric functions', () => {
             document.body.removeChild(secondForm);
         });
 
-        it(`should only add a single 'submit' event listener, and remove it when all the AutoNumeric element are removed`, () => {
+        it(`should only add a single 'submit' and 'reset' event listener handler name, and remove it when all the AutoNumeric element are removed`, () => {
             // Get the initial parent form element reference
             const initialForm = anInput1.form();
             const formHandlerName = initialForm.dataset.anFormHandler;

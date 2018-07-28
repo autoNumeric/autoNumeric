@@ -576,7 +576,7 @@ autoNumeric provides numerous methods to access and modify the element value, fo
 
 First. you need to get a reference to the AutoNumeric module that you need to import:
 ```js
-import AutoNumeric from 'autoNumeric.min';
+import AutoNumeric from 'autonumeric';
 ```
 
 Then you'll be able to access either the methods on the instantiated AutoNumeric object, or the [static functions](#static-methods) directly by using the `AutoNumeric` class.

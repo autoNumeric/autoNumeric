@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.3.7
++ Fixes #594 Currency at wrong position for empty fields with euro/french preset after typing minus sign
+
 ### 4.3.6
 + Fixes #219 'Bug on form reset' that was re-opened
 + AutoNumeric now listens to the `reset` event on the parent form, and react accordingly if detected 

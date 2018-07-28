@@ -1015,6 +1015,16 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #594</p>
+			<div>
+				<input id="issue_594_left" type="text" placeholder="#594">
+				<input id="issue_594_right" type="text" placeholder="#594">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -2162,6 +2172,10 @@
     form219.addEventListener('reset', e => {
         console.log('Form reset detected', e); //DEBUG
     });
+
+    //-------------- Issue #594
+    new AutoNumeric('#issue_594_left').french();
+    new AutoNumeric('#issue_594_right', ['French', { negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right }]);
 </script>
 </body>
 </html>

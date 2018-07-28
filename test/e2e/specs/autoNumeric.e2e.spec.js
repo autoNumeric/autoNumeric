@@ -220,6 +220,8 @@ const selectors = {
     issue593                          : '#issue_593',
     issue593Paste                     : '#issue_593_paste',
     issue593Truncate                  : '#issue_593_truncate',
+    issue594Left                      : '#issue_594_left',
+    issue594Right                     : '#issue_594_right',
 };
 
 //-----------------------------------------------------------------------------
@@ -4114,7 +4116,7 @@ describe('Issue #593', () => {
             return { start: input.selectionStart, end: input.selectionEnd };
         }, selectors.issue593).value;
         expect(inputCaretPosition.start).toEqual(6);
-        */ //FIXME Manually this returns the correct caret position, with selenium is fails
+        */ //FIXME Manually this returns the correct caret position, with selenium it fails
 
         // Paste into the other AutoNumeric element with the `truncate` `onInvalidPaste` option
         browser.keys(['Shift', 'Tab', 'Shift']); // Go to the other input
@@ -4128,7 +4130,46 @@ describe('Issue #593', () => {
             return { start: input.selectionStart, end: input.selectionEnd };
         }, selectors.issue593Truncate).value;
         expect(inputCaretPosition.start).toEqual(6);
-        */ //FIXME Manually this returns the correct caret position, with selenium is fails
+        */ //FIXME Manually this returns the correct caret position, with selenium it fails
+    });
+});
+
+describe('Issue #594', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue594Left)).toEqual('');
+        expect(browser.getValue(selectors.issue594Right)).toEqual('');
+    });
+
+    it(`should display the negative sign on the left side of the currency symbol when the element is empty`, () => {
+        const input = $(selectors.issue594Left);
+        input.click();
+        expect(browser.getValue(selectors.issue594Left)).toEqual(' €');
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.issue594Left)).toEqual('- €');
+
+        // Check the caret position
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }, selectors.issue594Left).value;
+        expect(inputCaretPosition.start).toEqual(1);
+    });
+
+    it(`should display the negative sign on the right side of the currency symbol when the element is empty`, () => {
+        const input = $(selectors.issue594Right);
+        input.click();
+        expect(browser.getValue(selectors.issue594Right)).toEqual(' €');
+        browser.keys(['-']);
+        expect(browser.getValue(selectors.issue594Right)).toEqual(' €-');
+
+        // Check the caret position
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return { start: input.selectionStart, end: input.selectionEnd };
+        }, selectors.issue594Right).value;
+        expect(inputCaretPosition.start).toEqual(0);
     });
 });
 

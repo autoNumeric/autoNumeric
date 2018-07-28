@@ -419,10 +419,15 @@ AutoNumeric.options = {
     /* Placement of the negative/positive sign relative to the `currencySymbol` option.
      *
      * Example:
+     * // Default values
      * -1,234.56  => default no options required
-     * -$1,234.56 => {currencySymbol: "$"} or {currencySymbol: "$", negativePositiveSignPlacement: "l"}
      * $-1,234.56 => {currencySymbol: "$", negativePositiveSignPlacement: "r"} // Default if negativePositiveSignPlacement is 'null' and currencySymbol is not empty
+     *
+     * // Sign on the left hand side of the whole number
+     * -$1,234.56 => {currencySymbol: "$"} or {currencySymbol: "$", negativePositiveSignPlacement: "l"}
      * -1,234.56$ => {currencySymbol: "$", currencySymbolPlacement: "s", negativePositiveSignPlacement: "p"} // Default if negativePositiveSignPlacement is 'null' and currencySymbol is not empty
+     *
+     * // Sign on the right hand side of the whole number
      * 1,234.56-  => {negativePositiveSignPlacement: "s"}
      * $1,234.56- => {currencySymbol: "$", negativePositiveSignPlacement: "s"}
      * 1,234.56-$ => {currencySymbol: "$", currencySymbolPlacement: "s"}

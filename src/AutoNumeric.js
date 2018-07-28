@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.3.6
- * @date         2018-07-25 UTC 20:47
+ * @version      4.3.7
+ * @date         2018-07-28 UTC 04:00
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -890,7 +890,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.3.6';
+        return '4.3.7';
     }
 
     /**
@@ -5172,10 +5172,14 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     static _orderValueCurrencySymbolAndSuffixText(value, settings, signOnEmpty) {
         let result;
         if (settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.always || signOnEmpty) {
-            if (settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.left) {
-                result = value + settings.currencySymbol + settings.suffixText;
-            } else {
-                result = settings.currencySymbol + value + settings.suffixText;
+            switch (settings.negativePositiveSignPlacement) {
+                case AutoNumeric.options.negativePositiveSignPlacement.left:
+                case AutoNumeric.options.negativePositiveSignPlacement.prefix:
+                case AutoNumeric.options.negativePositiveSignPlacement.none:
+                    result = value + settings.currencySymbol + settings.suffixText;
+                    break;
+                default :
+                    result = settings.currencySymbol + value + settings.suffixText;
             }
         } else {
             result = value;

@@ -2,6 +2,7 @@
 
 ### 4.3.7
 + Fixes #594 Currency at wrong position for empty fields with euro/french preset after typing minus sign
++ Fixes #565 Entering a single minus character in a `negativeBracketsTypeOnBlur` input invert the currency sign and that minus sign
 
 ### 4.3.6
 + Fixes #219 'Bug on form reset' that was re-opened

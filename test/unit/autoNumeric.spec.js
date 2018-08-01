@@ -1391,18 +1391,23 @@ describe('autoNumeric options and `options.*` methods', () => {
             aNInput.options.reset().french().set('');
             aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.min);
             expect(aNInput.getFormatted()).toEqual('-9.999.999.999.999,99\u202f€');
+            expect(aNInput.getNumericString()).toEqual('-9999999999999.99');
             aNInput.options.reset().french().set('');
             aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.max);
             expect(aNInput.getFormatted()).toEqual('9.999.999.999.999,99\u202f€');
+            expect(aNInput.getNumericString()).toEqual('9999999999999.99');
             aNInput.options.reset().french().set('');
             aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.zero);
             expect(aNInput.getFormatted()).toEqual('0,00\u202f€');
+            expect(aNInput.getNumericString()).toEqual('0');
             aNInput.options.reset().french().set('');
             aNInput.options.emptyInputBehavior(-1);
             expect(aNInput.getFormatted()).toEqual('-1,00\u202f€');
+            expect(aNInput.getNumericString()).toEqual('-1');
             aNInput.options.reset().french().set('');
             aNInput.options.emptyInputBehavior('-1');
             expect(aNInput.getFormatted()).toEqual('-1,00\u202f€');
+            expect(aNInput.getNumericString()).toEqual('-1');
 
             aNInput.options.reset().french().set(-1234567.89);
             aNInput.options.leadingZero(AutoNumeric.options.leadingZero.deny);

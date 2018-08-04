@@ -1,5 +1,11 @@
 ## Changelog for autoNumeric
 
+### 4.4.0
++ Closes #476 Add a feature where `emptyInputBehavior` could be set to the minimum or maximum value
+  + `emptyInputBehavior` now accepts either a number (or a string representing a number), or the `'min'` or `'max'` option
++ Fix the `emptyInputBehavior` validation test when checking the value limits
++ Fixes #579 Allow `emptyInputBehavior` to be set to min, max, or a number
+
 ### 4.3.7
 + Fixes #594 Currency at wrong position for empty fields with euro/french preset after typing minus sign
 + Fixes #565 Entering a single minus character in a `negativeBracketsTypeOnBlur` input invert the currency sign and that minus sign

@@ -1390,12 +1390,12 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual('\u202f€');
             aNInput.options.reset().french().set('');
             aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.min);
-            expect(aNInput.getFormatted()).toEqual('-9.999.999.999.999,99\u202f€');
-            expect(aNInput.getNumericString()).toEqual('-9999999999999.99');
+            expect(aNInput.getFormatted()).toEqual('-10.000.000.000.000,00\u202f€');
+            expect(aNInput.getNumericString()).toEqual('-10000000000000');
             aNInput.options.reset().french().set('');
             aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.max);
-            expect(aNInput.getFormatted()).toEqual('9.999.999.999.999,99\u202f€');
-            expect(aNInput.getNumericString()).toEqual('9999999999999.99');
+            expect(aNInput.getFormatted()).toEqual('10.000.000.000.000,00\u202f€');
+            expect(aNInput.getNumericString()).toEqual('10000000000000');
             aNInput.options.reset().french().set('');
             aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.zero);
             expect(aNInput.getFormatted()).toEqual('0,00\u202f€');
@@ -4563,50 +4563,45 @@ describe('Instantiated autoNumeric functions', () => {
     });
 
     describe(`getNumericString`, () => {
-        it(`should return an empty string as the default value`, () => {
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            const aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
+        let aNInput;
+        let newInput;
 
+        beforeEach(() => { // Initialization
+            newInput = document.createElement('input');
+            document.body.appendChild(newInput);
+        });
+
+        afterEach(() => { // Un-initialization
+            aNInput.nuke();
+        });
+
+        it(`should return an empty string as the default value`, () => {
+            aNInput = new AutoNumeric(newInput); // Initiate the autoNumeric input
             expect(aNInput.getNumericString()).toEqual('');
         });
 
         it(`should return '0' as the default value`, () => {
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            const aNInput = new AutoNumeric(newInput, { emptyInputBehavior : 'zero' }); // Initiate the autoNumeric input
-
+            aNInput = new AutoNumeric(newInput, { emptyInputBehavior : 'zero' }); // Initiate the autoNumeric input
             expect(aNInput.getNumericString()).toEqual('0');
         });
 
-        it('should return number from `emptyInputBehavior` setting as the default value', () => {
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            const aNInput = new AutoNumeric(newInput, { emptyInputBehavior : 1 }); // Initiate the autoNumeric input
-
-            expect(aNInput.getNumericString()).toEqual('1');
+        it('should return the number from the `emptyInputBehavior` setting as the default value', () => {
+            aNInput = new AutoNumeric(newInput, { emptyInputBehavior : 1.12345 }); // Initiate the autoNumeric input
+            expect(aNInput.getNumericString()).toEqual('1.12');
         });
 
-        it('should return minimumValue as the default value', () => {
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            const aNInput = new AutoNumeric(newInput, { emptyInputBehavior : 'min' }); // Initiate the autoNumeric input
-
-            expect(aNInput.getNumericString()).toEqual('-9999999999999.99');
+        it('should return the `minimumValue` as the default value', () => {
+            aNInput = new AutoNumeric(newInput, { emptyInputBehavior : 'min' }); // Initiate the autoNumeric input
+            expect(aNInput.getNumericString()).toEqual('-10000000000000');
         });
 
-        it('should return maximumValue as the default value', () => {
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            const aNInput = new AutoNumeric(newInput, { emptyInputBehavior : 'max' }); // Initiate the autoNumeric input
-
-            expect(aNInput.getNumericString()).toEqual('9999999999999.99');
+        it('should return the `maximumValue` as the default value', () => {
+            aNInput = new AutoNumeric(newInput, { emptyInputBehavior : 'max' }); // Initiate the autoNumeric input
+            expect(aNInput.getNumericString()).toEqual('10000000000000');
         });
 
         it(`should not return a negative value when inputting a positive one and minimumValue is equal to '0' (cf. issue #284)`, () => {
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            const aNInput = new AutoNumeric(newInput, { minimumValue: '0', maximumValue: '9999', decimalPlaces: 2 }); // Initiate the autoNumeric input
+            aNInput = new AutoNumeric(newInput, { minimumValue: '0', maximumValue: '9999', decimalPlaces: 2 }); // Initiate the autoNumeric input
 
             expect(aNInput.getNumericString()).toEqual('');
             aNInput.set(1234);
@@ -4615,22 +4610,14 @@ describe('Instantiated autoNumeric functions', () => {
             expect(aNInput.getNumericString()).toEqual('0');
             aNInput.set(-0);
             expect(aNInput.getNumericString()).toEqual('0');
-
-            aNInput.remove();
-            document.body.removeChild(newInput);
         });
 
         it(`should not return a negative value when inputting a positive one and minimumValue is superior to '0' (cf. issue #284)`, () => {
-            const newInput = document.createElement('input');
-            document.body.appendChild(newInput);
-            const aNInput = new AutoNumeric(newInput, { minimumValue: '1', maximumValue: '9999', decimalPlaces: 2 }); // Initiate the autoNumeric input
+            aNInput = new AutoNumeric(newInput, { minimumValue: '1', maximumValue: '9999', decimalPlaces: 2 }); // Initiate the autoNumeric input
 
             expect(aNInput.getNumericString()).toEqual('');
             aNInput.set(1234);
             expect(aNInput.getNumericString()).toEqual('1234');
-
-            aNInput.remove();
-            document.body.removeChild(newInput);
         });
     });
 

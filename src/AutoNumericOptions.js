@@ -283,14 +283,18 @@ AutoNumeric.options = {
      * - 'press'  : The currency sign is displayed whenever a key is being pressed
      * - 'always' : The currency sign is always displayed
      * - 'zero'   : A zero is displayed ('rounded' with or without a currency sign) if the input has no value on focus out
+     * - 'min'    : The minimum value is displayed if the input has no value on focus out
+     * - 'max'    : The maximum value is displayed if the input has no value on focus out
      * - 'null'   : When the element is empty, the `rawValue` and the element value/text is set to `null`. This also allows to set the value to `null` using `anElement.set(null)`.
      */
     emptyInputBehavior: {
-        null  : 'null',
         focus : 'focus',
         press : 'press',
         always: 'always',
         zero  : 'zero',
+        min   : 'min',
+        max   : 'max',
+        null  : 'null',
     },
 
     /* Defines if the custom and native events triggered by AutoNumeric should bubble up or not.

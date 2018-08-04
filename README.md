@@ -330,7 +330,7 @@ You can also generate your custom options object and try those live with the [Au
 | `digitalGroupSpacing` | Digital grouping for the thousand separator | `'3'` |
 | `digitGroupSeparator` | Thousand separator character  | `','` |
 | `divisorWhenUnfocused` | Defines the number that will divide the current value shown when unfocused | `null` |
-| `emptyInputBehavior` | Defines what to display when the input value is empty (possible options are `null`, `focus`, `press`, `always` and `zero`) | `'focus'` |
+| `emptyInputBehavior` | Defines what to display when the input value is empty (possible options are `null`, `focus`, `press`, `always`, `min`, `max`, `zero`, number, or string representing a number) | `'focus'` |
 | `eventBubbles` | Defines if the custom and native events triggered by AutoNumeric should bubble up or not | `true` |
 | `eventIsCancelable` | Defines if the custom and native events triggered by AutoNumeric should be cancelable | `true` |
 | `failOnUnknownOption ` | This option is the 'strict mode' *(aka 'debug' mode)*, which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the `options` object. | `false` |

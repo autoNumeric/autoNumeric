@@ -131,13 +131,25 @@ export default class AutoNumeric {
             let valueToSet;
             if (AutoNumericHelper.isNull(initialValue)) {
                 switch (this.settings.emptyInputBehavior) {
+                    case AutoNumeric.options.emptyInputBehavior.min:
+                        valueToSet = this.settings.minimumValue;
+                        break;
+                    case AutoNumeric.options.emptyInputBehavior.max:
+                        valueToSet = this.settings.maximumValue;
+                        break;
                     case AutoNumeric.options.emptyInputBehavior.zero:
                         valueToSet = '0';
                         break;
-                    // In order to stay consistent when `formatOnPageLoad` is set to `true`, it's still impossible so set the `null` value as the initial value
+                    // In order to stay consistent when `formatOnPageLoad` is set to `true`, it's still impossible to set the `null` value as the initial value
+                    case AutoNumeric.options.emptyInputBehavior.focus:
+                    case AutoNumeric.options.emptyInputBehavior.press:
+                    case AutoNumeric.options.emptyInputBehavior.always:
                     case AutoNumeric.options.emptyInputBehavior.null:
-                    default :
                         valueToSet = '';
+                        break;
+                    // When `emptyInputBehavior` is a number or a string representing a number
+                    default :
+                        valueToSet = this.settings.emptyInputBehavior;
                 }
             } else {
                 valueToSet = initialValue;
@@ -2043,10 +2055,23 @@ export default class AutoNumeric {
 
             return this;
         }
-        
-        if (value === '' && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {
-            // Keep the value zero inside the element
-            value = 0;
+
+        if (value === '') {
+            switch (this.settings.emptyInputBehavior) {
+                case AutoNumeric.options.emptyInputBehavior.zero:
+                    value = 0;
+                    break;
+                case AutoNumeric.options.emptyInputBehavior.min:
+                    value = this.settings.minimumValue;
+                    break;
+                case AutoNumeric.options.emptyInputBehavior.max:
+                    value = this.settings.maximumValue;
+                    break;
+                default:
+                    if (AutoNumericHelper.isNumber(this.settings.emptyInputBehavior)) {
+                        value = Number(this.settings.emptyInputBehavior);
+                    }
+            }
         }
 
         if (value !== '') {
@@ -4014,19 +4039,29 @@ export default class AutoNumeric {
             AutoNumericHelper.throwError(`The brackets for negative values option 'negativeBracketsTypeOnBlur' is invalid ; it should either be '(,)', '[,]', '<,>', '{,}', '〈,〉', '｢,｣', '⸤,⸥', '⟦,⟧', '‹,›' or '«,»', [${options.negativeBracketsTypeOnBlur}] given.`);
         }
 
-        if (!AutoNumericHelper.isInArray(options.emptyInputBehavior, [
-            AutoNumeric.options.emptyInputBehavior.focus,
-            AutoNumeric.options.emptyInputBehavior.press,
-            AutoNumeric.options.emptyInputBehavior.always,
-            AutoNumeric.options.emptyInputBehavior.zero,
-            AutoNumeric.options.emptyInputBehavior.null,
-        ])) {
-            AutoNumericHelper.throwError(`The display on empty string option 'emptyInputBehavior' is invalid ; it should either be 'focus', 'press', 'always', 'zero' or 'null', [${options.emptyInputBehavior}] given.`);
+        if (!(AutoNumericHelper.isString(options.emptyInputBehavior) || AutoNumericHelper.isNumber(options.emptyInputBehavior)) ||
+            !(AutoNumericHelper.isInArray(options.emptyInputBehavior, [
+                AutoNumeric.options.emptyInputBehavior.focus,
+                AutoNumeric.options.emptyInputBehavior.press,
+                AutoNumeric.options.emptyInputBehavior.always,
+                AutoNumeric.options.emptyInputBehavior.min,
+                AutoNumeric.options.emptyInputBehavior.max,
+                AutoNumeric.options.emptyInputBehavior.zero,
+                AutoNumeric.options.emptyInputBehavior.null,
+            ]) || testFloatOrIntegerAndPossibleNegativeSign.test(options.emptyInputBehavior))) {
+            AutoNumericHelper.throwError(`The display on empty string option 'emptyInputBehavior' is invalid ; it should either be 'focus', 'press', 'always', 'min', 'max', 'zero', 'null', a number, or a string that represents a number, [${options.emptyInputBehavior}] given.`);
         }
 
         if (options.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero &&
             (options.minimumValue > 0 || options.maximumValue < 0)) {
             AutoNumericHelper.throwError(`The 'emptyInputBehavior' option is set to 'zero', but this value is outside of the range defined by 'minimumValue' and 'maximumValue' [${options.minimumValue}, ${options.maximumValue}].`);
+        }
+
+        if (testFloatOrIntegerAndPossibleNegativeSign.test(String(options.emptyInputBehavior))) {
+            const [minTest, maxTest] = this._checkIfInRangeWithOverrideOption(options.emptyInputBehavior, options);
+            if ((!minTest || !maxTest)) {
+                AutoNumericHelper.throwError(`The 'emptyInputBehavior' option is set to a number or a string that represents a number, but its value [${options.emptyInputBehavior}] is outside of the range defined by the 'minimumValue' and 'maximumValue' options [${options.minimumValue}, ${options.maximumValue}].`);
+            }
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.eventBubbles) && !AutoNumericHelper.isBoolean(options.eventBubbles)) {
@@ -5599,7 +5634,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
-     * Round the given `value` with the number of decimal places to show for the element is focused.
+     * Round the given `value` with the number of decimal places to show for the element if focused.
      *
      * @param {string|null} value An unformatted numeric value
      * @param {object} settings
@@ -5611,7 +5646,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
-     * Round the given `value` with the number of decimal places to show for the element is unfocused.
+     * Round the given `value` with the number of decimal places to show for the element if unfocused.
      *
      * @param {string|null} value An unformatted numeric value
      * @param {object} settings
@@ -5620,6 +5655,23 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      */
     static _roundFormattedValueShownOnBlur(value, settings) {
         return this._roundValue(value, settings, Number(settings.decimalPlacesShownOnBlur));
+    }
+
+    /**
+     * Round the given `value` with the number of decimal places to show for the element based on the value of isFocused.
+     *
+     * @param {string|null} value An unformatted numeric value
+     * @param {object} settings
+     * @param {boolean} isFocused
+     * @returns {*}
+     * @private
+     */
+    static _roundFormattedValueShownOnFocusOrBlur(value, settings, isFocused) {
+        if (isFocused) {
+            return this._roundFormattedValueShownOnFocus(value, settings);
+        } else {
+            return this._roundFormattedValueShownOnBlur(value, settings);
+        }
     }
 
     /**
@@ -6136,12 +6188,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             // Modify the element value according to the number of decimal places to show on focus or the `showOnlyNumbersOnFocus` option
             if (rawValueToFormat !== '') {
                 // Round the given value according to the object state (focus/unfocused)
-                let roundedValue;
-                if (this.isFocused) {
-                    roundedValue = this.constructor._roundFormattedValueShownOnFocus(rawValueToFormat, this.settings);
-                } else {
-                    roundedValue = this.constructor._roundFormattedValueShownOnBlur(rawValueToFormat, this.settings);
-                }
+                const roundedValue = this.constructor._roundFormattedValueShownOnFocusOrBlur(rawValueToFormat, this.settings, this.isFocused);
 
                 if (this.settings.showOnlyNumbersOnFocus === AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers) {
                     //TODO Use a `this.settingsOverride` object instead of modifying the `this.settings` object
@@ -6614,9 +6661,26 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                             this._triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
                         }
                     }
-                } else if (rawValueToFormat === '' && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.zero) {
-                    this._setRawValue('0');
-                    value = this.constructor._roundValue('0', this.settings, 0);
+                } else if (rawValueToFormat === '') {
+                    switch (this.settings.emptyInputBehavior) {
+                        case AutoNumeric.options.emptyInputBehavior.zero:
+                            this._setRawValue('0');
+                            value = this.constructor._roundValue('0', this.settings, 0); 
+                            break;
+                        case AutoNumeric.options.emptyInputBehavior.min:
+                            this._setRawValue(this.settings.minimumValue);
+                            value = this.constructor._roundFormattedValueShownOnFocusOrBlur(this.settings.minimumValue, this.settings, this.isFocused); 
+                            break;
+                        case AutoNumeric.options.emptyInputBehavior.max:
+                            this._setRawValue(this.settings.maximumValue);
+                            value = this.constructor._roundFormattedValueShownOnFocusOrBlur(this.settings.maximumValue, this.settings, this.isFocused); 
+                            break;
+                        default:
+                            if (AutoNumericHelper.isNumber(this.settings.emptyInputBehavior)) {
+                                this._setRawValue(this.settings.emptyInputBehavior);
+                                value = this.constructor._roundFormattedValueShownOnFocusOrBlur(this.settings.emptyInputBehavior, this.settings, this.isFocused);
+                            }
+                    }
                 }
 
 
@@ -7429,19 +7493,24 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             if (currentValue === '') {
                 switch (this.settings.emptyInputBehavior) {
                     case AutoNumeric.options.emptyInputBehavior.focus:
-                        setValue = false;
+                    case AutoNumeric.options.emptyInputBehavior.null:
+                    case AutoNumeric.options.emptyInputBehavior.press:
                         break;
-                    //TODO What about the `AutoNumeric.options.emptyInputBehavior.press` value?
                     case AutoNumeric.options.emptyInputBehavior.always:
                         this._setElementValue(this.settings.currencySymbol);
-                        setValue = false;
+                        break;
+                    case AutoNumeric.options.emptyInputBehavior.min:
+                        this.set(this.settings.minimumValue);
+                        break;
+                    case AutoNumeric.options.emptyInputBehavior.max:
+                        this.set(this.settings.maximumValue);
                         break;
                     case AutoNumeric.options.emptyInputBehavior.zero:
                         this.set('0');
-                        setValue = false;
                         break;
-                    default :
-                    //
+                    // When `emptyInputBehavior` is a number or a string representing a number
+                    default:
+                        this.set(this.settings.emptyInputBehavior);
                 }
             } else if (setValue && currentValue === this.domElement.getAttribute('value')) {
                 this.set(currentValue);
@@ -8225,14 +8294,26 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             if (testValue === '' || testValue === this.settings.negativeSignCharacter) {
                 let valueToSetOnEmpty;
                 switch (this.settings.emptyInputBehavior) {
+                    case AutoNumeric.options.emptyInputBehavior.focus:
+                    case AutoNumeric.options.emptyInputBehavior.press:
+                    case AutoNumeric.options.emptyInputBehavior.always:
+                        valueToSetOnEmpty = '';
+                        break;
+                    case AutoNumeric.options.emptyInputBehavior.min:
+                        valueToSetOnEmpty = this.settings.minimumValue;
+                        break;
+                    case AutoNumeric.options.emptyInputBehavior.max:
+                        valueToSetOnEmpty = this.settings.maximumValue;
+                        break;
                     case AutoNumeric.options.emptyInputBehavior.zero:
                         valueToSetOnEmpty = '0';
                         break;
                     case AutoNumeric.options.emptyInputBehavior.null:
                         valueToSetOnEmpty = null;
                         break;
-                    default :
-                        valueToSetOnEmpty = '';
+                    // When `emptyInputBehavior` is a number or a string representing a number
+                    default:
+                        valueToSetOnEmpty = this.settings.emptyInputBehavior;
                 }
 
                 this._setRawValue(valueToSetOnEmpty);

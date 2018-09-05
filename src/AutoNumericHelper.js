@@ -389,7 +389,12 @@ export default class AutoNumericHelper {
                     result = AutoNumericEnum.keyName.CrSel;
                     break;
                 case 'Decimal':
-                    result = AutoNumericEnum.keyName.NumpadDot;
+                    if (event.char) {
+                        // this fixes #602
+                        result = event.char;
+                    } else {
+                        result = AutoNumericEnum.keyName.NumpadDot;
+                    }
                     break;
                 case 'Del':
                     browser = this.browser();

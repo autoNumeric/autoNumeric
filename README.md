@@ -1070,7 +1070,7 @@ Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] *(Robert)* 
 [coveralls-url]: https://coveralls.io/github/autoNumeric/autoNumeric?branch=next
 [paypal-image]: http://img.shields.io/badge/paypal-donate-brightgreen.svg
 [paypal-url]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NCW5699RY8NN2
-[patreon-url]: https://www.patreon.com/user?u=4810062
+[patreon-url]: https://www.patreon.com/AlexandreBonneau
 [patreon-image]: https://img.shields.io/badge/patreon-donate-orange.svg
 [browserstack-url]: https://www.browserstack.com
 [browserstack-image]: http://i.imgur.com/kjddhbT.png

@@ -1,5 +1,9 @@
 ## Changelog for autoNumeric
 
+### 4.4.1
++ Modify the `package.json` configuration `main` field to `browser`
+  + This is useful per npm's documentation when the module is using browser-specific features like the `window` object
+
 ### 4.4.0
 + Closes #476 Add a feature where `emptyInputBehavior` could be set to the minimum or maximum value
   + `emptyInputBehavior` now accepts either a number (or a string representing a number), or the `'min'` or `'max'` option

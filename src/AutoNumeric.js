@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.4.0
- * @date         2018-08-04 UTC 07:44
+ * @version      4.4.1
+ * @date         2018-09-13 UTC 08:02
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -902,7 +902,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.4.0';
+        return '4.4.1';
     }
 
     /**

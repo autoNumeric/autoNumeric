@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.4.3
++ Fixes #598 The `unformatOnHover` config value isn't used when set to `false`
+
 ### 4.4.2
 + Fixes #609 Uncaught Error: Cannot find module 'autonumeric' on v4.4.1
 + Reverts the changes from `4.4.1` : "Modify the `package.json` configuration `main` field to `browser`"

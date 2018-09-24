@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.4.2
- * @date         2018-09-14 UTC 18:45
+ * @version      4.4.3
+ * @date         2018-09-24 UTC 07:26
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -902,7 +902,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.4.2';
+        return '4.4.3';
     }
 
     /**
@@ -7331,7 +7331,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             const hoveredElement = AutoNumericHelper.getHoveredElement();
             if (AutoNumeric.isManagedByAutoNumeric(hoveredElement)) {
                 const anElement = AutoNumeric.getAutoNumericElement(hoveredElement);
-                this.constructor._unformatAltHovered(anElement);
+                if (anElement.settings.unformatOnHover) {
+                    this.constructor._unformatAltHovered(anElement);
+                }
             }
         }
     }

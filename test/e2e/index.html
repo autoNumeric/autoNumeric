@@ -1025,6 +1025,13 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #598</p>
+			<input id="issue_598" type="text" placeholder="#598">
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -1466,14 +1473,14 @@
 
     //-------------- decimalPlacesShownOnFocus and selections
     new AutoNumeric('#selection1')
-	    .french()
-	    .set(12266.1234567, { minimumValue: '0', maximumValue: '9999999', decimalPlaces: 3, decimalPlacesShownOnFocus: 6 });
+        .french()
+        .set(12266.1234567, { minimumValue: '0', maximumValue: '9999999', decimalPlaces: 3, decimalPlacesShownOnFocus: 6 });
 
     //-------------- showOnlyNumbersOnFocus option
     new AutoNumeric('#showOnlyNumbersOnFocus1').french()
-	    .set(-246813.58, { showOnlyNumbersOnFocus: AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers, suffixText: ' loan' });
+        .set(-246813.58, { showOnlyNumbersOnFocus: AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers, suffixText: ' loan' });
     new AutoNumeric('#showOnlyNumbersOnFocus2').northAmerican()
-	    .set(-246813.58, { showOnlyNumbersOnFocus: AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers, suffixText: ' interest' });
+        .set(-246813.58, { showOnlyNumbersOnFocus: AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers, suffixText: ' interest' });
 
     //-------------- selectOnFocus option
     new AutoNumeric('#selectOnFocusA').french().set(-246813.58, { selectOnFocus: AutoNumeric.options.selectOnFocus.select });
@@ -2176,6 +2183,9 @@
     //-------------- Issue #594
     new AutoNumeric('#issue_594_left').french();
     new AutoNumeric('#issue_594_right', ['French', { negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.right }]);
+
+    //-------------- Issue #598
+    new AutoNumeric('#issue_598', 1234567.89, { unformatOnHover: false });
 </script>
 </body>
 </html>

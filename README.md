@@ -879,9 +879,9 @@ If you want to cancel the math expression edition and exit the formula mode, hit
 
 ### Allowed characters in formula mode
 
-Simple math expressions are allowed, which means you can use any numeric characters, the decimal point `.`, as well as the following operators `+`, `-`, `*`, `/`, `(` and `)`.
+Simple math expressions are allowed, which means you can use any numeric characters, the decimal point `.`, as well as the following operators `+`, `-`, `*`, `/`, `(` and `)`.<br>
 *Note: parentheses and operators precedence are respected as expected*
-//FIXME Finish this : examples
+
 This allows for evaluating the following math expressions examples:
 - `8 * -12.46`
 - `22* (10 - 2)/1.5- -0.5`

@@ -3,7 +3,7 @@
 ### 4.5.0
 + Closes #542 Allow basic calculations when entering expressions like `=12*78`
   + Introduces the *formula mode* which allows a user to enter a math expression in the element using the `=` key, then evaluate it with the `Enter` one
-  + Adds the `formulaMode` option, set to `false` by default, that controls if the *formual mode* is enabled
+  + Adds the `formulaMode` option, set to `false` by default, that controls if the *formula mode* is enabled
 + Adds the `Lexer`, `Parser`, `Evaluator`, `ASTNode` and `Token` classes for managing math expressions
 
 ### 4.4.3

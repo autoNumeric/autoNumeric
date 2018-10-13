@@ -327,6 +327,20 @@ AutoNumeric.options = {
         doNotFormat: false, // will not format the default value on initialization
     },
 
+    /* Defines if the 'formula mode' can be activated by the user.
+     * If set to `true`, then the user can enter the formula mode by entering the '=' character.
+     * He will then be allowed to enter any simple math formula using numeric characters as well as the following operators +, -, *, /, ( and ).
+     * The formula mode is closed when the user either validate their math expression using the `Enter` key, or when the element is blurred.
+     * If the formula is invalid, the previous valid `rawValue` is set back, and the `autoNumeric:invalidFormula` event is sent.
+     * When a valid formula is accepted, then its result is `set()`, and the `autoNumeric:validFormula` event is sent.
+     *
+     * By default, this mode is disabled.
+     */
+    formulaMode: {
+        enabled : true,
+        disabled: false,
+    },
+
     /* Set the undo/redo history table size.
      * Each record keeps the raw value as well and the last known caret/selection positions.
      */

@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.4.3
- * @date         2018-09-24 UTC 07:26
+ * @version      4.5.0
+ * @date         2018-10-13 UTC 01:00
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -47,7 +47,9 @@
 
 //TODO Prevent having to enter relative path in the js files (ie. using `./AutoNumericHelper` instead of just `AutoNumericHelper`) (cf. http://moduscreate.com/es6-es2015-import-no-relative-path-webpack/)
 import AutoNumericHelper from './AutoNumericHelper';
-import AutoNumericEnum from './AutoNumericEnum';
+import AutoNumericEnum   from './AutoNumericEnum';
+import Evaluator         from './maths/Evaluator';
+import Parser            from './maths/Parser';
 
 /**
  * Class declaration for the AutoNumeric object.
@@ -712,6 +714,11 @@ export default class AutoNumeric {
 
                 return this;
             },
+            formulaMode                  : formulaMode => {
+                this.settings.formulaMode = formulaMode; //FIXME Test this
+
+                return this;
+            },
             historySize                  : historySize => {
                 this.settings.historySize = historySize;
 
@@ -902,7 +909,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.4.3';
+        return '4.5.0';
     }
 
     /**
@@ -1155,6 +1162,7 @@ export default class AutoNumeric {
      * @private
      */
     _createEventListeners() {
+        this.formulaMode = false;
         // Create references to the event handler functions, so we can then cleanly removes those listeners if needed
         // That would not be possible if we used closures directly in the event handler declarations
         this._onFocusInFunc = e => { this._onFocusIn(e); };
@@ -4084,6 +4092,10 @@ export default class AutoNumeric {
             AutoNumericHelper.throwError(`The format on initialization option 'formatOnPageLoad' is invalid ; it should be either 'false' or 'true', [${options.formatOnPageLoad}] given.`);
         }
 
+        if (!AutoNumericHelper.isTrueOrFalseString(options.formulaMode) && !AutoNumericHelper.isBoolean(options.formulaMode)) {
+            AutoNumericHelper.throwError(`The formula mode option 'formulaMode' is invalid ; it should be either 'true' or 'false', [${options.formulaMode}] given.`);
+        }
+
         if (!testPositiveInteger.test(options.historySize) || options.historySize === 0) {
             AutoNumericHelper.throwError(`The history size option 'historySize' is invalid ; it should be a positive integer, [${options.historySize}] given.`);
         }
@@ -6156,7 +6168,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         //TODO Create separate handlers for the focus and mouseenter events
         this.isEditing = false; // Just in case no `keyUp` event have been sent (ie. if the user lost the focus from the current window while typing)
 
-        if (this.settings.unformatOnHover && e.type === 'mouseenter' && e.altKey) {
+        if (!this.formulaMode && this.settings.unformatOnHover && e.type === 'mouseenter' && e.altKey) {
             this.constructor._unformatAltHovered(this);
 
             return;
@@ -6267,6 +6279,67 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
+     * Enter the special 'formula mode' where users can enter a math expression that will be evaluated on blur and `enter`
+     * @private
+     */
+    _enterFormulaMode() {
+        if (this.settings.formulaMode) {
+            this.formulaMode = true; // 'Deactivate' the normal event listeners behavior
+            // Clear the input and add a '=' sign to it
+            AutoNumericHelper.setElementValue(this.domElement, '=');
+            // Put the caret after the `=` character
+            AutoNumericHelper.setElementSelection(this.domElement, 1);
+        }
+    }
+
+    /**
+     * Exit the formula mode
+     * Tries to parse and evaluate the math expression, then `set()` the result if it's correct, otherwise reformat with the previous `rawValue`
+     * @private
+     */
+    _exitFormulaMode() {
+        // Parse the formula
+        let formula = AutoNumericHelper.getElementValue(this.domElement);
+        formula     = formula.replace(/^\s*=/, ''); // Remove all the leading whitespaces and the equal sign from the formula
+        let result;
+        try {
+            const ast = new Parser(formula);
+            result    = (new Evaluator()).evaluate(ast);
+        } catch (e) {
+            // Error when parsing the math expression
+            this._triggerEvent(AutoNumeric.events.invalidFormula, this.domElement, {
+                formula,
+                aNElement: this,
+            });
+            this.reformat();
+            this.formulaMode = false;
+
+            return;
+        }
+
+        // The math expression is correctly parsed
+        this._triggerEvent(AutoNumeric.events.validFormula, this.domElement, {
+            formula,
+            result,
+            aNElement: this,
+        });
+        this.set(result); // Note: we can have a valid formula, but an invalid value (ie. out of the min/max range)
+        this.formulaMode = false;
+    }
+
+    /**
+     * Returns `true` if the non printable key is accepted in formula mode
+     *
+     * @returns {boolean}
+     * @private
+     */
+    _acceptNonPrintableKeysInFormulaMode() {
+        return this.eventKey === AutoNumericEnum.keyName.Backspace || this.eventKey === AutoNumericEnum.keyName.Delete ||
+            this.eventKey === AutoNumericEnum.keyName.LeftArrow || this.eventKey === AutoNumericEnum.keyName.RightArrow ||
+            this.eventKey === AutoNumericEnum.keyName.Home || this.eventKey === AutoNumericEnum.keyName.End;
+    }
+
+    /**
      * Handler for 'keydown' events.
      * The user just started pushing any key, hence one event is sent.
      *
@@ -6312,7 +6385,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this.formatted = false; // Keep track if the element has been formatted already. If that's the case, prevent further format calculations.
         this.isEditing = true; // Keep track if the user is currently editing the element manually
 
-        if (!this.isFocused && this.settings.unformatOnHover && e.altKey && this.domElement === AutoNumericHelper.getHoveredElement()) {
+        if (!this.formulaMode && !this.isFocused && this.settings.unformatOnHover && e.altKey && this.domElement === AutoNumericHelper.getHoveredElement()) {
             // Here I prevent calling _unformatAltHovered if the element is already focused, since the global 'keydown' listener will pick it up as well
             this.constructor._unformatAltHovered(this);
 
@@ -6322,6 +6395,33 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this._updateEventKeyInfo(e);
         this.initialValueOnKeydown = AutoNumericHelper.getElementValue(e.target); // This is needed in `onKeyup()` to check if the value as changed during the key press
         this.initialRawValueOnKeydown = this.rawValue;
+
+        if (this.formulaMode) {
+            if (this.eventKey === AutoNumericEnum.keyName.Esc) { // Cancel the formula
+                this.formulaMode = false;
+                this.reformat();
+
+                return;
+            }
+
+            if (this.eventKey === AutoNumericEnum.keyName.Enter) { // Calculate the formula
+                this._exitFormulaMode();
+
+                return;
+            }
+
+            // Accept the backspace, delete, arrow, home and end keys
+            if (this._acceptNonPrintableKeysInFormulaMode()) {
+                return;
+            }
+
+            //TODO Manage the undo/redo events *while* editing a math expression
+            //TODO Manage the cut/paste events *while* editing a math expression
+        } else if (this.eventKey === AutoNumericEnum.keyName.Equal) {
+            this._enterFormulaMode();
+
+            return;
+        }
 
         if (this.domElement.readOnly) {
             this.processed = true;
@@ -6397,6 +6497,22 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {KeyboardEvent} e
      */
     _onKeypress(e) {
+        if (this.formulaMode) {
+            // Accept the backspace, delete, arrow, home and end keys
+            if (this._acceptNonPrintableKeysInFormulaMode()) {
+                return;
+            }
+
+            //TODO Prevent keys to be entered on the left-hand side of the '=' sign?...Or just let the user see what they are wrongly doing?
+            if (/[0-9.+\-*/() ]/.test(this.eventKey)) {
+                return; // Accept the key in the formula (and do not accept the '=' character here again)
+            } else {
+                e.preventDefault(); // Reject the key
+            }
+
+            return;
+        }
+
         if (this.eventKey === AutoNumericEnum.keyName.Insert) {
             return;
         }
@@ -6450,6 +6566,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      */
     _onKeyup(e) {
         this.isEditing = false;
+
+        if (this.formulaMode) {
+            return;
+        }
 
         if (this.settings.isCancellable && this.eventKey === AutoNumericEnum.keyName.Esc) {
             // If the user wants to cancel its modifications, we drop the 'keyup' event for the Esc key
@@ -6594,6 +6714,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         //TODO Create separate handlers for blur and mouseleave
         this.isEditing = false; // Just in case no `keyUp` event have been sent (if the user lost the focus to the window while typing)
 
+        if (e.type === 'mouseleave' && this.formulaMode) {
+            return;
+        }
+
         //FIXME Do not call `set()` if the current raw value is the same as the one we are trying to set (currently, on focus out, `set()` is always called, even if the value has not changed
         if (this.settings.unformatOnHover && e.type === 'mouseleave' && this.hoveredWithAlt) {
             this.constructor._reformatAltHovered(this);
@@ -6602,6 +6726,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         if ((e.type === 'mouseleave' && !this.isFocused) || e.type === 'blur') {
+            if (e.type === 'blur' && this.formulaMode) {
+                this._exitFormulaMode();
+            }
+
             this._saveValueToPersistentStorage();
             if (this.settings.showOnlyNumbersOnFocus === AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers) {
                 this.settings.digitGroupSeparator = this.originalDigitGroupSeparator;
@@ -7143,6 +7271,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {WheelEvent} e
      */
     _onWheel(e) {
+        if (this.formulaMode) {
+            return;
+        }
+
         if (this.settings.readOnly || this.domElement.readOnly || this.domElement.disabled) {
             // Do not allow scrolling in a readonly element (fix issue #541)
             return;
@@ -7260,6 +7392,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {DragEvent} e
      */
     _onDrop(e) {
+        if (this.formulaMode) { // Dropping while in formula mode shouldn't be possible. This is done 'just in case'
+            return;
+        }
+
         // Note: by default browsers already prevent the drop on readOnly and disabled elements
         this.isDropEvent = true;
         e.preventDefault();
@@ -7331,7 +7467,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             const hoveredElement = AutoNumericHelper.getHoveredElement();
             if (AutoNumeric.isManagedByAutoNumeric(hoveredElement)) {
                 const anElement = AutoNumeric.getAutoNumericElement(hoveredElement);
-                if (anElement.settings.unformatOnHover) {
+                if (!anElement.formulaMode && anElement.settings.unformatOnHover) {
                     this.constructor._unformatAltHovered(anElement);
                 }
             }
@@ -7349,6 +7485,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             const hoveredElement = AutoNumericHelper.getHoveredElement();
             if (AutoNumeric.isManagedByAutoNumeric(hoveredElement)) {
                 const anElement = AutoNumeric.getAutoNumericElement(hoveredElement);
+                if (anElement.formulaMode || !anElement.settings.unformatOnHover) {
+                    return;
+                }
+
                 this.constructor._reformatAltHovered(anElement);
             }
         }
@@ -7858,6 +7998,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             eventIsCancelable                 : true,
             failOnUnknownOption               : true,
             formatOnPageLoad                  : true,
+            formulaMode                       : true,
             historySize                       : true,
             isCancellable                     : true,
             leadingZero                       : true,

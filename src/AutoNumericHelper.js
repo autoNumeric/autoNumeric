@@ -156,6 +156,16 @@ export default class AutoNumericHelper {
     }
 
     /**
+     * Return `true` if the given character is a number (0 to 9)
+     *
+     * @param {char} char
+     * @returns {boolean}
+     */
+    static isDigit(char) {
+        return /\d/.test(char);
+    }
+
+    /**
      * Return `true` if the parameter is a number (or a number written as a string).
      * This version also accepts Arabic and Persian numbers.
      *

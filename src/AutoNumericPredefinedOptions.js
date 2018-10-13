@@ -57,6 +57,8 @@ const japanese = { // 日本語
 
 
 // Here we need to clone the initial objects in order to be able to edit the clones without affecting the originals
+const euroF                           = AutoNumericHelper.cloneObject(euro);
+euroF.formulaMode                     = AutoNumeric.options.formulaMode.enabled;
 const euroPos                         = AutoNumericHelper.cloneObject(euro);
 euroPos.minimumValue                  = 0;
 const euroNeg                         = AutoNumericHelper.cloneObject(euro);
@@ -89,6 +91,8 @@ percentageEU3decPos.decimalPlaces = 3;
 const percentageEU3decNeg         = AutoNumericHelper.cloneObject(percentageEU2decNeg);
 percentageEU3decNeg.decimalPlaces = 3;
 
+const dollarF                                = AutoNumericHelper.cloneObject(dollar);
+dollarF.formulaMode                          = AutoNumeric.options.formulaMode.enabled;
 const dollarPos                              = AutoNumericHelper.cloneObject(dollar);
 dollarPos.minimumValue                       = 0;
 const dollarNeg                              = AutoNumericHelper.cloneObject(dollar);

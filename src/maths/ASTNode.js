@@ -1,7 +1,8 @@
 /**
- * Options for autoNumeric.js
+ * Math expression tokenizer/parser/evaluator functions for autoNumeric.js
+ *
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
- * @copyright © 2017 Alexandre Bonneau
+ * @copyright © 2018 Alexandre Bonneau
  *
  * The MIT License (http://www.opensource.org/licenses/mit-license.php)
  *
@@ -27,27 +28,44 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import AutoNumeric from './AutoNumeric';
-
 /**
- * Event list managed by AutoNumeric
+ * The Abstract Syntax Tree node
  *
- * @type {{initialized: string, invalidFormula: string, formatted: string, minRangeExceeded: string, maxRangeExceeded: string, native: {input: string, change: string}, validFormula: string}}
+ * Each node carries the node information such as type (operator type), value (if it's a leaf), and the left and right branches
  */
-AutoNumeric.events = {
-    initialized     : 'autoNumeric:initialized',
-    invalidFormula  : 'autoNumeric:invalidFormula',
-    formatted       : 'autoNumeric:formatted',
-    rawValueModified: 'autoNumeric:rawValueModified',
-    minRangeExceeded: 'autoNumeric:minExceeded',
-    maxRangeExceeded: 'autoNumeric:maxExceeded',
-    native          : {
-        input : 'input',
-        change: 'change',
-    },
-    validFormula    : 'autoNumeric:validFormula',
-};
+export default class ASTNode {
+    /*
+    constructor() {
+        // this.type = void(0);
+        // this.value = 0;
+        // this.left = null;
+        // this.right = null;
+    }
+    */
 
-Object.freeze(AutoNumeric.events.native);
-Object.freeze(AutoNumeric.events);
-Object.defineProperty(AutoNumeric, 'events', { configurable: false, writable: false });
+    static createNode(type, left, right) {
+        const node = new ASTNode();
+        node.type = type;
+        node.left = left;
+        node.right = right;
+
+        return node;
+    }
+
+    static createUnaryNode(left) {
+        const node = new ASTNode();
+        node.type = 'unaryMinus';
+        node.left = left;
+        node.right = null;
+
+        return node;
+    }
+
+    static createLeaf(value) {
+        const node = new ASTNode();
+        node.type = 'number';
+        node.value = value;
+
+        return node;
+    }
+}

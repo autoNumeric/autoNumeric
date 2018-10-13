@@ -222,6 +222,8 @@ const selectors = {
     issue593Truncate                  : '#issue_593_truncate',
     issue594Left                      : '#issue_594_left',
     issue594Right                     : '#issue_594_right',
+    issue542On                        : '#issue_542_on',
+    issue542Off                       : '#issue_542_off',
 };
 
 //-----------------------------------------------------------------------------
@@ -4170,6 +4172,72 @@ describe('Issue #594', () => {
             return { start: input.selectionStart, end: input.selectionEnd };
         }, selectors.issue594Right).value;
         expect(inputCaretPosition.start).toEqual(0);
+    });
+});
+
+xdescribe('Issue #542', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue542On)).toEqual('1,234,567.89');
+        expect(browser.getValue(selectors.issue542Off)).toEqual('1,234,567.89');
+    });
+
+    it(`should not allow formula mode on default AutoNumeric elements`, () => {
+        const input = $(selectors.issue542Off);
+        input.click();
+        browser.keys(['Home', '=']);
+        expect(browser.getValue(selectors.issue542Off)).toEqual('1,234,567.89');
+    });
+
+    it(`should allow formula mode on AutoNumeric elements with the \`formulaMode\` option set to \`true\``, () => {
+        const input = $(selectors.issue542On);
+        input.click();
+
+
+        browser.keys(['Esc', '666777.88']);
+        expect(browser.getValue(selectors.issue542Off)).toEqual('666,777.88'); //XXX Fails in Chrome, not in Firefox
+        browser.keys(['Esc']);
+        expect(browser.getValue(selectors.issue542Off)).toEqual('1,234,567.89');
+        browser.keys(['Esc', '666777.88', 'Enter']); // Save the rawValue
+        expect(browser.getValue(selectors.issue542Off)).toEqual('666,777.88');
+        browser.keys(['Esc']);
+        expect(browser.getValue(selectors.issue542Off)).toEqual('666,777.88');
+        // Start editing the value as usual
+        browser.keys(['12345']);
+        expect(browser.getValue(selectors.issue542Off)).toEqual('12,345');
+
+        // Then enter formula mode
+        browser.keys(['=']);
+        expect(browser.getValue(selectors.issue542On)).toEqual('=');
+        browser.keys(['12+ 24.11']); //XXX The chromedriver bugs and does not accepts the '+' character
+        expect(browser.getValue(selectors.issue542On)).toEqual('=12+ 24.11');
+        browser.keys(['foobar']);
+        expect(browser.getValue(selectors.issue542On)).toEqual('=12+ 24.11');
+        browser.keys(['-( 2/ (12+5))']); //XXX The geckodriver bugs and does not accepts the '(' and ')' characters
+        expect(browser.getValue(selectors.issue542On)).toEqual('=12+ 24.11-( 2/ (12+5))');
+
+        // Cancel the formula
+        browser.keys(['Esc']);
+        expect(browser.getValue(selectors.issue542On)).toEqual('12,345.00');
+        // Check that hitting `esc` a second time changes the value to the last saved one, not the one before entering the formula mode
+        browser.keys(['Esc']);
+        expect(browser.getValue(selectors.issue542On)).toEqual('666,777.88');
+
+        // Validate the formula with Enter
+        browser.keys(['=']);
+        expect(browser.getValue(selectors.issue542On)).toEqual('=');
+        browser.keys(['-10000 + 12+ 24.16-( 1044/ (12))', 'Enter']);
+        expect(browser.getValue(selectors.issue542On)).toEqual('-10,050.84');
+
+        // Validate the formula with Blur
+        browser.keys(['=']);
+        expect(browser.getValue(selectors.issue542On)).toEqual('=');
+        browser.keys(['-60000 + 12+ 24.16-( 1044/ (12))']);
+        expect(browser.getValue(selectors.issue542On)).toEqual('=-60000 + 12+ 24.16-( 1044/ (12))');
+        const input2 = $(selectors.issue542Off);
+        input2.click(); // Blur
+        expect(browser.getValue(selectors.issue542On)).toEqual('-60,050.84');
     });
 });
 

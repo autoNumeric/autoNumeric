@@ -1032,6 +1032,16 @@
 			<input id="issue_598" type="text" placeholder="#598">
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #542</p>
+			<div>
+				<input id="issue_542_off" type="text" placeholder="#542 'off'">
+				<input id="issue_542_on" type="text" placeholder="#542 'on'">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -2186,6 +2196,10 @@
 
     //-------------- Issue #598
     new AutoNumeric('#issue_598', 1234567.89, { unformatOnHover: false });
+
+    //-------------- Issue #542
+    new AutoNumeric('#issue_542_on', 1234567.89, { formulaMode: true });
+    new AutoNumeric('#issue_542_off', 1234567.89);
 </script>
 </body>
 </html>

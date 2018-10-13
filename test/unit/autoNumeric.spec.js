@@ -32,9 +32,12 @@
 // eslint-disable-next-line
 /* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach, spyOn */
 
-import AutoNumeric from '../../src/AutoNumeric';
-import AutoNumericEnum from '../../src/AutoNumericEnum';
+import AutoNumeric       from '../../src/AutoNumeric';
+import AutoNumericEnum   from '../../src/AutoNumericEnum';
 import AutoNumericHelper from '../../src/AutoNumericHelper';
+import Lexer             from '../../src/maths/Lexer';
+import Parser            from '../../src/maths/Parser';
+import Evaluator         from '../../src/maths/Evaluator';
 
 // The autoNumeric tests :
 
@@ -100,6 +103,7 @@ describe('The AutoNumeric object', () => {
             eventIsCancelable            : true,
             failOnUnknownOption          : false,
             formatOnPageLoad             : true,
+            formulaMode                  : false,
             historySize                  : 20,
             isCancellable                : true,
             leadingZero                  : 'deny',
@@ -278,6 +282,7 @@ describe('The AutoNumeric object', () => {
             expect(defaultSettings.eventIsCancelable         ).toEqual(aNInputSettings.eventIsCancelable          );
             expect(defaultSettings.failOnUnknownOption       ).toEqual(aNInputSettings.failOnUnknownOption        );
             expect(defaultSettings.formatOnPageLoad          ).toEqual(aNInputSettings.formatOnPageLoad           );
+            expect(defaultSettings.formulaMode               ).toEqual(aNInputSettings.formulaMode                );
             expect(String(defaultSettings.historySize)       ).toEqual(aNInputSettings.historySize                );
             expect(defaultSettings.isCancellable             ).toEqual(aNInputSettings.isCancellable              );
             expect(defaultSettings.leadingZero               ).toEqual(aNInputSettings.leadingZero                );
@@ -3179,7 +3184,7 @@ describe('autoNumeric options and `options.*` methods', () => {
      decimalPlacesShownOnFocus
      defaultValueOverride
      failOnUnknownOption
-     formatOnPageLoad
+     formulaMode
      historySize
      isCancellable
      modifyValueOnWheel
@@ -7744,6 +7749,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ formatOnPageLoad: 'true' })).not.toThrow();
             expect(() => AutoNumeric.validate({ formatOnPageLoad: 'false' })).not.toThrow();
 
+            expect(() => AutoNumeric.validate({ formulaMode: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ formulaMode: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ formulaMode: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ formulaMode: 'false' })).not.toThrow();
+
             expect(() => AutoNumeric.validate({ historySize: 1 })).not.toThrow();
             expect(() => AutoNumeric.validate({ historySize: 10 })).not.toThrow();
             expect(() => AutoNumeric.validate({ historySize: 1000 })).not.toThrow();
@@ -8157,6 +8167,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ formatOnPageLoad: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ formatOnPageLoad: 'foobar' })).toThrow();
 
+            expect(() => AutoNumeric.validate({ formulaMode: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ formulaMode: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ formulaMode: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ formulaMode: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ formulaMode: 'foobar' })).toThrow();
+
             expect(() => AutoNumeric.validate({ historySize: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ historySize: -1 })).toThrow();
             expect(() => AutoNumeric.validate({ historySize: 5.34 })).toThrow();
@@ -8466,3 +8482,133 @@ describe(`The AutoNumeric event lifecycle`, () => {
         aNInput.set(2000);
     });
 });
+
+describe(`The Math expression lexer and parser`, () => {
+    it(`should correctly tokenize the math expressions`, () => {
+        function testTokenizer(text) {
+            const lexer = new Lexer(text);
+            const tokens = [];
+            let token;
+
+            do {
+                token = lexer.getNextToken();
+                tokens.push(token);
+            } while (token.type !== 'EOT');
+
+            return tokens;
+        }
+
+        expect(testTokenizer('2 + 6').length).toEqual(4);
+        expect(testTokenizer('2 - 6').length).toEqual(4);
+        expect(testTokenizer('(4+1) * 2').length).toEqual(8);
+        expect(testTokenizer('(4+1) * 2 ').length).toEqual(8);
+        expect(testTokenizer('    (4+1) * 2 ').length).toEqual(8);
+        expect(testTokenizer('(4+1) * 2 - (104587.23 * 8 - (-7))').length).toEqual(19);
+        expect(testTokenizer('-(7 * 4)').length).toEqual(7);
+        expect(testTokenizer('-7 * 4').length).toEqual(5);
+        expect(testTokenizer('-7 * -4').length).toEqual(6);
+        expect(testTokenizer('7 * -4').length).toEqual(5);
+        expect(testTokenizer('8 * -12.46').length).toEqual(5);
+        expect(testTokenizer('7 + -4').length).toEqual(5);
+        expect(testTokenizer('1.6').length).toEqual(2);
+        expect(testTokenizer('-1.6').length).toEqual(3);
+        expect(testTokenizer('-1.6 - 1.2').length).toEqual(5);
+        expect(testTokenizer('(1+2)+(5-3)').length).toEqual(12);
+        expect(testTokenizer('(1+2)+(5-3) + 4').length).toEqual(14);
+        expect(testTokenizer('(1+2) + 1').length).toEqual(8);
+        expect(testTokenizer('(1+2) + 1 - (1+3)').length).toEqual(14);
+        expect(testTokenizer('22+ 10').length).toEqual(4);
+        expect(testTokenizer('22+ (10 * 2)').length).toEqual(8);
+        expect(testTokenizer('22+ (10 * 2) + 1').length).toEqual(10);
+        expect(testTokenizer('22+ (10 * 2)-2.5').length).toEqual(10);
+        expect(testTokenizer('22+ (10 * 2)-2').length).toEqual(10);
+        expect(testTokenizer('22+ (10 * 2)-1.5').length).toEqual(10);
+        expect(testTokenizer('22+ (10 * 2)-1.5- -0.5').length).toEqual(13);
+        expect(testTokenizer('22+ (10 * 2)-2- -6').length).toEqual(13);
+        expect(testTokenizer('2 - -6').length).toEqual(5);
+        expect(testTokenizer('2 + -6').length).toEqual(5);
+        expect(testTokenizer('-2 + -6').length).toEqual(6);
+        expect(testTokenizer('2 * -6').length).toEqual(5);
+        expect(testTokenizer('22/2').length).toEqual(4);
+        expect(testTokenizer('-47/2').length).toEqual(5);
+        expect(testTokenizer('5').length).toEqual(2);
+        expect(testTokenizer('(5)').length).toEqual(4);
+        expect(testTokenizer('(-5)').length).toEqual(5);
+        expect(testTokenizer('-(5)').length).toEqual(5);
+        expect(testTokenizer('((5))').length).toEqual(6);
+        expect(testTokenizer('')[0].type).toEqual('EOT');
+
+        expect(() => testTokenizer('22+ (10 * 2)+foobar')).toThrow();
+        expect(() => testTokenizer('foobar')).toThrow();
+        expect(() => testTokenizer('(foobar)')).toThrow();
+        expect(() => testTokenizer('(45foo)')).toThrow();
+    });
+
+    it(`should correctly parse the math expressions`, () => {
+        function testParser(text) {
+            const ast = new Parser(text);
+            const result = (new Evaluator()).evaluate(ast);
+
+            return Number(result);
+        }
+
+        expect(testParser('2 + 6')).toEqual(8);
+        expect(testParser('2 - 6')).toEqual(-4);
+        expect(testParser('(4+1) * 2')).toEqual(10);
+        expect(testParser('(4+1) * 2 ')).toEqual(10);
+        expect(testParser('    (4+1) * 2 ')).toEqual(10);
+        expect(testParser('(4+1) * 2 - (104587.23 * 8 - (-7))')).toEqual(-836694.84);
+        expect(testParser('-(7 * 4)')).toEqual(-28);
+        expect(testParser('-7 * 4')).toEqual(-28);
+        expect(testParser('-7 * -4')).toEqual(28);
+        expect(testParser('7 * -4')).toEqual(-28);
+        expect(testParser('8 * -12.46')).toEqual(-99.68);
+        expect(testParser('7 + -4')).toEqual(3);
+        expect(testParser('1.6')).toEqual(1.6);
+        expect(testParser('-1.6')).toEqual(-1.6);
+        expect(testParser('-1.6 - 1.2')).toEqual(-2.8);
+        expect(testParser('(1+2)+(5-3)')).toEqual(5);
+        expect(testParser('(5-3) + 4')).toEqual(6);
+        expect(testParser('(2) + (1)')).toEqual(3);
+        expect(testParser('(2) + (1) + (5)')).toEqual(8);
+        expect(testParser('(2) - (1) + (5)')).toEqual(6);
+        expect(testParser('(2) + (1) - (5)')).toEqual(-2);
+        expect(testParser('2+1')).toEqual(3);
+        expect(testParser('2+1+5')).toEqual(8);
+        expect(testParser('2 + 1 +5')).toEqual(8);
+        expect(testParser('(2) + 1 +5')).toEqual(8);
+        expect(testParser('(2) + (1) +5')).toEqual(8);
+        expect(testParser('(2) - (1) +5')).toEqual(6);
+        expect(testParser('(2) + (1) -5')).toEqual(-2);
+        expect(testParser('(1+2)+(5-3) + 4')).toEqual(9);
+        expect(testParser('(1+2) + 1')).toEqual(4);
+        expect(testParser('(1+2) + 1 - (1+3)')).toEqual(0);
+        expect(testParser('22+ 10')).toEqual(32);
+        expect(testParser('22+ (10 * 2)')).toEqual(42);
+        expect(testParser('22+ (10 * 2) + 1')).toEqual(43);
+        expect(testParser('22+ (10 * 2)-2.5')).toEqual(39.5);
+        expect(testParser('22+ (10 * 2)-2')).toEqual(40);
+        expect(testParser('22+ (10 * 2)-1.5')).toEqual(40.5);
+        expect(testParser('22+ (10 * 2)-1.5- -0.5')).toEqual(41);
+        expect(testParser('22+ (10 * 2)-2- -6')).toEqual(46);
+        expect(testParser('2 - -6')).toEqual(8);
+        expect(testParser('2 + -6')).toEqual(-4);
+        expect(testParser('-2 + -6')).toEqual(-8);
+        expect(testParser('2 * -6')).toEqual(-12);
+        expect(testParser('22/2')).toEqual(11);
+        expect(testParser('-47/2')).toEqual(-23.5);
+        expect(testParser('5')).toEqual(5);
+        expect(testParser('(5)')).toEqual(5);
+        expect(testParser('(-5)')).toEqual(-5);
+        expect(testParser('-(5)')).toEqual(-5);
+        expect(testParser('((5))')).toEqual(5);
+
+        expect(() => testParser('22+ (10 * 2)+foobar')).toThrow();
+        expect(() => testParser('')).toThrow();
+        expect(() => testParser('foobar')).toThrow();
+        expect(() => testParser('(foobar)')).toThrow();
+        expect(() => testParser('(45foo)')).toThrow();
+    });
+});
+
+

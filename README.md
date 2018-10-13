@@ -64,10 +64,11 @@ anElement.french()
 - The settings can easily be changed at *any* time using the `update` method or via a callback
 - autoNumeric supports `input` elements as well as most text elements with the `contenteditable` attribute, allowing you to place formatted numbers and currencies on just about any part of your pages
 - AutoNumeric elements *can be linked together* allowing you to perform one action on multiple elements at once
-- 8 pre-defined [currency options](#predefined-language-options) as well as 31 [common options](#predefined-common-options) allows you to directly use autoNumeric by skipping the option configuration step
+- 8 pre-defined [currency options](#predefined-language-options) as well as 33 [common options](#predefined-common-options) allows you to directly use autoNumeric by skipping the option configuration step
 - 26 built-in [methods](#methods) gives you the flexibility needed to use autoNumeric to its full potential
 - 22 [global methods](#perform-actions-globally-on-a-shared-list-of-autonumeric-elements) that allows to control sets of AutoNumeric-managed elements at once
 - 21 additional [methods](#methods) specialized for managing form management and submission
+- A [formula mode](#formula-mode) that allows to quickly enter and evaluate math expressions inside the element
 - 17 [static functions](#static-methods) provided by the `AutoNumeric` class
 - And more than 40 [options](#options) allowing you to precisely customize your currency format and behavior
 
@@ -116,6 +117,9 @@ With that said, autoNumeric supports most international numeric formats and curr
     - [Form functions](#form-functions)
     - [Function chaining](#function-chaining)
   - [Static methods](#static-methods)
+- [Formula mode](#formula-mode)
+  - [Allowed characters in formula mode](#allowed-characters-in-formula-mode)
+  - [Formula mode events](#formula-mode-events)
 - [Event lifecycle](#event-lifecycle)
   - [AutoNumeric custom events details](#autonumeric-custom-events-details)
 - [Questions](#questions)
@@ -335,6 +339,7 @@ You can also generate your custom options object and try those live with the [Au
 | `eventIsCancelable` | Defines if the custom and native events triggered by AutoNumeric should be cancelable | `true` |
 | `failOnUnknownOption ` | This option is the 'strict mode' *(aka 'debug' mode)*, which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the `options` object. | `false` |
 | `formatOnPageLoad` | Determine if the default value will be formatted on initialization | `true` |
+| `formulaMode` | Defines if the [*formula mode*](#formula-mode) can be activated by the user | `false` |
 | `historySize` | Determine how many undo states an AutoNumeric object should keep in memory | `20` |
 | `isCancellable` | Determine if the user can *'cancel'* the last modifications done to the element value when using the `Escape` key | `true` |
 | `leadingZero` | Controls the leading zero behavior (possible options are `allow`, `deny` and `keep`) | `'deny'` |
@@ -418,12 +423,14 @@ Moreover, autoNumeric provides the following common options:
 | `numericPos` | Idem above, but only allow positive values | `1234.56` |
 | `numericNeg` | Idem above, but only allow negative values | `-1234.56` |
 | `euro` | Same configuration than `French` | `1.234,56 €` |
+| `euroF` | Same configuration than `euro`, with the formula mode activated | `1.234,56 €` |
 | `euroPos` | Idem above, but only allow positive values | `1.234,56 €` |
 | `euroNeg` | Idem above, but only allow negative values | `-1.234,56 €` |
 | `euroSpace` | Same configuration than `French` except a space is used for the group separator instead of the dot | `1 234,56 €` |
 | `euroSpacePos` | Idem above, but only allow positive values | `1 234,56 €` |
 | `euroSpaceNeg` | Idem above, but only allow negative values | `-1 234,56 €` |
 | `dollar` | Same configuration than `NorthAmerican`  | `$1,234.56` |
+| `dollarF` | Same configuration than `dollar`, with the formula mode activated  | `$1,234.56` |
 | `dollarPos` | Idem above, but only allow positive values | `$1,234.56` |
 | `dollarNeg` | Idem above, but only allow negative values | `-$1,234.56` |
 | `percentageEU2dec` | Same configuration than `French`, but display a percent `%` sign instead of the currency sign, with `2` decimal places | `12,34 %` |
@@ -851,16 +858,53 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 | `version` | Return the current AutoNumeric version number *(for debugging purpose)* | `AutoNumeric.version();` |
 
 
+## Formula mode
+
+AutoNumeric provides a quick way to enter and evaluate simple math expression into the element.<br>
+
+Sometimes, you need to quickly calculate the product or the sum of two numbers, before entering the result in the AutoNumeric element.
+<br>
+For instance, you might ask yourself *"How many months is there in 14 years and 5 months ?"*, then you'd need to either make a mental calculation, or resort to using a calculator.
+To speed things up and provide a lean user experience, AutoNumeric provides a *formula mode* which allows you to enter and evaluate simple math expressions very quickly.
+
+Using our previous example, you would just need to activate the *formula mode* by entering the equal sign (`=`) key, then type `=14*12 + 5`, and finally validate that expression by using the `Enter` key, or by blurring the field.
+<br>*Note: if the math expression is invalid, the previous `rawValue` is set back*
+
+By default, this behavior is disabled. If you want to enable the math expression parsing, you need to set the `formulaMode` option:
+```js
+new AutoNumeric(domElement, { formulaMode: true });
+```
+
+If you want to cancel the math expression edition and exit the formula mode, hit the `Escape` key.
+
+### Allowed characters in formula mode
+
+Simple math expressions are allowed, which means you can use any numeric characters, the decimal point `.`, as well as the following operators `+`, `-`, `*`, `/`, `(` and `)`.
+*Note: parentheses and operators precedence are respected as expected*
+//FIXME Finish this : examples
+This allows for evaluating the following math expressions examples:
+- `8 * -12.46`
+- `22* (10 - 2)/1.5- -0.5`
+- `(4+1) * 2 - (104587.23 * 8 - (-7))`
+
+### Formula mode events
+
+On user validation, if the math expression syntax is invalid, the previous valid `rawValue` is set back, and the `autoNumeric:invalidFormula` event is sent.
+When a valid math expression is accepted, then its result is `set()`, and the `autoNumeric:validFormula` event is sent.
+
+
 ## Event lifecycle
 
 AutoNumeric elements are transparent to the native `input` and `change` events, which means those are correctly sent when using an `<input>` element managed by AutoNumeric.
 
 In addition to the native events, custom events sent by AutoNumeric elements allows you to hook into the formatting lifecycle, as you see fit:
 - `'autoNumeric:initialized'` when the AutoNumeric element is initialized
+- `'autoNumeric:invalidFormula'` when the user tries to validate an invalid math expression
 - `'autoNumeric:rawValueModified'` when the `rawValue` is modified
 - `'autoNumeric:formatted'` when all the formatting is done and the formatted string is modified
 - `'autoNumeric:minExceeded'` if the `minimumValue` is not respected
 - `'autoNumeric:maxExceeded'` if the `maximumValue` is not respected
+- `'autoNumeric:validFormula'` when the user validate a valid math expression
 
 *Note: You can also set if the events triggered by the AutoNumeric elements, custom or native, should bubble up (option `eventBubbles`) or be cancelable (option `eventIsCancelable`).*<br><br>
 
@@ -920,6 +964,31 @@ const theCustomEvent = {
         newRawValue: 788,        // The new raw value
         error      : null,       // The error message as a string, `null` if no errors.
         aNElement  : theAutoNumericObject, // The AutoNumeric object emitting this event
+    },
+    // ...
+}
+```
+
+The `'autoNumeric:invalidFormula'` event has a payload that contains the following `detail` attribute:
+```js
+// This is an example of `CustomEvent` object sent by AutoNumeric when the math expression is invalid:
+const theCustomEvent = {
+    detail    : {
+        formula  : '22+35 - (44',        // The invalid formula
+        aNElement: theAutoNumericObject, // The AutoNumeric object emitting this event
+    },
+    // ...
+}
+```
+
+The `'autoNumeric:validFormula'` event has a payload that contains the following `detail` attribute:
+```js
+// This is an example of `CustomEvent` object sent by AutoNumeric when the math expression is valid:
+const theCustomEvent = {
+    detail    : {
+        formula  : '22+35 - (44)',       // The valid formula
+        result   : 13,                   // The math expression result
+        aNElement: theAutoNumericObject, // The AutoNumeric object emitting this event
     },
     // ...
 }

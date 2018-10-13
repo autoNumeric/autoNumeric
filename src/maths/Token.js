@@ -1,7 +1,8 @@
 /**
- * Options for autoNumeric.js
+ * Math expression tokenizer/parser/evaluator functions for autoNumeric.js
+ *
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
- * @copyright © 2017 Alexandre Bonneau
+ * @copyright © 2018 Alexandre Bonneau
  *
  * The MIT License (http://www.opensource.org/licenses/mit-license.php)
  *
@@ -27,27 +28,13 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import AutoNumeric from './AutoNumeric';
-
 /**
- * Event list managed by AutoNumeric
- *
- * @type {{initialized: string, invalidFormula: string, formatted: string, minRangeExceeded: string, maxRangeExceeded: string, native: {input: string, change: string}, validFormula: string}}
+ * Data structure used by the Lexer and Parser classes
  */
-AutoNumeric.events = {
-    initialized     : 'autoNumeric:initialized',
-    invalidFormula  : 'autoNumeric:invalidFormula',
-    formatted       : 'autoNumeric:formatted',
-    rawValueModified: 'autoNumeric:rawValueModified',
-    minRangeExceeded: 'autoNumeric:minExceeded',
-    maxRangeExceeded: 'autoNumeric:maxExceeded',
-    native          : {
-        input : 'input',
-        change: 'change',
-    },
-    validFormula    : 'autoNumeric:validFormula',
-};
-
-Object.freeze(AutoNumeric.events.native);
-Object.freeze(AutoNumeric.events);
-Object.defineProperty(AutoNumeric, 'events', { configurable: false, writable: false });
+export default class Token {
+    constructor(type, value, symbol) {
+        this.type = type;
+        this.value = value;
+        this.symbol = symbol;
+    }
+}

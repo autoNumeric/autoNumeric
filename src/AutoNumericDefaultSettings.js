@@ -60,6 +60,7 @@ AutoNumeric.defaultSettings = {
     eventIsCancelable            : AutoNumeric.options.eventIsCancelable.isCancelable,
     failOnUnknownOption          : AutoNumeric.options.failOnUnknownOption.ignore,
     formatOnPageLoad             : AutoNumeric.options.formatOnPageLoad.format,
+    formulaMode                  : AutoNumeric.options.formulaMode.disabled,
     historySize                  : AutoNumeric.options.historySize.medium,
     isCancellable                : AutoNumeric.options.isCancellable.cancellable,
     leadingZero                  : AutoNumeric.options.leadingZero.deny,

@@ -2,7 +2,7 @@
  *               AutoNumeric.js
  *
  * @version      4.5.0
- * @date         2018-10-13 UTC 01:00
+ * @date         2018-10-13 UTC 01:16
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -6619,7 +6619,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         // Manage the reformat when hovered with the Alt key pressed
-        if (this.eventKey === AutoNumericEnum.keyName.Alt && this.hoveredWithAlt) {
+        if (this.eventKey === AutoNumericEnum.keyName.Alt && this.settings.unformatOnHover && this.hoveredWithAlt) {
             this.constructor._reformatAltHovered(this);
 
             return;

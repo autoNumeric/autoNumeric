@@ -5,6 +5,14 @@
   + Introduces the *formula mode* which allows a user to enter a math expression in the element using the `=` key, then evaluate it with the `Enter` one
   + Adds the `formulaMode` option, set to `false` by default, that controls if the *formula mode* is enabled
 + Adds the `Lexer`, `Parser`, `Evaluator`, `ASTNode` and `Token` classes for managing math expressions
++ Fixes #612 Dist files contain eval
+  + The webpack `devtool` option for the `development` configuration has been changed from `cheap-module-eval-source-map` to `cheap-source-map`;
+    This removes any `eval()` from the generated `dist/autoNumeric.js` file, and makes the source maps works in all cases in the browsers
++ Merge the changes from `4.4.1` while making sure there is no regression with #609; this adds the `browser` field alongside the `main` one in `package.json`
+  + Note: The `browser` option points to the minified library `dist/autoNumeric.min.js`
++ Update the `index.html` test file to use the un-minified `development` library `dist/autoNumeric.js`
+  This allows to *temporarily* use forbidden functions like `console` or wrong formatting while debugging, using `yarn build:dev`
++ Fixes a call to `_reformatAltHovered()` even when the `unformatOnHover` option was set to `false`
 
 ### 4.4.3
 + Fixes #598 The `unformatOnHover` config value isn't used when set to `false`

@@ -7,8 +7,8 @@ const baseWebpackConfig = require('./webpack.config.base.js');
 
 module.exports = merge(baseWebpackConfig, {
     mode   : 'development',
-    // cheap-module-eval-source-map is faster for development
-    devtool: '#cheap-module-eval-source-map',
+    // cf. https://webpack.js.org/configuration/devtool/
+    devtool: 'cheap-source-map',
     plugins: [
         new webpack.NoEmitOnErrorsPlugin(),
         // new FriendlyErrorsPlugin(),

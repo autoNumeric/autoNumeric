@@ -3773,7 +3773,7 @@ export default class AutoNumeric {
 
         // First things first, we test that the `showWarnings` option is valid
         if (!AutoNumericHelper.isTrueOrFalseString(options.showWarnings) && !AutoNumericHelper.isBoolean(options.showWarnings)) {
-            AutoNumericHelper.throwError(`The debug option 'showWarnings' is invalid ; it should be either 'false' or 'true', [${options.showWarnings}] given.`);
+            AutoNumericHelper.throwError(`The debug option 'showWarnings' is invalid ; it should be either 'true' or 'false', [${options.showWarnings}] given.`);
         }
 
         // Define the regular expressions needed for the following tests
@@ -3842,7 +3842,7 @@ export default class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.showOnlyNumbersOnFocus) && !AutoNumericHelper.isBoolean(options.showOnlyNumbersOnFocus)) {
-            AutoNumericHelper.throwError(`The 'showOnlyNumbersOnFocus' option is invalid ; it should be either 'false' or 'true', [${options.showOnlyNumbersOnFocus}] given.`);
+            AutoNumericHelper.throwError(`The 'showOnlyNumbersOnFocus' option is invalid ; it should be either 'true' or 'false', [${options.showOnlyNumbersOnFocus}] given.`);
         }
 
         if (!AutoNumericHelper.isInArray(options.digitalGroupSpacing, [
@@ -3895,7 +3895,7 @@ export default class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.showPositiveSign) && !AutoNumericHelper.isBoolean(options.showPositiveSign)) {
-            AutoNumericHelper.throwError(`The show positive sign option 'showPositiveSign' is invalid ; it should be either 'false' or 'true', [${options.showPositiveSign}] given.`);
+            AutoNumericHelper.throwError(`The show positive sign option 'showPositiveSign' is invalid ; it should be either 'true' or 'false', [${options.showPositiveSign}] given.`);
         }
 
         if (!AutoNumericHelper.isString(options.suffixText) || (options.suffixText !== '' && (AutoNumericHelper.isNegative(options.suffixText, options.negativeSignCharacter) || testNumericalCharacters.test(options.suffixText)))) {
@@ -4001,7 +4001,7 @@ export default class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.saveValueToSessionStorage) && !AutoNumericHelper.isBoolean(options.saveValueToSessionStorage)) {
-            AutoNumericHelper.throwError(`The save to session storage option 'saveValueToSessionStorage' is invalid ; it should be either 'false' or 'true', [${options.saveValueToSessionStorage}] given.`);
+            AutoNumericHelper.throwError(`The save to session storage option 'saveValueToSessionStorage' is invalid ; it should be either 'true' or 'false', [${options.saveValueToSessionStorage}] given.`);
         }
 
         if (!AutoNumericHelper.isInArray(options.onInvalidPaste, [
@@ -4089,7 +4089,7 @@ export default class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.formatOnPageLoad) && !AutoNumericHelper.isBoolean(options.formatOnPageLoad)) {
-            AutoNumericHelper.throwError(`The format on initialization option 'formatOnPageLoad' is invalid ; it should be either 'false' or 'true', [${options.formatOnPageLoad}] given.`);
+            AutoNumericHelper.throwError(`The format on initialization option 'formatOnPageLoad' is invalid ; it should be either 'true' or 'false', [${options.formatOnPageLoad}] given.`);
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.formulaMode) && !AutoNumericHelper.isBoolean(options.formulaMode)) {
@@ -4101,11 +4101,11 @@ export default class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.selectNumberOnly) && !AutoNumericHelper.isBoolean(options.selectNumberOnly)) {
-            AutoNumericHelper.throwError(`The select number only option 'selectNumberOnly' is invalid ; it should be either 'false' or 'true', [${options.selectNumberOnly}] given.`);
+            AutoNumericHelper.throwError(`The select number only option 'selectNumberOnly' is invalid ; it should be either 'true' or 'false', [${options.selectNumberOnly}] given.`);
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.selectOnFocus) && !AutoNumericHelper.isBoolean(options.selectOnFocus)) {
-            AutoNumericHelper.throwError(`The select on focus option 'selectOnFocus' is invalid ; it should be either 'false' or 'true', [${options.selectOnFocus}] given.`);
+            AutoNumericHelper.throwError(`The select on focus option 'selectOnFocus' is invalid ; it should be either 'true' or 'false', [${options.selectOnFocus}] given.`);
         }
 
         if (!AutoNumericHelper.isNull(options.defaultValueOverride) && (options.defaultValueOverride !== '' && !testFloatOrIntegerAndPossibleNegativeSign.test(options.defaultValueOverride))) {
@@ -4113,7 +4113,7 @@ export default class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.unformatOnSubmit) && !AutoNumericHelper.isBoolean(options.unformatOnSubmit)) {
-            AutoNumericHelper.throwError(`The remove formatting on submit option 'unformatOnSubmit' is invalid ; it should be either 'false' or 'true', [${options.unformatOnSubmit}] given.`);
+            AutoNumericHelper.throwError(`The remove formatting on submit option 'unformatOnSubmit' is invalid ; it should be either 'true' or 'false', [${options.unformatOnSubmit}] given.`);
         }
 
         if (!AutoNumericHelper.isNull(options.valuesToStrings) &&
@@ -4135,15 +4135,15 @@ export default class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.isCancellable) && !AutoNumericHelper.isBoolean(options.isCancellable)) {
-            AutoNumericHelper.throwError(`The cancellable behavior option 'isCancellable' is invalid ; it should be either 'false' or 'true', [${options.isCancellable}] given.`);
+            AutoNumericHelper.throwError(`The cancellable behavior option 'isCancellable' is invalid ; it should be either 'true' or 'false', [${options.isCancellable}] given.`);
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.modifyValueOnWheel) && !AutoNumericHelper.isBoolean(options.modifyValueOnWheel)) {
-            AutoNumericHelper.throwError(`The increment/decrement on mouse wheel option 'modifyValueOnWheel' is invalid ; it should be either 'false' or 'true', [${options.modifyValueOnWheel}] given.`);
+            AutoNumericHelper.throwError(`The increment/decrement on mouse wheel option 'modifyValueOnWheel' is invalid ; it should be either 'true' or 'false', [${options.modifyValueOnWheel}] given.`);
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.watchExternalChanges) && !AutoNumericHelper.isBoolean(options.watchExternalChanges)) {
-            AutoNumericHelper.throwError(`The option 'watchExternalChanges' is invalid ; it should be either 'false' or 'true', [${options.watchExternalChanges}] given.`);
+            AutoNumericHelper.throwError(`The option 'watchExternalChanges' is invalid ; it should be either 'true' or 'false', [${options.watchExternalChanges}] given.`);
         }
 
         if (!AutoNumericHelper.isInArray(options.wheelOn, [
@@ -4168,7 +4168,7 @@ export default class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.noEventListeners) && !AutoNumericHelper.isBoolean(options.noEventListeners)) {
-            AutoNumericHelper.throwError(`The option 'noEventListeners' that prevent the creation of event listeners is invalid ; it should be either 'false' or 'true', [${options.noEventListeners}] given.`);
+            AutoNumericHelper.throwError(`The option 'noEventListeners' that prevent the creation of event listeners is invalid ; it should be either 'true' or 'false', [${options.noEventListeners}] given.`);
         }
 
         if (!AutoNumericHelper.isNull(options.styleRules) &&
@@ -4199,19 +4199,19 @@ export default class AutoNumeric {
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.readOnly) && !AutoNumericHelper.isBoolean(options.readOnly)) {
-            AutoNumericHelper.throwError(`The option 'readOnly' is invalid ; it should be either 'false' or 'true', [${options.readOnly}] given.`);
+            AutoNumericHelper.throwError(`The option 'readOnly' is invalid ; it should be either 'true' or 'false', [${options.readOnly}] given.`);
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.unformatOnHover) && !AutoNumericHelper.isBoolean(options.unformatOnHover)) {
-            AutoNumericHelper.throwError(`The option 'unformatOnHover' is invalid ; it should be either 'false' or 'true', [${options.unformatOnHover}] given.`);
+            AutoNumericHelper.throwError(`The option 'unformatOnHover' is invalid ; it should be either 'true' or 'false', [${options.unformatOnHover}] given.`);
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.failOnUnknownOption) && !AutoNumericHelper.isBoolean(options.failOnUnknownOption)) {
-            AutoNumericHelper.throwError(`The debug option 'failOnUnknownOption' is invalid ; it should be either 'false' or 'true', [${options.failOnUnknownOption}] given.`);
+            AutoNumericHelper.throwError(`The debug option 'failOnUnknownOption' is invalid ; it should be either 'true' or 'false', [${options.failOnUnknownOption}] given.`);
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.createLocalList) && !AutoNumericHelper.isBoolean(options.createLocalList)) {
-            AutoNumericHelper.throwError(`The debug option 'createLocalList' is invalid ; it should be either 'false' or 'true', [${options.createLocalList}] given.`);
+            AutoNumericHelper.throwError(`The debug option 'createLocalList' is invalid ; it should be either 'true' or 'false', [${options.createLocalList}] given.`);
         }
     }
 

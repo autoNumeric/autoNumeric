@@ -1576,7 +1576,7 @@ describe('Negative numbers & brackets notations', () => {
 
         // Focus in the input
         negativeBracketsInput1.click();
-        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57'); //FIXME Fails on Chrome only; there is a bug in the selenium chromedriver
         browser.keys(['Tab']);
         expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
 
@@ -1614,7 +1614,7 @@ describe('Negative numbers & brackets notations', () => {
 
         // Focus in the input
         negativeBracketsInput1.click();
-        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57'); //FIXME Fails on Chrome only; there is a bug in the selenium chromedriver
         browser.keys(['Home', '-', 'Tab']);
 
         expect(browser.getValue(selectors.negativeBracketsInput2)).toEqual('1.234,57+');
@@ -1664,7 +1664,7 @@ describe('Negative numbers & brackets notations', () => {
 
         // Focus in the input
         negativeBracketsInput1.click();
-        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57');
+        expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('-1.234,57'); //FIXME Fails on Chrome only; there is a bug in the selenium chromedriver
         browser.keys(['End', '+']);
         expect(browser.getValue(selectors.negativeBracketsInput1)).toEqual('+1.234,57');
 
@@ -3562,7 +3562,7 @@ describe('`negativeSignCharacter` option', () => {
         $(selectors.issue478RightPlacementPos1).click(); // Focus on the input element
         expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00p');
         browser.keys(['Home', '+']);
-        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00-');
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00-'); //FIXME Fails on Chrome only; there is a bug in the selenium chromedriver
         browser.keys(['Home', '+']);
         expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('14.00p');
         browser.keys('+');
@@ -3622,7 +3622,7 @@ describe('`negativeSignCharacter` option', () => {
         expect(inputCaretPosition.end).toEqual(8);
 
         browser.keys(['End', '+']);
-        expect(browser.getValue(selectors.issue478RightPlacementNegPos)).toEqual('1,234.78∸');
+        expect(browser.getValue(selectors.issue478RightPlacementNegPos)).toEqual('1,234.78∸'); //FIXME Fails on Chrome only; there is a bug in the selenium chromedriver
         // Check that the caret position is at the correct position
         inputCaretPosition = browser.execute(domId => {
             const input = document.querySelector(domId);
@@ -3644,7 +3644,7 @@ describe('`negativeSignCharacter` option', () => {
 
     it('should not allow setting the positive state using the custom positive sign', () => {
         $(selectors.issue478RightPlacementPos1).click(); // Focus on the input element
-        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('23,414.00p');
+        expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('23,414.00p'); //FIXME Fails on Chrome only; there is a bug in the selenium chromedriver
         browser.keys(['Home', '+']);
         expect(browser.getValue(selectors.issue478RightPlacementPos1)).toEqual('23,414.00-');
         browser.keys('+');

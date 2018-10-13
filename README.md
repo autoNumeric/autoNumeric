@@ -864,7 +864,7 @@ AutoNumeric provides a quick way to enter and evaluate simple math expression in
 
 Sometimes, you need to quickly calculate the product or the sum of two numbers, before entering the result in the AutoNumeric element.
 <br>
-For instance, you might ask yourself *"How many months is there in 14 years and 5 months ?"*, then you'd need to either make a mental calculation, or resort to using a calculator.
+For instance, you might ask yourself *"How many months are there in 14 years and 5 months ?"*, then you'd need to either make a mental calculation, or resort to using a calculator.
 To speed things up and provide a lean user experience, AutoNumeric provides a *formula mode* which allows you to enter and evaluate simple math expressions very quickly.
 
 Using our previous example, you would just need to activate the *formula mode* by entering the equal sign (`=`) key, then type `=14*12 + 5`, and finally validate that expression by using the `Enter` key, or by blurring the field.

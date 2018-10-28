@@ -6425,7 +6425,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             return;
         }
 
-        if (this.domElement.readOnly) {
+        if (this.domElement.readOnly || this.settings.readOnly || this.domElement.disabled) {
             this.processed = true;
 
             return;

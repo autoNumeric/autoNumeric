@@ -2,7 +2,7 @@
  *               AutoNumeric.js
  *
  * @version      4.5.1
- * @date         2018-10-28 UTC 07:14
+ * @date         2018-10-28 UTC 08:20
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -6305,7 +6305,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         formula     = formula.replace(/^\s*=/, ''); // Remove all the leading whitespaces and the equal sign from the formula
         let result;
         try {
-            const ast = new Parser(formula);
+            const ast = new Parser(formula, this.settings.decimalCharacter);
             result    = (new Evaluator()).evaluate(ast);
         } catch (e) {
             // Error when parsing the math expression
@@ -6506,7 +6506,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             }
 
             //TODO Prevent keys to be entered on the left-hand side of the '=' sign?...Or just let the user see what they are wrongly doing?
-            if (/[0-9.+\-*/() ]/.test(this.eventKey)) {
+            if (this.settings.formulaChars.test(this.eventKey)) { // Accept the custom decimal character too
                 return; // Accept the key in the formula (and do not accept the '=' character here again)
             } else {
                 e.preventDefault(); // Reject the key
@@ -7917,6 +7917,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // Using this regex version `^${regex.aNegRegAutoStrip}0*(\\d|$)` entirely clear the input on blur
         settings.stripReg = new RegExp(`^${regex.aNegRegAutoStrip}0*([0-9])`);
+
+        // All the characters that are accepted during the formula mode
+        settings.formulaChars = new RegExp(`[0-9${settings.decimalCharacter}+\\-*/() ]`);
     }
 
     /**
@@ -8038,6 +8041,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             // Additional information that are added to the `settings` object :
             //TODO Find a way to exclude those internal data from the settings object (ideally by using another object, or better yet, class attributes) -->
             allowedAutoStrip                  : true,
+            formulaChars                      : true,
             isNegativeSignAllowed             : true,
             isPositiveSignAllowed             : true,
             mIntNeg                           : true,

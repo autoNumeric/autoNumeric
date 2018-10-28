@@ -8609,6 +8609,26 @@ describe(`The Math expression lexer and parser`, () => {
         expect(() => testParser('(foobar)')).toThrow();
         expect(() => testParser('(45foo)')).toThrow();
     });
+
+    it(`should correctly parse the math expressions with a custom decimal character`, () => {
+        function testParser(text) {
+            const ast = new Parser(text, ',');
+            const result = (new Evaluator()).evaluate(ast);
+
+            return Number(result);
+        }
+
+        expect(testParser('(4+1) * 2 - (104587,23 * 8 - (-7))')).toEqual(-836694.84);
+        expect(testParser('8 * -12,46')).toEqual(-99.68);
+        expect(testParser('1,6')).toEqual(1.6);
+        expect(testParser('-1,6')).toEqual(-1.6);
+        expect(testParser('-1,6 - 1,2')).toEqual(-2.8);
+        expect(testParser('22+ (10 * 2)-2,5')).toEqual(39.5);
+        expect(testParser('22+ (10 * 2)-1,5')).toEqual(40.5);
+        expect(testParser('22+ (10 * 2)-1,5- -0,5')).toEqual(41);
+
+        expect(() => testParser('(4+1) * 2 - (104587.23 * 8 - (-7))')).toThrow();
+    });
 });
 
 

@@ -52,12 +52,14 @@ export default class Parser {
      * Parse the given string, and generate an abstract syntax tree (AST) from the math expression
      *
      * @param {string} text
+     * @param {string} customDecimalCharacter The custom decimal character to use in floats
      * @returns {ASTNode}
      */
-    constructor(text) {
+    constructor(text, customDecimalCharacter = '.') {
         this.text = text;
+        this.decimalCharacter = customDecimalCharacter;
         this.lexer = new Lexer(text);
-        this.token = this.lexer.getNextToken();
+        this.token = this.lexer.getNextToken(this.decimalCharacter);
 
         return this._exp();
     }
@@ -75,13 +77,13 @@ export default class Parser {
         let exprNode;
         switch (this.token.type) {
             case '+':
-                this.token = this.lexer.getNextToken();
+                this.token = this.lexer.getNextToken(this.decimalCharacter);
                 termNode = this._term();
                 exprNode = this._moreExp();
 
                 return ASTNode.createNode('op_+', exprNode, termNode);
             case '-':
-                this.token = this.lexer.getNextToken();
+                this.token = this.lexer.getNextToken(this.decimalCharacter);
                 termNode = this._term();
                 exprNode = this._moreExp();
 
@@ -104,13 +106,13 @@ export default class Parser {
         let termsNode;
         switch (this.token.type) {
             case '*':
-                this.token = this.lexer.getNextToken();
+                this.token = this.lexer.getNextToken(this.decimalCharacter);
                 factorNode = this._factor();
                 termsNode = this._moreTerms();
 
                 return ASTNode.createNode('op_*', termsNode, factorNode);
             case '/':
-                this.token = this.lexer.getNextToken();
+                this.token = this.lexer.getNextToken(this.decimalCharacter);
                 factorNode = this._factor();
                 termsNode = this._moreTerms();
 
@@ -127,16 +129,16 @@ export default class Parser {
         switch (this.token.type) {
             case 'num':
                 value = this.token.value;
-                this.token = this.lexer.getNextToken();
+                this.token = this.lexer.getNextToken(this.decimalCharacter);
 
                 return ASTNode.createLeaf(value);
             case '-':
-                this.token = this.lexer.getNextToken();
+                this.token = this.lexer.getNextToken(this.decimalCharacter);
                 factor = this._factor();
 
                 return ASTNode.createUnaryNode(factor);
             case '(':
-                this.token = this.lexer.getNextToken();
+                this.token = this.lexer.getNextToken(this.decimalCharacter);
                 expression = this._exp();
                 this._match(')');
 
@@ -150,7 +152,7 @@ export default class Parser {
     _match(expected) {
         const index = this.lexer.getIndex() - 1;
         if (this.text[index] === expected) {
-            this.token = this.lexer.getNextToken();
+            this.token = this.lexer.getNextToken(this.decimalCharacter);
         } else {
             throw new Error(`Unexpected token '${this.token.symbol}' at position '${index}' in the match function`);
         }

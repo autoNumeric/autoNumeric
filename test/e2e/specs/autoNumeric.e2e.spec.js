@@ -4242,6 +4242,8 @@ xdescribe('Issue #542', () => {
         input2.click(); // Blur
         expect(browser.getValue(selectors.issue542On)).toEqual('-60,050.84');
     });
+
+    //TODO Add the tests when using a custom `decimalCharacter`
 });
 
 describe('Issue #611', () => {

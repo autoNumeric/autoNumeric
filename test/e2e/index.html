@@ -1040,6 +1040,7 @@
 			<div>
 				<input id="issue_542_off" type="text" placeholder="#542 'off'">
 				<input id="issue_542_on" type="text" placeholder="#542 'on'">
+				<input id="issue_542_on_decimal_char" type="text" placeholder="#542 'on' decimal character">
 			</div>
 		</div>
 	</div>
@@ -2212,6 +2213,7 @@
     //-------------- Issue #542
     new AutoNumeric('#issue_542_on', 1234567.89, { formulaMode: true });
     new AutoNumeric('#issue_542_off', 1234567.89);
+    new AutoNumeric('#issue_542_on_decimal_char', 1234567.89, { formulaMode: true }).french();
 
     //-------------- Issue #611
     new AutoNumeric('#issue_611_html_readonly', { readOnly: false });

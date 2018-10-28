@@ -2,6 +2,8 @@
 
 ### 4.5.1
 + Fixes #611 The html `readonly` attribute is ignored on initial load
++ Fix how readonly and disabled inputs should not process keyboard events
++ Fix the formula mode so that the custom decimal character set with `decimalCharacter` is used instead of the default `'.'` character when writing float numbers
 
 ### 4.5.0
 + Closes #542 Allow basic calculations when entering expressions like `=12*78`

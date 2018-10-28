@@ -61,9 +61,10 @@ export default class Lexer {
     /**
      * Return the next token object
      *
+     * @param {string} decimalCharacter The decimal character to use in the float numbers
      * @returns {Token}
      */
-    getNextToken() {
+    getNextToken(decimalCharacter = '.') {
         this._skipSpaces();
 
         // Test for the end of text
@@ -76,7 +77,7 @@ export default class Lexer {
         // If the current character is a digit read a number
         if (AutoNumericHelper.isDigit(this.text[this.index])) {
             this.token.type  = 'num';
-            this.token.value = this._getNumber();
+            this.token.value = this._getNumber(decimalCharacter);
 
             return this.token;
         }
@@ -105,10 +106,12 @@ export default class Lexer {
     /**
      * Return the integer or float number starting from the `this.index` string index
      *
+     * @param {string} decimalCharacter The decimal character to use in the float numbers
+     *
      * @returns {string}
      * @private
      */
-    _getNumber() {
+    _getNumber(decimalCharacter) {
         this._skipSpaces();
 
         const startIndex = this.index;
@@ -116,18 +119,19 @@ export default class Lexer {
             this.index++;
         }
 
-        if (this.text[this.index] === '.') {
+        if (this.text[this.index] === decimalCharacter) {
             this.index++;
         }
 
-        while (this.index <= this.textLength && AutoNumericHelper.isDigit(this.text[this.index])) { // Decimal part
+        while (this.index <= this.textLength && AutoNumericHelper.isDigit(this.text[this.index])) { // Decimal part, if any
             this.index++;
         }
 
-        if (this.index - startIndex === 0) {
+        if (this.index === startIndex) {
             throw new Error(`No number has been found while it was expected`);
         }
 
-        return this.text.substring(startIndex, this.index);
+        // Convert the localized float number to a Javascript number
+        return this.text.substring(startIndex, this.index).replace(decimalCharacter, '.');
     }
 }

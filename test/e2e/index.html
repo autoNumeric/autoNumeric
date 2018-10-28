@@ -1043,6 +1043,17 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #611</p>
+			<div>
+				<input id="issue_611_html_readonly" type="text" placeholder="#611 html read-only" readonly value="224466.88">
+				<input id="issue_611_option_readonly" type="text" placeholder="#611 option read-only" value="11224466.88">
+				<input id="issue_611_html_and_option_readonly" type="text" placeholder="#611 both ro" readonly value="4466.88">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -2201,6 +2212,11 @@
     //-------------- Issue #542
     new AutoNumeric('#issue_542_on', 1234567.89, { formulaMode: true });
     new AutoNumeric('#issue_542_off', 1234567.89);
+
+    //-------------- Issue #611
+    new AutoNumeric('#issue_611_html_readonly', { readOnly: false });
+    new AutoNumeric('#issue_611_option_readonly',  { readOnly: true });
+    new AutoNumeric('#issue_611_html_and_option_readonly', { readOnly: true });
 </script>
 </body>
 </html>

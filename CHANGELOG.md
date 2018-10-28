@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.5.1
++ Fixes #611 The html `readonly` attribute is ignored on initial load
+
 ### 4.5.0
 + Closes #542 Allow basic calculations when entering expressions like `=12*78`
   + Introduces the *formula mode* which allows a user to enter a math expression in the element using the `=` key, then evaluate it with the `Enter` one

@@ -224,6 +224,9 @@ const selectors = {
     issue594Right                     : '#issue_594_right',
     issue542On                        : '#issue_542_on',
     issue542Off                       : '#issue_542_off',
+    issue611HtmlReadOnly              : '#issue_611_html_readonly',
+    issue611OptionReadOnly            : '#issue_611_option_readonly',
+    issue611HtmlAndOptionReadOnly     : '#issue_611_html_and_option_readonly',
 };
 
 //-----------------------------------------------------------------------------
@@ -4240,5 +4243,50 @@ xdescribe('Issue #542', () => {
         expect(browser.getValue(selectors.issue542On)).toEqual('-60,050.84');
     });
 });
+
+describe('Issue #611', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect(browser.getValue(selectors.issue611HtmlReadOnly)).toEqual('224,466.88');
+        expect(browser.getValue(selectors.issue611OptionReadOnly)).toEqual('11,224,466.88');
+        expect(browser.getValue(selectors.issue611HtmlAndOptionReadOnly)).toEqual('4,466.88');
+    });
+
+    it(`should not allow entering anything in an element set read-only via its html attribute`, () => {
+        const input = $(selectors.issue611HtmlReadOnly);
+        input.click();
+        browser.keys(['Home', '1']);
+        expect(browser.getValue(selectors.issue611HtmlReadOnly)).toEqual('224,466.88');
+    });
+
+    xit(`should allow modifying the element value if the html read-only attribute is removed dynamically`, () => {
+        const input = $(selectors.issue611HtmlReadOnly);
+        input.click();
+        browser.keys(['Home', '1']);
+        expect(browser.getValue(selectors.issue611HtmlReadOnly)).toEqual('224,466.88');
+        browser.execute(domId => { document.querySelector(domId).readOnly = false; }, selectors.issue611HtmlReadOnly);
+        browser.keys(['Home', '1']);
+        expect(browser.getValue(selectors.issue611HtmlReadOnly)).toEqual('1,224,466.88'); //FIXME Fails on Chrome only; there is a bug in the selenium chromedriver
+    });
+
+    it(`should still not allow modifying the element value if the html read-only attribute is removed dynamically, but the \`readOnly\` option is set to \`true\``, () => {
+        const input = $(selectors.issue611HtmlAndOptionReadOnly);
+        input.click();
+        browser.keys(['Home', '1']);
+        expect(browser.getValue(selectors.issue611HtmlAndOptionReadOnly)).toEqual('4,466.88');
+        browser.execute(domId => { document.querySelector(domId).readOnly = false; }, selectors.issue611HtmlAndOptionReadOnly);
+        browser.keys(['Home', '1']);
+        expect(browser.getValue(selectors.issue611HtmlAndOptionReadOnly)).toEqual('4,466.88');
+    });
+
+    it(`should not allow entering anything in an element set read-only via the AutoNumeric \`readOnly\` option`, () => {
+        const input = $(selectors.issue611OptionReadOnly);
+        input.click();
+        browser.keys(['Home', '1']);
+        expect(browser.getValue(selectors.issue611OptionReadOnly)).toEqual('11,224,466.88');
+    });
+});
+
 
 //TODO Add some tests to make sure the correct number of `AutoNumeric.events.formatted` is sent during each keypress

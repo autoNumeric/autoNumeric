@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.5.0
- * @date         2018-10-13 UTC 01:16
+ * @version      4.5.1
+ * @date         2018-10-28 UTC 07:14
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -170,7 +170,7 @@ export default class AutoNumeric {
                 this._createEventListeners();
             }
 
-            this._setWritePermissions();
+            this._setWritePermissions(true);
         }
 
         // Save the initial values (html attribute + element.value) for the pristine test
@@ -909,7 +909,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.5.0';
+        return '4.5.1';
     }
 
     /**
@@ -1468,11 +1468,13 @@ export default class AutoNumeric {
 
     /**
      * Set the DOM element write permissions according to the current settings, by setting the `readonly` or `contenteditable` attributes depending of its tag type.
+     * If the `useHtmlAttribute` parameter is set to `true`, then the `readonly` html attribute is used and has precedence over the `readOnly` option to set the element as read-only.
      *
+     * @param {boolean} useHtmlAttribute If set to `true`, then the write permissions are set by taking into account the html 'readonly' attribute, even if the `readOnly` option is set to false
      * @private
      */
-    _setWritePermissions() {
-        if (this.settings.readOnly) {
+    _setWritePermissions(useHtmlAttribute = false) {
+        if ((useHtmlAttribute && this.domElement.readOnly) || this.settings.readOnly) {
             this._setReadOnly();
         } else {
             this._setReadWrite();

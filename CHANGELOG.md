@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.5.2
++ Fixes #621 The `autoNumeric:formatted` event should be triggered when the input field is cleared while continuously pressing the `Backspace` or `Delete`keys
+
 ### 4.5.1
 + Fixes #611 The html `readonly` attribute is ignored on initial load
 + Fix how readonly and disabled inputs should not process keyboard events

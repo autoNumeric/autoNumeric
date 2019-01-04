@@ -1055,6 +1055,15 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #621</p>
+			<div>
+				<input id="issue_621" type="text" placeholder="#621" value="662736.82">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     //-------------- Classic input
@@ -2219,6 +2228,26 @@
     new AutoNumeric('#issue_611_html_readonly', { readOnly: false });
     new AutoNumeric('#issue_611_option_readonly',  { readOnly: true });
     new AutoNumeric('#issue_611_html_and_option_readonly', { readOnly: true });
+
+    //-------------- Issue #621
+    const issue621an = new AutoNumeric('#issue_621');
+    const issue621 = document.querySelector("#issue_621");
+    let backspaceCounter = 0;
+    issue621.addEventListener('keydown', e => {
+        if (e.keyCode === 8) {
+            backspaceCounter++;
+            console.log(`keydown Backspace ${backspaceCounter}`);
+        }
+    });
+    issue621.addEventListener('input', () => {
+        console.log(`${backspaceCounter} : input`);
+    });
+    issue621.addEventListener('keyup', () => {
+        console.log(`${backspaceCounter} : keyup`);
+    });
+    issue621.addEventListener("autoNumeric:formatted", () => {
+        console.log(`===> Formatted: ${issue621an.getFormatted()}`);
+    });
 </script>
 </body>
 </html>

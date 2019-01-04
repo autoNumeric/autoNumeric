@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.5.1
- * @date         2018-10-28 UTC 08:20
+ * @version      4.5.2
+ * @date         2019-01-04 UTC 09:20
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -909,7 +909,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.5.1';
+        return '4.5.2';
     }
 
     /**
@@ -6356,9 +6356,16 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * - keydown
      * - keyup
      *
-     * If 'delete' or 'backspace' is entered, the following events are sent :
+     * If 'delete' or 'backspace' are entered 'normally', the following events are sent :
      * - keydown
      * - input
+     * - keyup
+     *
+     * If 'delete' or 'backspace' are entered continuously (with the key still pressed), the following events are sent :
+     * - keydown
+     * - input
+     * [- keydown
+     * - input] x times
      * - keyup
      *
      * If 'enter' is entered and the value has not changed, the following events are sent :
@@ -6397,6 +6404,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this._updateEventKeyInfo(e);
         this.initialValueOnKeydown = AutoNumericHelper.getElementValue(e.target); // This is needed in `onKeyup()` to check if the value as changed during the key press
         this.initialRawValueOnKeydown = this.rawValue;
+
+        this.keydownEventCounter += 1; // Every time the keydown event is caught, increment the counter to keep track if the key is continuously pressed
+        if (this.keydownEventCounter === 1) {
+            this.initialRawValueOnFirstKeydown = this.rawValue;
+        }
 
         if (this.formulaMode) {
             if (this.eventKey === AutoNumericEnum.keyName.Esc) { // Cancel the formula
@@ -6568,6 +6580,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      */
     _onKeyup(e) {
         this.isEditing = false;
+        const multipleKeydownEvents = this.keydownEventCounter > 1;
+        this.keydownEventCounter = 0; // Reset the keydown events counter
 
         if (this.formulaMode) {
             return;
@@ -6632,7 +6646,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         const skip = this._processNonPrintableKeysAndShortcuts(e);
         delete this.valuePartsBeforePaste;
         const targetValue = AutoNumericHelper.getElementValue(e.target);
-        if (skip || targetValue === '') {
+        if (skip || !multipleKeydownEvents && targetValue === '') { // When the user keeps pressing the backspace or delete key, and end up deleting the entire input text, then the target value is equal to '', but we shouldn't `return` without first testing what was the initial value when the user started pressing any key (cf. issue #621)
             return;
         }
 
@@ -6665,7 +6679,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this._saveRawValueForAndroid();
 
         // If the input value has changed during the key press event chain, an event is sent to alert that a formatting has been done (cf. Issue #187)
-        if (targetValue !== this.initialValueOnKeydown) {
+        if ((multipleKeydownEvents && targetValue !== this.initialRawValueOnFirstKeydown) || // If multiple keydown events are detected, then we need to check the rawValue saved on the very first event
+            targetValue !== this.initialValueOnKeydown) {
             this._triggerEvent(AutoNumeric.events.formatted, e.target, {
                 oldValue   : this.initialValueOnKeydown,
                 newValue   : targetValue,

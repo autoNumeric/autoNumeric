@@ -868,12 +868,12 @@ function freezeOptions(options) {
         if (optionName === 'valuesToStrings') {
             const vsProps = Object.getOwnPropertyNames(options.valuesToStrings);
             vsProps.forEach(valuesToStringObjectName => {
-                if (!AutoNumericHelper.isIE11() || options.valuesToStrings[valuesToStringObjectName] !== null) {
+                if (!AutoNumericHelper.isIE11() && options.valuesToStrings[valuesToStringObjectName] !== null) {
                     Object.freeze(options.valuesToStrings[valuesToStringObjectName]);
                 }
             });
         } else if (optionName !== 'styleRules') {
-            if (!AutoNumericHelper.isIE11() || options[optionName] !== null) {
+            if (!AutoNumericHelper.isIE11() && options[optionName] !== null) {
                 Object.freeze(options[optionName]);
             }
         }

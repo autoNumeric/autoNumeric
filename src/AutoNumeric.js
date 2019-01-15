@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.5.3
+ * @version      4.5.4
  * @date         2019-01-05 UTC 07:40
  *
  * @authors      Bob Knothe, Alexandre Bonneau
@@ -909,7 +909,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.5.3';
+        return '4.5.4';
     }
 
     /**
@@ -3839,8 +3839,9 @@ export default class AutoNumeric {
             AutoNumeric.options.digitGroupSeparator.apostrophe,
             AutoNumeric.options.digitGroupSeparator.arabicThousandsSeparator,
             AutoNumeric.options.digitGroupSeparator.dotAbove,
+            AutoNumeric.options.digitGroupSeparator.privateUseTwo,
         ])) {
-            AutoNumericHelper.throwError(`The thousand separator character option 'digitGroupSeparator' is invalid ; it should be ',', '.', '٬', '˙', "'", ' ', '\u2009', '\u202f', '\u00a0' or empty (''), [${options.digitGroupSeparator}] given.`);
+            AutoNumericHelper.throwError(`The thousand separator character option 'digitGroupSeparator' is invalid ; it should be ',', '.', '٬', '˙', "'", '\u0092', ' ', '\u2009', '\u202f', '\u00a0' or empty (''), [${options.digitGroupSeparator}] given.`);
         }
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.showOnlyNumbersOnFocus) && !AutoNumericHelper.isBoolean(options.showOnlyNumbersOnFocus)) {

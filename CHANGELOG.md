@@ -1,5 +1,11 @@
 ## Changelog for autoNumeric
 
+### 4.5.4
++ Fixes #626 Missing the `\u0092` digit group separator
+
+### 4.5.3
++ Fixes #622 `freezeOptions()` can create issues in some browsers
+
 ### 4.5.2
 + Fixes #621 The `autoNumeric:formatted` event should be triggered when the input field is cleared while continuously pressing the `Backspace` or `Delete`keys
 

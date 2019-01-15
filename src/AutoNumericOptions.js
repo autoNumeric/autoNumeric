@@ -262,6 +262,7 @@ AutoNumeric.options = {
         apostrophe              : `'`,
         arabicThousandsSeparator: '٬',
         dotAbove                : '˙',
+        privateUseTwo           : '’', // \u0092
     },
 
     /* The `divisorWhenUnfocused` divide the element value on focus.

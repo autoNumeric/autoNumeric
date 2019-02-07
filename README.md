@@ -1101,7 +1101,8 @@ For integration with [PHP](http://php.net/) Yii2, take a look at the [extead/yii
 For integration into Javascript frameworks, you can use:
 - Vue.js with the [vue-autonumeric component](https://github.com/autoNumeric/vue-autoNumeric),
 - React with the [react-numeric component](https://github.com/mkg0/react-numeric),
-- Angular with the [angular-currency](https://github.com/BuffCoder/angular-currency) directive,
+- Angular with the [ng-autonumeric](https://github.com/angularfy/ng-autonumeric),
+- AngularJS with the [angular-currency](https://github.com/BuffCoder/angular-currency) directive,
 - Meteor with [meteor-autonumeric](https://github.com/gibson/meteor-autonumeric), and
 - Ember with [ember-autonumeric](https://github.com/ykaragol/ember-autonumeric).
 

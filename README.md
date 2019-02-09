@@ -150,7 +150,7 @@ Simply include **autoNumeric** in your html `<header>` tag.<br>No other files or
 ```html
 <script src="autoNumeric.min.js" type="text/javascript"></script>
 <!-- ...or, you may also directly use a CDN :-->
-<script src="https://cdn.jsdelivr.net/npm/autonumeric@4.1.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/autonumeric@4.5.4"></script>
 <!-- ...or -->
 <script src="https://unpkg.com/autonumeric"></script>
 ```

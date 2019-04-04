@@ -984,7 +984,7 @@
                         }
                     }
                     if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1 && $this.text() !== '') {
-                        $this.autoNumeric('set', $this.text());
+                        $this.autoNumeric('set', $this.text().replace(/(?:\r\n|\r|\n)\s+/g, ''));
                     }
                 }
                 settings.runOnce = true;

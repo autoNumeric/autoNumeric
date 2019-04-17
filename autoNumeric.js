@@ -2,7 +2,7 @@
  * autoNumeric.js
  * @author: Bob Knothe
  * @author: Sokolov Yura
- * @version: 1.9.46 - 2016-09-11 GMT 10:00 PM / 22:00
+ * @version: 1.9.47 - 2019-04-16 6h03 UTC
  *
  * Created by Robert J. Knothe on 2010-10-25. Please report any bugs to https://github.com/BobKnothe/autoNumeric
  * Contributor by Sokolov Yura on 2010-11-07
@@ -984,7 +984,7 @@
                         }
                     }
                     if ($.inArray($this.prop('tagName').toLowerCase(), settings.tagList) !== -1 && $this.text() !== '') {
-                        $this.autoNumeric('set', $this.text());
+                        $this.autoNumeric('set', $this.text().trim());
                     }
                 }
                 settings.runOnce = true;

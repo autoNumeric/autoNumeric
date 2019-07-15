@@ -25,6 +25,7 @@ module.exports = {
         library      : 'AutoNumeric',
         filename     : 'autoNumeric.js',
         path         : resolve('dist'),
+        globalObject : 'this',
     },
     resolve: {
         extensions: [

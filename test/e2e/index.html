@@ -1066,6 +1066,10 @@
 	</div>
 </div>
 <script>
+	console.log(`-------------------------------------------`);
+	console.log(`Testing AutoNumeric version ${AutoNumeric.version()}.`);
+	console.log(`-------------------------------------------`);
+
     //-------------- Classic input
     const classicInput = document.querySelector('#classic');
     classicInput.addEventListener('keydown', (e) => { console.warn('-- Classic "keydown" thrown', e.keyCode, e.key, `'${String.fromCharCode(e.keyCode)}'`); }, false);

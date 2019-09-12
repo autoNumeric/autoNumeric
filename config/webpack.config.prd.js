@@ -48,7 +48,7 @@ const webpackConfig = merge(baseWebpackConfig, {
                         comments: false,
                         preamble: `/**
  * AutoNumeric.js v${version}
- * © 2009-2018 Robert J. Knothe, Alexandre Bonneau
+ * © 2009-2019 Robert J. Knothe, Alexandre Bonneau
  * Released under the MIT License.
  */`
                     },
@@ -74,7 +74,7 @@ const webpackConfig = merge(baseWebpackConfig, {
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
 webpackConfig.plugins.push(
     new CompressionWebpackPlugin({
-        asset    : '[path].gz[query]',
+        filename : '[path].gz[query]',
         algorithm: 'gzip',
         test     : new RegExp('\\.(js)$'),
         threshold: 10240,

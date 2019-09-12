@@ -1,5 +1,16 @@
 ## Changelog for autoNumeric
 
+### 4.5.6
++ Fix #602 Numpad decimal separator does not work on IE11 with a keyboard whose numpad decimal key outputs a comma
++ Adds a reference for the Angular 4+ implementation `ng-angular` component in the README
+
+### 4.5.5
++ Update the dev dependencies, fix the unit and end-to-end tests  
++ Update the Babel version and fix the related configuration files
++ Update the Karma version and fix the related configuration files
++ Update the Webdriver.io version and fix the related configuration files
++ Update the Webpack version and fix the related configuration files
+
 ### 4.5.4
 + Fixes #626 Missing the `\u0092` digit group separator
 

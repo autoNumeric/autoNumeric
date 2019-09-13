@@ -1106,7 +1106,7 @@ export default class AutoNumeric {
      * @private
      */
     static _isPreDefinedOptionValid(preDefinedOptionName) {
-        return AutoNumeric.predefinedOptions.hasOwnProperty(preDefinedOptionName);
+        return Object.prototype.hasOwnProperty.call(AutoNumeric.predefinedOptions, preDefinedOptionName);
     }
 
     /**
@@ -4176,19 +4176,19 @@ export default class AutoNumeric {
 
         if (!AutoNumericHelper.isNull(options.styleRules) &&
             !(AutoNumericHelper.isObject(options.styleRules) &&
-            ((options.styleRules.hasOwnProperty('positive') ||
-            options.styleRules.hasOwnProperty('negative') ||
-            options.styleRules.hasOwnProperty('ranges') ||
-            options.styleRules.hasOwnProperty('userDefined'))))) {
+            ((Object.prototype.hasOwnProperty.call(options.styleRules, 'positive') ||
+            Object.prototype.hasOwnProperty.call(options.styleRules, 'negative') ||
+            Object.prototype.hasOwnProperty.call(options.styleRules, 'ranges') ||
+            Object.prototype.hasOwnProperty.call(options.styleRules, 'userDefined'))))) {
             AutoNumericHelper.throwError(`The option 'styleRules' is invalid ; it should be a correctly structured object, with one or more 'positive', 'negative', 'ranges' or 'userDefined' attributes, [${options.styleRules}] given.`);
         }
 
         // Deeper tests of the `styleRules` object : Check that the callback, if defined, is a function
         if (!AutoNumericHelper.isNull(options.styleRules) &&
-            options.styleRules.hasOwnProperty('userDefined') &&
+            Object.prototype.hasOwnProperty.call(options.styleRules, 'userDefined') &&
             !AutoNumericHelper.isNull(options.styleRules.userDefined)) {
             options.styleRules.userDefined.forEach(rule => {
-                if (rule.hasOwnProperty('callback') && !AutoNumericHelper.isFunction(rule.callback)) {
+                if (Object.prototype.hasOwnProperty.call(rule, 'callback') && !AutoNumericHelper.isFunction(rule.callback)) {
                     AutoNumericHelper.throwError(`The callback defined in the \`userDefined\` attribute is not a function, ${typeof rule.callback} given.`);
                 }
             });
@@ -4613,7 +4613,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         if (!this.isManagedByAutoNumeric(domElement)) {
             let showWarnings;
-            if (!AutoNumericHelper.isNull(options) && options.hasOwnProperty('showWarnings')) {
+            if (!AutoNumericHelper.isNull(options) && Object.prototype.hasOwnProperty.call(options, 'showWarnings')) {
                 showWarnings = options.showWarnings;
             } else {
                 showWarnings = true;
@@ -4837,7 +4837,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     _runCallbacksFoundInTheSettingsObject() { //FIXME test this
         // Loops through the this.settings object (option array) to find the following
         for (const key in this.settings) {
-            if (this.settings.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(this.settings, key)) {
                 const value = this.settings[key];
 
                 if (typeof value === 'function') {
@@ -7943,7 +7943,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      */
     _transformOptionsValuesToDefaultTypes() {
         for (const key in this.settings) {
-            if (this.settings.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(this.settings, key)) {
                 const value = this.settings[key];
 
                 // Convert the strings 'true' and 'false' to booleans
@@ -8069,13 +8069,13 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         };
 
         for (const option in options) {
-            if (options.hasOwnProperty(option)) {
+            if (Object.prototype.hasOwnProperty.call(options, option)) {
                 if (oldOptionsConverter[option] === true) {
                     // If the option is a 'new' option, we continue looping
                     continue;
                 }
 
-                if (oldOptionsConverter.hasOwnProperty(option)) {
+                if (Object.prototype.hasOwnProperty.call(oldOptionsConverter, option)) {
                     // Else we have an 'old' option name
                     AutoNumericHelper.warning(`You are using the deprecated option name '${option}'. Please use '${oldOptionsConverter[option]}' instead from now on. The old option name will be dropped very soon™.`, true);
 
@@ -9263,13 +9263,13 @@ AutoNumeric.multiple = (arg1, initialValue = null, options = null) => {
     if (AutoNumericHelper.isString(arg1)) {
         arg1 = [... document.querySelectorAll(arg1)]; // Convert a NodeList to an Array (cf. http://stackoverflow.com/a/37297292/2834898)
     } else if (AutoNumericHelper.isObject(arg1)) {
-        if (!arg1.hasOwnProperty('rootElement')) {
+        if (!Object.prototype.hasOwnProperty.call(arg1, 'rootElement')) {
             AutoNumericHelper.throwError(`The object passed to the 'multiple' function is invalid ; no 'rootElement' attribute found.`);
         }
 
         // Retrieve the DOM element list from the given <form> element
         const elements = [... arg1.rootElement.querySelectorAll('input')];
-        if (arg1.hasOwnProperty('exclude')) {
+        if (Object.prototype.hasOwnProperty.call(arg1, 'exclude')) {
             if (!Array.isArray(arg1.exclude)) {
                 AutoNumericHelper.throwError(`The 'exclude' array passed to the 'multiple' function is invalid.`);
             }

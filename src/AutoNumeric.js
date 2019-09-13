@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.5.6
- * @date         2019-09-12 UTC 19:30
+ * @version      4.5.7
+ * @date         2019-09-13 UTC 07:47
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -113,7 +113,7 @@ export default class AutoNumeric {
         this._checkElement();
 
         // Store the additional attributes inside the AutoNumeric object
-        // Note: This variable is needed and not a duplicate of `initialValueOnKeydown` nor `valueOnFocus` since it serves a different purpose and has a different lifecycle
+        // Note: This variable is needed and not a duplicate of `initialValueOnFirstKeydown` nor `valueOnFocus` since it serves a different purpose and has a different lifecycle
         this.savedCancellableValue = null;
 
         // Initialize the undo/redo variables
@@ -909,7 +909,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.5.6';
+        return '4.5.7';
     }
 
     /**
@@ -6403,11 +6403,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         this._updateEventKeyInfo(e);
-        this.initialValueOnKeydown = AutoNumericHelper.getElementValue(e.target); // This is needed in `onKeyup()` to check if the value as changed during the key press
-        this.initialRawValueOnKeydown = this.rawValue;
 
         this.keydownEventCounter += 1; // Every time the keydown event is caught, increment the counter to keep track if the key is continuously pressed
         if (this.keydownEventCounter === 1) {
+            this.initialValueOnFirstKeydown = AutoNumericHelper.getElementValue(e.target); // This is needed in `onKeyup()` to check if the value as changed during the key press
             this.initialRawValueOnFirstKeydown = this.rawValue;
         }
 
@@ -6581,7 +6580,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      */
     _onKeyup(e) {
         this.isEditing = false;
-        const multipleKeydownEvents = this.keydownEventCounter > 1;
         this.keydownEventCounter = 0; // Reset the keydown events counter
 
         if (this.formulaMode) {
@@ -6647,7 +6645,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         const skip = this._processNonPrintableKeysAndShortcuts(e);
         delete this.valuePartsBeforePaste;
         const targetValue = AutoNumericHelper.getElementValue(e.target);
-        if (skip || !multipleKeydownEvents && targetValue === '') { // When the user keeps pressing the backspace or delete key, and end up deleting the entire input text, then the target value is equal to '', but we shouldn't `return` without first testing what was the initial value when the user started pressing any key (cf. issue #621)
+        if (skip || targetValue === '' && this.initialValueOnFirstKeydown === '') { // If the user enters skippable keys, or keeps deleting/backspacing into the empty input, no 'formatted' event are sent (cf. issue #621)
             return;
         }
 
@@ -6680,12 +6678,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this._saveRawValueForAndroid();
 
         // If the input value has changed during the key press event chain, an event is sent to alert that a formatting has been done (cf. Issue #187)
-        if ((multipleKeydownEvents && targetValue !== this.initialRawValueOnFirstKeydown) || // If multiple keydown events are detected, then we need to check the rawValue saved on the very first event
-            targetValue !== this.initialValueOnKeydown) {
+        if (targetValue !== this.initialValueOnFirstKeydown) { // Checking the value that were saved after the very first keydown event ensure that the 'formatted' event will be sent even if the user continuously press the Delete/Backspace key
             this._triggerEvent(AutoNumeric.events.formatted, e.target, {
-                oldValue   : this.initialValueOnKeydown,
+                oldValue   : this.initialValueOnFirstKeydown,
                 newValue   : targetValue,
-                oldRawValue: this.initialRawValueOnKeydown,
+                oldRawValue: this.initialRawValueOnFirstKeydown,
                 newRawValue: this.rawValue,
                 isPristine : this.isPristine(false),
                 error      : null,
@@ -8218,7 +8215,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     static _toNumericValue(value, settings) {
         //XXX Note; this function is static since we need to pass a `settings` object when calling the static `AutoNumeric.format()` method
         let result;
-        if (AutoNumericHelper.isNumber(Number(value))) {
+        if (AutoNumericHelper.isNumber(Number(value))) { // if (settings.decimalCharacter === '.' && AutoNumericHelper.isNumber(Number(value))) {
             // The value has either already been stripped, or a 'real' javascript number is passed as a parameter
             result = AutoNumericHelper.scientificToDecimal(value);
         } else {
@@ -9289,7 +9286,7 @@ AutoNumeric.multiple = (arg1, initialValue = null, options = null) => {
             showWarnings = options.showWarnings;
         }
 
-        AutoNumericHelper.warning(`No valid DOM elements were given hence no AutoNumeric object were instantiated.`, showWarnings);
+        AutoNumericHelper.warning(`No valid DOM elements were given hence no AutoNumeric objects were instantiated.`, showWarnings);
 
         return [];
     }

@@ -2238,9 +2238,10 @@
     const issue621 = document.querySelector("#issue_621");
     let backspaceCounter = 0;
     issue621.addEventListener('keydown', e => {
+        console.log(`${backspaceCounter} : keydown`);
         if (e.keyCode === 8) {
             backspaceCounter++;
-            console.log(`keydown Backspace ${backspaceCounter}`);
+            console.log(`keydown Backspace ${backspaceCounter}[${issue621an.keydownEventCounter}]{${issue621an.initialRawValueOnFirstKeydown}}`);
         }
     });
     issue621.addEventListener('input', () => {

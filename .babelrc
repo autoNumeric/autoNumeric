@@ -1,10 +1,9 @@
 {
 	"presets": [
-		"env"
+		"@babel/preset-env"
 	],
 	"plugins": [
-		"add-module-exports",
-		"transform-object-assign"
+		"@babel/plugin-transform-object-assign"
 	],
 	"comments": true,
 	"sourceMaps": true,

@@ -67,7 +67,7 @@ exports.config = {
     // e.g. using promises you can set the sync option to false.
     sync: true,
 
-    // Level of logging verbosity: silent | verbose | command | data | result | error
+    // Level of logging verbosity: trace | debug | info | warn | error | silent
     logLevel: 'silent',
 
     // Enables colors for log output.
@@ -143,10 +143,10 @@ exports.config = {
     seleniumLogs       : 'test/e2e/selenium.log',
     //XXX Using the latest v3.0.1 make the tests crash under Firefox. This is tracked here : https://github.com/SeleniumHQ/selenium/issues/2285
     seleniumInstallArgs: {
-        version: '2.53.1',
+        version: '3.141.5',
     },
     seleniumArgs       : {
-        version: '2.53.1',
+        version: '3.141.5',
     },
 
     // Framework you want to run your specs with.
@@ -206,7 +206,7 @@ exports.config = {
     // },
     before() {
         // This allows to run babel before running the tests
-        require('babel-register');
+        require('@babel/register');
     },
 
     // Hook that gets executed before the suite starts

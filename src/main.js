@@ -2,7 +2,7 @@
  * Babel + Webpack workaround for autoNumeric
  *
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
- * @copyright © 2017 Alexandre Bonneau
+ * @copyright © 2019 Alexandre Bonneau
  *
  * The MIT License (http://www.opensource.org/licenses/mit-license.php)
  *
@@ -38,6 +38,8 @@ import AutoNumericPredefinedOptions from './AutoNumericPredefinedOptions';
 
 /**
  * This file serve as the main entry point to the library.
+ *
+ * This is needed since if the Webpack entrypoint is set to `./src/AutoNumeric.js`, then the AutoNumericEvents, AutoNumericOptions, AutoNumericDefaultSettings and AutoNumericPredefinedOptions files are not included in the bundle and therefore cannot be used.
  *
  * @type {AutoNumeric}
  */

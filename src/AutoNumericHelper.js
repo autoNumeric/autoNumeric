@@ -205,7 +205,7 @@ export default class AutoNumericHelper {
      */
     static isIE11() {
         // noinspection JSUnresolvedVariable
-        return !!window.MSInputMethodContext && !!document.documentMode;
+        return typeof window !== 'undefined' && !!window.MSInputMethodContext && !!document.documentMode;
     }
 
     /**

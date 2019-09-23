@@ -146,7 +146,7 @@ describe('The AutoNumeric object', () => {
             let i = 0;
             for (const prop in defaultSettings) {
                 i++;
-                if (defaultSettings.hasOwnProperty(prop)) {
+                if (Object.prototype.hasOwnProperty.call(defaultSettings, prop)) {
                     if (defaultSettings[prop] !== defaultOption[prop]) {
                         console.log(`${i}: Setting ${prop} = [${defaultSettings[prop]}][${defaultOption[prop]}]`); //DEBUG
                     }
@@ -236,9 +236,9 @@ describe('The AutoNumeric object', () => {
             let i = 0;
             for (const lang in defaultLanguageOption) { //XXX Here I test only this language subset
                 i++;
-                if (predefinedLanguages.hasOwnProperty(lang)) {
+                if (Object.prototype.hasOwnProperty.call(predefinedLanguages, lang)) {
                     for (const prop in predefinedLanguages[lang]) {
-                        if (predefinedLanguages[lang].hasOwnProperty(prop)) {
+                        if (Object.prototype.hasOwnProperty.call(predefinedLanguages[lang], prop)) {
                             if (predefinedLanguages[lang][prop] !== defaultLanguageOption[lang][prop]) {
                                 console.log(`${i}: Setting ${prop} = [${predefinedLanguages[lang][prop]}][${defaultLanguageOption[lang][prop]}]`); //DEBUG
                             }
@@ -8385,28 +8385,28 @@ describe(`The AutoNumeric event lifecycle`, () => {
                 return event;
             },
             testFormattedEvent(event) {
-                expect(event.detail.hasOwnProperty('oldValue')).toEqual(true);
-                expect(event.detail.hasOwnProperty('newValue')).toEqual(true);
-                expect(event.detail.hasOwnProperty('oldRawValue')).toEqual(true);
-                expect(event.detail.hasOwnProperty('newRawValue')).toEqual(true);
-                expect(event.detail.hasOwnProperty('isPristine')).toEqual(true);
-                expect(event.detail.hasOwnProperty('error')).toEqual(true);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'oldValue')).toEqual(true);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'newValue')).toEqual(true);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'oldRawValue')).toEqual(true);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'newRawValue')).toEqual(true);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'isPristine')).toEqual(true);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'error')).toEqual(true);
                 expect(event.detail.error).toEqual(null);
-                expect(event.detail.hasOwnProperty('aNElement')).toEqual(true);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'aNElement')).toEqual(true);
             },
             rawValueModifiedEvent(event) {
                 // console.log(`rawValueModified called!`); //DEBUG
                 return event;
             },
             testRawValueModifiedEvent(event) {
-                expect(event.detail.hasOwnProperty('oldValue')).toEqual(false);
-                expect(event.detail.hasOwnProperty('newValue')).toEqual(false);
-                expect(event.detail.hasOwnProperty('oldRawValue')).toEqual(true);
-                expect(event.detail.hasOwnProperty('newRawValue')).toEqual(true);
-                expect(event.detail.hasOwnProperty('isPristine')).toEqual(true);
-                expect(event.detail.hasOwnProperty('error')).toEqual(true);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'oldValue')).toEqual(false);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'newValue')).toEqual(false);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'oldRawValue')).toEqual(true);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'newRawValue')).toEqual(true);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'isPristine')).toEqual(true);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'error')).toEqual(true);
                 expect(event.detail.error).toEqual(null);
-                expect(event.detail.hasOwnProperty('aNElement')).toEqual(true);
+                expect(Object.prototype.hasOwnProperty.call(event.detail, 'aNElement')).toEqual(true);
             },
         };
     });

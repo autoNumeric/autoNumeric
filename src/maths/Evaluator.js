@@ -2,7 +2,7 @@
  * Math expression tokenizer/parser/evaluator functions for autoNumeric.js
  *
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
- * @copyright © 2018 Alexandre Bonneau
+ * @copyright © 2019 Alexandre Bonneau
  *
  * The MIT License (http://www.opensource.org/licenses/mit-license.php)
  *

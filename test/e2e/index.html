@@ -1064,6 +1064,18 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #652</p>
+			<div>
+				<input id="issue_652a" type="text" placeholder="#652">
+				<input id="issue_652b" type="text" placeholder="#652" value="1234.0">
+				<input id="issue_652c" type="text" placeholder="#652" value="150.0">
+				<input id="issue_652d" type="text" placeholder="#652">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
 	console.log(`-------------------------------------------`);
@@ -2253,6 +2265,24 @@
     issue621.addEventListener("autoNumeric:formatted", () => {
         console.log(`===> Formatted: ${issue621an.getFormatted()}`);
     });
+
+    //-------------- Issue #652
+    new AutoNumeric('#issue_652a', 150, { allowDecimalPadding: 'floats' });
+    new AutoNumeric('#issue_652b', { allowDecimalPadding: 'floats' });
+    new AutoNumeric('#issue_652c', { allowDecimalPadding: 'floats' });
+
+    const decimalAutonumericOptions = {
+        modifyValueOnWheel         : false,
+        digitGroupSeparator        : '.',
+        decimalCharacter           : ',',
+        decimalPlaces              : 2,
+        maximumValue               : 999999999999,
+        unformatOnSubmit           : true,
+        allowDecimalPadding        : 'floats',
+        decimalCharacterAlternative: '.',
+        formatOnPageLoad           : true,
+    };
+    new AutoNumeric('#issue_652d', 150, decimalAutonumericOptions);
 </script>
 </body>
 </html>

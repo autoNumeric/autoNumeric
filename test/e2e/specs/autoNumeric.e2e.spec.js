@@ -227,6 +227,10 @@ const selectors = {
     issue611HtmlReadOnly              : '#issue_611_html_readonly',
     issue611OptionReadOnly            : '#issue_611_option_readonly',
     issue611HtmlAndOptionReadOnly     : '#issue_611_html_and_option_readonly',
+    issue652a                         : '#issue_652a',
+    issue652b                         : '#issue_652b',
+    issue652c                         : '#issue_652c',
+    issue652d                         : '#issue_652d',
 };
 
 //-----------------------------------------------------------------------------
@@ -4338,6 +4342,17 @@ describe('Issue #611', () => {
         input.click();
         browser.keys(['Home', '1']);
         expect(input.getValue()).toEqual('11,224,466.88');
+    });
+});
+
+describe('Issue #652', () => {
+    it('should test for default values, and respect the `allowDecimalPadding` option set as \'floats\' on load', () => {
+        browser.url(testUrl);
+
+        expect($(selectors.issue652a).getValue()).toEqual('150');
+        expect($(selectors.issue652b).getValue()).toEqual('1,234');
+        expect($(selectors.issue652c).getValue()).toEqual('150');
+        expect($(selectors.issue652d).getValue()).toEqual('150');
     });
 });
 

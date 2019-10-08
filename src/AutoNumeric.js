@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.5.7
- * @date         2019-09-13 UTC 07:47
+ * @version      4.5.8
+ * @date         2019-10-08 UTC 00:34
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -909,7 +909,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.5.7';
+        return '4.5.8';
     }
 
     /**
@@ -5721,14 +5721,15 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         const decimalCharacterPosition = inputValue.lastIndexOf('.');
         const inputValueHasNoDot = decimalCharacterPosition === -1; // No dot character is found in the `inputValue`
-        const [, decimalPart] = inputValue.split('.'); // Here the decimal character is always a period '.'
+        const [integerPart, decimalPart] = inputValue.split('.'); // Here the decimal character is always a period '.'
         const hasDecimals = decimalPart > 0;
 
         // If no decimals are detected
         if (!hasDecimals &&
             (settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.never ||
             settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.floats)) {
-            return (Number(inputValue) === 0) ? inputValue : `${negativeSign}${inputValue}`;
+            // If the value decimalPart is only one or more zeroes, then it needs to be removed from the resulting string (cf. issue #652)
+            return (Number(inputValue) === 0) ? integerPart : `${negativeSign}${integerPart}`;
         }
 
         // Else there are some decimal places that may need to be rounded

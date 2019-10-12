@@ -231,6 +231,8 @@ const selectors = {
     issue652b                         : '#issue_652b',
     issue652c                         : '#issue_652c',
     issue652d                         : '#issue_652d',
+    issue647a                         : '#issue_647a',
+    issue647b                         : '#issue_647b',
 };
 
 //-----------------------------------------------------------------------------
@@ -4353,6 +4355,41 @@ describe('Issue #652', () => {
         expect($(selectors.issue652b).getValue()).toEqual('1,234');
         expect($(selectors.issue652c).getValue()).toEqual('150');
         expect($(selectors.issue652d).getValue()).toEqual('150');
+    });
+});
+
+describe('Issue #647', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect($(selectors.issue647a).getValue()).toEqual('a1 121.00');
+        expect($(selectors.issue647b).getValue()).toEqual('121.00 a1');
+    });
+
+    it(`should enter the number at the correct caret, even when the currency in prefix position contains numbers that are entered by the user`, () => {
+        const input = $(selectors.issue647a);
+        input.click();
+        browser.keys(['1']);
+        expect(input.getValue()).toEqual('a1 1');
+        browser.keys(['2']);
+        expect(input.getValue()).toEqual('a1 12');
+        browser.keys(['3']);
+        expect(input.getValue()).toEqual('a1 123');
+        browser.keys(['4']);
+        expect(input.getValue()).toEqual('a1 1,234');
+    });
+
+    it(`should enter the number at the correct caret, even when the currency in suffix position contains numbers that are entered by the user`, () => {
+        const input = $(selectors.issue647b);
+        input.click();
+        browser.keys(['1']);
+        expect(input.getValue()).toEqual('1 a1');
+        browser.keys(['2']);
+        expect(input.getValue()).toEqual('12 a1');
+        browser.keys(['3']);
+        expect(input.getValue()).toEqual('123 a1');
+        browser.keys(['4']);
+        expect(input.getValue()).toEqual('1,234 a1');
     });
 });
 

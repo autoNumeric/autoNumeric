@@ -2,33 +2,33 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8"/>
-<!--
- * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
- * @copyright © 2019 Alexandre Bonneau
- *
- * The MIT License (http://www.opensource.org/licenses/mit-license.php)
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sub license, and/or sell
- * copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
--->
+	<!--
+	 * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
+	 * @copyright © 2019 Alexandre Bonneau
+	 *
+	 * The MIT License (http://www.opensource.org/licenses/mit-license.php)
+	 *
+	 * Permission is hereby granted, free of charge, to any person
+	 * obtaining a copy of this software and associated documentation
+	 * files (the "Software"), to deal in the Software without
+	 * restriction, including without limitation the rights to use,
+	 * copy, modify, merge, publish, distribute, sub license, and/or sell
+	 * copies of the Software, and to permit persons to whom the
+	 * Software is furnished to do so, subject to the following
+	 * conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be
+	 * included in all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+	 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+	 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+	 * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+	 * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+	 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+	 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+	 * OTHER DEALINGS IN THE SOFTWARE.
+	-->
 	<title>End-to-end testing for autoNumeric</title>
 	<style>
 		.container {
@@ -1076,11 +1076,21 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #647</p>
+			<div>
+				<input id="issue_647a" type="text" placeholder="#647" value="121">
+				<input id="issue_647b" type="text" placeholder="#647" value="121">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
-	console.log(`-------------------------------------------`);
-	console.log(`Testing AutoNumeric version ${AutoNumeric.version()}.`);
-	console.log(`-------------------------------------------`);
+    console.log(`-------------------------------------------`);
+    console.log(`Testing AutoNumeric version ${AutoNumeric.version()}.`);
+    console.log(`-------------------------------------------`);
 
     //-------------- Classic input
     const classicInput = document.querySelector('#classic');
@@ -1100,7 +1110,7 @@
     //    $pureJsInput.autoNumeric('init', {decimalCharacter: ',', digitGroupSeparator: '.'}); //Basic
 
     const anElement = new AutoNumeric(pureJsInput, { digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '0', selectNumberOnly: true }); // OK
-//    const anElement = new AutoNumeric(pureJsInput, {digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '-9999999999.99', maximumValue: '0', negativePositiveSignPlacement: 'p'}); //Euro negative
+    //    const anElement = new AutoNumeric(pureJsInput, {digitGroupSeparator: '.', decimalCharacter: ',', decimalCharacterAlternative: '.', currencySymbol: ' €', currencySymbolPlacement: 's', roundingMethod: 'U', minimumValue: '-9999999999.99', maximumValue: '0', negativePositiveSignPlacement: 'p'}); //Euro negative
 
     // Pure JS
     pureJsInput.addEventListener('input', () => {
@@ -1150,7 +1160,7 @@
     const firstField = document.querySelector('#firstField');
     const secondField = document.querySelector('#secondField');
     firstField.addEventListener('keyup', () => {
-	    secondField.value = firstField.value;
+        secondField.value = firstField.value;
     });
 
     //-------------- Issue #290
@@ -1526,9 +1536,9 @@
 
     //-------------- showOnlyNumbersOnFocus option
     new AutoNumeric('#showOnlyNumbersOnFocus1').french()
-        .set(-246813.58, { showOnlyNumbersOnFocus: AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers, suffixText: ' loan' });
+                                               .set(-246813.58, { showOnlyNumbersOnFocus: AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers, suffixText: ' loan' });
     new AutoNumeric('#showOnlyNumbersOnFocus2').northAmerican()
-        .set(-246813.58, { showOnlyNumbersOnFocus: AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers, suffixText: ' interest' });
+                                               .set(-246813.58, { showOnlyNumbersOnFocus: AutoNumeric.options.showOnlyNumbersOnFocus.onlyNumbers, suffixText: ' interest' });
 
     //-------------- selectOnFocus option
     new AutoNumeric('#selectOnFocusA').french().set(-246813.58, { selectOnFocus: AutoNumeric.options.selectOnFocus.select });
@@ -1910,7 +1920,7 @@
     new AutoNumeric('#autoNumericEventInput', {
         negativeBracketsTypeOnBlur: AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses,
     });
-//	    .update({ valuesToStrings : AutoNumeric.options.valuesToStrings.zeroDash }); //DEBUG
+    //	    .update({ valuesToStrings : AutoNumeric.options.valuesToStrings.zeroDash }); //DEBUG
     const autoNumericEventInput = document.querySelector('#autoNumericEventInput');
     autoNumericEventInput.addEventListener(AutoNumeric.events.formatted, e => {
         console.log(`'${AutoNumeric.events.formatted}' sent with`, e); //DEBUG
@@ -1945,7 +1955,7 @@
 
     //-------------- Issue #452
     const anElement452 = new AutoNumeric('#issue_452', { rawValueDivisor: AutoNumeric.options.rawValueDivisor.percentage });
-//    const anElement452 = new AutoNumeric('#issue_452', { rawValueDivisor: 100.345 });
+    //    const anElement452 = new AutoNumeric('#issue_452', { rawValueDivisor: 100.345 });
     const anElement452Formatted = new AutoNumeric('#issue_452_formatted', AutoNumeric.getPredefinedOptions().percentageEU2dec);
     const input452 = document.getElementById('issue_452');
     const result452 = document.getElementById('result_452');
@@ -2283,6 +2293,10 @@
         formatOnPageLoad           : true,
     };
     new AutoNumeric('#issue_652d', 150, decimalAutonumericOptions);
+
+    //-------------- Issue #647
+    new AutoNumeric('#issue_647a', { currencySymbol: 'a1 ' });
+    new AutoNumeric('#issue_647b', { currencySymbol: ' a1', currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.suffix });
 </script>
 </body>
 </html>

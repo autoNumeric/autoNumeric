@@ -1,10 +1,13 @@
 ## Changelog for autoNumeric
 
+### 4.5.9
++ Fixes #647 Caret position is incorrectly set when the `currencySymbol` in prefix position contains the first value entered *(ie. a numeric value)*
+
 ### 4.5.8
 + Fixes #652 On initialization, `allowDecimalPadding` option `'floats'` does not hide the decimal zeroes if set in the html attribute
 
 ### 4.5.7
-+ Fixes #621 The `autoNumeric:formatted` event should be triggered when the input field is cleared while continuously pressing the `Backspace` or `Delete`keys (for real this time, see `v4.5.2`)
++ Fixes #621 The `autoNumeric:formatted` event should be triggered when the input field is cleared while continuously pressing the `Backspace` or `Delete` keys *(for real this time, see `v4.5.2`)*
 
 ### 4.5.6
 + Fix #602 Numpad decimal separator does not work on IE11 with a keyboard whose numpad decimal key outputs a comma

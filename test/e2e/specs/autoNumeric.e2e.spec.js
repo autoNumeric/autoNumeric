@@ -233,6 +233,8 @@ const selectors = {
     issue652d                         : '#issue_652d',
     issue647a                         : '#issue_647a',
     issue647b                         : '#issue_647b',
+    issue656a                         : '#issue_656a',
+    issue656b                         : '#issue_656b',
 };
 
 //-----------------------------------------------------------------------------
@@ -4390,6 +4392,37 @@ describe('Issue #647', () => {
         expect(input.getValue()).toEqual('123 a1');
         browser.keys(['4']);
         expect(input.getValue()).toEqual('1,234 a1');
+    });
+});
+
+xdescribe('Issue #656', () => { //FIXME With Firefox and Chromium, the control key is used correctly, while with Selenium the 'Control' key is not activated correctly when used in combination with Backspace nor Delete
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect($(selectors.issue656a).getValue()).toEqual('12,344,321.67');
+        expect($(selectors.issue656b).getValue()).toEqual('1,234,567,890.01');
+    });
+
+    it(`should delete batch of numbers using ctrl+backspace, then retain the resulting value on focusout`, () => {
+        const input = $(selectors.issue656a);
+        input.click();
+        browser.keys(['End', 'Control', 'Backspace', 'Backspace', 'Control']);
+        expect(input.getValue()).toEqual('12,344,');
+        const inputB = $(selectors.issue656b);
+        inputB.click();
+        expect(input.getValue()).toEqual('12,344.00');
+    });
+
+    it(`should delete batch of numbers using ctrl+delete, then retain the resulting value on focusout`, () => {
+        const input = $(selectors.issue656b);
+        input.click();
+        browser.keys(['End', 'Backspace', 'Backspace']);
+        expect(input.getValue()).toEqual('1,234,567,890.');
+        browser.keys(['Home', 'Control', 'Delete', 'Delete', 'Control']);
+        expect(input.getValue()).toEqual('567,890.');
+        const inputA = $(selectors.issue656a);
+        inputA.click();
+        expect(input.getValue()).toEqual('567,890.00');
     });
 });
 

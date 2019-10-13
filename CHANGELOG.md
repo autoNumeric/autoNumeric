@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.5.10
++ Fixes #656 Input value will undo on focusout when using only Ctrl+Backspace
+
 ### 4.5.9
 + Fixes #647 Caret position is incorrectly set when the `currencySymbol` in prefix position contains the first value entered *(ie. a numeric value)*
 

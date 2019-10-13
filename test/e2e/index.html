@@ -1086,6 +1086,16 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #656</p>
+			<div>
+				<input id="issue_656a" type="text" placeholder="#656" value="12344321.67">
+				<input id="issue_656b" type="text" placeholder="#656" value="1234567890.01">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     console.log(`-------------------------------------------`);
@@ -2297,6 +2307,10 @@
     //-------------- Issue #647
     new AutoNumeric('#issue_647a', { currencySymbol: 'a1 ' });
     new AutoNumeric('#issue_647b', { currencySymbol: ' a1', currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.suffix });
+
+    //-------------- Issue #656
+    new AutoNumeric('#issue_656a');
+    new AutoNumeric('#issue_656b');
 </script>
 </body>
 </html>

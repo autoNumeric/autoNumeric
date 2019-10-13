@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.5.9
- * @date         2019-10-12 UTC 07:07
+ * @version      4.5.10
+ * @date         2019-10-13 UTC 08:30
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -909,7 +909,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.5.9';
+        return '4.5.10';
     }
 
     /**
@@ -6641,6 +6641,14 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             return;
         }
 
+        // Manage the Backspace and Delete keys when used in combination with the control key (fix #656)
+        if ((e.ctrlKey || e.metaKey) && (this.eventKey === AutoNumericEnum.keyName.Backspace || this.eventKey === AutoNumericEnum.keyName.Delete)) {
+            const targetValue = AutoNumericHelper.getElementValue(e.target);
+            this._setRawValue(this._formatOrUnformatOther(false, targetValue));
+
+            return;
+        }
+
         this._updateInternalProperties(e);
 
         const skip = this._processNonPrintableKeysAndShortcuts(e);
@@ -8675,7 +8683,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
 
-        // The undo shortcut
+        // If the ctrl/meta key is used (during the undo shortcut for instance)
         if (e.ctrlKey || e.metaKey) {
             return !(this.eventKey === AutoNumericEnum.keyName.Z || this.eventKey === AutoNumericEnum.keyName.z);
         }

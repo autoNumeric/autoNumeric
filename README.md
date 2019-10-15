@@ -1113,11 +1113,10 @@ The old and outdated documentation can be found in the [Documentation](doc/Docum
 For some examples and an option code generator for the old v1.9.* version, take a look [here](http://www.decorplanit.com/plugin/).
 
 ## Licence
-autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source project, and its authors are credited in [AUTHORS](https://github.com/autoNumeric/autoNumeric/blob/master/AUTHORS).
+autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source project, and its authors are credited in [AUTHORS](https://github.com/autoNumeric/autoNumeric/blob/next/AUTHORS).
 
 ## Support
-We'd like to thank [JetBrains](https://www.jetbrains.com/) supporting us by providing open-source licences of their tools, and [Browserstack](https://www.browserstack.com) for allowing us to tests many browsers and platforms.<br>
-[![Browserstack][browserstack-image]][browserstack-url]
+We'd like to thank [JetBrains](https://www.jetbrains.com/) supporting us by providing an open-source licence of their tools.
 
 ****
 
@@ -1142,5 +1141,3 @@ Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] *(Robert)* 
 [paypal-url]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NCW5699RY8NN2
 [patreon-url]: https://www.patreon.com/AlexandreBonneau
 [patreon-image]: https://img.shields.io/badge/patreon-donate-orange.svg
-[browserstack-url]: https://www.browserstack.com
-[browserstack-image]: http://i.imgur.com/kjddhbT.png

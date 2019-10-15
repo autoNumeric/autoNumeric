@@ -139,9 +139,12 @@
     "test:unitc": "karma start test/unit/karma.conf.js --single-run --browsers Chrome",
     "test:unitpp": "karma start test/unit/karma.conf.js --single-run --browsers PhantomJS --reporters 'progress'",
     "test:unitfp": "karma start test/unit/karma.conf.js --single-run --browsers Firefox --reporters 'progress'",
+    "test:unitfhp": "karma start test/unit/karma.conf.js --single-run --browsers FirefoxDeveloperHeadless --reporters 'progress'",
     "test:unitcp": "karma start test/unit/karma.conf.js --single-run --browsers Chrome --reporters 'progress'",
+    "test:unitchp": "karma start test/unit/karma.conf.js --single-run --browsers ChromeHeadless --reporters 'progress'",
+    "test:unitheadless": "karma start test/unit/karma.conf.js --single-run --browsers FirefoxDeveloperHeadless,ChromeHeadless --reporters 'progress'",
     "test:e2e": "wdio test/e2e/wdio.local.conf.js",
-    "travis:test": "yarn test:unitp",
+    "travis:test": "test:unitheadless",
     "travis:lint": "yarn lint",
     "es-check": "es-check es5 dist/*.js"
   },

@@ -1116,7 +1116,7 @@ For some examples and an option code generator for the old v1.9.* version, take 
 autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source project, and its authors are credited in [AUTHORS](https://github.com/autoNumeric/autoNumeric/blob/next/AUTHORS).
 
 ## Support
-We'd like to thank [JetBrains](https://www.jetbrains.com/) supporting us by providing an open-source licence of their tools.
+We'd like to thank [JetBrains](https://www.jetbrains.com/) for supporting us by providing an open-source licence of their tools.
 
 ****
 

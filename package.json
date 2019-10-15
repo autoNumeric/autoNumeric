@@ -144,7 +144,7 @@
     "test:unitchp": "karma start test/unit/karma.conf.js --single-run --browsers ChromeHeadless --reporters 'progress'",
     "test:unitheadless": "karma start test/unit/karma.conf.js --single-run --browsers FirefoxDeveloperHeadless,ChromeHeadless --reporters 'progress'",
     "test:e2e": "wdio test/e2e/wdio.local.conf.js",
-    "travis:test": "test:unitheadless",
+    "travis:test": "yarn test:unitheadless",
     "travis:lint": "yarn lint",
     "es-check": "es-check es5 dist/*.js"
   },

@@ -9017,10 +9017,12 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             }
 
             let leftReg;
+            const escapedCurrencySymbol = `\\${this.settings.currencySymbol.split('').join('\\')}`;
+
             if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
                 leftReg = new RegExp(`^.*?${leftAr.join('.*?')}`);
             } else { // prefix is assumed
-                leftReg = new RegExp(`^.*${this.settings.currencySymbol}.*${leftAr.join('.*?')}`); // Fixes issue #647 when using a currency that has some characters in it that matches the value we just entered (ie. numbers in the currency)
+                leftReg = new RegExp(`^.*${escapedCurrencySymbol}.*${leftAr.join('.*?')}`); // Fixes issue #647 when using a currency that has some characters in it that matches the value we just entered (ie. numbers in the currency)
             }
 
             // Search cursor position in formatted value

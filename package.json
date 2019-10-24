@@ -1,11 +1,10 @@
 {
-  "name": "autonumeric",
-  "version": "4.5.10",
+  "name": "@zeedhi/autonumeric",
+  "version": "4.5.11",
   "description": "autoNumeric is a standalone Javascript library that provides live *as-you-type* formatting for international numbers and currencies. It supports most international numeric formats and currencies including those used in Europe, Asia, and North and South America.",
   "main": "dist/autoNumeric.js",
   "browser": "dist/autoNumeric.min.js",
   "module": "src/main.js",
-  "readmeFilename": "README.md",
   "keywords": [
     "currency",
     "money",
@@ -23,54 +22,22 @@
     "live"
   ],
   "license": "MIT",
-  "author": {
-    "name": "Robert Knothe",
-    "email": "bob@decorplanit.com"
-  },
+  "author": "Robert Knothe <bob@decorplanit.com>",
   "contributors": [
-    {
-      "name": "Alexandre Bonneau",
-      "email": "alexandre.bonneau@linuxfr.eu"
-    },
-    {
-      "name": "Sokolov Yura"
-    },
-    {
-      "name": "Carlos Gonzales"
-    },
-    {
-      "name": "Ney Estrabelli"
-    },
-    {
-      "name": "Carlos Ghan"
-    },
-    {
-      "name": "Boris Cherny"
-    },
-    {
-      "name": "Maxwell Barvian"
-    },
-    {
-      "name": "Sasha Koss"
-    },
-    {
-      "name": "Mic Biert"
-    },
-    {
-      "name": "Peter Boccia"
-    },
-    {
-      "name": "Bruno Batista"
-    },
-    {
-      "name": "Jarin Udom"
-    },
-    {
-      "name": "Raymond Lehnhoff"
-    },
-    {
-      "name": "Cory Foy"
-    }
+    "Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>",
+    "Sokolov Yura",
+    "Carlos Gonzales",
+    "Ney Estrabelli",
+    "Carlos Ghan",
+    "Boris Cherny",
+    "Maxwell Barvian",
+    "Sasha Koss",
+    "Mic Biert",
+    "Peter Boccia",
+    "Bruno Batista",
+    "Jarin Udom",
+    "Raymond Lehnhoff",
+    "Cory Foy"
   ],
   "homepage": "https://github.com/autoNumeric/autoNumeric/",
   "dependencies": {},
@@ -169,5 +136,12 @@
       "src/AutoNumericPredefinedOptions.js",
       "src/main.js"
     ]
+  },
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -46,7 +46,7 @@ declare class AutoNumeric {
   set(
     value: number | string | null,
     options?: AutoNumericOptions,
-    save?: boolean
+    saveChangeToHistory?: boolean
   ): void;
 
   update(...options: AutoNumericOptions[]): void;

@@ -211,36 +211,264 @@ declare class AutoNumeric {
  * Expose types as well
  */
 declare namespace AutoNumeric {
-  export type OutputFormat = 'string' | 'number';
+  export type OutputFormatOption =
+    | "string"
+    | "number"
+    | "."
+    | "-."
+    | ","
+    | "-,"
+    | ".-"
+    | ",-"
+    | null;
+
+  export type CaretPositionOption =
+    | "start"
+    | "end"
+    | "decimalLeft"
+    | "decimalRight"
+    | "doNoForceCaretPosition";
+  export type CurrencySymbolPlacementOption = "p" | "s";
+  export type EmptyInputBehaviorOption =
+    | "null"
+    | "focus"
+    | "press"
+    | "always"
+    | "min"
+    | "max"
+    | "zero"
+    | number
+    | string /* representing a number */;
+  export type LeadingZeroOption = "allow" | "deny" | "keep";
+  export type NegativePositiveSignPlacementOption =
+    | "p"
+    | "s"
+    | "l"
+    | "r"
+    | null;
+  export type OnInvalidPasteOption =
+    | "error"
+    | "ignore"
+    | "clamp"
+    | "truncate"
+    | "replace";
+  export type OverrideMinMaxLimitsOption =
+    | "ceiling"
+    | "floor"
+    | "ignore"
+    | null;
+  export type RoundingMethodOption =
+    | "S"
+    | "A"
+    | "s"
+    | "a"
+    | "B"
+    | "U"
+    | "D"
+    | "C"
+    | "F"
+    | "N05"
+    | "CHF"
+    | "U05"
+    | "D05";
+  export type SerializeSpacesOption = "+" | "%20";
 
   export interface Options {
-    allowDecimalPadding?: boolean | 'floats';
-    suffixText?: string;
+    /**
+     * Allow padding the decimal places with zeros.
+     * @default true
+     */
+    allowDecimalPadding?: boolean | "floats";
+
+    /**
+     * Determine where should be positioned the caret on focus
+     * @default null
+     */
+    caretPositionOnFocus?: CaretPositionOption;
+
+    /**
+     * Determine if a local list of AutoNumeric objects must be kept when initializing the elements and others
+     * @default true
+     */
+    createLocalList?: boolean;
+
+    /**
+     * Currency symbol
+     * @default ''
+     */
     currencySymbol?: string;
-    currencySymbolPlacement?: string;
+
+    /**
+     * Placement of the currency sign, relative to the number (as a prefix or a suffix)
+     * @default 'p'
+     */
+    currencySymbolPlacement?: CurrencySymbolPlacementOption;
+    /**
+     * Decimal separator character
+     * @default '.'
+     */
     decimalCharacter?: string;
+
+    /**
+     * Allow to declare alternative decimal separator which is automatically replaced by the real decimal character
+     * @default null
+     */
     decimalCharacterAlternative?: string | null;
-    decimalPlaces?: number; // 0 or positive integer
+
+    /**
+     * Defines the default number of decimal places to show on the formatted value, and to keep as the precision for the rawValue
+     * 0 or positive integer
+     * @default 2
+     */
+    decimalPlaces?: number;
+
+    /**
+     * Defines how many decimal places should be kept for the raw value.
+     * @default null
+     */
+    decimalPlacesRawValue?: number | null;
+
+    /**
+     * The number of decimal places to show when unfocused
+     * @default null
+     */
+    decimalPlacesShownOnBlur?: number | null;
+
+    /**
+     * The number of decimal places to show when focused
+     * @default null
+     */
+    decimalPlacesShownOnFocus?: number | null;
+
+    /**
+     * Helper option for ASP.NET postback
+     * This should be set as the value of the unformatted default value
+     * examples:
+     * no default value="" {defaultValueOverride: ""}
+     * value=1234.56 {defaultValueOverride: '1234.56'}
+     * @default null
+     */
+    defaultValueOverride?: string | { doNotOverride: null };
+
+    /**
+     * Digital grouping for the thousand separator
+     * @default '3'
+     */
+    digitalGroupSpacing?: string;
+
+    /**
+     * Thousand separator character
+     * @default ','
+     */
     digitGroupSeparator?: string;
-    emptyInputBehavior?:
-      | 'null'
-      | 'focus'
-      | 'press'
-      | 'always'
-      | 'min'
-      | 'max'
-      | 'zero'
-      | number
-      | string /* representing a number */;
-    modifyValueOnWheel?: boolean;
-    outputFormat?: AutoNumericOutputFormat;
-    readOnly?: boolean;
-    negativePositiveSignPlacement?: 'p';
-    styleRules?: {
-      positive: string;
-      negative: string;
-    };
-    minimumValue?: string;
+
+    /**
+     * Define the number that will divide the current value shown when unfocused
+     * @default null
+     */
+    divisorWhenUnfocused?: number | null;
+
+    emptyInputBehavior?: EmptyInputBehaviorOption;
+
+    failOnUnknownOption?: boolean;
+
+    formatOnPageLoad?: boolean;
+
+    historySize?: number;
+
+    isCancellable?: boolean;
+
+    leadingZero?: LeadingZeroOption;
+
     maximumValue?: string;
+
+    minimumValue?: string;
+
+    /**
+     * Determine if the element value can be incremented / decremented with the mouse wheel.
+     */
+
+    modifyValueOnWheel?: boolean;
+
+    negativeBracketsTypeOnBlur?: string | null;
+
+    /**
+     * Placement of negative/positive sign relative to the currency symbol (possible options are l (left), r (right), p (prefix) and s (suffix))
+     * @default null
+     */
+    negativePositiveSignPlacement?: NegativePositiveSignPlacementOption;
+
+    noEventListeners?: boolean;
+
+    onInvalidPaste?: OnInvalidPasteOption;
+
+    outputFormat?: OutputFormatOption;
+
+    overrideMinMaxLimits?: OverrideMinMaxLimitsOption;
+
+    rawValueDivisor?: number | null;
+
+    readOnly?: boolean;
+
+    roundingMethod?: RoundingMethodOption;
+
+    saveValueToSessionStorage?: boolean;
+
+    selectNumberOnly?: boolean;
+
+    selectOnFocus?: boolean;
+
+    serializeSpaces?: SerializeSpacesOption;
+
+    showOnlyNumbersOnFocus?: boolean;
+
+    showPositiveSign?: boolean;
+
+    showWarnings?: boolean;
+
+    // FIXME
+    styleRules?: {
+      positive?: string | null;
+      negative?: string;
+      ranges?: Array<{
+        min: number;
+        max: number;
+        class: string;
+      }>;
+      userDefined?: Array<
+        | {
+            callback: (rawValue: number) => boolean;
+            classes: [string] | [string, string];
+          }
+        | {
+            callback: (rawValue: number) => number | number[] | null;
+            classes: string[];
+          }
+        | { callback: (autoNumericInstance: AutoNumeric) => void }
+      >;
+    } | null;
+
+    suffixText?: string;
+
+    symbolWhenUnfocused?: string | null;
+
+    unformatOnHover?: boolean;
+
+    unformatOnSubmit?: boolean;
+
+    wheelStep?: number | "progressive";
   }
+
+  interface PredefinedLanguages {
+    French: Partial<Options>;
+    Spanish: Partial<Options>;
+    NorthAmerican: Partial<Options>;
+    British: Partial<Options>;
+    Swiss: Partial<Options>;
+    Japanese: Partial<Options>;
+    Chinese: Partial<Options>;
+    Brazilian: Partial<Options>;
+  }
+
+  type PredefinedOptions = Partial<Options> & PredefinedLanguages;
 }

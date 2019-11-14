@@ -29,7 +29,7 @@ declare class AutoNumeric {
     elementOrSelector: string | HTMLInputElement | HTMLElement,
     initialValue: string | number = null,
     options: AutoNumericOptions | string = null
-  ): Input;
+  ): AutoNumeric;
 
   multiple(
     elementsOrSelector:

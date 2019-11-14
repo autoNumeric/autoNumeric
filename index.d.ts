@@ -102,7 +102,6 @@ declare class AutoNumeric {
   ): void;
 
 
-  remove(): void;
 
   getNumber(
     callback: (value: number | null, instance: AutoNumeric) => void = null
@@ -111,6 +110,11 @@ declare class AutoNumeric {
   getNumericString(
     callback: (value: string | null, instance: AutoNumeric) => void = null
   ): string | null;
+
+  /**
+   * Remove the autoNumeric listeners from the element (previous name : 'destroy'). Keep the element content intact.
+   */
+  remove(): void;
 
 }
 

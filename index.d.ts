@@ -101,8 +101,17 @@ declare class AutoNumeric {
     saveChangeToHistory?: boolean
   ): void;
 
+  setUnformatted(value: number, options?: Options): void;
 
+  get(callback?: (value: string, instance: AutoNumeric) => void): string;
 
+  getFormatted(
+    callback?: (value: string, instance: AutoNumeric) => void
+  ): string;
+
+  /**
+   * Returns a plain number value without formatting
+   */
   getNumber(
     callback: (value: number | null, instance: AutoNumeric) => void = null
   ): number | null;
@@ -111,11 +120,91 @@ declare class AutoNumeric {
     callback: (value: string | null, instance: AutoNumeric) => void = null
   ): string | null;
 
+  getLocalized(callback: (value: string) => void): string;
+
+  reformat(): void;
+
+  unformat(): void;
+
+  unformatLocalized(forcedOutputFormat?: OutputFormatOption): void;
+
+  isPristine(): boolean;
+
+  select(): void;
+
+  selectNumber(): void;
+
+  selectInteger(): void;
+
+  selectDecimal(): void;
+
+  clear(reset?: boolean): void;
+
+  update(...options: Options[]): Input;
+
   /**
    * Remove the autoNumeric listeners from the element (previous name : 'destroy'). Keep the element content intact.
    */
   remove(): void;
 
+  /**
+   * Remove the autoNumeric listeners from the element, and reset its value to ''
+   */
+  wipe(): void;
+
+  /**
+   * Remove the autoNumeric listeners from the element, and delete the DOM element altogether
+   */
+  nuke(): void;
+
+  /**
+   * Return the DOM element reference of the autoNumeric-managed element
+   */
+  node(): HTMLInputElement;
+
+  parent(): HTMLElement;
+
+  detach(): void;
+
+  attach(otherAnElement: HTMLElement, reFormat?: boolean): void;
+
+  init(domeElement2: HTMLElement): Input;
+
+  form(forcedSearch?: boolean): HTMLFormElement;
+
+  formNumericString(): string;
+
+  formFormatted(): string;
+
+  formLocalized(forcedOutputFormat?: PredefinedLanguages): string;
+
+  formArrayNumericString(): HTMLInputElement[];
+
+  formArrayFormatted(): HTMLInputElement[];
+
+  formArrayLocalized(): HTMLInputElement[];
+
+  formJsonNumericString(): string;
+
+  formJsonFormatted(): string;
+
+  formJsonLocalized(): string;
+
+  formUnformat(): void;
+
+  formReformat(): void;
+
+  formSubmitArrayNumericString(callback: Function): Input;
+
+  formSubmitArrayFormatted(callback: Function): Input;
+
+  formSubmitArrayLocalized(callback: Function): Input;
+
+  formSubmitJsonNumericString(callback: Function): Input;
+
+  formSubmitJsonFormatted(callback: Function): Input;
+
+  formSubmitJsonLocalized(callback: Function): Input;
 }
 
 /**

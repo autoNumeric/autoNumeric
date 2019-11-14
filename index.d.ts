@@ -117,7 +117,7 @@ declare class AutoNumeric {
   ): number | null;
 
   getNumericString(
-    callback: (value: string | null, instance: AutoNumeric) => void = null
+    callback?: (value: string | null, instance: AutoNumeric) => void = null
   ): string | null;
 
   getLocalized(callback: (value: string) => void): string;

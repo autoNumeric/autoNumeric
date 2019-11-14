@@ -41,9 +41,56 @@ declare class AutoNumeric {
   ): AutoNumeric[];
 
   /**
+   * Return true in the settings are valid
+   */
+  static areSettingsValid(options: Options): boolean;
+
+  /**
+   * Format the given number with the given options. This returns the formatted value as a string.
+   */
+  static format(value: number | string | HTMLElement, options: Options): string;
+
+  /**
+   * Format the domElement value with the given options and returns the formatted value as a string.
+   */
+  static formatAndSet(domElement: HTMLElement, options: Options): string;
+
+  /**
+   * Return the AutoNumeric object that manages the given DOM element
+   */
+  static getAutoNumericElement(domElement: HTMLElement): Input;
+
+  /**
+   * Return the default autoNumeric settings
+   */
+  static getDefaultConfig(): Options;
+
+  /**
    * Return all the predefined options in one object
    */
   static getPredefinedOptions(): PredefinedOptions;
+
+  /**
+   * Return true if the given DOM element has an AutoNumeric object that manages it.
+   */
+  static isManagedByAutoNumeric(domElement: HTMLElement): boolean;
+
+  /**
+   * Unformat and localize the given formatted string with the given options.
+   */
+  static localize(value: string | HTMLElement, options: Options): string;
+
+  static localizeAndSet(domElement: HTMLElement, options: Options): string;
+
+  static mergeOptions(...options: Options[]): Options;
+
+  static reformatAndSet(referenceToTheDomElement: HTMLElement): void;
+
+  static test(domElement: HTMLElement): boolean;
+
+  static validate(options: Options): boolean;
+
+  static version(): string;
 
   /**
    * Set the value, but do not save the new state in the history table (used for undo/redo actions)

@@ -27,7 +27,7 @@ export = AutoNumeric;
 declare class AutoNumeric {
   constructor(
     elementOrSelector: string | HTMLInputElement | HTMLElement,
-    defaultValue: string | number = null,
+    initialValue: string | number = null,
     options: AutoNumericOptions | string = null
   ): Input;
 

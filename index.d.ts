@@ -93,7 +93,20 @@ declare class AutoNumeric {
   static version(): string;
 
   /**
-   * Set the value, but do not save the new state in the history table (used for undo/redo actions)
+   * Set the given element value, and format it immediately.
+   * Additionally, this `set()` method can accept options that will be merged into the current AutoNumeric element, taking precedence over any previous settings.
+   *
+   * @example anElement.set('12345.67') // Formats the value
+   * @example anElement.set(12345.67) // Formats the value
+   * @example anElement.set(12345.67, { decimalCharacter : ',' }) // Update the settings and formats the value in one go
+   * @example anElement.northAmerican().set('$12,345.67') // Set an already formatted value (this does not _exactly_ respect the currency symbol/negative placements, but only remove all non-numbers characters, according to the ones given in the settings)
+   * @example anElement.set(null) // Set the rawValue and element value to `null`
+   *
+   * @param {number|string|null} newValue The value must be a Number, a numeric string or `null` (if `emptyInputBehavior` is set to `'null'`)
+   * @param {object} options A settings object that will override the current settings. Note: the update is done only if the `newValue` is defined.
+   * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history table
+   * @returns {AutoNumeric}
+   * @throws
    */
   set(
     value: number | string | null,

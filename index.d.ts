@@ -31,14 +31,14 @@ declare class AutoNumeric {
     options: AutoNumericOptions | string = null
   ): AutoNumeric;
 
-  multiple(
+  static multiple(
     elementsOrSelector:
       | string
       | HTMLElement[]
       | { rootElement: HTMLElement; exclude?: HTMLInputElement[] },
     initialValue: number | Array<number | null> = null,
     options: AutoNumericOptions | AutoNumericOptions[] = null
-  ): Input;
+  ): AutoNumeric[];
 
   /**
    * Set the value, but do not save the new state in the history table (used for undo/redo actions)

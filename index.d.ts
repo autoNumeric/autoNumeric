@@ -28,7 +28,7 @@ declare class AutoNumeric {
   constructor(
     elementOrSelector: string | HTMLInputElement | HTMLElement,
     initialValue: string | number = null,
-    options: AutoNumericOptions | string = null
+    options: Options | string = null
   ): AutoNumeric;
 
   static multiple(
@@ -37,19 +37,23 @@ declare class AutoNumeric {
       | HTMLElement[]
       | { rootElement: HTMLElement; exclude?: HTMLInputElement[] },
     initialValue: number | Array<number | null> = null,
-    options: AutoNumericOptions | AutoNumericOptions[] = null
+    options: Options | Options[] = null
   ): AutoNumeric[];
+
+  /**
+   * Return all the predefined options in one object
+   */
+  static getPredefinedOptions(): PredefinedOptions;
 
   /**
    * Set the value, but do not save the new state in the history table (used for undo/redo actions)
    */
   set(
     value: number | string | null,
-    options?: AutoNumericOptions,
+    options?: Options,
     saveChangeToHistory?: boolean
   ): void;
 
-  update(...options: AutoNumericOptions[]): void;
 
   remove(): void;
 
@@ -61,7 +65,6 @@ declare class AutoNumeric {
     callback: (value: string | null, instance: AutoNumeric) => void = null
   ): string | null;
 
-  static getPredefinedOptions(): AutoNumericOptions;
 }
 
 /**

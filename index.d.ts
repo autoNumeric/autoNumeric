@@ -31,8 +31,6 @@ declare class AutoNumeric {
     options: AutoNumericOptions | string = null
   ): Input;
 
-  // someProperty: string[];
-
   multiple(
     elementsOrSelector:
       | string

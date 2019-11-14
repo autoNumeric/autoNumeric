@@ -1,23 +1,27 @@
-/*~ Note that ES6 modules cannot directly export class objects.
- *~ This file should be imported using the CommonJS-style:
- *~   import x = require('autonumeric');
- *~
- *~ Alternatively, if --allowSyntheticDefaultImports or
- *~ --esModuleInterop is turned on, this file can also be
- *~ imported as a default import:
- *~   import x from 'autonumeric';
- *~
- *~ Refer to the TypeScript documentation at
- *~ https://www.typescriptlang.org/docs/handbook/modules.html#export--and-import--require
- *~ to understand common workarounds for this limitation of ES6 modules.
+/**
+ * Note that ES6 modules cannot directly export class objects.
+ * This file should be imported using the CommonJS-style:
+ *   import x = require('autonumeric');
+ *
+ * Alternatively, if --allowSyntheticDefaultImports or
+ * --esModuleInterop is turned on, this file can also be
+ * imported as a default import:
+ *   import x from 'autonumeric';
+ *
+ * Refer to the TypeScript documentation at
+ * https://www.typescriptlang.org/docs/handbook/modules.html#export--and-import--require
+ * to understand common workarounds for this limitation of ES6 modules.
  */
  
-/*~ If this module is a UMD module that exposes a global variable 'myClassLib' when
- *~ loaded outside a module loader environment, declare that global here:
- *~ export as namespace myClassLib;
+/**
+ * If this module is a UMD module that exposes a global variable 'myClassLib' when
+ * loaded outside a module loader environment, declare that global here:
+ * export as namespace myClassLib;
  */
 
-/* The class constructor function is the exported object from the file */
+/**
+ * The class constructor function is the exported object from the file
+ */
 export = AutoNumeric;
 
 declare class AutoNumeric {
@@ -62,7 +66,9 @@ declare class AutoNumeric {
   static getPredefinedOptions(): AutoNumericOptions;
 }
 
-/* Expose types as well */
+/**
+ * Expose types as well
+ */
 declare namespace AutoNumeric {
   export type OutputFormat = 'string' | 'number';
 

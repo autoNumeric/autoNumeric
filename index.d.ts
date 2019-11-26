@@ -515,6 +515,7 @@ declare namespace AutoNumeric {
     Japanese: Partial<Options>;
     Chinese: Partial<Options>;
     Brazilian: Partial<Options>;
+    Turkish: Partial<Options>;
   }
 
   type PredefinedOptions = Partial<Options> & PredefinedLanguages;

@@ -114,28 +114,48 @@ declare class AutoNumeric {
     saveChangeToHistory?: boolean
   ): void;
 
+  /**
+   * Set the given value directly as the DOM element value, without formatting it beforehand.
+   * You can also set the value and update the setting in one go (the value will again not be formatted immediately).
+   */
   setUnformatted(value: number, options?: Options): void;
 
   /**
-    * The get() function is deprecated and should not be used. Omitted from TS def for that reason.
-    * get(callback?: (value: string, instance: AutoNumeric) => void): string;
-    */
+   * The get() function is deprecated and should not be used. Omitted from TS def for that reason.
+   * get(callback?: (value: string, instance: AutoNumeric) => void): string;
+   */
 
+  /**
+   * Return the current formatted value of the AutoNumeric element as a string.
+   */
   getFormatted(
     callback?: (value: string, instance: AutoNumeric) => void
   ): string;
 
   /**
-   * Returns a plain number value without formatting
+   * Return the element unformatted value as a real JavaScript number.
    */
   getNumber(
     callback: (value: number | null, instance: AutoNumeric) => void = null
   ): number | null;
 
+  /**
+   * Return the unformatted value as a string.
+   * This can also return `null` if `rawValue` is null.
+   */
   getNumericString(
     callback?: (value: string | null, instance: AutoNumeric) => void = null
   ): string | null;
 
+  /**
+   * Returns the unformatted value, but following the `outputFormat` setting, which means the output can either be:
+   *
+   * - a string (that could or could not represent a number, ie. "12345,67-"), or
+   * - a plain number (if the setting 'number' is used).
+   *
+   * By default the returned values are an ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period.
+   * Check the `outputFormat` option definition for more details.
+   */
   getLocalized(callback: (value: string) => void): string;
 
   reformat(): void;
@@ -159,17 +179,20 @@ declare class AutoNumeric {
   update(...options: Options[]): Input;
 
   /**
-   * Remove the autoNumeric listeners from the element (previous name : 'destroy'). Keep the element content intact.
+   * Remove the autoNumeric data and event listeners from the element, but keep the element content intact.
+   * This also clears the value from sessionStorage (or cookie, depending on browser supports).
+   * Note: this does not remove the formatting.
    */
   remove(): void;
 
   /**
-   * Remove the autoNumeric listeners from the element, and reset its value to ''
+   * Remove the autoNumeric data and event listeners from the element, and reset its value to the empty string ''.
+   * This also clears the value from sessionStorage (or cookie, depending on browser supports).
    */
   wipe(): void;
 
   /**
-   * Remove the autoNumeric listeners from the element, and delete the DOM element altogether
+   * Remove the autoNumeric data and event listeners from the element, and delete the DOM element altogether
    */
   nuke(): void;
 

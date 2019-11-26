@@ -116,7 +116,10 @@ declare class AutoNumeric {
 
   setUnformatted(value: number, options?: Options): void;
 
-  get(callback?: (value: string, instance: AutoNumeric) => void): string;
+  /**
+    * The get() function is deprecated and should not be used. Omitted from TS def for that reason.
+    * get(callback?: (value: string, instance: AutoNumeric) => void): string;
+    */
 
   getFormatted(
     callback?: (value: string, instance: AutoNumeric) => void

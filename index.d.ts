@@ -136,7 +136,7 @@ declare class AutoNumeric {
    * Return the element unformatted value as a real JavaScript number.
    */
   getNumber(
-    callback: (value: number | null, instance: AutoNumeric) => void = null
+    callback?: (value: number | null, instance: AutoNumeric) => void = null
   ): number | null;
 
   /**

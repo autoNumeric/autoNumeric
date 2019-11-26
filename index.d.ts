@@ -267,7 +267,9 @@ declare namespace AutoNumeric {
     | "decimalLeft"
     | "decimalRight"
     | "doNoForceCaretPosition";
+
   export type CurrencySymbolPlacementOption = "p" | "s";
+
   export type EmptyInputBehaviorOption =
     | "null"
     | "focus"
@@ -278,24 +280,29 @@ declare namespace AutoNumeric {
     | "zero"
     | number
     | string /* representing a number */;
+
   export type LeadingZeroOption = "allow" | "deny" | "keep";
+
   export type NegativePositiveSignPlacementOption =
     | "p"
     | "s"
     | "l"
     | "r"
     | null;
+
   export type OnInvalidPasteOption =
     | "error"
     | "ignore"
     | "clamp"
     | "truncate"
     | "replace";
+
   export type OverrideMinMaxLimitsOption =
     | "ceiling"
     | "floor"
     | "ignore"
     | null;
+
   export type RoundingMethodOption =
     | "S"
     | "A"
@@ -310,6 +317,7 @@ declare namespace AutoNumeric {
     | "CHF"
     | "U05"
     | "D05";
+
   export type SerializeSpacesOption = "+" | "%20";
 
   export interface Options {

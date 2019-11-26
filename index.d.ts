@@ -156,6 +156,7 @@ declare class AutoNumeric {
    * By default the returned values are an ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period.
    * Check the `outputFormat` option definition for more details.
    */
+  getLocalized(forcedOutputFormat?: OutputFormatOption, callback?: (value: string) => void): string;
   getLocalized(callback: (value: string) => void): string;
 
   reformat(): void;

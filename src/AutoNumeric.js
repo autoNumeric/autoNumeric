@@ -8713,8 +8713,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     /**
      * Process deletion of characters when the minus sign is to the right of the numeric characters.
      *
-     * @param {string} left The part on the left of the caret or selection
-     * @param {string} right The part on the right of the caret or selection
+     * @param {[string, string]} [left, right] The part on the left and on the right of the caret or selection
      * @returns {[string, string]}
      * @private
      */

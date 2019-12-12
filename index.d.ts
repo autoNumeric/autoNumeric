@@ -171,6 +171,9 @@ declare class AutoNumeric {
 
   clear(reset?: boolean): void;
 
+  /**
+   * Updates the AutoNumeric settings, and immediately format the element accordingly.
+   */
   update(...options: Options[]): Input;
 
   /**

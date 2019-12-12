@@ -14,12 +14,6 @@
  */
  
 /**
- * If this module is a UMD module that exposes a global variable 'myClassLib' when
- * loaded outside a module loader environment, declare that global here:
- * export as namespace myClassLib;
- */
-
-/**
  * The class constructor function is the exported object from the file
  */
 export = AutoNumeric;

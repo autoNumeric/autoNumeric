@@ -1,5 +1,9 @@
 ## Changelog for autoNumeric
 
+### 4.5.11
++ Adds a typescript definitions file to the library
++ Fixes some errors in the typescript definitions file and fixes the indentation
+
 ### 4.5.10
 + Fixes #656 Input value will undo on focusout when using only Ctrl+Backspace
 

@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.5.12
++ Synchronizes the AutoNumeric version with the published npm one
+
 ### 4.5.11
 + Adds a typescript definitions file to the library
 + Fixes some errors in the typescript definitions file and fixes the indentation

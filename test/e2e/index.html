@@ -1096,6 +1096,17 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #675</p>
+			<div>
+				<input id="issue_675a" type="text" placeholder="#675" value="80000">
+				<input id="issue_675b" type="text" placeholder="#675" value="90000">
+				<input id="issue_675c" type="text" placeholder="#675" value="70000">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     console.log(`-------------------------------------------`);
@@ -2305,12 +2316,17 @@
     new AutoNumeric('#issue_652d', 150, decimalAutonumericOptions);
 
     //-------------- Issue #647
-    new AutoNumeric('#issue_647a', { currencySymbol: 'a1 ' });
+    new AutoNumeric('#issue_647a', { currencySymbol: 'a1 ', currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.prefix });
     new AutoNumeric('#issue_647b', { currencySymbol: ' a1', currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.suffix });
 
     //-------------- Issue #656
     new AutoNumeric('#issue_656a');
     new AutoNumeric('#issue_656b');
+
+    //-------------- Issue #675
+    new AutoNumeric('#issue_675a', { currencySymbol: '' });
+    new AutoNumeric('#issue_675b', { currencySymbol: '€', currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.prefix });
+    new AutoNumeric('#issue_675c', { currencySymbol: '€', currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.suffix });
 </script>
 </body>
 </html>

@@ -235,6 +235,9 @@ const selectors = {
     issue647b                         : '#issue_647b',
     issue656a                         : '#issue_656a',
     issue656b                         : '#issue_656b',
+    issue675a                         : '#issue_675a',
+    issue675b                         : '#issue_675b',
+    issue675c                         : '#issue_675c',
 };
 
 //-----------------------------------------------------------------------------
@@ -4423,6 +4426,58 @@ xdescribe('Issue #656', () => { //FIXME With Firefox and Chromium, the control k
         const inputA = $(selectors.issue656a);
         inputA.click();
         expect(input.getValue()).toEqual('567,890.00');
+    });
+});
+
+describe('Issue #675', () => {
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect($(selectors.issue675a).getValue()).toEqual('80,000.00');
+        expect($(selectors.issue675b).getValue()).toEqual('€90,000.00');
+        expect($(selectors.issue675c).getValue()).toEqual('70,000.00€');
+    });
+
+    it(`should correctly place the caret when deleting a number leads to a rawValue of zero, while the currency symbol isn't displayed`, () => {
+        const input = $(selectors.issue675a);
+        input.click();
+        browser.keys(['Home', 'Delete']);
+        expect(input.getValue()).toEqual('0,000.00');
+
+        // Check the caret position
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return input.selectionStart;
+        }, selectors.issue675a);
+        expect(inputCaretPosition).toEqual(0);
+    });
+
+    it(`should correctly place the caret when deleting a number leads to a rawValue of zero, while the currency symbol is in suffix position`, () => {
+        const input = $(selectors.issue675b);
+        input.click();
+        browser.keys(['Home', 'Delete']);
+        expect(input.getValue()).toEqual('€0,000.00');
+
+        // Check the caret position
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return input.selectionStart;
+        }, selectors.issue675b);
+        expect(inputCaretPosition).toEqual(1);
+    });
+
+    it(`should correctly place the caret when deleting a number leads to a rawValue of zero, while the currency symbol is in prefix position`, () => {
+        const input = $(selectors.issue675c);
+        input.click();
+        browser.keys(['Home', 'Delete']);
+        expect(input.getValue()).toEqual('0,000.00€');
+
+        // Check the caret position
+        const inputCaretPosition = browser.execute(domId => {
+            const input = document.querySelector(domId);
+            return input.selectionStart;
+        }, selectors.issue675c);
+        expect(inputCaretPosition).toEqual(0);
     });
 });
 

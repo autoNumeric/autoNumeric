@@ -1,5 +1,8 @@
 ## Changelog for autoNumeric
 
+### 4.5.13
++ Fixes #675 The caret position is wrongly positioned when setting the raw value to zero on numbers with a prefix currency symbol (The bug was introduced in `v4.5.9` with the fix for #647)
+
 ### 4.5.12
 + Synchronizes the AutoNumeric version with the published npm one
 

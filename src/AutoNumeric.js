@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.5.12
- * @date         2020-02-15 UTC 19:45
+ * @version      4.5.13
+ * @date         2020-02-16 UTC 00:38
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -909,7 +909,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.5.12';
+        return '4.5.13';
     }
 
     /**
@@ -9019,7 +9019,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
                 leftReg = new RegExp(`^.*?${leftAr.join('.*?')}`);
             } else { // prefix is assumed
-                leftReg = new RegExp(`^.*${this.settings.currencySymbol}.*${leftAr.join('.*?')}`); // Fixes issue #647 when using a currency that has some characters in it that matches the value we just entered (ie. numbers in the currency)
+                leftReg = new RegExp(`^.*?${this.settings.currencySymbol}${leftAr.join('.*?')}`); // Fixes issue #647 when using a currency that has some characters in it that matches the value we just entered (ie. numbers in the currency)
             }
 
             // Search cursor position in formatted value

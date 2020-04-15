@@ -18,11 +18,13 @@
  */
 export = AutoNumeric;
 
+import { Options, OutputFormatOption, PredefinedOptions, PredefinedLanguages } from 'autonumeric';
+
 declare class AutoNumeric {
     constructor(
         elementOrSelector: string | HTMLInputElement | HTMLElement,
-        initialValue: string | number = null,
-        options: Options | string = null
+        initialValue?: string | number | null,
+        options?: Options | string | null
     );
 
     static multiple(
@@ -30,8 +32,8 @@ declare class AutoNumeric {
             | string
             | HTMLElement[]
             | { rootElement: HTMLElement; exclude?: HTMLInputElement[] },
-        initialValue: number | Array<number | null> = null,
-        options: Options | Options[] = null
+        initialValue?: number | Array<number | null> | null,
+        options?: Options | Options[] | null
     ): AutoNumeric[];
 
     /**
@@ -52,7 +54,7 @@ declare class AutoNumeric {
     /**
      * Return the AutoNumeric object that manages the given DOM element
      */
-    static getAutoNumericElement(domElement: HTMLElement): Input;
+    static getAutoNumericElement(domElement: HTMLElement): AutoNumeric;
 
     /**
      * Return the default autoNumeric settings
@@ -130,7 +132,7 @@ declare class AutoNumeric {
      * Return the element unformatted value as a real JavaScript number.
      */
     getNumber(
-        callback?: (value: number | null, instance: AutoNumeric) => void = null
+        callback?: (value: number | null, instance: AutoNumeric) => void | null
     ): number | null;
 
     /**
@@ -138,7 +140,7 @@ declare class AutoNumeric {
      * This can also return `null` if `rawValue` is null.
      */
     getNumericString(
-        callback?: (value: string | null, instance: AutoNumeric) => void = null
+        callback?: (value: string | null, instance: AutoNumeric) => void | null
     ): string | null;
 
     /**
@@ -174,7 +176,7 @@ declare class AutoNumeric {
     /**
      * Updates the AutoNumeric settings, and immediately format the element accordingly.
      */
-    update(...options: Options[]): Input;
+    update(...options: Options[]): AutoNumeric;
 
     /**
      * Remove the autoNumeric data and event listeners from the element, but keep the element content intact.
@@ -205,7 +207,7 @@ declare class AutoNumeric {
 
     attach(otherAnElement: HTMLElement, reFormat?: boolean): void;
 
-    init(domeElement2: HTMLElement): Input;
+    init(domeElement2: HTMLElement): AutoNumeric|AutoNumeric[];
 
     form(forcedSearch?: boolean): HTMLFormElement;
 
@@ -231,17 +233,17 @@ declare class AutoNumeric {
 
     formReformat(): void;
 
-    formSubmitArrayNumericString(callback: Function): Input;
+    formSubmitArrayNumericString(callback: Function): AutoNumeric;
 
-    formSubmitArrayFormatted(callback: Function): Input;
+    formSubmitArrayFormatted(callback: Function): AutoNumeric;
 
-    formSubmitArrayLocalized(callback: Function): Input;
+    formSubmitArrayLocalized(callback: Function): AutoNumeric;
 
-    formSubmitJsonNumericString(callback: Function): Input;
+    formSubmitJsonNumericString(callback: Function): AutoNumeric;
 
-    formSubmitJsonFormatted(callback: Function): Input;
+    formSubmitJsonFormatted(callback: Function): AutoNumeric;
 
-    formSubmitJsonLocalized(callback: Function): Input;
+    formSubmitJsonLocalized(callback: Function): AutoNumeric;
 }
 
 /**

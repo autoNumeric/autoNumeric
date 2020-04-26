@@ -32,11 +32,13 @@ import AutoNumeric from './AutoNumeric';
 /**
  * Event list managed by AutoNumeric
  *
- * @type {{initialized: string, invalidFormula: string, formatted: string, minRangeExceeded: string, maxRangeExceeded: string, native: {input: string, change: string}, validFormula: string}}
+ * @type {{correctedValue: string, initialized: string, invalidFormula: string, invalidValue: string, formatted: string, rawValueModified: string, minRangeExceeded: string, maxRangeExceeded: string, native: {input: string, change: string}, validFormula: string}}
  */
 AutoNumeric.events = {
+    correctedValue  : 'autoNumeric:correctedValue',
     initialized     : 'autoNumeric:initialized',
     invalidFormula  : 'autoNumeric:invalidFormula',
+    invalidValue    : 'autoNumeric:invalidValue',
     formatted       : 'autoNumeric:formatted',
     rawValueModified: 'autoNumeric:rawValueModified',
     minRangeExceeded: 'autoNumeric:minExceeded',

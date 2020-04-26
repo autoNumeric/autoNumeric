@@ -1281,6 +1281,31 @@ export default class AutoNumericHelper {
     }
 
     /**
+     * Set the invalid state for the given element.
+     * A custom message can be passed as the second argument.
+     * Note: This does not work with contenteditable elements
+     *
+     * @param {HTMLElement|HTMLInputElement} element
+     * @param {string|null} message
+     * @throws Error
+     */
+    static setInvalidState(element, message = 'Invalid') {
+        if (message === '' || this.isNull(message)) this.throwError('Cannot set the invalid state with an empty message.');
+
+        element.setCustomValidity(message);
+    }
+
+    /**
+     * Set the valid state for the given element.
+     * Note: This does not work with contenteditable elements
+     *
+     * @param {HTMLElement|HTMLInputElement} element
+     */
+    static setValidState(element) {
+        element.setCustomValidity('');
+    }
+
+    /**
      * This clone the given object, and return it.
      * WARNING: This does not do a deep cloning.
      * cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Examples

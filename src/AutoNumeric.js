@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.5.13
- * @date         2020-02-16 UTC 00:38
+ * @version      4.6.0
+ * @date         2020-04-26 UTC 10:45
  *
  * @authors      Bob Knothe, Alexandre Bonneau
  * @contributors Sokolov Yura and others, cf. AUTHORS
@@ -183,16 +183,12 @@ export default class AutoNumeric {
 
         // --------------------------------------------------------
         // -------------- Tracking
-        // Keep track if the element is currently focused
-        this.isFocused = false;
-        // Keep track if a mouse wheel event is currently ongoing
-        this.isWheelEvent = false;
-        // Keep track if a drop event is currently ongoing
-        this.isDropEvent = false;
-        // Keep track if the user is currently editing the element
-        this.isEditing = false;
-        // Keep track of the rawValue (needed to define if a change event must be sent on blur or enter key)
-        this.rawValueOnFocus = void(0);
+        this.validState = true; // Keep track if the element is in the valid state
+        this.isFocused = false; // Keep track if the element is currently focused
+        this.isWheelEvent = false; // Keep track if a mouse wheel event is currently ongoing
+        this.isDropEvent = false; // Keep track if a drop event is currently ongoing
+        this.isEditing = false; // Keep track if the user is currently editing the element
+        this.rawValueOnFocus = void(0); // Keep track of the rawValue (needed to define if a change event must be sent on blur or enter key)
         // Watch any external changes to the element value/textContent/nodeValue and `set()` the new value so that it gets formatted/saved in the history
         this.internalModification = false; // This is temporarily set to `true` only when the AutoNumeric object does update the element value
         this.attributeToWatch = this._getAttributeToWatch();
@@ -705,17 +701,17 @@ export default class AutoNumeric {
                 return this;
             },
             failOnUnknownOption          : failOnUnknownOption => {
-                this.settings.failOnUnknownOption = failOnUnknownOption; //FIXME test this
+                this.settings.failOnUnknownOption = failOnUnknownOption; //TODO test this with unit tests
 
                 return this;
             },
             formatOnPageLoad             : formatOnPageLoad => {
-                this.settings.formatOnPageLoad = formatOnPageLoad; //FIXME test this
+                this.settings.formatOnPageLoad = formatOnPageLoad; //TODO test this with unit tests
 
                 return this;
             },
             formulaMode                  : formulaMode => {
-                this.settings.formulaMode = formulaMode; //FIXME Test this
+                this.settings.formulaMode = formulaMode; //TODO test this with unit tests
 
                 return this;
             },
@@ -724,8 +720,13 @@ export default class AutoNumeric {
 
                 return this;
             },
+            invalidClass                 : invalidClass => {
+                this.settings.invalidClass = invalidClass; //TODO test this with unit tests
+
+                return this;
+            },
             isCancellable                : isCancellable => {
-                this.settings.isCancellable = isCancellable; //FIXME test this
+                this.settings.isCancellable = isCancellable; //TODO test this with unit tests
 
                 return this;
             },
@@ -745,7 +746,7 @@ export default class AutoNumeric {
                 return this;
             },
             modifyValueOnWheel           : modifyValueOnWheel => {
-                this.settings.modifyValueOnWheel = modifyValueOnWheel; //FIXME test this
+                this.settings.modifyValueOnWheel = modifyValueOnWheel; //TODO test this with unit tests
 
                 return this;
             },
@@ -764,7 +765,7 @@ export default class AutoNumeric {
 
                 return this;
             },
-            noEventListeners             : noEventListeners => { //FIXME test this
+            noEventListeners             : noEventListeners => { //TODO test this with unit tests
                 if (noEventListeners === AutoNumeric.options.noEventListeners.noEvents && this.settings.noEventListeners === AutoNumeric.options.noEventListeners.addEvents) {
                     // Remove the events once
                     this._removeEventListeners();
@@ -775,7 +776,7 @@ export default class AutoNumeric {
                 return this;
             },
             onInvalidPaste               : onInvalidPaste => {
-                this.settings.onInvalidPaste = onInvalidPaste; //FIXME test this
+                this.settings.onInvalidPaste = onInvalidPaste; //TODO test this with unit tests
 
                 return this;
             },
@@ -822,17 +823,17 @@ export default class AutoNumeric {
                 return this;
             },
             selectNumberOnly             : selectNumberOnly => {
-                this.settings.selectNumberOnly = selectNumberOnly; //FIXME test this
+                this.settings.selectNumberOnly = selectNumberOnly; //TODO test this with unit tests
 
                 return this;
             },
             selectOnFocus                : selectOnFocus => {
-                this.settings.selectOnFocus = selectOnFocus; //FIXME test this
+                this.settings.selectOnFocus = selectOnFocus; //TODO test this with unit tests
 
                 return this;
             },
             serializeSpaces              : serializeSpaces => {
-                this.settings.serializeSpaces = serializeSpaces; //FIXME test this
+                this.settings.serializeSpaces = serializeSpaces; //TODO test this with unit tests
 
                 return this;
             },
@@ -847,7 +848,7 @@ export default class AutoNumeric {
                 return this;
             },
             showWarnings                 : showWarnings => {
-                this.settings.showWarnings = showWarnings; //FIXME test this
+                this.settings.showWarnings = showWarnings; //TODO test this with unit tests
 
                 return this;
             },
@@ -862,12 +863,12 @@ export default class AutoNumeric {
                 return this;
             },
             unformatOnHover              : unformatOnHover => {
-                this.settings.unformatOnHover = unformatOnHover; //FIXME test this
+                this.settings.unformatOnHover = unformatOnHover; //TODO test this with unit tests
 
                 return this;
             },
             unformatOnSubmit             : unformatOnSubmit => {
-                this.settings.unformatOnSubmit = unformatOnSubmit; //FIXME test this
+                this.settings.unformatOnSubmit = unformatOnSubmit; //TODO test this with unit tests
 
                 return this;
             },
@@ -876,18 +877,18 @@ export default class AutoNumeric {
 
                 return this;
             },
-            watchExternalChanges         : watchExternalChanges => { //FIXME test this
+            watchExternalChanges         : watchExternalChanges => { //TODO test this with unit tests
                 this.update({ watchExternalChanges });
 
                 return this;
             },
             wheelOn                      : wheelOn => {
-                this.settings.wheelOn = wheelOn; //FIXME test this
+                this.settings.wheelOn = wheelOn; //TODO test this with unit tests
 
                 return this;
             },
             wheelStep                    : wheelStep => {
-                this.settings.wheelStep = wheelStep; //FIXME test this
+                this.settings.wheelStep = wheelStep; //TODO test this with unit tests
 
                 return this;
             },
@@ -909,7 +910,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.5.13';
+        return '4.6.0';
     }
 
     /**
@@ -2131,16 +2132,12 @@ export default class AutoNumeric {
 
                 this._setElementAndRawValue(value, forcedRawValue, saveChangeToHistory);
 
+                // Special case when the user is allowed to enter invalid numbers outside of the min/max range
+                this._setValidOrInvalidState(forcedRawValue);
+
                 return this;
             } else {
-                if (!minTest) {
-                    this._triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
-                }
-
-                if (!maxTest) {
-                    this._triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
-                }
-
+                this._triggerRangeEvents(minTest, maxTest);
                 AutoNumericHelper.throwError(`The value [${value}] being set falls outside of the minimumValue [${this.settings.minimumValue}] and maximumValue [${this.settings.maximumValue}] range set for this element`);
 
                 this._removeValueFromPersistentStorage();
@@ -2190,8 +2187,7 @@ export default class AutoNumeric {
             AutoNumericHelper.throwError(`The value is not a valid one, it's not a numeric string nor a recognized currency.`);
         }
 
-        const [minTest, maxTest] = this.constructor._checkIfInRangeWithOverrideOption(normalizedValue, this.settings);
-        if (minTest && maxTest) {
+        if (this.constructor._isWithinRangeWithOverrideOption(normalizedValue, this.settings)) {
             // If the `normalizedValue` is in the range
             this.setValue(value);
         } else {
@@ -3946,8 +3942,14 @@ export default class AutoNumeric {
             AutoNumeric.options.overrideMinMaxLimits.ceiling,
             AutoNumeric.options.overrideMinMaxLimits.floor,
             AutoNumeric.options.overrideMinMaxLimits.ignore,
+            AutoNumeric.options.overrideMinMaxLimits.invalid,
         ])) {
-            AutoNumericHelper.throwError(`The override min & max limits option 'overrideMinMaxLimits' is invalid ; it should either be 'ceiling', 'floor' or 'ignore', [${options.overrideMinMaxLimits}] given.`);
+            AutoNumericHelper.throwError(`The override min & max limits option 'overrideMinMaxLimits' is invalid ; it should either be 'ceiling', 'floor', 'ignore' or 'invalid', [${options.overrideMinMaxLimits}] given.`);
+        }
+
+        if ((options.overrideMinMaxLimits !== AutoNumeric.options.overrideMinMaxLimits.invalid && options.overrideMinMaxLimits !== AutoNumeric.options.overrideMinMaxLimits.ignore) &&
+            (options.minimumValue > 0 || options.maximumValue < 0)) {
+            AutoNumericHelper.warning(`You've set a \`minimumValue\` or a \`maximumValue\` excluding the value \`0\`. AutoNumeric will force the users to always have a valid value in the input, hence preventing them to clear the field. If you want to allow for temporary invalid values (ie. out-of-range), you should use the 'invalid' option for the 'overrideMinMaxLimits' setting.`);
         }
 
         if (!AutoNumericHelper.isString(options.maximumValue) || !testFloatOrIntegerAndPossibleNegativeSign.test(options.maximumValue)) {
@@ -4069,8 +4071,7 @@ export default class AutoNumeric {
         }
 
         if (testFloatOrIntegerAndPossibleNegativeSign.test(String(options.emptyInputBehavior))) {
-            const [minTest, maxTest] = this._checkIfInRangeWithOverrideOption(options.emptyInputBehavior, options);
-            if ((!minTest || !maxTest)) {
+            if (!this._isWithinRangeWithOverrideOption(options.emptyInputBehavior, options)) {
                 AutoNumericHelper.throwError(`The 'emptyInputBehavior' option is set to a number or a string that represents a number, but its value [${options.emptyInputBehavior}] is outside of the range defined by the 'minimumValue' and 'maximumValue' options [${options.minimumValue}, ${options.maximumValue}].`);
             }
         }
@@ -4081,6 +4082,10 @@ export default class AutoNumeric {
 
         if (!AutoNumericHelper.isTrueOrFalseString(options.eventIsCancelable) && !AutoNumericHelper.isBoolean(options.eventIsCancelable)) {
             AutoNumericHelper.throwError(`The event is cancelable option 'eventIsCancelable' is invalid ; it should be either 'true' or 'false', [${options.eventIsCancelable}] given.`);
+        }
+
+        if (AutoNumericHelper.isBoolean(options.invalidClass) || !/^-?[_a-zA-Z]+[_a-zA-Z0-9-]*$/.test(options.invalidClass)) { //TODO Make sure this covers all the CSS class names
+            AutoNumericHelper.throwError(`The name of the 'invalidClass' option is not a valid CSS class name ; it should not be empty, and should follow the '^-?[_a-zA-Z]+[_a-zA-Z0-9-]*$' regex, [${options.invalidClass}] given.`);
         }
 
         if (!AutoNumericHelper.isInArray(options.leadingZero, [
@@ -4355,9 +4360,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             AutoNumericHelper.throwError(`The value [${valueString}] that you are trying to format is not a recognized number.`);
         }
 
-        // Basic tests to check if the given valueString is valid
-        const [minTest, maxTest] = this._checkIfInRangeWithOverrideOption(valueString, settings);
-        if (!minTest || !maxTest) {
+        // Check if the given valueString is valid
+        if (!this._isWithinRangeWithOverrideOption(valueString, settings)) {
             // Throw a custom event
             AutoNumericHelper.triggerEvent(AutoNumeric.events.formatted, document, {
                 oldValue   : null,
@@ -5940,17 +5944,17 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
-     * Check that the number satisfy the format conditions
-     * and lays between settings.minimumValue and settings.maximumValue
-     * and the string length does not exceed the digits in settings.minimumValue and settings.maximumValue
+     * Check if the given value is within the `minimumValue` and `maximumValue` range, while using the override options set with `overrideMinMaxLimits`.
+     * The minimum and maximum limit test results are returned in a array like `[isMinimumLimitRespected, isMaximumLimitRespected]`.
      *
      * @param {string} value
      * @param {object} settings
-     * @returns {*}
+     * @returns {[boolean, boolean]}
      */
     static _checkIfInRangeWithOverrideOption(value, settings) {
-        if (AutoNumericHelper.isNull(value) && settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.null) {
-            // When the `null` value is accepted as the `rawValue`, the limits are ignored
+        if ((AutoNumericHelper.isNull(value) && settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.null) || // When the `null` value is accepted as the `rawValue`, the limits are ignored
+            settings.overrideMinMaxLimits === AutoNumeric.options.overrideMinMaxLimits.ignore ||
+            settings.overrideMinMaxLimits === AutoNumeric.options.overrideMinMaxLimits.invalid) {
             return [true, true];
         }
 
@@ -5968,14 +5972,141 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             case AutoNumeric.options.overrideMinMaxLimits.ceiling:
                 result = [true, AutoNumericHelper.testMinMax(maxParse, valParse) < 1];
                 break;
-            case AutoNumeric.options.overrideMinMaxLimits.ignore:
-                result = [true, true];
-                break;
             default:
                 result = [AutoNumericHelper.testMinMax(minParse, valParse) > -1, AutoNumericHelper.testMinMax(maxParse, valParse) < 1];
         }
 
         return result;
+    }
+
+    /**
+     * Returns `true` if the given value is within the `minimumValue` and `maximumValue` limits, while using the override options set with `overrideMinMaxLimits`, `false` otherwise
+     *
+     * @param {string} value
+     * @param {object} settings
+     * @returns {boolean}
+     * @private
+     */
+    static _isWithinRangeWithOverrideOption(value, settings) {
+        const [minTest, maxTest] = this._checkIfInRangeWithOverrideOption(value, settings);
+
+        return minTest && maxTest;
+    }
+
+    /**
+     * Helper function that prepares the value string for the min/max test
+     *
+     * @param {string} value
+     * @returns {{}}
+     * @private
+     */
+    static _cleanValueForRangeParse(value) {
+        value = value.toString().replace(',', '.');
+
+        return AutoNumericHelper.parseStr(value);
+    }
+
+    /**
+     * Returns `true` is the value is superior or equal to the `minimumValue` limit, discarding any override options
+     *
+     * @param {string} value
+     * @param {object} settings
+     * @returns {boolean}
+     * @private
+     */
+    static _isMinimumRangeRespected(value, settings) {
+        return AutoNumericHelper.testMinMax(AutoNumericHelper.parseStr(settings.minimumValue), this._cleanValueForRangeParse(value)) > -1;
+    }
+
+    /**
+     * Returns `true` is the value is inferior or equal to the `maximumValue` limit, discarding any override options
+     *
+     * @param {string} value
+     * @param {object} settings
+     * @returns {boolean}
+     * @private
+     */
+    static _isMaximumRangeRespected(value, settings) {
+        return AutoNumericHelper.testMinMax(AutoNumericHelper.parseStr(settings.maximumValue), this._cleanValueForRangeParse(value)) < 1;
+    }
+
+    /**
+     * Helper function that triggers the range events if they are needed
+     *
+     * @param {boolean} minTest
+     * @param {boolean} maxTest
+     * @private
+     */
+    _triggerRangeEvents(minTest, maxTest) {
+        if (!minTest) {
+            this._triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
+        }
+
+        if (!maxTest) {
+            this._triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
+        }
+    }
+
+    /**
+     * Set the invalid state on the AutoNumeric element.
+     * If the element is not an input, and therefore a contenteditable-enabled element, its validity state cannot be changed.
+     * In that case, the invalid css class defined with the `settings.invalidClass` option is added to the element.
+     * The 'autoNumeric:invalidValue' event is always sent when this function is called.
+     *
+     * @private
+     */
+    _setInvalidState() {
+        if (this.isInputElement) {
+            AutoNumericHelper.setInvalidState(this.domElement);
+        } else {
+            this._addCSSClass(this.settings.invalidClass);
+        }
+
+        this._triggerEvent(AutoNumeric.events.invalidValue, this.domElement);
+        this.validState = false;
+    }
+
+    /**
+     * Set the valid state on the AutoNumeric element.
+     * If the element is not an input, and therefore a contenteditable-enabled element, its validity state cannot be changed.
+     * In that case, the invalid css class defined with the `settings.invalidClass` option is removed.
+     * The 'autoNumeric:correctedValue' event is sent if the element state is invalid when this is called.
+     *
+     * @private
+     */
+    _setValidState() {
+        if (this.isInputElement) {
+            AutoNumericHelper.setValidState(this.domElement);
+        } else {
+            this._removeCSSClass(this.settings.invalidClass);
+        }
+
+        if (!this.validState) {
+            this._triggerEvent(AutoNumeric.events.correctedValue, this.domElement);
+        }
+
+        this.validState = true;
+    }
+
+    /**
+     * Sets the valid or invalid state on the DOM element, if the value is within the range set by the minimum and maximum value
+     *
+     * @param {string} value
+     * @private
+     */
+    _setValidOrInvalidState(value) {
+        if (this.settings.overrideMinMaxLimits === AutoNumeric.options.overrideMinMaxLimits.invalid) {
+            const minRangeOk = this.constructor._isMinimumRangeRespected(value, this.settings);
+            const maxRangeOk = this.constructor._isMaximumRangeRespected(value, this.settings);
+
+            if (minRangeOk && maxRangeOk) {
+                this._setValidState();
+            } else {
+                this._setInvalidState();
+            }
+
+            this._triggerRangeEvents(minRangeOk, maxRangeOk);
+        }
     }
 
     /**
@@ -6487,8 +6618,15 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // Check if the key is a delete/backspace key
         if (this.eventKey === AutoNumericEnum.keyName.Backspace || this.eventKey === AutoNumericEnum.keyName.Delete) {
-            this._processCharacterDeletion(); // Because backspace and delete only triggers keydown and keyup events, not keypress
+            const isDeletionAllowed = this._processCharacterDeletion(); // Because backspace and delete only triggers keydown and keyup events, not keypress
             this.processed = true;
+            if (!isDeletionAllowed) {
+                // Prevent the deletion if `overrideMinMaxLimits` option is `doNotOverride` and the result goes out of the allowed range
+                e.preventDefault();
+
+                return;
+            }
+
             this._formatValue(e);
 
             // If and only if the resulting value has changed after that backspace/delete, then we have to send an 'input' event like browsers normally do.
@@ -6566,6 +6704,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
             this.lastVal = AutoNumericHelper.getElementValue(e.target);
             this.throwInput = true;
+
+            this._setValidOrInvalidState(this.rawValue); // Updates the valid state as soon as the number is entered (in the case where the user keeps pressing the number key)
 
             return;
         }
@@ -6683,6 +6823,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             this._formatValue(e);
         }
 
+        this._setValidOrInvalidState(this.rawValue);
+
         // Force the `rawValue` update on Android Chrome
         this._saveRawValueForAndroid();
 
@@ -6736,7 +6878,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      */
     _onFocusOutAndMouseLeave(e) {
         //TODO Create separate handlers for blur and mouseleave
-        this.isEditing = false; // Just in case no `keyUp` event have been sent (if the user lost the focus to the window while typing)
+        this.isEditing = false; // Just in case no `keyUp` event have been sent (if the user lost the focus on the window while typing)
 
         if (e.type === 'mouseleave' && this.formulaMode) {
             return;
@@ -6769,13 +6911,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             // Directly set the formatted value if the `rawValue` is found in `valuesToStrings`
             let elementValueIsAlreadySet = false;
             if (rawValueToFormat !== '' && !isRawValueNull) {
-                if (!minTest) {
-                    this._triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
-                }
-
-                if (!maxTest) {
-                    this._triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
-                }
+                this._triggerRangeEvents(minTest, maxTest);
 
                 if (this.settings.valuesToStrings && this._checkValuesToStrings(rawValueToFormat)) {
                     // Set the formatted value with the corresponding string
@@ -6805,13 +6941,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                         value = this.constructor._roundFormattedValueShownOnBlur(value, this.settings);
                         value = this.constructor._modifyNegativeSignAndDecimalCharacterForFormattedValue(value, this.settings);
                     } else {
-                        if (!minTest) {
-                            this._triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
-                        }
-
-                        if (!maxTest) {
-                            this._triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
-                        }
+                        this._triggerRangeEvents(minTest, maxTest);
                     }
                 } else if (rawValueToFormat === '') {
                     switch (this.settings.emptyInputBehavior) {
@@ -6835,7 +6965,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     }
                 }
 
-
                 let groupedValue = this.constructor._orderValueCurrencySymbolAndSuffixText(value, this.settings, false);
                 if (!(this.constructor._isElementValueEmptyOrOnlyTheNegativeSign(value, this.settings) ||
                         (isRawValueNull && this.settings.emptyInputBehavior === AutoNumeric.options.emptyInputBehavior.null))) {
@@ -6854,6 +6983,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     this._setElementValue(groupedValue);
                 }
             }
+
+            this._setValidOrInvalidState(this.rawValue);
 
             if (e.type === 'blur') {
                 //TODO Create separate handlers for blur and mouseleave, really.
@@ -7801,7 +7932,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         settings.decimalPlacesRawValue = Math.max(
             Math.max(settings.decimalPlacesShownOnBlur, settings.decimalPlacesShownOnFocus) + additionalDecimalPlacesRawValue,
-            Number(settings.originalDecimalPlacesRawValue) + additionalDecimalPlacesRawValue
+            Number(settings.originalDecimalPlacesRawValue) + additionalDecimalPlacesRawValue,
         );
     }
 
@@ -7882,12 +8013,12 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         if (!settings.decimalPlaces && !settings.decimalPlacesRawValue) {
             settings.decimalPlacesRawValue = Math.max(
                 Math.max(settings.decimalPlacesShownOnBlur, settings.decimalPlacesShownOnFocus) + additionalDecimalPlacesRawValue,
-                Number(currentSettings.originalDecimalPlacesRawValue) + additionalDecimalPlacesRawValue
+                Number(currentSettings.originalDecimalPlacesRawValue) + additionalDecimalPlacesRawValue,
             );
         } else {
             settings.decimalPlacesRawValue = Math.max(
                 Math.max(settings.decimalPlacesShownOnBlur, settings.decimalPlacesShownOnFocus) + additionalDecimalPlacesRawValue,
-                Number(settings.decimalPlacesRawValue) + additionalDecimalPlacesRawValue
+                Number(settings.decimalPlacesRawValue) + additionalDecimalPlacesRawValue,
             );
         }
     }
@@ -8515,11 +8646,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             return true;
         }
 
-        if (!minTest) {
-            this._triggerEvent(AutoNumeric.events.minRangeExceeded, this.domElement);
-        } else if (!maxTest) {
-            this._triggerEvent(AutoNumeric.events.maxRangeExceeded, this.domElement);
-        }
+        this._triggerRangeEvents(minTest, maxTest);
 
         return false;
     }
@@ -8786,6 +8913,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Process the deletion of characters.
+     * Returns `true` if the deletion is allowed (within the min and max range, according to the `overrideMinMaxLimits` option, `false` otherwise.
+     *
+     * @returns {boolean}
      */
     _processCharacterDeletion() {
         let left;
@@ -8811,7 +8941,14 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             [left, right] = this._getUnformattedLeftAndRightPartAroundTheSelection();
         }
 
+        if (!this.constructor._isWithinRangeWithOverrideOption(`${left}${right}`, this.settings)) {
+            // If the result with the deletion would be out of the range, we prevent it
+            return false;
+        }
+
         this._setValueParts(left, right);
+
+        return true;
     }
 
     /**

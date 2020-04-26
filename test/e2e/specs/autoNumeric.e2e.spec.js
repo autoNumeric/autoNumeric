@@ -1,7 +1,7 @@
 /**
  * End-to-end tests for autoNumeric.js
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
- * @copyright © 2019 Alexandre Bonneau
+ * @copyright © 2020 Alexandre Bonneau
  *
  * The MIT License (http://www.opensource.org/licenses/mit-license.php)
  *
@@ -238,6 +238,10 @@ const selectors = {
     issue675a                         : '#issue_675a',
     issue675b                         : '#issue_675b',
     issue675c                         : '#issue_675c',
+    issue543Default                   : '#issue_543_override_default',
+    issue543Invalid                   : '#issue_543_override_invalid',
+    issue543Ignore                    : '#issue_543_override_ignore',
+    issue543InvalidCE                 : '#issue_543_override_invalid_ce',
 };
 
 //-----------------------------------------------------------------------------
@@ -325,7 +329,7 @@ describe('webdriver.io runner', () => {
             'ArrowLeft',
             'ArrowLeft',
             'ArrowLeft',
-        ]); //FIXME This does not work anymore with firefox, but only with Chromium
+        ]);
         browser.keys('NULL'); // This deactivates any modifiers key (I could have used `browser.keys('Shift');` again to toggle it off)
         browser.keys('foobar');
         expect(inputClassic.getValue()).toEqual('987654foobarg');
@@ -4483,3 +4487,86 @@ describe('Issue #675', () => {
 
 
 //TODO Add some tests to make sure the correct number of `AutoNumeric.events.formatted` is sent during each keypress
+
+describe('Issue #543', () => {
+    //TODO check the events sent when typing invalid numbers (#543)
+    it('should test for default values', () => {
+        browser.url(testUrl);
+
+        expect($(selectors.issue543Default).getValue()).toEqual('12.00');
+        expect($(selectors.issue543Invalid).getValue()).toEqual('24.00');
+        expect($(selectors.issue543Ignore).getValue()).toEqual('42.00');
+        expect($(selectors.issue543InvalidCE).getText()).toEqual('24.00');
+    });
+
+    it(`should disallows entering numbers out-of-bounds when using the default \`overrideMinMaxLimits\` option`, () => {
+        const input = $(selectors.issue543Default);
+        input.click();
+        browser.keys(['Home', 'Delete']);
+        expect(input.getValue()).toEqual('12.00');
+        browser.keys(['End', 'Backspace', 'Backspace', 'Backspace', 'Backspace']);
+        expect(input.getValue()).toEqual('12');
+        browser.keys(['Home', 'ArrowRight', '5']);
+        expect(input.getValue()).toEqual('152');
+        browser.keys(['Delete', 'Home', 'Delete']);
+        expect(input.getValue()).toEqual('5');
+        browser.keys(['Delete']);
+        expect(input.getValue()).toEqual('5');
+    });
+
+    xit(`should allows entering numbers out-of-bounds when using the \`overrideMinMaxLimits\` option \`invalid\`, while setting the invalid state`, () => { //FIXME Those tests are correct and work as expected under Chromium. They fail under Firefox ESR 68.7 when trying to access the validity property (see the upstream bug declared on https://github.com/mozilla/geckodriver/issues/938#issuecomment-616006856)
+        //TODO Check that the invalid event is sent
+        const input = $(selectors.issue543Invalid);
+        input.click();
+        expect(input.getProperty('validity').valid).toEqual(true);
+        browser.keys(['Home', 'Delete']);
+        expect(input.getValue()).toEqual('4.00');
+        expect(input.getProperty('validity').valid).toEqual(false);
+        browser.keys(['Delete']);
+        expect(input.getValue()).toEqual('0.00');
+        expect(input.getProperty('validity').valid).toEqual(false);
+        browser.keys(['5']);
+        expect(input.getProperty('validity').valid).toEqual(true);
+        browser.keys(['000']); // 5000
+        expect(input.getProperty('validity').valid).toEqual(true);
+        browser.keys(['Home', 'Delete', '10']); // 10000
+        expect(input.getProperty('validity').valid).toEqual(true);
+        browser.keys(['End', 'ArrowLeft', '1']); // 10000.01
+        expect(input.getProperty('validity').valid).toEqual(false);
+    });
+
+    xit(`should allows entering numbers out-of-bounds when using the \`overrideMinMaxLimits\` option \`invalid\` on a contenteditable-enabled element, while setting the invalid CSS class`, () => { //FIXME Those tests are correct and work as expected under Chromium. They fail under Firefox ESR 68.7 when trying to send the Home key (perhaps related to the upstream bug https://github.com/mozilla/geckodriver/issues/1508 ?)
+        //TODO Check that the invalid event is sent
+        const input = $(selectors.issue543InvalidCE);
+        input.click();
+        expect(input.getAttribute('class')).toEqual(''); //FIXME Chrome expects '', while Firefox expect 'null'...
+        browser.keys(['Home', 'Delete']);
+        expect(input.getText()).toEqual('4.00');
+        expect(input.getAttribute('class')).toEqual('an-invalid');
+        browser.keys(['Delete']);
+        expect(input.getText()).toEqual('0.00');
+        expect(input.getAttribute('class')).toEqual('an-invalid');
+        browser.keys(['5']);
+        expect(input.getAttribute('class')).toEqual('');
+        browser.keys(['000']); // 5000
+        expect(input.getAttribute('class')).toEqual('');
+        browser.keys(['Home', 'Delete', '10']); // 10000 //FIXME Under Firefox ESR, 'Home' does not work //TODO Change it back when the bug is fixed upstream
+        expect(input.getAttribute('class')).toEqual('');
+        browser.keys(['End', 'ArrowLeft', '1']); // 10000.01
+        expect(input.getAttribute('class')).toEqual('an-invalid');
+    });
+
+    it(`should allows entering numbers out-of-bounds when using the \`overrideMinMaxLimits\` option \`ignore\``, () => {
+        //TODO Check that no events are sent
+        const input = $(selectors.issue543Ignore);
+        input.click();
+        browser.keys(['Home', 'Delete']);
+        expect(input.getValue()).toEqual('2.00');
+        browser.keys(['Delete']);
+        expect(input.getValue()).toEqual('0.00');
+        browser.keys(['10000']);
+        expect(input.getValue()).toEqual('10,000.00');
+        browser.keys(['End', 'ArrowLeft', '1']); // 10000.01
+        expect(input.getValue()).toEqual('10,000.01');
+    });
+});

@@ -352,7 +352,7 @@ You can also generate your custom options object and try those live with the [Au
 | `noEventListeners` | Defines if the element should have event listeners activated on it.<br>*Note: Setting this to `true` will prevent any format to be applied once the user starts modifying the element value. This is unlikely what you want.* | `false` |
 | `onInvalidPaste` | Manage how autoNumeric react when the user tries to paste an invalid number (possible options are `error`, `ignore`, `clamp`, `truncate` or `replace`) | `'error'` |
 | `outputFormat` | Defines the localized output format of the `getLocalized`, `form*`, `formArray*` and `formJson*` methods | `null` |
-| `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor` and `ignore`) | `null` |
+| `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor`, `ignore` and `invalid`) | `null` |
 | `positiveSignCharacter` | Defines the positive sign character to use (Note: It's only shown if `showPositiveSign` is set to `true`) | `'+'` |
 | `rawValueDivisor` | Define the number that will divide the formatted value into the raw value (ie. when displaying `'1.23%'`, the raw value kept is `0.0123` if `rawValueDivisor` is set to `100`) | `null` |
 | `readOnly` | Defines if the element (`<input>` or another allowed html tag) should be set as read-only on initialization | `false` |
@@ -718,7 +718,7 @@ anElement.global.unformatLocalized();
 anElement.global.unformatLocalized(forcedOutputFormat);
 anElement.global.update({ options }); // Update the settings of each autoNumeric-managed elements
 anElement.global.update({ options1 }, { options2 }, { options3 }); // Idem above, but accepts as many option objects as needed
-anElement.global.isPristine(); // Return `true` is *all* the autoNumeric-managed elements are pristine, if their raw value hasn't changed
+anElement.global.isPristine(); // Return `true` if *all* the autoNumeric-managed elements are pristine, if their raw value hasn't changed
 anElement.global.isPristine(false); // Idem as above, but also checks that the formatted value hasn't changed
 anElement.global.clear(); // Clear the value in all the autoNumeric-managed elements that are shared on this element
 anElement.global.remove();
@@ -860,9 +860,9 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 
 ## Formula mode
 
-AutoNumeric provides a quick way to enter and evaluate simple math expression into the element.<br>
+AutoNumeric provides a quick way to enter and evaluate simple math expressions directly into the element.<br>
 
-Sometimes, you need to quickly calculate the product or the sum of two numbers, before entering the result in the AutoNumeric element.
+Sometimes, you need to quickly calculate the product or the sum of two or more numbers, before entering the result in the AutoNumeric element.
 <br>
 For instance, you might ask yourself *"How many months are there in 14 years and 5 months ?"*, then you'd need to either make a mental calculation, or resort to using a calculator.
 To speed things up and provide a lean user experience, AutoNumeric provides a *formula mode* which allows you to enter and evaluate simple math expressions very quickly.
@@ -870,7 +870,7 @@ To speed things up and provide a lean user experience, AutoNumeric provides a *f
 Using our previous example, you would just need to activate the *formula mode* by entering the equal sign (`=`) key, then type `=14*12 + 5`, and finally validate that expression by using the `Enter` key, or by blurring the field.
 <br>*Note: if the math expression is invalid, the previous `rawValue` is set back*
 
-By default, this behavior is disabled. If you want to enable the math expression parsing, you need to set the `formulaMode` option:
+By default, this behavior is *disabled*. If you want to enable the math expression parsing, you need to set the `formulaMode` option to `true`:
 ```js
 new AutoNumeric(domElement, { formulaMode: true });
 ```
@@ -898,8 +898,10 @@ When a valid math expression is accepted, then its result is `set()`, and the `a
 AutoNumeric elements are transparent to the native `input` and `change` events, which means those are correctly sent when using an `<input>` element managed by AutoNumeric.
 
 In addition to the native events, custom events sent by AutoNumeric elements allows you to hook into the formatting lifecycle, as you see fit:
+- `'autoNumeric:correctedValue'` when an invalid value is corrected
 - `'autoNumeric:initialized'` when the AutoNumeric element is initialized
 - `'autoNumeric:invalidFormula'` when the user tries to validate an invalid math expression
+- `'autoNumeric:invalidValue'` when an invalid value is entered (ie. when the raw value is out of the min/max range)
 - `'autoNumeric:rawValueModified'` when the `rawValue` is modified
 - `'autoNumeric:formatted'` when all the formatting is done and the formatted string is modified
 - `'autoNumeric:minExceeded'` if the `minimumValue` is not respected

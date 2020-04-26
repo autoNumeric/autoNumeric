@@ -13,6 +13,10 @@
 + From now on, whenever the user sets a `minimumValue` higher than `0`, or a `maximumValue` lower than `0`, a warning will be displayed in the console telling him to perhaps use the `overrideMinMaxLimits` `invalid` option. For information, the `overrideMinMaxLimits` `doNotOverride` is still the default behavior.
 + Simplify the min and max range tests with the new private `_isWithinRangeWithOverrideOption()` function
 + Fixes the bug where you could always clear the input even if the limit were preventing you to do so (the last valid value was then set back on blur). Now AutoNumeric correctly prevents you to clear the input if the resulting value is out-of-bound.
++ Fixes #676 36 errors in index.d.ts when using with typescript
+  + TypeScript users should now remove the `declare module 'autonumeric';` line from their script (cf. PR #677)
++ Removes node 6 from the CI tests (cf. PR #678)
++ Fixes the detection of wheel events when using a touchpad/trackball (cf. PR #672)
 
 ### 4.5.13
 + Fixes #675 The caret position is wrongly positioned when setting the raw value to zero on numbers with a prefix currency symbol (The bug was introduced in `v4.5.9` with the fix for #647)

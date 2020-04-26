@@ -354,6 +354,11 @@ AutoNumeric.options = {
         insane   : Number.MAX_SAFE_INTEGER,
     },
 
+    /* Defines the name of the CSS class to use on contenteditable-enabled elements when the value is invalid
+     * This is not used when the HTML element used is an input.
+     */
+    invalidClass: 'an-invalid',
+
     /* Allow the user to 'cancel' and undo the changes he made to the given autonumeric-managed element, by pressing the 'Escape' key.
      * Whenever the user 'validate' the input (either by hitting 'Enter', or blurring the element), the new value is saved for subsequent 'cancellation'.
      *
@@ -531,15 +536,27 @@ AutoNumeric.options = {
         none         : null,
     },
 
-    /* Override the minimum and maximum limits
-     * overrideMinMaxLimits: "ceiling" adheres to maximumValue and ignores minimumValue settings
-     * overrideMinMaxLimits: "floor" adheres to minimumValue and ignores maximumValue settings
-     * overrideMinMaxLimits: "ignore" ignores both minimumValue & maximumValue
+    /* Defines if AutoNumeric should let the user override the minimum and/or maximum limits when he types numbers in the element.
+     * - 'ceiling' Strictly adheres to `maximumValue` and ignores the `minimumValue` settings
+     *             It allows the user to enter anything between -∞ `and maximumValue`
+     *             If `maximumValue` is less than 0, then it will prevent the user emptying the field or typing value above `maximumValue`, making sure the value entered is always valid
+     * - 'floor'   Strictly adheres to `minimumValue` and ignores the `maximumValue` settings
+     *             It allows the user to enter anything between `minimumValue` and +∞
+     *             If `minimumValue` is higher than 0, then it will prevent the user emptying the field or typing value below `minimumValue`, making sure the value entered is always valid
+     * - 'ignore'  Ignores both the `minimumValue` and `maximumValue` settings
+     *             When using this option, the field will always be valid range-wise
+     * - 'invalid' The user can temporarily type out-of-bound values. In doing so, the invalid state is set on the field.
+     *             Whenever an invalid value is typed, an 'autoNumeric:invalidValue' event is sent
+     *             When the value is correctly set back within the limit boundaries, the invalid state is removed, and the 'autoNumeric:correctedValue' event is sent
+     * - 'doNotOverride' Strictly adheres to the `maximumValue` and `minimumValue` settings
+     *                   This is the default behavior
+     *                   If `0` is out of the min/max range, this will prevent the user clearing the input field, making sure the value entered is always valid
      */
     overrideMinMaxLimits: {
         ceiling      : 'ceiling',
         floor        : 'floor',
         ignore       : 'ignore',
+        invalid      : 'invalid',
         doNotOverride: null,
     },
 

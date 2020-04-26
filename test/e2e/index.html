@@ -176,6 +176,20 @@
 			background-color: whitesmoke !important;
 			color: #F692FF !important;
 		}
+
+		#issue_543_override_invalid:invalid,
+		.an-invalid {
+			border           : 1px solid #F00;
+			background-color : lightpink;
+			color            : #bc623d
+		}
+
+		#issue_543_override_invalid:valid,
+		.an-valid {
+			border: 1px solid #008000;
+			background-color: lightgreen;
+			color : #075362
+		}
 	</style>
 	<!-- Used by the end-to-end server spin up for the tests : -->
 	<script src="/autonumeric"></script>
@@ -210,6 +224,7 @@
 			<p class="description">AutoNumeric events</p>
 			<div>
 				<input id="autoNumericEventInput" type="text" placeholder="AutoNumeric events" value="2222">
+				<input id="autoNumericEventInputLimited" type="text" placeholder="Min 5 max 100" value="42">
 			</div>
 		</div>
 	</div>
@@ -1107,6 +1122,18 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Invalid entries (min 5, max 10000)</p>
+			<div>
+				<input id="issue_543_override_default" type="text" placeholder="Default" value="12">
+				<input id="issue_543_override_invalid" type="text" placeholder="invalid" value="24">
+				<input id="issue_543_override_ignore" type="text" placeholder="ignore" value="42">
+				<div id="issue_543_override_invalid_ce" contenteditable="true">24</div>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     console.log(`-------------------------------------------`);
@@ -1943,17 +1970,46 @@
     });
     //	    .update({ valuesToStrings : AutoNumeric.options.valuesToStrings.zeroDash }); //DEBUG
     const autoNumericEventInput = document.querySelector('#autoNumericEventInput');
-    autoNumericEventInput.addEventListener(AutoNumeric.events.formatted, e => {
-        console.log(`'${AutoNumeric.events.formatted}' sent with`, e); //DEBUG
+    autoNumericEventInput.addEventListener(AutoNumeric.events.initialized, e => {
+        console.log(`'${AutoNumeric.events.initialized}' sent with`, e); //DEBUG
+    });
+    autoNumericEventInput.addEventListener(AutoNumeric.events.invalidFormula, e => {
+        console.log(`'${AutoNumeric.events.invalidFormula}' sent with`, e); //DEBUG
     });
     autoNumericEventInput.addEventListener(AutoNumeric.events.rawValueModified, e => {
         console.log(`'${AutoNumeric.events.rawValueModified}' sent with`, e); //DEBUG
+    });
+    autoNumericEventInput.addEventListener(AutoNumeric.events.minRangeExceeded, e => {
+        console.log(`'${AutoNumeric.events.minRangeExceeded}' sent with`, e); //DEBUG
+    });
+    autoNumericEventInput.addEventListener(AutoNumeric.events.maxRangeExceeded, e => {
+        console.log(`'${AutoNumeric.events.maxRangeExceeded}' sent with`, e); //DEBUG
+    });
+    autoNumericEventInput.addEventListener(AutoNumeric.events.validFormula, e => {
+        console.log(`'${AutoNumeric.events.validFormula}' sent with`, e); //DEBUG
     });
     autoNumericEventInput.addEventListener(AutoNumeric.events.native.change, e => {
         console.log(`'${AutoNumeric.events.native.change}' sent with`, e); //DEBUG
     });
     autoNumericEventInput.addEventListener(AutoNumeric.events.native.input, e => {
         console.log(`'${AutoNumeric.events.native.input}' sent with`, e); //DEBUG
+    });
+
+    const autoNumericEventInputLimited = new AutoNumeric('#autoNumericEventInputLimited', { overrideMinMaxLimits: 'invalid', minimumValue: '5', maximumValue: '100' });
+    autoNumericEventInputLimited.node().addEventListener(AutoNumeric.events.correctedValue, e => {
+        console.log(`'${AutoNumeric.events.correctedValue}' sent with`, e); //DEBUG
+    });
+    autoNumericEventInputLimited.node().addEventListener(AutoNumeric.events.invalidValue, e => {
+        console.log(`'${AutoNumeric.events.invalidValue}' sent with`, e); //DEBUG
+    });
+    autoNumericEventInputLimited.node().addEventListener(AutoNumeric.events.rawValueModified, e => {
+        console.log(`'${AutoNumeric.events.rawValueModified}' sent with`, e); //DEBUG
+    });
+    autoNumericEventInputLimited.node().addEventListener(AutoNumeric.events.minRangeExceeded, e => {
+        console.log(`'${AutoNumeric.events.minRangeExceeded}' sent with`, e); //DEBUG
+    });
+    autoNumericEventInputLimited.node().addEventListener(AutoNumeric.events.maxRangeExceeded, e => {
+        console.log(`'${AutoNumeric.events.maxRangeExceeded}' sent with`, e); //DEBUG
     });
 
     //-------------- Issue #442 & #457
@@ -2327,6 +2383,12 @@
     new AutoNumeric('#issue_675a', { currencySymbol: '' });
     new AutoNumeric('#issue_675b', { currencySymbol: '€', currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.prefix });
     new AutoNumeric('#issue_675c', { currencySymbol: '€', currencySymbolPlacement: AutoNumeric.options.currencySymbolPlacement.suffix });
+
+    //-------------- Issue #543 overrideMinMaxLimits invalid option
+    new AutoNumeric('#issue_543_override_default', { minimumValue: '5', maximumValue: '10000' });
+    new AutoNumeric('#issue_543_override_invalid', { overrideMinMaxLimits: 'invalid', minimumValue: '5', maximumValue: '10000' });
+    new AutoNumeric('#issue_543_override_invalid_ce', { overrideMinMaxLimits: 'invalid', minimumValue: '5', maximumValue: '10000' });
+    new AutoNumeric('#issue_543_override_ignore', { overrideMinMaxLimits: 'ignore', minimumValue: '5', maximumValue: '10000' });
 </script>
 </body>
 </html>

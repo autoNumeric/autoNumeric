@@ -62,6 +62,7 @@ AutoNumeric.defaultSettings = {
     formatOnPageLoad             : AutoNumeric.options.formatOnPageLoad.format,
     formulaMode                  : AutoNumeric.options.formulaMode.disabled,
     historySize                  : AutoNumeric.options.historySize.medium,
+    invalidClass                 : AutoNumeric.options.invalidClass,
     isCancellable                : AutoNumeric.options.isCancellable.cancellable,
     leadingZero                  : AutoNumeric.options.leadingZero.deny,
     maximumValue                 : AutoNumeric.options.maximumValue.tenTrillions,

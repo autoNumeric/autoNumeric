@@ -1,5 +1,19 @@
 ## Changelog for autoNumeric
 
+### 4.6.0
++ Adds a new option `invalidClass`, which default to `an-invalid`, that defines the CSS class name to use when a contenteditable-enabled element value is invalid
++ Adds a new option value `'invalid'` for the `overrideMinMaxLimits` option, that will allow users to enter out-of-bound numbers
++ Fixes #543 Allow users to enter out-of-bound numbers, outside of the `minimumValue` and `maximumValue` range
+  + This allows users to type temporary invalid numbers when the `minimumValue` is superior to `0`, or the `maximumValue` is inferior to `0`
+  + While in this out-of-bound state, the element validity status is set to `invalid`
+  + Users can then target the CSS `:invalid` and/or `:valid` state as they wish to display a visual feedback as needed
+  + Do note that contenteditable-enabled elements cannot have a validity state set, so AutoNumeric instead sets by default the `an-invalid` CSS class on such 'invalid' elements
+  + Whenever the user type an invalid number (out of range), the new `'autoNumeric:invalidValue'` event is sent. When the value is corrected, the new `'autoNumeric:correctedValue'` event is sent.
+    + Beware; To reduce complexity, the `'autoNumeric:invalidValue'` event as well as the `'autoNumeric:minExceeded'` or `'autoNumeric:maxExceeded'` events are now sent up to three times for a single input; on keypress, keyup and blur
++ From now on, whenever the user sets a `minimumValue` higher than `0`, or a `maximumValue` lower than `0`, a warning will be displayed in the console telling him to perhaps use the `overrideMinMaxLimits` `invalid` option. For information, the `overrideMinMaxLimits` `doNotOverride` is still the default behavior.
++ Simplify the min and max range tests with the new private `_isWithinRangeWithOverrideOption()` function
++ Fixes the bug where you could always clear the input even if the limit were preventing you to do so (the last valid value was then set back on blur). Now AutoNumeric correctly prevents you to clear the input if the resulting value is out-of-bound.
+
 ### 4.5.13
 + Fixes #675 The caret position is wrongly positioned when setting the raw value to zero on numbers with a prefix currency symbol (The bug was introduced in `v4.5.9` with the fix for #647)
 

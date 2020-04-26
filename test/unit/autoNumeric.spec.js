@@ -105,6 +105,7 @@ describe('The AutoNumeric object', () => {
             formatOnPageLoad             : true,
             formulaMode                  : false,
             historySize                  : 20,
+            invalidClass                 : 'an-invalid',
             isCancellable                : true,
             leadingZero                  : 'deny',
             maximumValue                 : '10000000000000',
@@ -284,6 +285,7 @@ describe('The AutoNumeric object', () => {
             expect(defaultSettings.formatOnPageLoad          ).toEqual(aNInputSettings.formatOnPageLoad           );
             expect(defaultSettings.formulaMode               ).toEqual(aNInputSettings.formulaMode                );
             expect(String(defaultSettings.historySize)       ).toEqual(aNInputSettings.historySize                );
+            expect(String(defaultSettings.invalidClass)      ).toEqual(aNInputSettings.invalidClass               );
             expect(defaultSettings.isCancellable             ).toEqual(aNInputSettings.isCancellable              );
             expect(defaultSettings.leadingZero               ).toEqual(aNInputSettings.leadingZero                );
             expect(defaultSettings.maximumValue              ).toEqual(aNInputSettings.maximumValue               );
@@ -3186,6 +3188,7 @@ describe('autoNumeric options and `options.*` methods', () => {
      failOnUnknownOption
      formulaMode
      historySize
+     invalidClass
      isCancellable
      modifyValueOnWheel
      noEventListeners
@@ -7598,6 +7601,7 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ overrideMinMaxLimits: 'ceiling' })).not.toThrow();
             expect(() => AutoNumeric.validate({ overrideMinMaxLimits: 'floor' })).not.toThrow();
             expect(() => AutoNumeric.validate({ overrideMinMaxLimits: 'ignore' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ overrideMinMaxLimits: 'invalid' })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ maximumValue: '42' })).not.toThrow();
             expect(() => AutoNumeric.validate({ maximumValue: '42.4' })).not.toThrow();
@@ -7795,6 +7799,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ outputFormat: '-,' })).not.toThrow();
             expect(() => AutoNumeric.validate({ outputFormat: '.-' })).not.toThrow();
             expect(() => AutoNumeric.validate({ outputFormat: ',-' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ invalidClass: 'an-invalid' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ invalidClass: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ invalidClass: 'false' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ invalidClass: 'foobar' })).not.toThrow();
 
             expect(() => AutoNumeric.validate({ isCancellable: true })).not.toThrow();
             expect(() => AutoNumeric.validate({ isCancellable: false })).not.toThrow();
@@ -8214,6 +8223,12 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ outputFormat: 5 })).toThrow();
             expect(() => AutoNumeric.validate({ outputFormat: -5 })).toThrow();
 
+            expect(() => AutoNumeric.validate({ invalidClass: true })).toThrow();
+            expect(() => AutoNumeric.validate({ invalidClass: false })).toThrow();
+            expect(() => AutoNumeric.validate({ invalidClass: 42 })).toThrow();
+            expect(() => AutoNumeric.validate({ invalidClass: '123foo' })).toThrow();
+            expect(() => AutoNumeric.validate({ invalidClass: '---234' })).toThrow();
+
             expect(() => AutoNumeric.validate({ isCancellable: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ isCancellable: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ isCancellable: '0' })).toThrow();
@@ -8630,5 +8645,3 @@ describe(`The Math expression lexer and parser`, () => {
         expect(() => testParser('(4+1) * 2 - (104587.23 * 8 - (-7))')).toThrow();
     });
 });
-
-

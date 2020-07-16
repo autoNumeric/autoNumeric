@@ -8965,7 +8965,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             }
         }
 
-        const value = this.constructor._addGroupSeparators(elementValue, this.settings, this.isFocused, this.rawValue);
+        // value must have the full formatted value, with separators, decimals, etc.
+        // const value = this.constructor._addGroupSeparators(elementValue, this.settings, this.isFocused, this.rawValue);
+        const value = AutoNumeric.format(elementValue, this.settings);
+
         let position = value.length;
         if (value) {
             // Prepare regexp which searches for cursor position from unformatted left part

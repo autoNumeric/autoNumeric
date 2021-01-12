@@ -774,7 +774,8 @@ export default class AutoNumericHelper {
      * @throws
      */
     static throwError(message) {
-        throw new Error(message);
+        console.log('%c '+message, 'background: red; color: white; display: block;');
+        // throw new Error(message);
     }
 
     /**

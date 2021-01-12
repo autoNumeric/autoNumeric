@@ -775,8 +775,30 @@ export default class AutoNumeric {
 
                 return this;
             },
+            onErrorCallback              : onErrorCallback => {
+                if (AutoNumericHelper.isFunction(onErrorCallback)) {
+                    this.settings.onErrorCallback = (message) =>{
+                        onErrorCallback(message);
+                    }
+                } else {
+                    AutoNumericHelper.throwError(`The given callback is not a function.`);
+                }
+
+                return this;
+            },
             onInvalidPaste               : onInvalidPaste => {
                 this.settings.onInvalidPaste = onInvalidPaste; //TODO test this with unit tests
+
+                return this;
+            },
+            onResetErrorCallback         : onResetErrorCallback => {
+                if (AutoNumericHelper.isFunction(onResetErrorCallback)) {
+                    this.settings.onResetErrorCallback = () =>{
+                        onResetErrorCallback();
+                    }
+                } else {
+                    AutoNumericHelper.throwError(`The given callback is not a function.`);
+                }
 
                 return this;
             },
@@ -2138,8 +2160,9 @@ export default class AutoNumeric {
                 return this;
             } else {
                 this._triggerRangeEvents(minTest, maxTest);
-                AutoNumericHelper.throwError(`The value [${value}] being set falls outside of the minimumValue [${this.settings.minimumValue}] and maximumValue [${this.settings.maximumValue}] range set for this element`);
-
+                const error_message = `The value [${value}] being set falls outside of the minimumValue [${this.settings.minimumValue}] and maximumValue [${this.settings.maximumValue}] range set for this element`;
+                AutoNumericHelper.throwError(error_message);
+                this.settings.onErrorCallback(error_message);
                 this._removeValueFromPersistentStorage();
                 this.setValue('', saveChangeToHistory); //TODO Shouldn't we just drop that faulty newValue and keep the previous one? This is behind a `throwError()` call anyway..
 
@@ -2184,14 +2207,18 @@ export default class AutoNumeric {
         const strippedValue = this.constructor._removeBrackets(value, this.settings);
         const normalizedValue = this.constructor._stripAllNonNumberCharacters(strippedValue, this.settings, true, this.isFocused);
         if (!AutoNumericHelper.isNumber(normalizedValue)) {
-            AutoNumericHelper.throwError(`The value is not a valid one, it's not a numeric string nor a recognized currency.`);
+            const error_message = `The value is not a valid one, it's not a numeric string nor a recognized currency.`;
+            AutoNumericHelper.throwError(error_message);
+            this.settings.onErrorCallback(error_message);
         }
 
         if (this.constructor._isWithinRangeWithOverrideOption(normalizedValue, this.settings)) {
             // If the `normalizedValue` is in the range
             this.setValue(value);
         } else {
-            AutoNumericHelper.throwError(`The value is out of the range limits [${this.settings.minimumValue}, ${this.settings.maximumValue}].`);
+            const error_message = `The value is out of the range limits [${this.settings.minimumValue}, ${this.settings.maximumValue}].`;
+            AutoNumericHelper.throwError(error_message);
+            this.settings.onErrorCallback(error_message);
         }
 
         return this;
@@ -4338,7 +4365,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         if (!AutoNumericHelper.isString(value) && !AutoNumericHelper.isNumber(value)) {
-            AutoNumericHelper.throwError(`The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`);
+            const error_message = `The value "${value}" being "set" is not numeric and therefore cannot be used appropriately.`;
+            AutoNumericHelper.throwError(error_message);
+            this.settings.onErrorCallback(error_message);
         }
 
         // Manage options
@@ -4357,7 +4386,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Convert the value to a numeric string, stripping unnecessary characters in the process
         let valueString = this._toNumericValue(value, settings);
         if (isNaN(Number(valueString))) {
-            AutoNumericHelper.throwError(`The value [${valueString}] that you are trying to format is not a recognized number.`);
+            const error_message = `The value [${valueString}] that you are trying to format is not a recognized number.`;
+            AutoNumericHelper.throwError(error_message);
+            this.settings.onErrorCallback(error_message);
         }
 
         // Check if the given valueString is valid
@@ -4372,7 +4403,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 error      : 'Range test failed',
                 aNElement  : null,
             }, true, true);
-            AutoNumericHelper.throwError(`The value [${valueString}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`);
+            const error_message = `The value [${valueString}] being set falls outside of the minimumValue [${settings.minimumValue}] and maximumValue [${settings.maximumValue}] range set for this element`;
+            AutoNumericHelper.throwError(error_message);
+            this.settings.onErrorCallback(error_message);
         }
 
         // Directly format any `valuesToStrings` values, if found
@@ -4844,14 +4877,16 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             if (Object.prototype.hasOwnProperty.call(this.settings, key)) {
                 const value = this.settings[key];
 
-                if (typeof value === 'function') {
-                    this.settings[key] = value(this, key);
-                } else {
-                    // Calls the attached function from the html5 data. For instance: <tag data-currency-symbol="functionName"></tag>
-                    let htmlAttribute = this.domElement.getAttribute(key); //TODO Use `dataset` instead of `getAttribute` when we won't need to support obsolete browsers
-                    htmlAttribute = AutoNumericHelper.camelize(htmlAttribute);
-                    if (typeof this.settings[htmlAttribute] === 'function') {
-                        this.settings[key] = htmlAttribute(this, key);
+                if (typeof value === 'function' && value["name"] != "onErrorCallback" && value["name"] != "onResetErrorCallback" ) {
+                    if (typeof value === 'function') {
+                        this.settings[key] = value(this, key);
+                    } else {
+                        // Calls the attached function from the html5 data. For instance: <tag data-currency-symbol="functionName"></tag>
+                        let htmlAttribute = this.domElement.getAttribute(key); //TODO Use `dataset` instead of `getAttribute` when we won't need to support obsolete browsers
+                        htmlAttribute = AutoNumericHelper.camelize(htmlAttribute);
+                        if (typeof this.settings[htmlAttribute] === 'function') {
+                            this.settings[key] = htmlAttribute(this, key);
+                        }
                     }
                 }
             }
@@ -7045,7 +7080,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 this.formatted = true; // This prevent the `keyup` event on the `v` key during a paste to try to format an empty value.
                 // If the user tries to paste a single decimal character (that has been translated to '.' already) or the empty value, ignore the paste
                 if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.error) {
-                    AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' is not a valid paste content.`);
+                    const error_message = `The pasted value '${rawPastedText}' is not a valid paste content.`;
+                    AutoNumericHelper.throwError(error_message);
+                    this.settings.onErrorCallback(error_message);        
                 }
 
                 return;
@@ -7086,7 +7123,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         if (pastedText !== '.' && (!AutoNumericHelper.isNumber(pastedText) || pastedText === '')) {
             this.formatted = true; // This prevent the `keyup` event on the `v` key during a paste to try to format an empty value (fix issue #484)
             if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.error) {
-                AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' is not a valid paste content.`);
+                const error_message = `The pasted value '${rawPastedText}' is not a valid paste content.`;
+                AutoNumericHelper.throwError(error_message);
+                this.settings.onErrorCallback(error_message);    
             }
 
             return;
@@ -7300,7 +7339,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // 5. Check if the result is a valid number, if not, drop the paste and do nothing.
         if (!AutoNumericHelper.isNumber(result) || result === '') {
             if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.error) {
-                AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' would result into an invalid content '${result}'.`); //TODO Should we send a warning instead of throwing an error?
+                const error_message = `The pasted value '${rawPastedText}' would result into an invalid content '${result}'.`;
+                AutoNumericHelper.throwError(error_message);  //TODO Should we send a warning instead of throwing an error?
+                this.settings.onErrorCallback(error_message);
                 //TODO This is not DRY ; refactor with above
             }
             return;
@@ -7356,7 +7397,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 case AutoNumeric.options.onInvalidPaste.truncate:
                 case AutoNumeric.options.onInvalidPaste.replace:
                     // Throw an error message
-                    AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' results in a value '${result}' that is outside of the minimum [${this.settings.minimumValue}] and maximum [${this.settings.maximumValue}] value range.`);
+                    const error_message = `The pasted value '${rawPastedText}' results in a value '${result}' that is outside of the minimum [${this.settings.minimumValue}] and maximum [${this.settings.maximumValue}] value range.`;
+                    AutoNumericHelper.throwError(error_message);
+                    this.settings.onErrorCallback(error_message);
                 // falls through
                 case AutoNumeric.options.onInvalidPaste.ignore:
                 // Do nothing
@@ -7754,7 +7797,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     setValue = false;
                 } else {
                     // If not, inform the developer that nothing usable has been provided
-                    AutoNumericHelper.throwError(`The value [${currentValue}] used in the input is not a valid value autoNumeric can work with.`);
+                    const error_message = `The value [${currentValue}] used in the input is not a valid value autoNumeric can work with.`;
+                    AutoNumericHelper.throwError(error_message);
+                    this.settings.onErrorCallback(error_message);
                 }
             } else {
                 /* Checks for :
@@ -8971,6 +9016,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @returns {boolean}
      */
     _processCharacterInsertion() {
+        this.settings.onResetErrorCallback();
         let [left, right] = this._getUnformattedLeftAndRightPartAroundTheSelection();
         if (this.eventKey !== AutoNumericEnum.keyName.AndroidDefault) {
             this.throwInput = true;
@@ -9058,6 +9104,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             return true;
         }
 
+        this.settings.onErrorCallback(`The value [${this.eventKey}] used in the input is not a valid numeric value.`);
         // Prevent any other characters
         this.throwInput = false;
 

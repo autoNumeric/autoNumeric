@@ -9021,14 +9021,19 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         if ((this.eventKey === '-' || this.eventKey === '+') && this.settings.isNegativeSignAllowed) {
             // Here, the left and right parts have been normalized already, hence the minus sign usage
             if (left === '' && AutoNumericHelper.contains(right, '-')) {
-                // The value is originally negative (with a trailing negative sign)
-                right = right.replace('-', '');
+                // The value is originally negative (with a trailing negative sign) - change only on the '+' key
+                if(this.eventKey === '+' ) {
+                  right = right.replace('-', '');
+                }
             } else if (AutoNumericHelper.isNegativeStrict(left, '-')) {
                 // The value is originally negative (with a leading negative sign)
-                // Remove the negative sign, effectively converting the value to a positive one
-                left = left.replace('-', ''); //TODO replace with '+' if `showPositiveSign` too?
-            } else {
+                // Remove the negative sign, effectively converting the value to a positive one - change only on the '+' key
+                if(this.eventKey === '+' ) {
+                  left = left.replace('-', ''); //TODO replace with '+' if `showPositiveSign` too?
+                }
+            } else if (this.eventKey === '-') {
                 // The value is originally positive, so we toggle the state to a negative one (unformatted, which means even with a trailing negative sign, we add the minus sign on the far left)
+                // change only on the '-' key
                 left = `${this.settings.negativeSignCharacter}${left}`;
             }
 

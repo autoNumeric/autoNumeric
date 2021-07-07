@@ -73,7 +73,9 @@ AutoNumeric.defaultSettings = {
     negativeSignCharacter        : AutoNumeric.options.negativeSignCharacter.hyphen,
     noEventListeners             : AutoNumeric.options.noEventListeners.addEvents,
     //TODO Shouldn't we use `truncate` as the default value?
+    onErrorCallback              : () => {},
     onInvalidPaste               : AutoNumeric.options.onInvalidPaste.error,
+    onResetErrorCallback         : () => {},
     outputFormat                 : AutoNumeric.options.outputFormat.none,
     overrideMinMaxLimits         : AutoNumeric.options.overrideMinMaxLimits.doNotOverride,
     positiveSignCharacter        : AutoNumeric.options.positiveSignCharacter.plus,

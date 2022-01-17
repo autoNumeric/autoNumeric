@@ -175,7 +175,7 @@ export default class AutoNumeric {
 
         // Save the initial values (html attribute + element.value) for the pristine test
         this._saveInitialValues(initialValue);
-        
+
         // Setup the data for the persistent storage solution (ie. sessionStorage or cookies)
         this.sessionStorageAvailable = this.constructor._storageTest();
         this.storageNamePrefix = 'AUTO_'; // The prefix for the raw value storage name variable can be modified here
@@ -2245,7 +2245,12 @@ export default class AutoNumeric {
 
             if (saveChangeToHistory) {
                 // Save in the history the last known raw value and formatted result selection
-                this._historyTableAdd();
+                // requestAnimationFrame is used to schedule this between animation frame painting to avoid
+                // "Forced reflow while executing JavaScript" violation which is expensive when there are a huge number of
+                // elements (currency) to format.  The forced reflow is caused by calling `window.getSelection() in
+                // AutoNumericHelper/getElementSelection()` and then accessing the resulting `selection` variable in any way
+                // (in this case. selection.getRangeAt(0)).
+                window.requestAnimationFrame(() => {this._historyTableAdd()});
             }
         }
     }
@@ -6947,15 +6952,15 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     switch (this.settings.emptyInputBehavior) {
                         case AutoNumeric.options.emptyInputBehavior.zero:
                             this._setRawValue('0');
-                            value = this.constructor._roundValue('0', this.settings, 0); 
+                            value = this.constructor._roundValue('0', this.settings, 0);
                             break;
                         case AutoNumeric.options.emptyInputBehavior.min:
                             this._setRawValue(this.settings.minimumValue);
-                            value = this.constructor._roundFormattedValueShownOnFocusOrBlur(this.settings.minimumValue, this.settings, this.isFocused); 
+                            value = this.constructor._roundFormattedValueShownOnFocusOrBlur(this.settings.minimumValue, this.settings, this.isFocused);
                             break;
                         case AutoNumeric.options.emptyInputBehavior.max:
                             this._setRawValue(this.settings.maximumValue);
-                            value = this.constructor._roundFormattedValueShownOnFocusOrBlur(this.settings.maximumValue, this.settings, this.isFocused); 
+                            value = this.constructor._roundFormattedValueShownOnFocusOrBlur(this.settings.maximumValue, this.settings, this.isFocused);
                             break;
                         default:
                             if (AutoNumericHelper.isNumber(this.settings.emptyInputBehavior)) {

@@ -119,6 +119,7 @@
     "webpack-merge": "^4.1.2"
   },
   "scripts": {
+    "prepare": "yarn build",
     "authors": "sh tools/authors.sh",
     "postinstall": "node yarnfix.js",
     "build:dev": "webpack --config config/webpack.config.dev.js",

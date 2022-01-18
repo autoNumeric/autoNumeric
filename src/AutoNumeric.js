@@ -2244,8 +2244,12 @@ export default class AutoNumeric {
             this._parseStyleRules();
 
             if (saveChangeToHistory) {
-                // Save in the history the last known raw value and formatted result selection
-                this._historyTableAdd();
+                // requestAnimationFrame is used to schedule this between animation frame painting to avoid
+                // "Forced reflow while executing JavaScript" violation which is expensive when there are a huge number of
+                // elements (currency) to format.  The forced reflow is caused by calling `window.getSelection() in
+                // AutoNumericHelper/getElementSelection()` and then accessing the resulting `selection` variable in any way
+                // (in this case. selection.getRangeAt(0)).
+                window.requestAnimationFrame(() => {this._historyTableAdd(); });
             }
         }
     }

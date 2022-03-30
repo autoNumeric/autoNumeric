@@ -1,5 +1,5 @@
 /**
- * Babel + Webpack workaround for autoNumeric
+ * Math expression tokenizer/parser/evaluator functions for autoNumeric.js
  *
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
  * @copyright © 2019 Alexandre Bonneau
@@ -28,19 +28,43 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import AutoNumeric from './AutoNumeric';
-import AutoNumericEvents from './AutoNumericEvents';
-import AutoNumericOptions from './AutoNumericOptions';
-import AutoNumericDefaultSettings from './AutoNumericDefaultSettings';
-import AutoNumericPredefinedOptions from './AutoNumericPredefinedOptions';
-
-/* eslint no-unused-vars: 0 */
-
 /**
- * This file serve as the main entry point to the library.
- *
- * This is needed since if the Webpack entrypoint is set to `./src/AutoNumeric.js`, then the AutoNumericEvents, AutoNumericOptions, AutoNumericDefaultSettings and AutoNumericPredefinedOptions files are not included in the bundle and therefore cannot be used.
- *
- * @type {AutoNumeric}
+ * Recursively evaluate the abstract syntax tree (AST) and return the result for the given sub-tree
  */
-export default AutoNumeric;
+export default class Evaluator {
+    constructor(ast) {
+        if (ast === null) {
+            throw new Error(`Invalid AST`);
+        }
+
+        // return this.evaluate(ast);
+    }
+
+    evaluate(subtree) {
+        if (subtree === void(0) || subtree === null) {
+            throw new Error(`Invalid AST sub-tree`);
+        }
+
+        if (subtree.type === 'number') {
+            return subtree.value;
+        } else if (subtree.type === 'unaryMinus') {
+            return -this.evaluate(subtree.left);
+        } else {
+            const left  = this.evaluate(subtree.left);
+            const right = this.evaluate(subtree.right);
+
+            switch (subtree.type) {
+                case 'op_+':
+                    return Number(left) + Number(right);
+                case 'op_-':
+                    return left - right;
+                case 'op_*':
+                    return left * right;
+                case 'op_/':
+                    return left / right;
+                default :
+                    throw new Error(`Invalid operator '${subtree.type}'`);
+            }
+        }
+    }
+}

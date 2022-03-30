@@ -20,11 +20,13 @@ module.exports = {
             },
         ],
     },
-    output: {
-        libraryTarget: 'umd',
-        library: 'AutoNumeric',
-        filename: 'autoNumeric.js',
-        path: resolve('dist'),
+    output : {
+        libraryTarget: 'umd', // For info, using `var` instead of `umd` generates a cleaner dist file
+        libraryExport: 'default', // This option removes the `.default` after the build (see https://github.com/webpack/webpack/issues/3929)
+        library      : 'AutoNumeric',
+        filename     : 'autoNumeric.js',
+        path         : resolve('dist'),
+        globalObject : 'this',
     },
     resolve: {
         extensions: [

@@ -1,7 +1,7 @@
 /**
  * Helper functions for autoNumeric.js
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
- * @copyright © 2016 Alexandre Bonneau
+ * @copyright © 2019 Alexandre Bonneau
  *
  * The MIT License (http://www.opensource.org/licenses/mit-license.php)
  *
@@ -128,7 +128,7 @@ export default class AutoNumericHelper {
      */
     static isEmptyObj(obj) {
         for (const prop in obj) {
-            if (obj.hasOwnProperty(prop)) {
+            if (Object.prototype.hasOwnProperty.call(obj, prop)) {
                 return false;
             }
         }
@@ -153,6 +153,16 @@ export default class AutoNumericHelper {
      */
     static isNumber(n) {
         return !this.isArray(n) && !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
+    /**
+     * Return `true` if the given character is a number (0 to 9)
+     *
+     * @param {char} char
+     * @returns {boolean}
+     */
+    static isDigit(char) {
+        return /\d/.test(char);
     }
 
     /**
@@ -195,7 +205,7 @@ export default class AutoNumericHelper {
      */
     static isIE11() {
         // noinspection JSUnresolvedVariable
-        return !!window.MSInputMethodContext && !!document.documentMode;
+        return typeof window !== 'undefined' && !!window.MSInputMethodContext && !!document.documentMode;
     }
 
     /**
@@ -361,7 +371,7 @@ export default class AutoNumericHelper {
     static character(event) {
         let result;
         if (event.key === 'Unidentified' || event.key === void(0) || this.isSeleniumBot()) {
-            //XXX The selenium geckodriver do not understand `event.key`, hence when using it, we need to rely on the old deprecated `keyCode` attribute, cf. upstream issue https://github.com/mozilla/geckodriver/issues/440
+            //XXX The selenium geckodriver does not understand `event.key`, hence when using it, we need to rely on the old deprecated `keyCode` attribute, cf. upstream issue https://github.com/mozilla/geckodriver/issues/440
             // Use the old deprecated keyCode property, if the new `key` one is not supported
             const keyCode = this.keyCodeNumber(event);
             if (keyCode === AutoNumericEnum.keyCode.AndroidDefault) {
@@ -389,7 +399,12 @@ export default class AutoNumericHelper {
                     result = AutoNumericEnum.keyName.CrSel;
                     break;
                 case 'Decimal':
-                    result = AutoNumericEnum.keyName.NumpadDot;
+                    if (event.char) {
+                        // this fixes #602
+                        result = event.char;
+                    } else {
+                        result = AutoNumericEnum.keyName.NumpadDot;
+                    }
                     break;
                 case 'Del':
                     browser = this.browser();
@@ -493,6 +508,8 @@ export default class AutoNumericHelper {
      * Return `true` if the given number is negative, or if the given string contains a negative sign :
      * - everywhere in the string (by default), or
      * - on the first character only if the `checkEverywhere` parameter is set to `false`.
+     *
+     * Note: `-0` is not a negative number since it's equal to `0`.
      *
      * @param {number|string} numberOrNumericString A Number, or a number represented by a string
      * @param {string} negativeSignCharacter The single character that represent the negative sign
@@ -774,13 +791,24 @@ export default class AutoNumericHelper {
     }
 
     /**
+     * Return `true` if the given event is an instance of WheelEvent
+     *
+     * @static
+     * @param {event} event The event to test
+     * @returns {boolean} Return `true` if the event is an instance of WheelEvent, FALSE otherwise
+    */
+    static isWheelEvent(event) {
+        return event instanceof WheelEvent;
+    }
+
+    /**
      * Return `true` if the given event is a wheelup event
      *
      * @param {WheelEvent} wheelEvent
      * @returns {boolean}
      */
     static isWheelUpEvent(wheelEvent) {
-        if (!wheelEvent.deltaY) {
+        if (!this.isWheelEvent(wheelEvent) || this.isUndefinedOrNullOrEmpty(wheelEvent.deltaY)) {
             this.throwError(`The event passed as a parameter is not a valid wheel event, '${wheelEvent.type}' given.`);
         }
 
@@ -794,7 +822,7 @@ export default class AutoNumericHelper {
      * @returns {boolean}
      */
     static isWheelDownEvent(wheelEvent) {
-        if (!wheelEvent.deltaY) {
+        if (!this.isWheelEvent(wheelEvent) || this.isUndefinedOrNullOrEmpty(wheelEvent.deltaY)) {
             this.throwError(`The event passed as a parameter is not a valid wheel event, '${wheelEvent.type}' given.`);
         }
 
@@ -1253,6 +1281,31 @@ export default class AutoNumericHelper {
     }
 
     /**
+     * Set the invalid state for the given element.
+     * A custom message can be passed as the second argument.
+     * Note: This does not work with contenteditable elements
+     *
+     * @param {HTMLElement|HTMLInputElement} element
+     * @param {string|null} message
+     * @throws Error
+     */
+    static setInvalidState(element, message = 'Invalid') {
+        if (message === '' || this.isNull(message)) this.throwError('Cannot set the invalid state with an empty message.');
+
+        element.setCustomValidity(message);
+    }
+
+    /**
+     * Set the valid state for the given element.
+     * Note: This does not work with contenteditable elements
+     *
+     * @param {HTMLElement|HTMLInputElement} element
+     */
+    static setValidState(element) {
+        element.setCustomValidity('');
+    }
+
+    /**
      * This clone the given object, and return it.
      * WARNING: This does not do a deep cloning.
      * cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Examples
@@ -1457,5 +1510,101 @@ export default class AutoNumericHelper {
         }
 
         return key;
+    }
+
+    /**
+     * Insert the single character `char` in the string `str` at the given position `index`
+     *
+     * @param {string} str
+     * @param {string} char
+     * @param {int} index
+     * @returns {string}
+     */
+    static insertAt(str, char, index) {
+        str = String(str);
+
+        if (index > str.length) {
+            throw new Error(`The given index is out of the string range.`);
+        }
+
+        if (char.length !== 1) {
+            throw new Error('The given string `char` should be only one character long.');
+        }
+
+        if (str === '' && index === 0) {
+            return char;
+        }
+
+        return `${str.slice(0, index)}${char}${str.slice(index)}`;
+    }
+
+    /**
+     * Convert the given scientific notation to the 'expanded' decimal notation
+     *
+     * @example scientificToDecimal('-123.4567e-6') returns '-0.0001234567'
+     *
+     * @param {number|string} val
+     * @returns {number|string}
+     */
+    static scientificToDecimal(val) {
+        // Check that the val is a Number
+        const numericValue = Number(val);
+        if (isNaN(numericValue)) {
+            return NaN;
+        }
+
+        // Check if the number is in a scientific notation
+        val                = String(val);
+        const isScientific = this.contains(val, 'e') || this.contains(val, 'E');
+
+        if (!isScientific) {
+            return val;
+        }
+
+        // Convert the scientific notation to a numeric string
+        let [value, exponent] = val.split(/e/i);
+        const isNegative = value < 0;
+        if (isNegative) {
+            value = value.replace('-', '');
+        }
+
+        const isNegativeExponent = +exponent < 0;
+        if (isNegativeExponent) {
+            exponent = exponent.replace('-', ''); // Remove the negative sign
+        }
+
+        const [int, float] = value.split(/\./);
+
+        let result;
+        if (isNegativeExponent) {
+            if (int.length > exponent) {
+                // Place the decimal point at the int length count minus exponent
+                result = this.insertAt(int, '.', int.length - exponent);
+            } else {
+                // If that decimal point is greater than the int length, pad with zeros (ie. Number('-123.4567e-6') --> -0.0001234567)
+                result = `0.${'0'.repeat(exponent - int.length)}${int}`;
+            }
+
+            result = `${result}${float?float:''}`;
+        } else { // Positive exponent
+            if (float) {
+                value = `${int}${float}`; // Remove the '.', if any
+                if (exponent < float.length) {
+                    result = this.insertAt(value, '.', +exponent + int.length);
+                } else {
+                    result = `${value}${'0'.repeat(exponent - float.length)}`;
+                }
+            } else {
+                value = value.replace('.', ''); // Single case where val is '1.e4'
+                result = `${value}${'0'.repeat(Number(exponent))}`;
+            }
+        }
+
+        if (isNegative) {
+            // Put back the negative sign, if any
+            result = `-${result}`;
+        }
+
+        return result;
     }
 }

@@ -2,17 +2,23 @@ The AutoNumeric authors are:
 
 Commit  Authors
 ------  ------------------------------------------------------
-   419	Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
+   551	Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
    231	Bob Knothe <bob@decorplanit.com>
     12	Carlos Gonzales <carlos.rgn@gmail.com>
+     3	Lukas Drgon <lukas.drgon@gmail.com>
      3	Ney Estrabelli <neyestrabelli@gmail.com>
      2	Bernie Schelberg <bernie.schelberg@ausregistry.com.au>
      2	Carlos Ghan <charlie.brown.uy@gmail.com>
+     2	Daniel Ruf <DanielRuf@users.noreply.github.com>
      2	Kenny Moens <kenny.moens@cipalschaubroeck.be>
-     2	Lukas Drgon <lukas.drgon@gmail.com>
+     2	Luke Travis <luke.travis@k3integrations.com>
+     2	Nicolai Ehemann <en@enlightened.de>
      2	Ruslan Isay <isay.r@i20.biz>
      2	chery-qualset-hcd-ca-gov <cheryl.qualset@hcd.ca.gov>
      2	randoum <randoum@gmail.com>
+     1	Abdelghani AINOUSS <abel.ainou@gmail.Com>
+     1	Adrian Dmitroca <dmitroca.adrian@gmail.com>
+     1	Alex Turpin <alex.turpin@gmail.com>
      1	Aziz Khodjaev <ankh@inbox.ru>
      1	Boris Cherny <bcherny@gmail.com>
      1	Bruno Batista <bruno@atomtech.com.br>
@@ -29,7 +35,7 @@ Commit  Authors
      1	Zayter Munive <zayter@koombea.com>
      1	beastlike <beastlike@users.noreply.github.com>
 
-This list is ordered by contributions and has been generated on 2018-02-12 by `tools/authors.sh`.
+This list is ordered by contributions and has been generated on 2019-09-22 by `tools/authors.sh`.
 A more detailed list can be found on [Github](https://github.com/autoNumeric/autoNumeric/graphs/contributors).
 
 Special thanks to Sokolov 'funny-falcon' Yura for his contributions before autoNumeric moved to Github.

@@ -1,7 +1,7 @@
 /**
  * Options for autoNumeric.js
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
- * @copyright © 2017 Alexandre Bonneau
+ * @copyright © 2019 Alexandre Bonneau
  *
  * The MIT License (http://www.opensource.org/licenses/mit-license.php)
  *
@@ -32,20 +32,24 @@ import AutoNumeric from './AutoNumeric';
 /**
  * Event list managed by AutoNumeric
  *
- * @type {{initialized: string, formatted: string, minRangeExceeded: string, maxRangeExceeded: string, native: {input: string, change: string}}}
+ * @type {{correctedValue: string, initialized: string, invalidFormula: string, invalidValue: string, formatted: string, rawValueModified: string, minRangeExceeded: string, maxRangeExceeded: string, native: {input: string, change: string}, validFormula: string}}
  */
-Object.defineProperty(AutoNumeric, 'events', {
-    get() {
-        return {
-            initialized     : 'autoNumeric:initialized',
-            formatted       : 'autoNumeric:formatted',
-            rawValueModified: 'autoNumeric:rawValueModified',
-            minRangeExceeded: 'autoNumeric:minExceeded',
-            maxRangeExceeded: 'autoNumeric:maxExceeded',
-            native          : {
-                input : 'input',
-                change: 'change',
-            },
-        };
+AutoNumeric.events = {
+    correctedValue  : 'autoNumeric:correctedValue',
+    initialized     : 'autoNumeric:initialized',
+    invalidFormula  : 'autoNumeric:invalidFormula',
+    invalidValue    : 'autoNumeric:invalidValue',
+    formatted       : 'autoNumeric:formatted',
+    rawValueModified: 'autoNumeric:rawValueModified',
+    minRangeExceeded: 'autoNumeric:minExceeded',
+    maxRangeExceeded: 'autoNumeric:maxExceeded',
+    native          : {
+        input : 'input',
+        change: 'change',
     },
-});
+    validFormula    : 'autoNumeric:validFormula',
+};
+
+Object.freeze(AutoNumeric.events.native);
+Object.freeze(AutoNumeric.events);
+Object.defineProperty(AutoNumeric, 'events', { configurable: false, writable: false });

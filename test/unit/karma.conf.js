@@ -1,10 +1,7 @@
 // Karma configuration
 
-/* global require */
-
 const webpackConfig = require('../../config/webpack.config.test');
 
-/* global module */
 module.exports = function(config) {
     config.set({
         // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -18,7 +15,7 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            '../../node_modules/babel-polyfill/dist/polyfill.js',
+            '../../node_modules/@babel/polyfill/dist/polyfill.js',
             './tests.webpack.js',
         ],
 
@@ -92,7 +89,9 @@ module.exports = function(config) {
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         browsers: [
             'Chrome',
+            'ChromeHeadless',
             'Firefox',
+            'FirefoxDeveloperHeadless',
             'PhantomJS',
         ],
 

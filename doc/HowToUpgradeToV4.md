@@ -5,7 +5,7 @@ Version `4` has seen a [lots of improvements and new features](https://github.co
 ### Initialization
 
 Initialization of an AutoNumeric object [has changed](https://github.com/autoNumeric/autoNumeric/#initialization) a bit.<br>
-Since AutoNumeric is now an ES6 module, *`AutoNumeric` being the name of the `class`*, and since the jQuery dependency has been dropped, you now longer need to first select the DOM element with jQuery, then call the `$(yourElement).autoNumeric('init', { options })` method, but only need to instantiate an `AutoNumeric` object using `new AutoNumeric(yourElement, { options })`.
+Since AutoNumeric is now an ES6 module, *`AutoNumeric` being the name of the `class`*, and since the jQuery dependency has been dropped, you now longer need to first select the DOM element with jQuery, then call the `$(yourElement).autoNumeric('init', { options })` method, but only need to instantiate an `AutoNumeric` object using `new AutoNumeric(yourElement, { options })` (or if you do not already have a reference to the DOM element, use `new AutoNumeric('myCSSSeletor', { options })`).
 
 | <= `v2` (Before)          | `v4` (After) |
 | :---------------- | :-----------  |
@@ -52,12 +52,12 @@ If you wish, you can also specify a different number of decimal places for the f
 | `debug`         | `showWarnings` |
 
 If you want more detail about the AutoNumeric options, feel free to browse the [AutoNumeric options source code](https://github.com/autoNumeric/autoNumeric/blob/master/src/AutoNumericOptions.js) which has detailed comment for each one.<br>
-*A website is being constructed as we speak to make that more accessible.*
+*Check out the new options on the official website [here](http://autonumeric.org/guide).*
 
 ### Method calls
 
 Moreover, since we are now using an `AutoNumeric` object, we can now directly call its [methods](https://github.com/autoNumeric/autoNumeric/#methods) (and [chain](https://github.com/autoNumeric/autoNumeric/#function-chaining) them if needed).<br> 
-In the following table, the `anElement` variable is created using `const anElement = new AutoNumeric(domElement, { options })`.
+In the following table, the `anElement` variable is created using `const anElement = new AutoNumeric('someSelector', { options })`.
 
 The methods are now called like so:
 

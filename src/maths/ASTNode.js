@@ -1,5 +1,5 @@
 /**
- * Babel + Webpack workaround for autoNumeric
+ * Math expression tokenizer/parser/evaluator functions for autoNumeric.js
  *
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
  * @copyright © 2019 Alexandre Bonneau
@@ -28,19 +28,44 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import AutoNumeric from './AutoNumeric';
-import AutoNumericEvents from './AutoNumericEvents';
-import AutoNumericOptions from './AutoNumericOptions';
-import AutoNumericDefaultSettings from './AutoNumericDefaultSettings';
-import AutoNumericPredefinedOptions from './AutoNumericPredefinedOptions';
-
-/* eslint no-unused-vars: 0 */
-
 /**
- * This file serve as the main entry point to the library.
+ * The Abstract Syntax Tree node
  *
- * This is needed since if the Webpack entrypoint is set to `./src/AutoNumeric.js`, then the AutoNumericEvents, AutoNumericOptions, AutoNumericDefaultSettings and AutoNumericPredefinedOptions files are not included in the bundle and therefore cannot be used.
- *
- * @type {AutoNumeric}
+ * Each node carries the node information such as type (operator type), value (if it's a leaf), and the left and right branches
  */
-export default AutoNumeric;
+export default class ASTNode {
+    /*
+    constructor() {
+        // this.type = void(0);
+        // this.value = 0;
+        // this.left = null;
+        // this.right = null;
+    }
+    */
+
+    static createNode(type, left, right) {
+        const node = new ASTNode();
+        node.type = type;
+        node.left = left;
+        node.right = right;
+
+        return node;
+    }
+
+    static createUnaryNode(left) {
+        const node = new ASTNode();
+        node.type = 'unaryMinus';
+        node.left = left;
+        node.right = null;
+
+        return node;
+    }
+
+    static createLeaf(value) {
+        const node = new ASTNode();
+        node.type = 'number';
+        node.value = value;
+
+        return node;
+    }
+}

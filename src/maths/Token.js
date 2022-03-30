@@ -1,5 +1,5 @@
 /**
- * Babel + Webpack workaround for autoNumeric
+ * Math expression tokenizer/parser/evaluator functions for autoNumeric.js
  *
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
  * @copyright © 2019 Alexandre Bonneau
@@ -28,19 +28,13 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import AutoNumeric from './AutoNumeric';
-import AutoNumericEvents from './AutoNumericEvents';
-import AutoNumericOptions from './AutoNumericOptions';
-import AutoNumericDefaultSettings from './AutoNumericDefaultSettings';
-import AutoNumericPredefinedOptions from './AutoNumericPredefinedOptions';
-
-/* eslint no-unused-vars: 0 */
-
 /**
- * This file serve as the main entry point to the library.
- *
- * This is needed since if the Webpack entrypoint is set to `./src/AutoNumeric.js`, then the AutoNumericEvents, AutoNumericOptions, AutoNumericDefaultSettings and AutoNumericPredefinedOptions files are not included in the bundle and therefore cannot be used.
- *
- * @type {AutoNumeric}
+ * Data structure used by the Lexer and Parser classes
  */
-export default AutoNumeric;
+export default class Token {
+    constructor(type, value, symbol) {
+        this.type = type;
+        this.value = value;
+        this.symbol = symbol;
+    }
+}

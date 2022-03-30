@@ -18,7 +18,7 @@
 
 autoNumeric is a standalone Javascript library that provides live *as-you-type* formatting for international numbers and currencies.
 
-The latest stable branch is always on `master`. Currently this is version [4.1.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>
+The latest stable branch is always on `master`. Currently this is version [4.2.*](https://github.com/autoNumeric/autoNumeric/tree/master).<br>
 If you want to try the new features, you can check out the latest development version in the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).<br>
 That `next` branch can see changes in the API (check the [semver](http://semver.org/)), but is always fully tested for regressions.<br> 
 <br>
@@ -64,10 +64,11 @@ anElement.french()
 - The settings can easily be changed at *any* time using the `update` method or via a callback
 - autoNumeric supports `input` elements as well as most text elements with the `contenteditable` attribute, allowing you to place formatted numbers and currencies on just about any part of your pages
 - AutoNumeric elements *can be linked together* allowing you to perform one action on multiple elements at once
-- 8 pre-defined [currency options](#predefined-language-options) as well as 31 [common options](#predefined-common-options) allows you to directly use autoNumeric by skipping the option configuration step
+- 8 pre-defined [currency options](#predefined-language-options) as well as 33 [common options](#predefined-common-options) allows you to directly use autoNumeric by skipping the option configuration step
 - 26 built-in [methods](#methods) gives you the flexibility needed to use autoNumeric to its full potential
 - 22 [global methods](#perform-actions-globally-on-a-shared-list-of-autonumeric-elements) that allows to control sets of AutoNumeric-managed elements at once
 - 21 additional [methods](#methods) specialized for managing form management and submission
+- A [formula mode](#formula-mode) that allows to quickly enter and evaluate math expressions inside the element
 - 17 [static functions](#static-methods) provided by the `AutoNumeric` class
 - And more than 40 [options](#options) allowing you to precisely customize your currency format and behavior
 
@@ -116,6 +117,9 @@ With that said, autoNumeric supports most international numeric formats and curr
     - [Form functions](#form-functions)
     - [Function chaining](#function-chaining)
   - [Static methods](#static-methods)
+- [Formula mode](#formula-mode)
+  - [Allowed characters in formula mode](#allowed-characters-in-formula-mode)
+  - [Formula mode events](#formula-mode-events)
 - [Event lifecycle](#event-lifecycle)
   - [AutoNumeric custom events details](#autonumeric-custom-events-details)
 - [Questions](#questions)
@@ -146,7 +150,7 @@ Simply include **autoNumeric** in your html `<header>` tag.<br>No other files or
 ```html
 <script src="autoNumeric.min.js" type="text/javascript"></script>
 <!-- ...or, you may also directly use a CDN :-->
-<script src="https://cdn.jsdelivr.net/npm/autonumeric@4.1.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/autonumeric@4.5.4"></script>
 <!-- ...or -->
 <script src="https://unpkg.com/autonumeric"></script>
 ```
@@ -154,7 +158,7 @@ Simply include **autoNumeric** in your html `<header>` tag.<br>No other files or
 #### In another script
 If you want to use AutoNumeric in your code, you can import the `src/AutoNumeric.js` file as an ES6 module using:
 ```js
-import AutoNumeric from 'AutoNumeric';
+import AutoNumeric from 'autonumeric';
 ```
 
 Then you can initialize autoNumeric with or without options :
@@ -309,11 +313,13 @@ If you know you want to initialize multiple elements in one call, you must then 
 
 ## Options
 Multiple options allow you to customize precisely how a form input will format your key strokes as you type.<br>
-You can check what are the predefined choices for each option as well as a more detailed explanation of how they work on the [official documentation page](http://autonumeric.org/#/guide).
+You can check what are the predefined choices for each option as well as a more detailed explanation of how they work on the [official documentation page](http://autonumeric.org/guide).<br>
+You can also generate your custom options object and try those live with the [AutoNumeric configurator](http://autonumeric.org/configurator).
 
 | Option           | Description | Default Value |
 | :----------------: | :-----------:  | :-----------:  |
 | `allowDecimalPadding` | Allow padding the decimal places with zeros. If set to `'floats'`, padding is only done when there are some decimals. | `true` |
+| `alwaysAllowDecimalCharacter` | Defines if the decimal character or decimal character alternative should be accepted when there is already a decimal character shown in the element. | `false` |
 | `caretPositionOnFocus` | Determine where should be positioned the caret on focus | `null` |
 | `createLocalList` | Determine if a local list of AutoNumeric objects must be kept when initializing the elements and others | `true` |
 | `currencySymbol` | Defines the currency symbol to display | `''` |
@@ -328,16 +334,17 @@ You can check what are the predefined choices for each option as well as a more 
 | `digitalGroupSpacing` | Digital grouping for the thousand separator | `'3'` |
 | `digitGroupSeparator` | Thousand separator character  | `','` |
 | `divisorWhenUnfocused` | Defines the number that will divide the current value shown when unfocused | `null` |
-| `emptyInputBehavior` | Defines what to display when the input value is empty (possible options are `null`, `focus`, `press`, `always` and `zero`) | `'focus'` |
+| `emptyInputBehavior` | Defines what to display when the input value is empty (possible options are `null`, `focus`, `press`, `always`, `min`, `max`, `zero`, number, or a string representing a number) | `'focus'` |
 | `eventBubbles` | Defines if the custom and native events triggered by AutoNumeric should bubble up or not | `true` |
 | `eventIsCancelable` | Defines if the custom and native events triggered by AutoNumeric should be cancelable | `true` |
 | `failOnUnknownOption ` | This option is the 'strict mode' *(aka 'debug' mode)*, which allows autoNumeric to strictly analyse the options passed, and fails if an unknown options is used in the `options` object. | `false` |
 | `formatOnPageLoad` | Determine if the default value will be formatted on initialization | `true` |
+| `formulaMode` | Defines if the [*formula mode*](#formula-mode) can be activated by the user | `false` |
 | `historySize` | Determine how many undo states an AutoNumeric object should keep in memory | `20` |
 | `isCancellable` | Determine if the user can *'cancel'* the last modifications done to the element value when using the `Escape` key | `true` |
 | `leadingZero` | Controls the leading zero behavior (possible options are `allow`, `deny` and `keep`) | `'deny'` |
-| `maximumValue` | The maximum value that can be entered | `'9999999999999.99'` |
-| `minimumValue` | The minimum value that can be entered  | `'-9999999999999.99'` |
+| `maximumValue` | The maximum value that can be entered (10 trillions by default) | `'10000000000000'` |
+| `minimumValue` | The minimum value that can be entered (-10 trillions by default) | `'-10000000000000'` |
 | `modifyValueOnWheel` | Determine if the element value can be incremented / decremented with the mouse wheel. The wheel behavior is modified with the `wheelStep` option. | `true` |
 | `negativeBracketsTypeOnBlur` | Adds brackets `[]`, parenthesis `()`, curly braces `{}`, chevrons `<>`, angle brackets `〈〉`, Japanese quotation marks `｢｣`, half brackets `⸤⸥`, white square brackets `⟦⟧`, quotation marks `‹›` or guillemets `«»` on negative values when unfocused. The value must be formatted like `'<leftBracket>,<rightBracket>'`. | `null` |
 | `negativePositiveSignPlacement` | Placement of negative/positive sign relative to the currency symbol (possible options are `l` (left), `r` (right), `p` (prefix) and `s` (suffix)) | `null` |
@@ -345,10 +352,10 @@ You can check what are the predefined choices for each option as well as a more 
 | `noEventListeners` | Defines if the element should have event listeners activated on it.<br>*Note: Setting this to `true` will prevent any format to be applied once the user starts modifying the element value. This is unlikely what you want.* | `false` |
 | `onInvalidPaste` | Manage how autoNumeric react when the user tries to paste an invalid number (possible options are `error`, `ignore`, `clamp`, `truncate` or `replace`) | `'error'` |
 | `outputFormat` | Defines the localized output format of the `getLocalized`, `form*`, `formArray*` and `formJson*` methods | `null` |
-| `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor` and `ignore`) | `null` |
+| `overrideMinMaxLimits` | Override minimum and maximum limits (possible options are `ceiling`, `floor`, `ignore` and `invalid`) | `null` |
 | `positiveSignCharacter` | Defines the positive sign character to use (Note: It's only shown if `showPositiveSign` is set to `true`) | `'+'` |
 | `rawValueDivisor` | Define the number that will divide the formatted value into the raw value (ie. when displaying `'1.23%'`, the raw value kept is `0.0123` if `rawValueDivisor` is set to `100`) | `null` |
-| `readOnly` | Defines if the `<input>` element should be set as read only on initialization | `false` |
+| `readOnly` | Defines if the element (`<input>` or another allowed html tag) should be set as read-only on initialization | `false` |
 | `roundingMethod` | Method used for rounding. The possible options are:<br>`S` (Round-Half-Up Symmetric (default)),<br>`A` (Round-Half-Up Asymmetric),<br>`s` (Round-Half-Down Symmetric (lower case s)),<br>`a` (Round-Half-Down Asymmetric (lower case a)),<br>`B` (Round-Half-Even 'Bankers Rounding'),<br>`U` (Round Up 'Round-Away-From-Zero'),<br>`D` (Round Down 'Round-Toward-Zero' - same as truncate),<br>`C` (Round to Ceiling 'Toward Positive Infinity'),<br>`F` (Round to Floor 'Toward Negative Infinity'),<br>`N05` (Rounds to the nearest .05 (same as `'CHF'` used in v1.9.* and still valid)),<br>`U05` (Rounds up to next .05),<br>`D05` (Rounds down to next .05) | `'S'` |
 | `saveValueToSessionStorage` | Allow the `decimalPlacesShownOnFocus` value to be saved into session storage | `false` |
 | `selectNumberOnly` | Determine if the 'Select All' keyboard command will select the complete input text content (including the currency symbol and suffix text), or only the input numeric value | `false` |
@@ -394,6 +401,7 @@ Currently, the predefined language options are:
 | :jp: | `Japanese` |
 | :cn: | `Chinese` |
 | <span>&#x1f1e7;&#x1f1f7;</span> | `Brazilian` |
+| :tr: | `Turkish` |
 
 If you feel a common currency option is missing, please [create a pull request](https://github.com/autoNumeric/autoNumeric/compare) and we'll add it!
 
@@ -415,12 +423,14 @@ Moreover, autoNumeric provides the following common options:
 | `numericPos` | Idem above, but only allow positive values | `1234.56` |
 | `numericNeg` | Idem above, but only allow negative values | `-1234.56` |
 | `euro` | Same configuration than `French` | `1.234,56 €` |
+| `euroF` | Same configuration than `euro`, with the formula mode activated | `1.234,56 €` |
 | `euroPos` | Idem above, but only allow positive values | `1.234,56 €` |
 | `euroNeg` | Idem above, but only allow negative values | `-1.234,56 €` |
 | `euroSpace` | Same configuration than `French` except a space is used for the group separator instead of the dot | `1 234,56 €` |
 | `euroSpacePos` | Idem above, but only allow positive values | `1 234,56 €` |
 | `euroSpaceNeg` | Idem above, but only allow negative values | `-1 234,56 €` |
 | `dollar` | Same configuration than `NorthAmerican`  | `$1,234.56` |
+| `dollarF` | Same configuration than `dollar`, with the formula mode activated  | `$1,234.56` |
 | `dollarPos` | Idem above, but only allow positive values | `$1,234.56` |
 | `dollarNeg` | Idem above, but only allow negative values | `-$1,234.56` |
 | `percentageEU2dec` | Same configuration than `French`, but display a percent `%` sign instead of the currency sign, with `2` decimal places | `12,34 %` |
@@ -545,7 +555,9 @@ anElement.update(AutoNumeric.getPredefinedOptions().NorthAmerican); // Update th
 
 by passing multiple option objects, the latter overwriting the settings from the former ones...
 ```js
-anElement.update({ moreOptions1 }, { moreOptions2 }, { moreOptions3 });
+anElement.update({ moreOptions1 }, { moreOptions2 }, 'euro');
+// or in a single array
+anElement.update([{ moreOptions1 }, { moreOptions2 }, 'euro']);
 ```
 
 ...or by changing the options one by one (or by calling a pre-defined option object).
@@ -571,7 +583,7 @@ autoNumeric provides numerous methods to access and modify the element value, fo
 
 First. you need to get a reference to the AutoNumeric module that you need to import:
 ```js
-import AutoNumeric from 'autoNumeric.min';
+import AutoNumeric from 'autonumeric';
 ```
 
 Then you'll be able to access either the methods on the instantiated AutoNumeric object, or the [static functions](#static-methods) directly by using the `AutoNumeric` class.
@@ -706,7 +718,7 @@ anElement.global.unformatLocalized();
 anElement.global.unformatLocalized(forcedOutputFormat);
 anElement.global.update({ options }); // Update the settings of each autoNumeric-managed elements
 anElement.global.update({ options1 }, { options2 }, { options3 }); // Idem above, but accepts as many option objects as needed
-anElement.global.isPristine(); // Return `true` is *all* the autoNumeric-managed elements are pristine, if their raw value hasn't changed
+anElement.global.isPristine(); // Return `true` if *all* the autoNumeric-managed elements are pristine, if their raw value hasn't changed
 anElement.global.isPristine(false); // Idem as above, but also checks that the formatted value hasn't changed
 anElement.global.clear(); // Clear the value in all the autoNumeric-managed elements that are shared on this element
 anElement.global.remove();
@@ -846,16 +858,55 @@ Without having to initialize any AutoNumeric object, you can directly use the st
 | `version` | Return the current AutoNumeric version number *(for debugging purpose)* | `AutoNumeric.version();` |
 
 
+## Formula mode
+
+AutoNumeric provides a quick way to enter and evaluate simple math expressions directly into the element.<br>
+
+Sometimes, you need to quickly calculate the product or the sum of two or more numbers, before entering the result in the AutoNumeric element.
+<br>
+For instance, you might ask yourself *"How many months are there in 14 years and 5 months ?"*, then you'd need to either make a mental calculation, or resort to using a calculator.
+To speed things up and provide a lean user experience, AutoNumeric provides a *formula mode* which allows you to enter and evaluate simple math expressions very quickly.
+
+Using our previous example, you would just need to activate the *formula mode* by entering the equal sign (`=`) key, then type `=14*12 + 5`, and finally validate that expression by using the `Enter` key, or by blurring the field.
+<br>*Note: if the math expression is invalid, the previous `rawValue` is set back*
+
+By default, this behavior is *disabled*. If you want to enable the math expression parsing, you need to set the `formulaMode` option to `true`:
+```js
+new AutoNumeric(domElement, { formulaMode: true });
+```
+
+If you want to cancel the math expression edition and exit the formula mode, hit the `Escape` key.
+
+### Allowed characters in formula mode
+
+Simple math expressions are allowed, which means you can use any numeric characters, the decimal point `.`, as well as the following operators `+`, `-`, `*`, `/`, `(` and `)`.<br>
+*Note: parentheses and operators precedence are respected as expected*
+
+This allows for evaluating the following math expressions examples:
+- `8 * -12.46`
+- `22* (10 - 2)/1.5- -0.5`
+- `(4+1) * 2 - (104587.23 * 8 - (-7))`
+
+### Formula mode events
+
+On user validation, if the math expression syntax is invalid, the previous valid `rawValue` is set back, and the `autoNumeric:invalidFormula` event is sent.
+When a valid math expression is accepted, then its result is `set()`, and the `autoNumeric:validFormula` event is sent.
+
+
 ## Event lifecycle
 
 AutoNumeric elements are transparent to the native `input` and `change` events, which means those are correctly sent when using an `<input>` element managed by AutoNumeric.
 
 In addition to the native events, custom events sent by AutoNumeric elements allows you to hook into the formatting lifecycle, as you see fit:
+- `'autoNumeric:correctedValue'` when an invalid value is corrected
 - `'autoNumeric:initialized'` when the AutoNumeric element is initialized
+- `'autoNumeric:invalidFormula'` when the user tries to validate an invalid math expression
+- `'autoNumeric:invalidValue'` when an invalid value is entered (ie. when the raw value is out of the min/max range)
 - `'autoNumeric:rawValueModified'` when the `rawValue` is modified
 - `'autoNumeric:formatted'` when all the formatting is done and the formatted string is modified
 - `'autoNumeric:minExceeded'` if the `minimumValue` is not respected
 - `'autoNumeric:maxExceeded'` if the `maximumValue` is not respected
+- `'autoNumeric:validFormula'` when the user validate a valid math expression
 
 *Note: You can also set if the events triggered by the AutoNumeric elements, custom or native, should bubble up (option `eventBubbles`) or be cancelable (option `eventIsCancelable`).*<br><br>
 
@@ -915,6 +966,31 @@ const theCustomEvent = {
         newRawValue: 788,        // The new raw value
         error      : null,       // The error message as a string, `null` if no errors.
         aNElement  : theAutoNumericObject, // The AutoNumeric object emitting this event
+    },
+    // ...
+}
+```
+
+The `'autoNumeric:invalidFormula'` event has a payload that contains the following `detail` attribute:
+```js
+// This is an example of `CustomEvent` object sent by AutoNumeric when the math expression is invalid:
+const theCustomEvent = {
+    detail    : {
+        formula  : '22+35 - (44',        // The invalid formula
+        aNElement: theAutoNumericObject, // The AutoNumeric object emitting this event
+    },
+    // ...
+}
+```
+
+The `'autoNumeric:validFormula'` event has a payload that contains the following `detail` attribute:
+```js
+// This is an example of `CustomEvent` object sent by AutoNumeric when the math expression is valid:
+const theCustomEvent = {
+    detail    : {
+        formula  : '22+35 - (44)',       // The valid formula
+        result   : 13,                   // The math expression result
+        aNElement: theAutoNumericObject, // The AutoNumeric object emitting this event
     },
     // ...
 }
@@ -1026,7 +1102,9 @@ For integration with [PHP](http://php.net/) Yii2, take a look at the [extead/yii
 
 For integration into Javascript frameworks, you can use:
 - Vue.js with the [vue-autonumeric component](https://github.com/autoNumeric/vue-autoNumeric),
-- Angular with the [angular-currency](https://github.com/BuffCoder/angular-currency) directive,
+- React with the [react-numeric component](https://github.com/mkg0/react-numeric),
+- Angular with the [ng-autonumeric](https://github.com/angularfy/ng-autonumeric),
+- AngularJS with the [angular-currency](https://github.com/BuffCoder/angular-currency) directive,
 - Meteor with [meteor-autonumeric](https://github.com/gibson/meteor-autonumeric), and
 - Ember with [ember-autonumeric](https://github.com/ykaragol/ember-autonumeric).
 
@@ -1037,11 +1115,10 @@ The old and outdated documentation can be found in the [Documentation](doc/Docum
 For some examples and an option code generator for the old v1.9.* version, take a look [here](http://www.decorplanit.com/plugin/).
 
 ## Licence
-autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source project, and its authors are credited in [AUTHORS](https://github.com/autoNumeric/autoNumeric/blob/master/AUTHORS).
+autoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source project, and its authors are credited in [AUTHORS](https://github.com/autoNumeric/autoNumeric/blob/next/AUTHORS).
 
 ## Support
-We'd like to thank [JetBrains](https://www.jetbrains.com/) supporting us by providing open-source licences of their tools, and [Browserstack](https://www.browserstack.com) for allowing us to tests many browsers and platforms.<br>
-[![Browserstack][browserstack-image]][browserstack-url]
+We'd like to thank [JetBrains](https://www.jetbrains.com/) for supporting us by providing an open-source licence of their tools.
 
 ****
 
@@ -1064,7 +1141,5 @@ Feel free to donate via Paypal [![Donate][paypal-image]][paypal-url] *(Robert)* 
 [coveralls-url]: https://coveralls.io/github/autoNumeric/autoNumeric?branch=next
 [paypal-image]: http://img.shields.io/badge/paypal-donate-brightgreen.svg
 [paypal-url]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NCW5699RY8NN2
-[patreon-url]: https://www.patreon.com/user?u=4810062
+[patreon-url]: https://www.patreon.com/AlexandreBonneau
 [patreon-image]: https://img.shields.io/badge/patreon-donate-orange.svg
-[browserstack-url]: https://www.browserstack.com
-[browserstack-image]: http://i.imgur.com/kjddhbT.png

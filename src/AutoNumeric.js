@@ -6969,7 +6969,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Keep track if the user is currently editing the element
         this.isEditing = false;
 
-        if (AutoNumericHelper.getElementValue(e.target) !== this.valueOnFocus) {
+        if (Number(AutoNumericHelper.getElementValue(e.target)) !== Number(this.valueOnFocus)) {
             this._triggerEvent(AutoNumeric.events.native.change, e.target);
         }
     }

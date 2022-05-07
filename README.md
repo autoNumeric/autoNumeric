@@ -110,7 +110,8 @@ With that said, autoNumeric supports most international numeric formats and curr
       - [Using callback functions with `get*` methods](#using-callback-functions-with-get-methods)
     - [Un-initialize the AutoNumeric element](#un-initialize-the-autonumeric-element)
     - [Node manipulation](#node-manipulation)
-    - [Format and unformat other numbers or DOM elements with an existing AutoNumeric element](#format-and-unformat-other-numbers-or-dom-elements-with-an-existing-autonumeric-element)
+    - [Format and unformat other numbers or DOM elements with an existing AutoNumeric element](#format-and-unformat-other-numbers-or-dom-elements-with-an-existi
+    numeric-element)
     - [Initialize other DOM Elements](#initialize-other-dom-elements)
     - [Perform actions globally on a shared 'init' list of AutoNumeric elements](#perform-actions-globally-on-a-shared-init-list-of-autonumeric-elements)
       - [Using callback functions with `global.get*` methods](#using-callback-functions-with-globalget-methods)
@@ -1103,7 +1104,7 @@ For integration with [PHP](http://php.net/) Yii2, take a look at the [extead/yii
 For integration into Javascript frameworks, you can use:
 - Vue.js with the [vue-autonumeric component](https://github.com/autoNumeric/vue-autoNumeric),
 - React with the [react-numeric component](https://github.com/mkg0/react-numeric),
-- Angular with the [ng-autonumeric](https://github.com/angularfy/ng-autonumeric),
+- Angular with the [@angularfy/autonumeric](https://github.com/angularfy/autonumeric),
 - AngularJS with the [angular-currency](https://github.com/BuffCoder/angular-currency) directive,
 - Meteor with [meteor-autonumeric](https://github.com/gibson/meteor-autonumeric), and
 - Ember with [ember-autonumeric](https://github.com/ykaragol/ember-autonumeric).

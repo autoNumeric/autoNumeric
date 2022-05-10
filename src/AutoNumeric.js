@@ -6740,6 +6740,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 // Redo
                 e.preventDefault();
                 this._historyTableRedo();
+                this._triggerEvent(AutoNumeric.events.native.input, e.target);
                 this.onGoingRedo = true;
 
                 return;
@@ -6751,6 +6752,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     e.preventDefault();
                     // Undo
                     this._historyTableUndo();
+                    this._triggerEvent(AutoNumeric.events.native.input, e.target);
 
                     return;
                 }

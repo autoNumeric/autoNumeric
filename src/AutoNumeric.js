@@ -3784,6 +3784,7 @@ export default class AutoNumeric {
         // Then tests the options individually
         if (!AutoNumericHelper.isTrueOrFalseString(options.allowDecimalPadding) &&
             !AutoNumericHelper.isBoolean(options.allowDecimalPadding) &&
+            !AutoNumericHelper.isNumber(options.allowDecimalPadding) &&
             options.allowDecimalPadding !== AutoNumeric.options.allowDecimalPadding.floats) {
             AutoNumericHelper.throwError(`The decimal padding option 'allowDecimalPadding' is invalid ; it should either be \`false\`, \`true\` or \`'floats'\`, [${options.allowDecimalPadding}] given.`);
         }
@@ -5742,6 +5743,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         if (settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.always ||
             settings.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.floats) {
             temporaryDecimalPlacesOverride = decimalPlacesToRoundTo;
+        } else if (settings.allowDecimalPadding > 0) {
+            temporaryDecimalPlacesOverride = settings.allowDecimalPadding;
         } else {
             temporaryDecimalPlacesOverride = 0;
         }

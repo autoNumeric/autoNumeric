@@ -101,4 +101,4 @@ AutoNumeric.defaultSettings = {
 Object.freeze(AutoNumeric.defaultSettings);
 Object.defineProperty(AutoNumeric, 'defaultSettings', { configurable: false, writable: false });
 
-export default {}
+export default {};

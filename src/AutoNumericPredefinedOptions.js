@@ -235,4 +235,4 @@ Object.getOwnPropertyNames(AutoNumeric.predefinedOptions).forEach(optionName => 
 Object.freeze(AutoNumeric.predefinedOptions);
 Object.defineProperty(AutoNumeric, 'predefinedOptions', { configurable: false, writable: false });
 
-export default {}
+export default {};

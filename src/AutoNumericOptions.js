@@ -904,4 +904,4 @@ function freezeOptions(options) {
 freezeOptions(AutoNumeric.options);
 Object.defineProperty(AutoNumeric, 'options', { configurable: false, writable: false });
 
-export default {}
+export default {};

@@ -53,3 +53,5 @@ AutoNumeric.events = {
 Object.freeze(AutoNumeric.events.native);
 Object.freeze(AutoNumeric.events);
 Object.defineProperty(AutoNumeric, 'events', { configurable: false, writable: false });
+
+export default {}

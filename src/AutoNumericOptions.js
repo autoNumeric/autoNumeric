@@ -115,7 +115,7 @@ AutoNumeric.options = {
         peso          : '₱', // PHP
         pfennig       : '₰', // cents of the Mark
         pound         : '£',
-        real          : 'R$', // Brazilian real
+        real          : 'R$ ', // Brazilian real
         riel          : '៛', // KHR
         ruble         : '₽', // RUB
         rupee         : '₹', // INR

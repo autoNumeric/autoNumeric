@@ -6621,7 +6621,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // Check if the key is a delete/backspace key
         if (this.eventKey === AutoNumericEnum.keyName.Backspace || this.eventKey === AutoNumericEnum.keyName.Delete) {
-            const isDeletionAllowed = this._processCharacterDeletion(); // Because backspace and delete only triggers keydown and keyup events, not keypress
+            const isDeletionAllowed = this._processCharacterDeletion(e); // Because backspace and delete only triggers keydown and keyup events, not keypress
             this.processed = true;
             if (!isDeletionAllowed) {
                 // Prevent the deletion if `overrideMinMaxLimits` option is `doNotOverride` and the result goes out of the allowed range
@@ -8920,9 +8920,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Process the deletion of characters.
      * Returns `true` if the deletion is allowed (within the min and max range, according to the `overrideMinMaxLimits` option, `false` otherwise.
      *
+     * @param {Event} e
      * @returns {boolean}
      */
-    _processCharacterDeletion() {
+    _processCharacterDeletion(e) {
         let left;
         let right;
 
@@ -8948,6 +8949,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         if (!this.constructor._isWithinRangeWithOverrideOption(`${left}${right}`, this.settings)) {
             // If the result with the deletion would be out of the range, we prevent it
+            return false;
+        }
+        if (AutoNumericHelper.getElementValue(e.target) === this.settings.currencySymbol) {
             return false;
         }
 

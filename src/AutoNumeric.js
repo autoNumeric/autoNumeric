@@ -6761,6 +6761,14 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 }
             }
         }
+        else if ((this.eventKey === AutoNumericEnum.keyName.Y || this.eventKey === AutoNumericEnum.keyName.y) && e.ctrlKey) {
+            // Redo
+            e.preventDefault();
+            this._historyTableRedo();
+            this._triggerEvent(AutoNumeric.events.native.input, e.target);
+
+            return;
+        }
 
         if (this.onGoingRedo && (e.ctrlKey || e.shiftKey)) {
             // Special case where if the user has entered `Control+Shift+z`, then release `z`, keeping `Control` or `Shift` pressed, then `this.onGoingRedo` is never changed back to `false` when the user release `Control` or `Shift`

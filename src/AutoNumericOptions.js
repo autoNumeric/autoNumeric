@@ -235,7 +235,7 @@ AutoNumeric.options = {
     },
 
     /* Defines how many numbers should be grouped together (usually for the thousand separator)
-     * - "2",  results in 99,99,99,999 India's lakhs
+     * - "2",  results in 99,99,99,99
      * - "2s", results in 99,999,99,99,999 India's lakhs scaled
      * - "3",  results in 999,999,999 (default)
      * - "4",  results in 9999,9999,9999 used in some Asian countries

@@ -5277,23 +5277,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             inputValue = inputValue.replace('-', ''); // At this point the `inputValue` has been normalized with a 'normal' negative sign `'-'` //TODO Check that comment validity, since `_stripAllNonNumberCharactersExceptCustomDecimalChar` *does not* convert the negative sign
         }
 
-        settings.digitalGroupSpacing = settings.digitalGroupSpacing.toString();
-        let digitalGroup;
-        switch (settings.digitalGroupSpacing) {
-            case AutoNumeric.options.digitalGroupSpacing.two:
-                digitalGroup = /(\d)((\d)(\d{2}?)+)$/;
-                break;
-            case AutoNumeric.options.digitalGroupSpacing.twoScaled:
-                digitalGroup = /(\d)((?:\d{2}){0,2}\d{3}(?:(?:\d{2}){2}\d{3})*?)$/;
-                break;
-            case AutoNumeric.options.digitalGroupSpacing.four:
-                digitalGroup = /(\d)((\d{4}?)+)$/;
-                break;
-            case AutoNumeric.options.digitalGroupSpacing.three:
-            default :
-                digitalGroup = /(\d)((\d{3}?)+)$/;
-        }
-
         // Splits the string at the decimal string
         let [integerPart, decimalPart] = inputValue.split(settings.decimalCharacter);
         if (settings.decimalCharacterAlternative && AutoNumericHelper.isUndefined(decimalPart)) {
@@ -5301,6 +5284,13 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         if (settings.digitGroupSeparator !== '') {
+            let digitalGroup;
+            if (settings.digitalGroupSpacing === AutoNumeric.options.digitalGroupSpacing.twoScaled) {
+                digitalGroup = /(\d)((?:\d{2}){0,2}\d{3}(?:(?:\d{2}){2}\d{3})*?)$/;
+            } else {
+                digitalGroup = new RegExp(`(\\d)((\\d{${settings.digitalGroupSpacing}}?)+)$`);
+            }
+
             // Re-inserts the thousand separator via a regular expression
             while (digitalGroup.test(integerPart)) {
                 integerPart = integerPart.replace(digitalGroup, `$1${settings.digitGroupSeparator}$2`);

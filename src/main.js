@@ -29,10 +29,10 @@
  */
 
 import AutoNumeric from './AutoNumeric';
-import AutoNumericEvents from './AutoNumericEvents';
-import AutoNumericOptions from './AutoNumericOptions';
-import AutoNumericDefaultSettings from './AutoNumericDefaultSettings';
-import AutoNumericPredefinedOptions from './AutoNumericPredefinedOptions';
+import './AutoNumericEvents';
+import './AutoNumericOptions';
+import './AutoNumericDefaultSettings';
+import './AutoNumericPredefinedOptions';
 
 /* eslint no-unused-vars: 0 */
 

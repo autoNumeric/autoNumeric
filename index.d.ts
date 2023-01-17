@@ -517,5 +517,44 @@ declare namespace AutoNumeric {
         Turkish: Partial<Options>;
     }
 
-    type PredefinedOptions = Partial<Options> & PredefinedLanguages;
+    interface PredefinedCurrencies {
+        euro: Partial<Options>;
+        euroPos: Partial<Options>;
+        euroNeg: Partial<Options>;
+        euroSpace: Partial<Options>;
+        euroSpacePos: Partial<Options>;
+        euroSpaceNeg: Partial<Options>;
+        percentageEU2dec: Partial<Options>;
+        percentageEU2decPos: Partial<Options>;
+        percentageEU2decNeg: Partial<Options>;
+        percentageEU3dec: Partial<Options>;
+        percentageEU3decPos: Partial<Options>;
+        percentageEU3decNeg: Partial<Options>;
+        dollar: Partial<Options>;
+        dollarPos: Partial<Options>;
+        dollarNeg: Partial<Options>;
+        dollarNegBrackets: Partial<Options>;
+        percentageUS2dec: Partial<Options>;
+        percentageUS2decPos: Partial<Options>;
+        percentageUS2decNeg: Partial<Options>;
+        percentageUS3dec: Partial<Options>;
+        percentageUS3decPos: Partial<Options>;
+        percentageUS3decNeg: Partial<Options>;
+    }
+    
+    interface PredefinedNumbers {
+        dotDecimalCharCommaSeparator: Partial<Options>;
+        commaDecimalCharDotSeparator: Partial<Options>;
+        integer: Partial<Options>;
+        integerPos: Partial<Options>;
+        integerNeg: Partial<Options>;
+        float: Partial<Options>;
+        floatPos: Partial<Options>;
+        floatNeg: Partial<Options>;
+        numeric: Partial<Options>;
+        numericPos: Partial<Options>;
+        numericNeg: Partial<Options>;
+    }
+    
+    type PredefinedOptions = Partial<Options> & PredefinedLanguages & PredefinedCurrencies & PredefinedNumbers;
 }

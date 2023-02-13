@@ -7426,7 +7426,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this.isEditing = false;
 
         // Send a `change` event if the raw value has been changed since the last focus or 'enter' validation
-        if (this.rawValue !== this.rawValueOnFocus) {
+        if (AutoNumericHelper.trimPaddedZerosFromDecimalPlaces(this.rawValue) !== AutoNumericHelper.trimPaddedZerosFromDecimalPlaces(this.rawValueOnFocus)) {
             this._triggerEvent(AutoNumeric.events.native.change, e.target);
         }
 

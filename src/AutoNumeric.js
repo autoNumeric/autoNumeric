@@ -6738,6 +6738,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         // Manage the undo/redo events
+        this._updateEventKeyInfo(e); // Fixes #761, where the Ctrl key is no correctly detected during undo/redo since this.eventKey was not updated from 'Z' to 'Control'
         if (this.eventKey === AutoNumericEnum.keyName.Z || this.eventKey === AutoNumericEnum.keyName.z) {
             if (e.ctrlKey && e.shiftKey) {
                 // Redo

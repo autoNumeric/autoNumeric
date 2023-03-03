@@ -6748,29 +6748,29 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 // Redo
                 e.preventDefault();
                 this._historyTableRedo();
-                this._triggerEvent(AutoNumeric.events.native.input, e.target);
+                this._triggerEvent(AutoNumeric.events.native.input, e.target); //TODO instead of adding the event here, generate it from the `_historyTableRedo()` function?
                 this.onGoingRedo = true;
 
                 return;
             } else if (e.ctrlKey && !e.shiftKey) {
                 if (this.onGoingRedo) {
-                    // Prevent an 'undo' to be launch when releasing the shift key before the ctrl key after a 'redo' shortcut
+                    // Prevent an 'undo' to be launched when releasing the shift key before the ctrl key after a 'redo' shortcut
                     this.onGoingRedo = false;
                 } else {
                     e.preventDefault();
                     // Undo
                     this._historyTableUndo();
-                    this._triggerEvent(AutoNumeric.events.native.input, e.target);
+                    this._triggerEvent(AutoNumeric.events.native.input, e.target); //TODO instead of adding the event here, generate it from the `_historyTableRedo()` function?
 
                     return;
                 }
             }
-        }
-        else if ((this.eventKey === AutoNumericEnum.keyName.Y || this.eventKey === AutoNumericEnum.keyName.y) && e.ctrlKey) {
+        } else if ((this.eventKey === AutoNumericEnum.keyName.Y || this.eventKey === AutoNumericEnum.keyName.y) && e.ctrlKey) {
             // Redo
             e.preventDefault();
             this._historyTableRedo();
-            this._triggerEvent(AutoNumeric.events.native.input, e.target);
+            this._triggerEvent(AutoNumeric.events.native.input, e.target); //TODO instead of adding the event here, generate it from the `_historyTableRedo()` function?
+            this.onGoingRedo = true;
 
             return;
         }

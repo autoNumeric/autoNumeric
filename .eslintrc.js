@@ -1,11 +1,24 @@
 module.exports = {
     env          : {
-        browser: true,
+        // browser: true,
         es6    : true,
+        jasmine: true,
     },
     globals      : {
-        module : true,
-        require: true,
+        module        : true,
+        require       : true,
+        browser       : true,
+        process       : true,
+        window        : true,
+        document      : true,
+        Node          : true,
+        sessionStorage: true,
+        setTimeout    : true,
+        Element       : true,
+        navigator     : true,
+        console       : true,
+        CustomEvent   : true,
+        WheelEvent    : true,
     },
     extends      : 'eslint:recommended',
     parserOptions: {
@@ -40,16 +53,16 @@ module.exports = {
         'object-property-newline'      : [
             'error',
             {
-                'allowAllPropertiesOnSameLine': true,
+                allowAllPropertiesOnSameLine: true,
             },
         ],
         'object-curly-newline'         : [
             'error',
             {
-                'ObjectExpression' : { 'multiline': true, 'consistent': true },
-                'ObjectPattern'    : { 'multiline': true },
-                'ImportDeclaration': { 'multiline': true, 'minProperties': 2 },
-                'ExportDeclaration': { 'multiline': true, 'minProperties': 2 },
+                ObjectExpression : { multiline: true, consistent: true },
+                ObjectPattern    : { multiline: true },
+                ImportDeclaration: { multiline: true, minProperties: 2 },
+                ExportDeclaration: { multiline: true, minProperties: 2 },
             },
         ],
         'keyword-spacing'              : [
@@ -75,7 +88,7 @@ module.exports = {
             'error',
             'as-needed',
             {
-                requireReturnForObjectLiteral: false
+                requireReturnForObjectLiteral: false,
             },
         ],
         'no-confusing-arrow'           : 'error',
@@ -97,7 +110,7 @@ module.exports = {
             'error',
             {
                 ignoreChainWithDepth: 2,
-            }
+            },
         ],
         'object-curly-spacing'         : [
             'error',
@@ -207,7 +220,7 @@ module.exports = {
             {
                 before: false,
                 after : true,
-            }
+            },
         ],
         'no-case-declarations'  : 'error',
         'spaced-comment'        : [
@@ -222,8 +235,8 @@ module.exports = {
                     markers   : ['!'],
                     exceptions: ['*'],
                     balanced  : true,
-                }
-            }
+                },
+            },
         ],
         'eol-last'              : [
             'error',
@@ -253,21 +266,23 @@ module.exports = {
                 requireReturn           : false,
                 requireParamDescription : false, //TODO Ideally, this should be set to true
                 requireReturnDescription: false, //TODO Ideally, this should be set to true
-            }
+            },
         ],
         //TODO This should really be enabled by default :
         'no-invalid-this': 'error',
         'wrap-iife'      : [
             'error',
-            'inside'
+            'inside',
         ],
-        /*'yoda'           : [
+        /*
+        'yoda'           : [
             'error',
             'always',
             {
                 'onlyEquality': true,
             },
-        ],*/
+        ],
+        */
         // "no-param-reassign"              : "error",
         // "import/prefer-default-export"   : "error",
         // "import/first"                   : "error",

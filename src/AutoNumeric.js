@@ -3784,9 +3784,13 @@ export default class AutoNumeric {
         // Then tests the options individually
         if (!AutoNumericHelper.isTrueOrFalseString(options.allowDecimalPadding) &&
             !AutoNumericHelper.isBoolean(options.allowDecimalPadding) &&
-            !AutoNumericHelper.isNumber(options.allowDecimalPadding) &&
-            options.allowDecimalPadding !== AutoNumeric.options.allowDecimalPadding.floats) {
-            AutoNumericHelper.throwError(`The decimal padding option 'allowDecimalPadding' is invalid ; it should either be \`false\`, \`true\` or \`'floats'\`, [${options.allowDecimalPadding}] given.`);
+            options.allowDecimalPadding !== AutoNumeric.options.allowDecimalPadding.floats &&
+            !(AutoNumericHelper.isNumber(options.allowDecimalPadding) && options.allowDecimalPadding > 0)) {
+            AutoNumericHelper.throwError(`The decimal padding option 'allowDecimalPadding' is invalid ; it should either be \`false\`, \`true\`, \`'floats'\` or a positive integer superior to 0, [${options.allowDecimalPadding}] given.`);
+        }
+     
+        if (AutoNumericHelper.isNumber(options.allowDecimalPadding) && options.allowDecimalPadding > options.decimalPlaces) {
+            AutoNumericHelper.warning(`Setting 'allowDecimalPadding' to a number [${options.allowDecimalPadding}] superior to the current 'decimalPlaces' settings [${options.decimalPlaces}] is useless, since the padding will not be shown.`, options.showWarnings);
         }
 
         if ((options.allowDecimalPadding === AutoNumeric.options.allowDecimalPadding.never ||

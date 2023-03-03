@@ -1,7 +1,7 @@
 /**
  * Unit tests for autoNumeric.js
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
- * @copyright © 2019 Alexandre Bonneau
+ * @copyright © 2023 Alexandre Bonneau
  *
  * The MIT License (http://www.opensource.org/licenses/mit-license.php)
  *
@@ -30,7 +30,7 @@
 /* eslint space-in-parens: 0 */
 /* eslint spaced-comment: 0 */
 // eslint-disable-next-line
-/* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach, spyOn */
+/* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach, spyOn, console, document, window */
 
 import AutoNumeric       from '../../src/AutoNumeric';
 import AutoNumericEnum   from '../../src/AutoNumericEnum';
@@ -1395,6 +1395,35 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual('-1.234.567\u202f€');
             aNInput.set(-1234567.8);
             expect(aNInput.getFormatted()).toEqual('-1.234.567,80\u202f€');
+            // Tests for #741
+            expect(aNInput.getSettings().decimalPlaces).toEqual('2');
+            aNInput.options.decimalPlaces(7);
+            expect(aNInput.getSettings().decimalPlaces).toEqual('7');
+            aNInput.set(12.12);
+            expect(aNInput.getFormatted()).toEqual('12,1200000\u202f€');
+            aNInput.options.decimalPlaces(4);
+            expect(aNInput.getFormatted()).toEqual('12,1200\u202f€');
+            aNInput.options.decimalPlaces(5);
+            expect(aNInput.getFormatted()).toEqual('12,12000\u202f€');
+            aNInput.options.allowDecimalPadding(3); 
+            expect(aNInput.getFormatted()).toEqual('12,120\u202f€');
+            aNInput.options.allowDecimalPadding(4); 
+            expect(aNInput.getFormatted()).toEqual('12,1200\u202f€');
+            aNInput.options.allowDecimalPadding(5);
+            expect(aNInput.getFormatted()).toEqual('12,12000\u202f€');
+            aNInput.options.allowDecimalPadding(6);
+            expect(console.warn).toHaveBeenCalledTimes(6);
+            expect(aNInput.getFormatted()).toEqual('12,12000\u202f€');
+            aNInput.options.allowDecimalPadding(7);
+            expect(console.warn).toHaveBeenCalledTimes(7);
+            expect(aNInput.getFormatted()).toEqual('12,12000\u202f€');
+            aNInput.options.allowDecimalPadding(2);
+            expect(aNInput.getFormatted()).toEqual('12,12\u202f€');
+            aNInput.options.allowDecimalPadding(1);
+            expect(aNInput.getFormatted()).toEqual('12,12\u202f€');
+            aNInput.options.allowDecimalPadding(3);
+            expect(aNInput.getFormatted()).toEqual('12,120\u202f€');
+
             aNInput.options.allowDecimalPadding(AutoNumeric.options.allowDecimalPadding.always);
 
             aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.null);
@@ -1404,7 +1433,7 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getNumber()).toEqual(null);
             // Special case where changing the `emptyInputBehavior` option to something different from `AutoNumeric.options.emptyInputBehavior.null` while the rawValue is equal to `null`, modify that rawValue to '' automatically
             aNInput.options.emptyInputBehavior(AutoNumeric.options.emptyInputBehavior.focus);
-            expect(console.warn).toHaveBeenCalledTimes(3);
+            expect(console.warn).toHaveBeenCalledTimes(8);
             expect(aNInput.getFormatted()).toEqual('');
             expect(aNInput.getNumber()).toEqual(0);
 
@@ -3129,6 +3158,7 @@ describe('autoNumeric options and `options.*` methods', () => {
 
         it('should group the numbers with the allowed grouping choices', () => {
             aNInput = new AutoNumeric(newInput, { digitalGroupSpacing: 2, maximumValue : '999999999999999' });
+            // eslint-disable-next-line no-loss-of-precision
             aNInput.set(12345678901234.5678);
             expect(aNInput.getFormatted()).toEqual('1,23,45,67,89,01,234.57');
             aNInput.update({ digitalGroupSpacing: '2s' });
@@ -7713,7 +7743,10 @@ describe('Static autoNumeric functions', () => {
 
             expect(() => AutoNumeric.validate({ allowDecimalPadding: true })).not.toThrow();
             expect(() => AutoNumeric.validate({ allowDecimalPadding: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: 1 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: '1' })).not.toThrow();
             // The allowDecimalPadding tests with the `false` value is done in the next test, since it outputs a warning
+            // The allowDecimalPadding tests with an allowDecimalPadding value superior to the default '2' decimalPlaces outputs warning too; See below
 
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: null })).not.toThrow();
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '(,)' })).not.toThrow();
@@ -7904,14 +7937,23 @@ describe('Static autoNumeric functions', () => {
             expect(console.warn).toHaveBeenCalledTimes(7);
             expect(() => AutoNumeric.validate({ allowDecimalPadding: 'false' })).not.toThrow();
             expect(console.warn).toHaveBeenCalledTimes(8);
-        });
 
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: 3 })).not.toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(9);
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: '3' })).not.toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(10);
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: 5 })).not.toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(11);
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: '5' })).not.toThrow();
+            expect(console.warn).toHaveBeenCalledTimes(12);
+        });
+        
         it('should validate, without warnings', () => {
             expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats })).not.toThrow();
             expect(() => AutoNumeric.validate({ allowDecimalPadding: AutoNumeric.options.allowDecimalPadding.floats, decimalPlaces: '2' })).not.toThrow();
         });
 
-        it('should not validate', () => {
+        it('should not validate non objects', () => {
             expect(() => AutoNumeric.validate(0)).toThrow();
             expect(() => AutoNumeric.validate(undefined)).toThrow();
             expect(() => AutoNumeric.validate(null)).toThrow();
@@ -7920,7 +7962,9 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate([{ digitGroupSeparator: '.' }])).toThrow();
             expect(() => AutoNumeric.validate('foobar')).toThrow();
             expect(() => AutoNumeric.validate(42)).toThrow();
+        });
 
+        it('should not validate caretPositionOnFocus', () => {
             expect(() => AutoNumeric.validate({ caretPositionOnFocus: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ caretPositionOnFocus: -42 })).toThrow();
             expect(() => AutoNumeric.validate({ caretPositionOnFocus: '1' })).toThrow();
@@ -7928,7 +7972,9 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'a' })).toThrow();
             expect(() => AutoNumeric.validate({ caretPositionOnFocus: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ caretPositionOnFocus: true })).toThrow();
+        });
 
+        it('should not validate digitGroupSeparator', () => {
             expect(() => AutoNumeric.validate({ digitGroupSeparator: '-' })).toThrow();
             expect(() => AutoNumeric.validate({ digitGroupSeparator: '"' })).toThrow();
             expect(() => AutoNumeric.validate({ digitGroupSeparator: 'a' })).toThrow();
@@ -7936,23 +7982,31 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ digitGroupSeparator: '.' })).toThrow(); // Since the default 'decimalCharacter' is '.' too
             expect(() => AutoNumeric.validate({ digitGroupSeparator: true })).toThrow();
             expect(() => AutoNumeric.validate({ digitGroupSeparator: null })).toThrow();
+        });
 
+        it('should not validate alwaysAllowDecimalCharacter', () => {
             expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ alwaysAllowDecimalCharacter: 'foobar' })).toThrow();
+        });
 
+        it('should not validate createLocalList', () => {
             expect(() => AutoNumeric.validate({ createLocalList: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ createLocalList: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ createLocalList: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ createLocalList: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ createLocalList: 'foobar' })).toThrow();
+        });
 
+        it('should not validate showOnlyNumbersOnFocus', () => {
             expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ showOnlyNumbersOnFocus: null })).toThrow();
+        });
 
+        it('should not validate digitalGroupSpacing', () => {
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: '-2' })).toThrow();
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: -2 })).toThrow();
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: '1' })).toThrow();
@@ -7967,39 +8021,53 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: null })).toThrow();
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: [] })).toThrow();
             expect(() => AutoNumeric.validate({ digitalGroupSpacing: {} })).toThrow();
+        });
 
+        it('should not validate decimalCharacter', () => {
             expect(() => AutoNumeric.validate({ decimalCharacter: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ decimalCharacter: true })).toThrow();
             expect(() => AutoNumeric.validate({ decimalCharacter: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ decimalCharacter: '.', digitGroupSeparator: '.' })).toThrow();
             expect(() => AutoNumeric.validate({ decimalCharacter: ',', digitGroupSeparator: ',' })).toThrow();
+        });
 
+        it('should not validate decimalCharacterAlternative', () => {
             expect(() => AutoNumeric.validate({ decimalCharacterAlternative: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ decimalCharacterAlternative: true })).toThrow();
             expect(() => AutoNumeric.validate({ decimalCharacterAlternative: ['foobar'] })).toThrow();
+        });
 
+        it('should not validate currencySymbol', () => {
             expect(() => AutoNumeric.validate({ currencySymbol: [] })).toThrow();
             expect(() => AutoNumeric.validate({ currencySymbol: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ currencySymbol: true })).toThrow();
             expect(() => AutoNumeric.validate({ currencySymbol: null })).toThrow();
+        });
 
+        it('should not validate currencySymbolPlacement', () => {
             expect(() => AutoNumeric.validate({ currencySymbolPlacement: ['s'] })).toThrow();
             expect(() => AutoNumeric.validate({ currencySymbolPlacement: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ currencySymbolPlacement: true })).toThrow();
             expect(() => AutoNumeric.validate({ currencySymbolPlacement: null })).toThrow();
             expect(() => AutoNumeric.validate({ currencySymbolPlacement: 'foobar' })).toThrow();
+        });
 
+        it('should not validate negativePositiveSignPlacement', () => {
             expect(() => AutoNumeric.validate({ negativePositiveSignPlacement: ['r'] })).toThrow();
             expect(() => AutoNumeric.validate({ negativePositiveSignPlacement: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ negativePositiveSignPlacement: true })).toThrow();
             expect(() => AutoNumeric.validate({ negativePositiveSignPlacement: 'foobar' })).toThrow();
+        });
 
+        it('should not validate showPositiveSign', () => {
             expect(() => AutoNumeric.validate({ showPositiveSign: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ showPositiveSign: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ showPositiveSign: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ showPositiveSign: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ showPositiveSign: 'foobar' })).toThrow();
+        });
 
+        it('should not validate styleRules', () => {
             expect(() => AutoNumeric.validate({ styleRules: { } })).toThrow();
             expect(() => AutoNumeric.validate({ styleRules: true })).toThrow();
             expect(() => AutoNumeric.validate({ styleRules: 42 })).toThrow();
@@ -8011,7 +8079,9 @@ describe('Static autoNumeric functions', () => {
                     ],
                 },
             })).toThrow();
+        });
 
+        it('should not validate suffixText', () => {
             expect(() => AutoNumeric.validate({ suffixText: '-foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ suffixText: 'foo-bar' })).toThrow();
             expect(() => AutoNumeric.validate({ suffixText: 'foo42bar' })).toThrow();
@@ -8021,11 +8091,15 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ suffixText: -42 })).toThrow();
             expect(() => AutoNumeric.validate({ suffixText: true })).toThrow();
             expect(() => AutoNumeric.validate({ suffixText: null })).toThrow();
+        });
 
+        it('should not validate overrideMinMaxLimits', () => {
             expect(() => AutoNumeric.validate({ overrideMinMaxLimits: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ overrideMinMaxLimits: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ overrideMinMaxLimits: true })).toThrow();
+        });
 
+        it('should not validate maximumValue and minimumValue', () => {
             spyOn(console, 'warn');
             expect(() => AutoNumeric.validate({ maximumValue: true })).toThrow();
             expect(() => AutoNumeric.validate({ maximumValue: null })).toThrow();
@@ -8059,7 +8133,9 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ minimumValue: '20', maximumValue: '-10' })).toThrow();
             expect(() => AutoNumeric.validate({ minimumValue: '20', maximumValue:   '0' })).toThrow();
             expect(() => AutoNumeric.validate({ minimumValue: '20', maximumValue:  '10' })).toThrow();
+        });
 
+        it('should not validate decimalPlaces', () => {
             expect(() => AutoNumeric.validate({ decimalPlaces: [] })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlaces: true })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlaces: 'foobar' })).toThrow();
@@ -8068,7 +8144,9 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ decimalPlaces: -5 })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlaces: null })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlaces: 2.3 })).toThrow();
+        });
 
+        it('should not validate decimalPlacesRawValue', () => {
             expect(() => AutoNumeric.validate({ decimalPlacesRawValue: [] })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesRawValue: true })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesRawValue: 'foobar' })).toThrow();
@@ -8076,7 +8154,9 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ decimalPlacesRawValue: '-5' })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesRawValue: -5 })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesRawValue: 2.3 })).toThrow();
+        });
 
+        it('should not validate decimalPlacesShownOnFocus', () => {
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: [] })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: true })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: 'foobar' })).toThrow();
@@ -8084,19 +8164,25 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: '-5' })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: -5 })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnFocus: 2.3 })).toThrow();
+        });
 
+        it('should not validate rawValueDivisor', () => {
             expect(() => AutoNumeric.validate({ rawValueDivisor: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ rawValueDivisor: true })).toThrow();
             expect(() => AutoNumeric.validate({ rawValueDivisor: -1000 })).toThrow();
             expect(() => AutoNumeric.validate({ rawValueDivisor: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ rawValueDivisor: 1 })).toThrow();
+        });
 
+        it('should not validate divisorWhenUnfocused', () => {
             expect(() => AutoNumeric.validate({ divisorWhenUnfocused: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ divisorWhenUnfocused: true })).toThrow();
             expect(() => AutoNumeric.validate({ divisorWhenUnfocused: -1000 })).toThrow();
             expect(() => AutoNumeric.validate({ divisorWhenUnfocused: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ divisorWhenUnfocused: 1 })).toThrow();
+        });
 
+        it('should not validate decimalPlacesShownOnBlur', () => {
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: [] })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: true })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: 'foobar' })).toThrow();
@@ -8104,17 +8190,23 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: '-5' })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: -5 })).toThrow();
             expect(() => AutoNumeric.validate({ decimalPlacesShownOnBlur: 2.3 })).toThrow();
+        });
 
+        it('should not validate symbolWhenUnfocused', () => {
             expect(() => AutoNumeric.validate({ symbolWhenUnfocused: true })).toThrow();
             expect(() => AutoNumeric.validate({ symbolWhenUnfocused: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ symbolWhenUnfocused: [] })).toThrow();
+        });
 
+        it('should not validate saveValueToSessionStorage', () => {
             expect(() => AutoNumeric.validate({ saveValueToSessionStorage: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ saveValueToSessionStorage: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ saveValueToSessionStorage: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ saveValueToSessionStorage: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ saveValueToSessionStorage: 'foobar' })).toThrow();
+        });
 
+        it('should not validate onInvalidPaste', () => {
             expect(() => AutoNumeric.validate({ onInvalidPaste: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ onInvalidPaste: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ onInvalidPaste: -42 })).toThrow();
@@ -8125,18 +8217,26 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ onInvalidPaste: true })).toThrow();
             expect(() => AutoNumeric.validate({ onInvalidPaste: null })).toThrow();
             expect(() => AutoNumeric.validate({ onInvalidPaste: [] })).toThrow();
+        });
 
+        it('should not validate roundingMethod', () => {
             expect(() => AutoNumeric.validate({ roundingMethod: 0.5 })).toThrow();
             expect(() => AutoNumeric.validate({ roundingMethod: true })).toThrow();
             expect(() => AutoNumeric.validate({ roundingMethod: null })).toThrow();
             expect(() => AutoNumeric.validate({ roundingMethod: 'foobar' })).toThrow();
+        });
 
+        it('should not validate allowDecimalPadding', () => {
             expect(() => AutoNumeric.validate({ allowDecimalPadding: 0 })).toThrow();
-            expect(() => AutoNumeric.validate({ allowDecimalPadding: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ allowDecimalPadding: '0' })).toThrow();
-            expect(() => AutoNumeric.validate({ allowDecimalPadding: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: -1 })).toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: -42 })).toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: '-1' })).toThrow();
+            expect(() => AutoNumeric.validate({ allowDecimalPadding: '-42' })).toThrow();
             expect(() => AutoNumeric.validate({ allowDecimalPadding: 'foobar' })).toThrow();
+        });
 
+        it('should not validate negativeBracketsTypeOnBlur', () => {
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: [] })).toThrow();
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: true })).toThrow();
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: 'foobar' })).toThrow();
@@ -8144,7 +8244,9 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: '-5' })).toThrow();
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: 5 })).toThrow();
             expect(() => AutoNumeric.validate({ negativeBracketsTypeOnBlur: -5 })).toThrow();
+        });
 
+        it('should not validate negativeSignCharacter', () => {
             expect(() => AutoNumeric.validate({ negativeSignCharacter: 'ab' })).toThrow();
             expect(() => AutoNumeric.validate({ negativeSignCharacter: true })).toThrow();
             expect(() => AutoNumeric.validate({ negativeSignCharacter: [] })).toThrow();
@@ -8153,7 +8255,9 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ negativeSignCharacter: '' })).toThrow();
             expect(() => AutoNumeric.validate({ negativeSignCharacter: 2 })).toThrow();
             expect(() => AutoNumeric.validate({ negativeSignCharacter: 2.5 })).toThrow();
+        });
 
+        it('should not validate positiveSignCharacter', () => {
             expect(() => AutoNumeric.validate({ positiveSignCharacter: 'ab' })).toThrow();
             expect(() => AutoNumeric.validate({ positiveSignCharacter: true })).toThrow();
             expect(() => AutoNumeric.validate({ positiveSignCharacter: [] })).toThrow();
@@ -8162,25 +8266,33 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ positiveSignCharacter: '' })).toThrow();
             expect(() => AutoNumeric.validate({ positiveSignCharacter: 2 })).toThrow();
             expect(() => AutoNumeric.validate({ positiveSignCharacter: 2.5 })).toThrow();
+        });
 
+        it('should not validate emptyInputBehavior', () => {
             expect(() => AutoNumeric.validate({ emptyInputBehavior: [] })).toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: true })).toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: '22foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ emptyInputBehavior: null })).toThrow();
+        });
 
+        it('should not validate eventBubbles', () => {
             expect(() => AutoNumeric.validate({ eventBubbles: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ eventBubbles: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ eventBubbles: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ eventBubbles: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ eventBubbles: 'foobar' })).toThrow();
+        });
 
+        it('should not validate eventIsCancelable', () => {
             expect(() => AutoNumeric.validate({ eventIsCancelable: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ eventIsCancelable: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ eventIsCancelable: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ eventIsCancelable: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ eventIsCancelable: 'foobar' })).toThrow();
+        });
 
+        it('should not validate leadingZero', () => {
             expect(() => AutoNumeric.validate({ leadingZero: [] })).toThrow();
             expect(() => AutoNumeric.validate({ leadingZero: true })).toThrow();
             expect(() => AutoNumeric.validate({ leadingZero: 'foobar' })).toThrow();
@@ -8188,19 +8300,25 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ leadingZero: '-5' })).toThrow();
             expect(() => AutoNumeric.validate({ leadingZero: 5 })).toThrow();
             expect(() => AutoNumeric.validate({ leadingZero: -5 })).toThrow();
+        });
 
+        it('should not validate formatOnPageLoad', () => {
             expect(() => AutoNumeric.validate({ formatOnPageLoad: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ formatOnPageLoad: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ formatOnPageLoad: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ formatOnPageLoad: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ formatOnPageLoad: 'foobar' })).toThrow();
+        });
 
+        it('should not validate formulaMode', () => {
             expect(() => AutoNumeric.validate({ formulaMode: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ formulaMode: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ formulaMode: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ formulaMode: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ formulaMode: 'foobar' })).toThrow();
+        });
 
+        it('should not validate historySize', () => {
             expect(() => AutoNumeric.validate({ historySize: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ historySize: -1 })).toThrow();
             expect(() => AutoNumeric.validate({ historySize: 5.34 })).toThrow();
@@ -8210,30 +8328,40 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ historySize: false })).toThrow();
             expect(() => AutoNumeric.validate({ historySize: [] })).toThrow();
             expect(() => AutoNumeric.validate({ historySize: null })).toThrow();
+        });
 
+        it('should not validate selectNumberOnly', () => {
             expect(() => AutoNumeric.validate({ selectNumberOnly: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ selectNumberOnly: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ selectNumberOnly: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ selectNumberOnly: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ selectNumberOnly: 'foobar' })).toThrow();
+        });
 
+        it('should not validate selectOnFocus', () => {
             expect(() => AutoNumeric.validate({ selectOnFocus: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ selectOnFocus: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ selectOnFocus: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ selectOnFocus: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ selectOnFocus: 'foobar' })).toThrow();
+        });
 
+        it('should not validate defaultValueOverride', () => {
             expect(() => AutoNumeric.validate({ defaultValueOverride: [] })).toThrow();
             expect(() => AutoNumeric.validate({ defaultValueOverride: true })).toThrow();
             expect(() => AutoNumeric.validate({ defaultValueOverride: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ defaultValueOverride: '22foobar' })).toThrow();
+        });
 
+        it('should not validate unformatOnSubmit', () => {
             expect(() => AutoNumeric.validate({ unformatOnSubmit: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ unformatOnSubmit: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ unformatOnSubmit: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ unformatOnSubmit: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ unformatOnSubmit: 'foobar' })).toThrow();
+        });
 
+        it('should not validate outputFormat', () => {
             expect(() => AutoNumeric.validate({ outputFormat: [] })).toThrow();
             expect(() => AutoNumeric.validate({ outputFormat: true })).toThrow();
             expect(() => AutoNumeric.validate({ outputFormat: 'foobar' })).toThrow();
@@ -8241,32 +8369,42 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ outputFormat: '-5' })).toThrow();
             expect(() => AutoNumeric.validate({ outputFormat: 5 })).toThrow();
             expect(() => AutoNumeric.validate({ outputFormat: -5 })).toThrow();
+        });
 
+        it('should not validate invalidClass', () => {
             expect(() => AutoNumeric.validate({ invalidClass: true })).toThrow();
             expect(() => AutoNumeric.validate({ invalidClass: false })).toThrow();
             expect(() => AutoNumeric.validate({ invalidClass: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ invalidClass: '123foo' })).toThrow();
             expect(() => AutoNumeric.validate({ invalidClass: '---234' })).toThrow();
+        });
 
+        it('should not validate isCancellable', () => {
             expect(() => AutoNumeric.validate({ isCancellable: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ isCancellable: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ isCancellable: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ isCancellable: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ isCancellable: 'foobar' })).toThrow();
+        });
 
+        it('should not validate modifyValueOnWheel', () => {
             expect(() => AutoNumeric.validate({ modifyValueOnWheel: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ modifyValueOnWheel: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ modifyValueOnWheel: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ modifyValueOnWheel: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ modifyValueOnWheel: 'foobar' })).toThrow();
+        });
 
+        it('should not validate wheelOn', () => {
             expect(() => AutoNumeric.validate({ wheelOn: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ wheelOn: true })).toThrow();
             expect(() => AutoNumeric.validate({ wheelOn: false })).toThrow();
             expect(() => AutoNumeric.validate({ wheelOn: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ wheelOn: -42 })).toThrow();
             expect(() => AutoNumeric.validate({ wheelOn: '-42.67' })).toThrow();
+        });
 
+        it('should not validate wheelStep', () => {
             expect(() => AutoNumeric.validate({ wheelStep: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ wheelStep: true })).toThrow();
             expect(() => AutoNumeric.validate({ wheelStep: 0 })).toThrow();
@@ -8275,7 +8413,9 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ wheelStep: -1000.02 })).toThrow();
             expect(() => AutoNumeric.validate({ wheelStep: '-1000.02' })).toThrow();
             expect(() => AutoNumeric.validate({ wheelStep: '1000foobar' })).toThrow();
+        });
 
+        it('should not validate serializeSpaces', () => {
             expect(() => AutoNumeric.validate({ serializeSpaces: true })).toThrow();
             expect(() => AutoNumeric.validate({ serializeSpaces: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ serializeSpaces: -42 })).toThrow();
@@ -8284,42 +8424,56 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ serializeSpaces: ' ' })).toThrow();
             expect(() => AutoNumeric.validate({ serializeSpaces: 'foobar' })).toThrow();
             expect(() => AutoNumeric.validate({ serializeSpaces: ' foobar' })).toThrow();
+        });
 
+        it('should not validate showWarnings', () => {
             expect(() => AutoNumeric.validate({ showWarnings: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ showWarnings: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ showWarnings: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ showWarnings: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ showWarnings: 'foobar' })).toThrow();
+        });
 
+        it('should not validate noEventListeners', () => {
             expect(() => AutoNumeric.validate({ noEventListeners: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ noEventListeners: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ noEventListeners: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ noEventListeners: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ noEventListeners: 'foobar' })).toThrow();
+        });
 
+        it('should not validate readOnly', () => {
             expect(() => AutoNumeric.validate({ readOnly: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ readOnly: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ readOnly: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ readOnly: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ readOnly: 'foobar' })).toThrow();
+        });
 
+        it('should not validate unformatOnHover', () => {
             expect(() => AutoNumeric.validate({ unformatOnHover: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ unformatOnHover: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ unformatOnHover: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ unformatOnHover: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ unformatOnHover: 'foobar' })).toThrow();
+        });
 
+        it('should not validate failOnUnknownOption', () => {
             expect(() => AutoNumeric.validate({ failOnUnknownOption: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ failOnUnknownOption: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ failOnUnknownOption: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ failOnUnknownOption: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ failOnUnknownOption: 'foobar' })).toThrow();
+        });
 
+        it('should not validate valuesToStrings', () => {
             expect(() => AutoNumeric.validate({ valuesToStrings: true })).toThrow();
             expect(() => AutoNumeric.validate({ valuesToStrings: [] })).toThrow();
             expect(() => AutoNumeric.validate({ valuesToStrings: 42 })).toThrow();
             expect(() => AutoNumeric.validate({ valuesToStrings: 'foobar' })).toThrow();
+        });
 
+        it('should not validate watchExternalChanges', () => {
             expect(() => AutoNumeric.validate({ watchExternalChanges: 0 })).toThrow();
             expect(() => AutoNumeric.validate({ watchExternalChanges: 1 })).toThrow();
             expect(() => AutoNumeric.validate({ watchExternalChanges: '0' })).toThrow();
@@ -8331,6 +8485,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({
                 negativeSignCharacter: '¼',
                 positiveSignCharacter: '¼',
+            })).toThrow();
+
+            expect(() => AutoNumeric.validate({
+                negativeSignCharacter: '-',
+                positiveSignCharacter: ' -',
             })).toThrow();
         });
 

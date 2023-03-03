@@ -1,7 +1,7 @@
 /* global module, require */
 
 const webpack           = require('webpack');
-const merge             = require('webpack-merge');
+const merge             = require('webpack-merge').default;
 const baseWebpackConfig = require('./webpack.config.base.js');
 // const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 

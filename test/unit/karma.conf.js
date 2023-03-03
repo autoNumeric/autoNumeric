@@ -1,6 +1,9 @@
 // Karma configuration
 
 const webpackConfig = require('../../config/webpack.config.test');
+const puppeteer = require('puppeteer');
+// eslint-disable-next-line no-undef
+process.env.CHROME_BIN = puppeteer.executablePath();
 
 module.exports = function(config) {
     config.set({
@@ -11,11 +14,11 @@ module.exports = function(config) {
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         frameworks: [
             'jasmine',
+            'webpack',
         ],
 
         // list of files / patterns to load in the browser
         files: [
-            '../../node_modules/@babel/polyfill/dist/polyfill.js',
             './tests.webpack.js',
         ],
 
@@ -92,7 +95,6 @@ module.exports = function(config) {
             'ChromeHeadless',
             'Firefox',
             'FirefoxDeveloperHeadless',
-            'PhantomJS',
         ],
 
         // Continuous Integration mode

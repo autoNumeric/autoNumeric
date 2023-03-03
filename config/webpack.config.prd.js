@@ -1,10 +1,10 @@
 /* global module, require */
 
 const path              = require('path');
-const webpack           = require('webpack');
-const merge             = require('webpack-merge');
+const merge             = require('webpack-merge').default;
 const baseWebpackConfig = require('./webpack.config.base.js');
 const UglifyJsPlugin    = require('uglifyjs-webpack-plugin');
+const ESLintPlugin      = require('eslint-webpack-plugin');
 const version           = require('../package.json').version;
 
 function resolve(dir) {
@@ -17,13 +17,13 @@ const webpackConfig = merge(baseWebpackConfig, {
     module : {
         rules: [ // Only activate the linting when building for the production
             {
-                test   : /\.js$/,
-                loader : 'eslint-loader',
+                /* test   : /\.js$/,
+                // loader : 'eslint-loader', // Deprecated in favor of eslint-webpack-plugin
                 enforce: 'pre',
                 include: [resolve('src'), resolve('test')],
-                options: {
+                /* options: {
                     formatter: require('eslint-friendly-formatter'),
-                },
+                }, */
             },
         ],
     },
@@ -48,7 +48,7 @@ const webpackConfig = merge(baseWebpackConfig, {
                         comments: false,
                         preamble: `/**
  * AutoNumeric.js v${version}
- * © 2009-2019 Robert J. Knothe, Alexandre Bonneau
+ * © 2009-2023 Alexandre Bonneau, Robert J. Knothe
  * Released under the MIT License.
  */`
                     },
@@ -56,7 +56,7 @@ const webpackConfig = merge(baseWebpackConfig, {
                         keep_fnames: false,
                         toplevel   : true,
                     },
-                }
+                },
             }),
         ],
     },
@@ -68,7 +68,7 @@ const webpackConfig = merge(baseWebpackConfig, {
         path         : resolve('dist'),
         globalObject : 'this',
     },
-    plugins: [],
+    plugins: [new ESLintPlugin()],
 });
 
 // Compress the library
@@ -80,7 +80,7 @@ webpackConfig.plugins.push(
         test     : new RegExp('\\.(js)$'),
         threshold: 10240,
         minRatio : 0.8,
-    })
+    }),
 );
 
 // Analyze the library file sizes

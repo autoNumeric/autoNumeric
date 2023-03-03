@@ -17,3 +17,6 @@ test/unit/coverage
 
 # Config and settings directory from PhpStorm/WebStorm
 .idea
+
+# Third-party service configuration and access
+.env.json

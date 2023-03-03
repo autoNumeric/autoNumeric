@@ -1907,7 +1907,7 @@ export default class AutoNumeric {
                         AutoNumericHelper.throwError('The callback/classes structure is not valid for the `styleRules` option.');
                     }
                 } else {
-                    AutoNumericHelper.warning(`The given \`styleRules\` callback is not a function, ${typeof callback} given.`, this.settings.showWarnings);
+                    AutoNumericHelper.warning(`The given \`styleRules\` callback is not a function, ${typeof userObject.callback} given.`, this.settings.showWarnings);
                 }
             });
         }

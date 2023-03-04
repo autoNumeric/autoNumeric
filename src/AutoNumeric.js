@@ -45,7 +45,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//TODO Prevent having to enter relative path in the js files (ie. using `./AutoNumericHelper` instead of just `AutoNumericHelper`) (cf. http://moduscreate.com/es6-es2015-import-no-relative-path-webpack/)
+//TODO Prevent having to enter relative path in the js files (i.e. using `./AutoNumericHelper` instead of just `AutoNumericHelper`) (cf. http://moduscreate.com/es6-es2015-import-no-relative-path-webpack/)
 import AutoNumericHelper from './AutoNumericHelper';
 import AutoNumericEnum   from './AutoNumericEnum';
 import Evaluator         from './maths/Evaluator';
@@ -59,7 +59,7 @@ import Parser            from './maths/Parser';
 export default class AutoNumeric {
     /**
      * Initialize the AutoNumeric object onto the given DOM element, and attach the settings and related event listeners to it.
-     * The options passed as a parameter is an object that contains the settings (ie. {digitGroupSeparator: ".", decimalCharacter: ",", currencySymbol: '€ '})
+     * The options passed as a parameter is an object that contains the settings (i.e. {digitGroupSeparator: ".", decimalCharacter: ",", currencySymbol: '€ '})
      *
      * @example
      * anElement = new AutoNumeric(domElement); // With the default options
@@ -176,7 +176,7 @@ export default class AutoNumeric {
         // Save the initial values (html attribute + element.value) for the pristine test
         this._saveInitialValues(initialValue);
         
-        // Setup the data for the persistent storage solution (ie. sessionStorage or cookies)
+        // Set up the data for the persistent storage solution (i.e. sessionStorage or cookies)
         this.sessionStorageAvailable = this.constructor._storageTest();
         this.storageNamePrefix = 'AUTO_'; // The prefix for the raw value storage name variable can be modified here
         this._setPersistentStorageName();
@@ -208,7 +208,7 @@ export default class AutoNumeric {
         // Create the global functions
         this.global = {
             /**
-             * Set the same given element value for each elements in the local AutoNumeric element list, and format those elements immediately
+             * Set the same given element value for each element in the local AutoNumeric element list, and format those elements immediately
              *
              * @param {number|string} newValue The value must be a number or a numeric string
              * @param {object} options A settings object that will override the current settings. Note: the update is done only if the `newValue` is defined.
@@ -221,7 +221,7 @@ export default class AutoNumeric {
 
             /**
              * Set the value given value directly as the DOM element value, without formatting it beforehand.
-             * This sets the same unformatted value for each elements in the local AutoNumeric element list.
+             * This sets the same unformatted value for each element in the local AutoNumeric element list.
              *
              * @param {number|string} value
              * @param {object} options
@@ -323,7 +323,7 @@ export default class AutoNumeric {
             },
 
             /**
-             * Remove the formatting and keep only the raw unformatted value (as a numericString) in each elements of the local AutoNumeric element list
+             * Remove the formatting and keep only the raw unformatted value (as a numericString) in each element of the local AutoNumeric element list
              */
             unformat: () => {
                 this.autoNumericLocalList.forEach(aNObject => {
@@ -334,7 +334,7 @@ export default class AutoNumeric {
             /**
              * Remove the formatting and keep only the localized unformatted value in the element, with the option to override the default outputFormat if needed
              *
-             * @param {null|string} forcedOutputFormat If set to something different than `null`, then this is used as an overriding outputFormat option
+             * @param {null|string} forcedOutputFormat If set to something different from `null`, then this is used as an overriding outputFormat option
              */
             unformatLocalized: (forcedOutputFormat = null) => {
                 this.autoNumericLocalList.forEach(aNObject => {
@@ -343,7 +343,7 @@ export default class AutoNumeric {
             },
 
             /**
-             * Updates the AutoNumeric settings, and immediately format the elements accordingly, for each elements of the local AutoNumeric element list
+             * Updates the AutoNumeric settings, and immediately format the elements accordingly, for each element of the local AutoNumeric element list
              *
              * @param {object} newOptions This can be either one or more option objects
              */
@@ -565,7 +565,7 @@ export default class AutoNumeric {
 
         // Create the functions that will allow to change each setting one by one
         /**
-         * For each options, we define if we need to reformat the element content (does changing the options should change the way its value is displayed?).
+         * For each option, we define if we need to reformat the element content (does changing the options should change the way its value is displayed?).
          * If yes, then we use the `update()` for force a reformat, otherwise, we just update the `settings` object.
          */
         this.options = {
@@ -1135,8 +1135,8 @@ export default class AutoNumeric {
     /**
      * Save the initial element values for later use in the pristine test.
      * Those values are :
-     * - the html attribute (ie. <input value='42'>), and
-     * - the script `value` (ie. `let domElement.value`)
+     * - the html attribute (i.e. <input value='42'>), and
+     * - the script `value` (i.e. `let domElement.value`)
      *
      * @param {null|number|string} initialValue
      * @private
@@ -1164,7 +1164,7 @@ export default class AutoNumeric {
      */
     _createEventListeners() {
         this.formulaMode = false;
-        // Create references to the event handler functions, so we can then cleanly removes those listeners if needed
+        // Create references to the event handler functions, so we can then cleanly remove those listeners if needed
         // That would not be possible if we used closures directly in the event handler declarations
         this._onFocusInFunc = e => { this._onFocusIn(e); };
         this._onFocusInAndMouseEnterFunc = e => { this._onFocusInAndMouseEnter(e); };
@@ -1237,7 +1237,7 @@ export default class AutoNumeric {
     _updateEventListeners() {
         if (!this.settings.noEventListeners && !this.hasEventListeners) {
             // Special case where an update is done on an element that did not activate its event listeners in the first place
-            // ie. when an element is first created with `contenteditable="false"`, then an update is done with `anElement.french()`
+            // i.e. when an element is first created with `contenteditable="false"`, then an update is done with `anElement.french()`
             this._createEventListeners();
         }
 
@@ -1255,7 +1255,7 @@ export default class AutoNumeric {
      */
     _setupFormListener() {
         if (!AutoNumericHelper.isNull(this.parentForm)) {
-            // Setup the handler function
+            // Set up the handler function
             this._onFormSubmitFunc = () => { this._onFormSubmit(); };
             this._onFormResetFunc = () => { this._onFormReset(); };
 
@@ -1276,7 +1276,7 @@ export default class AutoNumeric {
 
     /**
      * Remove the form 'submit' event listener, as well as the `dataset` info (`anCount` and `anFormHandler`) from the parent form, only when there are only one AutoNumeric child element left in that <form>.
-     * Otherwise decrement the `anCount`.
+     * Otherwise, decrement the `anCount`.
      *
      * @private
      */
@@ -1468,7 +1468,7 @@ export default class AutoNumeric {
     }
 
     /**
-     * Set the DOM element write permissions according to the current settings, by setting the `readonly` or `contenteditable` attributes depending of its tag type.
+     * Set the DOM element write permissions according to the current settings, by setting the `readonly` or `contenteditable` attributes depending on its tag type.
      * If the `useHtmlAttribute` parameter is set to `true`, then the `readonly` html attribute is used and has precedence over the `readOnly` option to set the element as read-only.
      *
      * @param {boolean} useHtmlAttribute If set to `true`, then the write permissions are set by taking into account the html 'readonly' attribute, even if the `readOnly` option is set to false
@@ -1609,22 +1609,22 @@ export default class AutoNumeric {
      *
      * If the user has done some undos and tries to enter:
      * - a new and different number than the 'next' state, this drops the rest of the history table
-     * - the very same number that result in the same rawValue than the 'next' state, we only move the history table pointer to the next state
+     * - the very same number that result in the same rawValue as the 'next' state, we only move the history table pointer to the next state
      *
      * @private
      */
     _historyTableAdd() {
         //TODO Add a `this.settings.saveSelectionsIntoHistory` option to prevent saving the selections (in order to gain performance)
         const isEmptyHistoryTable = this.historyTable.length === 0;
-        // Only add a new value if it's different than the previous one (to prevent infinitely adding values on mouseover for instance)
+        // Only add a new value if it's different from the previous one (to prevent infinitely adding values on mouseover for instance)
         if (isEmptyHistoryTable || this.rawValue !== this._historyTableCurrentValueUsed()) {
             // Trim the history table if the user changed the value of an intermediary state
             let addNewHistoryState = true;
             if (!isEmptyHistoryTable) {
-                // If some undo has been done and the user type the exact same data than the next entry after the current history pointer, do no drop the rest of the 'redo' list, and just advance the historyTableIndex
+                // If some undo has been done and the user type the exact same data than the next entry after the current history pointer, do not drop the rest of the 'redo' list, and just advance the historyTableIndex
                 const nextHistoryStateIndex = this.historyTableIndex + 1;
                 if (nextHistoryStateIndex < this.historyTable.length && this.rawValue === this.historyTable[nextHistoryStateIndex].value) {
-                    // If the character input result in the same state than the next one, do not remove the next history states nor add a new one
+                    // If the character input result in the same state as the next one, do not remove the next history states nor add a new one
                     addNewHistoryState = false;
                 } else {
                     // First remove anything that is after the current index
@@ -1647,7 +1647,7 @@ export default class AutoNumeric {
                     // Save the rawValue and selection start/end
                     value: this.rawValue,
                     // The selection for this element is temporary, and will be updated when the next history state will be recorded.
-                    // That way, we are always sure we save the last caret or selection positions just before the value is changed. Otherwise we would only save those positions when the value is first changed, and would not take into account that the user could move the caret around afterward.
+                    // That way, we are always sure we save the last caret or selection positions just before the value is changed. Otherwise, we would only save those positions when the value is first changed, and would not take into account that the user could move the caret around afterward.
                     // For instance, this is needed if the user change the element value, and immediately undo it ; if he then does a redo, he'll see the value and the right selection
                     // To sum up; The selection position are not always +1 character, since it could also be '2' if a group separator is added when entering one character. That's why the current history state caret/selection position is updated on each `keyup` event.
                     start: this.selectionStart + 1, // Here we add one since the user added one character too
@@ -1933,11 +1933,11 @@ export default class AutoNumeric {
         this.domElement.classList.remove(cssClassName);
     }
 
-    // This are the public function available on each autoNumeric-managed element
+    // Those are the public function available on each autoNumeric-managed element
 
     /**
      * Method that updates the AutoNumeric settings, and immediately format the element accordingly.
-     * The options passed as parameter(s) is either one or many objects that each contains some settings, ie. :
+     * The options passed as parameter(s) is either one or many objects that each contains some settings, i.e. :
      * {
      *     digitGroupSeparator: ".",
      *     decimalCharacter: ",",
@@ -1973,7 +1973,7 @@ export default class AutoNumeric {
         } else if (newOptions.length >= 1) {
             newOptions.forEach(optionObject => {
                 if (this.constructor._isPreDefinedOptionValid(optionObject)) {
-                    // The option object is a predefined option name (ie. 'euro')
+                    // The option object is a predefined option name (i.e. 'euro')
                     optionObject = this.constructor._getOptionObject(optionObject);
                 }
 
@@ -2132,7 +2132,7 @@ export default class AutoNumeric {
 
                 this._setElementAndRawValue(value, forcedRawValue, saveChangeToHistory);
 
-                // Special case when the user is allowed to enter invalid numbers outside of the min/max range
+                // Special case when the user is allowed to enter invalid numbers outside the min/max range
                 this._setValidOrInvalidState(forcedRawValue);
 
                 return this;
@@ -2219,7 +2219,7 @@ export default class AutoNumeric {
      * @private
      */
     _setRawValue(rawValue, saveChangeToHistory = true) {
-        // Only set the raw value if the given value is different than the current one
+        // Only set the raw value if the given value is different from the current one
         if (this.rawValue !== rawValue) { //TODO Manage the case where one value is a string while the other is a number?
             const oldRawValue = this.rawValue;
             // Update the raw value
@@ -2252,7 +2252,7 @@ export default class AutoNumeric {
 
     /**
      * Set the given value on the DOM element, without affecting the `rawValue`.
-     * This send an 'autoNumeric:formatted' event if the new value is different than the old one.
+     * This sends an 'autoNumeric:formatted' event if the new value is different from the old one.
      *
      * @param {number|string} newElementValue
      * @param {boolean} sendFormattedEvent If set to `true`, then the `AutoNumeric.events.formatted` event is sent if the value has changed
@@ -2473,7 +2473,7 @@ export default class AutoNumeric {
      */
     getFormatted(callback = null) {
         if (!('value' in this.domElement || 'textContent' in this.domElement)) {
-            // Make sure `.value` or `.textContent' exists before trying to access those properties
+            // Make sure `.value` or `.textContent` exists before trying to access those properties
             AutoNumericHelper.throwError('Unable to get the formatted string from the element.');
         }
 
@@ -2508,15 +2508,15 @@ export default class AutoNumeric {
 
     /**
      * Returns the unformatted value, but following the `outputFormat` setting, which means the output can either be :
-     * - a string (that could or could not represent a number (ie. "12345,67-")), or
+     * - a string (that could or could not represent a number (i.e. "12345,67-")), or
      * - a plain number (if the setting 'number' is used).
      *
-     * By default the returned values are an ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period.
+     * By default, the returned values are an ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period.
      * Check the "outputFormat" option definition for more details.
      *
      * @usage anElement.getLocalized();
      *
-     * @param {null|string|function} forcedOutputFormat If set to something different than `null`, then this is used as an overriding outputFormat option
+     * @param {null|string|function} forcedOutputFormat If set to something different from `null`, then this is used as an overriding outputFormat option
      * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
      *
      * @returns {*}
@@ -2533,7 +2533,7 @@ export default class AutoNumeric {
         if (AutoNumericHelper.isEmptyString(this.rawValue)) {
             value = '';
         } else {
-            // Here I use `this.rawValue` instead of `this.getNumericString()` since the current input value could be unformatted with a localization (ie. '1234567,89-').
+            // Here I use `this.rawValue` instead of `this.getNumericString()` since the current input value could be unformatted with a localization (i.e. '1234567,89-').
             // I also convert the rawValue to a number, then back to a string in order to drop the decimal part if the rawValue is an integer.
             value = ''+Number(this.rawValue);
         }
@@ -2574,7 +2574,7 @@ export default class AutoNumeric {
      * Remove the formatting and keep only the raw unformatted value in the element (as a numericString)
      * Note: this is loosely based on the previous 'unSet()' function
      *
-     * By default, values are returned as ISO numeric strings (ie. "1234.56" or "-1234.56"), where the decimal character is a period.
+     * By default, values are returned as ISO numeric strings (i.e. "1234.56" or "-1234.56"), where the decimal character is a period.
      * @example anElement.unformat()
      *
      * @returns {AutoNumeric}
@@ -2591,7 +2591,7 @@ export default class AutoNumeric {
      * Locale formats are supported "1234.56-" or "1234,56" or "-1234,56 or "1234,56-", or even plain numbers.
      * Take a look at the `outputFormat` option definition in the default settings for more details.
      *
-     * @param {null|string} forcedOutputFormat If set to something different than `null`, then this is used as an overriding outputFormat option
+     * @param {null|string} forcedOutputFormat If set to something different from `null`, then this is used as an overriding outputFormat option
      * @returns {AutoNumeric}
      */
     unformatLocalized(forcedOutputFormat = null) {
@@ -2706,7 +2706,7 @@ export default class AutoNumeric {
             (this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.prefix ||
             this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.none))) {
             if ((this.settings.showPositiveSign && isPositive) ||  // This only exclude the positive sign from being selected
-                (!isPositive && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.left)) { // And this exclude the negative sign from being selected in this special case : '-€ 1.234,57suffixText'
+                (!isPositive && this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.prefix && this.settings.negativePositiveSignPlacement === AutoNumeric.options.negativePositiveSignPlacement.left)) { // And this excludes the negative sign from being selected in this special case : '-€ 1.234,57suffixText'
                 start = start + 1;
             }
         }
@@ -2962,7 +2962,7 @@ export default class AutoNumeric {
             // Initialize the new AutoNumeric element
             const originalCreateLocalListSetting = this.settings.createLocalList;
             if (attached) {
-                // Temporary variable to know if we should create the local list during the initialization (since we'll remove it afterwards)
+                // Temporary variable to know if we should create the local list during the initialization (since we'll remove it afterward)
                 this.settings.createLocalList = false;
             }
 
@@ -3169,7 +3169,7 @@ export default class AutoNumeric {
      * Return a string in standard URL-encoded notation with the form input values, with localized values.
      * The default output format can be overridden by passing the option as a parameter.
      *
-     * @param {null|string} forcedOutputFormat If set to something different than `null`, then this is used as an overriding outputFormat option
+     * @param {null|string} forcedOutputFormat If set to something different from `null`, then this is used as an overriding outputFormat option
      * @returns {string}
      */
     formLocalized(forcedOutputFormat = null) {
@@ -3207,7 +3207,7 @@ export default class AutoNumeric {
      * Return an array containing an object for each form <input> element.
      * Those objects are of the following structure `{ name: foo, value: '42' }`, where the `name` is the DOM element name, and the `value` is the localized numeric string.
      *
-     * @param {null|string} forcedOutputFormat If set to something different than `null`, then this is used as an overriding outputFormat option
+     * @param {null|string} forcedOutputFormat If set to something different from `null`, then this is used as an overriding outputFormat option
      * @returns {Array}
      */
     formArrayLocalized(forcedOutputFormat = null) {
@@ -3245,7 +3245,7 @@ export default class AutoNumeric {
      * Return a JSON string containing an object representing the form input values.
      * This is based on the result of the `formArrayLocalized()` function.
      *
-     * @param {null|string} forcedOutputFormat If set to something different than `null`, then this is used as an overriding outputFormat option
+     * @param {null|string} forcedOutputFormat If set to something different from `null`, then this is used as an overriding outputFormat option
      * @returns {string}
      */
     formJsonLocalized(forcedOutputFormat = null) {
@@ -3341,7 +3341,7 @@ export default class AutoNumeric {
      * The function can either take a callback, or not. If it doesn't, the default `form.submit()` function will be called.
      * Otherwise, it runs `callback(value)` with `value` being equal to the result of `formLocalized()`.
      *
-     * @param {null|string} forcedOutputFormat If set to something different than `null`, then this is used as an overriding outputFormat option
+     * @param {null|string} forcedOutputFormat If set to something different from `null`, then this is used as an overriding outputFormat option
      * @param {function|null} callback
      * @returns {AutoNumeric}
      */
@@ -3398,7 +3398,7 @@ export default class AutoNumeric {
      * Under the hood, the array is generated via a call to `formArrayLocalized()`.
      *
      * @param {function} callback
-     * @param {null|string} forcedOutputFormat If set to something different than `null`, then this is used as an overriding outputFormat option
+     * @param {null|string} forcedOutputFormat If set to something different from `null`, then this is used as an overriding outputFormat option
      * @returns {AutoNumeric}
      */
     formSubmitArrayLocalized(callback, forcedOutputFormat = null) { //FIXME test this
@@ -3450,7 +3450,7 @@ export default class AutoNumeric {
      * Under the hood, the array is generated via a call to `formJsonLocalized()`.
      *
      * @param {function} callback
-     * @param {null|string} forcedOutputFormat If set to something different than `null`, then this is used as an overriding outputFormat option
+     * @param {null|string} forcedOutputFormat If set to something different from `null`, then this is used as an overriding outputFormat option
      * @returns {AutoNumeric}
      */
     formSubmitJsonLocalized(callback, forcedOutputFormat = null) { //FIXME test this
@@ -3536,7 +3536,7 @@ export default class AutoNumeric {
      * @private
      */
     static _createGlobalList() {
-        // The check that this global list does not exists already is done in the add and remove functions already
+        // The check that this global list does not exist already is done in the add and remove functions already
         this.autoNumericGlobalListName = 'autoNumericGlobalList'; //XXX This looks weird to set a variable on `this.` in a static method, but that really declare that variable like a static property
         // Note: I should not get any memory leaks for referencing the DOM element in the `value`, this DOM element also being the `key`, according to the spec : http://www.ecma-international.org/ecma-262/6.0/#sec-weakmap-objects
         this._createWeakMap(this.autoNumericGlobalListName);
@@ -3625,7 +3625,7 @@ export default class AutoNumeric {
     }
 
     /**
-     * Create a `Map` that will stores all the autoNumeric elements that are initialized from this current element.
+     * Create a `Map` that will store all the autoNumeric elements that are initialized from this current element.
      * @private
      */
     _createLocalList() {
@@ -3742,7 +3742,7 @@ export default class AutoNumeric {
      * This function is lenient since it only tests the settings properties ; it ignores any other properties the options object could have.
      *
      * @param {*} userOptions
-     * @param {Boolean} shouldExtendDefaultOptions If `true`, then this function will extends the `userOptions` passed by the user, with the default options.
+     * @param {Boolean} shouldExtendDefaultOptions If `true`, then this function will extend the `userOptions` passed by the user, with the default options.
      * @param {object|null} originalOptions The user can pass the original options (and not the one that are generated from the default settings and the various usability corrections), in order to add compatibility and conflicts checks.
      * @throws Error This throws if the `userOptions` are not valid
      */
@@ -3954,7 +3954,7 @@ export default class AutoNumeric {
 
         if ((options.overrideMinMaxLimits !== AutoNumeric.options.overrideMinMaxLimits.invalid && options.overrideMinMaxLimits !== AutoNumeric.options.overrideMinMaxLimits.ignore) &&
             (options.minimumValue > 0 || options.maximumValue < 0)) {
-            AutoNumericHelper.warning(`You've set a \`minimumValue\` or a \`maximumValue\` excluding the value \`0\`. AutoNumeric will force the users to always have a valid value in the input, hence preventing them to clear the field. If you want to allow for temporary invalid values (ie. out-of-range), you should use the 'invalid' option for the 'overrideMinMaxLimits' setting.`);
+            AutoNumericHelper.warning(`You've set a \`minimumValue\` or a \`maximumValue\` excluding the value \`0\`. AutoNumeric will force the users to always have a valid value in the input, hence preventing them to clear the field. If you want to allow for temporary invalid values (i.e. out-of-range), you should use the 'invalid' option for the 'overrideMinMaxLimits' setting.`);
         }
 
         if (!AutoNumericHelper.isString(options.maximumValue) || !testFloatOrIntegerAndPossibleNegativeSign.test(options.maximumValue)) {
@@ -4470,7 +4470,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             return AutoNumericHelper.objectKeyLookup(settings.valuesToStrings, value);
         }
 
-        // This checks if a negative sign is anywhere in the `value`, not just on the very first character (ie. '12345.67-')
+        // This checks if a negative sign is anywhere in the `value`, not just on the very first character (i.e. '12345.67-')
         if (AutoNumericHelper.isNegative(value, settings.negativeSignCharacter)) {
             settings.isNegativeSignAllowed = true;
             settings.isPositiveSignAllowed = false;
@@ -4710,7 +4710,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     // Pre-defined options can be called to update the current default options with their specificities
-    //XXX A better way would be to not initialize first, but that's not possible since `new` is called first and we do not pass the language options (ie. `French`) to the constructor
+    //XXX A better way would be to not initialize first, but that's not possible since `new` is called first and we do not pass the language options (i.e. `French`) to the constructor
 
     /**
      * Update the AutoNumeric object with the predefined options, and possibly some option overrides.
@@ -4877,7 +4877,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Strip all the unwanted non-number characters.
-     * However it does not reorder the localized negative sign.
+     * However, it does not reorder the localized negative sign.
      *
      * @param {string} s
      * @param {object} settings
@@ -5043,7 +5043,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * - the suffix text (suffixText),
      * - the positive sign (positiveSignCharacter),
      * - the brackets if any,
-     * - by replacing the negative sign character with an hyphen,
+     * - by replacing the negative sign character with a hyphen,
      * - and by replacing the decimal character (decimalCharacter) by a dot.
      *
      * Lastly, it also put the negative sign back to its normal position if needed.
@@ -5088,7 +5088,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
-     * Removes the currency symbol and the suffix text from the given string, and replace the custom negative sign with an hyphen.
+     * Removes the currency symbol and the suffix text from the given string, and replace the custom negative sign with a hyphen.
      *
      * @param {string} s
      * @param {object} settings
@@ -5096,7 +5096,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @private
      */
     static _normalizeCurrencySuffixAndNegativeSignCharacters(s, settings) {
-        s = String(s); // Typecast to to a string, in case that the given value is a number
+        s = String(s); // Typecast to a string, in case that the given value is a number
 
         // Remove the currency symbol
         if (settings.currencySymbol !== AutoNumeric.options.currencySymbol.none) {
@@ -5108,7 +5108,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             s = s.replace(settings.suffixText, '');
         }
 
-        // Replace the custom negative sign with an hyphen
+        // Replace the custom negative sign with a hyphen
         if (settings.negativeSignCharacter !== AutoNumeric.options.negativeSignCharacter.hyphen) {
             s = s.replace(settings.negativeSignCharacter, '-');
         }
@@ -5165,7 +5165,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
-     * Modify the negative sign and the decimal character of the given string value to an hyphen (-) and a dot (.) in order to make that value 'typecastable' to a real number.
+     * Modify the negative sign and the decimal character of the given string value to a hyphen (-) and a dot (.) in order to make that value 'typecastable' to a real number.
      *
      * @param {string} s The formatted value
      * @returns {string} The value with the 'normal' minus sign and decimal character
@@ -5250,7 +5250,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     /**
      * Modify the input value by adding the group separators, as defined in the settings, and the negative brackets if needed.
      *
-     * @param {string} inputValue The formatted value (ie. with the `decimalCharacter` defined in the settings, not the raw value)
+     * @param {string} inputValue The formatted value (i.e. with the `decimalCharacter` defined in the settings, not the raw value)
      * @param {object} settings
      * @param {boolean} isFocused
      * @param {number|string|null} currentRawValue The object current raw value (`this.rawValue`)
@@ -5861,7 +5861,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Modify the given `value` in order to make it usable for the rest of the rounding function.
-     * This convert the `value` to a positive one, trim any leading zeros and make sure it does not starts with a leading dot.
+     * This convert the `value` to a positive one, trim any leading zeros and make sure it does not start with a leading dot.
      *
      * @param {string} value The unformatted value
      * @param {object} settings
@@ -5952,7 +5952,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Check if the given value is within the `minimumValue` and `maximumValue` range, while using the override options set with `overrideMinMaxLimits`.
-     * The minimum and maximum limit test results are returned in a array like `[isMinimumLimitRespected, isMaximumLimitRespected]`.
+     * The minimum and maximum limit test results are returned in an array like `[isMinimumLimitRespected, isMaximumLimitRespected]`.
      *
      * @param {string} value
      * @param {object} settings
@@ -6175,7 +6175,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @returns {string|null}
      */
     _trimLeadingAndTrailingZeros(value) {
-        // Return the empty string is the value is already empty. This prevent converting that value to '0'.
+        // Return the empty string is the value is already empty. This prevents converting that value to '0'.
         if (value === '' || value === null) {
             return value;
         }
@@ -6191,7 +6191,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         //TODO remove this from that function and use `trimPaddedZerosFromDecimalPlaces()` instead
-        // Trim the trailing zeros after the last decimal place not being a zero (ie. 1.2300 -> 1.23)
+        // Trim the trailing zeros after the last decimal place not being a zero (i.e. 1.2300 -> 1.23)
         if (AutoNumericHelper.contains(value, '.')) {
             value = value.replace(/(\.[0-9]*?)0+$/, '$1');
         }
@@ -6225,7 +6225,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             if (this.sessionStorageAvailable) {
                 sessionStorage.setItem(this.rawValueStorageName, this.rawValue);
             } else {
-                // Use cookies for obsolete browsers that do not support sessionStorage (ie. IE 6 & 7)
+                // Use cookies for obsolete browsers that do not support sessionStorage (i.e. IE 6 & 7)
                 document.cookie = `${this.rawValueStorageName}=${this.rawValue}; expires= ; path=/`;
             }
         }
@@ -6308,7 +6308,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      */
     _onFocusInAndMouseEnter(e) {
         //TODO Create separate handlers for the focus and mouseenter events
-        this.isEditing = false; // Just in case no `keyUp` event have been sent (ie. if the user lost the focus from the current window while typing)
+        this.isEditing = false; // Just in case no `keyUp` event have been sent (i.e. if the user lost the focus from the current window while typing)
 
         if (!this.formulaMode && this.settings.unformatOnHover && e.type === 'mouseenter' && e.altKey) {
             this.constructor._unformatAltHovered(this);
@@ -6465,12 +6465,12 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             result,
             aNElement: this,
         });
-        this.set(result); // Note: we can have a valid formula, but an invalid value (ie. out of the min/max range)
+        this.set(result); // Note: we can have a valid formula, but an invalid value (i.e. out of the min/max range)
         this.formulaMode = false;
     }
 
     /**
-     * Returns `true` if the non printable key is accepted in formula mode
+     * Returns `true` if the non-printable key is accepted in formula mode
      *
      * @returns {boolean}
      * @private
@@ -6486,13 +6486,13 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * The user just started pushing any key, hence one event is sent.
      *
      * Note :
-     * By default a 'normal' input output those events in the right order when inputting a character key (ie. 'a') :
+     * By default a 'normal' input output those events in the right order when inputting a character key (i.e. 'a') :
      * - keydown
      * - keypress
      * - input
      * - keyup
      *
-     * ...when inputting a modifier key (ie. 'ctrl') :
+     * ...when inputting a modifier key (i.e. 'ctrl') :
      * - keydown
      * - keyup
      *
@@ -6597,7 +6597,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 }
             }
 
-            // ..and lastly we update the caret selection, even if the option `isCancellable` is false
+            // ...and lastly we update the caret selection, even if the option `isCancellable` is false
             this.select();
             //TODO Add an option to select either the integer or decimal part with `Esc`
         }
@@ -6651,7 +6651,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Handler for 'keypress' events.
-     * The user is still pressing the key, which will output a character (ie. '2') continuously until he releases the key.
+     * The user is still pressing the key, which will output a character (i.e. '2') continuously until he releases the key.
      * Note: 'keypress' events are not sent for delete keys like Backspace/Delete.
      *
      * @param {KeyboardEvent} e
@@ -6742,7 +6742,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         // Manage the undo/redo events
-        this._updateEventKeyInfo(e); // Fixes #761, where the Ctrl key is no correctly detected during undo/redo since this.eventKey was not updated from 'Z' to 'Control'
+        this._updateEventKeyInfo(e); // Fixes #761, where the Ctrl key is not correctly detected during undo/redo since this.eventKey was not updated from 'Z' to 'Control'
         if (this.eventKey === AutoNumericEnum.keyName.Z || this.eventKey === AutoNumericEnum.keyName.z) {
             if (e.ctrlKey && e.shiftKey) {
                 // Redo
@@ -7034,10 +7034,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             // Normal case with modern browsers
             rawPastedText = e.clipboardData.getData('text/plain');
         } else {
-            AutoNumericHelper.throwError('Unable to retrieve the pasted value. Please use a modern browser (ie. Firefox or Chromium).');
+            AutoNumericHelper.throwError('Unable to retrieve the pasted value. Please use a modern browser (i.e. Firefox or Chromium).');
         }
 
-        // Fix for firefox paste handling on `contenteditable` elements where `e.target` is the the text node, not the element
+        // Fix for firefox paste handling on `contenteditable` elements where `e.target` is the text node, not the element
         let eventTarget;
         if (!e.target.tagName) {
             eventTarget = e.explicitOriginalTarget;
@@ -7060,7 +7060,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
             // 2. Check that the paste is a valid number once it has been normalized to a raw value
             if (pastedRawValue === '.' || pastedRawValue === '' || (pastedRawValue !== '.' && !AutoNumericHelper.isNumber(pastedRawValue))) {
-                this.formatted = true; // This prevent the `keyup` event on the `v` key during a paste to try to format an empty value.
+                this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to format an empty value.
                 // If the user tries to paste a single decimal character (that has been translated to '.' already) or the empty value, ignore the paste
                 if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.error) {
                     AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' is not a valid paste content.`);
@@ -7069,7 +7069,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 return;
             }
 
-            // 3. Then try to set it as the new value. The `set()` method will run the additional tests (ie. limits) as needed.
+            // 3. Then try to set it as the new value. The `set()` method will run the additional tests (i.e. limits) as needed.
             this.set(pastedRawValue);
             this.formatted = true;
 
@@ -7102,7 +7102,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // 3. Test if the paste is valid (only has numbers and eventually a decimal character). If it's not valid, stop here.
         if (pastedText !== '.' && (!AutoNumericHelper.isNumber(pastedText) || pastedText === '')) {
-            this.formatted = true; // This prevent the `keyup` event on the `v` key during a paste to try to format an empty value (fix issue #484)
+            this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to format an empty value (fix issue #484)
             if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.error) {
                 AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' is not a valid paste content.`);
             }
@@ -7247,7 +7247,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                         continue;
                     }
 
-                    // This replace one character at a time
+                    // This replaces one character at a time
                     result = AutoNumericHelper.replaceCharAt(lastGoodKnownResult, lastGoodKnownResultIndex, pastedText[pastedTextIndex]);
 
                     // Check the range limits
@@ -7289,7 +7289,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 if (selectionStart === selectionEnd) {
                     // There is no selection, then the caret position is set after the pasted text
                     const indexWherePastedTextHasBeenInserted = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, this.settings.decimalCharacter));
-                    caretPositionOnInitialTextAfterPasting = indexWherePastedTextHasBeenInserted + pastedText.length; // I must not count the characters that have been removed from the pasted text (ie. '.')
+                    caretPositionOnInitialTextAfterPasting = indexWherePastedTextHasBeenInserted + pastedText.length; // I must not count the characters that have been removed from the pasted text (i.e. '.')
                 } else if (rightPart === '') {
                     // If the user selected from the caret position to the end of the input (on the far right)
                     caretPositionOnInitialTextAfterPasting = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionStart, this.settings.decimalCharacter)) + pastedText.length;
@@ -7298,7 +7298,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     // Usual case
                     const indexSelectionEndInRawValue = AutoNumericHelper.convertCharacterCountToIndexPosition(AutoNumericHelper.countNumberCharactersOnTheCaretLeftSide(initialFormattedValue, selectionEnd, this.settings.decimalCharacter));
 
-                    // Here I must not count the characters that have been removed from the pasted text (ie. '.'), or the thousand separators in the initial selected text
+                    // Here I must not count the characters that have been removed from the pasted text (i.e. '.'), or the thousand separators in the initial selected text
                     const selectedText = AutoNumericHelper.getElementValue(eventTarget).slice(selectionStart, selectionEnd);
                     caretPositionOnInitialTextAfterPasting = indexSelectionEndInRawValue - selectionSize + AutoNumericHelper.countCharInText(this.settings.digitGroupSeparator, selectedText) + pastedText.length;
                 }
@@ -7375,10 +7375,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 case AutoNumeric.options.onInvalidPaste.replace:
                     // Throw an error message
                     AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' results in a value '${result}' that is outside of the minimum [${this.settings.minimumValue}] and maximum [${this.settings.maximumValue}] value range.`);
-                // falls through
+                // Fall through
                 case AutoNumeric.options.onInvalidPaste.ignore:
                 // Do nothing
-                // falls through
+                // Fall through
                 default :
                     return; // ...and nothing else should be changed
             }
@@ -7394,7 +7394,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                         if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
                             AutoNumericHelper.setElementSelection(eventTarget, targetValue.length - this.settings.currencySymbol.length); // This puts the caret on the right of the last decimal place
                         } else {
-                            AutoNumericHelper.setElementSelection(eventTarget, targetValue.length); // ..and this on the far right
+                            AutoNumericHelper.setElementSelection(eventTarget, targetValue.length); // ...and this on the far right
                         }
 
                         break;
@@ -7411,7 +7411,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             }
         }
 
-        // 8. We make sure we send an input event only if the result is different than the initial value before the paste
+        // 8. We make sure we send an input event only if the result is different from the initial value before the paste
         if (valueHasBeenSet && initialFormattedValue !== targetValue) {
             // On a 'normal' non-autoNumeric input, an `input` event is sent when a paste is done. We mimic that.
             this._triggerEvent(AutoNumeric.events.native.input, eventTarget);
@@ -7905,7 +7905,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      *
      * This method is called during the AutoNumeric object initialization. This assumes some internal variable state.
      *
-     * This methods set the following options accordingly to their own value and the mandatory `decimalPlaces` option:
+     * This method set the following options accordingly to their own value and the mandatory `decimalPlaces` option:
      * - decimalPlacesRawValue     (nullable)
      * - decimalPlacesShownOnBlur  (nullable)
      * - decimalPlacesShownOnFocus (nullable)
@@ -7913,7 +7913,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Note: the `decimalPlaces` option is only used here and only serve to define those three previous options value.
      * AutoNumeric will then *only* use `decimalPlacesRawValue`, `decimalPlacesShownOnBlur` and `decimalPlacesShownOnFocus` from there.
      *
-     * This methods directly modifies the `settings` object passed as a parameter.
+     * This method directly modifies the `settings` object passed as a parameter.
      *
      * @param {object} settings This is an object with the new settings to use.
      * @private
@@ -7942,7 +7942,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Add the additional decimal places to the raw value
         let additionalDecimalPlacesRawValue = 0;
         if (settings.rawValueDivisor && settings.rawValueDivisor !== AutoNumeric.options.rawValueDivisor.none) {
-            additionalDecimalPlacesRawValue = String(settings.rawValueDivisor).length - 1; // ie. Dividing by '100' adds 2 decimal places to the needed precision
+            additionalDecimalPlacesRawValue = String(settings.rawValueDivisor).length - 1; // i.e. Dividing by '100' adds 2 decimal places to the needed precision
             if (additionalDecimalPlacesRawValue < 0) {
                 additionalDecimalPlacesRawValue = 0;
             }
@@ -8022,7 +8022,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Add the additional decimal places to the raw value
         let additionalDecimalPlacesRawValue = 0;
         if (settings.rawValueDivisor && settings.rawValueDivisor !== AutoNumeric.options.rawValueDivisor.none) {
-            additionalDecimalPlacesRawValue = String(settings.rawValueDivisor).length - 1; // ie. Dividing by '100' adds 2 decimal places to the needed precision
+            additionalDecimalPlacesRawValue = String(settings.rawValueDivisor).length - 1; // i.e. Dividing by '100' adds 2 decimal places to the needed precision
             if (additionalDecimalPlacesRawValue < 0) {
                 additionalDecimalPlacesRawValue = 0;
             }
@@ -8107,7 +8107,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 }
 
                 // Convert numbers in options to strings
-                //TODO Only transform the values of type 'Number' to 'String' if it's a currency number (so that we can have big numbers). Do not convert other numbers (ie. `historySize`)
+                //TODO Only transform the values of type 'Number' to 'String' if it's a currency number (so that we can have big numbers). Do not convert other numbers (i.e. `historySize`)
                 if (typeof value === 'number') {
                     this.settings[key] = value.toString();
                 }
@@ -8359,10 +8359,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     /**
      * Convert the `value` parameter that can either be :
      * - a real number,
-     * - a number represented in the scientific notation (ie. -123.4567e-6)
+     * - a number represented in the scientific notation (i.e. -123.4567e-6)
      * - a string representing a real number, or
      * - a string representing a localized number (with specific group separators and decimal character),
-     * ...to a string representing a real 'javascript' number (ie. '1234' or '1234.567').
+     * ...to a string representing a real 'javascript' number (i.e. '1234' or '1234.567').
      *
      * This function returns `NaN` if such conversion fails.
      *
@@ -8488,7 +8488,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Return an array containing the string parts located on the left and right side of the caret or selection.
-     * Those parts are left 'untouched', ie. formatted by autoNumeric.
+     * Those parts are left 'untouched', i.e. formatted by autoNumeric.
      *
      * @returns {[string, string]} The parts on the left and right of the caret or selection
      * @private
@@ -8524,7 +8524,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         if (this.isTrailingNegative &&
             ((AutoNumericHelper.isNegative(right, this.settings.negativeSignCharacter) && // The caret is placed on the left of the negative sign
             !AutoNumericHelper.isNegative(left, this.settings.negativeSignCharacter)) ||
-            (right === '' && // ..or the caret is placed on the far right of the input (Fix issue #481)
+            (right === '' && // ...or the caret is placed on the far right of the input (Fix issue #481)
             AutoNumericHelper.isNegative(left, this.settings.negativeSignCharacter, true)))) {
             left = left.replace(this.settings.negativeSignCharacter, '');
             right = right.replace(this.settings.negativeSignCharacter, '');
@@ -8648,7 +8648,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 position = roundedValueToShow.length;
             }
 
-            // Make sure when the user enter a '0' on the far left with a leading zero option set to 'deny', that the caret does not moves since the input is dropped (fix issue #283)
+            // Make sure when the user enter a '0' on the far left with a leading zero option set to 'deny', that the caret does not move since the input is dropped (fix issue #283)
             if (position === 1 && normalizedLeft === '0' && this.settings.leadingZero === AutoNumeric.options.leadingZero.deny) {
                 // If the user enter `0`, then the caret is put on the right side of it (Fix issue #299)
                 if (normalizedRight === '' || normalizedLeft === '0' && normalizedRight !== '') {
@@ -8931,7 +8931,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Process the deletion of characters.
-     * Returns `true` if the deletion is allowed (within the min and max range, according to the `overrideMinMaxLimits` option, `false` otherwise.
+     * Returns `true` if the deletion is allowed (within the min and max range, according to the `overrideMinMaxLimits` option), `false` otherwise.
      *
      * @param {Event} e
      * @returns {boolean}
@@ -9178,7 +9178,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
                 leftReg = new RegExp(`^.*?${leftAr.join('.*?')}`);
             } else { // prefix is assumed
-                leftReg = new RegExp(`^.*?[${this.settings.currencySymbol}]${leftAr.join('.*?')}`); // Fixes issue #647 when using a currency that has some characters in it that matches the value we just entered (ie. numbers in the currency)
+                leftReg = new RegExp(`^.*?[${this.settings.currencySymbol}]${leftAr.join('.*?')}`); // Fixes issue #647 when using a currency that has some characters in it that matches the value we just entered (i.e. numbers in the currency)
             }
 
             // Search cursor position in formatted value
@@ -9498,7 +9498,7 @@ AutoNumeric.multiple = (arg1, initialValue = null, options = null) => {
         }
     }
 
-    // Depending of our findings, we generate the options variable to use `optionsToUse`, either directly, or merged
+    // Depending on our findings, we generate the options variable to use `optionsToUse`, either directly, or merged
     let optionsToUse;
     if (secondArgumentIsOptionArray) {
         optionsToUse = AutoNumeric.mergeOptions(initialValue);
@@ -9519,7 +9519,7 @@ AutoNumeric.multiple = (arg1, initialValue = null, options = null) => {
     // Instantiate each AutoNumeric objects
     arg1.forEach((domElement, index) => {
         if (isInitialValueNumber) {
-            // We set the same value for each elements
+            // We set the same value for each element
             result.push(new AutoNumeric(domElement, initialValue, optionsToUse));
         } else if (secondArgumentIsInitialValueArray && index <= initialValueArraySize) {
             result.push(new AutoNumeric(domElement, initialValue[index], optionsToUse));

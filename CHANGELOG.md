@@ -1,5 +1,20 @@
 ## Changelog for autoNumeric
 
+### 4.6.1
++ Updates all the dependencies
++ Removes the PhantomJS dependency in favor of Puppeteer
++ Fixes and cleans the Karma configuration files to support v6.4.1
++ Fixes and cleans the Webpack configuration files to support v5.75.0
++ Fixes the failing unit tests on the `validate()` function for the `allowDecimalPadding` option
++ Updates the Webdriverio configuration to v8
++ Updates the Webdriver end-to-end tests to v8, i.e. removing the `@wdio/sync` package in favor of using async/await everywhere, and updating all the `keys()` calls to use the Webdriver `Key` object, and arrays of individual characters
++ Adds unit tests for feature request #741
++ Completes the `validate()` function with additional tests for the new `allowDecimalPadding` option as a number
++ Fixes #761 Undo and redo actions are done twice, on Z and Control KeyUp events
++ Fixes missing variable update in #739 (`this.onGoingRedo`)
++ Fixes the warning message when a faulty `styleRules` callback is passed as a parameter
++ Fixes typos and grammar in comments
+
 ### 4.6.0
 + Adds a new option `invalidClass`, which default to `an-invalid`, that defines the CSS class name to use when a contenteditable-enabled element value is invalid
 + Adds a new option value `'invalid'` for the `overrideMinMaxLimits` option, that will allow users to enter out-of-bound numbers

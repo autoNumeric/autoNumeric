@@ -1,10 +1,10 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.6.0
- * @date         2020-04-26 UTC 10:45
+ * @version      4.6.1
+ * @date         2023-03-03 UTC 20:33
  *
- * @authors      Bob Knothe, Alexandre Bonneau
+ * @authors      Alexandre Bonneau, Bob Knothe
  * @contributors Sokolov Yura and others, cf. AUTHORS
  * @copyright    2009 Robert J. Knothe
  * @since        2009-08-09
@@ -910,7 +910,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.6.0';
+        return '4.6.1';
     }
 
     /**

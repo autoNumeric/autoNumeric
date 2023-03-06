@@ -57,6 +57,11 @@ import Parser            from './maths/Parser';
  * An AutoNumeric element is an object wrapper that keeps a reference to the DOM element it manages (usually an <input> one), and provides autoNumeric-specific variables and functions.
  */
 export default class AutoNumeric {
+    static options; // Those static declarations are only used by the IDE, to prevent error messages not finding those fields declarations
+    static events;
+    static defaultSettings;
+    static predefinedOptions;
+
     /**
      * Initialize the AutoNumeric object onto the given DOM element, and attach the settings and related event listeners to it.
      * The options passed as a parameter is an object that contains the settings (i.e. {digitGroupSeparator: ".", decimalCharacter: ",", currencySymbol: '€ '})

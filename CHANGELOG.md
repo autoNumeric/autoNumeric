@@ -1,5 +1,9 @@
 ## Changelog for autoNumeric
 
+### 4.6.2
++ Fixes issue #757 Converted scientific numbers returns NaN when using `formArrayNumericString()`
++ Fixes warning messages in the IDE
+
 ### 4.6.1
 + Updates all the dependencies
 + Removes the PhantomJS dependency in favor of Puppeteer

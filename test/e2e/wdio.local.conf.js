@@ -231,6 +231,7 @@ export const config = {
         // The Jasmine framework allows it to intercept each assertion in order to log the state of the application
         // or website depending on the result. For example, it is pretty handy to take a screenshot every time
         // an assertion fails.
+        // eslint-disable-next-line no-unused-vars
         expectationResultHandler: (passed, assertion) => {
             // do something
         },
@@ -293,6 +294,7 @@ export const config = {
     // methods. If one of them returns with a promise, WebdriverIO will wait until that promise is
     // resolved to continue.
     //
+    /* eslint-disable no-unused-vars */
     /**
      * Gets executed once before all workers get launched.
      * @param {Object} config wdio configuration object
@@ -339,13 +341,13 @@ export const config = {
      * @param {Object}         browser      instance of created browser/device session
      */
     before: (capabilities, specs, browser) => {
-        require('@babel/register'); //FIXME Test this
+        require('@babel/register');
     },
     /**
      * Gets executed before the suite starts.
      * @param {Object} suite suite details
      */
-    beforeSuite: (suite) => {
+    beforeSuite: suite => {
     },
     /**
      * This hook gets executed _before_ every hook within the suite starts.
@@ -406,7 +408,7 @@ export const config = {
      * Hook that gets executed after the suite has ended.
      * @param {Object} suite suite details
      */
-    afterSuite: (suite) => {
+    afterSuite: suite => {
     },
     /**
      * Gets executed after all tests are done. You still have access to all global variables from
@@ -503,6 +505,7 @@ export const config = {
      */
     afterFeature: (uri, feature) => {
     },
+    /* eslint-enable no-unused-vars */
     
     
     // Enables colors for log output.

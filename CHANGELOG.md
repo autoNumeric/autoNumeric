@@ -18,6 +18,19 @@
 + Fixes missing variable update in #739 (`this.onGoingRedo`)
 + Fixes the warning message when a faulty `styleRules` callback is passed as a parameter
 + Fixes typos and grammar in comments
++ Fixes #734 Fire change event onBlur only if number is changed (#735)
++ Fixes #753 Correct invalid JS imports
++ Fixes #758 Adding missing predefined options to typescript interface file
++ Update the readme with the new documentation website
++ Fixes #739 Add CTRL+Y shortcut for redo
++ Fixes the currency symbol for Brazilian real
++ Fixes #697 Currency can be deleted (#725)
++ Updates the README related to PR #742
++ Fixes #741 + Ability to set a numeric allowDecimalPadding (#742)
++ Adds default export to modules (#747)
++ Fixes #737 Undo/redo not firing input event
++ Fixes #684 Caret always set far right when deleting or inserting numbers using $ (#716)
++ Fixes unit tests following the changes in `v4.6.0`
 
 ### 4.6.0
 + Adds a new option `invalidClass`, which default to `an-invalid`, that defines the CSS class name to use when a contenteditable-enabled element value is invalid

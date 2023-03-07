@@ -2,7 +2,7 @@ The AutoNumeric authors are:
 
 Commit  Authors
 ------  ------------------------------------------------------
-   551	Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
+   590	Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
    231	Bob Knothe <bob@decorplanit.com>
     12	Carlos Gonzales <carlos.rgn@gmail.com>
      3	Lukas Drgon <lukas.drgon@gmail.com>
@@ -14,7 +14,9 @@ Commit  Authors
      2	Luke Travis <luke.travis@k3integrations.com>
      2	Nicolai Ehemann <en@enlightened.de>
      2	Ruslan Isay <isay.r@i20.biz>
+     2	Sebastian Busch <s.busch@obg-gruppe.de>
      2	chery-qualset-hcd-ca-gov <cheryl.qualset@hcd.ca.gov>
+     2	neunato <wesleymustdie@gmail.com>
      2	randoum <randoum@gmail.com>
      1	Abdelghani AINOUSS <abel.ainou@gmail.Com>
      1	Adrian Dmitroca <dmitroca.adrian@gmail.com>
@@ -26,16 +28,26 @@ Commit  Authors
      1	CoryFoy <github@cornetdesign.com>
      1	Ivan Hayes <git@ivanhayes.com>
      1	Jarin Udom <jarin@robotmodehq.com>
+     1	Lothaire Laeuffer <32293830+LothaireLaeuffer@users.noreply.github.com>
+     1	Marc Dagatan <53462376+marcdagatan@users.noreply.github.com>
+     1	Matthew Thomson <32156362+matthewthomsonnz@users.noreply.github.com>
      1	Maxwell Barvian <max@barvian.me>
+     1	Melloware <mellowaredev@gmail.com>
      1	Mic Biert <mbi@netz3.ch>
+     1	Michael Seele <mseele@gmail.com>
+     1	Oliver Schneider <olsio@users.noreply.github.com>
      1	Peter <peterboccia88@gmail.com>
      1	Ray <smdaegan@gmail.com>
      1	Sasha Koss <kossnocorp@gmail.com>
+     1	Sebastian Busch <mail@sebastian-bus.ch>
      1	SvenTo <mail@sven.to>
+     1	Willem Veelenturf <willem.veelenturf@gmail.com>
      1	Zayter Munive <zayter@koombea.com>
      1	beastlike <beastlike@users.noreply.github.com>
+     1	shrpne <shrpne@gmail.com>
+     1	tetreum <basura@yelidmod.com>
 
-This list is ordered by contributions and has been generated on 2019-09-22 by `tools/authors.sh`.
+This list is ordered by contributions and has been generated on 2023-03-07 by `tools/authors.sh`.
 A more detailed list can be found on [Github](https://github.com/autoNumeric/autoNumeric/graphs/contributors).
 
 Special thanks to Sokolov 'funny-falcon' Yura for his contributions before autoNumeric moved to Github.

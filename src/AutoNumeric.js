@@ -4490,6 +4490,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         value = this._convertToNumericString(value, settings);
+        if (AutoNumericHelper.isNumber(Number(value))) { // In case of numbers with the scientific notation (#757)
+            value = AutoNumericHelper.scientificToDecimal(value);
+        }
+
         const unwantedCharacters = new RegExp(`[^+-0123456789.]`, 'gi');
         if (unwantedCharacters.test(value)) {
             return NaN;

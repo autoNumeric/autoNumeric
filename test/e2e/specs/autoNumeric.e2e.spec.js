@@ -306,6 +306,13 @@ const selectors = {
     issue543Invalid                   : '#issue_543_override_invalid',
     issue543Ignore                    : '#issue_543_override_ignore',
     issue543InvalidCE                 : '#issue_543_override_invalid_ce',
+    issue757Form                      : '#issue_757_form',
+    issue757input0                    : '#issue_757_test0',
+    issue757input1                    : '#issue_757_test1',
+    issue757input2                    : '#issue_757_test2',
+    issue757input3                    : '#issue_757_test3',
+    issue757input4                    : '#issue_757_test4',
+    issue757Submit                    : '#issue_757_submit',
 };
 
 //-----------------------------------------------------------------------------
@@ -4635,5 +4642,28 @@ describe('Issue #543', () => {
         expect(await input.getValue()).toEqual('10,000.00');
         await browser.keys([Key.End, Key.ArrowLeft, '1']); // 10000.01
         expect(await input.getValue()).toEqual('10,000.01');
+    });
+});
+
+describe('Issue #757', () => {
+    it('should test for default values', async () => {
+        await browser.url(testUrl);
+
+        expect(await $(selectors.issue757input0).getValue()).toEqual('$0.00000002');
+        expect(await $(selectors.issue757input1).getValue()).toEqual('$0.00000012');
+        expect(await $(selectors.issue757input2).getValue()).toEqual('$0.00000112');
+        expect(await $(selectors.issue757input3).getValue()).toEqual('$0.00001112');
+        expect(await $(selectors.issue757input4).getValue()).toEqual('$0.00011112');
+    });
+
+    it(`should display the unformatted values after submitting the form data`, async () => {
+        const input = await $(selectors.issue757Submit);
+        await input.click();
+
+        expect(await $(selectors.issue757input0).getValue()).toEqual('0.00000002');
+        expect(await $(selectors.issue757input1).getValue()).toEqual('0.00000012');
+        expect(await $(selectors.issue757input2).getValue()).toEqual('0.00000112');
+        expect(await $(selectors.issue757input3).getValue()).toEqual('0.00001112');
+        expect(await $(selectors.issue757input4).getValue()).toEqual('0.00011112');
     });
 });

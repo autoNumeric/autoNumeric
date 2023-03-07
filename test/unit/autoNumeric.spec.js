@@ -5820,6 +5820,147 @@ describe('Instantiated autoNumeric functions', () => {
         //FIXME Add the tests for : formUnformat, formReformat, formSubmit*
     });
 
+    describe(`The 'formArrayNumericString' method`, () => {
+        let form;
+        let input1;
+        let input2;
+        let input3;
+        let input4;
+        let input5;
+        let anInput1;
+        let anInput2;
+        let anInput3;
+        let anInput4;
+        let anInput5;
+
+        beforeEach(() => { // Initialization
+            form   = document.createElement('form');
+            input1 = document.createElement('input');
+            input2 = document.createElement('input');
+            input3 = document.createElement('input');
+            input4 = document.createElement('input');
+            input5 = document.createElement('input');
+
+            document.body.appendChild(form);
+            form.appendChild(input1);
+            form.appendChild(input2);
+            form.appendChild(input3);
+            form.appendChild(input4);
+            form.appendChild(input5);
+
+            input1.name = 'test0';
+            input2.name = 'test1';
+            input3.name = 'test2';
+            input4.name = 'test3';
+            input5.name = 'test4';
+
+            input1.value = '0.00000002';
+            expect(input1.value).toEqual('0.00000002');
+            input2.value = '0.00000012';
+            expect(input2.value).toEqual('0.00000012');
+            input3.value = '0.00000112';
+            expect(input3.value).toEqual('0.00000112');
+            input4.value = '0.00001112';
+            expect(input4.value).toEqual('0.00001112');
+            input5.value = '0.00011112';
+            expect(input5.value).toEqual('0.00011112');
+
+            // Initiate only 3 autoNumeric inputs
+            const anOptions = {
+                unformatOnSubmit   : true,
+                decimalPlaces      : 8,
+                currencySymbol     : '$',
+                decimalCharacter   : '.',
+                digitGroupSeparator: ',',
+            };
+            anInput1 = new AutoNumeric(input1, anOptions);
+            anInput2 = new AutoNumeric(input2, anOptions);
+            anInput3 = new AutoNumeric(input3, anOptions);
+            anInput4 = new AutoNumeric(input4, anOptions);
+            anInput5 = new AutoNumeric(input5, anOptions);
+
+            expect(input1.value).toEqual('$0.00000002');
+            expect(input2.value).toEqual('$0.00000012');
+            expect(input3.value).toEqual('$0.00000112');
+            expect(input4.value).toEqual('$0.00001112');
+            expect(input5.value).toEqual('$0.00011112');
+
+            expect(anInput1.getFormatted()).toEqual('$0.00000002');
+            expect(anInput2.getFormatted()).toEqual('$0.00000012');
+            expect(anInput3.getFormatted()).toEqual('$0.00000112');
+            expect(anInput4.getFormatted()).toEqual('$0.00001112');
+            expect(anInput5.getFormatted()).toEqual('$0.00011112');
+        });
+
+        afterEach(() => { // Un-initialization
+            anInput1.remove();
+            anInput2.remove();
+            anInput3.remove();
+            anInput4.remove();
+            anInput5.remove();
+            form.removeChild(input1);
+            form.removeChild(input2);
+            form.removeChild(input3);
+            form.removeChild(input4);
+            form.removeChild(input5);
+            document.body.removeChild(form);
+        });
+
+        it(`should return the correct JSON object with non-null values when the first elements have decimal values, with unformatted values`, () => {
+            const jsonResult = JSON.stringify([
+                {
+                    name : 'test0',
+                    value: '0.00000002', // This is internally transformed into the scientific notation, then we force it back to a string with zeroes
+                },
+                {
+                    name : 'test1',
+                    value: '0.00000012',
+                },
+                {
+                    name : 'test2',
+                    value: '0.00000112',
+                },
+                {
+                    name : 'test3',
+                    value: '0.00001112',
+                },
+                {
+                    name : 'test4',
+                    value: '0.00011112',
+                },
+            ]);
+            expect(anInput1.formJsonNumericString()).toEqual(jsonResult);
+        });
+
+        it(`should return the correct Array with non-null values when the first elements have decimal values, with unformatted values`, () => {
+            const arrResult = [
+                {
+                    name : 'test0',
+                    value: '0.00000002',
+                },
+                {
+                    name : 'test1',
+                    value: '0.00000012',
+                },
+                {
+                    name : 'test2',
+                    value: '0.00000112',
+                },
+                {
+                    name : 'test3',
+                    value: '0.00001112',
+                },
+                {
+                    name : 'test4',
+                    value: '0.00011112',
+                },
+            ];
+            const observedArr = anInput1.formArrayNumericString();
+            expect(observedArr.length).toEqual(5);
+            expect(observedArr).toEqual(arrResult);
+        });
+    });
+
     //TODO Complete the tests in order to test every single method separately:
     /*
      isPristine

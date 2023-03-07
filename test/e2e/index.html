@@ -1134,6 +1134,23 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #757</p>
+			<div>
+				<form action="#" id="issue_757_form">
+					<input id="issue_757_test0" type="text" name="TEST0" placeholder="#757"/>
+					<input id="issue_757_test1" type="text" name="TEST1" placeholder="#757"/>
+					<input id="issue_757_test2" type="text" name="TEST2" placeholder="#757"/>
+					<input id="issue_757_test3" type="text" name="TEST3" placeholder="#757"/>
+					<input id="issue_757_test4" type="text" name="TEST4" placeholder="#757"/>
+					<input id="issue_757_reset" type="reset" value="Reset">
+					<input id="issue_757_submit" type="submit" value="Submit">
+				</form>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     console.log(`-------------------------------------------`);
@@ -2389,6 +2406,39 @@
     new AutoNumeric('#issue_543_override_invalid', { overrideMinMaxLimits: 'invalid', minimumValue: '5', maximumValue: '10000' });
     new AutoNumeric('#issue_543_override_invalid_ce', { overrideMinMaxLimits: 'invalid', minimumValue: '5', maximumValue: '10000' });
     new AutoNumeric('#issue_543_override_ignore', { overrideMinMaxLimits: 'ignore', minimumValue: '5', maximumValue: '10000' });
+
+    //-------------- Issue #757
+    const form757 = document.getElementById('issue_757_form');
+    form757.addEventListener('submit', e => {
+        console.log('Form submit detected', e); //DEBUG
+        e.preventDefault();
+    });
+    form757.addEventListener('reset', e => {
+        console.log('Form reset detected', e); //DEBUG
+    });
+
+    let AutoConfig = {
+        unformatOnSubmit   : true,
+        decimalPlaces      : 8,
+        currencySymbol     : '$',
+        decimalCharacter   : '.',
+        digitGroupSeparator: ','
+    };
+    let an_757_0 = new AutoNumeric('#issue_757_test0', AutoConfig);
+    let an_757_1 = new AutoNumeric('#issue_757_test1', AutoConfig);
+    let an_757_2 = new AutoNumeric('#issue_757_test2', AutoConfig);
+    let an_757_3 = new AutoNumeric('#issue_757_test3', AutoConfig);
+    let an_757_4 = new AutoNumeric('#issue_757_test4', AutoConfig);
+    an_757_0.set('0.00000002');
+    an_757_1.set('0.00000012');
+    an_757_2.set('0.00000112');
+    an_757_3.set('0.00001112');
+    an_757_4.set('0.00011112');
+
+    /*console.log('an_757_0.formArrayNumericString():', an_757_0.formArrayNumericString()); //DEBUG
+    an_757_0.formArrayNumericString().forEach((currentValue) => {
+        console.log("currentValue: ", currentValue); //DEBUG
+    });*/
 </script>
 </body>
 </html>

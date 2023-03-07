@@ -21,9 +21,10 @@ module.exports = {
         WheelEvent    : true,
     },
     extends      : 'eslint:recommended',
+    parser       : '@babel/eslint-parser',
     parserOptions: {
         sourceType : 'module',
-        ecmaVersion: 2017,
+        ecmaVersion: 2022,
     },
     rules        : {
         // Basic rules

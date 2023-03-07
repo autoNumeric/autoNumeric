@@ -1,11 +1,12 @@
-/* global module, require */
+/* global module, require, __dirname */
 
-const path              = require('path');
-const merge             = require('webpack-merge').default;
+const path = require('path');
+const merge = require('webpack-merge').default;
 const baseWebpackConfig = require('./webpack.config.base.js');
-const UglifyJsPlugin    = require('uglifyjs-webpack-plugin');
-const ESLintPlugin      = require('eslint-webpack-plugin');
-const version           = require('../package.json').version;
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
+const CompressionWebpackPlugin = require('compression-webpack-plugin');
+const version = require('../package.json').version;
 
 function resolve(dir) {
     return path.join(__dirname, '..', dir);
@@ -68,20 +69,11 @@ const webpackConfig = merge(baseWebpackConfig, {
         path         : resolve('dist'),
         globalObject : 'this',
     },
-    plugins: [new ESLintPlugin()],
+    plugins: [
+        new ESLintPlugin(),
+        new CompressionWebpackPlugin(), // Compress the library
+    ],
 });
-
-// Compress the library
-const CompressionWebpackPlugin = require('compression-webpack-plugin');
-webpackConfig.plugins.push(
-    new CompressionWebpackPlugin({
-        filename : '[path].gz[query]',
-        algorithm: 'gzip',
-        test     : new RegExp('\\.(js)$'),
-        threshold: 10240,
-        minRatio : 0.8,
-    }),
-);
 
 // Analyze the library file sizes
 const showBundleAnalyzer = false; // Set to `true` to automatically launch the bundle analyzer in the browser after the compilation

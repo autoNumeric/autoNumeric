@@ -4,7 +4,8 @@
  * @version      4.6.2
  * @date         2023-03-06 UTC 04:22
  *
- * @authors      Alexandre Bonneau, Bob Knothe
+ * @authors      2009-2016 Bob Knothe <bob.knothe@gmail.com>
+ *               2016-2023 Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
  * @contributors Sokolov Yura and others, cf. AUTHORS
  * @copyright    2009 Robert J. Knothe
  * @since        2009-08-09
@@ -14,6 +15,7 @@
  *               international numbers and currencies.
  *
  * @link         http://autonumeric.org
+ * @docs         https://docs.autonumeric.org
  *
  *               Note : Some functions are borrowed from big.js
  * @see          https://github.com/MikeMcl/big.js/
@@ -9030,7 +9032,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     return true;
                 }
 
-                // Remove the decimal character is found on the far left of the right part
+                // Remove the decimal character if found on the far left of the right part
                 if (right.indexOf(this.settings.decimalCharacter) === 0) {
                     right = right.substr(1);
                 }
@@ -9179,15 +9181,16 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
             for (let i = 0; i < leftAr.length; i++) {
                 if (!leftAr[i].match('\\d')) {
-                    leftAr[i] = '\\' + leftAr[i];
+                    leftAr[i] = '\\' + leftAr[i]; // Escapes the decimal character
                 }
             }
 
+            // Generates the regex that will search for the cursor position in the formatted value
             let leftReg;
             if (this.settings.currencySymbolPlacement === AutoNumeric.options.currencySymbolPlacement.suffix) {
                 leftReg = new RegExp(`^.*?${leftAr.join('.*?')}`);
             } else { // prefix is assumed
-                leftReg = new RegExp(`^.*?[${this.settings.currencySymbol}]${leftAr.join('.*?')}`); // Fixes issue #647 when using a currency that has some characters in it that matches the value we just entered (i.e. numbers in the currency)
+                leftReg = new RegExp(`^.*?[${this.settings.currencySymbol}]*${leftAr.join('.*?')}`); // Fixes issue #647 when using a currency that has some characters in it that matches the value we just entered (i.e. numbers in the currency)
             }
 
             // Search cursor position in formatted value

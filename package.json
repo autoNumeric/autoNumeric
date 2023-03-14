@@ -145,7 +145,7 @@
     "testwdio": "wdio test/e2e/wdio.conf.js",
     "travis:test": "yarn test:unitheadless",
     "travis:lint": "yarn lint",
-    "es-check": "es-check es5 dist/*.js"
+    "es-check": "es-check es2017 dist/*.js"
   },
   "repository": {
     "type": "git",

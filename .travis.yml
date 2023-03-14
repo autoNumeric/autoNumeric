@@ -3,8 +3,8 @@ sudo: false
 language: node_js
 
 node_js:
- - "12"
  - "16"
+# - "18" # Webpack uglify does not support this node version yet
 
 cache:
   yarn: true

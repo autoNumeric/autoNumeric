@@ -118,7 +118,6 @@
   },
   "scripts": {
     "authors": "sh tools/authors.sh",
-    "postinstall": "node yarnfix.js",
     "build:dev": "webpack --config config/webpack.config.dev.js",
     "build:prd": "webpack --config config/webpack.config.prd.js",
     "build": "yarn clean:build && yarn build:dev && yarn build:prd && yarn es-check",

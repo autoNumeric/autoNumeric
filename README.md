@@ -1,7 +1,7 @@
 <p align="center"><a href="http://autonumeric.org"><img src="http://autonumeric.org/statics/icons/apple-icon-152x152.png" alt="autonumeric.org"></a></p>
 <p align="center">
 <a href="https://npmjs.org/package/autonumeric"><img src="https://img.shields.io/npm/v/autonumeric.svg" alt="Latest Version"></a>
-<a href="https://travis-ci.org/autoNumeric/autoNumeric"><img src="https://img.shields.io/travis/autoNumeric/autoNumeric.svg" alt="Build Status"></a>
+<a href="https://app.travis-ci.com/github/autoNumeric/autoNumeric/"><img src="https://app.travis-ci.com/autoNumeric/autoNumeric.svg?branch=next" alt="Build Status"></a>
 <a href="https://snyk.io/test/github/autoNumeric/autoNumeric"><img src="https://snyk.io/test/github/autoNumeric/autoNumeric/badge.svg" alt="Known Vulnerabilities"></a>
 <a href="https://coveralls.io/github/autoNumeric/autoNumeric?branch=next"><img src="https://coveralls.io/repos/github/autoNumeric/autoNumeric/badge.svg?branch=next" alt="Coverage Status"></a>
 <br>

@@ -19,6 +19,7 @@ module.exports = {
         console       : true,
         CustomEvent   : true,
         WheelEvent    : true,
+        __dirname     : true,
     },
     extends      : 'eslint:recommended',
     parser       : '@babel/eslint-parser',

@@ -1034,7 +1034,7 @@ describe('Issue #317', () => {
             return input.selectionStart;
         }, selectors.issue317input);
         expect(inputCaretPosition).toEqual(17);
-       /* await browser.keys(Key.Decimal); //FIXME The webdriver.io v8 changed 'Decimal' to `Key.Decimal`, and while it works manually, this now fails during the tests. Uncomment when webdriver.io has fixed this bug
+        /* await browser.keys(Key.Decimal); //FIXME The webdriver.io v8 changed 'Decimal' to `Key.Decimal`, and while it works manually, this now fails during the tests. Uncomment when webdriver.io has fixed this bug
         expect(await input.getValue()).toEqual('2,342,423,423,423.00');
         inputCaretPosition = await browser.execute(domId => {
             const input = document.querySelector(domId);

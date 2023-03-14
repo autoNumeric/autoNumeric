@@ -3,9 +3,8 @@ sudo: false
 language: node_js
 
 node_js:
- - "8"
- - "10"
  - "12"
+ - "16"
 
 cache:
   yarn: true
@@ -26,7 +25,7 @@ after_success:
   - cat ./test/unit/coverage/lcov.info | ./node_modules/.bin/coveralls --verbose && rm -rf ./test/unit/coverage
 
 notifications:
-  irc: "chat.freenode.net#autoNumeric"
+  irc: "chat.libera.chat#autoNumeric"
   webhooks:
       urls:
         - https://webhooks.gitter.im/e/d6718ebae97be830c6d5

@@ -21,7 +21,8 @@ before_script :
 script:
  - yarn build
  - yarn travis:lint
- - yarn travis:test
+# - yarn travis:test # Fix puppeteer not correctly downloading Chromedriver
+ - yarn test:unitpc
 
 after_success:
   - cat ./test/unit/coverage/lcov.info | ./node_modules/.bin/coveralls --verbose && rm -rf ./test/unit/coverage

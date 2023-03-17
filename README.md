@@ -42,11 +42,13 @@ For checking the official AutoNumeric website, you can take a look at [http://au
 
 ### AutoNumeric versions
 
-The latest stable branch is on the `master` branch. Currently this is version [4.2.*](https://github.com/autoNumeric/autoNumeric/tree/master).
+AutoNumeric provides 2 branches, `master` and `next`.
 
-However if you feel semi-adventurous and want to try the new features, you can check out the latest development version in the `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next).
+The very, *very* stable version is on the `master` branch (currently this is version [4.6.*](https://github.com/autoNumeric/autoNumeric/tree/master)).
 
-That `next` branch can see changes in the API (check the [semver](http://semver.org/)), but is always fully tested for regressions. It's very safe to use since it's always thoroughly tested and should not contain any bugs *(that we know of)*.
+The `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next) contains all the new features and fixes, and is considered 'stable' too.
+
+> Do note that the `next` branch can see changes in the API (check the [semver](http://semver.org/)), but is always fully tested for regressions.<br>It's safe to use on production servers since it's always thoroughly tested and should not contain any bugs *(that we know of)*.
 
 ****
 

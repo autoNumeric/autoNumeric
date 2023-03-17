@@ -7095,7 +7095,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         const isPasteNegative = AutoNumericHelper.isNegativeStrict(rawPastedText, this.settings.negativeSignCharacter);
         if (isPasteNegative) {
             // 1a. Remove the negative sign from the pasted text
-            rawPastedText = rawPastedText.slice(1, rawPastedText.length);
+            rawPastedText = rawPastedText.slice(1, rawPastedText.length); //TODO This can lead to an empty rawPastedText if only the negative sign character is pasted. This then complains about not being a valid paste content. Define which behaviour we want when this happens, then implement the solution.
         }
 
         // 2. Strip all thousand separators, brackets and currency sign, and convert the decimal character to a dot

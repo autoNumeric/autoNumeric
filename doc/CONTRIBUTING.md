@@ -44,7 +44,7 @@ We strive to keep the tests green at all times. Hence whenever you change the so
 1. Write at least 2 tests for each change :
   - One that validate your changes
   - One that invalidate your changes
-2. Make sure all tests passes on all supported browsers (PhantomJS, Firefox, and Chrome)
+2. Make sure all tests passes on all supported browsers (Puppeteer, Firefox, and Chrome)
   - Write unit tests *and* end-to-end tests
 3. Make sure `eslint` does not return any errors regarding the coding style.
 

@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.6.2
- * @date         2023-03-06 UTC 04:22
+ * @version      4.6.3
+ * @date         2023-03-18 UTC 00:38
  *
  * @authors      2009-2016 Bob Knothe <bob.knothe@gmail.com>
  *               2016-2023 Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
@@ -917,7 +917,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.6.2';
+        return '4.6.3';
     }
 
     /**
@@ -8386,6 +8386,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         let result;
         if (AutoNumericHelper.isNumber(Number(value))) { // if (settings.decimalCharacter === '.' && AutoNumericHelper.isNumber(Number(value))) {
             // The value has either already been stripped, or a 'real' javascript number is passed as a parameter
+            if (!AutoNumericHelper.isNumberStrict(value)) {
+                value = String(value).trim(); // cf. issue #721
+            }
             result = AutoNumericHelper.scientificToDecimal(value);
         } else {
             // Else if it's a string that `Number()` cannot typecast, then we try to convert the localized numeric string to a numeric one

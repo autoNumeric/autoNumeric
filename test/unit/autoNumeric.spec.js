@@ -4881,6 +4881,51 @@ describe('Instantiated autoNumeric functions', () => {
             spyOn(console, 'warn');
             expect(() => aNInput.update({ minimumValue: '100', maximumValue: '-666' })).toThrow();
         });
+
+        it('should set the raw value correctly when spaces are introduced before and after the value (cf. issue #721)', () => {
+            // Without a currency symbol
+            aNInput.update(AutoNumeric.getPredefinedOptions().euro, { currencySymbol : '' });
+            aNInput.set('3 ');
+            expect(aNInput.getFormatted()).toEqual('3,00');
+            expect(aNInput.getNumericString()).toEqual('3');
+            aNInput.set('  5');
+            expect(aNInput.getFormatted()).toEqual('5,00');
+            expect(aNInput.getNumericString()).toEqual('5');
+            aNInput.set('  11  ');
+            expect(aNInput.getFormatted()).toEqual('11,00');
+            expect(aNInput.getNumericString()).toEqual('11');
+
+            aNInput.update({ maximumValue : '30' });
+            aNInput.set('4 ');
+            expect(aNInput.getFormatted()).toEqual('4,00');
+            expect(aNInput.getNumericString()).toEqual('4');
+            aNInput.set('       3        ');
+            expect(aNInput.getFormatted()).toEqual('3,00');
+            expect(aNInput.getNumericString()).toEqual('3');
+
+            // With a currency symbol
+            aNInput.update(AutoNumeric.getPredefinedOptions().euro, {
+                currencySymbol : 'E',
+                maximumValue: AutoNumeric.options.maximumValue.tenTrillions,
+            });
+            aNInput.set('3 ');
+            expect(aNInput.getFormatted()).toEqual('3,00E');
+            expect(aNInput.getNumericString()).toEqual('3');
+            aNInput.set('  5');
+            expect(aNInput.getFormatted()).toEqual('5,00E');
+            expect(aNInput.getNumericString()).toEqual('5');
+            aNInput.set('  11  ');
+            expect(aNInput.getFormatted()).toEqual('11,00E');
+            expect(aNInput.getNumericString()).toEqual('11');
+
+            aNInput.update({ maximumValue : '30' });
+            aNInput.set('4 ');
+            expect(aNInput.getFormatted()).toEqual('4,00E');
+            expect(aNInput.getNumericString()).toEqual('4');
+            aNInput.set('       3        ');
+            expect(aNInput.getFormatted()).toEqual('3,00E');
+            expect(aNInput.getNumericString()).toEqual('3');
+        });
     });
 
     describe('`set` and non-ascii numbers', () => {

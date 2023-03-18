@@ -4,6 +4,9 @@ node_modules/
 # Puppeteer cache directory
 .cache
 
+# NPM files
+autonumeric-*.tgz
+
 # Logs
 *.log
 

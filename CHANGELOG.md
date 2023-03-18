@@ -1,5 +1,14 @@
 ## Changelog for autoNumeric
 
+### 4.6.3
++ Fixes #721 AutoNumeric.set() breaks internal state when string-value has leading or trailing whitespace
++ Fixes all the remaining end-to-end tests with the latest Webdriver.io version
++ Removes the remnants of PhantomJS hacks (#384)
++ Updates the Travis CI configuration
++ Fixes the caret positioning in some specific cases
++ Fixes the lint issues in the wdio config file
++ Fixes the webpack production config to correctly generate gzipped dist files
+
 ### 4.6.2
 + Fixes issue #757 Converted scientific numbers returns NaN when using `formArrayNumericString()`
 + Fixes warning messages in the IDE

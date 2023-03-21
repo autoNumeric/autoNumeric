@@ -7480,27 +7480,15 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
-     * Handler for up and down arrow keys
-     * Increment or decrement the element value according to the `upDownStep` option chosen
+     * Helper function that DRY the similar behaviors of the mousewheel and up/down arrow keys, which increment/decrement the element value, either by a fixed value, or using the 'progressive' heuristic
      *
-     * @param {KeyboardEvent} e
+     * @param {WheelEvent|KeyboardEvent} e The `wheel` or keyboard event
+     * @param {boolean} isUp Defines if the event should increment the value
+     * @param {boolean} isDown Defines if the event should decrement the value
+     * @param {string|number} step The step to be applied to the increment/decrement action
+     * @private
      */
-    upDownArrowAction(e) { //TODO DRY this with the `wheelAction` method
-        if (this.formulaMode ||
-            this.settings.readOnly || this.domElement.readOnly || this.domElement.disabled) {
-            return;
-        }
-
-        let isUp = false;
-        let isDown = false;
-        if (this.eventKey === AutoNumericEnum.keyName.UpArrow) {
-            isUp = true;
-        } else if (this.eventKey === AutoNumericEnum.keyName.DownArrow) {
-            isDown = true;
-        } else {
-            AutoNumericHelper.throwError('Something has gone wrong since neither an Up or Down arrow key is detected, but the function was still called!');
-        }
-
+    _wheelAndUpDownActions(e, isUp, isDown, step) {
         // 0) First, save the caret position so we can set it back once the value has been changed
         const selectionStart = e.target.selectionStart || 0;
         const selectionEnd = e.target.selectionEnd || 0;
@@ -7529,14 +7517,14 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // 2) Increment/Decrement the value
         // But first, choose the increment/decrement method ; fixed or progressive
-        if (AutoNumericHelper.isNumber(this.settings.upDownStep)) {
-            const step = +this.settings.upDownStep; // Typecast to a number needed for the following addition/subtraction
+        if (AutoNumericHelper.isNumber(step)) {
+            const stepToUse = +step; // Typecast to a number needed for the following addition/subtraction
             // Fixed method
             // This is the simplest method, where a fixed offset in added/subtracted from the current value
             if (isUp) { // Increment
-                result += step;
+                result += stepToUse;
             } else if (isDown) { // Decrement
-                result -= step;
+                result -= stepToUse;
             }
         } else {
             // Progressive method
@@ -7567,6 +7555,31 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // 4) Finally, we set back the caret position/selection
         // There is no need to take into account the fact that the number count could be different at the end of the wheel event ; it would be too complex and most of the time unreliable
         this._setSelection(selectionStart, selectionEnd);
+    }
+
+    /**
+     * Handler for up and down arrow keys
+     * Increment or decrement the element value according to the `upDownStep` option chosen
+     *
+     * @param {KeyboardEvent} e
+     */
+    upDownArrowAction(e) {
+        if (this.formulaMode ||
+            this.settings.readOnly || this.domElement.readOnly || this.domElement.disabled) {
+            return;
+        }
+
+        let isUp = false;
+        let isDown = false;
+        if (this.eventKey === AutoNumericEnum.keyName.UpArrow) {
+            isUp = true;
+        } else if (this.eventKey === AutoNumericEnum.keyName.DownArrow) {
+            isDown = true;
+        } else {
+            AutoNumericHelper.throwError('Something has gone wrong since neither an Up or Down arrow key is detected, but the function was still called!');
+        }
+
+        this._wheelAndUpDownActions(e, isUp, isDown, this.settings.upDownStep);
     }
 
     /**
@@ -7618,74 +7631,17 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     wheelAction(e) {
         this.isWheelEvent = true; // Keep the info that we are currently managing a mouse wheel event
 
-        // 0) First, save the caret position so we can set it back once the value has been changed
-        const selectionStart = e.target.selectionStart || 0;
-        const selectionEnd = e.target.selectionEnd || 0;
-
-        // 1) Get the unformatted value
-        const currentUnformattedValue = this.rawValue;
-
-        let result;
-        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(currentUnformattedValue)) {
-            // If by default the input is empty, start at '0'
-            if (this.settings.minimumValue > 0 || this.settings.maximumValue < 0) {
-                // or if '0' is not between min and max value, 'minimumValue' if the user does a wheelup, 'maximumValue' if the user does a wheeldown
-                if (AutoNumericHelper.isWheelUpEvent(e)) {
-                    result = this.settings.minimumValue;
-                } else if (AutoNumericHelper.isWheelDownEvent(e)) {
-                    result = this.settings.maximumValue;
-                } else {
-                    AutoNumericHelper.throwError(`The event is not a 'wheel' event.`);
-                }
-            } else {
-                result = 0;
-            }
+        let isUp = false;
+        let isDown = false;
+        if (AutoNumericHelper.isWheelUpEvent(e)) {
+            isUp = true;
+        } else if (AutoNumericHelper.isWheelDownEvent(e)) {
+            isDown = true;
         } else {
-            result = currentUnformattedValue;
+            AutoNumericHelper.throwError(`The event is not a 'wheel' event.`);
         }
 
-        result = +result; // Typecast to a number needed for the following addition/subtraction
-
-        // 2) Increment/Decrement the value
-        // But first, choose the increment/decrement method ; fixed or progressive
-        if (AutoNumericHelper.isNumber(this.settings.wheelStep)) {
-            const step = +this.settings.wheelStep; // Typecast to a number needed for the following addition/subtraction
-            // Fixed method
-            // This is the simplest method, where a fixed offset in added/subtracted from the current value
-            if (AutoNumericHelper.isWheelUpEvent(e)) { // Increment
-                result += step;
-            } else if (AutoNumericHelper.isWheelDownEvent(e)) { // Decrement
-                result -= step;
-            }
-        } else {
-            // Progressive method
-            // For this method, we calculate an offset that is in relation to the size of the current number (using only the integer part size).
-            // The bigger the number, the bigger the offset (usually the number count in the integer part minus 3, except for small numbers where a different behavior is better for the user experience).
-            //TODO Known limitation : The progressive method does not play well with numbers between 0 and 1 where to modify the decimal places the rawValue first has to go from '1' to '0'
-            if (AutoNumericHelper.isWheelUpEvent(e)) { // Increment
-                result = AutoNumericHelper.addAndRoundToNearestAuto(result, this.settings.decimalPlacesRawValue);
-            } else if (AutoNumericHelper.isWheelDownEvent(e)) { // Decrement
-                result = AutoNumericHelper.subtractAndRoundToNearestAuto(result, this.settings.decimalPlacesRawValue);
-            }
-        }
-
-        // 3) Set the new value so it gets formatted
-        // First clamp the result if needed
-        result = AutoNumericHelper.clampToRangeLimits(result, this.settings);
-        if (result !== +currentUnformattedValue) {
-            // Only 'set' the value if it has changed. For instance 'set' should not happen if the user hits a limit and continue to try to go past it since we clamp the value.
-            this.set(result);
-
-            // Since we changed the input value, we send a native `input` event
-            this._triggerEvent(AutoNumeric.events.native.input, e.target);
-        }
-
-        //XXX Do not prevent if the value is not modified? From a UX point of view, preventing the wheel event when the user use it on top of an autoNumeric element should always be done, even if the value does not change. Perhaps that could affect other scripts relying on this event to be sent though.
-        e.preventDefault(); // We prevent the page to scroll while we increment/decrement the value
-
-        // 4) Finally, we set back the caret position/selection
-        // There is no need to take into account the fact that the number count could be different at the end of the wheel event ; it would be too complex and most of the time unreliable
-        this._setSelection(selectionStart, selectionEnd);
+        this._wheelAndUpDownActions(e, isUp, isDown, this.settings.wheelStep);
 
         this.isWheelEvent = false; // Set back the mouse wheel indicator to its default
     }

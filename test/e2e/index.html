@@ -1151,6 +1151,24 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #719</p>
+			<div>
+				<div>
+					<input id="issue_719a" type="text" placeholder="#719" value="80000">
+					<input id="issue_719b" type="text" placeholder="#719" value="90000">
+					<input id="issue_719c" type="text" placeholder="#719" value="70000">
+				</div>
+				<div>
+					<input id="issue_719d" type="text" placeholder="#719" value="42">
+					<input id="issue_719e" type="text" placeholder="#719" value="0.2345">
+					<input id="issue_719f" type="text" placeholder="#719" value="12345678">
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     console.log(`-------------------------------------------`);
@@ -2440,6 +2458,14 @@
     an_757_0.formArrayNumericString().forEach((currentValue) => {
         console.log("currentValue: ", currentValue); //DEBUG
     });*/
+
+    //-------------- Issue #719
+    new AutoNumeric('#issue_719a', { modifyValueOnWheel: false  });
+    new AutoNumeric('#issue_719b', { modifyValueOnWheel: true, wheelStep: 1000 });
+    new AutoNumeric('#issue_719c', { modifyValueOnWheel: true, wheelStep: 'progressive' });
+    new AutoNumeric('#issue_719d', { modifyValueOnUpDownArrow: false  });
+    new AutoNumeric('#issue_719e', { modifyValueOnUpDownArrow: true, upDownStep: 1000 });
+    new AutoNumeric('#issue_719f', { modifyValueOnUpDownArrow: true, upDownStep: 'progressive' });
 </script>
 </body>
 </html>

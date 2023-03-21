@@ -408,7 +408,20 @@ AutoNumeric.options = {
         zero                  : '0',
     },
 
+    /* Allows the user to increment or decrement the element value with the up and down arrow keys.
+     * The behavior is similar to the mouse wheel one.
+     * The up and down arrow keys behavior can be modified by the `upDownStep` option.
+     * This `upDownStep` option can be used in two ways, either by setting:
+     * - a 'fixed' step value (`upDownStep : 1000`), or
+     * - the 'progressive' string (`upDownStep : 'progressive'`), which will then activate a special mode where the step is automatically calculated based on the element value size.
+     */
+    modifyValueOnUpDownArrow: {
+        modifyValue: true,
+        doNothing  : false,
+    },
+
     /* Allows the user to increment or decrement the element value with the mouse wheel.
+     * The behavior is similar to the up/down arrow one.
      * The wheel behavior can be modified by the `wheelStep` option.
      * This `wheelStep` option can be used in two ways, either by setting:
      * - a 'fixed' step value (`wheelStep : 1000`), or
@@ -823,6 +836,18 @@ AutoNumeric.options = {
         keepCurrentValue: false,
     },
 
+    /* That option is linked to the `modifyValueOnUpDownArrow` one and will only be used if the latter is set to `true`.
+     * This option will modify the up/down arrow behavior and can be used in two ways, either by setting :
+     * - a 'fixed' step value (a positive float or integer number (ex: `1000`)), or
+     * - the `'progressive'` string.
+     *
+     * The 'fixed' mode always increment/decrement the element value by that amount, while respecting the `minimumValue` and `maximumValue` settings.
+     * The 'progressive' mode will increment/decrement the element value based on its current value. The bigger the number, the bigger the step, and vice versa.
+     */
+    upDownStep: {
+        progressive: 'progressive',
+    },
+
     /* Provides a way for automatically replacing the formatted value with a pre-defined string, when the raw value is equal to a specific value
      * Here you can specify as many 'conversion' as needed.
      */
@@ -861,7 +886,7 @@ AutoNumeric.options = {
 
     /* That option is linked to the `modifyValueOnWheel` one and will only be used if the latter is set to `true`.
      * This option will modify the wheel behavior and can be used in two ways, either by setting :
-     * - a 'fixed' step value (a positive float or integer number `1000`), or
+     * - a 'fixed' step value (a positive float or integer (ex: number `1000`)), or
      * - the `'progressive'` string.
      *
      * The 'fixed' mode always increment/decrement the element value by that amount, while respecting the `minimumValue` and `maximumValue` settings.

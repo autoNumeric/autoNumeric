@@ -1,5 +1,9 @@
 ## Changelog for autoNumeric
 
+### 4.7.0
++ Fixes #719 Feature request: Up and down arrow keys behavior matching standard number input
++ Adds 2 new options to control how the up and down arrow keys behave: `modifyValueOnUpDownArrow` and `upDownStep`
+
 ### 4.6.3
 + Fixes #721 AutoNumeric.set() breaks internal state when string-value has leading or trailing whitespace
 + Fixes all the remaining end-to-end tests with the latest Webdriver.io version

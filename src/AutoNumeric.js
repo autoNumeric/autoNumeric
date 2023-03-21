@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.6.3
- * @date         2023-03-18 UTC 00:38
+ * @version      4.7.0
+ * @date         2023-03-21 UTC 03:35
  *
  * @authors      2009-2016 Bob Knothe <bob.knothe@gmail.com>
  *               2016-2023 Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
@@ -752,6 +752,11 @@ export default class AutoNumeric {
 
                 return this;
             },
+            modifyValueOnUpDownArrow     : modifyValueOnUpDownArrow => {
+                this.settings.modifyValueOnUpDownArrow = modifyValueOnUpDownArrow; //TODO test this with unit tests
+
+                return this;
+            },
             modifyValueOnWheel           : modifyValueOnWheel => {
                 this.settings.modifyValueOnWheel = modifyValueOnWheel; //TODO test this with unit tests
 
@@ -879,6 +884,11 @@ export default class AutoNumeric {
 
                 return this;
             },
+            upDownStep                   : upDownStep => {
+                this.settings.upDownStep = upDownStep; //TODO test this with unit tests
+
+                return this;
+            },
             valuesToStrings              : valuesToStrings => {
                 this.update({ valuesToStrings });
 
@@ -917,7 +927,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.6.3';
+        return '4.7.0';
     }
 
     /**
@@ -4158,6 +4168,10 @@ export default class AutoNumeric {
             AutoNumericHelper.throwError(`The cancellable behavior option 'isCancellable' is invalid ; it should be either 'true' or 'false', [${options.isCancellable}] given.`);
         }
 
+        if (!AutoNumericHelper.isTrueOrFalseString(options.modifyValueOnUpDownArrow) && !AutoNumericHelper.isBoolean(options.modifyValueOnUpDownArrow)) {
+            AutoNumericHelper.throwError(`The increment/decrement on up and down arrow keys 'modifyValueOnUpDownArrow' is invalid ; it should be either 'true' or 'false', [${options.modifyValueOnUpDownArrow}] given.`);
+        }
+
         if (!AutoNumericHelper.isTrueOrFalseString(options.modifyValueOnWheel) && !AutoNumericHelper.isBoolean(options.modifyValueOnWheel)) {
             AutoNumericHelper.throwError(`The increment/decrement on mouse wheel option 'modifyValueOnWheel' is invalid ; it should be either 'true' or 'false', [${options.modifyValueOnWheel}] given.`);
         }
@@ -4171,6 +4185,13 @@ export default class AutoNumeric {
             AutoNumeric.options.wheelOn.hover,
         ])) {
             AutoNumericHelper.throwError(`The wheel behavior option 'wheelOn' is invalid ; it should either be 'focus' or 'hover', [${options.wheelOn}] given.`);
+        }
+
+        if (!(AutoNumericHelper.isString(options.upDownStep) || AutoNumericHelper.isNumber(options.upDownStep)) ||
+            (options.upDownStep !== 'progressive' && !testPositiveFloatOrInteger.test(options.upDownStep)) ||
+            Number(options.upDownStep) === 0) {
+            // A step equal to '0' is rejected
+            AutoNumericHelper.throwError(`The up/down arrow step value option 'upDownStep' is invalid ; it should either be the string 'progressive', or a number or a string that represents a positive number (excluding zero), [${options.upDownStep}] given.`);
         }
 
         if (!(AutoNumericHelper.isString(options.wheelStep) || AutoNumericHelper.isNumber(options.wheelStep)) ||
@@ -6581,10 +6602,19 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
             //TODO Manage the undo/redo events *while* editing a math expression
             //TODO Manage the cut/paste events *while* editing a math expression
-        } else if (this.eventKey === AutoNumericEnum.keyName.Equal) {
-            this._enterFormulaMode();
+        } else {
+            if (this.eventKey === AutoNumericEnum.keyName.Equal) {
+                this._enterFormulaMode();
 
-            return;
+                return;
+            }
+
+            if (this.settings.modifyValueOnUpDownArrow &&
+                (this.eventKey === AutoNumericEnum.keyName.UpArrow || this.eventKey === AutoNumericEnum.keyName.DownArrow)) {
+                this.upDownArrowAction(e);
+
+                return;
+            }
         }
 
         if (this.domElement.readOnly || this.settings.readOnly || this.domElement.disabled) {
@@ -7447,6 +7477,96 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         this.rawValueOnFocus = void(0); // Reset the tracker
+    }
+
+    /**
+     * Handler for up and down arrow keys
+     * Increment or decrement the element value according to the `upDownStep` option chosen
+     *
+     * @param {KeyboardEvent} e
+     */
+    upDownArrowAction(e) { //TODO DRY this with the `wheelAction` method
+        if (this.formulaMode ||
+            this.settings.readOnly || this.domElement.readOnly || this.domElement.disabled) {
+            return;
+        }
+
+        let isUp = false;
+        let isDown = false;
+        if (this.eventKey === AutoNumericEnum.keyName.UpArrow) {
+            isUp = true;
+        } else if (this.eventKey === AutoNumericEnum.keyName.DownArrow) {
+            isDown = true;
+        } else {
+            AutoNumericHelper.throwError('Something has gone wrong since neither an Up or Down arrow key is detected, but the function was still called!');
+        }
+
+        // 0) First, save the caret position so we can set it back once the value has been changed
+        const selectionStart = e.target.selectionStart || 0;
+        const selectionEnd = e.target.selectionEnd || 0;
+
+        // 1) Get the unformatted value
+        const currentUnformattedValue = this.rawValue;
+
+        let result;
+        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(currentUnformattedValue)) {
+            // If by default the input is empty, start at '0'
+            if (this.settings.minimumValue > 0 || this.settings.maximumValue < 0) {
+                // or if '0' is not between min and max value, 'minimumValue' if the user does a wheelup, 'maximumValue' if the user does a wheeldown
+                if (isUp) {
+                    result = this.settings.minimumValue;
+                } else {
+                    result = this.settings.maximumValue;
+                }
+            } else {
+                result = 0;
+            }
+        } else {
+            result = currentUnformattedValue;
+        }
+
+        result = +result; // Typecast to a number needed for the following addition/subtraction
+
+        // 2) Increment/Decrement the value
+        // But first, choose the increment/decrement method ; fixed or progressive
+        if (AutoNumericHelper.isNumber(this.settings.upDownStep)) {
+            const step = +this.settings.upDownStep; // Typecast to a number needed for the following addition/subtraction
+            // Fixed method
+            // This is the simplest method, where a fixed offset in added/subtracted from the current value
+            if (isUp) { // Increment
+                result += step;
+            } else if (isDown) { // Decrement
+                result -= step;
+            }
+        } else {
+            // Progressive method
+            // For this method, we calculate an offset that is in relation to the size of the current number (using only the integer part size).
+            // The bigger the number, the bigger the offset (usually the number count in the integer part minus 3, except for small numbers where a different behavior is better for the user experience).
+            //TODO Known limitation : The progressive method does not play well with numbers between 0 and 1 where to modify the decimal places the rawValue first has to go from '1' to '0'
+            if (isUp) { // Increment
+                result = AutoNumericHelper.addAndRoundToNearestAuto(result, this.settings.decimalPlacesRawValue);
+            } else if (isDown) { // Decrement
+                result = AutoNumericHelper.subtractAndRoundToNearestAuto(result, this.settings.decimalPlacesRawValue);
+            }
+        }
+
+        // 3) Set the new value so it gets formatted
+        // First clamp the result if needed
+        result = AutoNumericHelper.clampToRangeLimits(result, this.settings);
+        if (result !== +currentUnformattedValue) {
+            // Only 'set' the value if it has changed. For instance 'set' should not happen if the user hits a limit and continue to try to go past it since we clamp the value.
+            this.set(result);
+
+            // Since we changed the input value, we send a native `input` event
+            this._triggerEvent(AutoNumeric.events.native.input, e.target);
+        }
+
+        //XXX Do not prevent if the value is not modified? From a UX point of view, preventing the wheel event when the user use it on top of an autoNumeric element should always be done, even if the value does not change. Perhaps that could affect other scripts relying on this event to be sent though.
+        e.preventDefault(); // We prevent the page to scroll while we increment/decrement the value
+
+        // 4) Finally, we set back the caret position/selection
+        // There is no need to take into account the fact that the number count could be different at the end of the wheel event ; it would be too complex and most of the time unreliable
+        this._setSelection(selectionStart, selectionEnd);
     }
 
     /**

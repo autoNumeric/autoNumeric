@@ -249,6 +249,12 @@ const selectors = {
     issue757input3                    : '#issue_757_test3',
     issue757input4                    : '#issue_757_test4',
     issue757Submit                    : '#issue_757_submit',
+    issue719a                         : '#issue_719a',
+    issue719b                         : '#issue_719b',
+    issue719c                         : '#issue_719c',
+    issue719d                         : '#issue_719d',
+    issue719e                         : '#issue_719e',
+    issue719f                         : '#issue_719f',
 };
 
 //-----------------------------------------------------------------------------
@@ -4624,3 +4630,97 @@ describe('Issue #757', () => {
         expect(await $(selectors.issue757input4).getValue()).toEqual('0.00011112');
     });
 });
+
+describe('Issue #719', () => {
+    it('should test for default values', async () => {
+        await browser.url(testUrl);
+
+        expect(await $(selectors.issue719a).getValue()).toEqual('80,000.00');
+        expect(await $(selectors.issue719b).getValue()).toEqual('90,000.00');
+        expect(await $(selectors.issue719c).getValue()).toEqual('70,000.00');
+        expect(await $(selectors.issue719d).getValue()).toEqual('42.00');
+        expect(await $(selectors.issue719e).getValue()).toEqual('0.23');
+        expect(await $(selectors.issue719f).getValue()).toEqual('12,345,678.00');
+    });
+
+    it(`should increment and decrement the value with the up and down arrow keys by the default amount`, async () => {
+        const input = await $(selectors.issue719a);
+        await input.click();
+
+        await browser.keys([Key.ArrowUp]);
+        expect(await input.getValue()).toEqual('80,001.00');
+        await browser.keys([Key.ArrowUp]);
+        expect(await input.getValue()).toEqual('80,002.00');
+        await browser.keys([Key.ArrowUp]);
+        expect(await input.getValue()).toEqual('80,003.00');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('80,002.00');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('80,001.00');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('80,000.00');
+    });
+
+    it(`should not increment and decrement the value with the up and down arrow keys if 'modifyValueOnUpArrowDown' is set to 'false'`, async () => {
+        const input = await $(selectors.issue719d);
+        await input.click();
+
+        await browser.keys([Key.ArrowUp]);
+        expect(await input.getValue()).toEqual('42.00');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('42.00');
+    });
+
+    it(`should increment and decrement the value with the up and down arrow keys by the specified amount`, async () => {
+        const input = await $(selectors.issue719e);
+        await input.click();
+
+        await browser.keys([Key.ArrowUp]);
+        expect(await input.getValue()).toEqual('1,000.23');
+        await browser.keys([Key.ArrowUp]);
+        expect(await input.getValue()).toEqual('2,000.23');
+        await browser.keys([Key.ArrowUp]);
+        expect(await input.getValue()).toEqual('3,000.23');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('2,000.23');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('1,000.23');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('0.23');
+    });
+
+    it(`should increment and decrement the value with the up and down arrow keys by the progressive amount`, async () => {
+        const input = await $(selectors.issue719f);
+        await input.click();
+
+        await browser.keys([Key.ArrowUp]);
+        expect(await input.getValue()).toEqual('12,400,000.00');
+        await browser.keys([Key.ArrowUp]);
+        expect(await input.getValue()).toEqual('12,500,000.00');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('12,400,000.00');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('12,300,000.00');
+
+        await input.setValue('1,200.47');
+        expect(await input.getValue()).toEqual('1,200.47');
+
+        await browser.keys([Key.ArrowUp]);
+        expect(await input.getValue()).toEqual('1,300.00');
+        await browser.keys([Key.ArrowUp]);
+        expect(await input.getValue()).toEqual('1,400.00');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('1,300.00');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('1,200.00');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('1,100.00');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('1,000.00');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('900.00');
+        await browser.keys([Key.ArrowDown]);
+        expect(await input.getValue()).toEqual('890.00');
+    });
+});
+

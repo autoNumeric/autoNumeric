@@ -67,6 +67,7 @@ AutoNumeric.defaultSettings = {
     leadingZero                  : AutoNumeric.options.leadingZero.deny,
     maximumValue                 : AutoNumeric.options.maximumValue.tenTrillions,
     minimumValue                 : AutoNumeric.options.minimumValue.tenTrillions,
+    modifyValueOnUpDownArrow     : AutoNumeric.options.modifyValueOnUpDownArrow.modifyValue,
     modifyValueOnWheel           : AutoNumeric.options.modifyValueOnWheel.modifyValue,
     negativeBracketsTypeOnBlur   : AutoNumeric.options.negativeBracketsTypeOnBlur.none,
     negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
@@ -92,6 +93,7 @@ AutoNumeric.defaultSettings = {
     symbolWhenUnfocused          : AutoNumeric.options.symbolWhenUnfocused.none,
     unformatOnHover              : AutoNumeric.options.unformatOnHover.unformat,
     unformatOnSubmit             : AutoNumeric.options.unformatOnSubmit.keepCurrentValue,
+    upDownStep                   : '1', // To mimic the behavior of 'numeric'-typed input
     valuesToStrings              : AutoNumeric.options.valuesToStrings.none,
     watchExternalChanges         : AutoNumeric.options.watchExternalChanges.doNotWatch,
     wheelOn                      : AutoNumeric.options.wheelOn.focus,

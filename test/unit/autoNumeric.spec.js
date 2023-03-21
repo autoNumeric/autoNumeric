@@ -110,6 +110,7 @@ describe('The AutoNumeric object', () => {
             leadingZero                  : 'deny',
             maximumValue                 : '10000000000000',
             minimumValue                 : '-10000000000000',
+            modifyValueOnUpDownArrow     : true,
             modifyValueOnWheel           : true,
             negativeBracketsTypeOnBlur   : null,
             negativePositiveSignPlacement: null,
@@ -134,6 +135,7 @@ describe('The AutoNumeric object', () => {
             symbolWhenUnfocused          : null,
             unformatOnHover              : true,
             unformatOnSubmit             : false,
+            upDownStep                   : '1',
             valuesToStrings              : null,
             watchExternalChanges         : false,
             wheelOn                      : 'focus',
@@ -290,6 +292,7 @@ describe('The AutoNumeric object', () => {
             expect(defaultSettings.leadingZero               ).toEqual(aNInputSettings.leadingZero                );
             expect(defaultSettings.maximumValue              ).toEqual(aNInputSettings.maximumValue               );
             expect(defaultSettings.minimumValue              ).toEqual(aNInputSettings.minimumValue               );
+            expect(defaultSettings.modifyValueOnUpDownArrow  ).toEqual(aNInputSettings.modifyValueOnUpDownArrow   );
             expect(defaultSettings.modifyValueOnWheel        ).toEqual(aNInputSettings.modifyValueOnWheel         );
             expect(defaultSettings.negativeBracketsTypeOnBlur).toEqual(aNInputSettings.negativeBracketsTypeOnBlur );
             // Special case for `negativePositiveSignPlacement`, see the related tests
@@ -313,6 +316,7 @@ describe('The AutoNumeric object', () => {
             expect(defaultSettings.symbolWhenUnfocused       ).toEqual(aNInputSettings.symbolWhenUnfocused        );
             expect(defaultSettings.unformatOnHover           ).toEqual(aNInputSettings.unformatOnHover            );
             expect(defaultSettings.unformatOnSubmit          ).toEqual(aNInputSettings.unformatOnSubmit           );
+            expect(defaultSettings.upDownStep                ).toEqual(aNInputSettings.upDownStep                 );
             expect(defaultSettings.valuesToStrings           ).toEqual(aNInputSettings.valuesToStrings            );
             expect(defaultSettings.watchExternalChanges      ).toEqual(aNInputSettings.watchExternalChanges       );
             expect(defaultSettings.wheelOn                   ).toEqual(aNInputSettings.wheelOn                    );
@@ -3232,6 +3236,7 @@ describe('autoNumeric options and `options.*` methods', () => {
      historySize
      invalidClass
      isCancellable
+     modifyValueOnUpDownArrow
      modifyValueOnWheel
      noEventListeners
      showOnlyNumbersOnFocus
@@ -3244,6 +3249,7 @@ describe('autoNumeric options and `options.*` methods', () => {
      serializeSpaces
      showWarnings
      unformatOnHover
+     upDownStep
      watchExternalChanges
      wheelOn
      wheelStep
@@ -8047,6 +8053,17 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ isCancellable: 'true' })).not.toThrow();
             expect(() => AutoNumeric.validate({ isCancellable: 'false' })).not.toThrow();
 
+            expect(() => AutoNumeric.validate({ modifyValueOnUpDownArrow: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnUpDownArrow: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnUpDownArrow: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnUpDownArrow: 'false' })).not.toThrow();
+
+            expect(() => AutoNumeric.validate({ upDownStep: 'progressive' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ upDownStep: '1000' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ upDownStep: '422.345' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ upDownStep: 1000 })).not.toThrow();
+            expect(() => AutoNumeric.validate({ upDownStep: 422.345 })).not.toThrow();
+
             expect(() => AutoNumeric.validate({ modifyValueOnWheel: true })).not.toThrow();
             expect(() => AutoNumeric.validate({ modifyValueOnWheel: false })).not.toThrow();
             expect(() => AutoNumeric.validate({ modifyValueOnWheel: 'true' })).not.toThrow();
@@ -8571,6 +8588,25 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ isCancellable: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ isCancellable: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ isCancellable: 'foobar' })).toThrow();
+        });
+
+        it('should not validate modifyValueOnUpDownArrow', () => {
+            expect(() => AutoNumeric.validate({ modifyValueOnUpDownArrow: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnUpDownArrow: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnUpDownArrow: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnUpDownArrow: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ modifyValueOnUpDownArrow: 'foobar' })).toThrow();
+        });
+
+        it('should not validate upDownStep', () => {
+            expect(() => AutoNumeric.validate({ upDownStep: 'foobar' })).toThrow();
+            expect(() => AutoNumeric.validate({ upDownStep: true })).toThrow();
+            expect(() => AutoNumeric.validate({ upDownStep: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ upDownStep: -42 })).toThrow();
+            expect(() => AutoNumeric.validate({ upDownStep: '-42' })).toThrow();
+            expect(() => AutoNumeric.validate({ upDownStep: -1000.02 })).toThrow();
+            expect(() => AutoNumeric.validate({ upDownStep: '-1000.02' })).toThrow();
+            expect(() => AutoNumeric.validate({ upDownStep: '1000foobar' })).toThrow();
         });
 
         it('should not validate modifyValueOnWheel', () => {

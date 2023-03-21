@@ -333,6 +333,8 @@ declare namespace AutoNumeric {
          */
         caretPositionOnFocus?: CaretPositionOption;
 
+        alwaysAllowDecimalCharacter?: boolean;
+
         /**
          * Determine if a local list of AutoNumeric objects must be kept when initializing the elements and others
          * @default true
@@ -418,11 +420,19 @@ declare namespace AutoNumeric {
 
         emptyInputBehavior?: EmptyInputBehaviorOption;
 
+        eventBubbles?: boolean;
+
+        eventIsCancelable?: boolean;
+
         failOnUnknownOption?: boolean;
 
         formatOnPageLoad?: boolean;
 
+        formulaMode?: boolean;
+
         historySize?: number;
+
+        invalidClass?: string;
 
         isCancellable?: boolean;
 
@@ -431,6 +441,11 @@ declare namespace AutoNumeric {
         maximumValue?: string;
 
         minimumValue?: string;
+
+        /**
+         * Determine if the element value can be incremented / decremented with the up and down arrow keys.
+         */
+        modifyValueOnUpDownArrow?: boolean;
 
         /**
          * Determine if the element value can be incremented / decremented with the mouse wheel.
@@ -446,6 +461,8 @@ declare namespace AutoNumeric {
          */
         negativePositiveSignPlacement?: NegativePositiveSignPlacementOption;
 
+        negativeSignCharacter?: string;
+
         noEventListeners?: boolean;
 
         onInvalidPaste?: OnInvalidPasteOption;
@@ -453,6 +470,8 @@ declare namespace AutoNumeric {
         outputFormat?: OutputFormatOption;
 
         overrideMinMaxLimits?: OverrideMinMaxLimitsOption;
+
+        positiveSignCharacter?: string;
 
         rawValueDivisor?: number | null;
 
@@ -501,6 +520,14 @@ declare namespace AutoNumeric {
         unformatOnHover?: boolean;
 
         unformatOnSubmit?: boolean;
+
+        upDownStep?: number | "progressive";
+
+        valuesToStrings?: object;
+
+        watchExternalChanges?: boolean;
+
+        wheelOn?: "focus" | "hover";
 
         wheelStep?: number | "progressive";
     }

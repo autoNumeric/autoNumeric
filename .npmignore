@@ -14,6 +14,9 @@ test/e2e/screenshots
 # Built files
 # (You want to keep that directory and its files when publishing to npmjs)
 # dist/*
+dist/runtime*
+dist/commons*
+dist/test*
 
 # Coverage files
 test/unit/coverage

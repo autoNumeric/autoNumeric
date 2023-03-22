@@ -4,8 +4,8 @@
  * @version      4.7.0
  * @date         2023-03-21 UTC 03:35
  *
- * @authors      2009-2016 Bob Knothe <bob.knothe@gmail.com>
- *               2016-2023 Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
+ * @authors      2016-2023 Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
+ *               2009-2016 Bob Knothe <bob.knothe@gmail.com>
  * @contributors Sokolov Yura and others, cf. AUTHORS
  * @copyright    2009 Robert J. Knothe
  * @since        2009-08-09

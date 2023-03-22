@@ -16,87 +16,85 @@
     "number",
     "numeric",
     "format",
+    "formatting",
     "form",
     "input",
     "mask",
+    "masked",
     "as-you-type",
     "live"
   ],
   "license": "MIT",
-  "author": {
-    "name": "Robert Knothe",
-    "email": "bob@decorplanit.com"
-  },
+  "author": "Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>",
   "contributors": [
-    {
-      "name": "Alexandre Bonneau",
-      "email": "alexandre.bonneau@linuxfr.eu"
-    },
-    {
-      "name": "Sokolov Yura"
-    },
-    {
-      "name": "Carlos Gonzales"
-    },
-    {
-      "name": "Ney Estrabelli"
-    },
-    {
-      "name": "Carlos Ghan"
-    },
-    {
-      "name": "Boris Cherny"
-    },
-    {
-      "name": "Maxwell Barvian"
-    },
-    {
-      "name": "Sasha Koss"
-    },
-    {
-      "name": "Mic Biert"
-    },
-    {
-      "name": "Peter Boccia"
-    },
-    {
-      "name": "Bruno Batista"
-    },
-    {
-      "name": "Jarin Udom"
-    },
-    {
-      "name": "Raymond Lehnhoff"
-    },
-    {
-      "name": "Cory Foy"
-    }
+    "Bob Knothe <bob@decorplanit.com>",
+    "Carlos Gonzales <carlos.rgn@gmail.com>",
+    "Lukas Drgon <lukas.drgon@gmail.com>",
+    "Ney Estrabelli <neyestrabelli@gmail.com>",
+    "Bernie Schelberg <bernie.schelberg@ausregistry.com.au>",
+    "Carlos Ghan <charlie.brown.uy@gmail.com>",
+    "Daniel Ruf <DanielRuf@users.noreply.github.com>",
+    "Kenny Moens <kenny.moens@cipalschaubroeck.be>",
+    "Luke Travis <luke.travis@k3integrations.com>",
+    "Nicolai Ehemann <en@enlightened.de>",
+    "Ruslan Isay <isay.r@i20.biz>",
+    "Sebastian Busch <s.busch@obg-gruppe.de>",
+    "chery-qualset-hcd-ca-gov <cheryl.qualset@hcd.ca.gov>",
+    "neunato <wesleymustdie@gmail.com>",
+    "randoum <randoum@gmail.com>",
+    "Abdelghani AINOUSS <abel.ainou@gmail.Com>",
+    "Adrian Dmitroca <dmitroca.adrian@gmail.com>",
+    "Alex Turpin <alex.turpin@gmail.com>",
+    "Aziz Khodjaev <ankh@inbox.ru>",
+    "Boris Cherny <bcherny@gmail.com>",
+    "Bruno Batista <bruno@atomtech.com.br>",
+    "Burhan Zainuddin <burhan@codeyellow.nl>",
+    "CoryFoy <github@cornetdesign.com>",
+    "Ivan Hayes <git@ivanhayes.com>",
+    "Jarin Udom <jarin@robotmodehq.com>",
+    "Lothaire Laeuffer <32293830+LothaireLaeuffer@users.noreply.github.com>",
+    "Marc Dagatan <53462376+marcdagatan@users.noreply.github.com>",
+    "Matthew Thomson <32156362+matthewthomsonnz@users.noreply.github.com>",
+    "Maxwell Barvian <max@barvian.me>",
+    "Melloware <mellowaredev@gmail.com>",
+    "Mic Biert <mbi@netz3.ch>",
+    "Michael Seele <mseele@gmail.com>",
+    "Oliver Schneider <olsio@users.noreply.github.com>",
+    "Peter <peterboccia88@gmail.com>",
+    "Ray <smdaegan@gmail.com>",
+    "Sasha Koss <kossnocorp@gmail.com>",
+    "Sebastian Busch <mail@sebastian-bus.ch>",
+    "SvenTo <mail@sven.to>",
+    "Willem Veelenturf <willem.veelenturf@gmail.com>",
+    "Zayter Munive <zayter@koombea.com>",
+    "beastlike <beastlike@users.noreply.github.com>",
+    "shrpne <shrpne@gmail.com>",
+    "tetreum <basura@yelidmod.com>"
   ],
-  "homepage": "https://github.com/autoNumeric/autoNumeric/",
+  "homepage": "https://docs.autonumeric.org",
   "dependencies": {},
   "devDependencies": {
-    "@babel/cli": "^7.5.5",
-    "@babel/core": "^7.4.3",
-    "@babel/eslint-parser": "^7.19.1",
+    "@babel/cli": "^7.21.0",
+    "@babel/core": "^7.21.3",
+    "@babel/eslint-parser": "^7.21.3",
     "@babel/plugin-transform-object-assign": "^7.2.0",
     "@babel/preset-env": "^7.4.3",
-    "@babel/register": "^7.4.0",
-    "@wdio/cli": "^8.3.5",
-    "@wdio/codemod": "^0.12.0",
-    "@wdio/jasmine-framework": "^8.3.5",
-    "@wdio/local-runner": "^8.3.5",
-    "@wdio/selenium-standalone-service": "^8.3.2",
-    "@wdio/spec-reporter": "^8.3.0",
-    "@wdio/static-server-service": "^8.3.0",
+    "@babel/register": "^7.21.0",
+    "@wdio/cli": "^8.6.7",
+    "@wdio/jasmine-framework": "^8.6.7",
+    "@wdio/local-runner": "^8.6.7",
+    "@wdio/selenium-standalone-service": "^8.6.6",
+    "@wdio/spec-reporter": "^8.6.6",
+    "@wdio/static-server-service": "^8.6.6",
     "babel-loader": "^9.1.2",
     "compression-webpack-plugin": "^10.0.0",
-    "core-js": "^3.28.0",
+    "core-js": "^3.29.1",
     "coveralls": "^3.0.6",
     "es-check": "^7.1.0",
-    "eslint": "^8.34.0",
+    "eslint": "^8.36.0",
     "eslint-webpack-plugin": "^4.0.0",
     "imports-loader": "^4.0.1",
-    "jasmine-core": "^4.5.0",
+    "jasmine-core": "^4.6.0",
     "karma": "^6.4.1",
     "karma-chrome-launcher": "^3.1.1",
     "karma-coverage": "^2.0.1",
@@ -107,12 +105,11 @@
     "karma-spec-reporter": "^0.0.36",
     "karma-webpack": "^5.0.0",
     "loader-utils": "^3.2.1",
-    "puppeteer": "^19.7.4",
-    "rimraf": "^4.1.2",
-    "uglify-js": "^3.5.4",
-    "uglifyjs-webpack-plugin": "^2.0.1",
-    "webdriverio": "^8.6.2",
-    "webpack": "^5.76.0",
+    "puppeteer": "^19.7.5",
+    "rimraf": "^4.4.0",
+    "terser-webpack-plugin": "^5.3.7",
+    "webdriverio": "^8.6.7",
+    "webpack": "^5.76.3",
     "webpack-cli": "^5.0.1",
     "webpack-merge": "^5.8.0"
   },
@@ -166,5 +163,9 @@
       "src/AutoNumericPredefinedOptions.js",
       "src/main.js"
     ]
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/AlexandreBonneau"
   }
 }

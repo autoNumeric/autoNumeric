@@ -346,7 +346,6 @@ describe('webdriver.io runner', () => {
         // await browser.keys('NULL'); // This deactivates any modifiers key (I could have used `await browser.keys(Key.Shift);` again to toggle it off)
         await browser.keys(Key.Shift);
         await browser.keys('foobar');
-        // await browser.pause(5000); //DEBUG
         expect(await inputClassic.getValue()).toEqual('987654foobarg');
     });
 });

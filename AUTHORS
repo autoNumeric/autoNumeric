@@ -2,7 +2,7 @@ The AutoNumeric authors are:
 
 Commit  Authors
 ------  ------------------------------------------------------
-   590	Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
+   608	Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
    231	Bob Knothe <bob@decorplanit.com>
     12	Carlos Gonzales <carlos.rgn@gmail.com>
      3	Lukas Drgon <lukas.drgon@gmail.com>
@@ -47,7 +47,7 @@ Commit  Authors
      1	shrpne <shrpne@gmail.com>
      1	tetreum <basura@yelidmod.com>
 
-This list is ordered by contributions and has been generated on 2023-03-07 by `tools/authors.sh`.
+This list is ordered by contributions and has been generated on 2023-03-22 by `tools/authors.sh`.
 A more detailed list can be found on [Github](https://github.com/autoNumeric/autoNumeric/graphs/contributors).
 
 Special thanks to Sokolov 'funny-falcon' Yura for his contributions before autoNumeric moved to Github.

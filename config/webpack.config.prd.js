@@ -3,13 +3,19 @@
 const path = require('path');
 const merge = require('webpack-merge').default;
 const baseWebpackConfig = require('./webpack.config.base.js');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
 const version = require('../package.json').version;
+const info = require('../package.json');
 
 function resolve(dir) {
     return path.join(__dirname, '..', dir);
+}
+
+function lastYear() {
+    const currentYear = new Date().getFullYear();
+    return Math.max(2023, currentYear);
 }
 
 // Configuration for building the library
@@ -29,33 +35,43 @@ const webpackConfig = merge(baseWebpackConfig, {
         ],
     },
     optimization: {
-        minimizer   : [
-            new UglifyJsPlugin({
-                cache        : true,
-                parallel     : true,
-                sourceMap    : true,
-                uglifyOptions: {
-                    nameCache: {},
-                    ie8      : false,
+        minimize: true,
+        minimizer: [
+            new TerserPlugin({
+                parallel : true,
+                extractComments: false,
+                terserOptions: {
+                    sourceMap: true,
+                    ie8: false,
                     safari10 : true,
-                    compress : { // see https://github.com/mishoo/UglifyJS2#compress-options
-                        dead_code    : true,
-                        drop_debugger: true,
-                        keep_fnames  : false,
-                        passes       : 4,
+                    compress: {
+                        // dead_code    : true,
+                        // drop_debugger: true,
+                        // keep_fnames: false,
+                        passes       : 1,
+                        module       : true,
+                        // eslint-disable-next-line camelcase
+                        keep_infinity: true,
                     },
-                    output   : { // See https://github.com/mishoo/UglifyJS2#output-options
+                    output   : {
                         beautify: false,
                         comments: false,
                         preamble: `/**
  * AutoNumeric.js v${version}
- * © 2009-2023 Alexandre Bonneau, Robert J. Knothe
+ * © 2016-${lastYear()} ${info.author.name}
+ * © 2009-2016 ${info.contributors[0].name}
  * Released under the MIT License.
- */`
+ * See ${info.homepage}
+ */`,
                     },
-                    mangle   : { // see https://github.com/mishoo/UglifyJS2#mangle-options
+                    mangle: {
+                        // eslint-disable-next-line camelcase
                         keep_fnames: false,
                         toplevel   : true,
+                        // properties: { //TODO Find a way to mangle properties while still having the library work as expected
+                        //     regex: /^_/, // Needed to mangle the private AutoNumeric properties and functions
+                        // },
+                        // module: true,
                     },
                 },
             }),

@@ -1,7 +1,7 @@
 ## Changelog for autoNumeric
 
 ### 4.8.0
-+ Adds #719 Feature request: Disallow toggling the negative/positive sign with '+' and '-' keypress
++ Adds #709 Feature request: Disallow toggling the negative/positive sign with '+' and '-' keypress
   + This adds a new option `negativePositiveSignBehavior` for the managing the '-' and '+' key behavior
   + Setting `negativePositiveSignBehavior` to `true` will allow the toggling, while setting it to `false` will disable it; this means that when hitting the '-' key, the value will always be set to its negative value, and hitting the '+' key will always set the element to its positive value (given the minimum and maximum value allows this)
   + Do note that the default behavior is changed in this version, where toggling between the positive and negative value with the '-' or '+' keys is not activated by default. If you want to use the previous behavior, please set `negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle` in your options' configuration.

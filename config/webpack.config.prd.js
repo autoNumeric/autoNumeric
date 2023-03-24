@@ -58,8 +58,8 @@ const webpackConfig = merge(baseWebpackConfig, {
                         comments: false,
                         preamble: `/**
  * AutoNumeric.js v${version}
- * © 2016-${lastYear()} ${info.author.name}
- * © 2009-2016 ${info.contributors[0].name}
+ * © 2016-${lastYear()} ${info.author}
+ * © 2009-2016 ${info.contributors[0]}
  * Released under the MIT License.
  * See ${info.homepage}
  */`,

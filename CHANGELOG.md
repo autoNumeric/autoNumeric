@@ -1,5 +1,14 @@
 ## Changelog for autoNumeric
 
+### 4.8.0
++ Adds #719 Feature request: Disallow toggling the negative/positive sign with '+' and '-' keypress
+  + This adds a new option `negativePositiveSignBehavior` for the managing the '-' and '+' key behavior
+  + Setting `negativePositiveSignBehavior` to `true` will allow the toggling, while setting it to `false` will disable it; this means that when hitting the '-' key, the value will always be set to its negative value, and hitting the '+' key will always set the element to its positive value (given the minimum and maximum value allows this)
+  + Do note that the default behavior is changed in this version, where toggling between the positive and negative value with the '-' or '+' keys is not activated by default. If you want to use the previous behavior, please set `negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle` in your options' configuration.
++ Updates the existing end-to-end tests that relied on the toggle behavior  
++ Fixes the incorrect error message when setting an invalid `positiveSignCharacter` option 
++ Attempts to fix the 'node: 18' error from Travis CI 
+
 ### 4.7.0
 + Fixes #719 Feature request: Up and down arrow keys behavior matching standard number input
 + Adds 2 new options to control how the up and down arrow keys behave: `modifyValueOnUpDownArrow` and `upDownStep`

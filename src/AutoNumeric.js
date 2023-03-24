@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.7.0
- * @date         2023-03-21 UTC 03:35
+ * @version      4.8.0
+ * @date         2023-03-24 UTC 02:56
  *
  * @authors      2016-2023 Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
  *               2009-2016 Bob Knothe <bob.knothe@gmail.com>
@@ -63,6 +63,15 @@ export default class AutoNumeric {
     static events;
     static defaultSettings;
     static predefinedOptions;
+
+    /**
+     * Return the autoNumeric version number (for debugging purpose)
+     *
+     * @returns {string}
+     */
+    static version() {
+        return '4.8.0';
+    }
 
     /**
      * Initialize the AutoNumeric object onto the given DOM element, and attach the settings and related event listeners to it.
@@ -777,6 +786,11 @@ export default class AutoNumeric {
 
                 return this;
             },
+            negativePositiveSignBehavior : negativePositiveSignBehavior => {
+                this.settings.negativePositiveSignBehavior = negativePositiveSignBehavior; //TODO test this with unit tests
+
+                return this;
+            },
             noEventListeners             : noEventListeners => { //TODO test this with unit tests
                 if (noEventListeners === AutoNumeric.options.noEventListeners.noEvents && this.settings.noEventListeners === AutoNumeric.options.noEventListeners.addEvents) {
                     // Remove the events once
@@ -919,15 +933,6 @@ export default class AutoNumeric {
             error      : null,
             aNElement  : this,
         });
-    }
-
-    /**
-     * Return the autoNumeric version number (for debugging purpose)
-     *
-     * @returns {string}
-     */
-    static version() {
-        return '4.7.0';
     }
 
     /**
@@ -3934,11 +3939,15 @@ export default class AutoNumeric {
             options.positiveSignCharacter.length !== 1 ||
             AutoNumericHelper.isUndefinedOrNullOrEmpty(options.positiveSignCharacter) ||
             testNumericalCharacters.test(options.positiveSignCharacter)) {
-            AutoNumericHelper.throwError(`The positive sign character option 'positiveSignCharacter' is invalid ; it should be a single character, and cannot be any numerical characters, [${options.positiveSignCharacter}] given.\nIf you want to hide the positive sign character, you need to set the \`showPositiveSign\` option to \`true\`.`);
+            AutoNumericHelper.throwError(`The positive sign character option 'positiveSignCharacter' is invalid ; it should be a single character, and cannot be any numerical characters, [${options.positiveSignCharacter}] given.\nIf you want to show the positive sign character, you need to set the \`showPositiveSign\` option to \`true\`.`);
         }
 
         if (options.negativeSignCharacter === options.positiveSignCharacter) {
             AutoNumericHelper.throwError(`The positive 'positiveSignCharacter' and negative 'negativeSignCharacter' sign characters cannot be identical ; [${options.negativeSignCharacter}] given.`);
+        }
+
+        if (!AutoNumericHelper.isTrueOrFalseString(options.negativePositiveSignBehavior) && !AutoNumericHelper.isBoolean(options.negativePositiveSignBehavior)) {
+            AutoNumericHelper.throwError(`The option 'negativePositiveSignBehavior' is invalid ; it should be either 'true' or 'false', [${options.negativePositiveSignBehavior}] given.`);
         }
 
         const [leftBracket, rightBracket] = AutoNumericHelper.isNull(options.negativeBracketsTypeOnBlur)?['', '']:options.negativeBracketsTypeOnBlur.split(',');
@@ -8267,10 +8276,12 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             leadingZero                       : true,
             maximumValue                      : true,
             minimumValue                      : true,
+            modifyValueOnUpDownArrow          : true,
             modifyValueOnWheel                : true,
             negativeBracketsTypeOnBlur        : true,
             negativePositiveSignPlacement     : true,
             negativeSignCharacter             : true,
+            negativePositiveSignBehavior      : true,
             noEventListeners                  : true,
             onInvalidPaste                    : true,
             outputFormat                      : true,
@@ -8289,6 +8300,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             styleRules                        : true,
             suffixText                        : true,
             symbolWhenUnfocused               : true,
+            upDownStep                        : true,
             unformatOnHover                   : true,
             unformatOnSubmit                  : true,
             valuesToStrings                   : true,
@@ -9134,12 +9146,16 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             // Here, the left and right parts have been normalized already, hence the minus sign usage
             if (left === '' && AutoNumericHelper.contains(right, '-')) {
                 // The value is originally negative (with a trailing negative sign)
-                right = right.replace('-', '');
+                if (this.settings.negativePositiveSignBehavior || (!this.settings.negativePositiveSignBehavior && this.eventKey === '+')) {
+                    right = right.replace('-', '');
+                }
             } else if (AutoNumericHelper.isNegativeStrict(left, '-')) {
                 // The value is originally negative (with a leading negative sign)
                 // Remove the negative sign, effectively converting the value to a positive one
-                left = left.replace('-', ''); //TODO replace with '+' if `showPositiveSign` too?
-            } else {
+                if (this.settings.negativePositiveSignBehavior || (!this.settings.negativePositiveSignBehavior && this.eventKey === '+')) {
+                    left = left.replace('-', '');
+                }
+            } else if (this.settings.negativePositiveSignBehavior || (!this.settings.negativePositiveSignBehavior && this.eventKey === '-')) {
                 // The value is originally positive, so we toggle the state to a negative one (unformatted, which means even with a trailing negative sign, we add the minus sign on the far left)
                 left = `${this.settings.negativeSignCharacter}${left}`;
             }

@@ -496,6 +496,16 @@ AutoNumeric.options = {
         not            : '¬',
     },
 
+    /*
+     * Defines if the negative sign should be toggled when hitting the negative or positive key multiple times.
+     * When `toggle` is used, using the same '-' on '+' key will toggle between a positive and negative value.
+     * When `doNotToggle` is used, using '-' will always set the value negative, and '+' will always set the value positive.
+     */
+    negativePositiveSignBehavior: {
+        toggle     : true,
+        doNotToggle: false,
+    },
+
     /* Defines if the element should have event listeners activated on it.
      * By default, those event listeners are only added to <input> elements and html element with the `contenteditable` attribute set to `true`, but not on the other html tags.
      * This allows to initialize elements without any event listeners.

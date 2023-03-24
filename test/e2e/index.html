@@ -1169,6 +1169,30 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #709</p>
+			<div>
+				<div>
+					<input id="issue_709a" type="text" placeholder="#709" value="12">
+					<input id="issue_709b" type="text" placeholder="#709" value="42">
+				</div>
+				<div>
+					<input id="issue_709c" type="text" placeholder="#709" value="8">
+					<input id="issue_709d" type="text" placeholder="#709" value="-5">
+					<input id="issue_709e" type="text" placeholder="#709" value="8">
+					<input id="issue_709f" type="text" placeholder="#709" value="-5">
+				</div>
+				<div>
+					<input id="issue_709g" type="text" placeholder="#709" value="100">
+					<input id="issue_709h" type="text" placeholder="#709" value="-200">
+					<input id="issue_709i" type="text" placeholder="#709" value="100">
+					<input id="issue_709j" type="text" placeholder="#709" value="-200">
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     console.log(`-------------------------------------------`);
@@ -1551,11 +1575,11 @@
     new AutoNumeric('#negativeBrackets4').french().options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
     new AutoNumeric('#negativeBrackets5').northAmerican().options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.none);
 
-    new AutoNumeric('#negativeBrackets_1', noneLeft).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
+    new AutoNumeric('#negativeBrackets_1', [noneLeft, { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle }]).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
     new AutoNumeric('#negativeBrackets_2', noneSuffix).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
     new AutoNumeric('#negativeBrackets_3', leftRight).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
     new AutoNumeric('#negativeBrackets_4', leftLeft).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
-    new AutoNumeric('#negativeBrackets_5', leftSuffix).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
+    new AutoNumeric('#negativeBrackets_5', [leftSuffix, { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle }]).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
     new AutoNumeric('#negativeBrackets_6', rightLeft).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
     new AutoNumeric('#negativeBrackets_7', rightRight).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
     new AutoNumeric('#negativeBrackets_8', rightPrefix).options.negativeBracketsTypeOnBlur(AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses);
@@ -2098,8 +2122,14 @@
     });
 
     //-------------- Issue #478
-    new AutoNumeric('#issue_478_neg1', -0.20, { negativeSignCharacter: AutoNumeric.options.negativeSignCharacter.hyphen });
-    new AutoNumeric('#issue_478_neg2', -12, { negativeSignCharacter: '°' });
+    new AutoNumeric('#issue_478_neg1', -0.20, {
+        negativeSignCharacter: AutoNumeric.options.negativeSignCharacter.hyphen,
+	    negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle,
+    });
+    new AutoNumeric('#issue_478_neg2', -12, {
+        negativeSignCharacter: '°',
+        negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle,
+    });
     new AutoNumeric('#issue_478_neg3', -200, {
         negativeBracketsTypeOnBlur: AutoNumeric.options.negativeBracketsTypeOnBlur.parentheses,
     });
@@ -2107,6 +2137,7 @@
         positiveSignCharacter: AutoNumeric.options.positiveSignCharacter.plus,
         negativeSignCharacter: 'z',
         showPositiveSign     : AutoNumeric.options.showPositiveSign.show,
+        negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle,
     });
     new AutoNumeric('#issue_478_pos2', -0.42, {
         positiveSignCharacter: AutoNumeric.options.positiveSignCharacter.doublePlus,
@@ -2135,6 +2166,7 @@
         positiveSignCharacter        : 'p',
         showPositiveSign             : AutoNumeric.options.showPositiveSign.show,
         negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+        negativePositiveSignBehavior : AutoNumeric.options.negativePositiveSignBehavior.toggle,
     });
     new AutoNumeric('#issue_478_RightPlacement_pos2', 0.42, {
         positiveSignCharacter        : AutoNumeric.options.positiveSignCharacter.doublePlus,
@@ -2146,6 +2178,7 @@
         positiveSignCharacter        : AutoNumeric.options.positiveSignCharacter.triplePlus,
         showPositiveSign             : AutoNumeric.options.showPositiveSign.show,
         negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.suffix,
+        negativePositiveSignBehavior : AutoNumeric.options.negativePositiveSignBehavior.toggle,
     });
 
     new AutoNumeric('#issue_478_neg4', -468.31, {
@@ -2304,7 +2337,7 @@
     });
 
     //-------------- Issue #574
-    new AutoNumeric('#issue_574', -0.05);
+    new AutoNumeric('#issue_574', -0.05, { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle });
 
     //-------------- Issue #559
     new AutoNumeric('#issue_559', { alwaysAllowDecimalCharacter: true });
@@ -2466,6 +2499,20 @@
     new AutoNumeric('#issue_719d', { modifyValueOnUpDownArrow: false  });
     new AutoNumeric('#issue_719e', { modifyValueOnUpDownArrow: true, upDownStep: 1000 });
     new AutoNumeric('#issue_719f', { modifyValueOnUpDownArrow: true, upDownStep: 'progressive' });
+
+    //-------------- Issue #709
+    new AutoNumeric('#issue_709a', { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle });
+    new AutoNumeric('#issue_709b', { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.doNotToggle });
+
+    new AutoNumeric('#issue_709c', { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle, minimumValue: '-10', maximumValue: '2000', showPositiveSign : true });
+    new AutoNumeric('#issue_709d', { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle, minimumValue: '-2000', maximumValue: '10', showPositiveSign : true });
+    new AutoNumeric('#issue_709e', { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.doNotToggle, minimumValue: '-10', maximumValue: '2000', showPositiveSign : true });
+    new AutoNumeric('#issue_709f', { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.doNotToggle, minimumValue: '-2000', maximumValue: '10', showPositiveSign : true });
+
+    new AutoNumeric('#issue_709g', { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle, minimumValue: '-10', maximumValue: '2000', showPositiveSign : true });
+    new AutoNumeric('#issue_709h', { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle, minimumValue: '-2000', maximumValue: '10', showPositiveSign : true });
+    new AutoNumeric('#issue_709i', { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.doNotToggle, minimumValue: '-10', maximumValue: '2000', showPositiveSign : true });
+    new AutoNumeric('#issue_709j', { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.doNotToggle, minimumValue: '-2000', maximumValue: '10', showPositiveSign : true });
 </script>
 </body>
 </html>

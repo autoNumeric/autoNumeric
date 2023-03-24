@@ -115,6 +115,7 @@ describe('The AutoNumeric object', () => {
             negativeBracketsTypeOnBlur   : null,
             negativePositiveSignPlacement: null,
             negativeSignCharacter        : '-',
+            negativePositiveSignBehavior : false,
             noEventListeners             : false,
             onInvalidPaste               : 'error',
             outputFormat                 : null,
@@ -297,6 +298,7 @@ describe('The AutoNumeric object', () => {
             expect(defaultSettings.negativeBracketsTypeOnBlur).toEqual(aNInputSettings.negativeBracketsTypeOnBlur );
             // Special case for `negativePositiveSignPlacement`, see the related tests
             // expect(defaultSettings.negativePositiveSignPlacement).toEqual(aNInputSettings.negativePositiveSignPlacement);
+            expect(defaultSettings.negativePositiveSignBehavior).toEqual(aNInputSettings.negativePositiveSignBehavior);
             expect(defaultSettings.noEventListeners          ).toEqual(aNInputSettings.noEventListeners           );
             expect(defaultSettings.onInvalidPaste            ).toEqual(aNInputSettings.onInvalidPaste             );
             expect(defaultSettings.outputFormat              ).toEqual(aNInputSettings.outputFormat               );
@@ -8086,6 +8088,11 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ showWarnings: 'true' })).not.toThrow();
             expect(() => AutoNumeric.validate({ showWarnings: 'false' })).not.toThrow();
 
+            expect(() => AutoNumeric.validate({ negativePositiveSignBehavior: true })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignBehavior: false })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignBehavior: 'true' })).not.toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignBehavior: 'false' })).not.toThrow();
+
             expect(() => AutoNumeric.validate({ noEventListeners: true })).not.toThrow();
             expect(() => AutoNumeric.validate({ noEventListeners: false })).not.toThrow();
             expect(() => AutoNumeric.validate({ noEventListeners: 'true' })).not.toThrow();
@@ -8654,6 +8661,14 @@ describe('Static autoNumeric functions', () => {
             expect(() => AutoNumeric.validate({ showWarnings: '0' })).toThrow();
             expect(() => AutoNumeric.validate({ showWarnings: '1' })).toThrow();
             expect(() => AutoNumeric.validate({ showWarnings: 'foobar' })).toThrow();
+        });
+
+        it('should not validate negativePositiveSignBehavior', () => {
+            expect(() => AutoNumeric.validate({ negativePositiveSignBehavior: 0 })).toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignBehavior: 1 })).toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignBehavior: '0' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignBehavior: '1' })).toThrow();
+            expect(() => AutoNumeric.validate({ negativePositiveSignBehavior: 'foobar' })).toThrow();
         });
 
         it('should not validate noEventListeners', () => {

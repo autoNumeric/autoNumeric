@@ -72,6 +72,7 @@ AutoNumeric.defaultSettings = {
     negativeBracketsTypeOnBlur   : AutoNumeric.options.negativeBracketsTypeOnBlur.none,
     negativePositiveSignPlacement: AutoNumeric.options.negativePositiveSignPlacement.none,
     negativeSignCharacter        : AutoNumeric.options.negativeSignCharacter.hyphen,
+    negativePositiveSignBehavior : AutoNumeric.options.negativePositiveSignBehavior.doNotToggle,
     noEventListeners             : AutoNumeric.options.noEventListeners.addEvents,
     //TODO Shouldn't we use `truncate` as the default value?
     onInvalidPaste               : AutoNumeric.options.onInvalidPaste.error,

@@ -255,6 +255,16 @@ const selectors = {
     issue719d                         : '#issue_719d',
     issue719e                         : '#issue_719e',
     issue719f                         : '#issue_719f',
+    issue709a                         : '#issue_709a',
+    issue709b                         : '#issue_709b',
+    issue709c                         : '#issue_709c',
+    issue709d                         : '#issue_709d',
+    issue709e                         : '#issue_709e',
+    issue709f                         : '#issue_709f',
+    issue709g                         : '#issue_709g',
+    issue709h                         : '#issue_709h',
+    issue709i                         : '#issue_709i',
+    issue709j                         : '#issue_709j',
 };
 
 //-----------------------------------------------------------------------------
@@ -4723,3 +4733,201 @@ describe('Issue #719', () => {
     });
 });
 
+describe('Issue #709', () => {
+    it('should test for default values', async () => {
+        await browser.url(testUrl);
+
+        expect(await $(selectors.issue709a).getValue()).toEqual('12.00');
+        expect(await $(selectors.issue709b).getValue()).toEqual('42.00');
+        expect(await $(selectors.issue709c).getValue()).toEqual('+8.00');
+        expect(await $(selectors.issue709d).getValue()).toEqual('-5.00');
+        expect(await $(selectors.issue709e).getValue()).toEqual('+8.00');
+        expect(await $(selectors.issue709f).getValue()).toEqual('-5.00');
+        expect(await $(selectors.issue709g).getValue()).toEqual('+100.00');
+        expect(await $(selectors.issue709h).getValue()).toEqual('-200.00');
+        expect(await $(selectors.issue709i).getValue()).toEqual('+100.00');
+        expect(await $(selectors.issue709j).getValue()).toEqual('-200.00');
+    });
+
+    it(`should allow the sign toggle behavior`, async () => {
+        const input = await $(selectors.issue709a);
+        await input.click();
+
+        await browser.keys([Key.Home, '-']);
+        expect(await input.getValue()).toEqual('-12.00');
+        await browser.keys(['-']);
+        expect(await input.getValue()).toEqual('12.00');
+        await browser.keys(['-']);
+        expect(await input.getValue()).toEqual('-12.00');
+
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('12.00');
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('-12.00');
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('12.00');
+    });
+
+    it(`should disallow the sign toggle behavior`, async () => {
+        const input = await $(selectors.issue709b);
+        await input.click();
+
+        await browser.keys([Key.Home, '-']);
+        expect(await input.getValue()).toEqual('-42.00');
+        await browser.keys(['-']);
+        expect(await input.getValue()).toEqual('-42.00');
+        await browser.keys(['-']);
+        expect(await input.getValue()).toEqual('-42.00');
+
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('42.00');
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('42.00');
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('42.00');
+    });
+
+    it(`should allow the sign toggle behavior with the positive sign shown`, async () => {
+        const input = await $(selectors.issue709c);
+        await input.click();
+
+        await browser.keys([Key.Home, '-']);
+        expect(await input.getValue()).toEqual('-8.00');
+        await browser.keys(['-']);
+        expect(await input.getValue()).toEqual('+8.00');
+        await browser.keys(['-']);
+        expect(await input.getValue()).toEqual('-8.00');
+
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('+8.00');
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('-8.00');
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('+8.00');
+
+        const input2 = await $(selectors.issue709d);
+        await input2.click();
+
+        await browser.keys([Key.Home, '-']);
+        expect(await input2.getValue()).toEqual('+5.00');
+        await browser.keys(['-']);
+        expect(await input2.getValue()).toEqual('-5.00');
+        await browser.keys(['-']);
+        expect(await input2.getValue()).toEqual('+5.00');
+
+        await browser.keys(['+']);
+        expect(await input2.getValue()).toEqual('-5.00');
+        await browser.keys(['+']);
+        expect(await input2.getValue()).toEqual('+5.00');
+        await browser.keys(['+']);
+        expect(await input2.getValue()).toEqual('-5.00');
+    });
+
+    it(`should disallow the sign toggle behavior with the positive sign shown`, async () => {
+        const input = await $(selectors.issue709e);
+        await input.click();
+
+        await browser.keys([Key.Home, '-']);
+        expect(await input.getValue()).toEqual('-8.00');
+        await browser.keys(['-']);
+        expect(await input.getValue()).toEqual('-8.00');
+        await browser.keys(['-']);
+        expect(await input.getValue()).toEqual('-8.00');
+
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('+8.00');
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('+8.00');
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('+8.00');
+
+        const input2 = await $(selectors.issue709f);
+        await input2.click();
+
+        await browser.keys([Key.Home, '-']);
+        expect(await input2.getValue()).toEqual('-5.00');
+        await browser.keys(['-']);
+        expect(await input2.getValue()).toEqual('-5.00');
+        await browser.keys(['-']);
+        expect(await input2.getValue()).toEqual('-5.00');
+
+        await browser.keys(['+']);
+        expect(await input2.getValue()).toEqual('+5.00');
+        await browser.keys(['+']);
+        expect(await input2.getValue()).toEqual('+5.00');
+        await browser.keys(['+']);
+        expect(await input2.getValue()).toEqual('+5.00');
+    });
+
+    it(`should allow the sign toggle behavior with the positive sign shown, but within the minimum and maximum values allowed`, async () => {
+        const input = await $(selectors.issue709g);
+        await input.click();
+
+        await browser.keys([Key.Home, '-']);
+        expect(await input.getValue()).toEqual('+100.00');
+        await browser.keys(['-']);
+        expect(await input.getValue()).toEqual('+100.00');
+        await browser.keys(['-']);
+        expect(await input.getValue()).toEqual('+100.00');
+
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('+100.00');
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('+100.00');
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('+100.00');
+
+        const input2 = await $(selectors.issue709h);
+        await input2.click();
+
+        await browser.keys([Key.Home, '-']);
+        expect(await input2.getValue()).toEqual('-200.00');
+        await browser.keys(['-']);
+        expect(await input2.getValue()).toEqual('-200.00');
+        await browser.keys(['-']);
+        expect(await input2.getValue()).toEqual('-200.00');
+
+        await browser.keys(['+']);
+        expect(await input2.getValue()).toEqual('-200.00');
+        await browser.keys(['+']);
+        expect(await input2.getValue()).toEqual('-200.00');
+        await browser.keys(['+']);
+        expect(await input2.getValue()).toEqual('-200.00');
+    });
+
+    it(`should disallow the sign toggle behavior with the positive sign shown, but within the minimum and maximum values allowed`, async () => {
+        const input = await $(selectors.issue709i);
+        await input.click();
+
+        await browser.keys([Key.Home, '-']);
+        expect(await input.getValue()).toEqual('+100.00');
+        await browser.keys(['-']);
+        expect(await input.getValue()).toEqual('+100.00');
+        await browser.keys(['-']);
+        expect(await input.getValue()).toEqual('+100.00');
+
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('+100.00');
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('+100.00');
+        await browser.keys(['+']);
+        expect(await input.getValue()).toEqual('+100.00');
+
+        const input2 = await $(selectors.issue709j);
+        await input2.click();
+
+        await browser.keys([Key.Home, '-']);
+        expect(await input2.getValue()).toEqual('-200.00');
+        await browser.keys(['-']);
+        expect(await input2.getValue()).toEqual('-200.00');
+        await browser.keys(['-']);
+        expect(await input2.getValue()).toEqual('-200.00');
+
+        await browser.keys(['+']);
+        expect(await input2.getValue()).toEqual('-200.00');
+        await browser.keys(['+']);
+        expect(await input2.getValue()).toEqual('-200.00');
+        await browser.keys(['+']);
+        expect(await input2.getValue()).toEqual('-200.00');
+    });
+});

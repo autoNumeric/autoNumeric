@@ -1,4 +1,11 @@
-## Changelog for autoNumeric
+## Changelog for AutoNumeric
+
+### 4.8.2
++ Fixes PR #731 by avoiding "Forced reflow" when calling the `_historyTableAdd()` function
+
+### 4.8.1
++ Fixes #763 Copyright banner in the minimized distribution file is undefined
++ Removes unused wdio script from package.json
 
 ### 4.8.0
 + Adds #709 Feature request: Disallow toggling the negative/positive sign with '+' and '-' keypress

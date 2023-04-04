@@ -1,7 +1,7 @@
 /**
- * Options for autoNumeric.js
+ * Options for AutoNumeric.js
  * @author Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
- * @copyright © 2019 Alexandre Bonneau
+ * @copyright © 2023 Alexandre Bonneau
  *
  * The MIT License (http://www.opensource.org/licenses/mit-license.php)
  *

@@ -1,16 +1,16 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.8.1
- * @date         2023-03-24 UTC 07:46
+ * @version      4.8.2
+ * @date         2023-04-04 UTC 10:42
  *
  * @authors      2016-2023 Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
  *               2009-2016 Bob Knothe <bob.knothe@gmail.com>
  * @contributors Sokolov Yura and others, cf. AUTHORS
- * @copyright    2009 Robert J. Knothe
+ * @copyright    Alexandre Bonneau & Robert J. Knothe
  * @since        2009-08-09
  *
- * @summary      autoNumeric is a standalone Javascript library
+ * @summary      AutoNumeric is a standalone Javascript library
  *               that provides live *as-you-type* formatting for
  *               international numbers and currencies.
  *
@@ -70,7 +70,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.8.1';
+        return '4.8.2';
     }
 
     /**

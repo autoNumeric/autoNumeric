@@ -2267,7 +2267,7 @@ export default class AutoNumeric {
 
             if (saveChangeToHistory) {
                 // Save in the history the last known raw value and formatted result selection
-                this._historyTableAdd();
+                window.requestAnimationFrame(() => this._historyTableAdd()); // The use of `requestAnimationFrame` fixes PR #731 by avoiding "Forced reflow"
             }
         }
     }

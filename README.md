@@ -4,6 +4,7 @@
 <a href="https://app.travis-ci.com/github/autoNumeric/autoNumeric/"><img src="https://app.travis-ci.com/autoNumeric/autoNumeric.svg?branch=next" alt="Build Status"></a>
 <a href="https://snyk.io/test/github/autoNumeric/autoNumeric"><img src="https://snyk.io/test/github/autoNumeric/autoNumeric/badge.svg" alt="Known Vulnerabilities"></a>
 <a href="https://coveralls.io/github/autoNumeric/autoNumeric?branch=next"><img src="https://coveralls.io/repos/github/autoNumeric/autoNumeric/badge.svg?branch=next" alt="Coverage Status"></a>
+<a href="https://github.com/autoNumeric/autoNumeric/stargazers"><img src="https://img.shields.io/github/stars/autoNumeric/autoNumeric?color=yellow" alt="GitHub Repo stars"></a>
 <br>
 <a href="https://gitter.im/autoNumeric/autoNumeric"><img src="https://img.shields.io/badge/gitter-autoNumeric%2FautoNumeric-brightgreen.svg" alt="Gitter chat"></a>
 <a href="http://badge.fury.io/js/autonumeric"><img src="http://img.shields.io/npm/dm/autonumeric.svg" alt="Npm downloads per month"></a>

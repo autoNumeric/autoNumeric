@@ -55,3 +55,10 @@ The `next` [branch](https://github.com/autoNumeric/autoNumeric/tree/next) contai
 
 ### Licence
 AutoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source project, and its authors are credited in [AUTHORS](https://github.com/autoNumeric/autoNumeric/blob/next/AUTHORS).
+
+****
+
+### Support
+
+AutoNumeric is created using the [JetBrains IDE](https://www.jetbrains.com/community/opensource/#support), which kindly provide access to its tools to the developers.<br>
+If you feel AutoNumeric is useful to you, please consider [supporting](https://docs.autonumeric.org/Documentation/support/) the project.

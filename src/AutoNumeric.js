@@ -1216,7 +1216,7 @@ export default class AutoNumeric {
 
         // Only add the wheel event listener when you want to modify the value on scroll
         // This prevents the passive event warning when not using scrollwheel
-        if(this.settings.modifyValueOnWheel) {
+        if (this.settings.modifyValueOnWheel) {
             this.domElement.addEventListener('wheel', this._onWheelFunc, false);
         }
 

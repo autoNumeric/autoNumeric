@@ -1212,8 +1212,14 @@ export default class AutoNumeric {
         this.domElement.addEventListener('blur', this._onFocusOutAndMouseLeaveFunc, false);
         this.domElement.addEventListener('mouseleave', this._onFocusOutAndMouseLeaveFunc, false);
         this.domElement.addEventListener('paste', this._onPasteFunc, false);
-        this.domElement.addEventListener('wheel', this._onWheelFunc, false);
         this.domElement.addEventListener('drop', this._onDropFunc, false);
+
+        // Only add the wheel event listener when you want to modify the value on scroll
+        // This prevents the passive event warning when not using scrollwheel
+        if(this.settings.modifyValueOnWheel) {
+            this.domElement.addEventListener('wheel', this._onWheelFunc, false);
+        }
+
         this._setupFormListener();
 
         // Keep track if the event listeners have been initialized on this object

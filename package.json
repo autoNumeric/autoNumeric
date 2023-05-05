@@ -121,7 +121,7 @@
     "clean:build": "rimraf dist",
     "clean:coverage": "rimraf test/unit/coverage",
     "clean:e2e": "rimraf test/e2e/reports/* && rimraf test/e2e/screenshots/*",
-    "clean:log": "rimraf npm-debug.log selenium-debug.log test/e2e/selenium.log yarn-error.log",
+    "clean:log": "rimraf npm-debug.log selenium-debug.log test/e2e/*.log yarn-error.log",
     "clean": "yarn clean:build && yarn clean:coverage && yarn clean:log && yarn clean:e2e",
     "lint": "eslint --ext .js src test/unit test/e2e",
     "lintfix": "eslint --fix --ext .js src test/unit test/e2e",

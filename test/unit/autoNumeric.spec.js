@@ -1174,7 +1174,7 @@ describe('The AutoNumeric object', () => {
             aNInput.wipe();
 
             aNInput = new AutoNumeric(newInput, null, { currencySymbol:'$', formatOnPageLoad: false, emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
-            expect(aNInput.getNumericString()).toEqual('');
+            expect(aNInput.getNumericString()).toEqual(null);
             expect(aNInput.getFormatted()).toEqual('');
             aNInput.set(null);
             expect(aNInput.getNumericString()).toEqual(null);
@@ -1194,7 +1194,7 @@ describe('The AutoNumeric object', () => {
             aNInput.wipe();
 
             aNInput = new AutoNumeric(newInput, null, { currencySymbol:'$', formatOnPageLoad: true, emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
-            expect(aNInput.getNumericString()).toEqual('');
+            expect(aNInput.getNumericString()).toEqual(null);
             expect(aNInput.getFormatted()).toEqual('');
             aNInput.set(null);
             expect(aNInput.getNumericString()).toEqual(null);
@@ -2453,11 +2453,11 @@ describe('autoNumeric options and `options.*` methods', () => {
                 expect(console.warn).toHaveBeenCalledTimes(1);
             });
 
-            it('should not allow initializing an AutoNumeric object with the `null` value, but will default to the `\'\'` value', () => {
+            it('should allow initializing an AutoNumeric object with the `null` value, that will not default to the `\'\'` value', () => {
                 // This is not allowed since using `null` for the initial value means that AutoNumeric needs to use the current html value instead of `null`
                 aNInput = new AutoNumeric(newInput, null, { emptyInputBehavior: AutoNumeric.options.emptyInputBehavior.null });
                 expect(aNInput.getFormatted()).toEqual('');
-                expect(aNInput.getNumber()).toEqual(0);
+                expect(aNInput.getNumber()).toEqual(null);
 
                 // Verification when setting the rawValue after the initialization
                 aNInput.set(null);

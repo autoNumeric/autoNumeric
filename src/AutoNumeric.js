@@ -158,12 +158,14 @@ export default class AutoNumeric {
                     case AutoNumeric.options.emptyInputBehavior.zero:
                         valueToSet = '0';
                         break;
-                    // In order to stay consistent when `formatOnPageLoad` is set to `true`, it's still impossible to set the `null` value as the initial value
                     case AutoNumeric.options.emptyInputBehavior.focus:
                     case AutoNumeric.options.emptyInputBehavior.press:
                     case AutoNumeric.options.emptyInputBehavior.always:
-                    case AutoNumeric.options.emptyInputBehavior.null:
                         valueToSet = '';
+                        break;
+                    // It's possible to set the `null` value as the initial value
+                    case AutoNumeric.options.emptyInputBehavior.null:
+                        valueToSet = null;
                         break;
                     // When `emptyInputBehavior` is a number or a string representing a number
                     default :
@@ -7913,7 +7915,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             if (currentValue === '') {
                 switch (this.settings.emptyInputBehavior) {
                     case AutoNumeric.options.emptyInputBehavior.focus:
-                    case AutoNumeric.options.emptyInputBehavior.null:
                     case AutoNumeric.options.emptyInputBehavior.press:
                         break;
                     case AutoNumeric.options.emptyInputBehavior.always:
@@ -7927,6 +7928,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                         break;
                     case AutoNumeric.options.emptyInputBehavior.zero:
                         this.set('0');
+                        break;
+                    // It's possible to set the `null` value as the initial value
+                    case AutoNumeric.options.emptyInputBehavior.null:
+                        this.set(null);
                         break;
                     // When `emptyInputBehavior` is a number or a string representing a number
                     default:

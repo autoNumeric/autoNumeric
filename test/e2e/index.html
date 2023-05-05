@@ -1193,6 +1193,17 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #718</p>
+			<div>
+				<input id="issue_718" type="text" placeholder="#718" value="">
+				<input id="issue_718_before" type="text">
+				<input id="issue_718_after" type="text">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     console.log(`-------------------------------------------`);
@@ -2513,6 +2524,14 @@
     new AutoNumeric('#issue_709h', { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.toggle, minimumValue: '-2000', maximumValue: '10', showPositiveSign : true });
     new AutoNumeric('#issue_709i', { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.doNotToggle, minimumValue: '-10', maximumValue: '2000', showPositiveSign : true });
     new AutoNumeric('#issue_709j', { negativePositiveSignBehavior: AutoNumeric.options.negativePositiveSignBehavior.doNotToggle, minimumValue: '-2000', maximumValue: '10', showPositiveSign : true });
+
+    //-------------- Issue #718
+    const an718 = new AutoNumeric('#issue_718', { emptyInputBehavior: 'null' });
+    console.log('an718.getNumber() before set:', an718.getNumber()); //DEBUG
+    document.querySelector('#issue_718_before').value = an718.getNumber();
+    an718.set(null);
+    console.log('an718.getNumber() after set:', an718.getNumber()); //DEBUG
+    document.querySelector('#issue_718_after').value = an718.getNumber();
 </script>
 </body>
 </html>

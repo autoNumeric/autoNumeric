@@ -1,5 +1,10 @@
 ## Changelog for AutoNumeric
 
+### 4.8.3
++ Fixes #718 When `emptyInputBehavior` is set to `null`, then `getNumber()` returns `0` when no value has been set before
++ Updates the `yarn clean:log` command to clean the logs from the newer webdriver.io version
++ Fixes #765 `change` event is not triggered when dragging value into a text input
+
 ### 4.8.2
 + Fixes PR #731 by avoiding "Forced reflow" when calling the `_historyTableAdd()` function
 

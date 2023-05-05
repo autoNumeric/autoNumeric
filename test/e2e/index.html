@@ -2364,8 +2364,8 @@
     let issue596ChangeCount = 0;
     issue596ChangeDetector.value = 0;
 
-    issue596.node().addEventListener('change', () => {
-        console.log(`Change detected with value '${issue596.getNumericString()}'`); //DEBUG
+    issue596.node().addEventListener('change', (e) => {
+        console.log(`Change detected with value '${issue596.getNumericString()}' and target.value ${e.target.value}`); //DEBUG
         issue596ChangeDetector.value = ++issue596ChangeCount;
     });
 

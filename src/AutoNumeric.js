@@ -7677,8 +7677,17 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         const droppedText = e.dataTransfer.getData(format);
         const cleanedValue = this.unformatOther(droppedText);
+        const previousValue = this.rawValue;
         this.set(cleanedValue);
         this.isDropEvent = false;
+
+        // Test if a change event must be sent (if the dropped value is different from before)
+        const newValue = this.constructor._toNumericValue(cleanedValue, this.settings);
+        if (!isNaN(Number(newValue))) {
+            if (AutoNumericHelper.trimPaddedZerosFromDecimalPlaces(previousValue) !== AutoNumericHelper.trimPaddedZerosFromDecimalPlaces(newValue)) {
+                this._triggerEvent(AutoNumeric.events.native.change, this.domElement);
+            }
+        }
     }
 
     /**

@@ -2962,7 +2962,7 @@ export default class AutoNumeric {
         let returnASingleAutoNumericObject = false; // By default, this function returns an array of AutoNumeric objects
         let domElementsArray = [];
         if (AutoNumericHelper.isString(domElementOrArrayOrString)) {
-            domElementsArray = [... document.querySelectorAll(domElementOrArrayOrString)]; // Convert a NodeList to an Array
+            domElementsArray = [...document.querySelectorAll(domElementOrArrayOrString)]; // Convert a NodeList to an Array
         } else if (AutoNumericHelper.isElement(domElementOrArrayOrString)) {
             domElementsArray.push(domElementOrArrayOrString);
             returnASingleAutoNumericObject = true; // Special case when only one DOM element is passed as a parameter
@@ -3116,7 +3116,8 @@ export default class AutoNumeric {
     }
 
     /**
-     * Return an array of the AutoNumeric-managed elements for the given form element is passed, otherwise for the current `this.parentForm` element.
+     * Returns an array of the AutoNumeric-managed elements for the given form element is passed, otherwise for the current `this.parentForm` element.
+     * This search for <input> elements, as well as contenteditable non-input tag ones. This also search for elements outside the `form` elements.
      *
      * @param {HTMLFormElement|null} formElement
      *
@@ -3132,7 +3133,7 @@ export default class AutoNumeric {
     }
 
     /**
-     * Return a reference to the parent <form> element if it exists, otherwise return `null`.
+     * Returns a reference to the parent <form> element if it exists, otherwise return `null`.
      *
      * @returns {HTMLFormElement|null}
      * @private

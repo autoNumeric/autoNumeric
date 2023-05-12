@@ -1204,6 +1204,28 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #768</p>
+			<div>
+				<form id='issue_768_form' name='issue_768_formName' method='post' action='http://example.com'>
+					<label>Inside form
+						<input type='string' id='issue_768_inside'/>
+					</label>
+					<input type='submit' id='issue_768_submit'/>
+					<span id='issue_768_spanInside' contenteditable="true">Edit me 1</span>
+				</form>
+				<div>
+					<label>Outside form
+						<input type='string' id='issue_768_outside' form='issue_768_form'/>
+					</label>
+					<span id='issue_768_spanOutside' contenteditable="true" form='issue_768_form'>Edit me 2</span>
+					<span id='issue_768_spanOutsideNotContentEditable' contenteditable="false" form='issue_768_form'>Cannot edit me</span>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
     console.log(`-------------------------------------------`);
@@ -2532,6 +2554,21 @@
     an718.set(null);
     console.log('an718.getNumber() after set:', an718.getNumber()); //DEBUG
     document.querySelector('#issue_718_after').value = an718.getNumber();
+
+    //-------------- Issue #768
+    const anOptions768 = {
+        unformatOnSubmit: true
+    }
+
+   new AutoNumeric('#issue_768_inside', 12345.67, anOptions768);
+   new AutoNumeric('#issue_768_outside', 2222.02, anOptions768);
+
+   new AutoNumeric('#issue_768_spanInside', 54321.06, anOptions768);
+   new AutoNumeric('#issue_768_spanOutside', 1111.01, anOptions768);
+    document.querySelector('#issue_768_form').addEventListener('submit', e => {
+        console.log('Form 768 submitted'); //DEBUG
+        e.preventDefault();
+    }, false);
 </script>
 </body>
 </html>

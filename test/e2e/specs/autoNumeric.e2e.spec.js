@@ -28,7 +28,7 @@
  */
 
 // eslint-disable-next-line
-/* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach, spyOn, require, process, browser, $, toEqual */
+/* global describe, it, xdescribe, xit, fdescribe, fit, expect, beforeEach, afterEach, spyOn, require, process, browser, $, toEqual, jasmine */
 
 import { Key } from 'webdriverio';
 
@@ -265,6 +265,12 @@ const selectors = {
     issue709h                         : '#issue_709h',
     issue709i                         : '#issue_709i',
     issue709j                         : '#issue_709j',
+    issue768Inside                    : '#issue_768_inside',
+    issue768SpanInside                : '#issue_768_spanInside',
+    issue768Outside                   : '#issue_768_outside',
+    issue768SpanOutside               : '#issue_768_spanOutside',
+    issue768SpanOutsideNotCtEditable  : '#issue_768_spanOutsideNotContentEditable',
+    issue768Submit                    : '#issue_768_submit',
 };
 
 //-----------------------------------------------------------------------------
@@ -4929,5 +4935,28 @@ describe('Issue #709', () => {
         expect(await input2.getValue()).toEqual('-200.00');
         await browser.keys(['+']);
         expect(await input2.getValue()).toEqual('-200.00');
+    });
+});
+
+describe('Issue #768', () => {
+    it('should test for default values', async () => {
+        await browser.url(testUrl);
+
+        expect(await $(selectors.issue768Inside).getValue()).toEqual('12,345.67');
+        expect(await $(selectors.issue768SpanInside).getText()).toEqual('54,321.06');
+        expect(await $(selectors.issue768Outside).getValue()).toEqual('2,222.02');
+        expect(await $(selectors.issue768SpanOutside).getText()).toEqual('1,111.01');
+        expect(await $(selectors.issue768SpanOutsideNotCtEditable).getText()).toEqual('Cannot edit me');
+    });
+
+    it(`should unformat on submit all the input and contenteditable elements, even outside the DOM form element`, async () => {
+        const input = await $(selectors.issue768Submit);
+        await input.click();
+
+        expect(await $(selectors.issue768Inside).getValue()).toEqual('12345.67');
+        expect(await $(selectors.issue768SpanInside).getText()).toEqual('54321.06');
+        expect(await $(selectors.issue768Outside).getValue()).toEqual('2222.02');
+        expect(await $(selectors.issue768SpanOutside).getText()).toEqual('1111.01');
+        expect(await $(selectors.issue768SpanOutsideNotCtEditable).getText()).toEqual('Cannot edit me');
     });
 });

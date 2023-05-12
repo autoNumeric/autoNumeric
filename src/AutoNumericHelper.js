@@ -1481,7 +1481,7 @@ export default class AutoNumericHelper {
      * @param {...array} arrays
      * @returns {[*]}
      */
-    static arrayUnique(...arrays) { //FIXME à tester
+    static arrayUnique(...arrays) {
         return [...new Set([].concat(...arrays))];
     }
 

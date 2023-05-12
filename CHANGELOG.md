@@ -1,5 +1,9 @@
 ## Changelog for AutoNumeric
 
+### 4.8.4
++ Fixes #768 `unformatOnSubmit` does not unformat fields located outside of form DOM subtree
++ Updates the function that search for form children to also include the `contenteditable` elements
+
 ### 4.8.3
 + Fixes #718 When `emptyInputBehavior` is set to `null`, then `getNumber()` returns `0` when no value has been set before
 + Updates the `yarn clean:log` command to clean the logs from the newer webdriver.io version

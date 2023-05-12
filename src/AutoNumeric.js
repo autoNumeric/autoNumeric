@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.8.3
- * @date         2023-05-05 UTC 21:42
+ * @version      4.8.4
+ * @date         2023-05-12 UTC 02:46
  *
  * @authors      2016-2023 Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
  *               2009-2016 Bob Knothe <bob.knothe@gmail.com>
@@ -70,7 +70,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.8.3';
+        return '4.8.4';
     }
 
     /**
@@ -3126,10 +3126,32 @@ export default class AutoNumeric {
      */
     _getFormAutoNumericChildren(formElement) {
         // Search for all the child AutoNumeric elements in that parent form
-        //TODO This only search for <input> elements, not contenteditable non-input tag ones, for now. Add a parameter to allow this function to search on every tags.
-        const inputList = [... formElement.querySelectorAll('input')];
+        const inputElementsList = [...formElement.elements]; //XXX `.elements` here only returns the form's inputs, not the other child elements that could be contenteditable
+        const nonInputContentEditableElementsList = this._getContenteditableElements(formElement); // Get the contenteditable elements inside and outside the form element
+        const elementsList = AutoNumericHelper.arrayUnique(inputElementsList, nonInputContentEditableElementsList);
 
-        return inputList.filter(input => this.constructor.isManagedByAutoNumeric(input));
+        return elementsList.filter(element => this.constructor.isManagedByAutoNumeric(element));
+    }
+
+    /**
+     * Returns an array of the non-input contenteditable elements linked to the given form element.
+     * Two types of elements are possible, either located inside the form element, or outside.
+     * For the outside elements, this only works if the form element has a defined id and that id is referenced on the non-input element as the `form` attribute.
+     * If no elements can be found, then an empty array is returned.
+     *
+     * @param {HTMLFormElement|null} formElement
+     *
+     * @returns {Array.<HTMLInputElement>}
+     * @private
+     */
+    _getContenteditableElements(formElement) {
+        if (AutoNumericHelper.isUndefinedOrNullOrEmpty(formElement) || !formElement.hasAttribute('id')) {
+            return [];
+        }
+        const elementsInside = [...formElement.querySelectorAll('[contenteditable=true]')];
+        const elementsOutside = [...document.querySelectorAll(`*:not(input)[form=${formElement.id}][contenteditable=true]`)];
+
+        return AutoNumericHelper.arrayUnique(elementsInside, elementsOutside);
     }
 
     /**
@@ -3139,6 +3161,8 @@ export default class AutoNumeric {
      * @private
      */
     _getParentForm() {
+        if (!AutoNumericHelper.isUndefined(this.domElement.form)) return this.domElement.form; // This catches input elements outside the form element
+
         if (this.domElement.tagName.toLowerCase() === 'body') {
             return null;
         }
@@ -7837,8 +7861,18 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             this.isInputElement = true;
         } else {
             this.isInputElement = false;
-            this.isContentEditable = this.domElement.hasAttribute('contenteditable') && this.domElement.getAttribute('contenteditable') === 'true';
+            this.isContentEditable = this._isContentEditable(this.domElement);
         }
+    }
+
+    /**
+     * Returns `true` if the given DOM element is a contenteditable one (set to `true`)
+     *
+     * @param {HTMLElement} domElement
+     * @returns {boolean}
+     */
+    _isContentEditable(domElement) {
+        return domElement.hasAttribute('contenteditable') && domElement.getAttribute('contenteditable') === 'true';
     }
 
     /**

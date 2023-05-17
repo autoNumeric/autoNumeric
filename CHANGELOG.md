@@ -1,5 +1,10 @@
 ## Changelog for AutoNumeric
 
+### 4.9.0
++ Closes #728 Unable to group by 2 using digital group spacing options
+  + This version modifies the `AutoNumeric.options.digitalGroupSpacing.two` option, which is now named `AutoNumeric.options.digitalGroupSpacing.twoThree`
+  + The `AutoNumeric.options.digitalGroupSpacing.two` now effectively groups only by 2 (and not by 2 and 3 like before for India's numbering system)
+
 ### 4.8.4
 + Fixes #768 `unformatOnSubmit` does not unformat fields located outside of form DOM subtree
 + Updates the function that search for form children to also include the `contenteditable` elements

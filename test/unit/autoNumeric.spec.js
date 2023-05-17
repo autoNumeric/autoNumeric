@@ -1312,7 +1312,7 @@ describe('autoNumeric options and `options.*` methods', () => {
 
             aNInput.options.digitGroupSeparator(AutoNumeric.options.digitGroupSeparator.apostrophe);
             expect(aNInput.getFormatted()).toEqual(`1'146'789,02\u202f€`);
-            aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.two);
+            aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.twoThree);
             expect(aNInput.getFormatted()).toEqual(`11'46'789,02\u202f€`);
             aNInput.options.decimalCharacter(AutoNumeric.options.decimalCharacter.middleDot);
             expect(aNInput.getFormatted()).toEqual(`11'46'789·02\u202f€`);
@@ -1322,6 +1322,20 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual(`₣11'46'789·02`);
             aNInput.options.showPositiveSign(AutoNumeric.options.showPositiveSign.show);
             expect(aNInput.getFormatted()).toEqual(`+₣11'46'789·02`);
+
+            aNInput.options.reset().french().set(1146789.02);
+            aNInput.options.digitGroupSeparator(AutoNumeric.options.digitGroupSeparator.apostrophe);
+            expect(aNInput.getFormatted()).toEqual(`1'146'789,02\u202f€`);
+            aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.two);
+            expect(aNInput.getFormatted()).toEqual(`1'14'67'89,02\u202f€`);
+            aNInput.options.decimalCharacter(AutoNumeric.options.decimalCharacter.middleDot);
+            expect(aNInput.getFormatted()).toEqual(`1'14'67'89·02\u202f€`);
+            aNInput.options.currencySymbol(AutoNumeric.options.currencySymbol.franc);
+            expect(aNInput.getFormatted()).toEqual(`1'14'67'89·02₣`);
+            aNInput.options.currencySymbolPlacement(AutoNumeric.options.currencySymbolPlacement.prefix);
+            expect(aNInput.getFormatted()).toEqual(`₣1'14'67'89·02`);
+            aNInput.options.showPositiveSign(AutoNumeric.options.showPositiveSign.show);
+            expect(aNInput.getFormatted()).toEqual(`+₣1'14'67'89·02`);
 
             aNInput.options.reset().french().set(-1234567.89);
             expect(aNInput.getSettings().decimalPlaces).toEqual('2');
@@ -3162,24 +3176,35 @@ describe('autoNumeric options and `options.*` methods', () => {
             aNInput.nuke();
         });
 
+        it('should group the numbers by 3 by default', () => {
+            aNInput = new AutoNumeric(newInput, { maximumValue : '999999999999999' });
+            // eslint-disable-next-line no-loss-of-precision
+            aNInput.set(12345678901234.5678);
+            expect(aNInput.getFormatted()).toEqual('12,345,678,901,234.57');
+        });
+
         it('should group the numbers with the allowed grouping choices', () => {
             aNInput = new AutoNumeric(newInput, { digitalGroupSpacing: 2, maximumValue : '999999999999999' });
             // eslint-disable-next-line no-loss-of-precision
             aNInput.set(12345678901234.5678);
-            expect(aNInput.getFormatted()).toEqual('1,23,45,67,89,01,234.57');
+            expect(aNInput.getFormatted()).toEqual('12,34,56,78,90,12,34.57');
             aNInput.update({ digitalGroupSpacing: '2s' });
             expect(aNInput.getFormatted()).toEqual('12,34,567,89,01,234.57');
 
             // Update the option
-            aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.two);
+            aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.twoThree);
             expect(aNInput.getFormatted()).toEqual('1,23,45,67,89,01,234.57');
+            aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.twoScaled);
+            expect(aNInput.getFormatted()).toEqual('12,34,567,89,01,234.57');
+            aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.two);
+            expect(aNInput.getFormatted()).toEqual('12,34,56,78,90,12,34.57');
             aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.three);
             expect(aNInput.getFormatted()).toEqual('12,345,678,901,234.57');
             aNInput.options.digitalGroupSpacing(AutoNumeric.options.digitalGroupSpacing.four);
             expect(aNInput.getFormatted()).toEqual('12,3456,7890,1234.57');
 
             aNInput.options.digitalGroupSpacing(2);
-            expect(aNInput.getFormatted()).toEqual('1,23,45,67,89,01,234.57');
+            expect(aNInput.getFormatted()).toEqual('12,34,56,78,90,12,34.57');
             aNInput.options.digitalGroupSpacing(3);
             expect(aNInput.getFormatted()).toEqual('12,345,678,901,234.57');
             aNInput.options.digitalGroupSpacing(4);

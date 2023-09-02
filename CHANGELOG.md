@@ -1,5 +1,10 @@
 ## Changelog for AutoNumeric
 
+### 4.10.0
++ Drops IE11 support
++ Removes IE11 hacks, and updates part of the code that was not using modern tech because of obsolete browsers support
++ Removes the `Array.from` and `CustomEvent` polyfills
+
 ### 4.9.0
 + Closes #728 Unable to group by 2 using digital group spacing options
   + This version modifies the `AutoNumeric.options.digitalGroupSpacing.two` option, which is now named `AutoNumeric.options.digitalGroupSpacing.twoThree`

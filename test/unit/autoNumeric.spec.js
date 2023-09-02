@@ -175,7 +175,6 @@ describe('The AutoNumeric object', () => {
             expect(AutoNumericEnum.keyName._allFnKeys).toEqual(['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']);
 
             expect(() => { AutoNumericEnum.allowedTagList = ['foobar']; }).toThrow();
-            expect(() => { AutoNumericEnum.keyCode = {}; }).toThrow();
             expect(() => { AutoNumericEnum.fromCharCodeKeyCode = []; }).toThrow();
             expect(() => { AutoNumericEnum.fromCharCodeKeyCode[91] = 'foobar'; }).toThrow();
             expect(() => { AutoNumericEnum.keyName = {}; }).toThrow();

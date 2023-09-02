@@ -1,7 +1,7 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.9.0
+ * @version      4.10.0
  * @date         2023-05-17 UTC 20:45
  *
  * @authors      2016-2023 Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
@@ -70,7 +70,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.9.0';
+        return '4.10.0';
     }
 
     /**
@@ -194,8 +194,7 @@ export default class AutoNumeric {
         // Save the initial values (html attribute + element.value) for the pristine test
         this._saveInitialValues(initialValue);
         
-        // Set up the data for the persistent storage solution (i.e. sessionStorage or cookies)
-        this.sessionStorageAvailable = this.constructor._storageTest();
+        // Set up the data for the persistent storage solution (i.e. sessionStorage)
         this.storageNamePrefix = 'AUTO_'; // The prefix for the raw value storage name variable can be modified here
         this._setPersistentStorageName();
 
@@ -4922,7 +4921,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     this.settings[key] = value(this, key);
                 } else {
                     // Calls the attached function from the html5 data. For instance: <tag data-currency-symbol="functionName"></tag>
-                    let htmlAttribute = this.domElement.getAttribute(key); //TODO Use `dataset` instead of `getAttribute` when we won't need to support obsolete browsers
+                    let htmlAttribute = '';
+                    if (key in this.domElement.dataset) {
+                        htmlAttribute = this.domElement.dataset[key];
+                    }
+
                     htmlAttribute = AutoNumericHelper.camelize(htmlAttribute);
                     if (typeof this.settings[htmlAttribute] === 'function') {
                         this.settings[key] = htmlAttribute(this, key);
@@ -6195,47 +6198,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
-     * Original settings saved for use when `decimalPlacesShownOnFocus` & `showOnlyNumbersOnFocus` options are being used.
-     * This is taken from Quirksmode.
-     *
-     * @param {string} name
-     * @returns {*}
-     */
-    static _readCookie(name) {
-        const nameEQ = name + '=';
-        const ca = document.cookie.split(';');
-        let c = '';
-        for (let i = 0; i < ca.length; i += 1) {
-            c = ca[i];
-            while (c.charAt(0) === ' ') {
-                c = c.substring(1, c.length);
-            }
-            if (c.indexOf(nameEQ) === 0) {
-                return c.substring(nameEQ.length, c.length);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Test if sessionStorage is supported.
-     * This is taken from Modernizr.
-     *
-     * @returns {boolean}
-     */
-    static _storageTest() {
-        const mod = 'modernizr';
-        try {
-            sessionStorage.setItem(mod, mod);
-            sessionStorage.removeItem(mod);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    }
-
-    /**
      * Removes any zeros in excess in the front and back of the given `value`, according to the `settings`.
      * This also manages the cases where the decimal point is on the far left or far right of the `value`.
      *
@@ -6290,12 +6252,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      */
     _saveValueToPersistentStorage() {
         if (this.settings.saveValueToSessionStorage) {
-            if (this.sessionStorageAvailable) {
-                sessionStorage.setItem(this.rawValueStorageName, this.rawValue);
-            } else {
-                // Use cookies for obsolete browsers that do not support sessionStorage (i.e. IE 6 & 7)
-                document.cookie = `${this.rawValueStorageName}=${this.rawValue}; expires= ; path=/`;
-            }
+            sessionStorage.setItem(this.rawValueStorageName, this.rawValue);
         }
     }
 
@@ -6307,14 +6264,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      */
     _getValueFromPersistentStorage() {
         if (this.settings.saveValueToSessionStorage) {
-            let result;
-            if (this.sessionStorageAvailable) {
-                result = sessionStorage.getItem(this.rawValueStorageName);
-            } else {
-                result = this.constructor._readCookie(this.rawValueStorageName);
-            }
-
-            return result;
+            return sessionStorage.getItem(this.rawValueStorageName);
         }
 
         AutoNumericHelper.warning('`_getValueFromPersistentStorage()` is called but `settings.saveValueToSessionStorage` is false. There must be an error that needs fixing.', this.settings.showWarnings);
@@ -6328,14 +6278,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      */
     _removeValueFromPersistentStorage() {
         if (this.settings.saveValueToSessionStorage) {
-            if (this.sessionStorageAvailable) {
-                sessionStorage.removeItem(this.rawValueStorageName);
-            } else {
-                const date = new Date();
-                date.setTime(date.getTime() - 86400000); // -86400000 === -1 * 24 * 60 * 60 * 1000
-                const expires = `; expires=${date.toUTCString()}`;
-                document.cookie = `${this.rawValueStorageName}='' ;${expires}; path=/`;
-            }
+            sessionStorage.removeItem(this.rawValueStorageName);
         }
     }
 
@@ -7104,11 +7047,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         let rawPastedText;
-        if (window.clipboardData && window.clipboardData.getData) {
-            // Special case for the obsolete and non-standard IE browsers 10 and 11
-            rawPastedText = window.clipboardData.getData('Text');
-        } else if (e.clipboardData && e.clipboardData.getData) {
-            // Normal case with modern browsers
+        if (e.clipboardData && e.clipboardData.getData) {
             rawPastedText = e.clipboardData.getData('text/plain');
         } else {
             AutoNumericHelper.throwError('Unable to retrieve the pasted value. Please use a modern browser (i.e. Firefox or Chromium).');
@@ -7695,14 +7634,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         // Note: by default browsers already prevent the drop on readOnly and disabled elements
         this.isDropEvent = true;
         e.preventDefault();
-        let format;
-        if (AutoNumericHelper.isIE11()) {
-            format = 'text';
-        } else {
-            format = 'text/plain';
-        }
 
-        const droppedText = e.dataTransfer.getData(format);
+        const droppedText = e.dataTransfer.getData('text/plain');
         const cleanedValue = this.unformatOther(droppedText);
         const previousValue = this.rawValue;
         this.set(cleanedValue);
@@ -9686,28 +9619,3 @@ AutoNumeric.multiple = (arg1, initialValue = null, options = null) => {
 
     return result;
 };
-
-/**
- * Polyfill for obsolete browsers like IE
- */
-(function() {
-// Polyfill for `Array.from()` (Fix issue #495)
-if (!Array.from) {
-    Array.from = object => [].slice.call(object);
-}
-
-// Polyfill for `CustomEvent` (cf. https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent)
-if (typeof window === 'undefined' || typeof window.CustomEvent === 'function') {
-    return false;
-}
-
-function CustomEvent(event, params) {
-    params = params || { bubbles: false, cancelable: false, detail: void(0) };
-    const evt = document.createEvent('CustomEvent');
-    evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-    return evt;
-}
-
-CustomEvent.prototype = window.Event.prototype;
-window.CustomEvent = CustomEvent;
-})();

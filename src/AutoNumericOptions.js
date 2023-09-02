@@ -28,7 +28,6 @@
  */
 
 import AutoNumeric from './AutoNumeric';
-import AutoNumericHelper from './AutoNumericHelper';
 
 /**
  * Options values enumeration
@@ -923,12 +922,12 @@ function freezeOptions(options) {
         if (optionName === 'valuesToStrings') {
             const vsProps = Object.getOwnPropertyNames(options.valuesToStrings);
             vsProps.forEach(valuesToStringObjectName => {
-                if (!AutoNumericHelper.isIE11() && options.valuesToStrings[valuesToStringObjectName] !== null) {
+                if (options.valuesToStrings[valuesToStringObjectName] !== null) {
                     Object.freeze(options.valuesToStrings[valuesToStringObjectName]);
                 }
             });
         } else if (optionName !== 'styleRules') {
-            if (!AutoNumericHelper.isIE11() && options[optionName] !== null) {
+            if (options[optionName] !== null) {
                 Object.freeze(options[optionName]);
             }
         }

@@ -198,17 +198,6 @@ export default class AutoNumericHelper {
     }
 
     /**
-     * Return `true` if the current browser is the obsolete Internet Explorer 11 (IE11) one
-     * cf. https://stackoverflow.com/a/21825207/2834898
-     *
-     * @returns {boolean}
-     */
-    static isIE11() {
-        // noinspection JSUnresolvedVariable
-        return typeof window !== 'undefined' && !!window.MSInputMethodContext && !!document.documentMode;
-    }
-
-    /**
      * Return `true` is the string `str` contains the string `needle`
      * Note: this function does not coerce the parameters types
      *
@@ -374,7 +363,7 @@ export default class AutoNumericHelper {
             //XXX The selenium geckodriver does not understand `event.key`, hence when using it, we need to rely on the old deprecated `keyCode` attribute, cf. upstream issue https://github.com/mozilla/geckodriver/issues/440
             // Use the old deprecated keyCode property, if the new `key` one is not supported
             const keyCode = this.keyCodeNumber(event);
-            if (keyCode === AutoNumericEnum.keyCode.AndroidDefault) {
+            if (keyCode === 229) { // Android Chrome returns the same keycode number 229 for all keys pressed
                 return AutoNumericEnum.keyName.AndroidDefault;
             }
 
@@ -386,7 +375,6 @@ export default class AutoNumericHelper {
                 result = String.fromCharCode(keyCode);
             }
         } else {
-            let browser;
             switch (event.key) {
                 // Manages all the special cases for obsolete browsers that return the non-standard names
                 case 'Add':
@@ -407,15 +395,7 @@ export default class AutoNumericHelper {
                     }
                     break;
                 case 'Del':
-                    browser = this.browser();
-                    if ((browser.name === 'firefox' && browser.version <= 36) ||
-                        (browser.name === 'ie' && browser.version <= 9)) {
-                        // Special workaround for the obsolete browser IE11 which output a 'Delete' key when using the numpad 'dot' one! This fixes issue #401
-                        // This workaround break the usage of the 'Delete' key for Firefox <=36, and IE9, since those browser send 'Del' instead of 'Delete', therefore we only use it for those obsolete browsers
-                        result = AutoNumericEnum.keyName.Dot;
-                    } else {
-                        result = AutoNumericEnum.keyName.Delete;
-                    }
+                    result = AutoNumericEnum.keyName.Delete;
                     break;
                 case 'Divide':
                     result = AutoNumericEnum.keyName.NumpadSlash;

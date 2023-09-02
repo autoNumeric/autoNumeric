@@ -2,7 +2,7 @@
  *               AutoNumeric.js
  *
  * @version      4.10.0
- * @date         2023-05-17 UTC 20:45
+ * @date         2023-09-02 UTC 01:50
  *
  * @authors      2016-2023 Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
  *               2009-2016 Bob Knothe <bob.knothe@gmail.com>

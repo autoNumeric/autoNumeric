@@ -200,6 +200,7 @@
 <body>
 <div class="container">
 	<div class="title">End-to-end testing page for <a href="https://github.com/autoNumeric/autoNumeric" target="_blank">autoNumeric</a></div>
+	<div>Version : <span id="autonumericVersion"></span></div>
 
 	<div class="testSuite">
 		<div class="test">
@@ -1231,6 +1232,9 @@
     console.log(`-------------------------------------------`);
     console.log(`Testing AutoNumeric version ${AutoNumeric.version()}.`);
     console.log(`-------------------------------------------`);
+
+    const anVersionSpan = document.querySelector('#autonumericVersion');
+    anVersionSpan.textContent = AutoNumeric.version();
 
     //-------------- Classic input
     const classicInput = document.querySelector('#classic');

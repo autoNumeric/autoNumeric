@@ -810,6 +810,16 @@ export default class AutoNumericHelper {
     }
 
     /**
+     * Return `true` if the given event is an instance of WheelEvent and the deltaY value is equal to zero
+     *
+     * @param {WheelEvent} wheelEvent The event to test
+     * @returns {boolean} Return `true` if the event is an instance of WheelEvent and the deltaY value is equal to zero, FALSE otherwise
+     */
+    static isWheelEventWithZeroDeltaY(wheelEvent) {
+        return this.isWheelEvent(wheelEvent) && this.isUndefinedOrNullOrEmpty(wheelEvent.deltaY) && wheelEvent.deltaY === 0;
+    }
+
+    /**
      * Return the given raw value truncated at the given number of decimal places `decimalPlaces`.
      * This function does not round the value.
      *

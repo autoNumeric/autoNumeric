@@ -1,8 +1,8 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.10.0
- * @date         2023-09-02 UTC 01:50
+ * @version      4.10.1
+ * @date         2023-12-15 UTC 18:00
  *
  * @authors      2016-2023 Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
  *               2009-2016 Bob Knothe <bob.knothe@gmail.com>
@@ -70,7 +70,7 @@ export default class AutoNumeric {
      * @returns {string}
      */
     static version() {
-        return '4.10.0';
+        return '4.10.1';
     }
 
     /**
@@ -7608,15 +7608,21 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         let isUp = false;
         let isDown = false;
+        let isDeltaYZero = false;
         if (AutoNumericHelper.isWheelUpEvent(e)) {
             isUp = true;
         } else if (AutoNumericHelper.isWheelDownEvent(e)) {
             isDown = true;
+        } else if (AutoNumericHelper.isWheelEventWithZeroDeltaY(e)) {
+            // Ignore that event (maybe call e.preventDefault() ?), fixes issue #776
+            isDeltaYZero = true;
         } else {
             AutoNumericHelper.throwError(`The event is not a 'wheel' event.`);
         }
 
-        this._wheelAndUpDownActions(e, isUp, isDown, this.settings.wheelStep);
+        if (!isDeltaYZero) {
+            this._wheelAndUpDownActions(e, isUp, isDown, this.settings.wheelStep);
+        }
 
         this.isWheelEvent = false; // Set back the mouse wheel indicator to its default
     }

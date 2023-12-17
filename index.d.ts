@@ -18,7 +18,7 @@
  */
 export = AutoNumeric;
 
-import { NameValuePair, Options, OptionsHandler, OutputFormatOption, PredefinedOptions, PredefinedLanguages } from 'autonumeric';
+import { CallbackOptions, NameValuePair, Options, OptionsHandler, OutputFormatOption, PredefinedOptions } from 'autonumeric';
 
 declare class AutoNumeric {
     /**
@@ -39,7 +39,7 @@ declare class AutoNumeric {
     constructor(
         element: string | HTMLElement,
         initialValue?: string | number | null,
-        options?: Options | string | null
+        options?: CallbackOptions | string | null
     );
 
     /**
@@ -60,7 +60,7 @@ declare class AutoNumeric {
     static multiple(
         elements: string | HTMLElement[] | { rootElement: HTMLElement; exclude?: HTMLInputElement[] },
         initialValue?: number | (number | null)[] | null,
-        options?: Options | Options[] | null
+        options?: CallbackOptions | CallbackOptions[] | null
     ): AutoNumeric[];
 
     /**
@@ -78,7 +78,7 @@ declare class AutoNumeric {
      */
     static multiple(
         elements: string | HTMLElement[] | { rootElement: HTMLElement; exclude?: HTMLInputElement[] },
-        options: Options | Options[] | null
+        options: CallbackOptions | CallbackOptions[] | null
     ): AutoNumeric[];
 
     /**
@@ -182,7 +182,7 @@ declare class AutoNumeric {
      * @param options List of options to set.
      * @returns The merged options.
      */
-    static mergeOptions(...options: (Options | string)[]): Options;
+    static mergeOptions(options: (Options | string)[]): Options;
 
     /**
      * Test if the given DOM element, or the element selected by the given selector string is already managed by auto numeric
@@ -265,7 +265,7 @@ declare class AutoNumeric {
      */
     set(
         newValue: number | string | null,
-        options?: Options,
+        options?: CallbackOptions,
         saveChangeToHistory?: boolean
     ): AutoNumeric;
 
@@ -277,7 +277,7 @@ declare class AutoNumeric {
      * @param options New options to set.
      * @returns This instance for chaining method calls.
      */
-    setUnformatted(value: number | string | null, options?: Options): AutoNumeric;
+    setUnformatted(value: number | string | null, options?: CallbackOptions): AutoNumeric;
 
     // The get() function is deprecated and should not be used. Omitted from TS def for that reason.
 
@@ -418,7 +418,7 @@ declare class AutoNumeric {
      * Updates the AutoNumeric settings, and immediately format the element accordingly.
      * @returns This instance for chaining method calls.
      */
-    update(...options: Options[]): AutoNumeric;
+    update(...options: CallbackOptions[]): AutoNumeric;
 
     /**
      * Remove the autoNumeric data and event listeners from the element, but keep the element content intact.
@@ -753,6 +753,8 @@ declare namespace AutoNumeric {
         | "D05";
 
     export type SerializeSpacesOption = "+" | "%20";
+
+    export type ValueOrCallback<T> = T | ((instance: AutoNumeric, key: string) => T);
 
     export type OptionsHandler = {
         [K in keyof Options]-?: (value: Required<Options[K]>) => AutoNumeric
@@ -1294,6 +1296,12 @@ declare namespace AutoNumeric {
         */
         wheelStep?: number | "progressive";
     }
+
+    /**
+     * Similar to {@link Options}, but each property can be either the value itself, or a function that
+     * returns the value.
+     */
+    export type CallbackOptions = { [K in keyof Options]: ValueOrCallback<Required<Options>[K]> };
 
     interface PredefinedLanguages {
         French: Partial<Options>;

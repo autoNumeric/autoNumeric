@@ -708,7 +708,7 @@ declare namespace AutoNumeric {
     export type SerializeSpacesOption = "+" | "%20";
 
     export type OptionsHandler = {
-        [K in keyof Options]-?: (value: Exclude<Options[K], undefined>) => AutoNumeric
+        [K in keyof Options]-?: (value: Required<Options[K]>) => AutoNumeric
     } & {
        /**
         * Reset any options set previously, by overwriting them with the default settings

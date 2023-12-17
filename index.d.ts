@@ -21,19 +21,64 @@ export = AutoNumeric;
 import { NameValuePair, Options, OptionsHandler, OutputFormatOption, PredefinedOptions, PredefinedLanguages } from 'autonumeric';
 
 declare class AutoNumeric {
+    /**
+     * Enables the auto numeric feature for the given element.
+     * 
+     * The DOM element must be one of the allowed elements:
+     * 
+     * > b, caption, cite, code, const, dd, del, div, dfn, dt, em, h1, h2, h3, h4, h5, h6, input, ins, kdb, label, li, option, output, p, q, s, sample, span, strong, td, th, u
+     * 
+     * When not an `input` element, the element may have the `contenteditable` set. If it does, all
+     * entered values are formatted according to the given options. Otherwise, the formatted value is
+     * set once and no further edits are possible. 
+     * 
+     * @param element Either one of the allowed elements, or a CSS selector string for a single element. 
+     * @param initialValue Initial value, when `null`, the value of the DOM element is used.
+     * @param options Settings for auto numeric.
+     */
     constructor(
-        elementOrSelector: string | HTMLInputElement | HTMLElement,
+        element: string | HTMLElement,
         initialValue?: string | number | null,
         options?: Options | string | null
     );
 
+    /**
+     * Enables the auto numeric feature for the given elements.
+     * 
+     * The DOM element must be one of the allowed elements:
+     * 
+     * > b, caption, cite, code, const, dd, del, div, dfn, dt, em, h1, h2, h3, h4, h5, h6, input, ins, kdb, label, li, option, output, p, q, s, sample, span, strong, td, th, u
+     * 
+     * When not an `input` element, the element may have the `contenteditable` set. If it does, all
+     * entered values are formatted according to the given options. Otherwise, the formatted value is
+     * set once and no further edits are possible. 
+     * @param elements A list of elements, which may be a CSS selector string.
+     * @param initialValue Initial value to set. Can be an array to set a different value for each element. When `null`, the
+     * value of the DOM element is used.
+     * @param options Auto numeric options. Can be an array to use a different set of options for each element.
+     */
     static multiple(
-        elementsOrSelector:
-            | string
-            | HTMLElement[]
-            | { rootElement: HTMLElement; exclude?: HTMLInputElement[] },
-        initialValue?: number | Array<number | null> | null,
+        elements: string | HTMLElement[] | { rootElement: HTMLElement; exclude?: HTMLInputElement[] },
+        initialValue?: number | (number | null)[] | null,
         options?: Options | Options[] | null
+    ): AutoNumeric[];
+
+    /**
+     * Enables the auto numeric feature for the given elements.
+     * 
+     * The DOM element must be one of the allowed elements:
+     * 
+     * > b, caption, cite, code, const, dd, del, div, dfn, dt, em, h1, h2, h3, h4, h5, h6, input, ins, kdb, label, li, option, output, p, q, s, sample, span, strong, td, th, u
+     * 
+     * When not an `input` element, the element may have the `contenteditable` set. If it does, all
+     * entered values are formatted according to the given options. Otherwise, the formatted value is
+     * set once and no further edits are possible. 
+     * @param elements A list of elements, which may be a CSS selector string.
+     * @param options Auto numeric options. Can be an array to use a different set of options for each element.
+     */
+    static multiple(
+        elements: string | HTMLElement[] | { rootElement: HTMLElement; exclude?: HTMLInputElement[] },
+        options: Options | Options[] | null
     ): AutoNumeric[];
 
     /**
@@ -396,9 +441,11 @@ declare class AutoNumeric {
     nuke(): void;
 
     /**
-     * Return the DOM element reference of the autoNumeric-managed element
+     * Return the DOM element reference of the autoNumeric-managed element. The exact type depends
+     * on the element that on which auto numeric was initialized - auto numerics supports input elements
+     * as well as other content editable elements such as div elements.
      */
-    node(): HTMLInputElement;
+    node(): HTMLElement;
 
     /**
      * Return the DOM element reference of the parent node of the auto numeric managed element

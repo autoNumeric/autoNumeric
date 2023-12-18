@@ -752,6 +752,13 @@ declare namespace AutoNumeric {
         | "U05"
         | "D05";
 
+    export type DigitalGroupSpacingOption =
+        | "2"
+        | "2t"
+        | "2s"
+        | "3"
+        | "4"
+
     export type SerializeSpacesOption = "+" | "%20";
 
     export type ValueOrCallback<T> = T | ((instance: AutoNumeric, key: string) => T);
@@ -782,7 +789,7 @@ declare namespace AutoNumeric {
          * Allow padding the decimal places with zeros.
          * @default true
          */
-        allowDecimalPadding?: boolean | "floats";
+        allowDecimalPadding?: boolean | number | "floats";
 
         /**
          * Determine where should be positioned the caret on focus
@@ -859,11 +866,16 @@ declare namespace AutoNumeric {
          */
         defaultValueOverride?: string | { doNotOverride: null };
 
-        /**
-         * Digital grouping for the thousand separator
+        /* Defines how many numbers should be grouped together (usually for the thousand separator)
+         * - `2`,  results in 99,99,99,99 Group by two
+         * - `2t`, results in 99,99,99,999 India's lakhs
+         * - `2s`, results in 99,999,99,99,999 India's lakhs scaled
+         * - `3`,  results in 999,999,999 (default)
+         * - `4`,  results in 9999,9999,9999 used in some Asian countries
+         * Note: This option does not accept other grouping choice.
          * @default '3'
          */
-        digitalGroupSpacing?: string;
+        digitalGroupSpacing?: DigitalGroupSpacingOption;
 
         /**
          * Thousand separator character

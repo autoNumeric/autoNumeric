@@ -759,6 +759,18 @@ declare namespace AutoNumeric {
         | "3"
         | "4"
 
+    export type NegativeBracketsTypeOnBlurOption =
+        | "(,)"
+        | "[,]"
+        | "<,>"
+        | "{,}"
+        | "〈,〉"
+        | "｢,｣"
+        | "⸤,⸥"
+        | "⟦,⟧"
+        | "‹,›"
+        | "«,»";
+
     export type SerializeSpacesOption = "+" | "%20";
 
     export type ValueOrCallback<T> = T | ((instance: AutoNumeric, key: string) => T);
@@ -1015,7 +1027,7 @@ declare namespace AutoNumeric {
          * 
          * The left and right symbols should be enclosed in quotes and separated by a comma.
          */
-        negativeBracketsTypeOnBlur?: string | null;
+        negativeBracketsTypeOnBlur?: NegativeBracketsTypeOnBlurOption | null;
 
         /**
          * Placement of negative/positive sign relative to the currency symbol (possible options are l (left), r (right), p (prefix) and s (suffix))

@@ -801,7 +801,7 @@ declare namespace AutoNumeric {
          * Allow padding the decimal places with zeros.
          * @default true
          */
-        allowDecimalPadding?: boolean | number | "floats";
+        allowDecimalPadding?: boolean | number | string | "floats";
 
         /**
          * Determine where should be positioned the caret on focus
@@ -846,25 +846,25 @@ declare namespace AutoNumeric {
          * 0 or positive integer
          * @default 2
          */
-        decimalPlaces?: number;
+        decimalPlaces?: number | string;
 
         /**
          * Defines how many decimal places should be kept for the raw value.
          * @default null
          */
-        decimalPlacesRawValue?: number | null;
+        decimalPlacesRawValue?: number | string | null;
 
         /**
          * The number of decimal places to show when unfocused
          * @default null
          */
-        decimalPlacesShownOnBlur?: number | null;
+        decimalPlacesShownOnBlur?: number | string | null;
 
         /**
          * The number of decimal places to show when focused
          * @default null
          */
-        decimalPlacesShownOnFocus?: number | null;
+        decimalPlacesShownOnFocus?: number | string | null;
 
         /**
          * Helper option for ASP.NET postback
@@ -899,7 +899,7 @@ declare namespace AutoNumeric {
          * Define the number that will divide the current value shown when unfocused
          * @default null
          */
-        divisorWhenUnfocused?: number | null;
+        divisorWhenUnfocused?: number | string | null;
 
         /**
          *  Defines what should be displayed in the element if the raw value is an empty string.
@@ -959,7 +959,7 @@ declare namespace AutoNumeric {
          *
          * Each record keeps the raw value as well and the last known caret/selection positions.
          */
-        historySize?: number;
+        historySize?: number | string;
 
         /**
          * Defines the name of the CSS class to use on `contenteditable`-enabled elements when the value is invalid
@@ -1121,7 +1121,7 @@ declare namespace AutoNumeric {
          * 
          * This is useful when displaying percentage for instance, and avoid the need to divide/multiply by 100 between the number shown and the raw value.
          */
-        rawValueDivisor?: number | null;
+        rawValueDivisor?: number | string | null;
 
         /**
          * Defines if the element (`<input>` or another allowed html tag) should be set as read-only on initialization.
@@ -1284,7 +1284,7 @@ declare namespace AutoNumeric {
           * 
           * The `progressive` mode will increment/decrement the element value based on its current value. The bigger the number, the bigger the step, and vice versa.
           */
-        upDownStep?: number | "progressive";
+        upDownStep?: number | string | "progressive";
 
         /**
          * Provides a way for automatically replacing the formatted value with a pre-defined string,
@@ -1318,7 +1318,7 @@ declare namespace AutoNumeric {
          * 
           * The `progressive` mode will increment/decrement the element value based on its current value. The bigger the number, the bigger the step, and vice versa.
         */
-        wheelStep?: number | "progressive";
+        wheelStep?: number | string | "progressive";
     }
 
     /**

@@ -807,7 +807,7 @@ declare namespace AutoNumeric {
          * Determine where should be positioned the caret on focus
          * @default null
          */
-        caretPositionOnFocus?: CaretPositionOption;
+        caretPositionOnFocus?: CaretPositionOption | null;
 
         alwaysAllowDecimalCharacter?: boolean;
 
@@ -876,7 +876,7 @@ declare namespace AutoNumeric {
          * - value=1234.56 {defaultValueOverride: '1234.56'}
          * @default null
          */
-        defaultValueOverride?: string | { doNotOverride: null };
+        defaultValueOverride?: string | { doNotOverride: null } | null;
 
         /* Defines how many numbers should be grouped together (usually for the thousand separator)
          * - `2`,  results in 99,99,99,99 Group by two

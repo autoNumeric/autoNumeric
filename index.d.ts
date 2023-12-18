@@ -110,7 +110,7 @@ declare class AutoNumeric {
     /**
      * Return the default autoNumeric settings
      */
-    static getDefaultConfig(): Options;
+    static getDefaultConfig(): Required<Options>;
 
     /**
      * Return all the predefined options in one object

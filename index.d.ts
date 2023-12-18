@@ -39,7 +39,25 @@ declare class AutoNumeric {
     constructor(
         element: string | HTMLElement,
         initialValue?: string | number | null,
-        options?: CallbackOptions | string | null
+        options?: CallbackOptions | string | (CallbackOptions | string)[] | null
+    );
+    /**
+     * Enables the auto numeric feature for the given element.
+     * 
+     * The DOM element must be one of the allowed elements:
+     * 
+     * > b, caption, cite, code, const, dd, del, div, dfn, dt, em, h1, h2, h3, h4, h5, h6, input, ins, kdb, label, li, option, output, p, q, s, sample, span, strong, td, th, u
+     * 
+     * When not an `input` element, the element may have the `contenteditable` set. If it does, all
+     * entered values are formatted according to the given options. Otherwise, the formatted value is
+     * set once and no further edits are possible. 
+     * 
+     * @param element Either one of the allowed elements, or a CSS selector string for a single element. 
+     * @param options Settings for auto numeric.
+     */
+    constructor(
+        element: string | HTMLElement,
+        options: CallbackOptions | (CallbackOptions | string)[]
     );
 
     /**
@@ -59,8 +77,8 @@ declare class AutoNumeric {
      */
     static multiple(
         elements: string | HTMLElement[] | { rootElement: HTMLElement; exclude?: HTMLInputElement[] },
-        initialValue?: number | (number | null)[] | null,
-        options?: CallbackOptions | CallbackOptions[] | null
+        initialValue?: number | string | (number | string | null)[] | null,
+        options?: CallbackOptions | string | (CallbackOptions | string)[] | null
     ): AutoNumeric[];
 
     /**
@@ -78,7 +96,7 @@ declare class AutoNumeric {
      */
     static multiple(
         elements: string | HTMLElement[] | { rootElement: HTMLElement; exclude?: HTMLInputElement[] },
-        options: CallbackOptions | CallbackOptions[] | null
+        options: CallbackOptions | (CallbackOptions | string)[]
     ): AutoNumeric[];
 
     /**

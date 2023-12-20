@@ -731,6 +731,78 @@ declare class AutoNumeric {
      * @returns This instance for chaining method calls.
      */
     formSubmitJsonLocalized(callback: (values: string) => void, forcedOutputFormat?: null | string): AutoNumeric;
+
+    /**
+     * Update the settings to use the Brazilian pre-defined language options.
+     * Those pre-defined options can be overridden by passing an option object as a parameter.
+     *
+     * @param optionOverride Optional options to override the pre-defined options.
+     * @returns This instance for chaining method calls.
+     */
+    brazilian(optionOverride?: CallbackOptions | null): AutoNumeric;
+
+    /**
+     * Update the settings to use the British pre-defined language options.
+     * Those pre-defined options can be overridden by passing an option object as a parameter.
+     *
+     * @param optionOverride Optional options to override the pre-defined options.
+     * @returns This instance for chaining method calls.
+     */
+    british(optionOverride?: CallbackOptions | null): AutoNumeric;
+
+    /**
+     * Update the settings to use the Chinese pre-defined language options.
+     * Those pre-defined options can be overridden by passing an option object as a parameter.
+     *
+     * @param optionOverride Optional options to override the pre-defined options.
+     * @returns This instance for chaining method calls.
+     */
+    chinese(optionOverride?: CallbackOptions | null): AutoNumeric;
+
+    /**
+     * Update the settings to use the French pre-defined language options.
+     * Those pre-defined options can be overridden by passing an option object as a parameter.
+     *
+     * @param optionOverride Optional options to override the pre-defined options.
+     * @returns This instance for chaining method calls.
+     */
+    french(optionOverride?: CallbackOptions | null): AutoNumeric;
+
+    /**
+     * Update the settings to use the Japanese pre-defined language options.
+     * Those pre-defined options can be overridden by passing an option object as a parameter.
+     *
+     * @param optionOverride Optional options to override the pre-defined options.
+     * @returns This instance for chaining method calls.
+     */
+    japanese(optionOverride?: CallbackOptions | null): AutoNumeric;
+
+    /**
+     * Update the settings to use the North American pre-defined language options.
+     * Those pre-defined options can be overridden by passing an option object as a parameter.
+     *
+     * @param optionOverride Optional options to override the pre-defined options.
+     * @returns This instance for chaining method calls.
+     */
+    northAmerican(optionOverride?: CallbackOptions | null): AutoNumeric;
+
+    /**
+     * Update the settings to use the Spanish pre-defined language options.
+     * Those pre-defined options can be overridden by passing an option object as a parameter.
+     *
+     * @param optionOverride Optional options to override the pre-defined options.
+     * @returns This instance for chaining method calls.
+     */
+    spanish(optionOverride?: CallbackOptions | null): AutoNumeric;
+
+    /**
+     * Update the settings to use the Swiss pre-defined language options.
+     * Those pre-defined options can be overridden by passing an option object as a parameter.
+     *
+     * @param optionOverride Optional options to override the pre-defined options.
+     * @returns This instance for chaining method calls.
+     */
+    swiss(optionOverride?: CallbackOptions | null): AutoNumeric;
 }
 
 /**

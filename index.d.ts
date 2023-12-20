@@ -348,7 +348,7 @@ declare class AutoNumeric {
      * Returns the unformatted value, but following the `outputFormat` setting, which means the output can either be:
      *
      * - a string (that could or could not represent a number, ie. "12345,67-"), or
-     * - a plain number (if the setting `number` is used).
+     * - a plain number (if the setting `'number'` is used).
      *
      * By default the returned values are an ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period.
      *
@@ -363,7 +363,7 @@ declare class AutoNumeric {
      * Returns the unformatted value, but following the `outputFormat` setting, which means the output can either be:
      *
      * - a string (that could or could not represent a number, ie. "12345,67-"), or
-     * - a plain number (if the setting `number` is used).
+     * - a plain number (if the setting `'number'` is used).
      *
      * By default the returned values are an ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period.
      * 

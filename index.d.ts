@@ -22,11 +22,10 @@ import { CallbackOptions, NameValuePair, Options, OptionsHandler, OutputFormatOp
 
 declare class AutoNumeric {
     /**
-     * Enables the auto numeric feature for the given element.
+     * Enables the AutoNumeric feature for the given element.
      * 
-     * The DOM element must be one of the allowed elements:
-     * 
-     * > b, caption, cite, code, const, dd, del, div, dfn, dt, em, h1, h2, h3, h4, h5, h6, input, ins, kdb, label, li, option, output, p, q, s, sample, span, strong, td, th, u
+     * The DOM element must be one of the allowed elements. Allowed elements are `<input>`, as well as some 
+     * other text-containing elements such `<div>`. See the documentation for the full list.
      * 
      * When not an `input` element, the element may have the `contenteditable` set. If it does, all
      * entered values are formatted according to the given options. Otherwise, the formatted value is
@@ -34,26 +33,26 @@ declare class AutoNumeric {
      * 
      * @param element Either one of the allowed elements, or a CSS selector string for a single element. 
      * @param initialValue Initial value, when `null`, the value of the DOM element is used.
-     * @param options Settings for auto numeric.
+     * @param options Settings for AutoNumeric.
      */
     constructor(
         element: string | HTMLElement,
         initialValue?: string | number | null,
         options?: CallbackOptions | string | (CallbackOptions | string)[] | null
     );
+
     /**
-     * Enables the auto numeric feature for the given element.
+     * Enables the AutoNumeric feature for the given element.
      * 
-     * The DOM element must be one of the allowed elements:
-     * 
-     * > b, caption, cite, code, const, dd, del, div, dfn, dt, em, h1, h2, h3, h4, h5, h6, input, ins, kdb, label, li, option, output, p, q, s, sample, span, strong, td, th, u
+     * The DOM element must be one of the allowed elements. Allowed elements are `<input>`, as well as some 
+     * other text-containing elements such `<div>`. See the documentation for the full list.
      * 
      * When not an `input` element, the element may have the `contenteditable` set. If it does, all
      * entered values are formatted according to the given options. Otherwise, the formatted value is
      * set once and no further edits are possible. 
      * 
      * @param element Either one of the allowed elements, or a CSS selector string for a single element. 
-     * @param options Settings for auto numeric.
+     * @param options Settings for AutoNumeric.
      */
     constructor(
         element: string | HTMLElement,
@@ -61,11 +60,10 @@ declare class AutoNumeric {
     );
 
     /**
-     * Enables the auto numeric feature for the given elements.
+     * Enables the AutoNumeric feature for the given elements.
      * 
-     * The DOM element must be one of the allowed elements:
-     * 
-     * > b, caption, cite, code, const, dd, del, div, dfn, dt, em, h1, h2, h3, h4, h5, h6, input, ins, kdb, label, li, option, output, p, q, s, sample, span, strong, td, th, u
+     * The DOM element must be one of the allowed elements. Allowed elements are `<input>`, as well as some 
+     * other text-containing elements such `<div>`. See the documentation for the full list.
      * 
      * When not an `input` element, the element may have the `contenteditable` set. If it does, all
      * entered values are formatted according to the given options. Otherwise, the formatted value is
@@ -73,7 +71,7 @@ declare class AutoNumeric {
      * @param elements A list of elements, which may be a CSS selector string.
      * @param initialValue Initial value to set. Can be an array to set a different value for each element. When `null`, the
      * value of the DOM element is used.
-     * @param options Auto numeric options. Can be an array to use a different set of options for each element.
+     * @param options AutoNumeric options. Can be an array to use a different set of options for each element.
      */
     static multiple(
         elements: string | HTMLElement[] | { rootElement: HTMLElement; exclude?: HTMLInputElement[] },
@@ -82,17 +80,16 @@ declare class AutoNumeric {
     ): AutoNumeric[];
 
     /**
-     * Enables the auto numeric feature for the given elements.
+     * Enables the AutoNumeric feature for the given elements.
      * 
-     * The DOM element must be one of the allowed elements:
-     * 
-     * > b, caption, cite, code, const, dd, del, div, dfn, dt, em, h1, h2, h3, h4, h5, h6, input, ins, kdb, label, li, option, output, p, q, s, sample, span, strong, td, th, u
+     * The DOM element must be one of the allowed elements. Allowed elements are `<input>`, as well as some 
+     * other text-containing elements such `<div>`. See the documentation for the full list.
      * 
      * When not an `input` element, the element may have the `contenteditable` set. If it does, all
      * entered values are formatted according to the given options. Otherwise, the formatted value is
      * set once and no further edits are possible. 
      * @param elements A list of elements, which may be a CSS selector string.
-     * @param options Auto numeric options. Can be an array to use a different set of options for each element.
+     * @param options AutoNumeric options. Can be an array to use a different set of options for each element.
      */
     static multiple(
         elements: string | HTMLElement[] | { rootElement: HTMLElement; exclude?: HTMLInputElement[] },
@@ -126,7 +123,7 @@ declare class AutoNumeric {
     static getAutoNumericElement(domElement: HTMLElement): AutoNumeric;
 
     /**
-     * Return the default autoNumeric settings
+     * Return the default AutoNumeric settings
      */
     static getDefaultConfig(): Required<Options>;
 
@@ -203,11 +200,11 @@ declare class AutoNumeric {
     static mergeOptions(options: (Options | string)[]): Options;
 
     /**
-     * Test if the given DOM element, or the element selected by the given selector string is already managed by auto numeric
+     * Test if the given DOM element, or the element selected by the given selector string is already managed by AutoNumeric
      * (if it has been initialized on the current page).
      *
      * @param domElementOrSelector The DOM element to test. A string is interpreted as a CSS selector that should return one element, if any.
-     * @returns Whether the element is managed by auto numeric.
+     * @returns Whether the element is managed by AutoNumeric.
      */
     static test(domElement: HTMLElement | string): boolean;
 
@@ -255,9 +252,9 @@ declare class AutoNumeric {
     static validate(options: Options, shouldExtendDefaultOptions?: boolean, originalOptions?: Options | null): void;
     
     /**
-     * Returns the auto numeric version number (for debugging purpose).
+     * Returns the AutoNumeric version number (for debugging purpose).
      *
-     * @returns The current auto numeric version.
+     * @returns The current AutoNumeric version.
      */
     static version(): string;
 
@@ -270,9 +267,9 @@ declare class AutoNumeric {
      * Set the given element value, and format it immediately.
      * Additionally, this `set()` method can accept options that will be merged into the current AutoNumeric element, taking precedence over any previous settings.
      *
-     * @example anElement.set(`12345.67`) // Formats the value
+     * @example anElement.set('12345.67') // Formats the value
      * @example anElement.set(12345.67) // Formats the value
-     * @example anElement.set(12345.67, { decimalCharacter : `,` }) // Update the settings and formats the value in one go
+     * @example anElement.set(12345.67, { decimalCharacter : ',' }) // Update the settings and formats the value in one go
      * @example anElement.northAmerican().set('$12,345.67') // Set an already formatted value (this does not _exactly_ respect the currency symbol/negative placements, but only remove all non-numbers characters, according to the ones given in the settings)
      * @example anElement.set(null) // Set the rawValue and element value to `null`
      *
@@ -352,7 +349,9 @@ declare class AutoNumeric {
 
     /**
      * Returns the options object containing all the current autoNumeric settings in effect.
-     * You can then directly access each option by using its name : `anElement.getSettings().optionNameAutoCompleted`.
+     * You can then directly access each option by using its name:
+     * 
+     * > anElement.getSettings().optionNameAutoCompleted
      * @returns The current settings for this instance.
      */
     getSettings(): Required<Options>;
@@ -460,15 +459,15 @@ declare class AutoNumeric {
 
     /**
      * Return the DOM element reference of the autoNumeric-managed element. The exact type depends
-     * on the element that on which auto numeric was initialized - auto numerics supports input elements
+     * on the element that on which AutoNumeric was initialized - AutoNumeric supports input elements
      * as well as other content editable elements such as div elements.
      */
     node(): HTMLElement;
 
     /**
-     * Return the DOM element reference of the parent node of the auto numeric managed element
+     * Return the DOM element reference of the parent node of the AutoNumeric managed element
      *
-     * @returns The parent of the auto numeric element.
+     * @returns The parent of the AutoNumeric element.
      */
     parent(): HTMLElement;
 
@@ -512,7 +511,7 @@ declare class AutoNumeric {
      *
      * @param domElement A single element to initialize.
      * @param attached If set to `false`, then the newly generated AutoNumeric element will not share the same local element list.
-     * @returns The initialized auto numeric instance.
+     * @returns The initialized AutoNumeric instance.
      */
     init(domElement: HTMLElement, attached?: boolean): AutoNumeric;
     /**
@@ -530,7 +529,7 @@ declare class AutoNumeric {
      *
      * @param domElement A list of elements, or a string representing a CSS selector.
      * @param attached If set to `false`, then the newly generated AutoNumeric element will not share the same local element list.
-     * @returns The initialized auto numeric instances.
+     * @returns The initialized AutoNumeric instances.
      */
     init(domElement: HTMLElement[] | string, attached?: boolean): AutoNumeric[];
 
@@ -545,9 +544,9 @@ declare class AutoNumeric {
      *
      * In either case, whenever a new parent form is set for the current AutoNumeric element, we make sure to update the anCount and anFormHandler attributes on both the old form and the new one (for instance in case the user moved the input elements with `appendChild()` since AutoNumeric cannot not detect that).
      *
-     * @param forceSearch If set to `true`, the parent form is searched again, even if `this.parentForm` is already set.
+     * @param forceSearch Whether to force a new search for the parent `<form>` element, discarding any previously found one. Defaults to `false`.
      *
-     * @returns The form element containing this auto numeric element, if any.
+     * @returns The form element containing this AutoNumeric element, if any.
      */
     form(forceSearch?: boolean): HTMLFormElement | null;
 
@@ -579,14 +578,14 @@ declare class AutoNumeric {
 
     /**
      * Return an array containing an object for each form <input> element. The name of each pair is the name of the DOM elements.
-     * The value is is stringified numeric value of each auto numeric input.
+     * The value is is stringified numeric value of each AutoNumeric input.
      * @returns The numerical values.
      */
     formArrayNumericString(): NameValuePair<number | string>[];
 
     /**
      * Return an array containing an object for each form <input> element. The name of each pair is the name of the DOM elements.
-     * The value is is formatted value of each auto numeric input.
+     * The value is is formatted value of each AutoNumeric input.
      * @returns The formatted values.
      */
     formArrayFormatted(): NameValuePair<string>[];
@@ -594,7 +593,7 @@ declare class AutoNumeric {
     /**
      * Return an array containing an object for each form <input> element. The name of each pair is the name of the DOM elements.
      * 
-     * The value is is localized value of each auto numeric input.
+     * The value is is localized value of each AutoNumeric input.
      * 
      * Values might be a string or a number, depending on the `outputFormat` option.
      *
@@ -605,24 +604,25 @@ declare class AutoNumeric {
 
     /**
      * Return an array containing an object for each form <input> element, stringified as a JSON string.
-     * The name of each pair is the name of the DOM elements. The value is is localized value of each auto numeric input.
+     * The name of each pair is the name of the DOM elements. The value is is localized value of each AutoNumeric input.
      * @returns The numerical values.
      */
     formJsonNumericString(): string;
 
     /**
      * Return an array containing an object for each form <input> element, stringified as a JSON string.
-     * The name of each pair is the name of the DOM elements. The value is is formatted value of each auto numeric input.
+     * The name of each pair is the name of the DOM elements. The value is is formatted value of each AutoNumeric input.
      * @returns The formatted values.
      */
     formJsonFormatted(): string;
 
     /**
      * Return an array containing an object for each form <input> element, stringified as a JSON string.
-     * The name of each pair is the name of the DOM elements. The value is is localized value of each auto numeric input.
+     * The name of each pair is the name of the DOM elements. The value is is localized value of each AutoNumeric input.
+     * @param forcedOutputFormat If set to something different from `null`, then this is used as an override for the `outputFormat` option.
      * @returns The localized values.
      */
-    formJsonLocalized(): string;
+    formJsonLocalized(forcedOutputFormat?: OutputFormatOption | null): string;
 
     /**
      * Unformat all the autoNumeric-managed elements that are a child of the parent <form> element of this DOM element, to numeric strings
@@ -798,7 +798,7 @@ declare namespace AutoNumeric {
     } & {
        /**
         * Reset any options set previously, by overwriting them with the default settings
-        * @returns This auto numeric instance for chaining method calls.
+        * @returns This AutoNumeric instance for chaining method calls.
         */
         reset: () => AutoNumeric;
     };
@@ -987,7 +987,7 @@ declare namespace AutoNumeric {
         invalidClass?: string;
 
         /**
-         * Allow the user to `cancel` and undo the changes he made to the given autonumeric-managed element, by pressing the `Escape` key.
+         * Allow the user to `cancel` and undo the changes he made to the given AutoNumeric-managed element, by pressing the `Escape` key.
          * 
          * Whenever the user validates the input (either by hitting `Enter`, or blurring the element), the new value is saved for subsequent cancellations.
          *

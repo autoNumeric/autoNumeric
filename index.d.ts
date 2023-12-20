@@ -18,7 +18,7 @@
  */
 export = AutoNumeric;
 
-import { CallbackOptions, GetValueCallback, NameValuePair, Options, OptionsHandler, OutputFormatOption, PredefinedOptions } from 'autonumeric';
+import { AutoNumericGlobal, CallbackOptions, GetValueCallback, NameValuePair, Options, OptionsHandler, OutputFormatOption, PredefinedOptions } from 'autonumeric';
 
 declare class AutoNumeric {
     /**
@@ -274,6 +274,16 @@ declare class AutoNumeric {
     readonly options: OptionsHandler;
 
     /**
+     * Whenever {@link init} is used to initialize other DOM elements, a shared local `init` list of those elements is stored in
+     * the AutoNumeric instances.
+     * 
+     * This allows for neat things like modifying all those linked AutoNumeric elements globally, with only one call.
+     * 
+     * Use this property to access the handler that provides methods to modify all linked elements.
+     */
+    readonly global: AutoNumericGlobal;
+
+    /**
      * Set the given element value, and format it immediately.
      * Additionally, this `set()` method can accept options that will be merged into the current AutoNumeric element, taking precedence over any previous settings.
      *
@@ -308,6 +318,8 @@ declare class AutoNumeric {
 
     /**
      * Return the current formatted value of the AutoNumeric element as a string.
+     * @param callback Optional callback that, when given, is called with the value and the AutoNumeric instance.
+     * @returns The formatted value.
      */
     getFormatted(
         callback?: GetValueCallback<string> | null
@@ -315,6 +327,8 @@ declare class AutoNumeric {
 
     /**
      * Return the element unformatted value as a real JavaScript number.
+     * @param callback Optional callback that, when given, is called with the value and the AutoNumeric instance.
+     * @returns The number value.
      */
     getNumber(
         callback?: GetValueCallback<number | null> | null
@@ -323,6 +337,8 @@ declare class AutoNumeric {
     /**
      * Return the unformatted value as a string.
      * This can also return `null` if `rawValue` is null.
+     * @param callback Optional callback that, when given, is called with the value and the AutoNumeric instance.
+     * @returns The numerical value.
      */
     getNumericString(
         callback?: GetValueCallback<string | null> | null
@@ -338,7 +354,7 @@ declare class AutoNumeric {
      *
      * Check the `outputFormat` option definition for more details.
      * @param forcedOutputFormat Override for the `outputFormat` option.
-     * @param callback Optional callback to invoke with the localized number.
+     * @param callback Optional callback that, when given, is called with the value and the AutoNumeric instance.
      * @returns The localized value.
      */
     getLocalized(forcedOutputFormat?: OutputFormatOption | null, callback?: GetValueCallback<string | number> | null): string | number;
@@ -352,7 +368,7 @@ declare class AutoNumeric {
      * By default the returned values are an ISO numeric string "1234.56" or "-1234.56" where the decimal character is a period.
      * 
      * Check the `outputFormat` option definition for more details.
-     * @param callback Optional callback to invoke with the localized number.
+     * @param callback Optional callback that, when given, is called with the value and the AutoNumeric instance.
      * @returns The localized value.
      */
     getLocalized(callback: GetValueCallback<string | number>): string | number;
@@ -434,15 +450,17 @@ declare class AutoNumeric {
 
     /**
      * Reset the element value either to the empty string '', or the currency sign, depending on the `emptyInputBehavior` option value.
-     * If you set the `forceClearAll` argument to `true`, then the `emptyInputBehavior` option is overridden and the whole input is clear, including any currency sign.
+     * If you set the `forceClearAll` argument to `true`, then the `emptyInputBehavior` option is overridden
+     * and the whole input is cleared, including any currency sign.
      *
-     * @param forceClearAll
+     * @param forceClearAll `true` to clear the the entire input, including the currency sign.
      * @returns This instance for chaining method calls.
      */
     clear(forceClearAll?: boolean): AutoNumeric;
 
     /**
      * Updates the AutoNumeric settings, and immediately format the element accordingly.
+     * @param options New options to set. When multiple options are specified, later options override previous options.
      * @returns This instance for chaining method calls.
      */
     update(...options: CallbackOptions[]): AutoNumeric;
@@ -844,6 +862,16 @@ declare namespace AutoNumeric {
          */
         caretPositionOnFocus?: CaretPositionOption | null;
 
+       /**
+        * Defines if the decimal character or decimal character alternative should be accepted when there is already a
+        * decimal character shown in the element.
+        * 
+        * If set to `true`, any decimal character input will be accepted and will subsequently modify the decimal character
+        * position, as well as the `rawValue`.
+        * 
+        * If set to `false`, the decimal character and its alternative key will be dropped as before. This is the default setting.
+        * @default false
+        */
         alwaysAllowDecimalCharacter?: boolean;
 
         /**
@@ -955,6 +983,7 @@ declare namespace AutoNumeric {
 
         /**
          * Defines if the custom and native events triggered by AutoNumeric should be cancelable.
+         * @default true
          */
         eventIsCancelable?: boolean;
 
@@ -1362,7 +1391,197 @@ declare namespace AutoNumeric {
      */
     export type CallbackOptions = { [K in keyof Options]: ValueOrCallback<Required<Options>[K]> };
 
-    interface PredefinedLanguages {
+    /**
+     * Whenever {@link init} is used to initialize other DOM elements, a shared local `init` list of those elements is stored in
+     * the AutoNumeric instances.
+     * 
+     * This allows for neat things like modifying all those linked AutoNumeric elements globally, with only one call.
+     * 
+     * Use the {@link AutoNumeric.global} property to access the handler that provides methods to modify all linked elements.
+     */
+    export interface AutoNumericGlobal {
+        /**
+         * Add an existing AutoNumeric object (or DOM element) to the local AutoNumeric element list, using the DOM element as the key.
+         * This manages the case where `addObject` is used on an AutoNumeric object that already has multiple elements in its local list.
+         * @param element The AutoNumeric element to add.
+         */
+        readonly addObject: (element: HTMLElement | AutoNumeric) => void;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.clear} method on each AutoNumeric object in the local AutoNumeric element list
+         *
+         * @param forceClearAll `true` to clear the the entire input, including the currency sign.
+         */
+        readonly clear: (forceClearAll?: boolean) => void;
+
+        /**
+         * Gets an array containing all the AutoNumeric DOM elements that have been initialized by each other.
+         * @returns An array with all AutoNumeric DOM elements.
+         */
+        readonly elements: () => HTMLElement[];
+
+        /**
+         * Remove all elements from the shared list, effectively emptying it.
+         * This is the equivalent of calling {@link AutoNumeric.detach} on each of its elements.
+         * @param keepEachAnObjectInItsOwnList If set to `true`, then instead of completely emptying the local list
+         * of each AutoNumeric objects, each one of those keeps itself in its own local list.
+         */
+        readonly empty: (keepEachAnObjectInItsOwnList?: boolean) => void;
+
+        // The get() function is deprecated and should not be used. Omitted from TS def for that reason.
+
+        /**
+         * Gets a map containing all the AutoNumeric DOM elements that have been initialized by each other.
+         * The key is the DOM element, the value the corresponding AutoNumeric instance.
+         * @returns A map with all AutoNumeric instances.
+         */
+        readonly getList: () => Map<HTMLElement, AutoNumeric>;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.getNumericString} method on each AutoNumeric object in the local AutoNumeric element list.
+         * 
+         * Return an array of the unformatted values of each AutoNumeric element of the local AutoNumeric element list
+         * This can also return `null` if `rawValue` is null.
+         * @param callback Optional callback that, when given, is called with the value and the AutoNumeric instance.
+         * @returns The numeric value for each linked AutoNumeric instance.
+         */
+        readonly getNumericString: (callback?: GetValueCallback<Array<string | null>> | null) => Array<string | null>;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.getFormatted} method on each AutoNumeric object in the local AutoNumeric element list.
+         * 
+         * Return an array of the current formatted values of each AutoNumeric element of the local AutoNumeric element list
+         * @param callback Optional callback that, when given, is called with the value and the AutoNumeric instance.
+         * @returns The formatted value for each linked AutoNumeric instance.
+         */
+        readonly getFormatted: (
+            callback?: GetValueCallback<Array<string>> | null
+        ) => Array<string>;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.getNumber} method on each AutoNumeric object in the local AutoNumeric element list.
+         * 
+         * Return an array of the element unformatted values (as a real Javascript number), for
+         * each element of the local AutoNumeric element list.
+         * @param callback Optional callback that, when given, is called with the value and the AutoNumeric instance.
+         * @returns The number value for each linked AutoNumeric instance.
+         */
+        readonly getNumber: (callback?: GetValueCallback<Array<number | null>> | null) => Array<number | null>;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.getLocalized} method on each AutoNumeric object in the local AutoNumeric element list.
+         * 
+         * Returns the unformatted values (following the `outputFormat`) setting of each element
+         * of the local AutoNumeric element list into an array.
+         * @param callback Optional callback that, when given, is called with the value and the AutoNumeric instance.
+         * @returns The localized value for each linked AutoNumeric instance.
+         */
+        readonly getLocalized: (callback: GetValueCallback<Array<string | number>>) => Array<string | number>;
+
+        /**
+         * Return `true` if the given AutoNumeric instance (or DOM element) is in the local AutoNumeric element list.
+         * @param element The element to check.
+         * @returns Whether the given element is in the local AutoNumeric element list.
+         */
+        readonly has: (element: HTMLElement | AutoNumeric) => unknown;
+
+        /**
+         * Return `true` if *all* the AutoNumeric-managed elements are pristine, i.e. if their raw value hasn't changed.
+         * By default, this returns `true` if the raw unformatted value is still the same even if the formatted one has changed
+         * (due to a configuration update for instance).
+         * @param checkOnlyRawValue If set to `true`, the pristine value is done on the raw unformatted value, not the
+         * formatted one. If set to `false`, this also checks that the formatted value hasn't changed.
+         * @returns Whether all AutoNumeric-managed elements are pristine.
+         */
+        readonly isPristine: (checkOnlyRawValue?: boolean) => boolean;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.nuke} method on each AutoNumeric object in the local AutoNumeric element list.
+         */
+        readonly nuke: () => void;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.reformat} method on each AutoNumeric object in the local AutoNumeric element list.
+         * 
+         * Force each element of the local AutoNumeric element list to reformat its value.
+         */
+        readonly reformat: () => void;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.remove} method on each AutoNumeric object in the local AutoNumeric element list.
+         */
+        readonly remove: () => void;
+
+        /**
+         * Remove the given AutoNumeric object (or DOM element) from the local AutoNumeric element list, using the DOM element as the key.
+         * If this function attempts to remove the current AutoNumeric object from the local list, a warning is shown, but the deletion is still done.
+         *
+         * Special cases :
+         * - If the current object removes itself, then it's removed from the shared local list, then a new empty local list is used/created
+         * - If another object remove this object, then a local list with only this object is used/created
+         * @param element The AutoNumeric element to remove.
+         * @param keepCurrentAnObject If set to `false`, then the function will also remove the current AutoNumeric object if asked,
+         * otherwise it will ignore it and print a warning message.
+         */
+        readonly removeObject: (element: HTMLElement | AutoNumeric, keepCurrentAnObject?: boolean) => void;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.set} method on each AutoNumeric object in the local AutoNumeric element list.
+         * 
+         * Set the same given element value for each element in the local AutoNumeric element list, and format those elements immediately.
+         * @param newValue The new value to set.
+         * @param options A settings object that will override the current settings. Note: the update is done only if the `newValue` is defined.
+         */
+        readonly set: (newValue: number | string | null, options?: CallbackOptions) => void;
+    
+        /**
+         * Return the number of element in the local AutoNumeric element list.
+         * @returns The number of linked AutoNumeric elements. 
+         */
+        readonly size: () => number;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.setUnformatted} method on each AutoNumeric object in the local AutoNumeric element list.
+         * 
+         * Set the value given value directly as the DOM element value, without formatting it beforehand.
+         * This sets the same unformatted value for each element in the local AutoNumeric element list.
+         * @param value The new value to set.
+         * @param options A settings object that will override the current settings. Note: the update is done only if the `newValue` is defined.
+         */
+        readonly setUnformatted: (value: number | string | null, options?: CallbackOptions) => void;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.unformat} method on each AutoNumeric object in the local AutoNumeric element list.
+         * 
+         * Remove the formatting and keep only the raw unformatted value (as a numericString) in each element
+         * of the local AutoNumeric element list
+         */
+        readonly unformat: () => void;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.unformatLocalized} method on each AutoNumeric object in the local AutoNumeric element list.
+         * 
+         * Remove the formatting and keep only the localized unformatted value in the element.
+         * @param forcedOutputFormat Optional override for the default `outputFormat` setting if needed.
+         */
+        readonly unformatLocalized: (forcedOutputFormat?: OutputFormatOption) => void;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.update} method on each AutoNumeric object in the local AutoNumeric element list.
+         * 
+         * Updates the AutoNumeric settings, and immediately format the elements accordingly, for each element of
+         * the local AutoNumeric element list.
+         * @param newOptions New options to set. When multiple options are specified, later options override previous options.
+         */
+        readonly update: (...newOptions: CallbackOptions[]) => void;
+
+        /**
+         * Execute the {@link AutoNumeric.prototype.wipe} method on each AutoNumeric object in the local AutoNumeric element list.
+         */
+        readonly wipe: () => void;
+    }
+
+    export interface PredefinedLanguages {
         French: Partial<Options>;
         Spanish: Partial<Options>;
         NorthAmerican: Partial<Options>;
@@ -1374,7 +1593,7 @@ declare namespace AutoNumeric {
         Turkish: Partial<Options>;
     }
 
-    interface PredefinedCurrencies {
+    export interface PredefinedCurrencies {
         euro: Partial<Options>;
         euroPos: Partial<Options>;
         euroNeg: Partial<Options>;
@@ -1399,7 +1618,7 @@ declare namespace AutoNumeric {
         percentageUS3decNeg: Partial<Options>;
     }
     
-    interface PredefinedNumbers {
+    export interface PredefinedNumbers {
         dotDecimalCharCommaSeparator: Partial<Options>;
         commaDecimalCharDotSeparator: Partial<Options>;
         integer: Partial<Options>;
@@ -1413,5 +1632,5 @@ declare namespace AutoNumeric {
         numericNeg: Partial<Options>;
     }
     
-    type PredefinedOptions = Partial<Options> & PredefinedLanguages & PredefinedCurrencies & PredefinedNumbers;
+    export type PredefinedOptions = Partial<Options> & PredefinedLanguages & PredefinedCurrencies & PredefinedNumbers;
 }

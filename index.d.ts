@@ -235,6 +235,16 @@ declare class AutoNumeric {
     static unformatAndSet(value: HTMLElement, options?: Options | null): number | string;
 
     /**
+     * Set the given value on the AutoNumeric object that manages the given DOM element, if any.
+     * @param element DOM element with a value to unformat and set. Can be a CSS selector string.
+     * @param newValue The new value to set. Can be `null` when `emptyInputBehavior` is set to `null`.
+     * @param options A settings object that will override the current settings. Note: the update is done only if the `newValue` is defined.
+     * @param saveChangeToHistory If set to `true`, then the change is recorded in the history table. Defaults to `true`.
+     * @returns The AutoNumeric instance of the given element, or `null` if no such instance was found.
+     */
+    static set(element: HTMLElement | string, newValue: number | string | null, options?: CallbackOptions | null, saveChangeToHistory?: boolean): AutoNumeric | null;
+
+    /**
      * Validate the given option object.
      * 
      * If the options are valid, this function returns nothing, otherwise if the options are invalid, this function throws an error.

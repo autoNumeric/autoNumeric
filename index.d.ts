@@ -18,7 +18,44 @@
  */
 export = AutoNumeric;
 
-import { AutoNumericGlobal, CallbackOptions, GetValueCallback, NameValuePair, Options, OptionsHandler, OutputFormatOption, PredefinedOptions } from 'autonumeric';
+import {
+    AutoNumericEventInitialized,
+    AutoNumericEventInvalidFormula,
+    AutoNumericEventRawValueModified,
+    AutoNumericEventFormatted,
+    AutoNumericEventValidFormula,
+    AutoNumericGlobal,
+    CallbackOptions,
+    GetValueCallback,
+    NameValuePair,
+    Options,
+    OptionsHandler,
+    OutputFormatOption,
+    PredefinedOptions
+} from 'autonumeric';
+
+declare global {
+    interface GlobalEventHandlersEventMap {
+        /** When an invalid value is corrected. */
+        "autoNumeric:correctedValue": CustomEvent<null>;
+        /** When the AutoNumeric element is initialized. */
+        "autoNumeric:initialized": CustomEvent<AutoNumericEventInitialized>;
+        /** When the user tries to validate an invalid math expression. */
+        "autoNumeric:invalidFormula": CustomEvent<AutoNumericEventInvalidFormula>;
+        /** When an invalid value is entered (ie. when the raw value is out of the min/max range). */
+        "autoNumeric:invalidValue": CustomEvent<null>;
+        /** When the `rawValue` is modified. */
+        "autoNumeric:rawValueModified": CustomEvent<AutoNumericEventRawValueModified>;
+        /** When all the formatting is done and the formatted string is modified. */
+        "autoNumeric:formatted": CustomEvent<AutoNumericEventFormatted>;
+        /** When the `minimumValue` is not respected. */
+        "autoNumeric:minExceeded": CustomEvent<null>;
+        /** When the `maximumValue` is not respected. */
+        "autoNumeric:maxExceeded": CustomEvent<null>;
+        /** When the user validates a valid math expression. */
+        "autoNumeric:validFormula": CustomEvent<AutoNumericEventValidFormula>;
+    }
+}
 
 declare class AutoNumeric {
     /**
@@ -260,7 +297,7 @@ declare class AutoNumeric {
      * @throws If the given options are not valid.
      */
     static validate(options: Options, shouldExtendDefaultOptions?: boolean, originalOptions?: Options | null): void;
-    
+
     /**
      * Returns the AutoNumeric version number (for debugging purpose).
      *
@@ -411,7 +448,7 @@ declare class AutoNumeric {
      * @returns If this instance is pristine.
      */
     isPristine(checkOnlyRawValue?: boolean): boolean;
-    
+
     /**
      * Select the formatted element content, based on the `selectNumberOnly` option
      *
@@ -911,10 +948,10 @@ declare namespace AutoNumeric {
     export type OptionsHandler = {
         [K in keyof Options]-?: (value: Required<Options[K]>) => AutoNumeric
     } & {
-       /**
-        * Reset any options set previously, by overwriting them with the default settings
-        * @returns This AutoNumeric instance for chaining method calls.
-        */
+        /**
+         * Reset any options set previously, by overwriting them with the default settings
+         * @returns This AutoNumeric instance for chaining method calls.
+         */
         reset: () => AutoNumeric;
     };
 
@@ -942,16 +979,16 @@ declare namespace AutoNumeric {
          */
         caretPositionOnFocus?: CaretPositionOption | null;
 
-       /**
-        * Defines if the decimal character or decimal character alternative should be accepted when there is already a
-        * decimal character shown in the element.
-        * 
-        * If set to `true`, any decimal character input will be accepted and will subsequently modify the decimal character
-        * position, as well as the `rawValue`.
-        * 
-        * If set to `false`, the decimal character and its alternative key will be dropped as before. This is the default setting.
-        * @default false
-        */
+        /**
+         * Defines if the decimal character or decimal character alternative should be accepted when there is already a
+         * decimal character shown in the element.
+         * 
+         * If set to `true`, any decimal character input will be accepted and will subsequently modify the decimal character
+         * position, as well as the `rawValue`.
+         * 
+         * If set to `false`, the decimal character and its alternative key will be dropped as before. This is the default setting.
+         * @default false
+         */
         alwaysAllowDecimalCharacter?: boolean;
 
         /**
@@ -1375,9 +1412,9 @@ declare namespace AutoNumeric {
                 classes: [string] | [string, string];
             }
                 | {
-                callback: (rawValue: number) => number | number[] | null;
-                classes: string[];
-            }
+                    callback: (rawValue: number) => number | number[] | null;
+                    classes: string[];
+                }
                 | { callback: (autoNumericInstance: AutoNumeric) => void }>;
         } | null;
 
@@ -1613,7 +1650,7 @@ declare namespace AutoNumeric {
          * @param options A settings object that will override the current settings. Note: the update is done only if the `newValue` is defined.
          */
         readonly set: (newValue: number | string | null, options?: CallbackOptions) => void;
-    
+
         /**
          * Return the number of element in the local AutoNumeric element list.
          * @returns The number of linked AutoNumeric elements. 
@@ -1661,6 +1698,76 @@ declare namespace AutoNumeric {
         readonly wipe: () => void;
     }
 
+    /**
+     * A custom event details object with either the given properties and `error` set to `null`, or all
+     * properties `null` and a string error message.
+     * @typeParam T Properties available when there is no error. 
+     */
+    export type AutoNumericEventSuccessOrError<T> = (AutoNumericEventFormattedData & {
+        /** The error message, `null` if there are no errors. */
+        error: null;
+    }) | ({ [K in keyof T]: null } & {
+        /** The error message, `null` if there are no errors. */
+        error: string;
+    });
+
+    export interface AutoNumericEventFormattedData {
+        /** The AutoNumeric instance emitting this event */
+        aNElement: AutoNumeric;
+        /** Is the element value still pristine? In other words, has its value changed since its initialization? */
+        isPristine: boolean;
+        /** The new raw value. */
+        newRawValue: number | null;
+        /** The new formatted value. */
+        newValue: string;
+        /** The previous raw value. */
+        oldRawValue: number | null;
+        /** The previous formatted value. */
+        oldValue: string;
+    }
+
+    export interface AutoNumericEventRawValueModifiedData {
+        /** The AutoNumeric instance emitting this event */
+        aNElement: AutoNumeric;
+        /** Is the element value still pristine? In other words, has its value changed since its initialization? */
+        isPristine: boolean;
+        /** The new raw value. */
+        newRawValue: number | null;
+        /** The previous raw value. */
+        oldRawValue: number | null;
+    }
+
+    export interface AutoNumericEventInitializedData {
+        /** The AutoNumeric instance emitting this event */
+        aNElement: AutoNumeric;
+        /** The new raw value. */
+        newRawValue: number | null;
+        /** The new formatted value. */
+        newValue: string;
+    }
+
+    export type AutoNumericEventFormatted = AutoNumericEventSuccessOrError<AutoNumericEventFormattedData>;
+
+    export type AutoNumericEventRawValueModified = AutoNumericEventSuccessOrError<AutoNumericEventRawValueModifiedData>;
+
+    export type AutoNumericEventInitialized = AutoNumericEventSuccessOrError<AutoNumericEventInitializedData>;
+
+    export interface AutoNumericEventInvalidFormula {
+        /** The AutoNumeric instance emitting this event. */
+        aNElement: AutoNumeric;
+        /** The invalid formula. */
+        formula: string;
+    }
+
+    export interface AutoNumericEventValidFormula {
+        /** The AutoNumeric instance emitting this event. */
+        aNElement: AutoNumeric;
+        /** The valid formula. */
+        formula: string;
+        /** The math expression result. */
+        result: number;
+    }
+
     export interface PredefinedLanguages {
         French: Partial<Options>;
         Spanish: Partial<Options>;
@@ -1697,7 +1804,7 @@ declare namespace AutoNumeric {
         percentageUS3decPos: Partial<Options>;
         percentageUS3decNeg: Partial<Options>;
     }
-    
+
     export interface PredefinedNumbers {
         dotDecimalCharCommaSeparator: Partial<Options>;
         commaDecimalCharDotSeparator: Partial<Options>;
@@ -1711,6 +1818,6 @@ declare namespace AutoNumeric {
         numericPos: Partial<Options>;
         numericNeg: Partial<Options>;
     }
-    
+
     export type PredefinedOptions = Partial<Options> & PredefinedLanguages & PredefinedCurrencies & PredefinedNumbers;
 }

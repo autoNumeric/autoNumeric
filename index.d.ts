@@ -660,6 +660,14 @@ declare class AutoNumeric {
     formUnformat(): AutoNumeric;
 
     /**
+     * Unformat all the autoNumeric-managed elements that are a child of the parent `<form>` element of
+     * this DOM element, to localized strings
+     * 
+     * @returns This instance for chaining method calls.
+     */
+    formUnformatLocalized(): AutoNumeric;
+
+    /**
      * Reformat all the autoNumeric-managed elements that are a child of the parent <form> element of this DOM element
      *
      * @returns This instance for chaining method calls.
@@ -1012,7 +1020,7 @@ declare namespace AutoNumeric {
          * 
          * If the formula is invalid, the previous valid `rawValue` is set back, and the `autoNumeric:invalidFormula` event is sent.
          * 
-         * When a valid formula is accepted, then its result is `set()`, and the `autoNumeric:validFormula` event is sent.
+         * When a valid formula is accepted, then its result is {@link AutoNumeric.prototype.set set}, and the `autoNumeric:validFormula` event is sent.
          *
          * By default, this mode is disabled.
          */

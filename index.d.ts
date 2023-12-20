@@ -18,7 +18,7 @@
  */
 export = AutoNumeric;
 
-import { CallbackOptions, NameValuePair, Options, OptionsHandler, OutputFormatOption, PredefinedOptions } from 'autonumeric';
+import { CallbackOptions, GetValueCallback, NameValuePair, Options, OptionsHandler, OutputFormatOption, PredefinedOptions } from 'autonumeric';
 
 declare class AutoNumeric {
     /**
@@ -310,14 +310,14 @@ declare class AutoNumeric {
      * Return the current formatted value of the AutoNumeric element as a string.
      */
     getFormatted(
-        callback?: (value: string, instance: AutoNumeric) => void
+        callback?: GetValueCallback<string> | null
     ): string;
 
     /**
      * Return the element unformatted value as a real JavaScript number.
      */
     getNumber(
-        callback?: (value: number | null, instance: AutoNumeric) => void | null
+        callback?: GetValueCallback<number | null> | null
     ): number | null;
 
     /**
@@ -325,7 +325,7 @@ declare class AutoNumeric {
      * This can also return `null` if `rawValue` is null.
      */
     getNumericString(
-        callback?: (value: string | null, instance: AutoNumeric) => void | null
+        callback?: GetValueCallback<string | null> | null
     ): string | null;
 
     /**
@@ -341,7 +341,7 @@ declare class AutoNumeric {
      * @param callback Optional callback to invoke with the localized number.
      * @returns The localized value.
      */
-    getLocalized(forcedOutputFormat?: OutputFormatOption | null, callback?: ((value: string | number) => void) | null): string | number;
+    getLocalized(forcedOutputFormat?: OutputFormatOption | null, callback?: GetValueCallback<string | number> | null): string | number;
 
     /**
      * Returns the unformatted value, but following the `outputFormat` setting, which means the output can either be:
@@ -355,7 +355,7 @@ declare class AutoNumeric {
      * @param callback Optional callback to invoke with the localized number.
      * @returns The localized value.
      */
-    getLocalized(callback: (value: string | number) => void): string | number;
+    getLocalized(callback: GetValueCallback<string | number>): string | number;
 
     /**
      * Returns the options object containing all the current autoNumeric settings in effect.
@@ -711,6 +711,13 @@ declare class AutoNumeric {
  * Exposes the types used in that definitions file
  */
 declare namespace AutoNumeric {
+    /**
+     * Callback that can optionally be passed to the various `get*` methods. Receives
+     * the value as well as the current AutoNumeric instance.
+     * @typeParam T Type of the value returned by the get method.
+     */
+    export type GetValueCallback<T> = (value: T, instance: AutoNumeric) => void;
+
     export type OutputFormatOption =
         | "string"
         | "number"

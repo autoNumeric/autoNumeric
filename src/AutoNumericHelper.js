@@ -816,7 +816,7 @@ export default class AutoNumericHelper {
      * @returns {boolean} Return `true` if the event is an instance of WheelEvent and the deltaY value is equal to zero, FALSE otherwise
      */
     static isWheelEventWithZeroDeltaY(wheelEvent) {
-        return this.isWheelEvent(wheelEvent) && this.isUndefinedOrNullOrEmpty(wheelEvent.deltaY) && wheelEvent.deltaY === 0;
+        return this.isWheelEvent(wheelEvent) && !this.isUndefinedOrNullOrEmpty(wheelEvent.deltaY) && wheelEvent.deltaY === 0;
     }
 
     /**

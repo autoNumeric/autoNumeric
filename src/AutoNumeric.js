@@ -6801,7 +6801,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         // Manage the Cut event
-        if ((e.ctrlKey || e.metaKey) && this.eventKey === AutoNumericEnum.keyName.x) {
+        if ((e.ctrlKey || e.metaKey) && (this.eventKey === AutoNumericEnum.keyName.X || this.eventKey === AutoNumericEnum.keyName.x)) {
             // Save the caret position at the start of the selection
             const caretPosition = AutoNumericHelper.getElementSelection(this.domElement).start;
             // Convert the remaining 'formatted' numbers in a Js number

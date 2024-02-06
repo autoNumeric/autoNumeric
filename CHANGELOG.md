@@ -1,5 +1,23 @@
 ## Changelog for AutoNumeric
 
+### 4.10.5
++ Adds the native `focus` event to the test page
++ Fixes cut event handling when `eventKey` `x` is in uppercase
+
+### 4.10.4
++ Fixes wrong npm deployment for `4.10.3`
+
+### 4.10.3
++ Fixes the handling of a wheel event with a deltaY equal to zero, for real this time ;)
+
+### 4.10.2
++ Bumps the AutoNumeric version to include the new index.d.ts file
++ Fixes #773 Typescript types in index.d.ts missing/wrong
+
+### 4.10.1
++ Fixes #776 On rapid event wheel emissions, deltaY of value 0 can be emitted and makes AutoNumeric throw an error
++ Adds more visibly the current AutoNumeric version being tested on the end-to-end testing page
+
 ### 4.10.0
 + Drops IE11 support
 + Removes IE11 hacks, and updates part of the code that was not using modern tech because of obsolete browsers support

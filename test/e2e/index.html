@@ -1263,6 +1263,9 @@
     pureJsInput.addEventListener('change', () => {
         console.warn('>>> Pure "Change" thrown', anElement.getNumericString());
     }, false);
+    pureJsInput.addEventListener('focus', () => {
+        console.warn('>>> Pure "focus" thrown', anElement.getNumericString());
+    }, false);
 
     //-------------- Initializing AutoNumeric on non-<input> tags
     new AutoNumeric('#tag_p1', { decimalPlacesShownOnBlur: 3, divisorWhenUnfocused: 0.01, symbolWhenUnfocused: '%', maximumValue: '999', decimalPlaces: 4 });

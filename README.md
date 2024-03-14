@@ -62,3 +62,11 @@ AutoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source
 
 AutoNumeric is created using the [JetBrains IDE](https://www.jetbrains.com/community/opensource/#support), which kindly provide access to its tools to the developers.<br>
 If you feel AutoNumeric is useful to you, please consider [supporting](https://docs.autonumeric.org/Documentation/support/) the project.
+
+### Contributors
+
+**Thanks** to all the contributors over the years for making AutoNumeric a reality!
+
+<a href="https://github.com/autoNumeric/autoNumeric/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=autoNumeric/autoNumeric" />
+</a>

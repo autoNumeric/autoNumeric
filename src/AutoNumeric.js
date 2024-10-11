@@ -3148,7 +3148,7 @@ export default class AutoNumeric {
             return [];
         }
         const elementsInside = [...formElement.querySelectorAll('[contenteditable=true]')];
-        const elementsOutside = [...document.querySelectorAll(`*:not(input)[form=${formElement.id}][contenteditable=true]`)];
+        const elementsOutside = [...document.querySelectorAll(`*:not(input)[form=${formElement.getAttribute('id')}][contenteditable=true]`)];
 
         return AutoNumericHelper.arrayUnique(elementsInside, elementsOutside);
     }

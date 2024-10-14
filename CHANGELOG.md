@@ -1,5 +1,9 @@
 ## Changelog for AutoNumeric
 
+
+### 4.10.6
++ Fixes #795 Error when resetting a form that has an input with name="id"
+
 ### 4.10.5
 + Adds the native `focus` event to the test page
 + Fixes cut event handling when `eventKey` `x` is in uppercase

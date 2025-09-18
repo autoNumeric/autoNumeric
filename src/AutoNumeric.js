@@ -6791,6 +6791,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
                 // if lastVal is updated in the undo branch, it should be update here too, otherwise backspace could delete two chars (enter 1234, ctrl-z, ctrl-y, backspace)
                 this.lastVal = AutoNumericHelper.getElementValue(e.target);
+                this.throwInput = true;
 
                 return;
             } else if (e.ctrlKey && !e.shiftKey) {
@@ -6805,6 +6806,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
                     // lastVal should be updated to properly detect change in the delete/backspace handler above
                     this.lastVal = AutoNumericHelper.getElementValue(e.target);
+                    this.throwInput = true;
 
                     return;
                 }
@@ -6818,7 +6820,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
             // if lastVal is updated in the undo branch, it should be update here too, otherwise backspace could delete two chars (enter 1234, ctrl-z, ctrl-y, backspace)
             this.lastVal = AutoNumericHelper.getElementValue(e.target);
-            
+            this.throwInput = true;
+
             return;
         }
 

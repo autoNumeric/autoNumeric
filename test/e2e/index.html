@@ -1236,7 +1236,18 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #808</p>
+			<div>
+				<input id="issue_808" type="text" placeholder="#808" value="1000">
+				<input id="issue_808_input_detector" type="text">
+			</div>
+		</div>
+	</div>
 </div>
+
 <script>
     console.log(`-------------------------------------------`);
     console.log(`Testing AutoNumeric version ${AutoNumeric.version()}.`);
@@ -2595,6 +2606,23 @@
     }
 
     new AutoNumeric('#issue_799', null, anOptions799);
+
+
+    //-------------- Issue #808
+    new AutoNumeric('#issue_808', {
+        "decimalPlaces": 0,
+        "digitGroupSeparator": ' '
+    });
+    const issue808 = document.querySelector('#issue_808');
+    const issue808InputDetector = document.querySelector('#issue_808_input_detector');
+
+    let issue808InputCount = 0;
+    issue808InputDetector.value = '0';
+
+    issue808.addEventListener('input', () => {
+        issue808InputDetector.value = ++issue808InputCount;
+    });
+
 </script>
 </body>
 </html>

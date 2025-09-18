@@ -271,24 +271,88 @@ const selectors = {
     issue768SpanOutside               : '#issue_768_spanOutside',
     issue768SpanOutsideNotCtEditable  : '#issue_768_spanOutsideNotContentEditable',
     issue768Submit                    : '#issue_768_submit',
+    issue808                          : '#issue_808',
+    issue808InputDetector             : '#issue_808_input_detector',
 };
 
 //-----------------------------------------------------------------------------
 // ---- Helper functions
 
-/*
-function helperGetCaretPosition(wdioElement) { //FIXME Find a way to allow using helper functions inside webdriver.io `execute()` blocks
-    console.log('wdioElement:', wdioElement); //DEBUG
-    // console.log('this:', this); //DEBUG
-    const selector = wdioElement.selector;
-    console.log('selector:', selector); //DEBUG
+/**
+ * Returns the {start, end} positions of the caret in the given input
+ * @param {string} domId  The input's id in the dom to query start/end caret positions
+ * @returns {Promise<{start: number, end: number}>} 
+ */
+// eslint-disable-next-line arrow-body-style
+const getCaretPositions = async domId => {
+    return await browser.execute(domId => {
+        const input = document.querySelector(domId);
+        return { start: input.selectionStart, end: input.selectionEnd };
+    }, domId);
+};
 
-    const element = document.querySelector(selector);
-    console.log('element.selectionStart:', element.selectionStart); //DEBUG
-    return element.selectionStart;
-}
-*/
+/**
+ * Returns the start position of the caret in the given input
+ * @param {string} domId  The input's id in the dom to query start/end caret positions
+ * @returns {Promise<number>} 
+ */
+// eslint-disable-next-line arrow-body-style
+const getCaretStart = async domId => {
+    return (await getCaretPositions(domId)).start;
+};
 
+/**
+ * Sends Ctrl-char key combination (e.g.: Ctrl-x or Ctrl-z) to the currently focused element (input)
+ * @param {string} char  character to send as part of the ctrl-char sequence
+ * @returns {Promise<void>} 
+ */
+const sendCtrlChar = async char => {
+    // based on https://stackoverflow.com/questions/75092823/webdriverio-browser-keysdown-arrow-is-not-working-for-a-specific-custom-drop
+    await browser.performActions([{
+        type: 'key',
+        id: 'keyboard',
+        actions: [
+            { type: 'keyDown', value: '\uE009' },
+            { type: 'pause', duration: 50 },  // 50ms might not be enough in all environments
+            { type: 'keyDown', value: char },
+            { type: 'pause', duration: 50 },
+            { type: 'keyUp', value: char },
+            { type: 'pause', duration: 50 },
+            { type: 'keyUp', value: '\uE009' },
+        ],
+    }]);
+};
+
+/**
+ * Returns true or false depending on whether the given input is hovered
+ * @param {string} domId  The input's id in the dom to query isHovered for
+ * @returns {Promise<boolean>} 
+ */
+// eslint-disable-next-line arrow-body-style
+const isHovered = async domId => {
+    return await browser.execute(domId => {
+        const input = document.querySelector(domId).matches(':hover');
+
+        return Boolean(input);
+    }, domId);
+};
+
+/**
+ * Scroll the mouse wheel by the given deltaX, deltaY amounts
+ * @param {number} deltaX
+ * @param {number} deltaY
+ * @param {number} duration
+ * @returns {Promise<void>} 
+ */
+const mouseWheel = async (deltaX, deltaY, duration = 200) => {
+    await browser.actions([
+        browser.action('wheel').scroll({
+            deltaX,
+            deltaY,
+            duration,
+        }),
+    ]);
+};
 
 //-----------------------------------------------------------------------------
 // ---- Tests
@@ -307,6 +371,11 @@ describe('webdriver.io runner', () => {
     it(`should be able to send basic keys to basic inputs (which we'll use later for copy-pasting text strings)`, async () => {
         await browser.url(testUrl);
         const inputClassic = await $(selectors.inputClassic);
+
+        // Might be useful to know that @wdio\jasmine-framework v8.x imports jasmine v4.6
+        // but it seems that jasmine's globals are not injected into this context and expect() is not jasmine's expect(),
+        // consequently e.g.: expect().toBeTrue() cannot be used...
+        console.log('Jasmine.version=' + jasmine.version);  
 
         // Test the initial values
         const title = await browser.getTitle();
@@ -329,11 +398,7 @@ describe('webdriver.io runner', () => {
         await browser.keys('1');
         expect(await inputClassic.getValue()).toEqual('987654321te01ststYES!ring');
 
-        /*
-        expect(helperGetCaretPosition(inputClassic)).toEqual(42); //FIXME This cannot be called correctly
-        const result = browser.getCaretPosition(inputClassic); //FIXME This cannot be called correctly
-        expect(result).toEqual(19);
-        */
+        expect(await getCaretStart(selectors.inputClassic)).toEqual(13);
 
         // Hold some modifier keys
         await browser.keys(Key.End);
@@ -374,6 +439,32 @@ describe('Webdriverio modifiers keys', () => {
         await inputClassic.setValue('12345');
         expect(await inputClassic.getValue()).toEqual('12345');
 
+        await browser.keys([Key.Control, 'a', Key.Control, Key.Backspace]); // Key.Ctrl does not work anymore in v8
+        expect(await inputClassic.getValue()).toEqual('');
+
+        // Test that modifier keys dont have to be released separately
+        await browser.keys(['a', 'b', Key.Shift, 'c', 'D']);
+        expect(await inputClassic.getValue()).toEqual('abcD');  // c is sent as a 'c' character not as a KeyC
+        expect(await getCaretStart(selectors.inputClassic)).toEqual(4);  // we must be at: abcD|
+        await browser.keys([Key.Shift, Key.ArrowLeft, Key.ArrowLeft]);
+        let caretPositions = await getCaretPositions(selectors.inputClassic);  // we must be at: ab|cD|
+        expect(caretPositions.start).toEqual(2);
+        expect(caretPositions.end).toEqual(4);
+
+        // we dont have to release the modifier keys, it is released at the end of the keys([...]) sequence
+        await browser.keys([Key.ArrowLeft]);  // we must be at: ab|cD, because the first ArrowLeft clears the selection, but does not move the caret (Chrome, Edge and FF)
+        caretPositions = await getCaretPositions(selectors.inputClassic);
+        expect(caretPositions.start).toEqual(2);
+        expect(caretPositions.end).toEqual(2);
+
+        // A separate Key.Shift call does not make it stay pressed
+        await browser.keys(Key.Shift);
+        await browser.keys([Key.ArrowLeft]);
+        caretPositions = await getCaretPositions(selectors.inputClassic);
+        expect(caretPositions.start).toEqual(1);
+        expect(caretPositions.end).toEqual(1);
+
+        // clear contents
         await browser.keys([Key.Control, 'a', Key.Control, Key.Backspace]); // Key.Ctrl does not work anymore in v8
         expect(await inputClassic.getValue()).toEqual('');
     });
@@ -770,7 +861,7 @@ describe('Issue #326', () => {
         expect(await $(selectors.issue326input).getValue()).toEqual('12.345.678,00 €');
     });
 
-    xit('should position the decimal character correctly on paste', async () => { //FIXME This does not work anymore in the v8 e2e test, but does manually
+    it('should position the decimal character correctly on paste', async () => {
         // Add a comma ',' to the classic input in order to be able to copy it with `ctrl+c`
         const inputClassic = await $(selectors.inputClassic);
         await inputClassic.click();
@@ -779,12 +870,8 @@ describe('Issue #326', () => {
 
         // Copy ','
         await browser.keys(Key.End);
-        await browser.keys(Key.Shift);
-        await browser.keys(Key.ArrowLeft);
-        await browser.keys(Key.Shift);
-        await browser.keys(Key.Control);
-        await browser.keys('c');
-        await browser.keys(Key.Control);
+        await browser.keys([Key.Shift, Key.ArrowLeft]);
+        await sendCtrlChar('c');
         // ',' is copied
 
         // Remove that ',' in order to get back to the original input state
@@ -796,32 +883,28 @@ describe('Issue #326', () => {
 
         // Delete the ',00 €' part
         await browser.keys(Key.End);
-        await browser.keys(Key.Shift);
-        await browser.keys([Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft]);
-        await browser.keys(Key.Shift);
+        await browser.keys([Key.Shift, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft]);
         await browser.keys(Key.Delete);
 
         // Move the caret position to  // 12.34|5.678 €
         await browser.keys([Key.End, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft]);
 
         // Paste the comma
-        await browser.keys(Key.Control);
-        await browser.keys('v');
-        await browser.keys(Key.Control);
+        await sendCtrlChar('v');
 
         // Test the resulting value
         expect(await input.getValue()).toEqual('1.234,57 €');
     });
 });
 
-xdescribe('Issue #322', () => {
+describe('Issue #322', () => {
     it('should test for default values, and focus on it', async () => {
         await browser.url(testUrl);
 
         expect(await $(selectors.issue322input).getValue()).toEqual('12,345,678.00');
     });
 
-    it('should paste correctly a string that contains grouping separators when pasting on a caret position', async () => { //FIXME This does not work anymore in the v8 e2e test, but does manually
+    it('should paste correctly a string that contains grouping separators when pasting on a caret position', async () => {
         // Add '11,1' to the classic input in order to be able to copy it with `ctrl+c`
         const inputClassic = await $(selectors.inputClassic);
         await inputClassic.click();
@@ -830,12 +913,8 @@ xdescribe('Issue #322', () => {
 
         // Copy ','
         await browser.keys(Key.End);
-        await browser.keys(Key.Shift);
-        await browser.keys([Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft]);
-        await browser.keys(Key.Shift);
-        await browser.keys(Key.Control);
-        await browser.keys('c');
-        await browser.keys(Key.Control);
+        await browser.keys([Key.Shift, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft]);
+        await sendCtrlChar('c');
         // '11,1' is copied
 
         // Remove that ',' in order to get back to the original input state
@@ -847,20 +926,17 @@ xdescribe('Issue #322', () => {
 
         // Move the caret position to  // 12,345|,678.00
         await browser.keys([Key.End, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft]);
+        let inputCaretPosition = await getCaretStart(selectors.issue322input);
+        expect(inputCaretPosition).toEqual(6);
 
         // Paste the clipboard content
-        await browser.keys(Key.Control);
-        await browser.keys('v');
-        await browser.keys(Key.Control);
+        await sendCtrlChar('v');
 
         // Test the resulting value
         expect(await input.getValue()).toEqual('12,345,111,678.00');
 
         // Check the caret position
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue322input);
+        inputCaretPosition = await getCaretStart(selectors.issue322input);
         expect(inputCaretPosition).toEqual(10);
     });
 
@@ -877,28 +953,24 @@ xdescribe('Issue #322', () => {
 
         // Set the selection to  // 12,|345|,678
         await browser.keys([Key.End, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft]);
-        await browser.keys(Key.Shift);
-        await browser.keys([Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft]);
-        await browser.keys(Key.Shift);
+        await browser.keys([Key.Shift, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowLeft]);
+        let inputCaretPositions = await getCaretPositions(selectors.issue322input);
+        expect(inputCaretPositions.start).toEqual(3);
+        expect(inputCaretPositions.end).toEqual(6);
 
         // Paste the clipboard content
-        await browser.keys(Key.Control);
-        await browser.keys('v');
-        await browser.keys(Key.Control);
+        await sendCtrlChar('v');
 
         // Test the resulting value
         expect(await input.getValue()).toEqual('12,111,678.00');
 
         // Check the caret position
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue322input);
-        expect(inputCaretPosition).toEqual(6);
+        inputCaretPositions = await getCaretPositions(selectors.issue322input);
+        expect(inputCaretPositions.start).toEqual(6);
     });
 });
 
-xdescribe('Issue #527', () => { //FIXME This does not work anymore in the v8 e2e test, but does manually
+describe('Issue #527', () => {
     it('should test for default values, and focus on it', async () => {
         await browser.url(testUrl);
 
@@ -912,14 +984,12 @@ xdescribe('Issue #527', () => { //FIXME This does not work anymore in the v8 e2e
         await input.click();
         await browser.keys(Key.Home);
         await browser.keys([Key.ArrowRight, Key.ArrowRight, Key.ArrowRight]); // 1,35|7,246.81
+        const caretStart = await getCaretStart(selectors.issue527input);
+        expect(caretStart).toEqual(4);
 
         // Cut
-        await browser.keys(Key.Shift);
-        await browser.keys([Key.ArrowRight, Key.ArrowRight, Key.ArrowRight, Key.ArrowRight]); // 1,35|7,24|6.81
-        await browser.keys(Key.Shift);
-        await browser.keys(Key.Control);
-        await browser.keys('x');
-        await browser.keys(Key.Control);
+        await browser.keys([Key.Shift, Key.ArrowRight, Key.ArrowRight, Key.ArrowRight, Key.ArrowRight]); // 1,35|7,24|6.81
+        await sendCtrlChar('x');
         expect(await input.getValue()).toEqual('1,356.81');
 
         // Blur that input
@@ -1031,20 +1101,13 @@ describe('Issue #303', () => {
         // Then 'tab' to the next one
         await browser.keys(Key.Tab);
         expect(await $(selectors.issue303inputP).getValue()).toEqual('$');
-        let inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue303inputP);
+        let inputCaretPosition = await getCaretStart(selectors.issue303inputP);
         expect(inputCaretPosition).toEqual(1);
-
 
         // Then 'tab' to the next one
         await browser.keys(Key.Tab);
         expect(await $(selectors.issue303inputS).getValue()).toEqual('\u00a0€');
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue303inputP);
+        inputCaretPosition = await getCaretStart(selectors.issue303inputP);
         expect(inputCaretPosition).toEqual(0);
     });
 });
@@ -1070,10 +1133,7 @@ describe('Issue #387', () => {
         await browser.keys([Key.Escape]);
         expect(await input.getValue()).toEqual('$220,242.76');
         // Check the text selection
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue387inputCancellable);
+        const inputCaretPosition = await getCaretPositions(selectors.issue387inputCancellable);
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual('$220,242.76'.length);
 
@@ -1114,10 +1174,7 @@ describe('Issue #387', () => {
         // Test the initial value
         expect(await $(selectors.issue387inputCancellableNumOnly).getValue()).toEqual('$220,242.76');
         // Check the text selection
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue387inputCancellableNumOnly);
+        const inputCaretPosition = await getCaretPositions(selectors.issue387inputCancellableNumOnly);
         // Since `selectNumberOnly` is set to `true`, the currency symbol is not selected by default
         expect(inputCaretPosition.start).toEqual(1); //XXX This does not work under Firefox 45.7, but does under firefox 53. Since we only support the browsers last version - 2, let's ignore it.
         expect(inputCaretPosition.end).toEqual('$220,242.76'.length);
@@ -1218,43 +1275,24 @@ describe('Issue #393', () => { //FIXME Finish this
     });
     //TODO Create the tests once the mousewheel events will be managed by the Selenium server (cf. http://stackoverflow.com/questions/6735830/how-to-fire-mouse-wheel-event-in-firefox-with-javascript | https://groups.google.com/forum/#!topic/selenium-users/VyE-BB5Z2lU)
 
-    xit('should increment and decrement the value with a fixed step', async () => { //FIXME Finish this
+    it('should increment and decrement the value with a fixed step', async () => { //FIXME Finish this
         // Focus in the input
         const input = await $(selectors.issue393inputFixed);
-        await input.click();
+        await input.click();  // click also scrolls it into the view and moves the pointer into it
         // Test the initial value
         expect(await input.getValue()).toEqual('');
+        expect(await isHovered(selectors.issue393inputFixed)).toEqual(true);
+        expect(await input.isFocused()).toEqual(true);
 
         // Simulate a mouseevent on that input element
-        // input.scrollIntoView(); //FIXME Does not work : This only used to scroll the view to that element, but does not simulate wheel events (cf. http://webdriver.io/api/utility/scroll.html#Example)
-        /*
-        browser.execute(() => {
-            /!*const evt = document.createEvent('MouseEvents'); //FIXME Does not work (cf. http://stackoverflow.com/a/6740625/2834898)
-            evt.initMouseEvent(
-                'DOMMouseScroll', // in DOMString typeArg,
-                true,  // in boolean canBubbleArg,
-                true,  // in boolean cancelableArg,
-                window,// in views::AbstractView viewArg,
-                120,   // in long detailArg,
-                0,     // in long screenXArg,
-                0,     // in long screenYArg,
-                0,     // in long clientXArg,
-                0,     // in long clientYArg,
-                0,     // in boolean ctrlKeyArg,
-                0,     // in boolean altKeyArg,
-                0,     // in boolean shiftKeyArg,
-                0,     // in boolean metaKeyArg,
-                0,     // in unsigned short buttonArg,
-                null   // in EventTarget relatedTargetArg
-            );
-            document.querySelector('#issue_393_fixed').dispatchEvent(evt);*!/
-
-            const input = document.querySelector('#issue_393_fixed');
-            // input.scrollTop += 20; //FIXME à tester (cf. http://stackoverflow.com/questions/25994971/mousewheel-scrolling-over-div)
-        });
-        */
-        // input.mouseWheel(-100); //FIXME Does not work (cf. http://stackoverflow.com/questions/29837922/how-to-implement-zoom-in-out-by-using-ctrlmousewheel-in-selenium-webdriver)
+        await mouseWheel(0, -100);
         expect(await input.getValue()).toEqual('1,000.00');
+
+        await mouseWheel(0, 100);
+        expect(await input.getValue()).toEqual('0.00');
+
+        await mouseWheel(0, 100);
+        expect(await input.getValue()).toEqual('-1,000.00');
     });
 });
 
@@ -1843,7 +1881,7 @@ xdescribe('undo and redo functions', () => {
         expect(await $(selectors.undoRedo4).getValue()).toEqual('');
     });
 
-    it('should undo the user inputs correctly on <input> elements', async () => {
+    it('should undo the user inputs correctly on <input> elements', async () => {  // FIXME started to use sendCtrlChar/getCaretStart, but there is some problem with the caret positions, see below
         let inputCaretPosition;
         const undoRedoInput = await $(selectors.undoRedo1);
 
@@ -1854,102 +1892,68 @@ xdescribe('undo and redo functions', () => {
         await browser.keys([Key.Home, '0']); // Input a character that will be dropped and won't be set in the history list
         expect(await undoRedoInput.getValue()).toEqual('1.357,92 €'); // |1.357,92 €
         // Check the caret position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.undoRedo1);
+        inputCaretPosition = await getCaretStart(selectors.undoRedo1);
         expect(inputCaretPosition).toEqual(0);
 
         await browser.keys(['1']);
         expect(await undoRedoInput.getValue()).toEqual('11.357,92 €'); // 1|1.357,92 €
         // Check the caret position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.undoRedo1);
+        inputCaretPosition = await getCaretStart(selectors.undoRedo1);
         expect(inputCaretPosition).toEqual(1);
 
         await browser.keys([Key.ArrowRight, '2']);
         expect(await undoRedoInput.getValue()).toEqual('112.357,92 €'); // 11.|357,92 € -> 112|.357,92 €
         // Check the caret position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.undoRedo1);
+        inputCaretPosition = await getCaretStart(selectors.undoRedo1);
         expect(inputCaretPosition).toEqual(3);
 
         await browser.keys(['4']);
         expect(await undoRedoInput.getValue()).toEqual('1.124.357,92 €'); // 1.124|.357,92 €
         // Check the caret position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.undoRedo1);
+        inputCaretPosition = await getCaretStart(selectors.undoRedo1);
         expect(inputCaretPosition).toEqual(5);
 
         await browser.keys([Key.ArrowRight, Key.ArrowRight, '6']);
         expect(await undoRedoInput.getValue()).toEqual('11.243.657,92 €'); // 1.124.|357,92 € -> 1.124.3|57,92 € -> 11.243.6|57,92 €
         // Check the caret position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.undoRedo1);
+        inputCaretPosition = await getCaretStart(selectors.undoRedo1);
         expect(inputCaretPosition).toEqual(8);
 
-        //FIXME All those undos do not work anymore with webdriver.io v8, but do manually; check back later when Webdriver.io has fixed that
         // Undos
-        await browser.keys([Key.Control, 'z']);
+        await sendCtrlChar('z');
         expect(await undoRedoInput.getValue()).toEqual('1.124.357,92 €'); // 1.124.3|57,92 €
         // Check the caret position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.undoRedo1);
-        expect(inputCaretPosition).toEqual(7);
+        inputCaretPosition = await getCaretStart(selectors.undoRedo1);
+        expect(inputCaretPosition).toEqual(7);  //FIXME This check fails, probably the component fails to restore the caret prosition properly, this needs more investigation
 
-        await browser.keys(['z']);
+        await sendCtrlChar('z');
         expect(await undoRedoInput.getValue()).toEqual('112.357,92 €'); // 112|.357,92 €
         // Check the caret position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.undoRedo1);
+        inputCaretPosition = await getCaretStart(selectors.undoRedo1);
         expect(inputCaretPosition).toEqual(3);
 
-        await browser.keys(['z']);
+        await sendCtrlChar('z');
         expect(await undoRedoInput.getValue()).toEqual('11.357,92 €'); // 11.|357,92 €
         // Check the caret position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.undoRedo1);
+        inputCaretPosition = await getCaretStart(selectors.undoRedo1);
         expect(inputCaretPosition).toEqual(3);
 
-        await browser.keys(['z']);
+        await sendCtrlChar('z');
         expect(await undoRedoInput.getValue()).toEqual('1.357,92 €'); // |1.357,92 €
         // Check the caret position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.undoRedo1);
+        inputCaretPosition = await getCaretStart(selectors.undoRedo1);
         expect(inputCaretPosition).toEqual(0);
 
-        await browser.keys(['z']); // This makes sure we cannot go back too far
+        await sendCtrlChar('z'); // This makes sure we cannot go back too far
         expect(await undoRedoInput.getValue()).toEqual('1.357,92 €'); // |1.357,92 €
         // Check the caret position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.undoRedo1);
+        inputCaretPosition = await getCaretStart(selectors.undoRedo1);
         expect(inputCaretPosition).toEqual(0);
 
         await browser.keys([Key.Control]); // Release the control key
         expect(await undoRedoInput.getValue()).toEqual('1.357,92 €'); // |1.357,92 €
         // Check the caret position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.undoRedo1);
+        inputCaretPosition = await getCaretStart(selectors.undoRedo1);
         expect(inputCaretPosition).toEqual(0);
     });
 
@@ -3828,10 +3832,27 @@ describe('`negativeSignCharacter` option', () => {
         //
     });
 
-    xit('should correctly display the negative value with the custom negative sign on mouseover (without adding the default minus sign)', async () => { //FIXME Finish this -->
-        expect(await $(selectors.issue478Neg3).getValue()).toEqual('(200.00)');
-        await browser.moveTo(selectors.issue478Neg3); // Move the mouse over the element //FIXME This does not work //TODO Test the webdriver.io v5 moveToObject change to `moveTo` function
-        expect(await $(selectors.issue478Neg3).getValue()).toEqual('-200.00');
+    it('should correctly display the negative value with the custom negative sign on mouseover (without adding the default minus sign)', async () => { //FIXME Is this descrition still ok?
+        const input = await $(selectors.issue478Neg3);
+        expect(await input.getValue()).toEqual('(200.00)');
+
+        // await input.moveTo({ xOffset:1, yOffset:1 }); // Move the mouse over :1the element:1 }//FIXME This does not work //TODO Test the webdriver.io v5 moveToObject change to `moveTo` function
+        // Could not get .moveTo to work either, but click() also moves the pointer into the element
+        await input.click();  
+        await browser.keys([Key.Shift, Key.Tab]);  // Tab to previous input, because if focused, it displays the neg value without parentheses, but not the raw value which we expect (hopefully the page will not scroll - if so the next expect will detect it)
+
+        expect(await isHovered(selectors.issue478Neg3)).toEqual(true);
+        expect(await input.isFocused()).toEqual(false);
+
+        // Nudge the pointer a little with the alt key held down
+        await browser.actions([
+            browser.action('pointer').move({ origin: input, x: 10, y: 0 }),
+            browser.action('key').down(Key.Alt),
+        ]);
+        expect(await input.getValue()).toEqual('-200');  // It should display the raw value according to https://autonumeric.org/guide#unformatOnHover 
+        await browser.actions([
+            browser.action('key').up(Key.Alt),
+        ]);
     });
 });
 
@@ -4106,6 +4127,219 @@ describe('Issue #521', () => {
         await browser.keys([Key.Control, 'v', Key.Control]); // Paste
         expect(await issue521InputDetector.getValue()).toEqual('1');
         expect(await input.getValue()).toEqual('98.00');
+    });
+});
+
+describe('Issue #808', () => {
+    const resetInputDetector = async () => {
+        await browser.execute(domId => {
+            const input = document.querySelector(domId);
+            input.value = '0';
+            issue808InputCount = 0;
+        }, selectors.issue808InputDetector);
+    };
+
+    const setAutonumericValue = async newValue => {
+        await browser.execute((domId, newValue) => {
+            const numEdit = AutoNumeric.getAutoNumericElement(domId);
+            numEdit.set(newValue);
+        }, selectors.issue808, newValue);
+    };
+
+    it('should test for default values', async () => {
+        await browser.url(testUrl);
+        const input = await $(selectors.issue808);
+        expect(await input.getValue()).toEqual('1 000');
+    });
+
+    it(`CTRL-Z: input event should be sent after key sequence ending with ctrl-z/delete`, async () => {
+        // reset
+        const input = await $(selectors.issue808);
+        const issue808InputDetector = await $(selectors.issue808InputDetector);
+        await resetInputDetector();
+        await setAutonumericValue('1200');
+
+        await input.click();
+        expect(await issue808InputDetector.getValue()).toEqual('0');
+        expect(await input.getValue()).toEqual('1 200');
+
+        // Select All in input - Delete - ctrl-z - Select All in input - Delete ---> should send input event
+        await browser.keys([Key.Control, 'a']);
+        await browser.keys([Key.Delete]);
+        expect(await input.getValue()).toEqual('');
+        expect(await issue808InputDetector.getValue()).toEqual('1');
+
+        // console.log('Before undo: ' + await input.getValue());
+        await sendCtrlChar('z');
+        // console.log('After undo: ' + await input.getValue());
+
+        expect(await input.getValue()).toEqual('1 200');
+        expect(await issue808InputDetector.getValue()).toEqual('2');
+        await browser.keys([Key.Control, 'a']);
+        await browser.keys([Key.Delete]);
+        expect(await issue808InputDetector.getValue()).toEqual('3');
+    });
+
+    it(`CTRL-Y: input event should be sent and no double delete after key sequence ending with ctrl-y/backspace`, async () => {
+        // reset
+        const input = await $(selectors.issue808);
+        const issue808InputDetector = await $(selectors.issue808InputDetector);
+        await resetInputDetector();
+        await setAutonumericValue('');
+
+        await input.click();
+        expect(await issue808InputDetector.getValue()).toEqual('0');
+        expect(await input.getValue()).toEqual('');
+
+        // if undo is fixed, but redo not:
+        //   Enter 1234, undo, redo, backspace --> 12
+        //   We expect using the fixed code: 123
+        await browser.keys(['1']);
+        await browser.keys(['2']);
+        await browser.keys(['3']);
+        await browser.keys(['4']);
+        expect(await input.getValue()).toEqual('1 234');
+        expect(await issue808InputDetector.getValue()).toEqual('4');
+
+        await sendCtrlChar('z');
+        expect(await input.getValue()).toEqual('123');
+        expect(await issue808InputDetector.getValue()).toEqual('5');
+
+        await sendCtrlChar('y');
+        expect(await input.getValue()).toEqual('1 234');
+        expect(await issue808InputDetector.getValue()).toEqual('6');
+
+        await browser.keys([Key.Backspace]);
+        expect(await input.getValue()).toEqual('123');
+        expect(await issue808InputDetector.getValue()).toEqual('7');
+    });
+
+    it(`CTRL-X: input event should be sent after key sequence ending with ctrl-x/Reenter same digit`, async () => {
+        // reset
+        const input = await $(selectors.issue808);
+        const issue808InputDetector = await $(selectors.issue808InputDetector);
+        await resetInputDetector();
+        await setAutonumericValue('');
+
+        await input.click();
+        expect(await issue808InputDetector.getValue()).toEqual('0');
+        expect(await input.getValue()).toEqual('');
+
+        // Enter 128 - select last digit - ctrl-x - enter 8 --> input event
+        await browser.keys(['1']);
+        await browser.keys(['2']);
+        await browser.keys(['8']);
+        expect(await input.getValue()).toEqual('128');
+        expect(await issue808InputDetector.getValue()).toEqual('3');
+        await browser.keys([
+            Key.Shift, // This activates the shift key from now on 
+            Key.ArrowLeft]);
+        await sendCtrlChar('x');
+        expect(await input.getValue()).toEqual('12');
+        expect(await issue808InputDetector.getValue()).toEqual('4');
+
+        await browser.keys(['8']);
+        expect(await input.getValue()).toEqual('128');
+        expect(await issue808InputDetector.getValue()).toEqual('5');
+    });
+
+    it(`CTRL-DEL: input event should be sent after key sequence ending with ctrl-del/Reenter same digit`, async () => {
+        // reset
+        const input = await $(selectors.issue808);
+        const issue808InputDetector = await $(selectors.issue808InputDetector);
+        await resetInputDetector();
+        await setAutonumericValue('');
+
+        await input.click();
+        expect(await issue808InputDetector.getValue()).toEqual('0');
+        expect(await input.getValue()).toEqual('');
+
+        // Enter 1234 - position caret before '4' - hit ctrl-del - press 4 --> input event, resulting number should also be reformatted
+        await browser.keys(['1']);
+        await browser.keys(['2']);
+        await browser.keys(['3']);
+        await browser.keys(['4']);
+        expect(await input.getValue()).toEqual('1 234');
+        expect(await issue808InputDetector.getValue()).toEqual('4');
+        await browser.keys([
+            Key.Shift, // This activates the shift key from now on 
+            Key.ArrowLeft]);
+        await sendCtrlChar(Key.Delete);
+        expect(await input.getValue()).toEqual('123');
+        expect(await issue808InputDetector.getValue()).toEqual('5');
+
+        await browser.keys(['4']);
+        expect(await input.getValue()).toEqual('1 234');
+        expect(await issue808InputDetector.getValue()).toEqual('6');
+    });
+
+    it(`CTRL-V(1): input event should be sent after key sequence ending with ctrl-del/Reenter same digit`, async () => {
+        // this tests the 1st branch in the Paste handler when the whole content of the input is replaced with the pasted content
+
+        // reset
+        const input = await $(selectors.issue808);
+        const issue808InputDetector = await $(selectors.issue808InputDetector);
+        await resetInputDetector();
+        await setAutonumericValue('1200');
+
+        await input.click();
+        expect(await issue808InputDetector.getValue()).toEqual('0');
+        expect(await input.getValue()).toEqual('1 200');
+
+        // Select all - backspace - ctrl-v - select all - backspace --> no input event
+        await sendCtrlChar('a');
+        await sendCtrlChar('c');
+        await browser.keys([Key.Backspace]);
+        expect(await issue808InputDetector.getValue()).toEqual('1');
+        expect(await input.getValue()).toEqual('');
+
+        await sendCtrlChar('v');
+        expect(await issue808InputDetector.getValue()).toEqual('2');
+        expect(await input.getValue()).toEqual('1 200');
+
+        await sendCtrlChar('a');
+        await browser.keys([Key.Backspace]);
+        expect(await issue808InputDetector.getValue()).toEqual('3');
+        expect(await input.getValue()).toEqual('');
+    });
+
+    it(`CTRL-V(2): input event should be sent after key sequence ending with ctrl-del/Reenter same digit`, async () => {
+        // this tests the 2nd branch in the paste handler when addition content is pasted into the input
+
+        // reset
+        const input = await $(selectors.issue808);
+        const issue808InputDetector = await $(selectors.issue808InputDetector);
+        await resetInputDetector();
+        await setAutonumericValue('');
+
+        await input.click();
+        expect(await issue808InputDetector.getValue()).toEqual('0');
+        expect(await input.getValue()).toEqual('');
+
+        // Put some value to the clipboard - Position caret after the last digit in the input, selection is empty - ctrl-V - select the pasted part only, backspace --> extra character is not deleted
+        await browser.keys(['1']);
+        await browser.keys(['2']);
+        await browser.keys(['3']);
+        await browser.keys(['4']);
+        expect(await input.getValue()).toEqual('1 234');
+        expect(await issue808InputDetector.getValue()).toEqual('4');
+        await browser.keys([
+            Key.Shift, // This activates the shift key from now on 
+            Key.ArrowLeft]);
+        await sendCtrlChar('c');
+
+        await browser.keys([Key.End]);
+        await sendCtrlChar('v');
+        expect(await issue808InputDetector.getValue()).toEqual('5');
+        expect(await input.getValue()).toEqual('12 344');
+
+        await browser.keys([Key.End]);
+        await browser.keys([
+            Key.Shift, // This activates the shift key from now on 
+            Key.ArrowLeft]);
+        await browser.keys([Key.Backspace]);
+        expect(await issue808InputDetector.getValue()).toEqual('6');
+        expect(await input.getValue()).toEqual('1 234');
     });
 });
 

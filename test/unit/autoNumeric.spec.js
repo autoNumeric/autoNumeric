@@ -1562,9 +1562,9 @@ describe('autoNumeric options and `options.*` methods', () => {
                 },
             };
 
-            // Setup the event listeners
-            form.addEventListener('click', customFunction.testingFunc);
-            input.addEventListener('click', customFunction.testingFunc);
+            // Event listeners should be added after customFunction.testingFunc has been 'decorated' by the spyOn API
+            // form.addEventListener('click', customFunction.testingFunc);
+            // input.addEventListener('click', customFunction.testingFunc);
         });
 
         afterEach(() => { // Un-initialization
@@ -1573,9 +1573,12 @@ describe('autoNumeric options and `options.*` methods', () => {
             document.body.removeChild(form);
         });
 
-        xit('should not modify how non-AutoNumeric or input event bubble up', () => { //FIXME The `testingFunc()` is called, but somehow Jasmine spy does not pick that up
+        it('should not modify how non-AutoNumeric or input event bubble up', () => { //FIXME The `testingFunc()` is called, but somehow Jasmine spy does not pick that up
             const spy = spyOn(customFunction, 'testingFunc');
             aNInput = new AutoNumeric(input, { eventBubbles: AutoNumeric.options.eventBubbles.doesNotBubble });
+            form.addEventListener('click', e => customFunction.testingFunc(e));
+            input.addEventListener('click', e => customFunction.testingFunc(e));
+
             aNInput.node().click();
             expect(customFunction.testingFunc).toHaveBeenCalledTimes(2);
 
@@ -4341,7 +4344,7 @@ describe('Modifying the options after initialization', () => {
     });
 });
 
-xdescribe('Managing external changes', () => { //XXX This test is deactivated since PhantomJS is failing when defining some properties with `Object.defineProperty`. See issue https://github.com/ariya/phantomjs/issues/13895
+describe('Managing external changes', () => {
     it(`should watch for external change to the input 'value' attribute`, () => {
         // Initialization
         const inputElement = document.createElement('input');
@@ -5294,7 +5297,16 @@ describe('Instantiated autoNumeric functions', () => {
             expect(aNInput.node().selectionStart).toEqual(0);
             expect(aNInput.node().selectionEnd).toEqual(6);
 
-            //TODO Test the decimalPlacesShownOnBlur with the selections
+            // Test the decimalPlacesShownOnBlur with the selections
+            aNInput.node().dispatchEvent(new window.Event('blur', { bubbles: false, cancelable: false }));
+            expect(aNInput.getFormatted()).toEqual('12.266,123\u202f€');
+            aNInput.selectDecimal();
+            expect(aNInput.node().selectionStart).toEqual(7);
+            expect(aNInput.node().selectionEnd).toEqual(10);
+
+            aNInput.selectInteger();
+            expect(aNInput.node().selectionStart).toEqual(0);
+            expect(aNInput.node().selectionEnd).toEqual(6);
 
             // Common configuration
             aNInput.update({ suffixText: 'suffixText', minimumValue: '-9999999', maximumValue: '9999999', decimalPlaces: 2 });

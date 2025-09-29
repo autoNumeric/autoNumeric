@@ -209,7 +209,7 @@ export default class AutoNumeric {
         // Watch any external changes to the element value/textContent/nodeValue and `set()` the new value so that it gets formatted/saved in the history
         this.internalModification = false; // This is temporarily set to `true` only when the AutoNumeric object does update the element value
         this.attributeToWatch = this._getAttributeToWatch();
-        this.getterSetter = Object.getOwnPropertyDescriptor(this.domElement.__proto__, this.attributeToWatch);
+        this.getterSetter = AutoNumericHelper.getGetterSetter(this.domElement, this.attributeToWatch);  // Object.getOwnPropertyDescriptor(this.domElement.__proto__, this.attributeToWatch);
         this._addWatcher();
 
         if (this.settings.createLocalList) {

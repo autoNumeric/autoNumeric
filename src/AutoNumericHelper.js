@@ -1506,6 +1506,14 @@ export default class AutoNumericHelper {
         return key;
     }
 
+    static getGetterSetter(obj, propertyName) {
+        while ((obj = Object.getPrototypeOf(obj))) {  // double () to make eslint happy
+            const descriptor = Object.getOwnPropertyDescriptor(obj, propertyName);
+            if (descriptor) return descriptor;
+        }
+        return null;
+    }
+
     /**
      * Insert the single character `char` in the string `str` at the given position `index`
      *

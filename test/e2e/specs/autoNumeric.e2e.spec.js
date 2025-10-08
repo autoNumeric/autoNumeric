@@ -1881,7 +1881,7 @@ xdescribe('undo and redo functions', () => {
         expect(await $(selectors.undoRedo4).getValue()).toEqual('');
     });
 
-    it('should undo the user inputs correctly on <input> elements', async () => {  // FIXME started to use sendCtrlChar/getCaretStart, but there is some problem with the caret positions, see below
+    it('should undo the user inputs correctly on <input> elements', async () => {  //FIXME started to use sendCtrlChar/getCaretStart, but there is some problem with the caret positions, see below
         let inputCaretPosition;
         const undoRedoInput = await $(selectors.undoRedo1);
 

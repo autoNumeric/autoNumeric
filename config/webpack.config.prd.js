@@ -83,7 +83,7 @@ const webpackConfig = merge(baseWebpackConfig, {
         library      : 'AutoNumeric',
         filename     : 'autoNumeric.min.js',
         path         : resolve('dist'),
-        globalObject: 'globalThis',
+        globalObject : 'globalThis',
     },
     plugins: [
         new ESLintPlugin(),

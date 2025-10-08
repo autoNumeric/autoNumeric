@@ -1561,10 +1561,6 @@ describe('autoNumeric options and `options.*` methods', () => {
                     return event;
                 },
             };
-
-            // Event listeners should be added after customFunction.testingFunc has been 'decorated' by the spyOn API
-            // form.addEventListener('click', customFunction.testingFunc);
-            // input.addEventListener('click', customFunction.testingFunc);
         });
 
         afterEach(() => { // Un-initialization
@@ -1573,7 +1569,7 @@ describe('autoNumeric options and `options.*` methods', () => {
             document.body.removeChild(form);
         });
 
-        it('should not modify how non-AutoNumeric or input event bubble up', () => { //FIXME The `testingFunc()` is called, but somehow Jasmine spy does not pick that up
+        it('should not modify how non-AutoNumeric or input event bubble up', () => {
             const spy = spyOn(customFunction, 'testingFunc');
             aNInput = new AutoNumeric(input, { eventBubbles: AutoNumeric.options.eventBubbles.doesNotBubble });
             form.addEventListener('click', e => customFunction.testingFunc(e));

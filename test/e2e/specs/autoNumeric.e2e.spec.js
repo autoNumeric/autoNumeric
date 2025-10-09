@@ -3832,13 +3832,14 @@ describe('`negativeSignCharacter` option', () => {
         //
     });
 
-    it('should correctly display the negative value with the custom negative sign on mouseover (without adding the default minus sign)', async () => { //FIXME Is this descrition still ok?
+    it('should correctly display the raw value while alt+hovering (not focused) with custom negative sign', async () => {
+        const prevInput = await $(selectors.issue478Neg2);  // to make sure that our input is not already focused (avoid test exec order dependency)
+        await prevInput.click();
+
         const input = await $(selectors.issue478Neg3);
         expect(await input.getValue()).toEqual('(200.00)');
 
-        // await input.moveTo({ xOffset:1, yOffset:1 }); // Move the mouse over :1the element:1 }//FIXME This does not work //TODO Test the webdriver.io v5 moveToObject change to `moveTo` function
-        // Could not get .moveTo to work either, but click() also moves the pointer into the element
-        await input.click();  
+        await input.click();
         await browser.keys([Key.Shift, Key.Tab]);  // Tab to previous input, because if focused, it displays the neg value without parentheses, but not the raw value which we expect (hopefully the page will not scroll - if so the next expect will detect it)
 
         expect(await isHovered(selectors.issue478Neg3)).toEqual(true);
@@ -3853,6 +3854,47 @@ describe('`negativeSignCharacter` option', () => {
         await browser.actions([
             browser.action('key').up(Key.Alt),
         ]);
+    });
+
+    it('should correctly display the negative value with the custom negative sign on mouseover (without adding the default minus sign)', async () => {
+        await browser.execute(domId => {
+            const an = AutoNumeric.getAutoNumericElement(domId);
+            an.update({ negativeSignCharacter: AutoNumeric.options.negativeSignCharacter.minusPlus });
+        }, selectors.issue478Neg3);
+        try {
+            const prevInput = await $(selectors.issue478Neg2);
+            await prevInput.click();
+
+            // not focused, should display the value using the parentheses
+            const input = await $(selectors.issue478Neg3);
+            expect(await input.isFocused()).toEqual(false);
+            expect(await input.getValue()).toEqual('(200.00)');  
+
+            // focused, should display the value using the custom negative sign
+            await input.click();
+            expect(await input.isFocused()).toEqual(true);
+            expect(await input.getValue()).toEqual('∓200.00');  
+
+            // focused and alt+hover: raw value should be displayed
+            expect(await isHovered(selectors.issue478Neg3)).toEqual(true);
+            expect(await input.isFocused()).toEqual(true);
+
+            // Nudge the pointer a little with the alt key held down
+            await browser.actions([
+                browser.action('pointer').move({ origin: input, x: 10, y: 0 }),
+                browser.action('key').down(Key.Alt),
+            ]);
+            expect(await input.getValue()).toEqual('-200');  // It should display the raw value according to https://autonumeric.org/guide#unformatOnHover 
+            await browser.actions([
+                browser.action('key').up(Key.Alt),
+            ]);
+        } 
+        finally {
+            await browser.execute(domId => {
+                const an = AutoNumeric.getAutoNumericElement(domId);
+                an.update({ negativeSignCharacter: AutoNumeric.options.negativeSignCharacter.hyphen });  // restore default - other tests expect it and test execution order might be different
+            }, selectors.issue478Neg3);
+        }
     });
 });
 

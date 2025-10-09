@@ -3892,7 +3892,7 @@ describe('`negativeSignCharacter` option', () => {
         finally {
             await browser.execute(domId => {
                 const an = AutoNumeric.getAutoNumericElement(domId);
-                an.update({ negativeSignCharacter: AutoNumeric.options.negativeSignCharacter.hyphen });  // restore default - other tests expect it and test execution order might be different
+                an.update({ negativeSignCharacter: AutoNumeric.options.negativeSignCharacter.hyphen });  // restore the default "-": other tests might expect it
             }, selectors.issue478Neg3);
         }
     });

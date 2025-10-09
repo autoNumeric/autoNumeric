@@ -3293,7 +3293,8 @@ describe('Initialization calls', () => {
         });
 
         afterEach(() => { // Un-initialization
-            aNInput.remove();
+            aNInput?.remove();  // "?.": There is one where we test that AN cannot be created - if it is the first to run, ANInput is undefined and this throws an exception
+            aNInput = null;
             document.body.removeChild(newInput);
         });
 

@@ -12,12 +12,10 @@
 </p>
 
 ## What is [AutoNumeric](http://autonumeric.org)?
-
 AutoNumeric is a standalone Javascript library that provides live *as-you-type* formatting for international numbers and currencies.
 
 
 ### Highlights
-
 AutoNumeric main features are:
 
 - **Easy** to use and configure
@@ -33,7 +31,6 @@ All in all, AutoNumeric supports most international numeric formats and currenci
 ****
 
 ### Documentation
-
 The documentation previously shown in that readme has now been moved to a specific web page where it's much more user-friendly; you can check it out on [https://docs.autonumeric.org](https://docs.autonumeric.org).
 
 #### Tools
@@ -42,7 +39,6 @@ For checking the official AutoNumeric website, you can take a look at [http://au
 ****
 
 ### AutoNumeric versions
-
 AutoNumeric provides 2 branches, `master` and `next`.
 
 The very, *very* stable version is on the `master` branch (currently this is version [4.6.*](https://github.com/autoNumeric/autoNumeric/tree/master)).
@@ -59,12 +55,10 @@ AutoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source
 ****
 
 ### Support
-
-AutoNumeric is created using the [JetBrains IDE](https://www.jetbrains.com/community/opensource/#support), which kindly provide access to its tools to the developers.<br>
+AutoNumeric is partly created using the [JetBrains IDE](https://www.jetbrains.com/community/opensource/#support), which kindly provided access to its tools to the developers for a couple of years.<br>
 If you feel AutoNumeric is useful to you, please consider [supporting](https://docs.autonumeric.org/Documentation/support/) the project.
 
 ### Contributors
-
 **Thanks** to all the contributors over the years for making AutoNumeric a reality!
 
 <a href="https://github.com/autoNumeric/autoNumeric/graphs/contributors">

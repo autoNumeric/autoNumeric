@@ -33,7 +33,7 @@ module.exports = function(config) {
             './tests.webpack.js': [
                 'webpack',
                 'sourcemap',
-                'coverage',
+                //'coverage',  //instrumentation for coverage is done by babel-plugin-istanbul as part of the webpack preprocessing
             ],
         },
 

@@ -1,18 +1,44 @@
 // This is the webpack config used for unit tests.
 
-const merge             = require('webpack-merge').default;
-const baseWebpackConfig = require('./webpack.config.base.js');
+// Inheriting from the base config caused problems (had to delete nearly all sections to make unit test coverage reporting to work), 
+// The following config is enough.
+//
+// const merge             = require('webpack-merge').default;
+// const baseWebpackConfig = require('./webpack.config.base.js');
 
-const webpackConfig = merge(baseWebpackConfig, {
-    mode   : 'development',
+const webpackConfig = {  // merge(baseWebpackConfig, {
+    module: {
+        rules: [
+            {
+                // exclude tests from coverage report
+                test: /\.(spec|test)\.js$/,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                    },
+                ],
+            },
+            {
+                // include code
+                test: /\.js$/,
+                exclude: /\.(spec|test)\.js$/,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            plugins: ['istanbul'],
+                        },
+                    },
+                ],
+            },
+        ],
+    },
+    mode: 'development',
     // Use inline sourcemap for karma-sourcemap-loader
     devtool: 'inline-source-map',
-    optimization: {
-        splitChunks: false, //TODO Remove this at one point, when karma-webpack is fixed (cf. https://stackoverflow.com/a/70778102/2834898). Also, this might be useful if chunks are needed at some point: https://github.com/ryanclark/karma-webpack/issues/493#issuecomment-823766082
-    },
-});
+};
 
 // No need for app entry during tests
-delete webpackConfig.entry;
+// delete webpackConfig.entry;
 
 module.exports = webpackConfig;

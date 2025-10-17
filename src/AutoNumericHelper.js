@@ -1506,11 +1506,19 @@ export default class AutoNumericHelper {
         return key;
     }
 
+    /**
+     * Returns the object `obj` property 'propertyName', or `null` if the property is not found
+     *
+     * @param {object} obj
+     * @param {string|number} propertyName
+     * @returns {*|null}
+     */
     static getGetterSetter(obj, propertyName) {
-        while ((obj = Object.getPrototypeOf(obj))) {  // double () to make eslint happy
+        while ((obj = Object.getPrototypeOf(obj))) { // double () to make eslint happy
             const descriptor = Object.getOwnPropertyDescriptor(obj, propertyName);
             if (descriptor) return descriptor;
         }
+
         return null;
     }
 

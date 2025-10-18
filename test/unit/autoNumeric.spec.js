@@ -1158,7 +1158,7 @@ describe('The AutoNumeric object', () => {
             aNInput = new AutoNumeric(newInput, 12234678.321, { currencySymbol:'$', formatOnPageLoad: false }); // An initial value, but not formatted on load
             expect(aNInput.getNumericString()).toEqual('12234678.321');
             expect(aNInput.getFormatted()).toEqual('12234678.321');
-            aNInput.node().dispatchEvent(new window.Event('focus', { bubbles: false, cancelable: true })); // simply calling focus() on the node is not enough, because the focus event is fired when the browser window is also active/focused
+            aNInput.node().dispatchEvent(new window.Event('focus', { bubbles: false, cancelable: true })); // Simply calling `focus()` on the node is not enough, because the focus event is fired when the browser window is also active/focused
             expect(aNInput.getFormatted()).toEqual('$12,234,678.32');
             aNInput.wipe();
 
@@ -1535,7 +1535,7 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getSettings().decimalPlacesRawValue).toEqual('4');
             aNInput.set(2222.12345);
             expect(aNInput.getFormatted()).toEqual('2.222,12\u202f€');
-            aNInput.node().dispatchEvent(new window.Event('focus', { bubbles: false, cancelable: true })); // simply calling focus() on the node is not enough, because the focus event is fired when the browser window is also active/focused
+            aNInput.node().dispatchEvent(new window.Event('focus', { bubbles: false, cancelable: true })); // Simply calling `focus()` on the node is not enough, because the focus event is fired when the browser window is also active/focused
             expect(aNInput.getFormatted()).toEqual('2.222,1235\u202f€');
         });
     });
@@ -5284,7 +5284,7 @@ describe('Instantiated autoNumeric functions', () => {
             expect(aNInput.node().selectionStart).toEqual(7);
             expect(aNInput.node().selectionEnd).toEqual(10);
 
-            aNInput.node().dispatchEvent(new window.Event('focus', { bubbles: false, cancelable: true })); // simply calling focus() on the node is not enough, because the focus event is fired when the browser window is also active/focused
+            aNInput.node().dispatchEvent(new window.Event('focus', { bubbles: false, cancelable: true })); // Simply calling `focus()` on the node is not enough, because the focus event is fired when the browser window is also active/focused
             expect(aNInput.getFormatted()).toEqual('12.266,123457\u202f€');
             aNInput.selectDecimal();
             expect(aNInput.node().selectionStart).toEqual(7);
@@ -8887,8 +8887,8 @@ describe(`The AutoNumeric event lifecycle`, () => {
         expect(aNInput.getFormatted()).toEqual('{5.600,78 €}');
         expect(customFunction.formattedEvent).toHaveBeenCalledTimes(5);
         
-        // Using aNInput.node().focus(); fails because that call (and the subsequent tests) fails, because focus() is ignored by the browser if the browser window itself is not focused/active 
-        // If the tests are executed only in one browser and the browser windows is activated (e.g.: not clicked away while the test is running), focus() works normally and it explains the "flakyness" when test:unitc is executed        
+        // Using `aNInput.node().focus();` fails because that call (and the subsequent tests) fails, because `focus()` is ignored by the browser if the browser window itself is not focused/active
+        // If the tests are executed only in one browser and the browser windows is activated (ie. not clicked away while the test is running), `focus()` works normally and it explains the "flakyness" when `test:unitc` is executed
         aNInput.node().dispatchEvent(new window.Event('focus', { bubbles: false, cancelable: true }));
         expect(customFunction.formattedEvent).toHaveBeenCalledTimes(6);
         expect(aNInput.getFormatted()).toEqual('-5.600,78 €');

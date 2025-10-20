@@ -6789,7 +6789,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 this._triggerEvent(AutoNumeric.events.native.input, e.target); //TODO instead of adding the event here, generate it from the `_historyTableRedo()` function?
                 this.onGoingRedo = true;
 
-                // if lastVal is updated in the undo branch, it should be update here too, otherwise backspace could delete two chars (enter 1234, ctrl-z, ctrl-y, backspace)
+                // if lastVal is updated in the undo branch, it should be updated here too, otherwise Backspace could delete two chars (enter 1234, ctrl-z, ctrl-y, Backspace)
                 this.lastVal = AutoNumericHelper.getElementValue(e.target);
                 this.throwInput = true;
 
@@ -6804,7 +6804,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     this._historyTableUndo();
                     this._triggerEvent(AutoNumeric.events.native.input, e.target); //TODO instead of adding the event here, generate it from the `_historyTableRedo()` function?
 
-                    // lastVal should be updated to properly detect change in the delete/backspace handler above
+                    // lastVal should be updated to properly detect change in the Delete/Backspace handler above
                     this.lastVal = AutoNumericHelper.getElementValue(e.target);
                     this.throwInput = true;
 
@@ -6818,7 +6818,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             this._triggerEvent(AutoNumeric.events.native.input, e.target); //TODO instead of adding the event here, generate it from the `_historyTableRedo()` function?
             this.onGoingRedo = true;
 
-            // if lastVal is updated in the undo branch, it should be update here too, otherwise backspace could delete two chars (enter 1234, ctrl-z, ctrl-y, backspace)
+            // if lastVal is updated in the undo branch, it should be updated here too, otherwise Backspace could delete two chars (enter 1234, ctrl-z, ctrl-y, Backspace)
             this.lastVal = AutoNumericHelper.getElementValue(e.target);
             this.throwInput = true;
 
@@ -6831,7 +6831,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         // Manage the Cut event
-        // Also handle the Ctrl-Del event on windows (Delete words to the right of the cursor) 
+        // Also handle the Ctrl-Del event on windows (delete words to the right of the cursor)
         if (((e.ctrlKey || e.metaKey) && (this.eventKey === AutoNumericEnum.keyName.X || this.eventKey === AutoNumericEnum.keyName.x)) ||
             (e.ctrlKey && this.eventKey === AutoNumericEnum.keyName.Delete)) {
             // Save the caret position at the start of the selection
@@ -6843,7 +6843,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             // Set back the initial caret position
             this._setCaretPosition(caretPosition);
             
-            // update lastVal to detect change in delete/backspace handler
+            // Update lastVal to detect changes in Delete/Backspace handler
             this.lastVal = AutoNumericHelper.getElementValue(e.target);
         }
 
@@ -7126,8 +7126,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
             // 4. On a 'normal' non-autoNumeric input, an `input` event is sent when a paste is done. We mimic that.
             this._triggerEvent(AutoNumeric.events.native.input, eventTarget);
-
-            this.lastVal = AutoNumericHelper.getElementValue(eventTarget);  // fix the 'input event sometimes not raised' issue after value is pasted into an empty input
+            this.lastVal = AutoNumericHelper.getElementValue(eventTarget);  // Fix the 'input event is sometimes not raised' issue after a value is pasted into an empty input
 
             // 5. Return since the job is done
             return;
@@ -7468,7 +7467,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         if (valueHasBeenSet && initialFormattedValue !== targetValue) {
             // On a 'normal' non-autoNumeric input, an `input` event is sent when a paste is done. We mimic that.
             this._triggerEvent(AutoNumeric.events.native.input, eventTarget);
-            this.lastVal = targetValue;  // update it to avoid deleting an extra char when the pasted content is selected and removed by hitting backspace (see also _onKeyDown)
+            this.lastVal = targetValue;  // Update lastVal to avoid deleting an extra character when the pasted content is selected and removed by hitting Backspace (see also `_onKeyDown`)
         }
     }
 

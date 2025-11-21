@@ -4383,6 +4383,48 @@ describe('Issue #808', () => {
         expect(await issue808InputDetector.getValue()).toEqual('6');
         expect(await input.getValue()).toEqual('1 234');
     });
+
+    it(`ESC: Re-entering the last input value on the second attempt after pressing Escape should trigger the oninput event`, async () => {
+        // This has been reported under #819
+
+        // reset
+        const input = await $(selectors.issue808);
+        const issue808InputDetector = await $(selectors.issue808InputDetector);
+        await resetInputDetector();
+        await setAutonumericValue('');
+
+        await input.click();
+        expect(await issue808InputDetector.getValue()).toEqual('0');
+        expect(await input.getValue()).toEqual('');
+
+        // Put some value to the clipboard - Position caret after the last digit in the input, selection is empty - ctrl-V - select the pasted part only, backspace --> extra character is not deleted
+        await browser.keys(['1']);
+        await browser.keys(['2']);
+        await browser.keys(['3']);
+        expect(await input.getValue()).toEqual('123');
+        expect(await issue808InputDetector.getValue()).toEqual('3');
+
+        // Focus next input
+        await browser.keys(Key.Tab);
+        expect(await input.isFocused()).toEqual(false);
+
+        // modify value and revert by the ESC key
+        await input.click();
+        await browser.keys([Key.Home]);
+        await browser.keys(['5']);
+        expect(await input.getValue()).toEqual('5 123');
+        expect(await issue808InputDetector.getValue()).toEqual('4');
+
+        await browser.keys([Key.Escape]);
+        expect(await input.getValue()).toEqual('123');
+        expect(await issue808InputDetector.getValue()).toEqual('5');
+
+        // Re-entering the last input value on the second attempt after pressing Escape should trigger the oninput event
+        await browser.keys([Key.Home]);
+        await browser.keys(['5']);
+        expect(await input.getValue()).toEqual('5 123');
+        expect(await issue808InputDetector.getValue()).toEqual('6');
+    });
 });
 
 describe('Issue #574', () => {

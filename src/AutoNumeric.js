@@ -6626,6 +6626,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     this.set(this.savedCancellableValue);
                     // And we need to send an 'input' event when setting back the initial value in order to make other scripts aware of the value change...
                     this._triggerEvent(AutoNumeric.events.native.input, e.target);
+
+                    // lastVal should be updated to properly detect change (#819)
+                    this.lastVal = AutoNumericHelper.getElementValue(e.target);
+                    this.throwInput = true;
                 }
             }
 

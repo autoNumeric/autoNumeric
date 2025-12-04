@@ -1204,6 +1204,7 @@ export default class AutoNumeric {
         this._onKeyupGlobalFunc = e => { this._onKeyupGlobal(e); };
         this._onCompositionstartFunc = e => { this._onCompositionstart(e); };
         this._onCompositionendFunc = e => { this._onCompositionend(e); };
+        this._onInputFunc = e => { this._onInput(e); };
 
         // Add the event listeners
         this.domElement.addEventListener('focusin', this._onFocusInFunc, false);
@@ -1213,6 +1214,7 @@ export default class AutoNumeric {
         this.domElement.addEventListener('keydown', this._onKeydownFunc, false);
         this.domElement.addEventListener('keypress', this._onKeypressFunc, false);
         this.domElement.addEventListener('keyup', this._onKeyupFunc, false);
+        this.domElement.addEventListener('input', this._onInputFunc, false);
         this.domElement.addEventListener('blur', this._onFocusOutAndMouseLeaveFunc, false);
         this.domElement.addEventListener('mouseleave', this._onFocusOutAndMouseLeaveFunc, false);
         this.domElement.addEventListener('paste', this._onPasteFunc, false);
@@ -1246,6 +1248,7 @@ export default class AutoNumeric {
         this.domElement.removeEventListener('keydown', this._onKeydownFunc, false);
         this.domElement.removeEventListener('keypress', this._onKeypressFunc, false);
         this.domElement.removeEventListener('keyup', this._onKeyupFunc, false);
+        this.domElement.removeEventListener('input', this._onInputFunc, false);
         this.domElement.removeEventListener('paste', this._onPasteFunc, false);
         this.domElement.removeEventListener('wheel', this._onWheelFunc, false);
         this.domElement.removeEventListener('drop', this._onDropFunc, false);
@@ -6922,6 +6925,18 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             this.historyTable[this.historyTableIndex].start = this.selectionStart;
             this.historyTable[this.historyTableIndex].end = this.selectionEnd;
         }
+    }
+
+    /**
+     * Handler for native 'input' events.
+     * Addresses Android Chrome [issue #781](https://github.com/autoNumeric/autoNumeric/issues/781) where keyboard events don't fire reliably,
+     * causing rawValue updates to be missed. The guard in _saveRawValueForAndroid()
+     * ensures this only processes on Android (keyCode 229).
+     *
+     * @private
+     */
+    _onInput() {
+        this._saveRawValueForAndroid();
     }
 
     /**

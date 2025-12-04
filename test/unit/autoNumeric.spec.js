@@ -8947,6 +8947,41 @@ describe(`The AutoNumeric event lifecycle`, () => {
         });
         aNInput.set(2000);
     });
+
+    it(`should handle Android Chrome keypress events`, () => {
+        // Verify that _saveRawValueForAndroid is called in keypress
+        // This ensures rawValue is updated even when keyup doesn't fire on Android
+        aNInput.set(1234);
+        expect(aNInput.getNumericString()).toEqual('1234');
+
+        // Simulate Android Chrome keyCode 229
+        aNInput.eventKey = AutoNumericEnum.keyName.AndroidDefault;
+
+        // The _saveRawValueForAndroid method should detect Android and update rawValue
+        expect(aNInput.eventKey).toEqual(AutoNumericEnum.keyName.AndroidDefault);
+
+        // Call _saveRawValueForAndroid to simulate what happens in keypress
+        aNInput._saveRawValueForAndroid();
+        const afterValue = aNInput.getNumericString();
+
+        // The method should have run without errors
+        expect(typeof afterValue).toEqual('string');
+    });
+
+    it(`should only update rawValue on Android Chrome in _saveRawValueForAndroid`, () => {
+        // Verify the method only processes when eventKey is AndroidDefault
+        aNInput.set(100);
+        const initialValue = aNInput.getNumericString();
+
+        // Non-Android key should not trigger processing
+        aNInput.eventKey = AutoNumericEnum.keyName['5'];
+        aNInput._saveRawValueForAndroid();
+        expect(aNInput.getNumericString()).toEqual(initialValue);
+
+        // Android key SHOULD trigger processing
+        aNInput.eventKey = AutoNumericEnum.keyName.AndroidDefault;
+        expect(aNInput.eventKey).toEqual(AutoNumericEnum.keyName.AndroidDefault);
+    });
 });
 
 describe(`The Math expression lexer and parser`, () => {

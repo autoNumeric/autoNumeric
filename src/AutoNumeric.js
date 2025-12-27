@@ -6602,6 +6602,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
             if (this.settings.modifyValueOnUpDownArrow &&
                 (this.eventKey === AutoNumericEnum.keyName.UpArrow || this.eventKey === AutoNumericEnum.keyName.DownArrow)) {
+                this.isEditing = false;  // Fix issue #817: When rawValueDivisor is not null: should disable this flag, otherwise this.rawValue becomes invalid in _setRawValue (_setRawValue gets the raw value that is already divided by rawValueDivisor and if isEditing is true the value is divided once more)
                 this.upDownArrowAction(e);
 
                 return;

@@ -3466,6 +3466,72 @@ describe('`rawValueDivisor` option', () => {
         expect(await $(selectors.issue452).getValue()).toEqual('7,621\u202f%');
     });
 
+    it('#817: should properly update the raw value when divided by a `rawValueDivisor`, and the value is modified by Arrow/Wheel × Up/Down Arrow', async () => {
+        // Modify the element value while it has the focus
+        const input = await $(selectors.issue452);
+        await input.click(); // Focus on the input element
+        await browser.keys([Key.Control, 'a']);  // Select All
+        await browser.keys('12,345');
+
+        // eslint-disable-next-line arrow-body-style
+        const getNumericString = async () => {
+            return await browser.execute(domId => {
+                const input = document.querySelector(domId);
+                const an = AutoNumeric.getAutoNumericElement(input);
+                return an.getNumericString();
+            }, selectors.issue452);
+        };
+
+        // Test default value
+        let result = await getNumericString();
+        expect(result).toEqual('0.12345');
+        expect(await input.getValue()).toEqual('12,345\u202f%');
+
+        // Test Arrow Up
+        await browser.keys([Key.ArrowUp]);
+        result = await getNumericString();
+        expect(result).toEqual('1.12345');  // Default is increment by 1
+        expect(await input.getValue()).toEqual('112,345\u202f%');
+
+        await browser.keys([Key.ArrowUp]);
+        result = await getNumericString();
+        expect(result).toEqual('2.12345');
+        expect(await input.getValue()).toEqual('212,345\u202f%');
+
+        // Test Arrow Down
+        await browser.keys([Key.ArrowDown]);
+        result = await getNumericString();
+        expect(result).toEqual('1.12345');
+        expect(await input.getValue()).toEqual('112,345\u202f%');
+
+        await browser.keys([Key.ArrowDown]);
+        result = await getNumericString();
+        expect(result).toEqual('0.12345');
+        expect(await input.getValue()).toEqual('12,345\u202f%');
+
+        // Test Wheel Up
+        await mouseWheel(0, -100);
+        result = await getNumericString();
+        expect(result).toEqual('0.12355');  // Using percentageEU3dec: 0.01 %
+        expect(await input.getValue()).toEqual('12,355\u202f%');
+
+        await mouseWheel(0, -100);
+        result = await getNumericString();
+        expect(result).toEqual('0.12365');
+        expect(await input.getValue()).toEqual('12,365\u202f%');
+
+        // Test Wheel Down
+        await mouseWheel(0, 100);
+        result = await getNumericString();
+        expect(result).toEqual('0.12355');
+        expect(await input.getValue()).toEqual('12,355\u202f%');
+
+        await mouseWheel(0, 100);
+        result = await getNumericString();
+        expect(result).toEqual('0.12345');
+        expect(await input.getValue()).toEqual('12,345\u202f%');
+    });
+
     it('should update on load the formatted and raw value when divided by a `rawValueDivisor`', async () => {
         expect(await $(selectors.issue452Formatted).getValue()).toEqual('12,35\u202f%');
         const result = await browser.execute(domId => {

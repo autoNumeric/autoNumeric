@@ -7369,6 +7369,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // 5. Check if the result is a valid number, if not, drop the paste and do nothing.
         if (!AutoNumericHelper.isNumber(result) || result === '') {
+            this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to format an empty value (compare with 3. above)
             if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.error) {
                 AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' would result into an invalid content '${result}'.`); //TODO Should we send a warning instead of throwing an error?
                 //TODO This is not DRY ; refactor with above
@@ -7406,6 +7407,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         let valueHasBeenClamped = false;
         try {
             this.set(result);
+            this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to reformat
             valueHasBeenSet = true;
         } catch (error) {
             let clampedValue;
@@ -7426,6 +7428,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 case AutoNumeric.options.onInvalidPaste.truncate:
                 case AutoNumeric.options.onInvalidPaste.replace:
                     // Throw an error message
+                    this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to format and set the value to 0
                     AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' results in a value '${result}' that is outside of the minimum [${this.settings.minimumValue}] and maximum [${this.settings.maximumValue}] value range.`);
                 // Fall through
                 case AutoNumeric.options.onInvalidPaste.ignore:

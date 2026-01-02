@@ -442,7 +442,7 @@ export default class AutoNumericHelper {
 
     /**
      * Return an object containing the name and version of the current browser.
-     * @example `browserVersion()` => { name: 'Firefox', version: '42' }
+     * @example `browser()` => { name: 'firefox', version: '42' }
      * Based on http://stackoverflow.com/a/38080051/2834898
      *
      * @returns {{ name: string, version: string }}
@@ -481,7 +481,7 @@ export default class AutoNumericHelper {
      */
     static isSeleniumBot() {
         // noinspection JSUnresolvedVariable
-        return window.navigator.webdriver === true;
+        return window.navigator.webdriver === true && this.browser().name === 'firefox';  // Should return false if executed under chromium/webdriver (both the geckodriver and the webdriver set window.navigator.webdriver to true)
     }
 
     /**

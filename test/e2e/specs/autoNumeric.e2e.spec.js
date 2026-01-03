@@ -4028,10 +4028,6 @@ describe('Pasting', () => {
         await inputToTest.click();
         await sendCtrlChar('a');
         expect(await getCaretStart(selectors.issue670)).toEqual(1);  // The currency sign should not be selected, so that the branch of partial selection is executed in _onPaste
-
-        await browser.execute(() => {
-            window.e2eLogs = '';
-        });
         await sendCtrlChar('v');
 
         expect(await inputToTest.getValue()).toEqual('$123.456,00');  // Must be properly formatted

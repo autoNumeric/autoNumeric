@@ -1246,6 +1246,15 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #670</p>
+			<div>
+				<input id="issue_670" type="text" placeholder="#670" value="1000">
+			</div>
+		</div>
+	</div>
 </div>
 
 <script>
@@ -2607,7 +2616,6 @@
 
     new AutoNumeric('#issue_799', null, anOptions799);
 
-
     //-------------- Issue #808
     new AutoNumeric('#issue_808', {
         "decimalPlaces": 0,
@@ -2623,6 +2631,13 @@
         issue808InputDetector.value = ++issue808InputCount;
     });
 
+    //-------------- Issue #670
+    new AutoNumeric('#issue_670', {
+        currencySymbol: '$',
+        decimalCharacter: ',',
+        digitGroupSeparator: '.',
+        minimumValue: '-10'
+    });
 </script>
 </body>
 </html>

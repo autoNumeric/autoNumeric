@@ -7414,6 +7414,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             switch (this.settings.onInvalidPaste) {
                 case AutoNumeric.options.onInvalidPaste.clamp:
                     clampedValue = AutoNumericHelper.clampToRangeLimits(result, this.settings);
+                    this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to reformat
                     try {
                         this.set(clampedValue);
                     } catch (error) {

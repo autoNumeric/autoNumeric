@@ -9133,6 +9133,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         this._setValueParts(left, right);
 
+        this.throwInput = true;  // fix #582: this.throwInput can be false (e.g.: by putting an invalid character previously) and we must enable this flag to ensure that input event is sent and double character is not removed, see also _onKeydown
         return true;
     }
 

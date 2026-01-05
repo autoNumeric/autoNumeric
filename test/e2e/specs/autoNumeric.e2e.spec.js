@@ -273,6 +273,7 @@ const selectors = {
     issue768Submit                    : '#issue_768_submit',
     issue808                          : '#issue_808',
     issue808InputDetector             : '#issue_808_input_detector',
+    issue582                          : '#issue_582',
 };
 
 //-----------------------------------------------------------------------------
@@ -299,6 +300,20 @@ const getCaretPositions = async domId => {
 // eslint-disable-next-line arrow-body-style
 const getCaretStart = async domId => {
     return (await getCaretPositions(domId)).start;
+};
+
+/**
+ * Returns the result of getNumericString method (rawValue as string)
+ * @param {string} domId  The input id that is already managed by an AutoNumeric instance
+ * @returns {Promise<string>} 
+ */
+// eslint-disable-next-line arrow-body-style
+const getNumericString = async domId => {
+    return await browser.execute(domId => {
+        const input = document.querySelector(domId);
+        const an = AutoNumeric.getAutoNumericElement(input);
+        return an.getNumericString();
+    }, domId);
 };
 
 /**
@@ -4457,6 +4472,47 @@ describe('Issue #559', () => {
         expect(await input.getValue()).toEqual('-1.23');
         await browser.keys(['6']);
         expect(await input.getValue()).toEqual('-1.62');
+    });
+});
+
+describe('Issue #582', () => {
+    it('should test for default values', async () => {
+        await browser.url(testUrl);
+
+        expect(await $(selectors.issue582).getValue()).toEqual('1.234,5678');
+    });
+
+    it(`should correctly 'backspace' only one character if we try to insert a forbidden character before`, async () => {
+        const inputToTest = await $(selectors.issue582);
+
+        await inputToTest.click();
+        await browser.keys([Key.Home, Key.ArrowRight, Key.ArrowRight, Key.ArrowRight]); // 1.23|4  (only 3 arrowrights are needed, it jumps over the grouping separator character)
+        expect(await getCaretStart(selectors.issue582)).toEqual(4);
+
+        await browser.keys('w');
+        await browser.keys(Key.Backspace);
+
+        expect(await getNumericString(selectors.issue582)).toEqual('124.5678');
+        expect(await inputToTest.getValue()).toEqual('124,5678');
+    });
+
+    it(`should correctly 'delete' only one character if we try to insert a forbidden character before`, async () => {
+        const inputToTest = await $(selectors.issue582);
+
+        await inputToTest.click();
+
+        await sendCtrlChar('a');
+        await browser.keys('1234,5678');
+        expect(await $(selectors.issue582).getValue()).toEqual('1.234,5678');
+
+        await browser.keys([Key.Home, Key.ArrowRight, Key.ArrowRight]); // 1.2|34  (only 2 arrowrights are needed, it jumps over the grouping separator character)
+        expect(await getCaretStart(selectors.issue582)).toEqual(3);
+
+        await browser.keys('w');
+        await browser.keys(Key.Delete);
+
+        expect(await getNumericString(selectors.issue582)).toEqual('124.5678');
+        expect(await inputToTest.getValue()).toEqual('124,5678');
     });
 });
 

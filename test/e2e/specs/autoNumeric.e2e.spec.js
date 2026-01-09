@@ -224,6 +224,7 @@ const selectors = {
     issue594Right                     : '#issue_594_right',
     issue542On                        : '#issue_542_on',
     issue542Off                       : '#issue_542_off',
+    issue542OnDecimalChar             : '#issue_542_on_decimal_char',
     issue611HtmlReadOnly              : '#issue_611_html_readonly',
     issue611OptionReadOnly            : '#issue_611_option_readonly',
     issue611HtmlAndOptionReadOnly     : '#issue_611_html_and_option_readonly',
@@ -353,6 +354,23 @@ const mouseWheel = async (deltaX, deltaY, duration = 200) => {
         }),
     ]);
 };
+
+/**
+ * Sets the {start, end} positions of the caret for the given input
+ * @param {string} domId  The input's id in the dom to set start/end caret positions
+ * @param {number} selectionStart  The caret start position to set
+ * @param {number} selectionEnd  The caret end position to set
+ * @returns {Promise<void>} 
+ */
+// eslint-disable-next-line arrow-body-style
+const setCaretPositions = async (domId, selectionStart, selectionEnd) => {
+    return await browser.execute((domId, selectionStart, selectionEnd) => {
+        const input = document.querySelector(domId);
+        input.selectionStart = selectionStart;
+        input.selectionEnd = selectionEnd;
+    }, domId, selectionStart, selectionEnd);
+};
+
 
 //-----------------------------------------------------------------------------
 // ---- Tests
@@ -541,37 +559,25 @@ describe('Issue #327 (using inputs from issue #183)', () => {
         // Then 'tab' on each other inputs
         await browser.keys(Key.Tab);
         // Check the text selection
-        let inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue183ignore);
+        let inputCaretPosition = await getCaretPositions(selectors.issue183ignore);
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual(13); //XXX This does not work under Firefox 45.7, but does under firefox 56. Since we only support the browsers last version - 2, let's ignore it.
 
         await browser.keys(Key.Tab);
         // Check the text selection
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue183clamp);
+        inputCaretPosition = await getCaretPositions(selectors.issue183clamp);
         expect(inputCaretPosition.start).toEqual(2);
         expect(inputCaretPosition.end).toEqual(15);
 
         await browser.keys(Key.Tab);
         // Check the text selection
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue183truncate);
+        inputCaretPosition = await getCaretPositions(selectors.issue183truncate);
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual(13);
 
         await browser.keys(Key.Tab);
         // Check the text selection
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue183replace);
+        inputCaretPosition = await getCaretPositions(selectors.issue183replace);
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual(13);
     });
@@ -607,12 +613,7 @@ describe('Issue #306', () => {
         expect(await input.getValue()).toEqual('0');
 
         // Check the caret position
-        let inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306input);
-        expect(inputCaretPosition).toEqual(1);
-
+        expect(await getCaretStart(selectors.issue306input)).toEqual(1);
 
         // Modify the input value
         await browser.keys(Key.Backspace);
@@ -621,22 +622,14 @@ describe('Issue #306', () => {
         expect(await input.getValue()).toEqual('0.');
 
         // Check the caret position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306input);
-        expect(inputCaretPosition).toEqual(2);
+        expect(await getCaretStart(selectors.issue306input)).toEqual(2);
 
 
         await browser.keys('0');
         expect(await input.getValue()).toEqual('0.0');
 
         // Check the caret position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306input);
-        expect(inputCaretPosition).toEqual(3);
+        expect(await getCaretStart(selectors.issue306input)).toEqual(3);
     });
 
     it(`should move the caret correctly while in the decimal places`, async () => {
@@ -653,62 +646,30 @@ describe('Issue #306', () => {
         expect(await input.getValue()).toEqual('0,12345');
         await browser.keys([Key.Home, Key.ArrowRight, '00000']);
         expect(await input.getValue()).toEqual('0,00000');
-        let inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306inputDecimals);
-        expect(inputCaretPosition).toEqual(7);
+        expect(await getCaretStart(selectors.issue306inputDecimals)).toEqual(7);
 
         // Tests that it does not allow adding a leading 0
         await browser.keys([Key.Home, '0']);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306inputDecimals);
-        expect(inputCaretPosition).toEqual(0);
+        expect(await getCaretStart(selectors.issue306inputDecimals)).toEqual(0);
 
         // Tests that entering a 0 while in the decimal places moves the caret to the right
         await browser.keys([Key.ArrowRight, '0']);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306inputDecimals);
-        expect(inputCaretPosition).toEqual(3);
+        expect(await getCaretStart(selectors.issue306inputDecimals)).toEqual(3);
         // ...and another
         await browser.keys('0');
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306inputDecimals);
-        expect(inputCaretPosition).toEqual(4);
+        expect(await getCaretStart(selectors.issue306inputDecimals)).toEqual(4);
         // ...and another
         await browser.keys('0');
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306inputDecimals);
-        expect(inputCaretPosition).toEqual(5);
+        expect(await getCaretStart(selectors.issue306inputDecimals)).toEqual(5);
         // ...and another
         await browser.keys('0');
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306inputDecimals);
-        expect(inputCaretPosition).toEqual(6);
+        expect(await getCaretStart(selectors.issue306inputDecimals)).toEqual(6);
         // ...and another
         await browser.keys('0');
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306inputDecimals);
-        expect(inputCaretPosition).toEqual(7);
+        expect(await getCaretStart(selectors.issue306inputDecimals)).toEqual(7);
         // ...and another that should be dropped
         await browser.keys('0');
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306inputDecimals);
-        expect(inputCaretPosition).toEqual(7);
+        expect(await getCaretStart(selectors.issue306inputDecimals)).toEqual(7);
     });
 
     it(`should move the caret correctly while in the decimal places, without having to setup any sequence of inputs`, async () => { //FIXME This does not work anymore
@@ -721,32 +682,16 @@ describe('Issue #306', () => {
         await input.setValue('50000,00');
         expect(await input.getValue()).toEqual('50.000,00');
         await browser.keys([Key.End, Key.ArrowLeft, Key.ArrowLeft, Key.ArrowRight]);
-        let inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306inputDecimals2);
-        expect(inputCaretPosition).toEqual(7);
+        expect(await getCaretStart(selectors.issue306inputDecimals2)).toEqual(7);
 
         await browser.keys('0');
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306inputDecimals2);
-        expect(inputCaretPosition).toEqual(8);
+        expect(await getCaretStart(selectors.issue306inputDecimals2)).toEqual(8);
 
         await browser.keys('0');
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306inputDecimals2);
-        expect(inputCaretPosition).toEqual(9);
+        expect(await getCaretStart(selectors.issue306inputDecimals2)).toEqual(9);
 
         await browser.keys('0');
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue306inputDecimals2);
-        expect(inputCaretPosition).toEqual(9);
+        expect(await getCaretStart(selectors.issue306inputDecimals2)).toEqual(9);
     });
 });
 
@@ -777,11 +722,7 @@ describe('Issue #283', () => {
         expect(await input.getValue()).toEqual('1.1235');
 
         // Check the final caret position
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue283Input1);
-        expect(inputCaretPosition).toEqual(0);
+        expect(await getCaretStart(selectors.issue283Input1)).toEqual(0);
     });
 
     it(`should keep the caret position when trying to input a '0' that gets rejected on a euro number`, async () => {
@@ -800,11 +741,7 @@ describe('Issue #283', () => {
         expect(await input.getValue()).toEqual('8.000,00\u00a0€');
 
         // Check the final caret position
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue283Input4);
-        expect(inputCaretPosition).toEqual(0);
+        expect(await getCaretStart(selectors.issue283Input4)).toEqual(0);
     });
 
     it(`should insert a '0' and move the caret position when leadingZero is 'allow'`, async () => {
@@ -823,11 +760,7 @@ describe('Issue #283', () => {
         expect(await input.getValue()).toEqual('08.000,00\u00a0€');
 
         // Check the final caret position
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue283Input3);
-        expect(inputCaretPosition).toEqual(1);
+        expect(await getCaretStart(selectors.issue283Input3)).toEqual(1);
     });
 
     it(`should insert a '0' when in the middle of other zeros, and move the caret position`, async () => {
@@ -846,11 +779,7 @@ describe('Issue #283', () => {
         expect(await input.getValue()).toEqual('80.000,00\u00a0€');
 
         // Check the final caret position
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue283Input4);
-        expect(inputCaretPosition).toEqual(4);
+        expect(await getCaretStart(selectors.issue283Input4)).toEqual(4);
     });
 });
 
@@ -940,7 +869,7 @@ describe('Issue #322', () => {
         expect(inputCaretPosition).toEqual(10);
     });
 
-    it('should paste correctly a string that contains grouping separators when pasting on a selection', async () => { //FIXME This does not work anymore in the v8 e2e test, but does manually
+    it('should paste correctly a string that contains grouping separators when pasting on a selection', async () => {
         // Pre-requisite : '11,1' is still in the clipboard
 
         // Focus in the issue input
@@ -1020,11 +949,7 @@ describe('Issue #317', () => {
 
         // Check that the value did not change, and that the caret is correctly positioned
         expect(await input.getValue()).toEqual('0.00');
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue317input);
-        expect(inputCaretPosition).toEqual(1);
+        expect(await getCaretStart(selectors.issue317input)).toEqual(1);
     });
 
     it('should move the caret correctly when the value is zero', async () => {
@@ -1041,39 +966,23 @@ describe('Issue #317', () => {
 
         // Check that the value did not change, and that the caret is correctly positioned
         expect(await input.getValue()).toEqual('2,342,423,423,423.00');
-        let inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue317input);
-        expect(inputCaretPosition).toEqual(17);
+        expect(await getCaretStart(selectors.issue317input)).toEqual(17);
 
         // Enter a decimal character that will make the caret move into the decimal place part
         // ...with the alternate decimal character
         await browser.keys(',');
         expect(await input.getValue()).toEqual('2,342,423,423,423.00');
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue317input);
-        expect(inputCaretPosition).toEqual(18); //FIXME this places the caret at the end instead of just after the decimal character
+        expect(await getCaretStart(selectors.issue317input)).toEqual(18); //FIXME this places the caret at the end instead of just after the decimal character
 
         // ...with the period '.'
         await browser.keys(Key.ArrowLeft);
         await browser.keys('.');
         expect(await input.getValue()).toEqual('2,342,423,423,423.00');
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue317input);
-        expect(inputCaretPosition).toEqual(18);
+        expect(await getCaretStart(selectors.issue317input)).toEqual(18);
 
         // ...with the numpad dot
         await browser.keys(Key.ArrowLeft);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue317input);
-        expect(inputCaretPosition).toEqual(17);
+        expect(await getCaretStart(selectors.issue317input)).toEqual(17);
         /* await browser.keys(Key.Decimal); //FIXME The webdriver.io v8 changed 'Decimal' to `Key.Decimal`, and while it works manually, this now fails during the tests. Uncomment when webdriver.io has fixed this bug
         expect(await input.getValue()).toEqual('2,342,423,423,423.00');
         inputCaretPosition = await browser.execute(domId => {
@@ -1091,7 +1000,6 @@ describe('Issue #303', () => {
         expect(await $(selectors.issue303inputP).getValue()).toEqual('');
         expect(await $(selectors.issue303inputS).getValue()).toEqual('');
     });
-
 
     it('should position the caret at the right position, depending on the currencySymbolPlacement', async () => {
         // Focus in the non-an input
@@ -1197,10 +1105,7 @@ describe('Issue #387', () => {
         await browser.keys([Key.Escape]);
         expect(await input.getValue()).toEqual('$22,024.76');
         // Check the text selection
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue387inputCancellable);
+        const inputCaretPosition = await getCaretPositions(selectors.issue387inputCancellable);
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual('$22,024.76'.length);
 
@@ -1226,10 +1131,7 @@ describe('Issue #387', () => {
         await browser.keys([Key.Escape]);
         expect(await input.getValue()).toEqual('$2,202.76');
         // Check the text selection
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue387inputNotCancellable);
+        const inputCaretPosition = await getCaretPositions(selectors.issue387inputNotCancellable);
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual('$2,202.76'.length);
 
@@ -2912,12 +2814,12 @@ describe('`decimalPlacesShownOnFocus` and selections', () => {
         await input1.click();
 
         // Check the text selection in the first input
-        const inputCaretPosition = await browser.execute(domId => {
+        await browser.execute(domId => {
             const input = document.querySelector(domId);
             const anElement = AutoNumeric.getAutoNumericElement(input);
             anElement.selectDecimal();
-            return { start: input.selectionStart, end: input.selectionEnd };
         }, selectors.selection1);
+        const inputCaretPosition = await getCaretPositions(selectors.selection1);
         expect(inputCaretPosition.start).toEqual(7);
         expect(inputCaretPosition.end).toEqual(13);
     });
@@ -3011,329 +2913,209 @@ describe('`caretPositionOnFocus` option', () => {
         // Serie 1
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus1);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus1);
         expect(inputCaretPosition).toEqual(3);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus2);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus2);
         expect(inputCaretPosition).toEqual(3);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus3);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus3);
         expect(inputCaretPosition).toEqual(3);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus4);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus4);
         expect(inputCaretPosition).toEqual(2);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus5);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus5);
         expect(inputCaretPosition).toEqual(3);
 
         // Serie 2
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus6);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus6);
         expect(inputCaretPosition).toEqual(13);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus7);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus7);
         expect(inputCaretPosition).toEqual(13);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus8);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus8);
         expect(inputCaretPosition).toEqual(13);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus9);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus9);
         expect(inputCaretPosition).toEqual(12);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus10);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus10);
         expect(inputCaretPosition).toEqual(13);
 
         // Serie 3
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus11);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus11);
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus12);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus12);
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus13);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus13);
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus14);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus14);
         expect(inputCaretPosition).toEqual(9);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus15);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus15);
         expect(inputCaretPosition).toEqual(10);
 
         // Serie 4
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus16);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus16);
         expect(inputCaretPosition).toEqual(11);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus17);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus17);
         expect(inputCaretPosition).toEqual(11);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus18);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus18);
         expect(inputCaretPosition).toEqual(11);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus19);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus19);
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus20);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus20);
         expect(inputCaretPosition).toEqual(11);
 
         // Serie 5
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus21);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus21);
         expect(inputCaretPosition).toEqual(1);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus22);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus22);
         expect(inputCaretPosition).toEqual(0);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus23);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus23);
         expect(inputCaretPosition).toEqual(0);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus24);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus24);
         expect(inputCaretPosition).toEqual(0);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus25);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus25);
         expect(inputCaretPosition).toEqual(1);
 
         // Serie 6
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus26);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus26);
         expect(inputCaretPosition).toEqual(11);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus27);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus27);
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus28);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus28);
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus29);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus29);
         expect(inputCaretPosition).toEqual(10);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus30);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus30);
         expect(inputCaretPosition).toEqual(11);
 
         // Serie 7
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus31);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus31);
         expect(inputCaretPosition).toEqual(8);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus32);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus32);
         expect(inputCaretPosition).toEqual(7);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus33);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus33);
         expect(inputCaretPosition).toEqual(7);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus34);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus34);
         expect(inputCaretPosition).toEqual(7);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus35);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus35);
         expect(inputCaretPosition).toEqual(8);
 
         // Serie 8
         // Focus on the input and check the caret position -246.813,58jk
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus36);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus36);
         expect(inputCaretPosition).toEqual(9);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus37);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus37);
         expect(inputCaretPosition).toEqual(8);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus38);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus38);
         expect(inputCaretPosition).toEqual(8);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus39);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus39);
         expect(inputCaretPosition).toEqual(8);
 
         // Focus on the input and check the caret position
         await browser.keys(Key.Tab);
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.selectOnFocus40);
+        inputCaretPosition = await getCaretStart(selectors.selectOnFocus40);
         expect(inputCaretPosition).toEqual(9);
     });
 });
@@ -3619,10 +3401,7 @@ describe('`negativeSignCharacter` option', () => {
         await browser.keys([Key.Home, '7']);
         expect(await $(selectors.issue478Neg2).getValue()).toEqual('°712.00');
         // Check the text selection
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue478Neg2);
+        const inputCaretPosition = await getCaretPositions(selectors.issue478Neg2);
         expect(inputCaretPosition.start).toEqual(2);
         expect(inputCaretPosition.end).toEqual(2);
 
@@ -3672,10 +3451,7 @@ describe('`negativeSignCharacter` option', () => {
         expect(await $(selectors.issue478RightPlacementPos1).getValue()).toEqual('14.00-');
 
         // Check that the caret position is at the correct position
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue478RightPlacementPos1);
+        const inputCaretPosition = await getCaretPositions(selectors.issue478RightPlacementPos1);
         expect(inputCaretPosition.start).toEqual(0);
         expect(inputCaretPosition.end).toEqual(0);
 
@@ -3707,40 +3483,28 @@ describe('`negativeSignCharacter` option', () => {
         await browser.keys([Key.End, '-']);
         expect(await $(selectors.issue478RightPlacementNegPos).getValue()).toEqual('1,234.78∸');
         // Check that the caret position is at the correct position
-        let inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue478RightPlacementNegPos);
+        let inputCaretPosition = await getCaretPositions(selectors.issue478RightPlacementNegPos);
         expect(inputCaretPosition.start).toEqual(8);
         expect(inputCaretPosition.end).toEqual(8);
 
         await browser.keys('-');
         expect(await $(selectors.issue478RightPlacementNegPos).getValue()).toEqual('1,234.78⧻');
         // Check that the caret position is at the correct position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue478RightPlacementNegPos);
+        inputCaretPosition = await getCaretPositions(selectors.issue478RightPlacementNegPos);
         expect(inputCaretPosition.start).toEqual(8);
         expect(inputCaretPosition.end).toEqual(8);
 
         await browser.keys([Key.End, '+']);
         expect(await $(selectors.issue478RightPlacementNegPos).getValue()).toEqual('1,234.78∸');
         // Check that the caret position is at the correct position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue478RightPlacementNegPos);
+        inputCaretPosition = await getCaretPositions(selectors.issue478RightPlacementNegPos);
         expect(inputCaretPosition.start).toEqual(8);
         expect(inputCaretPosition.end).toEqual(8);
 
         await browser.keys('+');
         expect(await $(selectors.issue478RightPlacementNegPos).getValue()).toEqual('1,234.78⧻');
         // Check that the caret position is at the correct position
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue478RightPlacementNegPos);
+        inputCaretPosition = await getCaretPositions(selectors.issue478RightPlacementNegPos);
         expect(inputCaretPosition.start).toEqual(8);
         expect(inputCaretPosition.end).toEqual(8);
     });
@@ -4479,10 +4243,7 @@ describe('Issue #593', () => {
         await browser.keys([Key.Control, 'v', Key.Control]);
         expect(await $(selectors.issue593).getValue()).toEqual('-1.234,00 €');
         // Also test the caret position after the paste
-        let inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue593);
+        let inputCaretPosition = await getCaretPositions(selectors.issue593);
         expect(inputCaretPosition.start).toEqual(6);
 
         // Paste into the other AutoNumeric element with the `truncate` `onInvalidPaste` option
@@ -4490,10 +4251,7 @@ describe('Issue #593', () => {
         await browser.keys([Key.Control, 'v', Key.Control]);
         expect(await $(selectors.issue593Truncate).getValue()).toEqual('-1.234,00 €');
         // Also test the caret position after the paste
-        inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue593Truncate);
+        inputCaretPosition = await getCaretPositions(selectors.issue593Truncate);
         expect(inputCaretPosition.start).toEqual(6);
     });
 
@@ -4509,13 +4267,7 @@ describe('Issue #593', () => {
         await browser.keys([Key.Control, 'a', 'v', Key.Control]);
         expect(await $(selectors.issue593).getValue()).toEqual('-1.234,00 €');
         // Also test the caret position after the paste
-        /*
-        let inputCaretPosition = browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue593);
-        expect(inputCaretPosition.start).toEqual(6);
-        */ //FIXME Manually this returns the correct caret position, with selenium it fails
+        expect(await getCaretStart(selectors.issue593)).toEqual(6);
 
         // Paste into the other AutoNumeric element with the `truncate` `onInvalidPaste` option
         await browser.keys([Key.Shift, Key.Tab, Key.Shift]); // Go to the other input
@@ -4523,13 +4275,7 @@ describe('Issue #593', () => {
         await browser.keys([Key.Control, 'a', 'v', Key.Control]);
         expect(await $(selectors.issue593Truncate).getValue()).toEqual('-1.234,00 €');
         // Also test the caret position after the paste
-        /*
-        inputCaretPosition = browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue593Truncate);
-        expect(inputCaretPosition.start).toEqual(6);
-        */ //FIXME Manually this returns the correct caret position, with selenium it fails
+        expect(await getCaretStart(selectors.issue593Truncate)).toEqual(6);
     });
 });
 
@@ -4549,11 +4295,7 @@ describe('Issue #594', () => {
         expect(await input.getValue()).toEqual('- €');
 
         // Check the caret position
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue594Left);
-        expect(inputCaretPosition.start).toEqual(1);
+        expect(await getCaretStart(selectors.issue594Left)).toEqual(1);
     });
 
     it(`should display the negative sign on the right side of the currency symbol when the element is empty`, async () => {
@@ -4564,15 +4306,11 @@ describe('Issue #594', () => {
         expect(await input.getValue()).toEqual(' €-');
 
         // Check the caret position
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return { start: input.selectionStart, end: input.selectionEnd };
-        }, selectors.issue594Right);
-        expect(inputCaretPosition.start).toEqual(0);
+        expect(await getCaretStart(selectors.issue594Right)).toEqual(0);
     });
 });
 
-xdescribe('Issue #542', () => {
+describe('Issue #542', () => {
     it('should test for default values', async () => {
         await browser.url(testUrl);
 
@@ -4592,27 +4330,27 @@ xdescribe('Issue #542', () => {
         const issue542Off = await $(selectors.issue542Off);
         await input.click();
 
-
         await browser.keys([Key.Escape, '666777.88']);
-        expect(await issue542Off.getValue()).toEqual('666,777.88'); //XXX Fails in Chrome, not in Firefox
+        expect(await input.getValue()).toEqual('666,777.88');
         await browser.keys([Key.Escape]);
-        expect(await issue542Off.getValue()).toEqual('1,234,567.89');
+        expect(await input.getValue()).toEqual('1,234,567.89');
         await browser.keys([Key.Escape, '666777.88', Key.Enter]); // Save the rawValue
-        expect(await issue542Off.getValue()).toEqual('666,777.88');
+        expect(await input.getValue()).toEqual('666,777.88');
         await browser.keys([Key.Escape]);
-        expect(await issue542Off.getValue()).toEqual('666,777.88');
+        expect(await input.getValue()).toEqual('666,777.88');
+
         // Start editing the value as usual
         await browser.keys(['12345']);
-        expect(await issue542Off.getValue()).toEqual('12,345');
+        expect(await input.getValue()).toEqual('12,345');
 
         // Then enter formula mode
         await browser.keys(['=']);
         expect(await input.getValue()).toEqual('=');
-        await browser.keys(['12+ 24.11']); //XXX The chromedriver bugs and does not accepts the '+' character
+        await browser.keys(['12+ 24.11']);
         expect(await input.getValue()).toEqual('=12+ 24.11');
         await browser.keys(['foobar']);
         expect(await input.getValue()).toEqual('=12+ 24.11');
-        await browser.keys(['-( 2/ (12+5))']); //XXX The geckodriver bugs and does not accepts the '(' and ')' characters
+        await browser.keys(['-( 2/ (12+5))']);
         expect(await input.getValue()).toEqual('=12+ 24.11-( 2/ (12+5))');
 
         // Cancel the formula
@@ -4633,11 +4371,62 @@ xdescribe('Issue #542', () => {
         expect(await input.getValue()).toEqual('=');
         await browser.keys(['-60000 + 12+ 24.16-( 1044/ (12))']);
         expect(await input.getValue()).toEqual('=-60000 + 12+ 24.16-( 1044/ (12))');
+
         await issue542Off.click(); // Blur
         expect(await input.getValue()).toEqual('-60,050.84');
     });
 
-    //TODO Add the tests when using a custom `decimalCharacter`
+    it(`should calculate values in formula mode and format values correctly when using a custom \`decimalCharacter\``, async () => {
+        const input = await $(selectors.issue542OnDecimalChar);
+        const issue542Off = await $(selectors.issue542Off);
+        await input.click();
+
+        await browser.keys([Key.Escape, '666777.88']);
+        expect(await input.getValue()).toEqual('666.777,88\u202f€');
+        await browser.keys([Key.Escape]);
+        expect(await input.getValue()).toEqual('1.234.567,89\u202f€');
+        await browser.keys([Key.Escape, '666777.88', Key.Enter]); // Save the rawValue
+        expect(await input.getValue()).toEqual('666.777,88\u202f€');
+        await browser.keys([Key.Escape]);
+        expect(await input.getValue()).toEqual('666.777,88\u202f€');
+
+        // Start editing the value as usual
+        await browser.keys(['12345']);
+        expect(await input.getValue()).toEqual('12.345\u202f€');
+
+        // Then enter formula mode
+        await browser.keys(['=']);
+        expect(await input.getValue()).toEqual('=');
+        await browser.keys(['12+ 24,11']);  // The correct decimal character must be used in the formula
+        expect(await input.getValue()).toEqual('=12+ 24,11');
+        await browser.keys(['foobar']);
+        expect(await input.getValue()).toEqual('=12+ 24,11');
+        await browser.keys(['-( 2/ (12+5))']);
+        expect(await input.getValue()).toEqual('=12+ 24,11-( 2/ (12+5))');
+
+        // Cancel the formula
+        await browser.keys([Key.Escape]);
+        expect(await input.getValue()).toEqual('12.345,00\u202f€');
+
+        // Check that hitting `esc` a second time changes the value to the last saved one, not the one before entering the formula mode
+        await browser.keys([Key.Escape]);
+        expect(await input.getValue()).toEqual('666.777,88\u202f€');
+
+        // Validate the formula with Enter
+        await browser.keys(['=']);
+        expect(await input.getValue()).toEqual('=');
+        await browser.keys(['-10000 + 12+ 24,16-( 1044/ (12))', Key.Enter]);
+        expect(await input.getValue()).toEqual('-10.050,84\u202f€');
+
+        // Validate the formula with Blur
+        await browser.keys(['=']);
+        expect(await input.getValue()).toEqual('=');
+        await browser.keys(['-60000 + 12+ 24,16-( 1044/ (12))']);
+        expect(await input.getValue()).toEqual('=-60000 + 12+ 24,16-( 1044/ (12))');
+
+        await issue542Off.click(); // Blur
+        expect(await input.getValue()).toEqual('-60.050,84\u202f€');
+    });
 });
 
 describe('Issue #611', () => {
@@ -4652,34 +4441,59 @@ describe('Issue #611', () => {
     it(`should not allow entering anything in an element set read-only via its html attribute`, async () => {
         const input = await $(selectors.issue611HtmlReadOnly);
         await input.click();
-        await browser.keys([Key.Home, '1']);
+
+        // If an input is readonly in Chrome, the Home key also starts scrolling the page to the top.
+        // That's why this and subsequent tests may throw "Node is either not clickable or not an HTMLElement" errors
+        // when an element is clicked, because scrolling is not instantenous and while webdriver tries to click the element,
+        // the page is being scrolled and the control to be clicked is not under the mouse cursor anymore.
+        // For these reasons, here we set caret positions directly, instead of the Home key
+        await setCaretPositions(selectors.issue611HtmlReadOnly, 0, 0);
+        await browser.keys('1');
+
         expect(await input.getValue()).toEqual('224,466.88');
     });
 
-    xit(`should allow modifying the element value if the html read-only attribute is removed dynamically`, async () => {
+    it(`should allow modifying the element value if the html read-only attribute is removed dynamically`, async () => {
         const input = await $(selectors.issue611HtmlReadOnly);
         await input.click();
-        await browser.keys([Key.Home, '1']);
+        expect(await input.isFocused()).toEqual(true);
+
+        // Not modified in read-only
+        await setCaretPositions(selectors.issue611HtmlReadOnly, 0, 0);
+        await browser.keys('1');
         expect(await input.getValue()).toEqual('224,466.88');
+
+        // Remove read-only html attribute
         await browser.execute(domId => { document.querySelector(domId).readOnly = false; }, selectors.issue611HtmlReadOnly);
-        await browser.keys([Key.Home, '1']);
-        expect(await input.getValue()).toEqual('1,224,466.88'); //FIXME Fails on Chrome only; there is a bug in the selenium chromedriver
+
+        // Can be modified if read-write
+        await setCaretPositions(selectors.issue611HtmlReadOnly, 0, 0);
+        await browser.keys('1');
+        expect(await input.getValue()).toEqual('1,224,466.88');
     });
 
     it(`should still not allow modifying the element value if the html read-only attribute is removed dynamically, but the \`readOnly\` option is set to \`true\``, async () => {
         const input = await $(selectors.issue611HtmlAndOptionReadOnly);
         await input.click();
-        await browser.keys([Key.Home, '1']);
+        expect(await input.isFocused()).toEqual(true);
+
+        await setCaretPositions(selectors.issue611HtmlAndOptionReadOnly, 0, 0);
+        await browser.keys('1');
         expect(await input.getValue()).toEqual('4,466.88');
+
         await browser.execute(domId => { document.querySelector(domId).readOnly = false; }, selectors.issue611HtmlAndOptionReadOnly);
-        await browser.keys([Key.Home, '1']);
+        await setCaretPositions(selectors.issue611HtmlAndOptionReadOnly, 0, 0);
+        await browser.keys('1');
         expect(await input.getValue()).toEqual('4,466.88');
     });
 
     it(`should not allow entering anything in an element set read-only via the AutoNumeric \`readOnly\` option`, async () => {
         const input = await $(selectors.issue611OptionReadOnly);
         await input.click();
-        await browser.keys([Key.Home, '1']);
+        expect(await input.isFocused()).toEqual(true);
+
+        await setCaretPositions(selectors.issue611OptionReadOnly, 0, 0);
+        await browser.keys('1');
         expect(await input.getValue()).toEqual('11,224,466.88');
     });
 });
@@ -4777,10 +4591,7 @@ describe('Issue #675', () => {
         expect(await input.getValue()).toEqual('0,000.00');
 
         // Check the caret position
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue675a);
+        const inputCaretPosition = await getCaretStart(selectors.issue675a);
         expect(inputCaretPosition).toEqual(0);
     });
 
@@ -4791,10 +4602,7 @@ describe('Issue #675', () => {
         expect(await input.getValue()).toEqual('€0,000.00');
 
         // Check the caret position
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue675b);
+        const inputCaretPosition = await getCaretStart(selectors.issue675b);
         expect(inputCaretPosition).toEqual(1);
     });
 
@@ -4805,10 +4613,7 @@ describe('Issue #675', () => {
         expect(await input.getValue()).toEqual('0,000.00€');
 
         // Check the caret position
-        const inputCaretPosition = await browser.execute(domId => {
-            const input = document.querySelector(domId);
-            return input.selectionStart;
-        }, selectors.issue675c);
+        const inputCaretPosition = await getCaretStart(selectors.issue675c);
         expect(inputCaretPosition).toEqual(0);
     });
 });

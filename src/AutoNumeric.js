@@ -7436,6 +7436,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 // Do nothing
                 // Fall through
                 default :
+                    this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to format and set the value to 0
                     return; // ...and nothing else should be changed
             }
         }

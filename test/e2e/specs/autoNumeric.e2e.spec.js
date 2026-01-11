@@ -4033,7 +4033,7 @@ describe('Pasting', () => {
         expect(await inputToTest.getValue()).toEqual('$123.456,00');  // Must be properly formatted
         expect(await getNumericString(selectors.issue670)).toEqual('123456');  // rawValue (or more precisely getNumericString()=the rawValue converted to string and extraneous zeros removed after the dot) must be correct (e.g.: not "123456.00,")
 
-        // 2. Test if the pasted value is outside of the range (and throws an exception and rawValue should not be changed)
+        // 2. Test when the pasted value is outside of the range (and it throws an exception and rawValue should not be changed)
 
         // Prepare clipboard
         await inputClassic.click();
@@ -4053,7 +4053,7 @@ describe('Pasting', () => {
         expect(await inputToTest.getValue()).toEqual('$123.456,00');  // Value must be properly formatted and not changed
         expect(await getNumericString(selectors.issue670)).toEqual('123456');  // rawValue should be consistent with the displayed value
 
-        // 3. Test when onInvalidPaste=clamp and the pasted value is outside of the range (and updates the value based on the min=max limits and rawValue should get corrupted)
+        // 3. Test when onInvalidPaste=clamp and the pasted value is outside of the range (and updates the value based on the min/max limits)
 
         // Update options
         await browser.execute(domId => {
@@ -4072,6 +4072,35 @@ describe('Pasting', () => {
 
         expect(await inputToTest.getValue()).toEqual('-$10,00');  // Value must be clamped and properly formatted
         expect(await getNumericString(selectors.issue670)).toEqual('-10');  // rawValue should be consistent with the displayed value
+
+        // 4. Test when onInvalidPaste=ignore and the pasted value is outside of the range (and value should not be changed)
+
+        // Update options
+        await browser.execute(domId => {
+            const input = document.querySelector(domId);
+            const an = AutoNumeric.getAutoNumericElement(input);
+            an.update({
+                onInvalidPaste: 'ignore',
+            });
+        }, selectors.issue670);
+
+        // Prepare input
+        await inputToTest.click();
+        await sendCtrlChar('a');
+        await browser.keys([Key.Backspace, Key.Backspace]);
+        await browser.keys('123456');
+        await browser.keys([Key.Tab]);  // Format it
+        expect(await inputToTest.getValue()).toEqual('$123.456,00');  // Value must be properly formatted
+        expect(await getNumericString(selectors.issue670)).toEqual('123456');  // rawValue should be consistent with the displayed value
+
+        // Paste
+        await inputToTest.click();
+        await sendCtrlChar('a');
+        expect(await getCaretStart(selectors.issue670)).toEqual(1);  // The currency sign should not be selected, so that the branch of partial selection is executed in _onPaste
+        await sendCtrlChar('v');
+
+        expect(await inputToTest.getValue()).toEqual('$123.456,00');  // Value must not be changed
+        expect(await getNumericString(selectors.issue670)).toEqual('123456');  // rawValue should be consistent with the displayed value
     });
 });
 

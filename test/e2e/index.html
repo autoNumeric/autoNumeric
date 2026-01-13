@@ -1257,6 +1257,15 @@
 	</div>
 </div>
 
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #702</p>
+			<div>
+				<input id="issue_702" type="text" placeholder="#702" value="12">
+			</div>
+		</div>
+	</div></div>
+
 <script>
     console.log(`-------------------------------------------`);
     console.log(`Testing AutoNumeric version ${AutoNumeric.version()}.`);
@@ -2638,6 +2647,20 @@
         digitGroupSeparator: '.',
         minimumValue: '-10'
     });
+    
+    //-------------- Issue #702
+    let windowErrorCount = 0;
+    window.addEventListener('error', () => { windowErrorCount++; } );
+    window.getWindowErrorCount = () => windowErrorCount;
+    window.resetWindowErrorCount = () => { windowErrorCount = 0; };
+
+    new AutoNumeric('#issue_702', {
+        maximumValue: 100,
+        minimumValue: -100,
+        decimalPlaces: 2,
+        onInvalidPaste: 'error'  // This is the default
+    });
+
 </script>
 </body>
 </html>

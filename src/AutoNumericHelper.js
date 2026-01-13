@@ -1081,13 +1081,21 @@ export default class AutoNumericHelper {
     }
 
     /**
+     * This typedef is based on big.js object properties: https://mikemcl.github.io/big.js/#instance-properties
+     * @typedef {Object} Big
+     * @property {number[]} c  coefficient: Array of single digits   	
+     * @property {number} e    exponent: an integer in the range of -1e+6 to 1e+6 inclusive
+     * @property {-1|1} s      sign: -1 or 1
+     */
+
+    /**
      * Function to parse minimumValue, maximumValue & the input value to prepare for testing to determine if the value falls within the min / max range.
      * Return an object example: minimumValue: "999999999999999.99" returns the following "{s: -1, e: 12, c: Array[15]}".
      *
      * This function is adapted from Big.js https://github.com/MikeMcl/big.js/. Many thanks to Mike.
      *
      * @param {number|string} value A numeric value.
-     * @returns {{}}
+     * @returns {Big}
      */
     static parseStr(value) {
         if (AutoNumericHelper.isUndefinedOrNullOrEmpty(value)) {
@@ -1160,9 +1168,9 @@ export default class AutoNumericHelper {
      *
      * This function is adapted from Big.js https://github.com/MikeMcl/big.js/. Many thanks to Mike.
      *
-     * @param {object} y Big number instance
-     * @param {object} x Big number instance
-     * @returns {*}
+     * @param {Big} y Big number instance
+     * @param {Big} x Big number instance
+     * @returns {-1|0|1} Comparison result: 0 if x=y, -1 if y>x, +1 if y<x
      */
     static testMinMax(y, x) {
         const xc = x.c;

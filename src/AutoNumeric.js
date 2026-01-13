@@ -7107,7 +7107,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             // Since the whole element content will be replaced, no need to complicate things and directly test for the validity of the pasted content, then set the `rawValue` and caret position (fix issue #482)
             // 1. Strip all thousand separators, brackets and currency sign, and convert the decimal character to a dot
             const untranslatedPastedText = this._preparePastedText(rawPastedText);
-            const pastedRawValue = AutoNumericHelper.arabicToLatinNumbers(untranslatedPastedText, false, false, false); // Allow pasting arabic numbers
+            let pastedRawValue = AutoNumericHelper.arabicToLatinNumbers(untranslatedPastedText, false, false, false); // Allow pasting arabic numbers
 
             // 2. Check that the paste is a valid number once it has been normalized to a raw value
             if (pastedRawValue === '.' || pastedRawValue === '' || (pastedRawValue !== '.' && !AutoNumericHelper.isNumber(pastedRawValue))) {
@@ -7120,9 +7120,66 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 return;
             }
 
+            // 2a. Handle 'truncate' or 'replace' paste behavior - they work the same way here because the whole text in the input is selected and there are no digits to the right of the caret to be replaced
+            if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.truncate || this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.replace) {
+                const minParse = AutoNumericHelper.parseStr(this.settings.minimumValue);
+                const maxParse = AutoNumericHelper.parseStr(this.settings.maximumValue);
+                let lastGoodKnownResult = ''; // This is set as the default, in case we do not add even one number
+                let pastedTextIndex = 0;
+                while (pastedTextIndex < pastedRawValue.length) {
+                    // Modify the result with another pasted character
+                    const newCandidate = lastGoodKnownResult + pastedRawValue[pastedTextIndex];
+
+                    // Check the range limits
+                    if (!this.constructor._checkIfInRange(newCandidate, minParse, maxParse)) {
+                        // The result is out of the range limits, stop the loop here
+                        break;
+                    }
+
+                    // Save the last good known result
+                    lastGoodKnownResult = newCandidate;
+
+                    // Update the local variables for the next loop
+                    pastedTextIndex++;
+                }
+                pastedRawValue = lastGoodKnownResult;
+            }
+
             // 3. Then try to set it as the new value. The `set()` method will run the additional tests (i.e. limits) as needed.
-            this.set(pastedRawValue);
-            this.formatted = true;
+            try {
+                this.set(pastedRawValue);
+                this.formatted = true;
+            }
+            catch (error) {
+                switch (this.settings.onInvalidPaste) {
+                    case AutoNumeric.options.onInvalidPaste.clamp:
+                        const clampedValue = AutoNumericHelper.clampToRangeLimits(pastedRawValue, this.settings);
+                        this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to reformat
+                        try {
+                            this.set(clampedValue);
+                        } catch (error) {
+                            AutoNumericHelper.throwError(`Fatal error: Unable to set the clamped value '${clampedValue}'.`);
+                        }
+                        break;
+                    case AutoNumeric.options.onInvalidPaste.error:
+                        // Throw an error message
+                        this.formatted = true;
+                        AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' results in a value '${pastedRawValue}' that is outside of the minimum [${this.settings.minimumValue}] and maximum [${this.settings.maximumValue}] value range.`);
+                        break;
+                    case AutoNumeric.options.onInvalidPaste.truncate:
+                    case AutoNumeric.options.onInvalidPaste.replace:
+                        // Throw an internal error message, because this should not happen if truncate/replace option is properly handled
+                        this.formatted = true;
+                        AutoNumericHelper.throwError(`Internal error: the paster value '${rawPastedText}' should have already been truncated but it results in a value '${pastedRawValue}' that is outside of the minimum [${this.settings.minimumValue}] and maximum [${this.settings.maximumValue}] value range.`);
+                        break;
+                    case AutoNumeric.options.onInvalidPaste.ignore:
+                    // Do nothing
+                    // Fall through
+                    default:
+                        this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to format and set the value to 0
+                        return; // ...and nothing else should be changed
+                }
+            }
 
             // 4. On a 'normal' non-autoNumeric input, an `input` event is sent when a paste is done. We mimic that.
             this._triggerEvent(AutoNumeric.events.native.input, eventTarget);

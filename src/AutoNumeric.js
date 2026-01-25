@@ -7483,12 +7483,12 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     result = clampedValue; // This is used only for setting the caret position later
                     break;
                 case AutoNumeric.options.onInvalidPaste.error:
-                case AutoNumeric.options.onInvalidPaste.truncate:
-                case AutoNumeric.options.onInvalidPaste.replace:
                     // Throw an error message
                     this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to format and set the value to 0
                     AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' results in a value '${result}' that is outside of the minimum [${this.settings.minimumValue}] and maximum [${this.settings.maximumValue}] value range.`);
                 // Fall through
+                case AutoNumeric.options.onInvalidPaste.truncate:  
+                case AutoNumeric.options.onInvalidPaste.replace:  // even in 'truncate' or 'replace' mode we can get an error here (e.g.: see e2e test of issue #670 - '8. Special case...')
                 case AutoNumeric.options.onInvalidPaste.ignore:
                 // Do nothing
                 // Fall through

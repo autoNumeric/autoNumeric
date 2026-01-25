@@ -370,6 +370,23 @@ const mouseWheel = async (deltaX, deltaY, duration = 200) => {
     ]);
 };
 
+/**
+ * Sets the {start, end} positions of the caret for the given input
+ * @param {string} domId  The input's id in the dom to set start/end caret positions
+ * @param {number} selectionStart  The caret start position to set
+ * @param {number} selectionEnd  The caret end position to set
+ * @returns {Promise<void>} 
+ */
+// eslint-disable-next-line arrow-body-style
+const setCaretPositions = async (domId, selectionStart, selectionEnd) => {
+    return await browser.execute((domId, selectionStart, selectionEnd) => {
+        const input = document.querySelector(domId);
+        input.selectionStart = selectionStart;
+        input.selectionEnd = selectionEnd;
+    }, domId, selectionStart, selectionEnd);
+};
+
+
 //-----------------------------------------------------------------------------
 // ---- Tests
 
@@ -4001,11 +4018,31 @@ describe('Pasting', () => {
         expect(await readOnlyElement.getValue()).toEqual('42.42'); // No changes!
     });
 
+
+    /**
+     * @returns {Promise<number>} 
+     */
+    // eslint-disable-next-line arrow-body-style
+    const getWindowErrorCount = async () => {
+        return await browser.execute(() => getWindowErrorCount());
+    };
+
+    /**
+     * @returns {Promise<void>} 
+     */
+    const resetWindowErrorCount = async () => {
+        await browser.execute(() => { resetWindowErrorCount(); });
+    };
+
     it('should not corrupt rawValue on pasting values over the partially selected input texts (issue #670)', async () => {
         const inputClassic = await $(selectors.inputClassic);
         const inputToTest = await $(selectors.issue670);
 
-        // 1. Test #670 (Pasted value is within the min/max bounds)
+        // Reset 'thrown error counter'
+        await resetWindowErrorCount();
+        expect(await getWindowErrorCount()).toEqual(0);
+
+        // 1. Test #670 (onInvalidPaste='error', pasted value is within the min/max bounds)
 
         // Prepare clipboard
         await inputClassic.click();
@@ -4031,6 +4068,7 @@ describe('Pasting', () => {
         expect(await getCaretStart(selectors.issue670)).toEqual(1);  // The currency sign should not be selected, so that the branch of partial selection is executed in _onPaste
         await sendCtrlChar('v');
 
+        expect(await getWindowErrorCount()).toEqual(0);
         expect(await inputToTest.getValue()).toEqual('$123.456,00');  // Must be properly formatted
         expect(await getNumericString(selectors.issue670)).toEqual('123456');  // rawValue (or more precisely getNumericString()=the rawValue converted to string and extraneous zeros removed after the dot) must be correct (e.g.: not "123456.00,")
 
@@ -4051,6 +4089,7 @@ describe('Pasting', () => {
         expect(await getCaretStart(selectors.issue670)).toEqual(1);  // The currency sign should not be selected, so that the branch of partial selection is executed in _onPaste
         await sendCtrlChar('v');
 
+        expect(await getWindowErrorCount()).toEqual(1);
         expect(await inputToTest.getValue()).toEqual('$123.456,00');  // Value must be properly formatted and not changed
         expect(await getNumericString(selectors.issue670)).toEqual('123456');  // rawValue should be consistent with the displayed value
 
@@ -4071,6 +4110,7 @@ describe('Pasting', () => {
         expect(await getCaretStart(selectors.issue670)).toEqual(1);  // The currency sign should not be selected, so that the branch of partial selection is executed in _onPaste
         await sendCtrlChar('v');
 
+        expect(await getWindowErrorCount()).toEqual(1);  // Have not been increased
         expect(await inputToTest.getValue()).toEqual('-$10,00');  // Value must be clamped and properly formatted
         expect(await getNumericString(selectors.issue670)).toEqual('-10');  // rawValue should be consistent with the displayed value
 
@@ -4100,24 +4140,105 @@ describe('Pasting', () => {
         expect(await getCaretStart(selectors.issue670)).toEqual(1);  // The currency sign should not be selected, so that the branch of partial selection is executed in _onPaste
         await sendCtrlChar('v');
 
+        expect(await getWindowErrorCount()).toEqual(1);  // Have not been increased
         expect(await inputToTest.getValue()).toEqual('$123.456,00');  // Value must not be changed
         expect(await getNumericString(selectors.issue670)).toEqual('123456');  // rawValue should be consistent with the displayed value
+
+        // 5. onInvalidPaste='truncate': should *not* raise error, value *should* be changed
+
+        // Update options
+        await browser.execute(domId => {
+            const input = document.querySelector(domId);
+            const an = AutoNumeric.getAutoNumericElement(input);
+            an.update({
+                onInvalidPaste: 'truncate',
+            });
+        }, selectors.issue670);
+
+        // Prepare clipboard (put '-81' on it)
+        await inputClassic.click();
+        await sendCtrlChar('a');
+        await browser.keys([Key.Backspace]);
+        await browser.keys('-81');
+        expect(await inputClassic.getValue()).toEqual('-81');
+        await sendCtrlChar('a');
+        await sendCtrlChar('c');
+
+        await inputToTest.click();
+        await sendCtrlChar('a');
+        await sendCtrlChar('v');
+
+        expect(await getWindowErrorCount()).toEqual(1);  // Have not been increased
+        expect(await inputToTest.getValue()).toEqual('-$8,00');  // Value is partially changed (pasted value is truncated)
+        expect(await getNumericString(selectors.issue670)).toEqual('-8');  // rawValue should be consistent with the displayed value
+
+        // 6. onInvalidPaste='replace': should *not* raise error, value *should* be changed
+        // Update options
+        await browser.execute(domId => {
+            const input = document.querySelector(domId);
+            const an = AutoNumeric.getAutoNumericElement(input);
+            an.update({
+                onInvalidPaste: 'replace',
+            });
+        }, selectors.issue670);
+
+        // clipboard still has '-81': ok
+
+        // Set starting value
+        await inputToTest.click();
+        await sendCtrlChar('a');
+        await browser.keys([Key.Backspace]);
+        await browser.keys('+100000');  // +: change sign
+        await inputClassic.click();
+        expect(await inputToTest.getValue()).toEqual('$100.000,00');
+        expect(await getNumericString(selectors.issue670)).toEqual('100000');
+
+        await inputToTest.click();
+        await sendCtrlChar('a');
+        await sendCtrlChar('v');
+
+        expect(await getWindowErrorCount()).toEqual(1);  // Have not been increased
+        expect(await inputToTest.getValue()).toEqual('-$8,00');  // Value is partially changed (pasted value is truncated)
+        expect(await getNumericString(selectors.issue670)).toEqual('-8');  // rawValue should be consistent with the displayed value
+
+        // 7. Special case of onInvalidPaste='truncate': should *not* raise error, not even one character can be pasted
+
+        // Update options
+        await browser.execute(domId => {
+            const input = document.querySelector(domId);
+            const an = AutoNumeric.getAutoNumericElement(input);
+            an.update({
+                onInvalidPaste: 'truncate',
+            });
+        }, selectors.issue670);
+
+        // clipboard still has '-81': ok
+
+        await inputToTest.click();
+        await browser.keys([Key.End, Key.ArrowLeft, Key.ArrowLeft]);
+        expect(await getCaretStart(selectors.issue670)).toEqual(3); // Expected: -$8|,00
+
+        await sendCtrlChar('v');
+
+        expect(await getWindowErrorCount()).toEqual(1);  // Have not been increased
+        expect(await inputToTest.getValue()).toEqual('-$8,00');  // Value is not changed
+        expect(await getNumericString(selectors.issue670)).toEqual('-8');  // rawValue should be consistent with the displayed value
+
+        // 8. Special case of onInvalidPaste='truncate': cannot add any character from the paste data, but removing the selection already makes the resulting value to violate the bounds
+        // should *not* raise error, value should not change
+
+        // clipboard still has '-81': ok
+
+        await inputToTest.click();
+        await setCaretPositions(selectors.issue670, 3, 4);  // decimal character is selected: -$8|,|00
+        await sendCtrlChar('v');
+        // In _onPaste() the selection is removed (lastGoodKnownResult = '-800'), and then it tries to insert characters one by one,
+        // however not even the first character can be inserted and the resulting input value ('-$800') would be smaller than the minimum value
+
+        expect(await getWindowErrorCount()).toEqual(1);  // Have not been increased
+        expect(await inputToTest.getValue()).toEqual('-$8,00');  // Value is not changed
+        expect(await getNumericString(selectors.issue670)).toEqual('-8');  // rawValue should be consistent with the displayed value
     });
-
-    /**
-     * @returns {Promise<number>} 
-     */
-    // eslint-disable-next-line arrow-body-style
-    const getWindowErrorCount = async () => {
-        return await browser.execute(() => getWindowErrorCount());
-    };
-
-    /**
-     * @returns {Promise<void>} 
-     */
-    const resetWindowErrorCount = async () => {
-        await browser.execute(() => { resetWindowErrorCount(); });
-    };
 
     it('should handle onInvalidPaste options properly when all text is selected in the input (issue #702)', async () => {
         const inputClassic = await $(selectors.inputClassic);
@@ -4276,7 +4397,7 @@ describe('Pasting', () => {
 
         // 6. Special case of onInvalidPaste='truncate': should *not* raise error, min/max limits are very narrow, not even one character can be pasted
 
-        // Set initial value
+        // Set initial value (must be done before updating onInvalidPaste)
         await inputToTest.click();
         await sendCtrlChar('a');
         await browser.keys([Key.Backspace]);

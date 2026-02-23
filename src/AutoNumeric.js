@@ -1475,7 +1475,7 @@ export default class AutoNumeric {
     /**
      * Return the 'submit' event handler function used for the parent form.
      *
-     * @returns {function}
+     * @returns {Function}
      * @private
      */
     _getFormHandlerFunction() {

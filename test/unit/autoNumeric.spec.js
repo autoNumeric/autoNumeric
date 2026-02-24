@@ -9147,11 +9147,18 @@ describe(`AutoNumericHelper functions()`, () => {
     it(`'indexFirstNonZeroDecimalPlace()' should return the correct number`, () => {
         expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.0)).toEqual(0);
         expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(1.00)).toEqual(0);
-        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.12)).toEqual(0);  // TODO is that special if (.. === -1) in indexFirstNonZeroDecimalPlace intentional?
-        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.1234)).toEqual(0);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.12)).toEqual(1);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.1204)).toEqual(1);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.1234)).toEqual(1);
         expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.01234)).toEqual(2);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.01204)).toEqual(2);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.012040)).toEqual(2);
         expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.001234)).toEqual(3);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.001004)).toEqual(3);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.00100400)).toEqual(3);
         expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.0001234)).toEqual(4);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.0001204)).toEqual(4);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.0001204000)).toEqual(4);
 
         expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace('123.0001234')).toEqual(4);
     });
@@ -9172,7 +9179,20 @@ describe(`AutoNumericHelper functions()`, () => {
         expect(AutoNumericHelper.addAndRoundToNearestAuto(1.12, 2)).toEqual(2); // Offset: 1
         expect(AutoNumericHelper.addAndRoundToNearestAuto(1.123, 3)).toEqual(2); // Offset: 1
 
-        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.412, 4)).toEqual(0.500); // Offset: 0.1  // source of difference (compared to the comment in modifyAndRoundToNearestAuto) see special rule in indexFirstNonZeroDecimalPlace
+        // Special case when the `value` to round is between -1 and 1, excluded
+        // 2 decimal places
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.12, 2)).toEqual(0.13); // Offset: 0.01
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.01, 2)).toEqual(0.02); // Offset: 0.01
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.00, 2)).toEqual(0.01); // Offset: 0.01
+
+        // 3 decimal places
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.123, 3)).toEqual(0.130);          // Offset: 0.01
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.012, 3)).toBeCloseTo(0.013, eps); // Offset: 0.001
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.001, 3)).toEqual(0.002);          // Offset: 0.001
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.000, 3)).toEqual(0.001);          // Offset: 0.001
+
+        // 4 decimal places
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.412, 4)).toEqual(0.420);            // Offset: 0.01
         expect(AutoNumericHelper.addAndRoundToNearestAuto(0.0412, 4)).toEqual(0.0420); // Offset: 0.001
         expect(AutoNumericHelper.addAndRoundToNearestAuto(0.0041, 4)).toBeCloseTo(0.0042, eps); // Offset: 0.0001
         expect(AutoNumericHelper.addAndRoundToNearestAuto(0.0004, 4)).toEqual(0.0005); // Offset: 0.0001

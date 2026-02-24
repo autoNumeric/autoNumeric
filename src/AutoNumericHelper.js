@@ -327,14 +327,15 @@ export default class AutoNumericHelper {
             return 0;
         }
 
-        let result = decimalPart.lastIndexOf('0');
-        if (result === -1) {
-            result = 0;
-        } else {
-            result += 2;
+        let count = 1;
+        for (const num of decimalPart) {
+            if (num !== '0') {
+                return count;
+            }
+            count++;
         }
 
-        return result;
+        return 0;
     }
 
     /**

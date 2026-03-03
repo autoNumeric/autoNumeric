@@ -4539,8 +4539,6 @@ describe('Pasting', () => {
         expect(await getWindowErrorCount()).toEqual(1);  // Remained as 1
         expect(await inputToTest.getValue()).toEqual('');  // Value is empty, similarly to partial selection where in this case, the selected parts will be removed
         expect(await getNumericString(selectors.issue702)).toEqual('');  // rawValue should be consistent with the displayed value
-        expect(await inputToTest.getValue()).toEqual('$123.456,00');  // Value must not be changed
-        expect(await getNumericString(selectors.issue670)).toEqual('123456');  // rawValue should be consistent with the displayed value
     });
 });
 

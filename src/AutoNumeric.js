@@ -6872,7 +6872,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this._updateInternalProperties(e);
 
         const skip = this._processNonPrintableKeysAndShortcuts(e);
-        delete this.valuePartsBeforePaste;
         const targetValue = AutoNumericHelper.getElementValue(e.target);
         if (skip || targetValue === '' && this.initialValueOnFirstKeydown === '') { // If the user enters skippable keys, or keeps deleting/backspacing into the empty input, no 'formatted' event are sent (cf. issue #621)
             return;
@@ -8958,30 +8957,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
-     * Try to strip pasted value to digits
-     */
-    _checkPaste() {
-        // Do not process anything if the value has already been formatted
-        if (this.formatted) {
-            return;
-        }
-
-        if (!AutoNumericHelper.isUndefined(this.valuePartsBeforePaste)) {
-            const oldParts = this.valuePartsBeforePaste;
-            const [left, right] = this._getLeftAndRightPartAroundTheSelection();
-
-            // Try to strip the pasted value first
-            delete this.valuePartsBeforePaste;
-
-            const modifiedLeftPart = left.substring(0, oldParts[0].length) + AutoNumeric._stripAllNonNumberCharactersExceptCustomDecimalChar(left.substring(oldParts[0].length), this.settings, true, this.isFocused);
-            if (!this._setValueParts(modifiedLeftPart, right, true)) {
-                this._setElementValue(oldParts.join(''), false);
-                this._setCaretPosition(oldParts[0].length);
-            }
-        }
-    }
-
-    /**
      * Return `true` if the given key should be ignored or not.
      *
      * @param {string} eventKeyName
@@ -9011,14 +8986,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @private
      */
     _processNonPrintableKeysAndShortcuts(e) {
-        // Catch the ctrl up on ctrl-v
-        if (((e.ctrlKey || e.metaKey) && e.type === 'keyup' && !AutoNumericHelper.isUndefined(this.valuePartsBeforePaste)) || (e.shiftKey && this.eventKey === AutoNumericEnum.keyName.Insert)) {
-            //TODO Move this test inside the `onKeyup` handler
-            this._checkPaste();
-
-            return false;
-        }
-
         // Skip all function keys (F1-F12), Windows keys, tab and other special keys
         if (this.constructor._shouldSkipEventKey(this.eventKey)) {
             return true;
@@ -9043,17 +9010,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
              this.eventKey === AutoNumericEnum.keyName.x)) {
             if (e.type === 'keydown') {
                 this._expandSelectionOnSign();
-            }
-
-            // Try to prevent wrong paste
-            if (this.eventKey === AutoNumericEnum.keyName.v || this.eventKey === AutoNumericEnum.keyName.Insert) {
-                if (e.type === 'keydown' || e.type === 'keypress') {
-                    if (AutoNumericHelper.isUndefined(this.valuePartsBeforePaste)) {
-                        this.valuePartsBeforePaste = this._getLeftAndRightPartAroundTheSelection();
-                    }
-                } else {
-                    this._checkPaste();
-                }
             }
 
             return e.type === 'keydown' || e.type === 'keypress' || this.eventKey === AutoNumericEnum.keyName.c;

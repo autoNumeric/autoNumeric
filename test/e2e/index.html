@@ -1255,7 +1255,15 @@
 			</div>
 		</div>
 	</div>
-</div>
+
+	<div class="testSuite">
+		<div class="test">
+			<p class="description">Issue #582</p>
+			<div>
+				<input id="issue_582" type="text" placeholder="#582" value="1234.5678">
+			</div>
+		</div>
+	</div>
 
 	<div class="testSuite">
 		<div class="test">
@@ -1264,7 +1272,9 @@
 				<input id="issue_702" type="text" placeholder="#702" value="12">
 			</div>
 		</div>
-	</div></div>
+	</div>
+
+</div>
 
 <script>
     console.log(`-------------------------------------------`);
@@ -2646,6 +2656,13 @@
         decimalCharacter: ',',
         digitGroupSeparator: '.',
         minimumValue: '-10'
+    });
+    
+    //-------------- Issue #582
+    new AutoNumeric('#issue_582', {
+        decimalCharacter: ',',
+        digitGroupSeparator: '.',
+        decimalPlaces: 4
     });
     
     //-------------- Issue #702

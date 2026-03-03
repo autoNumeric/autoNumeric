@@ -222,7 +222,7 @@ export default class AutoNumericHelper {
      * @returns {boolean}
      */
     static isInArray(needle, array) {
-        if (!this.isArray(array) || array === [] || this.isUndefined(needle)) {
+        if (!this.isArray(array) || this.isUndefined(needle)) {
             return false;
         }
 
@@ -327,14 +327,15 @@ export default class AutoNumericHelper {
             return 0;
         }
 
-        let result = decimalPart.lastIndexOf('0');
-        if (result === -1) {
-            result = 0;
-        } else {
-            result += 2;
+        let count = 1;
+        for (const num of decimalPart) {
+            if (num !== '0') {
+                return count;
+            }
+            count++;
         }
 
-        return result;
+        return 0;
     }
 
     /**
@@ -492,8 +493,8 @@ export default class AutoNumericHelper {
      * Note: `-0` is not a negative number since it's equal to `0`.
      *
      * @param {number|string} numberOrNumericString A Number, or a number represented by a string
-     * @param {string} negativeSignCharacter The single character that represent the negative sign
-     * @param {boolean} checkEverywhere If TRUE, then the negative sign is search everywhere in the numeric string (this is needed for instance if the string is '1234.56-')
+     * @param {string} [negativeSignCharacter='-'] The single character that represent the negative sign
+     * @param {boolean} [checkEverywhere=true] If TRUE, then the negative sign is search everywhere in the numeric string (this is needed for instance if the string is '1234.56-')
      * @returns {boolean}
      */
     static isNegative(numberOrNumericString, negativeSignCharacter = '-', checkEverywhere = true) {
@@ -525,7 +526,7 @@ export default class AutoNumericHelper {
      * @example isNegativeStrict('-1,234.56 €') => true
      *
      * @param {string} numericString
-     * @param {string} negativeSignCharacter The single character that represent the negative sign
+     * @param {string} [negativeSignCharacter='-'] The single character that represent the negative sign
      * @returns {boolean}
      */
     static isNegativeStrict(numericString, negativeSignCharacter = '-') {
@@ -579,7 +580,7 @@ export default class AutoNumericHelper {
      * @returns {string}
      */
     static replaceCharAt(string, index, newCharacter) {
-        return `${string.substr(0, index)}${newCharacter}${string.substr(index + newCharacter.length)}`;
+        return `${string.substring(0, index)}${newCharacter}${string.substring(index + newCharacter.length)}`;
     }
 
     /**
@@ -687,7 +688,7 @@ export default class AutoNumericHelper {
      * Note: this also works with edge cases like contenteditable-enabled elements, and hidden inputs.
      *
      * @param {HTMLInputElement|EventTarget} element
-     * @returns {{}}
+     * @returns {{start: number, end: number, length: number}}
      */
     static getElementSelection(element) {
         const position = {};
@@ -727,8 +728,8 @@ export default class AutoNumericHelper {
      * Cross browser routine for setting selected range/cursor position
      *
      * @param {HTMLInputElement|EventTarget} element
-     * @param {int} start
-     * @param {int|null} end
+     * @param {number} start
+     * @param {number|null} [end=null]
      */
     static setElementSelection(element, start, end = null) {
         if (this.isUndefinedOrNullOrEmpty(end)) {
@@ -761,7 +762,7 @@ export default class AutoNumericHelper {
      * Function that display a warning messages, according to the debug level.
      *
      * @param {string} message
-     * @param {boolean} showWarning If FALSE, then the warning message is not displayed
+     * @param {boolean} [showWarning=true] If FALSE, then the warning message is not displayed
      */
     static warning(message, showWarning = true) {
         if (showWarning) {
@@ -840,7 +841,7 @@ export default class AutoNumericHelper {
             return value;
         }
 
-        return `${integerPart}.${decimalPart.substr(0, decimalPlaces)}`;
+        return `${integerPart}.${decimalPart.substring(0, decimalPlaces)}`;
     }
 
     /**
@@ -848,8 +849,8 @@ export default class AutoNumericHelper {
      * @example roundToNearest(264789, 10000)) => 260000
      *
      * @param {number} value
-     * @param {number} stepPlace
-     * @returns {*}
+     * @param {number} [stepPlace=1000] Rounding step size (optional, default: 1000)
+     * @returns {number}
      */
     static roundToNearest(value, stepPlace = 1000) {
         if (0 === value) {
@@ -904,7 +905,7 @@ export default class AutoNumericHelper {
      * @param {number} value
      * @param {boolean} isAddition
      * @param {int} decimalPlacesRawValue The precision needed by the `rawValue`
-     * @returns {*}
+     * @returns {number}
      */
     static modifyAndRoundToNearestAuto(value, isAddition, decimalPlacesRawValue) {
         value = Number(this.forceDecimalPlaces(value, decimalPlacesRawValue)); // Make sure that '0.13000000001' is converted to the number of rawValue decimal places '0.13'
@@ -984,7 +985,7 @@ export default class AutoNumericHelper {
      *
      * @param {number} value
      * @param {int} decimalPlacesLimit
-     * @returns {*}
+     * @returns {number}
      */
     static addAndRoundToNearestAuto(value, decimalPlacesLimit) {
         return this.modifyAndRoundToNearestAuto(value, true, decimalPlacesLimit);
@@ -996,7 +997,7 @@ export default class AutoNumericHelper {
      *
      * @param {number} value
      * @param {int} decimalPlacesLimit
-     * @returns {*}
+     * @returns {number}
      */
     static subtractAndRoundToNearestAuto(value, decimalPlacesLimit) {
         return this.modifyAndRoundToNearestAuto(value, false, decimalPlacesLimit);
@@ -1009,9 +1010,9 @@ export default class AutoNumericHelper {
      * Based on http://stackoverflow.com/a/17025392/2834898
      *
      * @param {string} arabicNumbers
-     * @param {boolean} returnANumber If `true`, return a Number, otherwise return a String
-     * @param {boolean} parseDecimalCharacter
-     * @param {boolean} parseThousandSeparator
+     * @param {boolean} [returnANumber=true] If `true`, return a Number, otherwise return a String
+     * @param {boolean} [parseDecimalCharacter=false]
+     * @param {boolean} [parseThousandSeparator=false]
      * @returns {string|number|NaN}
      */
     static arabicToLatinNumbers(arabicNumbers, returnANumber = true, parseDecimalCharacter = false, parseThousandSeparator = false) {
@@ -1064,9 +1065,9 @@ export default class AutoNumericHelper {
      *
      * @param {string} eventName
      * @param {HTMLElement|HTMLDocument|EventTarget} element
-     * @param {object} detail
-     * @param {boolean} bubbles Set to `true` if the event must bubble up
-     * @param {boolean} cancelable Set to `true` if the event must be cancelable
+     * @param {object} [detail=null]
+     * @param {boolean} [bubbles=true] Set to `true` if the event must bubble up
+     * @param {boolean} [cancelable=true] Set to `true` if the event must be cancelable
      */
     static triggerEvent(eventName, element = document, detail = null, bubbles = true, cancelable = true) {
         let event;
@@ -1228,13 +1229,13 @@ export default class AutoNumericHelper {
      * Generate a random string.
      * cf. http://stackoverflow.com/a/8084248/2834898
      *
-     * @param {Number} strLength Length of the generated string (in character count)
+     * @param {Number} [strLength=5] Length of the generated string (in character count, optional, default: 5)
      * @returns {string}
      */
     static randomString(strLength = 5) {
         return Math.random()
             .toString(36)
-            .substr(2, strLength);
+            .substring(2, 2 + strLength);
     }
 
     /**
@@ -1258,7 +1259,7 @@ export default class AutoNumericHelper {
      * Retrieve the current element value.
      *
      * @param {HTMLElement|HTMLInputElement|EventTarget} element
-     * @returns {number|string|null}
+     * @returns {string|null}
      */
     static getElementValue(element) {
         if (element.tagName.toLowerCase() === 'input') {
@@ -1272,7 +1273,7 @@ export default class AutoNumericHelper {
      * Modify the element value directly.
      *
      * @param {HTMLElement|HTMLInputElement} element
-     * @param {number|string|null} value
+     * @param {number|string|null} [value=null]
      */
     static setElementValue(element, value = null) {
         if (element.tagName.toLowerCase() === 'input') {
@@ -1288,7 +1289,7 @@ export default class AutoNumericHelper {
      * Note: This does not work with contenteditable elements
      *
      * @param {HTMLElement|HTMLInputElement} element
-     * @param {string|null} message
+     * @param {string|null} [message='Invalid'] Custom message (optional, default: 'Invalid')
      * @throws Error
      */
     static setInvalidState(element, message = 'Invalid') {
@@ -1330,9 +1331,9 @@ export default class AutoNumericHelper {
      * @example camelize('data-currency-symbol') => 'currencySymbol'
      *
      * @param {string} str Text to camelize
-     * @param {string} separator Character that separate each word
-     * @param {boolean} removeData If set to `true`, remove the `data-` part that you can find on some html attributes
-     * @param {boolean} skipFirstWord If set to `true`, do not capitalize the very first word
+     * @param {string} [separator='-'] Character that separate each word (Optional, default: '-')
+     * @param {boolean} [removeData=true] If set to `true`, remove the `data-` part that you can find on some html attributes (Optional, default: true)
+     * @param {boolean} [skipFirstWord=true] If set to `true`, do not capitalize the very first word (Optional, default: true)
      * @returns {string|null}
      */
     static camelize(str, separator = '-', removeData = true, skipFirstWord = true) {
@@ -1417,7 +1418,7 @@ export default class AutoNumericHelper {
      * Remove the trailing zeros in the decimal part of a number.
      *
      * @param {string} numericString
-     * @returns {*}
+     * @returns {string}
      */
     static trimPaddedZerosFromDecimalPlaces(numericString) {
         numericString = String(numericString);
@@ -1445,7 +1446,7 @@ export default class AutoNumericHelper {
     /**
      * Return the top-most hovered item by the mouse cursor.
      *
-     * @returns {*}
+     * @returns {Element}
      */
     static getHoveredElement() {
         const hoveredElements = [...document.querySelectorAll(':hover')];
@@ -1453,12 +1454,12 @@ export default class AutoNumericHelper {
     }
 
     /**
-     * Return the given array trimmed to the given length.
+     * Return the given array trimmed to the given length. The original array is also trimmed.
      * @example arrayTrim([1, 2, 3, 4], 2) -> [1, 2]
      *
      * @param {Array} array
      * @param {Number} length
-     * @returns {*}
+     * @returns {Array}
      */
     static arrayTrim(array, length) {
         const arrLength = array.length;
@@ -1515,11 +1516,11 @@ export default class AutoNumericHelper {
     }
 
     /**
-     * Returns the object `obj` property 'propertyName', or `null` if the property is not found
+     * Returns `obj` objects's property descriptor of the property 'propertyName', or `null` if the property is not found
      *
      * @param {object} obj
      * @param {string|number} propertyName
-     * @returns {*|null}
+     * @returns {PropertyDescriptor|null}
      */
     static getGetterSetter(obj, propertyName) {
         while ((obj = Object.getPrototypeOf(obj))) { // double () to make eslint happy

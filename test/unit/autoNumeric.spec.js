@@ -9096,3 +9096,106 @@ describe(`The Math expression lexer and parser`, () => {
         expect(() => testParser('(4+1) * 2 - (104587.23 * 8 - (-7))')).toThrow();
     });
 });
+
+describe(`AutoNumericHelper functions()`, () => {
+    it(`'replaceCharAt()' should return the correct string`, () => {
+        expect(AutoNumericHelper.replaceCharAt('abcdef', 4, '1')).toEqual('abcd1f');  // Normal replace
+        expect(AutoNumericHelper.replaceCharAt('abcdef', 1, '123')).toEqual('a123ef');  // Replace more characters
+
+        expect(AutoNumericHelper.replaceCharAt('abcdef', 0, '12345678')).toEqual('12345678');  // newCharacter is longer than the original
+        expect(AutoNumericHelper.replaceCharAt('abcdef', 6, '12')).toEqual('abcdef12');  // Replace starts at the end
+        expect(AutoNumericHelper.replaceCharAt('abcdef', 99, '12')).toEqual('abcdef12');  // Replace starts after the end
+    });
+
+    it(`'clampToRangeLimits()' should return the correct number`, () => {
+        const settings = { minimumValue: '-100', maximumValue: '50.5123' };
+        expect(AutoNumericHelper.clampToRangeLimits(10.2, settings)).toEqual(10.2); 
+        expect(AutoNumericHelper.clampToRangeLimits('10.2', settings)).toEqual(10.2); 
+
+        expect(AutoNumericHelper.clampToRangeLimits(-200, settings)).toEqual(-100);
+        expect(AutoNumericHelper.clampToRangeLimits('-200', settings)).toEqual(-100);
+
+        expect(AutoNumericHelper.clampToRangeLimits(200, settings)).toEqual(50.5123);
+        expect(AutoNumericHelper.clampToRangeLimits('200', settings)).toEqual(50.5123);
+    });
+
+    it(`'forceDecimalPlaces()' should return the correct number or string`, () => {
+        expect(AutoNumericHelper.forceDecimalPlaces(123.45678, 0)).toEqual('123.');
+        expect(AutoNumericHelper.forceDecimalPlaces(123.45678, 1)).toEqual('123.4');
+        expect(AutoNumericHelper.forceDecimalPlaces(123.45678, 2)).toEqual('123.45');
+        expect(AutoNumericHelper.forceDecimalPlaces(123.45678, 3)).toEqual('123.456');
+
+        expect(AutoNumericHelper.forceDecimalPlaces(123, 3)).toEqual(123);
+    });
+
+    it(`'roundToNearest()' should return the correct number or string`, () => {
+        expect(AutoNumericHelper.roundToNearest(264789, 10000)).toEqual(260000);
+        expect(AutoNumericHelper.roundToNearest(264789, 10)).toEqual(264790);
+        expect(AutoNumericHelper.roundToNearest(0, 10)).toEqual(0);
+
+        expect(() => { AutoNumericHelper.roundToNearest(264789, 0); }).toThrow();
+    });
+
+    it(`'roundToNearest()' should return the correct number`, () => {
+        expect(AutoNumericHelper.roundToNearest(264789, 10000)).toEqual(260000);
+        expect(AutoNumericHelper.roundToNearest(264789, 10)).toEqual(264790);
+        expect(AutoNumericHelper.roundToNearest(0, 10)).toEqual(0);
+
+        expect(() => { AutoNumericHelper.roundToNearest(264789, 0); }).toThrow();
+    });
+
+    it(`'indexFirstNonZeroDecimalPlace()' should return the correct number`, () => {
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.0)).toEqual(0);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(1.00)).toEqual(0);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.12)).toEqual(1);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.1204)).toEqual(1);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.1234)).toEqual(1);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.01234)).toEqual(2);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.01204)).toEqual(2);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.012040)).toEqual(2);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.001234)).toEqual(3);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.001004)).toEqual(3);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.00100400)).toEqual(3);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.0001234)).toEqual(4);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.0001204)).toEqual(4);
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace(0.0001204000)).toEqual(4);
+
+        expect(AutoNumericHelper.indexFirstNonZeroDecimalPlace('123.0001234')).toEqual(4);
+    });
+
+    it(`'addAndRoundToNearestAuto()' should return the correct number`, () => {
+        const eps = 0.00000001;
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(1, 0)).toEqual(2);  // Offset: 1
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(14, 0)).toEqual(20);  // Offset: 10
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(17, 0)).toEqual(30);  // Offset: 10
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(143, 0)).toEqual(150);  // Offset: 10
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(1278, 0)).toEqual(1400);  // Offset: 100
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(28456, 0)).toEqual(28600);  // Offset: 100
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(276345, 0)).toEqual(277000); // Offset: 1000
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(4534061, 0)).toEqual(4540000); // Offset: 10000
+
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0, 4)).toBeCloseTo(0.0001, eps); // Offset: 1e-4
+
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(1.12, 2)).toEqual(2); // Offset: 1
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(1.123, 3)).toEqual(2); // Offset: 1
+
+        // Special case when the `value` to round is between -1 and 1, excluded
+        // 2 decimal places
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.12, 2)).toEqual(0.13); // Offset: 0.01
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.01, 2)).toEqual(0.02); // Offset: 0.01
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.00, 2)).toEqual(0.01); // Offset: 0.01
+
+        // 3 decimal places
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.123, 3)).toEqual(0.130);          // Offset: 0.01
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.012, 3)).toBeCloseTo(0.013, eps); // Offset: 0.001
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.001, 3)).toEqual(0.002);          // Offset: 0.001
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.000, 3)).toEqual(0.001);          // Offset: 0.001
+
+        // 4 decimal places
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.412, 4)).toEqual(0.420);            // Offset: 0.01
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.0412, 4)).toEqual(0.0420); // Offset: 0.001
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.0041, 4)).toBeCloseTo(0.0042, eps); // Offset: 0.0001
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.0004, 4)).toEqual(0.0005); // Offset: 0.0001
+        expect(AutoNumericHelper.addAndRoundToNearestAuto(0.0000, 4)).toBeCloseTo(0.0001, eps); // Offset: 0.0001
+    });
+});

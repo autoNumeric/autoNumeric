@@ -274,6 +274,7 @@ const selectors = {
     issue808                          : '#issue_808',
     issue808InputDetector             : '#issue_808_input_detector',
     issue670                          : '#issue_670',
+    issue582                          : '#issue_582',
 };
 
 //-----------------------------------------------------------------------------
@@ -304,7 +305,7 @@ const getCaretStart = async domId => {
 
 /**
  * Returns the result of getNumericString method (rawValue as string)
- * @param {string} domId  The input id that already managed by an AutoNumeric instance
+ * @param {string} domId  The input id that is already managed by an AutoNumeric instance
  * @returns {Promise<string>} 
  */
 // eslint-disable-next-line arrow-body-style
@@ -3481,6 +3482,72 @@ describe('`rawValueDivisor` option', () => {
         expect(await $(selectors.issue452).getValue()).toEqual('7,621\u202f%');
     });
 
+    it('#817: should properly update the raw value when divided by a `rawValueDivisor`, and the value is modified by Arrow/Wheel × Up/Down Arrow', async () => {
+        // Modify the element value while it has the focus
+        const input = await $(selectors.issue452);
+        await input.click(); // Focus on the input element
+        await browser.keys([Key.Control, 'a']);  // Select All
+        await browser.keys('12,345');
+
+        // eslint-disable-next-line arrow-body-style
+        const getNumericString = async () => {
+            return await browser.execute(domId => {
+                const input = document.querySelector(domId);
+                const an = AutoNumeric.getAutoNumericElement(input);
+                return an.getNumericString();
+            }, selectors.issue452);
+        };
+
+        // Test default value
+        let result = await getNumericString();
+        expect(result).toEqual('0.12345');
+        expect(await input.getValue()).toEqual('12,345\u202f%');
+
+        // Test Arrow Up
+        await browser.keys([Key.ArrowUp]);
+        result = await getNumericString();
+        expect(result).toEqual('1.12345');  // Default is increment by 1
+        expect(await input.getValue()).toEqual('112,345\u202f%');
+
+        await browser.keys([Key.ArrowUp]);
+        result = await getNumericString();
+        expect(result).toEqual('2.12345');
+        expect(await input.getValue()).toEqual('212,345\u202f%');
+
+        // Test Arrow Down
+        await browser.keys([Key.ArrowDown]);
+        result = await getNumericString();
+        expect(result).toEqual('1.12345');
+        expect(await input.getValue()).toEqual('112,345\u202f%');
+
+        await browser.keys([Key.ArrowDown]);
+        result = await getNumericString();
+        expect(result).toEqual('0.12345');
+        expect(await input.getValue()).toEqual('12,345\u202f%');
+
+        // Test Wheel Up
+        await mouseWheel(0, -100);
+        result = await getNumericString();
+        expect(result).toEqual('0.12355');  // Using percentageEU3dec: 0.01 %
+        expect(await input.getValue()).toEqual('12,355\u202f%');
+
+        await mouseWheel(0, -100);
+        result = await getNumericString();
+        expect(result).toEqual('0.12365');
+        expect(await input.getValue()).toEqual('12,365\u202f%');
+
+        // Test Wheel Down
+        await mouseWheel(0, 100);
+        result = await getNumericString();
+        expect(result).toEqual('0.12355');
+        expect(await input.getValue()).toEqual('12,355\u202f%');
+
+        await mouseWheel(0, 100);
+        result = await getNumericString();
+        expect(result).toEqual('0.12345');
+        expect(await input.getValue()).toEqual('12,345\u202f%');
+    });
+
     it('should update on load the formatted and raw value when divided by a `rawValueDivisor`', async () => {
         expect(await $(selectors.issue452Formatted).getValue()).toEqual('12,35\u202f%');
         const result = await browser.execute(domId => {
@@ -4530,6 +4597,48 @@ describe('Issue #808', () => {
         expect(await issue808InputDetector.getValue()).toEqual('6');
         expect(await input.getValue()).toEqual('1 234');
     });
+
+    it(`ESC: Re-entering the last input value on the second attempt after pressing Escape should trigger the oninput event`, async () => {
+        // This has been reported under #819
+
+        // reset
+        const input = await $(selectors.issue808);
+        const issue808InputDetector = await $(selectors.issue808InputDetector);
+        await resetInputDetector();
+        await setAutonumericValue('');
+
+        await input.click();
+        expect(await issue808InputDetector.getValue()).toEqual('0');
+        expect(await input.getValue()).toEqual('');
+
+        // Put some value to the clipboard - Position caret after the last digit in the input, selection is empty - ctrl-V - select the pasted part only, backspace --> extra character is not deleted
+        await browser.keys(['1']);
+        await browser.keys(['2']);
+        await browser.keys(['3']);
+        expect(await input.getValue()).toEqual('123');
+        expect(await issue808InputDetector.getValue()).toEqual('3');
+
+        // Focus next input
+        await browser.keys(Key.Tab);
+        expect(await input.isFocused()).toEqual(false);
+
+        // modify value and revert by the ESC key
+        await input.click();
+        await browser.keys([Key.Home]);
+        await browser.keys(['5']);
+        expect(await input.getValue()).toEqual('5 123');
+        expect(await issue808InputDetector.getValue()).toEqual('4');
+
+        await browser.keys([Key.Escape]);
+        expect(await input.getValue()).toEqual('123');
+        expect(await issue808InputDetector.getValue()).toEqual('5');
+
+        // Re-entering the last input value on the second attempt after pressing Escape should trigger the oninput event
+        await browser.keys([Key.Home]);
+        await browser.keys(['5']);
+        expect(await input.getValue()).toEqual('5 123');
+        expect(await issue808InputDetector.getValue()).toEqual('6');
+    });
 });
 
 describe('Issue #574', () => {
@@ -4604,6 +4713,47 @@ describe('Issue #559', () => {
         expect(await input.getValue()).toEqual('-1.23');
         await browser.keys(['6']);
         expect(await input.getValue()).toEqual('-1.62');
+    });
+});
+
+describe('Issue #582', () => {
+    it('should test for default values', async () => {
+        await browser.url(testUrl);
+
+        expect(await $(selectors.issue582).getValue()).toEqual('1.234,5678');
+    });
+
+    it(`should correctly 'backspace' only one character if we try to insert a forbidden character before`, async () => {
+        const inputToTest = await $(selectors.issue582);
+
+        await inputToTest.click();
+        await browser.keys([Key.Home, Key.ArrowRight, Key.ArrowRight, Key.ArrowRight]); // 1.23|4  (only 3 arrowrights are needed, it jumps over the grouping separator character)
+        expect(await getCaretStart(selectors.issue582)).toEqual(4);
+
+        await browser.keys('w');
+        await browser.keys(Key.Backspace);
+
+        expect(await getNumericString(selectors.issue582)).toEqual('124.5678');
+        expect(await inputToTest.getValue()).toEqual('124,5678');
+    });
+
+    it(`should correctly 'delete' only one character if we try to insert a forbidden character before`, async () => {
+        const inputToTest = await $(selectors.issue582);
+
+        await inputToTest.click();
+
+        await sendCtrlChar('a');
+        await browser.keys('1234,5678');
+        expect(await $(selectors.issue582).getValue()).toEqual('1.234,5678');
+
+        await browser.keys([Key.Home, Key.ArrowRight, Key.ArrowRight]); // 1.2|34  (only 2 arrowrights are needed, it jumps over the grouping separator character)
+        expect(await getCaretStart(selectors.issue582)).toEqual(3);
+
+        await browser.keys('w');
+        await browser.keys(Key.Delete);
+
+        expect(await getNumericString(selectors.issue582)).toEqual('124.5678');
+        expect(await inputToTest.getValue()).toEqual('124,5678');
     });
 });
 

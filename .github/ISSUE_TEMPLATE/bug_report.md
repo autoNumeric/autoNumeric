@@ -1,3 +1,12 @@
+---
+name: Create new issue
+about: Create a report to help us improve
+title: ''
+labels: ''
+assignees: ''
+
+---
+
 <!-- IMPORTANT: If you do not provide a reproducible example (ie. via codepen.io), we likely won't be able to help you to the best of our abilities, and could automatically close this issue. -->
 
 ### Current behavior

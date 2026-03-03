@@ -4033,7 +4033,36 @@ describe('Pasting', () => {
         expect(await inputToTest.getValue()).toEqual('$123.456,00');  // Must be properly formatted
         expect(await getNumericString(selectors.issue670)).toEqual('123456');  // rawValue (or more precisely getNumericString()=the rawValue converted to string and extraneous zeros removed after the dot) must be correct (e.g.: not "123456.00,")
 
+        // 1a Pasting digits+non-digit characters (123millimeter)
+
+        // Prepare clipboard
+        await inputClassic.click();
+        await sendCtrlChar('a');
+        await browser.keys([Key.Backspace]);
+        await browser.keys('123millimeter');
+        expect(await inputClassic.getValue()).toEqual('123millimeter');
+        await sendCtrlChar('a');
+        await sendCtrlChar('c');
+
+        // Paste
+        await inputToTest.click();
+        await sendCtrlChar('a');
+        expect(await getCaretStart(selectors.issue670)).toEqual(1);  // The currency sign should not be selected, so that the branch of partial selection is executed in _onPaste
+        await sendCtrlChar('v');
+
+        expect(await inputToTest.getValue()).toEqual('$123,00');  // Value must be properly formatted and changed
+        expect(await getNumericString(selectors.issue670)).toEqual('123');  // rawValue should be consistent with the displayed value
+
         // 2. Test when the pasted value is outside of the range (and it throws an exception and rawValue should not be changed)
+
+        // Prepare input
+        await inputToTest.click();
+        await sendCtrlChar('a');
+        await browser.keys([Key.Backspace, Key.Backspace]);
+        await browser.keys('123456');
+        await browser.keys([Key.Tab]);  // Format it
+        expect(await inputToTest.getValue()).toEqual('$123.456,00');  // Value must be properly formatted
+        expect(await getNumericString(selectors.issue670)).toEqual('123456');  // rawValue should be consistent with the displayed value
 
         // Prepare clipboard
         await inputClassic.click();

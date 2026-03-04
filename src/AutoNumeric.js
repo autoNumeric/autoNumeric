@@ -133,6 +133,8 @@ export default class AutoNumeric {
         this.savedCancellableValue = null;
 
         // Initialize the undo/redo variables
+        /** @typedef {{ value: string|null|number, start: number, end: string }} HistoryTableEntry */  // TODO can rawValue be number?
+        /** @type {Array<HistoryTableEntry>} */
         this.historyTable = []; // Keep track of *all* valid states of the element value
         this.historyTableIndex = -1; // Pointer to the current undo/redo state. This will be set to '0' during initialization since it first adds itself.
         this.onGoingRedo = false; // Variable that keeps track if a 'redo' is ongoing (in order to prevent an 'undo' to be launch when releasing the shift key before the ctrl key after a 'redo' shortcut)
@@ -1354,7 +1356,7 @@ export default class AutoNumeric {
     /**
      * Set the count of AutoNumeric form children to 1 for the given form element, or if none are passed, the current `this.parentForm` one.
      *
-     * @param {HTMLFormElement|null} formElement
+     * @param {HTMLFormElement|null} [formElement=null]
      * @private
      */
     _initializeFormCounterToOne(formElement = null) {
@@ -1415,8 +1417,8 @@ export default class AutoNumeric {
     /**
      * Return the given form element, or defaults to `this.parentForm` if no argument is passed.
      *
-     * @param {HTMLFormElement|null} formElement
-     * @returns {*}
+     * @param {HTMLFormElement|null} [formElement=null]
+     * @returns {HTMLFormElement}
      * @private
      */
     _getFormElement(formElement = null) {
@@ -1434,7 +1436,7 @@ export default class AutoNumeric {
      * Generate a form handler unique name and store it in the global form handler list.
      * This also save that name in the dataset of the given form element.
      *
-     * @param {HTMLFormElement|null} formElement
+     * @param {HTMLFormElement|null} [formElement=null]
      * @private
      */
     _storeFormHandlerFunction(formElement = null) {
@@ -1454,7 +1456,7 @@ export default class AutoNumeric {
     /**
      * Return the form handler key name from the parent form element, for the global form handler list.
      *
-     * @returns {string|*}
+     * @returns {string}
      * @private
      */
     _getFormHandlerKey() {
@@ -1473,7 +1475,7 @@ export default class AutoNumeric {
     /**
      * Return the 'submit' event handler function used for the parent form.
      *
-     * @returns {function}
+     * @returns {Function}
      * @private
      */
     _getFormHandlerFunction() {
@@ -1501,7 +1503,7 @@ export default class AutoNumeric {
      * Set the DOM element write permissions according to the current settings, by setting the `readonly` or `contenteditable` attributes depending on its tag type.
      * If the `useHtmlAttribute` parameter is set to `true`, then the `readonly` html attribute is used and has precedence over the `readOnly` option to set the element as read-only.
      *
-     * @param {boolean} useHtmlAttribute If set to `true`, then the write permissions are set by taking into account the html 'readonly' attribute, even if the `readOnly` option is set to false
+     * @param {boolean} [useHtmlAttribute=false] If set to `true`, then the write permissions are set by taking into account the html 'readonly' attribute, even if the `readOnly` option is set to false
      * @private
      */
     _setWritePermissions(useHtmlAttribute = false) {
@@ -1721,7 +1723,7 @@ export default class AutoNumeric {
      * 'Undo' or 'Redo' the last/next user entry in the history table.
      * This does not modify the history table, only the pointer to the current state.
      *
-     * @param {boolean} undo If set to `true`, then this function does an 'Undo', otherwise it does a 'Redo'
+     * @param {boolean} [undo=true] If set to `true`, then this function does an 'Undo', otherwise it does a 'Redo' (Optional, default: true)
      * @private
      */
     _historyTableUndoOrRedo(undo = true) {
@@ -1792,8 +1794,8 @@ export default class AutoNumeric {
      * Make the history table forget its first N elements, shifting its indexes in the process.
      * `N` being given as the `numberOfEntriesToForget` parameter.
      *
-     * @param {Number} numberOfEntriesToForget
-     * @returns {object|Array<object>} The discarded objects, in an Array.
+     * @param {Number} [numberOfEntriesToForget=1] (Optional, default: 1)
+     * @returns {HistoryTableEntry|Array<HistoryTableEntry>} The discarded objects, in an Array.
      * @private
      */
     _historyTableForget(numberOfEntriesToForget = 1) {
@@ -2056,8 +2058,8 @@ export default class AutoNumeric {
      * @example anElement.set(null) // Set the rawValue and element value to `null`
      *
      * @param {number|string|null} newValue The value must be a Number, a numeric string or `null` (if `emptyInputBehavior` is set to `'null'`)
-     * @param {object} options A settings object that will override the current settings. Note: the update is done only if the `newValue` is defined.
-     * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history table
+     * @param {object} [options=null] A settings object that will override the current settings. Note: the update is done only if the `newValue` is defined.
+     * @param {boolean} [saveChangeToHistory=true] If set to `true`, then the change is recorded in the history table
      * @returns {AutoNumeric}
      * @throws
      */
@@ -2196,7 +2198,7 @@ export default class AutoNumeric {
      * You can also set the value and update the setting in one go (the value will again not be formatted immediately).
      *
      * @param {number|string} value
-     * @param {object} options
+     * @param {object} [options=null]
      * @returns {AutoNumeric}
      * @throws
      */
@@ -2232,7 +2234,7 @@ export default class AutoNumeric {
      * This also updates the `rawValue` with the given `newValue`, without checking it too ; if it's not formatted like a number recognized by Javascript, this *will* likely make other AutoNumeric methods fail.
      *
      * @param {string|number|null} newValue The new value to set on the element
-     * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history array, otherwise it is not
+     * @param {boolean} [saveChangeToHistory=true] If set to `true`, then the change is recorded in the history array, otherwise it is not
      * @returns {AutoNumeric}
      */
     setValue(newValue, saveChangeToHistory = true) {
@@ -2245,7 +2247,7 @@ export default class AutoNumeric {
      * Save the raw value inside the AutoNumeric object.
      *
      * @param {number|string|null} rawValue The numeric value as understood by Javascript like a `Number`
-     * @param {boolean} saveChangeToHistory If set to `true`, then the change is recorded in the history array, otherwise it is not
+     * @param {boolean} [saveChangeToHistory=true] If set to `true`, then the change is recorded in the history array, otherwise it is not
      * @private
      */
     _setRawValue(rawValue, saveChangeToHistory = true) {
@@ -2285,7 +2287,7 @@ export default class AutoNumeric {
      * This sends an 'autoNumeric:formatted' event if the new value is different from the old one.
      *
      * @param {number|string} newElementValue
-     * @param {boolean} sendFormattedEvent If set to `true`, then the `AutoNumeric.events.formatted` event is sent if the value has changed
+     * @param {boolean} [sendFormattedEvent=true] If set to `true`, then the `AutoNumeric.events.formatted` event is sent if the value has changed
      * @returns {AutoNumeric}
      * @private
      */
@@ -2322,8 +2324,8 @@ export default class AutoNumeric {
      * Note: if the second argument `rawValue` is a boolean, we consider that is really is the `saveChangeToHistory` argument.
      *
      * @param {number|string|null} newElementValue
-     * @param {number|string|null|boolean} rawValue
-     * @param {boolean} saveChangeToHistory
+     * @param {number|string|null|boolean} [rawValue=null]
+     * @param {boolean} [saveChangeToHistory=true]
      * @returns {AutoNumeric}
      * @private
      */
@@ -2441,7 +2443,7 @@ export default class AutoNumeric {
      *
      * @param {string} eventName
      * @param {HTMLElement|HTMLDocument|EventTarget} element
-     * @param {object} detail
+     * @param {object} [detail=null]
      * @private
      */
     _triggerEvent(eventName, element = document, detail = null) {
@@ -2473,7 +2475,7 @@ export default class AutoNumeric {
      *
      * @usage anElement.getNumericString();
      *
-     * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
+     * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object as its second
      *
      * @returns {string|null}
      */
@@ -2497,7 +2499,7 @@ export default class AutoNumeric {
      *
      * @usage anElement.getFormatted()
      *
-     * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
+     * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object as its second
      *
      * @returns {string}
      */
@@ -2519,7 +2521,7 @@ export default class AutoNumeric {
      *
      * @usage anElement.getNumber()
      *
-     * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object has its second
+     * @param {function|null} callback If a callback is passed, then the result is passed to it as its first argument, and the AutoNumeric object as its second
      *
      * @returns {number|null}
      */
@@ -6602,6 +6604,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
             if (this.settings.modifyValueOnUpDownArrow &&
                 (this.eventKey === AutoNumericEnum.keyName.UpArrow || this.eventKey === AutoNumericEnum.keyName.DownArrow)) {
+                this.isEditing = false;  // Fix issue #817: When rawValueDivisor is not null: should disable this flag, otherwise this.rawValue becomes invalid in _setRawValue (_setRawValue gets the raw value that is already divided by rawValueDivisor and if isEditing is true the value is divided once more)
                 this.upDownArrowAction(e);
 
                 return;
@@ -6626,6 +6629,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     this.set(this.savedCancellableValue);
                     // And we need to send an 'input' event when setting back the initial value in order to make other scripts aware of the value change...
                     this._triggerEvent(AutoNumeric.events.native.input, e.target);
+
+                    // lastVal should be updated to properly detect change (#819)
+                    this.lastVal = AutoNumericHelper.getElementValue(e.target);
+                    this.throwInput = true;
                 }
             }
 
@@ -6865,7 +6872,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         this._updateInternalProperties(e);
 
         const skip = this._processNonPrintableKeysAndShortcuts(e);
-        delete this.valuePartsBeforePaste;
         const targetValue = AutoNumericHelper.getElementValue(e.target);
         if (skip || targetValue === '' && this.initialValueOnFirstKeydown === '') { // If the user enters skippable keys, or keeps deleting/backspacing into the empty input, no 'formatted' event are sent (cf. issue #621)
             return;
@@ -7107,7 +7113,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             // Since the whole element content will be replaced, no need to complicate things and directly test for the validity of the pasted content, then set the `rawValue` and caret position (fix issue #482)
             // 1. Strip all thousand separators, brackets and currency sign, and convert the decimal character to a dot
             const untranslatedPastedText = this._preparePastedText(rawPastedText);
-            const pastedRawValue = AutoNumericHelper.arabicToLatinNumbers(untranslatedPastedText, false, false, false); // Allow pasting arabic numbers
+            let pastedRawValue = AutoNumericHelper.arabicToLatinNumbers(untranslatedPastedText, false, false, false); // Allow pasting arabic numbers
 
             // 2. Check that the paste is a valid number once it has been normalized to a raw value
             if (pastedRawValue === '.' || pastedRawValue === '' || (pastedRawValue !== '.' && !AutoNumericHelper.isNumber(pastedRawValue))) {
@@ -7120,9 +7126,66 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                 return;
             }
 
+            // 2a. Handle 'truncate' or 'replace' paste behavior - they work the same way here because the whole text in the input is selected and there are no digits to the right of the caret to be replaced
+            if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.truncate || this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.replace) {
+                const minParse = AutoNumericHelper.parseStr(this.settings.minimumValue);
+                const maxParse = AutoNumericHelper.parseStr(this.settings.maximumValue);
+                let lastGoodKnownResult = ''; // This is set as the default, in case we do not add even one number
+                let pastedTextIndex = 0;
+                while (pastedTextIndex < pastedRawValue.length) {
+                    // Modify the result with another pasted character
+                    const newCandidate = lastGoodKnownResult + pastedRawValue[pastedTextIndex];
+
+                    // Check the range limits
+                    if (!this.constructor._checkIfInRange(newCandidate, minParse, maxParse)) {
+                        // The result is out of the range limits, stop the loop here
+                        break;
+                    }
+
+                    // Save the last good known result
+                    lastGoodKnownResult = newCandidate;
+
+                    // Update the local variables for the next loop
+                    pastedTextIndex++;
+                }
+                pastedRawValue = lastGoodKnownResult;
+            }
+
             // 3. Then try to set it as the new value. The `set()` method will run the additional tests (i.e. limits) as needed.
-            this.set(pastedRawValue);
-            this.formatted = true;
+            try {
+                this.set(pastedRawValue);
+                this.formatted = true;
+            }
+            catch (error) {
+                switch (this.settings.onInvalidPaste) {
+                    case AutoNumeric.options.onInvalidPaste.clamp:
+                        const clampedValue = AutoNumericHelper.clampToRangeLimits(pastedRawValue, this.settings);
+                        this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to reformat
+                        try {
+                            this.set(clampedValue);
+                        } catch (error) {
+                            AutoNumericHelper.throwError(`Fatal error: Unable to set the clamped value '${clampedValue}'.`);
+                        }
+                        break;
+                    case AutoNumeric.options.onInvalidPaste.error:
+                        // Throw an error message
+                        this.formatted = true;
+                        AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' results in a value '${pastedRawValue}' that is outside of the minimum [${this.settings.minimumValue}] and maximum [${this.settings.maximumValue}] value range.`);
+                        break;
+                    case AutoNumeric.options.onInvalidPaste.truncate:
+                    case AutoNumeric.options.onInvalidPaste.replace:
+                        // Throw an internal error message, because this should not happen if truncate/replace option is properly handled
+                        this.formatted = true;
+                        AutoNumericHelper.throwError(`Internal error: the paster value '${rawPastedText}' should have already been truncated but it results in a value '${pastedRawValue}' that is outside of the minimum [${this.settings.minimumValue}] and maximum [${this.settings.maximumValue}] value range.`);
+                        break;
+                    case AutoNumeric.options.onInvalidPaste.ignore:
+                    // Do nothing
+                    // Fall through
+                    default:
+                        this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to format and set the value to 0
+                        return; // ...and nothing else should be changed
+                }
+            }
 
             // 4. On a 'normal' non-autoNumeric input, an `input` event is sent when a paste is done. We mimic that.
             this._triggerEvent(AutoNumeric.events.native.input, eventTarget);
@@ -7369,6 +7432,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         // 5. Check if the result is a valid number, if not, drop the paste and do nothing.
         if (!AutoNumericHelper.isNumber(result) || result === '') {
+            this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to format an empty value (compare with 3. above)
             if (this.settings.onInvalidPaste === AutoNumeric.options.onInvalidPaste.error) {
                 AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' would result into an invalid content '${result}'.`); //TODO Should we send a warning instead of throwing an error?
                 //TODO This is not DRY ; refactor with above
@@ -7406,12 +7470,14 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         let valueHasBeenClamped = false;
         try {
             this.set(result);
+            this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to reformat
             valueHasBeenSet = true;
         } catch (error) {
             let clampedValue;
             switch (this.settings.onInvalidPaste) {
                 case AutoNumeric.options.onInvalidPaste.clamp:
                     clampedValue = AutoNumericHelper.clampToRangeLimits(result, this.settings);
+                    this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to reformat
                     try {
                         this.set(clampedValue);
                     } catch (error) {
@@ -7423,15 +7489,17 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
                     result = clampedValue; // This is used only for setting the caret position later
                     break;
                 case AutoNumeric.options.onInvalidPaste.error:
-                case AutoNumeric.options.onInvalidPaste.truncate:
-                case AutoNumeric.options.onInvalidPaste.replace:
                     // Throw an error message
+                    this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to format and set the value to 0
                     AutoNumericHelper.throwError(`The pasted value '${rawPastedText}' results in a value '${result}' that is outside of the minimum [${this.settings.minimumValue}] and maximum [${this.settings.maximumValue}] value range.`);
                 // Fall through
+                case AutoNumeric.options.onInvalidPaste.truncate:  
+                case AutoNumeric.options.onInvalidPaste.replace:  // even in 'truncate' or 'replace' mode we can get an error here (e.g.: see e2e test of issue #670 - '8. Special case...')
                 case AutoNumeric.options.onInvalidPaste.ignore:
                 // Do nothing
                 // Fall through
                 default :
+                    this.formatted = true; // This prevents the `keyup` event on the `v` key during a paste to try to format and set the value to 0
                     return; // ...and nothing else should be changed
             }
         }
@@ -8411,11 +8479,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
     /**
      * Analyse the settings/options passed by the user, validate and clean them, then set them into `this.settings`.
-     * Note: This sets the settings to `null` if somehow the settings objet is undefined or empty
+     * Note: This sets the settings to `null` if somehow the settings object is undefined or empty
      *       If only `decimalPlaces` is defined in the option, overwrite the other decimalPlaces* options, otherwise, use those options
      *
      * @param {object} options
-     * @param {boolean} update - If set to `true`, then the settings already exists and this function only updates them instead of recreating them from scratch
+     * @param {boolean} [update=false] - If set to `true`, then the settings already exists and this function only updates them instead of recreating them from scratch
      * @throws
      */
     _setSettings(options, update = false) {
@@ -8622,8 +8690,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     /**
      * Set the text selection inside the input with the given start and end position.
      *
-     * @param {int} start
-     * @param {int} end
+     * @param {number} start
+     * @param {number} end
      * @private
      */
     _setSelection(start, end) {
@@ -8835,7 +8903,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     /**
      * Helper function for `_expandSelectionOnSign()`.
      *
-     * @returns {Array} Array containing [signPosition, currencySymbolPosition] of a formatted value
+     * @returns {[number, number]} Array containing [signPosition, currencySymbolPosition] of a formatted value
      * @private
      */
     _getSignPosition() {
@@ -8889,30 +8957,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
     }
 
     /**
-     * Try to strip pasted value to digits
-     */
-    _checkPaste() {
-        // Do not process anything if the value has already been formatted
-        if (this.formatted) {
-            return;
-        }
-
-        if (!AutoNumericHelper.isUndefined(this.valuePartsBeforePaste)) {
-            const oldParts = this.valuePartsBeforePaste;
-            const [left, right] = this._getLeftAndRightPartAroundTheSelection();
-
-            // Try to strip the pasted value first
-            delete this.valuePartsBeforePaste;
-
-            const modifiedLeftPart = left.substr(0, oldParts[0].length) + AutoNumeric._stripAllNonNumberCharactersExceptCustomDecimalChar(left.substr(oldParts[0].length), this.settings, true, this.isFocused);
-            if (!this._setValueParts(modifiedLeftPart, right, true)) {
-                this._setElementValue(oldParts.join(''), false);
-                this._setCaretPosition(oldParts[0].length);
-            }
-        }
-    }
-
-    /**
      * Return `true` if the given key should be ignored or not.
      *
      * @param {string} eventKeyName
@@ -8942,14 +8986,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @private
      */
     _processNonPrintableKeysAndShortcuts(e) {
-        // Catch the ctrl up on ctrl-v
-        if (((e.ctrlKey || e.metaKey) && e.type === 'keyup' && !AutoNumericHelper.isUndefined(this.valuePartsBeforePaste)) || (e.shiftKey && this.eventKey === AutoNumericEnum.keyName.Insert)) {
-            //TODO Move this test inside the `onKeyup` handler
-            this._checkPaste();
-
-            return false;
-        }
-
         // Skip all function keys (F1-F12), Windows keys, tab and other special keys
         if (this.constructor._shouldSkipEventKey(this.eventKey)) {
             return true;
@@ -8974,17 +9010,6 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
              this.eventKey === AutoNumericEnum.keyName.x)) {
             if (e.type === 'keydown') {
                 this._expandSelectionOnSign();
-            }
-
-            // Try to prevent wrong paste
-            if (this.eventKey === AutoNumericEnum.keyName.v || this.eventKey === AutoNumericEnum.keyName.Insert) {
-                if (e.type === 'keydown' || e.type === 'keypress') {
-                    if (AutoNumericHelper.isUndefined(this.valuePartsBeforePaste)) {
-                        this.valuePartsBeforePaste = this._getLeftAndRightPartAroundTheSelection();
-                    }
-                } else {
-                    this._checkPaste();
-                }
             }
 
             return e.type === 'keydown' || e.type === 'keypress' || this.eventKey === AutoNumericEnum.keyName.c;
@@ -9133,6 +9158,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         this._setValueParts(left, right);
 
+        this.throwInput = true;  // fix #582: this.throwInput can be false (e.g.: by putting an invalid character previously) and we must enable this flag to ensure that input event is sent and double character is not removed, see also _onKeydown
         return true;
     }
 
@@ -9186,7 +9212,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
                 // Remove the decimal character if found on the far left of the right part
                 if (right.indexOf(this.settings.decimalCharacter) === 0) {
-                    right = right.substr(1);
+                    right = right.substring(1);
                 }
             }
 
@@ -9401,10 +9427,10 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * This is loosely based upon http://stackoverflow.com/a/40705993/2834898.
      *
      * @param {HTMLFormElement} form
-     * @param {boolean} intoAnArray If `true`, instead of generating a string, it generates an Array.
-     * @param {string} formatType If `'unformatted'`, then the AutoNumeric elements values are unformatted, if `'localized'`, then the AutoNumeric elements values are localized, and if `'formatted'`, then the AutoNumeric elements values are kept formatted. In either way, this function does not modify the value of each DOM element, but only affect the value that is returned by that serialize function.
-     * @param {string} serializedSpaceCharacter Can either be the '+' character, or the '%20' string.
-     * @param {string|null} forcedOutputFormat If set, then this is the format that is used for the localization, instead of the default `outputFormat` option.
+     * @param {boolean} [intoAnArray=false] If `true`, instead of generating a string, it generates an Array.
+     * @param {string} [formatType='unformatted'] If `'unformatted'`, then the AutoNumeric elements values are unformatted, if `'localized'`, then the AutoNumeric elements values are localized, and if `'formatted'`, then the AutoNumeric elements values are kept formatted. In either way, this function does not modify the value of each DOM element, but only affect the value that is returned by that serialize function.
+     * @param {string} [serializedSpaceCharacter='+'] Can either be the '+' character, or the '%20' string.
+     * @param {string|null} [forcedOutputFormat] If set, then this is the format that is used for the localization, instead of the default `outputFormat` option.
      * @returns {string|Array}
      * @private
      */
@@ -9496,7 +9522,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Serialize the form values to a string, outputting numeric strings for each AutoNumeric-managed element values.
      *
      * @param {HTMLFormElement} form
-     * @param {string} serializedSpaceCharacter
+     * @param {string} [serializedSpaceCharacter='+']
      * @returns {string}
      */
     static _serializeNumericString(form, serializedSpaceCharacter = '+') {
@@ -9507,7 +9533,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Serialize the form values to a string, outputting the formatted value as strings for each AutoNumeric-managed elements.
      *
      * @param {HTMLFormElement} form
-     * @param {string} serializedSpaceCharacter
+     * @param {string} [serializedSpaceCharacter='+']
      * @returns {string}
      */
     static _serializeFormatted(form, serializedSpaceCharacter = '+') {
@@ -9518,8 +9544,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Serialize the form values to a string, outputting localized strings for each AutoNumeric-managed element values.
      *
      * @param {HTMLFormElement} form
-     * @param {string} serializedSpaceCharacter
-     * @param {string|null} forcedOutputFormat If set, then this is the format that is used for the localization, instead of the default `outputFormat` option.
+     * @param {string} [serializedSpaceCharacter='+']
+     * @param {string|null} [forcedOutputFormat] If set, then this is the format that is used for the localization, instead of the default `outputFormat` option.
      * @returns {string}
      */
     static _serializeLocalized(form, serializedSpaceCharacter = '+', forcedOutputFormat = null) {
@@ -9530,7 +9556,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Generate an Array with the form values, outputting numeric strings for each AutoNumeric-managed element values.
      *
      * @param {HTMLFormElement} form
-     * @param {string} serializedSpaceCharacter
+     * @param {string} [serializedSpaceCharacter='+']
      * @returns {Array}
      */
     static _serializeNumericStringArray(form, serializedSpaceCharacter = '+') {
@@ -9541,7 +9567,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Generate an Array with the form values, outputting the formatted value as strings for each AutoNumeric-managed elements.
      *
      * @param {HTMLFormElement} form
-     * @param {string} serializedSpaceCharacter
+     * @param {string} [serializedSpaceCharacter='+']
      * @returns {Array}
      */
     static _serializeFormattedArray(form, serializedSpaceCharacter = '+') {
@@ -9552,8 +9578,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * Generate an Array with the form values, outputting localized strings for each AutoNumeric-managed element values.
      *
      * @param {HTMLFormElement} form
-     * @param {string} serializedSpaceCharacter
-     * @param {string|null} forcedOutputFormat If set, then this is the format that is used for the localization, instead of the default `outputFormat` option.
+     * @param {string} [serializedSpaceCharacter='+']
+     * @param {string|null} [forcedOutputFormat] If set, then this is the format that is used for the localization, instead of the default `outputFormat` option.
      * @returns {Array}
      */
     static _serializeLocalizedArray(form, serializedSpaceCharacter = '+', forcedOutputFormat = null) {
@@ -9583,8 +9609,8 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
  * [anElement1, anElement2] = AutoNumeric.multiple('.myCssClass > input', [null, 12345.789], { options }); // Idem above, but with passing the initial values too
  *
  * @param {string|Array|{ rootElement: HTMLElement }|{ rootElement: HTMLElement, exclude: Array<HTMLInputElement>}} arg1
- * @param {number|Array|object|null} initialValue
- * @param {object|Array|null} options
+ * @param {number|Array|object|null} [initialValue]
+ * @param {object|Array|null} [options]
  * @returns {Array}
  */
 AutoNumeric.multiple = (arg1, initialValue = null, options = null) => {

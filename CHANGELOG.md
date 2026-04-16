@@ -1,5 +1,44 @@
 ## Changelog for AutoNumeric
 
+## 4.10.10
++ Fixes coverage reporting and instrumentation in unit tests
++ Fixes #807 "__dirname is not defined in ES module scope" error in e2e test
++ Fixes #818 The test 'should fail to init when the default value is outside of the min and max limits' fails if this is the first one to execute
++ Modifies globalObject to `globalThis` so that the generated bundle can be used in more contexts (import as module from a browser, node.js)
++ Fixes watching external changes on elements different from input elements, and reenable/improve some unit tests
++ Fixes a few unit tests that uses `setFocus()` to raise focus even (and test its effect) on the element
++ Fixes #808 input event (#809)
++ Update this.lastVal internally in `_onKeyup()` and `_onPaste()` so that value change is detected in the Delete/Backspace handler and input event is raised
++ Handle the Ctrl-Del event on windows (it deletes the word to the right of the cursor)
++ Updates the `this.throwInput` in undo/redo branches by setting it to `true`, otherwise input event may not be raised in Chrome
++ Created global helper functions (`getCaretPositions`, `getCaretStart`, `sendCtrlChar`, `isHovered`, `mouseWheel`)
++ Added tests to 'Webdriverio modifiers keys' to test how webdriver handles modifier key down statuses in key seqs
++ Simplified some tests using the new helper function
++ Re-enabled test suites: 'Issue #322', 'Issue #527', 'Issue #393'
++ Started to re-enable test suite 'undo and redo functions'
++ Fixes the test: 'should correctly display the negative value with the custom negative sign on mouseover (without adding the default minus sign)' by emulating the alt+mousemove event
++ Fixes the `indexFirstNonZeroDecimalPlace()` function that did not return the correct indexes in some cases, and add some tests for it
++ Improves the JSDoc comments, fixes minor warnings (`substr()` is deprecated), `array === []` is always `false`) (#828)
++ Includes further tests for `addAndRoundToNearestAuto()` and modified some existing ones, because the fixed `indexFirstNonZeroDecimalPlace()` affected these too
++ Updates the issue template by replacing it with the original AutoNumeric issue template (#824)
++ Fixes #582 Two digits are removed in plugin when user tries to put forbidden character and press "Backspace" button
++ Fixes #819 Re-entering the last input value on the second attempt after pressing Escape does not trigger the oninput event listener
++ Fixes #817 Up and down arrows on values with a `rawValueDivisor` like percents are broken
++ Fixes #670 Copy pasting value adds incorrect additional comma/decimal to rawValue
++ Fixes `AutoNumericHelper.isSeleniumBot()` to not detect Chromium/webdriver as Selenium/geckodriver
++ Fixes another branch in `_onPaste` `onInvalidPaste.clamp`
++ Fixes when `onInvalidPaste == ignore` and the pasted value is outside of the range (and value should not be changed)
++ Removes unnecessary `_checkPaste()` and related codes
++ Adds a test to check when mixed content is pasted (ie. `"123millimeter"`)
++ Fixes #702 onInvalidPaste not working (#827)
++ Improves a few jsdoc comments in `AutoNumericHelper.js`
++ Improves the e2e tests of the partially selected text branch in `_onPaste()` and more `onInvalidPaste` options
++ Replaces `browser.execute()` calls with the appropriate utility functions: `getCaretPositions()` and `getCaretStart()`
++ Re-enables the 'Issue #593' suite
++ Re-enables the 'Issue #542' suite, and adds some tests when using a custom `decimalCharacter`"
++ Re-enables some tests in 'Issue #611'
++ Updates the AUTHORS file
+
 ## 4.10.9
 + Fixes #799 Cannot read properties of null (reading 'toString') in _cleanValueForRangeParse()
 

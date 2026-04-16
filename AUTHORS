@@ -2,8 +2,9 @@ The AutoNumeric authors are:
 
 Commit  Authors
 ------  ------------------------------------------------------
-   608	Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
+   645	Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
    231	Bob Knothe <bob@decorplanit.com>
+    14	kferenc617 <kubatovicsf@t-online.hu>
     12	Carlos Gonzales <carlos.rgn@gmail.com>
      3	Lukas Drgon <lukas.drgon@gmail.com>
      3	Ney Estrabelli <neyestrabelli@gmail.com>
@@ -12,27 +13,30 @@ Commit  Authors
      2	Daniel Ruf <DanielRuf@users.noreply.github.com>
      2	Kenny Moens <kenny.moens@cipalschaubroeck.be>
      2	Luke Travis <luke.travis@k3integrations.com>
+     2	Melloware <mellowaredev@gmail.com>
      2	Nicolai Ehemann <en@enlightened.de>
      2	Ruslan Isay <isay.r@i20.biz>
      2	Sebastian Busch <s.busch@obg-gruppe.de>
+     2	Takayuki Maruyama <maruTA-bis5@users.noreply.github.com>
      2	chery-qualset-hcd-ca-gov <cheryl.qualset@hcd.ca.gov>
      2	neunato <wesleymustdie@gmail.com>
      2	randoum <randoum@gmail.com>
      1	Abdelghani AINOUSS <abel.ainou@gmail.Com>
      1	Adrian Dmitroca <dmitroca.adrian@gmail.com>
      1	Alex Turpin <alex.turpin@gmail.com>
+     1	Andre Wachsmuth <sensenmann5@gmail.com>
      1	Aziz Khodjaev <ankh@inbox.ru>
      1	Boris Cherny <bcherny@gmail.com>
      1	Bruno Batista <bruno@atomtech.com.br>
      1	Burhan Zainuddin <burhan@codeyellow.nl>
      1	CoryFoy <github@cornetdesign.com>
      1	Ivan Hayes <git@ivanhayes.com>
+     1	Jannis Pohl <838818+jannispl@users.noreply.github.com>
      1	Jarin Udom <jarin@robotmodehq.com>
      1	Lothaire Laeuffer <32293830+LothaireLaeuffer@users.noreply.github.com>
      1	Marc Dagatan <53462376+marcdagatan@users.noreply.github.com>
      1	Matthew Thomson <32156362+matthewthomsonnz@users.noreply.github.com>
      1	Maxwell Barvian <max@barvian.me>
-     1	Melloware <mellowaredev@gmail.com>
      1	Mic Biert <mbi@netz3.ch>
      1	Michael Seele <mseele@gmail.com>
      1	Oliver Schneider <olsio@users.noreply.github.com>
@@ -44,10 +48,11 @@ Commit  Authors
      1	Willem Veelenturf <willem.veelenturf@gmail.com>
      1	Zayter Munive <zayter@koombea.com>
      1	beastlike <beastlike@users.noreply.github.com>
+     1	miguelnmaggioli <167191935+miguelnmaggioli@users.noreply.github.com>
      1	shrpne <shrpne@gmail.com>
      1	tetreum <basura@yelidmod.com>
 
-This list is ordered by contributions and has been generated on 2023-03-22 by `tools/authors.sh`.
+This list is ordered by contributions and has been generated on 2026-04-15 by `tools/authors.sh`.
 A more detailed list can be found on [Github](https://github.com/autoNumeric/autoNumeric/graphs/contributors).
 
 Special thanks to Sokolov 'funny-falcon' Yura for his contributions before autoNumeric moved to Github.

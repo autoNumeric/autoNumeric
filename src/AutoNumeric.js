@@ -1,10 +1,10 @@
 /**
  *               AutoNumeric.js
  *
- * @version      4.10.9
- * @date         2025-09-03 UTC 09:00
+ * @version      4.10.10
+ * @date         2026-04-16 UTC 03:52
  *
- * @authors      2016-2025 Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
+ * @authors      2016-2026 Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>
  *               2009-2016 Bob Knothe <bob.knothe@gmail.com>
  * @contributors Sokolov Yura and others, cf. AUTHORS
  * @copyright    Alexandre Bonneau & Robert J. Knothe

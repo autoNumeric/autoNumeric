@@ -1,0 +1,47 @@
+name: Attach dist files to release
+
+# When a release is published, build the library and upload the generated
+# `dist` files as release assets. This lets people download the exact
+# `autoNumeric.js` / `autoNumeric.min.js` the maintainers built, straight
+# from the GitHub release page, without going through a CDN or npm.
+# See issue #805.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write # Needed to upload assets to the release
+
+jobs:
+  build-and-attach:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the tagged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+
+      - name: Build the dist files
+        run: yarn build
+
+      - name: Upload dist files to the release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/autoNumeric.js
+            dist/autoNumeric.js.map
+            dist/autoNumeric.min.js
+            dist/autoNumeric.min.js.map

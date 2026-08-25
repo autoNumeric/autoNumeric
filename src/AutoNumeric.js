@@ -5873,6 +5873,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
         }
 
         const lastDigit = Number(inputValue.charAt(roundedStrLength + 1));
+        const hasStickyRemainder = /[1-9]/.test(inputValue.substring(roundedStrLength + 1));
         let inputValueArray = inputValue.substring(0, roundedStrLength + 1).split('');
         let odd;
         if (inputValue.charAt(roundedStrLength) === '.') {
@@ -5881,7 +5882,7 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             odd = inputValue.charAt(roundedStrLength) % 2;
         }
 
-        if (this._shouldRoundUp(lastDigit, settings, negativeSign, odd)) {
+        if (this._shouldRoundUp(lastDigit, settings, negativeSign, odd, hasStickyRemainder)) {
             // Round up the last digit if required, and continue until no more 9's are found
             for (let i = (inputValueArray.length - 1); i >= 0; i -= 1) {
                 if (inputValueArray[i] !== '.') {
@@ -5984,10 +5985,11 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
      * @param {object} settings
      * @param {string} negativeSign This variable comes from `_prepareValueForRounding()`, which return `'-'` if the initial value was negative
      * @param {number} odd
+     * @param {boolean} hasStickyRemainder `true` if any digit after the cutoff is nonzero
      * @returns {boolean}
      * @private
      */
-    static _shouldRoundUp(lastDigit, settings, negativeSign, odd) {
+    static _shouldRoundUp(lastDigit, settings, negativeSign, odd, hasStickyRemainder) {
         return (lastDigit > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpSymmetric)                                     || // Round half up symmetric
             (lastDigit > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpAsymmetric && negativeSign === '')                || // Round half up asymmetric positive values
             (lastDigit > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfUpAsymmetric && negativeSign === '-')               || // Round half up asymmetric negative values
@@ -5996,9 +5998,9 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
             (lastDigit > 4 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfDownAsymmetric && negativeSign === '-')             || // Round half down asymmetric negative values
             (lastDigit > 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfEvenBankersRounding)                                ||
             (lastDigit === 5 && settings.roundingMethod === AutoNumeric.options.roundingMethod.halfEvenBankersRounding && odd === 1)                 ||
-            (lastDigit > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.toCeilingTowardPositiveInfinity && negativeSign === '') ||
-            (lastDigit > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.toFloorTowardNegativeInfinity && negativeSign === '-')  ||
-            (lastDigit > 0 && settings.roundingMethod === AutoNumeric.options.roundingMethod.upRoundAwayFromZero);                                      // Round up away from zero
+            (hasStickyRemainder && settings.roundingMethod === AutoNumeric.options.roundingMethod.toCeilingTowardPositiveInfinity && negativeSign === '') ||
+            (hasStickyRemainder && settings.roundingMethod === AutoNumeric.options.roundingMethod.toFloorTowardNegativeInfinity && negativeSign === '-')  ||
+            (hasStickyRemainder && settings.roundingMethod === AutoNumeric.options.roundingMethod.upRoundAwayFromZero);                                      // Round up away from zero
     }
 
     /**

@@ -1922,6 +1922,17 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual('-1,120.00');
         });
 
+        it('should round away from zero when the first dropped digit is 0 but a later digit is nonzero', () => {
+            aNInput.update({
+                decimalPlaces : 1,
+                roundingMethod: AutoNumeric.options.roundingMethod.upRoundAwayFromZero,
+            });
+            aNInput.set(1.5001);
+            expect(aNInput.getFormatted()).toEqual('1.6');
+            aNInput.set(-1.5001);
+            expect(aNInput.getFormatted()).toEqual('-1.6');
+        });
+
         it('should round correctly with the method downRoundTowardZero', () => {
             aNInput.update({ roundingMethod: AutoNumeric.options.roundingMethod.downRoundTowardZero });
             // Positive values
@@ -1956,6 +1967,19 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual('-1,119.44');
             aNInput.set(-1119.995);
             expect(aNInput.getFormatted()).toEqual('-1,119.99');
+        });
+
+        it('should ceiling-round when the first dropped digit is 0 but a later digit is nonzero', () => {
+            aNInput.update({
+                decimalPlaces : 1,
+                roundingMethod: AutoNumeric.options.roundingMethod.toCeilingTowardPositiveInfinity,
+            });
+            aNInput.set(1.5001);
+            expect(aNInput.getFormatted()).toEqual('1.6');
+            aNInput.set(1.5000);
+            expect(aNInput.getFormatted()).toEqual('1.5');
+            aNInput.set(-1.5001);
+            expect(aNInput.getFormatted()).toEqual('-1.5');
         });
 
         it('should round correctly with the method toCeilingTowardPositiveInfinity and a custom negative sign', () => {
@@ -1995,6 +2019,17 @@ describe('autoNumeric options and `options.*` methods', () => {
             expect(aNInput.getFormatted()).toEqual('-1,119.45');
             aNInput.set(-1119.995);
             expect(aNInput.getFormatted()).toEqual('-1,120.00');
+        });
+
+        it('should floor-round when the first dropped digit is 0 but a later digit is nonzero', () => {
+            aNInput.update({
+                decimalPlaces : 1,
+                roundingMethod: AutoNumeric.options.roundingMethod.toFloorTowardNegativeInfinity,
+            });
+            aNInput.set(1.5001);
+            expect(aNInput.getFormatted()).toEqual('1.5');
+            aNInput.set(-1.5001);
+            expect(aNInput.getFormatted()).toEqual('-1.6');
         });
 
         it('should round correctly with the method toFloorTowardNegativeInfinity', () => {
@@ -7502,6 +7537,16 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.format(0.004796656, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0,480\u202f%');
             expect(AutoNumeric.format(0.004742656, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('0,474\u202f%');
             expect(AutoNumeric.format(-0.002541148, AutoNumeric.getPredefinedOptions().percentageEU3dec)).toEqual('-0,254\u202f%');
+        });
+
+        it('should ceiling-round when the first dropped digit is 0 but a later digit is nonzero', () => {
+            expect(AutoNumeric.format(1.5001, { decimalPlaces: 1, roundingMethod: 'C' })).toEqual('1.6');
+            expect(AutoNumeric.format(1.5000, { decimalPlaces: 1, roundingMethod: 'C' })).toEqual('1.5');
+            expect(AutoNumeric.format(-1.5001, { decimalPlaces: 1, roundingMethod: 'C' })).toEqual('-1.5');
+            expect(AutoNumeric.format(1.5001, { decimalPlaces: 1, roundingMethod: 'F' })).toEqual('1.5');
+            expect(AutoNumeric.format(-1.5001, { decimalPlaces: 1, roundingMethod: 'F' })).toEqual('-1.6');
+            expect(AutoNumeric.format(1.5001, { decimalPlaces: 1, roundingMethod: 'U' })).toEqual('1.6');
+            expect(AutoNumeric.format(-1.5001, { decimalPlaces: 1, roundingMethod: 'U' })).toEqual('-1.6');
         });
 
         it('should correctly format `valuesToStrings` values', () => {

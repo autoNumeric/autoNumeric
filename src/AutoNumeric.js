@@ -5798,6 +5798,13 @@ To solve that, you'd need to either set \`decimalPlacesRawValue\` to \`null\`, o
 
         //TODO Divide this function to make it easier to understand
         inputValue = (inputValue === '') ? '0' : inputValue.toString();
+        // A tiny product stringifies as `1e-8`. The exponent minus is not the sign.
+        if (AutoNumericHelper.contains(inputValue, 'e') || AutoNumericHelper.contains(inputValue, 'E')) {
+            const expanded = AutoNumericHelper.scientificToDecimal(inputValue);
+            if (!isNaN(Number(expanded))) {
+                inputValue = String(expanded);
+            }
+        }
         if (settings.roundingMethod === AutoNumeric.options.roundingMethod.toNearest05 ||
             settings.roundingMethod === AutoNumeric.options.roundingMethod.toNearest05Alt ||
             settings.roundingMethod === AutoNumeric.options.roundingMethod.upToNext05 ||

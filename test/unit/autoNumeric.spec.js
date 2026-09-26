@@ -7441,6 +7441,15 @@ describe('Static autoNumeric functions', () => {
             expect(AutoNumeric.format(undefined)).toEqual(null);
         });
 
+        it('should format a tiny percentage instead of reading the exponent sign', () => {
+            const percentage = AutoNumeric.getPredefinedOptions().percentageUS3dec;
+            expect(AutoNumeric.format(1e-19, percentage)).toEqual('0.000%');
+            expect(AutoNumeric.format(1e-10, percentage)).toEqual('0.000%');
+            expect(AutoNumeric.format(-1e-10, percentage)).toEqual('0.000%');
+            expect(AutoNumeric.format(0.1, percentage)).toEqual('10.000%');
+            expect(AutoNumeric.format(-0.1, percentage)).toEqual('-10.000%');
+        });
+
         it('should format the value retrieved from a DOM element', () => {
             // Create the DOM element
             const newInput = document.createElement('input');

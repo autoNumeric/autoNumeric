@@ -1,4 +1,4 @@
-<p align="center"><a href="http://autonumeric.org"><img src="http://autonumeric.org/statics/icons/apple-icon-152x152.png" alt="autonumeric.org"></a></p>
+<p align="center"><a href="https://autonumeric.org"><img src="https://autonumeric.org/statics/icons/apple-icon-152x152.png" alt="autonumeric.org"></a></p>
 <p align="center">
 <a href="https://npmjs.org/package/autonumeric"><img src="https://img.shields.io/npm/v/autonumeric.svg" alt="Latest Version"></a>
 <a href="https://app.travis-ci.com/github/autoNumeric/autoNumeric/"><img src="https://app.travis-ci.com/autoNumeric/autoNumeric.svg?branch=next" alt="Build Status"></a>
@@ -11,7 +11,7 @@
 <a href="https://www.jsdelivr.com/package/npm/autonumeric"><img src="https://data.jsdelivr.com/v1/package/npm/autonumeric/badge?style=rounded" alt="jsDelivr downloads per month"></a>
 </p>
 
-## What is [AutoNumeric](http://autonumeric.org)?
+## What is [AutoNumeric](https://autonumeric.org)?
 AutoNumeric is a standalone Javascript library that provides live *as-you-type* formatting for international numbers and currencies.
 
 
@@ -19,22 +19,22 @@ AutoNumeric is a standalone Javascript library that provides live *as-you-type* 
 AutoNumeric main features are:
 
 - **Easy** to use and configure
-- Very **high configurability** (more than 40 [options](https://docs.autonumeric.org/Documentation/configuration%20options/) available)
-- User experience oriented ; using autoNumeric just **feels right and natural**, specially with the [function chaining](https://docs.autonumeric.org/Documentation/instantiated%20methods/#function-chaining) feature
-- Supports most [**international**](https://docs.autonumeric.org/Documentation/predefined%20options/#predefined-language-options) numeric formats and currencies<br>*(If the one you use is not supported yet, open an [issue](https://github.com/autoNumeric/autoNumeric/issues/new) and we'll add it as soon as possible!)*
+- Very **high configurability** (more than 59 [options](https://autonumeric.org/docs/configuration-options) available)
+- User experience oriented ; using autoNumeric just **feels right and natural**, specially with the [function chaining](https://autonumeric.org/docs/instantiated-methods#function-chaining) feature
+- Supports most [**international**](https://autonumeric.org/docs/predefined-options#predefined-language-options) numeric formats and currencies<br>*(If the one you use is not supported yet, open an [issue](https://github.com/autoNumeric/autoNumeric/issues/new) and we'll add it as soon as possible!)*
 - The mobile Android Chrome browser is partially supported
 
-...and [much more](https://docs.autonumeric.org).
+...and [much more](https://autonumeric.org/docs).
 
 All in all, AutoNumeric supports most international numeric formats and currencies including those used in Europe, Asia, and North and South America.
 
 ****
 
 ### Documentation
-The documentation previously shown in that readme has now been moved to a specific web page where it's much more user-friendly; you can check it out on [https://docs.autonumeric.org](https://docs.autonumeric.org).
+The documentation previously shown in that readme has now been moved to a specific web page where it's much more user-friendly; you can check it out on [https://autonumeric.org/docs](https://autonumeric.org/docs).
 
 #### Tools
-For checking the official AutoNumeric website, you can take a look at [http://autonumeric.org](http://autonumeric.org). On this website you'll find additional tools for instance to generate your options configuration.
+For checking the official AutoNumeric website, you can take a look at [https://autonumeric.org](https://autonumeric.org). On this website you'll find additional tools for instance to generate your options configuration.
 
 ****
 
@@ -56,7 +56,7 @@ AutoNumeric is an [MIT](http://opensource.org/licenses/MIT)-licensed open source
 
 ### Support
 AutoNumeric is partly created using the [JetBrains IDE](https://www.jetbrains.com/community/opensource/#support), which kindly provided access to its tools to the developers for a couple of years.<br>
-If you feel AutoNumeric is useful to you, please consider [supporting](https://docs.autonumeric.org/Documentation/support/) the project.
+If you feel AutoNumeric is useful to you, please consider [supporting](https://autonumeric.org/docs/support) the project.
 
 ### Contributors
 **Thanks** to all the contributors over the years for making AutoNumeric a reality!

@@ -402,6 +402,43 @@ describe('webdriver.io page', () => {
 });
 */
 
+describe('AMD loader compatibility', () => {
+    it('should expose AutoNumeric when imported after an AMD loader', async () => {
+        await browser.url(testUrl);
+        const result = await browser.executeAsync(done => {
+            const frame = document.createElement('iframe');
+            frame.complete = value => {
+                frame.remove();
+                done(value);
+            };
+            // A fresh frame prevents the page's existing AutoNumeric global from hiding the regression.
+            frame.srcdoc = `<input><script type="module">
+                let amdFactory;
+                const define = window.define = (dependencies, factory) => { amdFactory = factory; };
+                define.amd = {};
+                try {
+                    await import('/autonumeric');
+                    const input = document.querySelector('input');
+                    const instance = new window.AutoNumeric(input, '1234.56', {
+                        digitGroupSeparator: ',', decimalCharacter: '.', decimalPlaces: 2,
+                    });
+                    const result = {
+                        value: input.value,
+                        sameConstructor: amdFactory() === window.AutoNumeric,
+                        sameDefine: window.define === define,
+                    };
+                    instance.remove();
+                    window.frameElement.complete(result);
+                } catch (error) {
+                    window.frameElement.complete({ error: error.message });
+                }
+            </script>`;
+            document.body.appendChild(frame);
+        });
+        expect(result).toEqual({ value: '1,234.56', sameConstructor: true, sameDefine: true });
+    });
+});
+
 describe('webdriver.io runner', () => {
     it(`should be able to send basic keys to basic inputs (which we'll use later for copy-pasting text strings)`, async () => {
         await browser.url(testUrl);
